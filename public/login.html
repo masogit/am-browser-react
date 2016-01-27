@@ -47,7 +47,7 @@
                             <label>Password</label>
                             <input type="password" class="form-control" placeholder="Password" ng-model="formData.password">
                         </div>
-                        <uib-alert ng-repeat="alert in alerts" dismiss-on-timeout="2000"
+                        <uib-alert ng-repeat="alert in alerts" dismiss-on-timeout="5000"
                                    type="{{alert.type}}" close="closeAlert($index)">
                             {{alert.msg}}
                         </uib-alert>

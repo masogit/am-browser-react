@@ -56,23 +56,23 @@ module.exports = function (app) {
     });
 
     function getMetadata(url, callback) {
-            if (metadata) {
-                console.log("query url: " + url);
+        if (metadata) {
+            console.log("query url: " + url);
 
-                var metalist = metadata.find({ 'url': { '$eq': url } });
-                // console.log("metalist: " + JSON.stringify(metalist[0].url));
-                if (metalist && metalist.length > 0) {
-                    return metalist[0];
-                    console.log("return url data: ");
-                }
-                else{
-                    console.log("not find url in Collection: ");
-                    return null;
-                }
-            } else {
-                console.log("not found Collection: ");
+            var metalist = metadata.find({ 'url': { '$eq': url } });
+            // console.log("metalist: " + JSON.stringify(metalist[0].url));
+            if (metalist && metalist.length > 0) {
+                return metalist[0];
+                console.log("return url data: ");
+            }
+            else {
+                console.log("not find url in Collection: ");
                 return null;
             }
+        } else {
+            console.log("not found Collection: ");
+            return null;
+        }
     }
 
     function saveMetadata(url, data) {
@@ -150,23 +150,25 @@ module.exports = function (app) {
 
         var url_str = "http://" + req.body.server + req.body.context + req.body.metadata;
         var metadata = getMetadata(url_str);
-            if (metadata && metadata.data)
-                res.json(metadata.data);
-            else {
-                request = client.get(url, args, function (data, response) {
-                    parseString(data, function (err, result) {
-                        //                console.log("meta data json: " + JSON.stringify(result));
-                        res.json(result);
-                        metadata = result;
-                        saveMetadata(url_str, metadata);
-                    });
+        if (metadata && metadata.data)
+            res.json(metadata.data);
+        else {
+            request = client.get(url, args,function (data, response) {
+                parseString(data, function (err, result) {
+                    //                console.log("meta data json: " + JSON.stringify(result));
+                    res.json(result);
+                    metadata = result;
+                    saveMetadata(url_str, metadata);
+                });
+            }).on('error', function (err) {
+                    res.status(500).send(err.toString());
                 });
 
-                request.on('error', function (err) {
-                    console.log('request error: ' + err);
-                });
-            }
-        });
+            request.on('error', function (err) {
+                console.log('request error: ' + err);
+            });
+        }
+    });
 
     // AM REST -------------------------------------------------------------
     app.post('/am/rest', function (req, res) {
@@ -187,9 +189,11 @@ module.exports = function (app) {
         };
 
         if (req.body.method == "get") {
-            request = client.get(url, args, function (data, response) {
+            request = client.get(url, args,function (data, response) {
                 res.send(data);
-            });
+            }).on('error', function (err) {
+                    res.status(500).send(err.toString());
+                });
             console.log("request.options: " + JSON.stringify(request.options));
             request.on('error', function (err) {
                 console.log('request error: ' + err);
@@ -257,11 +261,11 @@ module.exports = function (app) {
     app.get('/m', function (req, res) {
         res.sendfile('./public/mobile/index.html');
     });
-    
+
     app.get('/login', function (req, res) {
         res.sendfile('./public/login.html');
     });
-        
+
     app.get('/', function (req, res) {
         res.sendfile('./public/login.html');
     });
