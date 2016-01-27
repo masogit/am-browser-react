@@ -42,6 +42,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
         var form = clone($scope.formData);
         form['ref-link'] = "db/amEmplDept";
         form.param.filter = "UserLogin='" + form.user.trim() + "'";
+        $scope.logining = true;
         $http.post('/am/rest', form).success(function (data) {
             if (data instanceof Object) {
                 $scope.store();
@@ -51,13 +52,14 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
                     type: 'danger',
                     msg: 'Username or password incorrect!'
                 });
-
+                $scope.logining = false;
             }
         }).error(function (data) {
                 $scope.alerts.push({
                     type: 'danger',
                     msg: 'Server can not be reached!'
                 });
+                $scope.logining = false;
             });
     };
 
