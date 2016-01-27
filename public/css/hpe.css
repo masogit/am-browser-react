@@ -1,0 +1,170 @@
+@font-face {
+    font-family: 'Metric';
+    src: url('/fonts/MetricWeb-Regular.eot'),
+         url('/fonts/MetricWeb-Regular.woff') format('woff');
+         /*url('fonts/EntezareZohoor2.ttf') format('truetype'),*/
+         /*url('fonts/EntezareZohoor2.svg') format('svg');*/
+    /*font-weight: normal;*/
+    /*font-style: normal;*/
+
+}
+
+.nav-pills > li.active > a, .nav-pills > li.active > a:focus, .nav-pills > li.active > a:hover {
+    background-color: #01A982;
+}
+
+.navbar-inverse {
+    background-color: #425563;
+    border-color: #080808;
+}
+
+a {
+    color: #5F7A76;
+}
+
+a:focus, a:hover {
+    color: #5F7A76;
+}
+
+.panel-default > .panel-heading .badge {
+    color: #FFF;
+    background-color: #617C91;
+}
+
+
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+    color: #425563;
+}
+body {
+    color: #767676;
+    font-family: Metric, Fallback, sans-serif;
+    font-size: 150%;
+}
+
+.form-control {
+    color: #767676;
+}
+
+.nav-pills > li > a {
+    border-radius: 0px;
+}
+
+.form-control {
+    border-radius: 0px;
+}
+
+.btn {
+    border-radius: 0px;
+}
+
+.badge {
+    color: #FFF;
+    border-radius: 0px;
+    background-color: #5F7A76;
+}
+
+.panel-default > .panel-heading .badge {
+    background-color: #5F7A76;
+}
+
+.panel {
+    border-radius: 0px;
+}
+
+.modal-content {
+    border-radius: 0px;
+}
+
+.pagination > li > a:focus, .pagination > li > a:hover, .pagination > li > span:focus, .pagination > li > span:hover {
+    color: #01A982;
+}
+
+.pagination > li > a, .pagination > li > span {
+    color: #01A982;
+}
+
+.navbar {
+    border-radius: 0px;
+}
+
+.navbar-app .btn-navbar, .navbar-app .btn {
+    color: #FFF;
+}
+
+.btn-group > .btn-default.active, .btn-group > .btn-default.active:focus {
+    color: #FFF;
+    background-color: #01A982;
+    border-color: #080808;
+}
+
+.navbar-app {
+    color: #FFF;
+    background-color: #425563;
+}
+
+.btn-primary {
+    color: #FFF;
+    background-color: #01A982;
+    border-color: #01A982;
+}
+
+.btn-primary:hover {
+    color: #FFF;
+    background-color: #2AD2C9;
+    border-color: #2AD2C9;
+}
+
+.btn-danger {
+    color: #FFF;
+    background-color: #F04953;
+    border-color: #F04953;
+}
+
+.switch.active {
+    background-color: #2AD2C9;
+    border: 1px solid #2AD2C9;
+}
+
+.switch.active .switch-handle {
+    border-color: #2AD2C9;
+}
+
+.panel-group .panel {
+    border-radius: 0px;
+}
+
+.panel-group .panel + .panel {
+    margin-top: 0px;
+}
+
+.panel-default > .panel-heading {
+    border-color: #FFF;
+}
+
+.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:focus, .navbar-inverse .navbar-nav > .active > a:hover {
+    color: #FFF;
+    background-color: #425563;
+    border-bottom: 3px solid #01A982;
+}
+
+.navbar-nav > li > a {
+    padding-bottom: 12px;
+}
+
+.selected {
+    border-left: 5px solid #2AD2C9;
+}
+
+.panel-body{
+    overflow-x: auto;
+}
+
+.thumbnail {
+    border-radius: 0px;
+    border-top: 4px solid #425563;
+}
+
+.thumbnail:hover {
+    border-radius: 0px;
+    border-top: 4px solid #2AD2C9;
+}

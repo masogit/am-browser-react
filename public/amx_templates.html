@@ -1,0 +1,30 @@
+<div ng-show="templates" full-height="140">
+
+    <table class="table table-striped" ng-show="templates">
+        <!--<thead>-->
+        <!--<tr>-->
+            <!--<th>View Name</th>-->
+            <!--&lt;!&ndash;<th ng-click="tempAction=!tempAction">Table Name</th>&ndash;&gt;-->
+            <!--<th ng-show="tempAction">Actions</th>-->
+        <!--</tr>-->
+        <!--</thead>-->
+        <tbody>
+        <tr ng-repeat="temp in templates|orderBy:'-last.time'" ng-class="{selected: templates['selected']==temp['$loki']}" ng-click="backTableList();loadOneTemp(temp)">
+            <td><a>{{ temp.name }}</a>
+                <small class="badge pull-right">{{temp.last.count}}</small>
+                <h6>
+                    <small class="pull-left">{{ temp.description }}</small>
+                    <small class="pull-right">{{temp.last.time | date:'yyyy-MM-dd HH:mm:ss'}}</small></h6>
+                <!--<small class="badge">{{temp.last.count}}</small>-->
+            </td>
+            <!--<td>{{ temp['$']['sqlname'] }}</td>-->
+            <td ng-show="tempAction">
+                <!--<a ng-click="queryRootByTemp(temp)" class="badge"><span class="glyphicon glyphicon-eye-open"></span>-->
+                    <!--Query</a>-->
+                <a ng-click="removeTemplate(temp)" class="badge"><span class="glyphicon glyphicon-trash"></span>
+                    Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

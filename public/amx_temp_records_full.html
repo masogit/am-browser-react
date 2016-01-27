@@ -1,0 +1,53 @@
+<div ng-show="tempRecords">
+    <div class="{{(tempRecords.showDetail)?'col-md-9':'col-md-12'}}">
+        <a ng-click="backTableList()" class="badge"><span class="glyphicon glyphicon-chevron-left"></span></a> Back
+        <small style="padding-left: 20px" ng-show="tempRecords.timeEnd1">
+            Count: {{ tempRecords.count }}
+            Elapsed time: {{ tempRecords.timeEnd1 - tempRecords.timeStart1 }}ms
+        </small>
+        <a class="pull-right badge" ng-click="tempRecords.showDetail=!tempRecords.showDetail">
+            <span class="glyphicon glyphicon glyphicon-step-{{(tempRecords.showDetail)?'forward':'backward'}}"></span>
+        </a>
+
+        <span class="text-center" ng-show="tempRecords.loading1">Loading....</span>
+    </div>
+
+    <div class="{{(tempRecords.showDetail)?'col-md-9':'col-md-12'}}" full-height="130">
+        <table class="table table-striped" ng-show="tempRecords">
+            <thead ng-repeat="e in tempRecords.records" ng-if="$first">
+                <tr>
+                    <th>
+                        <a ng-click="order('self')">Self
+                            <span class="glyphicon glyphicon-arrow-up" ng-show="predicate=='self' && !reverse"></span>
+                            <span class="glyphicon glyphicon-arrow-down" ng-show="predicate=='self' && reverse"></span>
+                        </a>                        
+                    </th>
+                    <th ng-repeat="(key, value) in e" ng-show="!(key==('self')||key==('ref-link'))">
+                        <a ng-click="order(key)">{{ getCaptionByTemp(key, tempTable, tempTable.showLabel) }}
+                            <span class="glyphicon glyphicon-arrow-up" ng-show="predicate==key && !reverse"></span>
+                            <span class="glyphicon glyphicon-arrow-down" ng-show="predicate==key && reverse"></span>
+                        </a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="record in tempRecords.records|filter:globalSearch|orderBy:predicate:reverse" 
+                    ng-class="{selected: tempRecords['selected']==record['ref-link']}"
+                    ng-click="getRecordByTemp(record, tempRecords, true)">
+                    <td>
+                        <a ng-click="showRelations(record)">
+                            <span class="glyphicon glyphicon-zoom-in"></span> {{ record['self'] }}
+                        </a>
+                    </td>
+                    <td ng-repeat="(key, value) in record" ng-show="!(key==('self')||key==('ref-link'))">
+                        {{ formatValue(key, value) }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-3" ng-show="tempRecord && !tableData && !relations && tempRecords.showDetail" full-height="130">
+        <div ng-show="tempRecord" ng-include="'/amx_temp_record.html'"></div>
+    </div>
+
+</div>

@@ -1,0 +1,26 @@
+<!--<ol class="breadcrumb" ng-show="breadcrumb.length > 0">-->
+    <!--<li>Goto:</li>-->
+    <!--<li ng-repeat="b in breadcrumb">-->
+        <!--<a href="#" ng-click="useBreadcrumb(b)">{{b.label}}</a>-->
+    <!--</li>-->
+<!--</ol>-->
+<form class="navbar-form navbar-left" ng-show="serverbar">
+    <input type="text" class="form-control" placeholder="Limit" ng-model="formData.server">
+    <input type="text" class="form-control" placeholder="Limit" ng-model="formData.user" size="7">
+    <input type="password" class="form-control" placeholder="Password" ng-model="formData.password"
+           size="7">
+    <button class="btn" type="button" ng-click="store()">Save</button>
+</form>
+<form class="navbar-form navbar-left" ng-show="navbar">
+    <input type="text" class="form-control" placeholder="Limit" ng-model="formData.param.limit"
+           size="1">
+    <input type="text" class="form-control" placeholder="Pos" ng-model="formData.param.offset"
+           size="1">
+    <input type="text" class="form-control" placeholder="AQL Filter..." ng-model="formData.param.filter"
+           size="50">
+    <input type="text" class="form-control" placeholder="Order By..." ng-model="formData.param.orderby"
+           size="30">
+    <button class="btn" type="button" ng-click="query()">Query</button>
+</form>
+
+<pre ng-show="message" class="container"><label class="text-danger"><a ng-click="clearMsg()">X</a> {{ message }}</label></pre>

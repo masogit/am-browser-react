@@ -1,0 +1,32 @@
+<div ng-show="tempRecords">
+    <!--<h4><strong>{{tempRecords.name}} </strong>
+        <small>{{tempRecords['$']['sqlname']}} ({{ tempRecords.count }})</small>
+    </h4>
+    <hr>-->
+    <table class="table table-striped" ng-show="tempRecords">
+        <thead>
+        <tr>
+            <th>
+                {{tempRecords['$']['sqlname']}} ({{ tempRecords.count }})
+                <span class="text-center" ng-show="tempRecords.loading1">Loading....</span>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                <input type="text" class="form-control" placeholder="Search ..." ng-model="tempRecords.search.self">
+            </td>
+        </tr>
+        <tr ng-repeat="record in tempRecords.records | filter: tempRecords.search.self"
+            ng-class="{selected: tempRecords['selected']==record['ref-link']}"
+            ng-click="getRecordByTemp(record, tempRecords, true)">
+            <td>
+                <a ng-click="showRelations(record)"><span class="glyphicon glyphicon-zoom-in"></span></a>
+                {{ record['self'] }}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>

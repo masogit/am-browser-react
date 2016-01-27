@@ -1,0 +1,139 @@
+<!doctype html>
+<html ng-app="am">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AM Browser</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/hpe.css"/>
+    <link rel="shortcut icon" href="/img/favicon.png" type="image/x-icon"/>
+    <link rel="apple-touch-icon" href="/img/favicon.png" type="image/x-icon"/>
+    <script src="/js/lib/angular.min.js"></script>
+    <script src="/js/lib/ui-bootstrap-tpls-0.14.3.min.js"></script>
+    <script src="/js/lib/angular-route.min.js"></script>
+    <script src="/js/lib/mobile-angular-ui.min.js"></script>
+    <script src="/js/lib/mobile-angular-ui.gestures.min.js"></script>
+    <script src="/js/controllers/amx.js"></script>
+    <script src="/js/controllers/am_modal.js"></script>
+
+</head>
+<!-- SET THE CONTROLLER -->
+
+<body ng-controller="amCtl">
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <img src="/img/22 icon.png" class="pull-left" style="padding-top: 6px; margin-right: 10px;">
+            <a class="navbar-brand" href="#" style="font-size: 150%;"> {{ title }}
+                <span style="font-size: 50%">({{ formData.server }})</span>
+            </a>
+        </div>
+        <ul class="nav navbar-nav" style="padding-left: 50px" ng-init="module='explorer'">
+            <li ng-click="module='explorer'; backTableList()" ng-class="{active: module=='explorer'}"><a>Explorer</a></li>
+            <li ng-click="module='builder'" ng-class="{active: module=='builder'}"><a>Builder</a></li>
+            <li ng-click="module='slo'" ng-class="{active: module=='slo'}"><a>SLO</a></li>
+        </ul>
+        <div class="navbar-collapse collapse">
+            <form class="navbar-form navbar-right" ng-show="serverbar">
+                <!--<input type="text" class="form-control" placeholder="Server and port" ng-model="formData.server">
+                <input type="text" class="form-control" placeholder="Username" ng-model="formData.user" size="7">
+                <input type="password" class="form-control" placeholder="Password" ng-model="formData.password" size="7">-->
+                Limit:
+                <input type="text" class="form-control" placeholder="Limit" ng-model="formData.param.limit" size="1">
+                Offset:
+                <input type="text" class="form-control" placeholder="Pos" ng-model="formData.param.offset" size="1">
+                Page:
+                <input type="text" class="form-control" placeholder="Page" ng-model="formData.pageSize" size="1">
+                <input type="checkbox" ng-model="formData.showLabel"> Label
+                <!--<input type="checkbox" ng-model="formData.showError"> Error-->
+                <button class="btn" type="button" ng-click="store()">Save</button>
+            </form>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" ng-click="serverbar=!serverbar">Setting
+                        <!--<span class="glyphicon glyphicon-cog"></span> Setting-->
+                        <span class="glyphicon glyphicon-menu-right" ng-show="serverbar"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" ng-click="formData.showError=!formData.showError">
+                        Error
+                        <span class="badge" style="background-color: #F04953"
+                              ng-show="formData.showError || alerts.length>0">
+                            {{alerts.length}}
+                        </span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" ng-click="logout()">Exit</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<uib-alert ng-show="formData.showError" ng-repeat="alert in alerts"
+           type="{{alert.type}}" close="closeAlert($index)" class="container">
+    {{alert.msg}}
+</uib-alert>
+
+<div class="container-fluid" ng-hide="formData.showError && alerts.length>0">
+    <div class="container" ng-show="module=='explorer'">
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                <input type="text" ng-show="!relations" class="form-control" ng-model="globalSearch" placeholder="Search ...">
+            </div>
+        </div>
+
+        <div ng-show="!tempRecords" class="col-md-3" style="height: 150px;padding-top: 30px; margin-bottom: 20px"
+             ng-repeat="temp in templates|orderBy:'-last.time'|filter:globalSearch">
+                <span class="thumbnail" ng-click="backTableList();loadOneTemp(temp)">
+                    <h4 style="padding-left: 10px">{{ temp.name }}
+                        <strong class="badge pull-right">{{temp.last.count}}</strong>
+                    </h4>
+
+                    <small class="pull-left">{{ temp.description }}</small>
+
+                    <h6 style="padding-top: 90px;">
+                        <small class="pull-right">{{temp.last.time | date:'yyyy-MM-dd HH:mm:ss'}}</small>
+                    </h6>
+                </span>
+        </div>
+
+
+    </div>
+    <div ng-show="module=='explorer' && tempRecords && !relations" ng-include="'amx_temp_records_full.html'"></div>
+    <div class="col-md-12" ng-show="relations" ng-include="'amx.relations.html'"></div>
+    <div class="row" ng-show="module=='slo'"></div>
+    <div class="row" ng-show="module=='builder'">
+        <!--   nav bar -->
+
+
+        <div class="col-md-3" ng-show="!relations">
+            <ul class="nav nav-pills nav-justified" ng-init="tab='templates'">
+                <li ng-class="{active: tab=='templates'}"><a ng-click="tab='templates'">Views</a></li>
+                <li ng-class="{active: tab=='tables'}"><a ng-click="tab='tables'">Tables</a></li>
+            </ul>
+            <br>
+
+            <div ng-include="'amx_templates.html'" ng-init="loadTemplates()" ng-show="tab=='templates'"></div>
+            <div ng-include="'amx_tree.html'" ng-init="metadata('all')" ng-show="tab=='tables'"></div>
+        </div>
+
+
+        <div class="col-md-9" ng-show="tableData && !relations" ng-include="'amx_records.html'"></div>
+
+        <div class="col-md-3" ng-show="tempTable && !tableData && !relations" ng-include="'amx_temp_edit.html'"></div>
+        <div class="col-md-3" ng-show="tempRecords && !tableData && !relations"
+             ng-include="'amx_temp_records.html'" full-height="85"></div>
+        <div class="col-md-3" ng-show="tempRecord && !tableData && !relations"
+             ng-include="'amx_temp_record.html'" full-height="85"></div>
+
+    </div>
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,42 @@
+<!--<h4><strong>{{tempRecord.name}} </strong>
+    <small>Elapsed time: {{ tempRecord.timeEnd - tempRecord.timeStart }}ms</small>
+</h4>
+<hr>-->
+<div ng-show="tempRecord" ng-include="'amTempRecord'"></div>
+
+<script type="text/ng-template" id="amTempRecord">
+
+    <span style="display: none">{{table = (isStructure) ? l.table: (t)?t:tempRecord }}</span>
+
+    <h5>
+        <small>
+            <span class="glyphicon glyphicon-eye-close" ng-click="table.showSelf=!table.showSelf"
+                  ng-show="!table.showSelf"></span>
+            <span class="glyphicon glyphicon-eye-open" ng-click="table.showSelf=!table.showSelf"
+                  ng-show="table.showSelf"></span>
+        </small>
+        {{ (tempTable.showLabel)?(l['$']['label']) ? l['$']['label'] : table['$']['sqlname']:(l['$']['sqlname']) ?
+        l['$']['sqlname'] : table['$']['sqlname'] }}
+        <small>({{ table['ID'] }})</small>
+        <small class="pull-right" ng-show="!l">Elapsed time: {{ tempRecord.timeEnd - tempRecord.timeStart }}ms</small>
+    </h5>
+
+    <ul ng-show="!table.showSelf">
+        <li ng-repeat="f in table.field"><strong>{{(f.aliasName)?f.aliasName:(tempTable.showLabel)?f['$']['label']:f['$']['sqlname']}}:</strong>
+            {{ formatValue(f['$']['sqlname'], f.data) }}
+        </li>
+    </ul>
+
+    <span ng-show="!table.showSelf" ng-repeat="l in table.link">
+        <div ng-show="l.table && l['$']['card11']=='yes'" ng-include="'amTempRecord'" style="padding-left: 20px"
+             ng-init="isStructure=true"></div>
+        <div ng-show="l.tables && !l['$']['card11']" style="padding-left: 20px">
+            <a ng-click="l.showChild=!l.showChild" ng-show="!l.showChild"><span class="glyphicon glyphicon-plus"></span></a>
+            <a ng-click="l.showChild=!l.showChild" ng-show="l.showChild"><span class="glyphicon glyphicon-minus"></span></a>
+            {{l['$']['sqlname']}} ({{l.tables.length}})
+            <div ng-show="l.showChild" ng-repeat="t in l.tables" ng-include="'amTempRecord'" style="padding-left: 18px"
+                 ng-init="isStructure=false"></div>
+        </div>
+    </span>
+
+</script>
