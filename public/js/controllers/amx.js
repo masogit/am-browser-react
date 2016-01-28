@@ -750,10 +750,13 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
 
             $http.post('/am/rest', record.form).success(function (data) {
                 if (data instanceof Object) {
-                    if (data.entities)
+                    if (data.entities){
                         record.records = data.entities;
-                    else if (data)
+                        record.count = data.count;
+                    } else if (data){
                         record.records = [data];
+                        record.count = 1;
+                    }
                 } else {
 
                     $scope.alerts.push({

@@ -21,7 +21,7 @@
                 <li role="presentation" ng-repeat="r in childs" ng-class="{active: r.active}"
                     ng-show="r.records.length>0"
                     ng-init="getRecords(r)">
-                    <a ng-click="r.active=!r.active">{{ r.link }}<span class="badge">{{r.records.length}}</span></a>
+                    <a ng-click="r.active=!r.active">{{ r.link }}<span class="badge">{{r.count}}</span></a>
                 </li>
             </ul>
         </div>
