@@ -55,12 +55,12 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
                 $scope.logining = false;
             }
         }).error(function (data) {
-                $scope.alerts.push({
-                    type: 'danger',
-                    msg: 'Server can not be reached!'
-                });
-                $scope.logining = false;
+            $scope.alerts.push({
+                type: 'danger',
+                msg: 'Server can not be reached!'
             });
+            $scope.logining = false;
+        });
     };
 
     $scope.logout = function () {
@@ -528,7 +528,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
         delete $scope.tempTable;
     };
 
-    $scope.queryRootByTemp = function (temp) {
+    $scope.queryRootByTemp = function (temp, keyword) {
 
         var template = clone(temp);
         var form = clone($scope.formData);
@@ -539,8 +539,19 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
         //for (var i in template.field) {
         //    form.param.fields.push(template.field[i]["$"]["sqlname"]);
         //}
-        if (template.AQL)
-            form.param.filter = template.AQL;
+        if (template.AQL) {
+            if (keyword) {
+                var AQL = [];
+                template.fields.forEach(function(obj){
+                    AQL.push(obj + " like '%" + keyword + "%'");
+                });
+
+                var AQL = AQL.join(" OR ");
+
+                form.param.filter = template.AQL + " AND (" + AQL + ")";
+            } else
+                form.param.filter = template.AQL;
+        }
 
         $scope.tempRecords = template;
         $scope.tempRecords['timeStart1'] = Date.now();
@@ -750,10 +761,10 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
 
             $http.post('/am/rest', record.form).success(function (data) {
                 if (data instanceof Object) {
-                    if (data.entities){
+                    if (data.entities) {
                         record.records = data.entities;
                         record.count = data.count;
-                    } else if (data){
+                    } else if (data) {
                         record.records = [data];
                         record.count = 1;
                     }
@@ -771,6 +782,12 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
 
                 }
             });
+        }
+    };
+
+    $scope.dbSearch = function (keyword) {
+        if ($scope.tempTable) {
+            $scope.queryRootByTemp($scope.tempTable, keyword);
         }
     };
 
@@ -939,6 +956,21 @@ am.filter('range', function () {
         return input;
     };
 });
+
+am.directive('myEnter', function () {
+    return function (scope, element, attrs) {
+        element.bind("keydown keypress", function (event) {
+            if (event.which === 13) {
+                scope.$apply(function () {
+                    scope.$eval(attrs.myEnter);
+                });
+
+                event.preventDefault();
+            }
+        });
+    };
+});
+
 
 function clone(obj) {
     var o;
