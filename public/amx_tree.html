@@ -5,7 +5,7 @@
         <input type="text" placeholder="Search table..." class="form-control" ng-show="!formData.showLabel" ng-model="tableSearch.id">
         <input type="text" placeholder="Search table..." class="form-control" ng-show="formData.showLabel" ng-model="tableSearch.Label">
     </div>
-    <div class="panel-body" full-height="200">
+    <div class="panel-body" full-height="201">
         <ul class="nav sidebar">
             <li ng-repeat="table in metadata.tables | filter: tableSearch">
                 <a href="#" ng-click="metadata(table.id)">{{ (!formData.showLabel) ? table.id : table.Label }} 

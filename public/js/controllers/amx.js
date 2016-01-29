@@ -127,14 +127,21 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
         $scope.hiddenRelations();
     };
 
+    $scope.aqlQuery = function (form, aql){
+        var form = clone(form);
+        form['ref-link'] = aql.tableName;
+        form.collection = aql.fields.split(",") + " Where " + aql.where;
+        delete form.param;
+        $scope.query(form);
+    };
+
     // amx_record query
     $scope.query = function (form) {
         $scope.loading = true;
         $scope.tableData = {};
-
+        $scope.tableName = form["ref-link"].split("/")[1];
         // if param is query form, use it
         var form = form ? form : clone($scope.formData);
-        $scope.tableName = form["ref-link"].split("/")[1];
 
         form.method = "get";
         var timeStart = Date.now();
@@ -151,6 +158,13 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
                     $scope.tableData.entities.push(data);
                 }
                 $scope.tableData.form = form;
+
+                $scope.tableData.aql = {
+                    tableName: "aql/" + $scope.tableName + "/",
+                    where: form.param.filter,
+                    fields: form.param.fields.join(",")
+                };
+
             } else {
 
                 $scope.alerts.push({

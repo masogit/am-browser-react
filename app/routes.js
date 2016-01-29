@@ -190,7 +190,15 @@ module.exports = function (app) {
 
         if (req.body.method == "get") {
             request = client.get(url, args,function (data, response) {
-                res.send(data);
+                var prefix = req.body['ref-link'].split("/")[0];
+                if (prefix == "db") {
+                    res.send(data);
+                } else if (prefix == "aql") {
+                    parseString(data, function (err, result) {
+                        res.json(result);
+                    });
+                }
+//                res.send(data);
             }).on('error', function (err) {
                     res.status(500).send(err.toString());
                 });

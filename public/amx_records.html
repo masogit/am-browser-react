@@ -1,7 +1,8 @@
 <h4><strong>{{ tableName }} </strong>
     <small>
-        <a ng-click="query(tableData.form)"><span class="glyphicon glyphicon-refresh"></span></a>
-        <a ng-click="tableData.aqlEdit=!tableData.aqlEdit"><span class="glyphicon glyphicon-pencil"></span></a>
+        <a ng-click="query(tableData.form)" class="badge"><span class="glyphicon glyphicon-refresh"></span></a>
+        <a ng-click="tableData.restEdit=!tableData.restEdit" class="badge"><span class="glyphicon glyphicon-pencil"></span></a>
+        <a ng-click="tableData.aqlEdit=!tableData.aqlEdit" class="badge">AQL</a>
         <small>Count: {{ tableData.count }} Elapsed time: {{ tableData.timeEnd - tableData.timeStart }}ms</small>
     </small>
     <small class="pull-right">
@@ -16,12 +17,18 @@
 
 <div full-height="185">
     <span class="text-center" ng-show="loading">Loading....</span>
-    <form class="form-inline" ng-show="tableData.aqlEdit">
+    <form class="form-inline" ng-show="tableData.restEdit">
         <input class="form-control" type="text" placeholder="Limit" ng-model="tableData.form.param.limit" size="1">
         <input class="form-control" type="text" placeholder="Pos" ng-model="tableData.form.param.offset" size="1">
         <input class="form-control" type="text" placeholder="AQL Filter..." ng-model="tableData.form.param.filter" size="30">
         <input class="form-control" type="text" placeholder="Order By..." ng-model="tableData.form.param.orderby" size="20">
         <button class="btn" ng-click="query(tableData.form)">Query</button>
+    </form>
+    <form class="form-inline" ng-show="tableData.aqlEdit">
+        <input class="form-control" type="text" placeholder="Table Name" ng-model="tableData.aql.tableName">
+        <input class="form-control" type="text" placeholder="Fields..." ng-model="tableData.aql.fields">
+        <input class="form-control" type="text" placeholder="Where, group, order by" ng-model="tableData.aql.where" size="30">
+        <button class="btn" ng-click="aqlQuery(tableData.form, tableData.aql)">Query</button>
     </form>
     <table class="table table-striped">
         <thead>
