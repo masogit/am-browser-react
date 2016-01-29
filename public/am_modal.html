@@ -2,6 +2,7 @@
 
 <!-- ASSIGN OUR ANGULAR MODULE -->
 <html ng-app="am">
+
 <head>
     <!-- META -->
     <meta charset="utf-8">
@@ -12,6 +13,7 @@
 
     <!-- SCROLLS -->
     <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/hpe.css">
 
     <!-- IMPORT -->
     <script src="js/lib/angular.min.js"></script>
@@ -20,63 +22,48 @@
     <!-- SELF -->
     <script src="js/controllers/am.js"></script>
     <script src="js/controllers/am_modal.js"></script>
-    <!-- load up our controller -->
     <style>
         .modal-dialog {
             width: 900px;
         }
-
-        @media only screen and (min-height: 600px) {
-            .modal-body {
-                max-height: 550px;
-                overflow-y: auto;
-            }
-        }
-
-        @media only screen and (min-height: 1000px) {
-            .modal-body {
-                max-height: 850px;
-                overflow-y: auto;
-            }
-        }
     </style>
 </head>
-<!-- SET THE CONTROLLER -->
+
 <body ng-controller="amModalCtrl">
-<div>
     <div class="modal-header">
         <h3 class="modal-title">{{ title }}</h3>
         <label class="text-danger" ng-show="message">
             <a ng-click="clearMsg()">X</a> {{ message }}
         </label>
     </div>
-    <div class="modal-body">
+    <div class="modal-body" full-height="200">
         <table class="table table-striped">
             <thead>
-            <th>Field</th>
-            <th>Old Value</th>
-            <th>New Value <a ng-click="fill()">(Fill with old values)</a></th>
+                <th>Field</th>
+                <th>Old Value</th>
+                <th>New Value <a ng-click="fill()">(Fill with old values)</a></th>
             </thead>
             <tbody>
-            <tr ng-repeat="(key, value) in recordData" ng-show="key!='ref-link'">
-                <td><strong>{{ key }}</strong></td>
-                <td>{{value}}</td>
-                <td><input type="text" class="form-control" ng-model="modifyData[key]"></td>
-            </tr>
+                <tr ng-repeat="(key, value) in recordData" ng-show="key!='ref-link'">
+                    <td><strong>{{ key }}</strong></td>
+                    <td>{{value}}</td>
+                    <td>
+                        <input type="text" class="form-control" ng-model="modifyData[key]">
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>
     <div class="modal-footer">
         <div class="pull-left">
             <!--<button class="btn btn-primary" type="button" ng-click="fill()">Fill New</button>-->
-            <button class="btn btn-primary" type="button" ng-click="create(modifyData)">Create</button>
-            <button class="btn btn-primary" type="button" ng-click="update(modifyData)">Update</button>
-            <button class="btn btn-primary" type="button" ng-click="delete(recordData)">Delete</button>
+            <button class="btn" type="button" ng-click="create(modifyData)">Create</button>
+            <button class="btn" type="button" ng-click="update(modifyData)">Update</button>
+            <button class="btn" type="button" ng-click="delete(recordData)">Delete</button>
         </div>
-        <button class="btn btn-warning" type="button" ng-click="ok()">Close</button>
+        <button class="btn" type="button" ng-click="ok()">Close</button>
     </div>
 
-</div>
-
 </body>
+
 </html>

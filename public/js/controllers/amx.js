@@ -55,12 +55,12 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
                 $scope.logining = false;
             }
         }).error(function (data) {
-            $scope.alerts.push({
-                type: 'danger',
-                msg: 'Server can not be reached!'
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: 'Server can not be reached!'
+                });
+                $scope.logining = false;
             });
-            $scope.logining = false;
-        });
     };
 
     $scope.logout = function () {
@@ -541,7 +541,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
         //}
         if (keyword) {
             var AQLs = [];
-            template.fields.forEach(function(obj){
+            template.fields.forEach(function (obj) {
                 AQLs.push(obj + " like '%" + keyword + "%'");
             });
 
@@ -549,7 +549,10 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
         }
 
         if (template.AQL) {
+            if (form.param.filter != "")
                 form.param.filter = form.param.filter + " AND " + template.AQL;
+            else
+                form.param.filter = template.AQL;
         }
 
         $scope.tempRecords = template;
