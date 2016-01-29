@@ -80,11 +80,10 @@
 
 <div class="container-fluid" ng-hide="formData.showError && alerts.length>0">
     <div class="container" ng-show="module=='explorer'">
-        <div class="row">
+        <div ng-show="!tempRecords" class="row">
             <div class="col-md-2"></div>
             <div class="col-md-8">
-                <input type="text" ng-show="!relations" class="form-control" ng-model="globalSearch"
-                       my-enter="dbSearch(globalSearch)" placeholder="Search ...">
+                <input type="text" ng-show="!relations" class="form-control" ng-model="globalSearch" placeholder="Search view...">
             </div>
         </div>
 

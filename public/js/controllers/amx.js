@@ -539,18 +539,17 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
         //for (var i in template.field) {
         //    form.param.fields.push(template.field[i]["$"]["sqlname"]);
         //}
+        if (keyword) {
+            var AQLs = [];
+            template.fields.forEach(function(obj){
+                AQLs.push(obj + " like '%" + keyword + "%'");
+            });
+
+            form.param.filter = AQLs.join(" OR ");
+        }
+
         if (template.AQL) {
-            if (keyword) {
-                var AQL = [];
-                template.fields.forEach(function(obj){
-                    AQL.push(obj + " like '%" + keyword + "%'");
-                });
-
-                var AQL = AQL.join(" OR ");
-
-                form.param.filter = template.AQL + " AND (" + AQL + ")";
-            } else
-                form.param.filter = template.AQL;
+                form.param.filter = form.param.filter + " AND " + template.AQL;
         }
 
         $scope.tempRecords = template;
@@ -565,7 +564,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
                 $scope.tempRecords['timeEnd1'] = Date.now();
                 $scope.tempRecords.loading1 = false;
 
-                if (temp.$loki) {
+                if (temp.$loki && !keyword) {
                     temp['last'] = {
                         time: Date.now(),
                         count: data.count

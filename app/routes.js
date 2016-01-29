@@ -35,7 +35,7 @@ module.exports = function (app) {
             temp = db.addCollection("template");
         }
         var obj = req.body;
-        console.log("template insert or update: " + JSON.stringify(obj));
+//        console.log("template insert or update: " + JSON.stringify(obj));
         var data;
         if (obj.$loki)
             data = temp.update(obj);
