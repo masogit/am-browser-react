@@ -14,15 +14,14 @@
     </small>
 </h4>
 
-<span class="text-center" ng-show="loading">Loading....</span>
-
-<div full-height="180">
-    <form class="form-inline">
-        <input class="form-control" ng-show="tableData.aqlEdit" type="text" placeholder="Limit" ng-model="tableData.form.param.limit" size="1">
-        <input class="form-control" ng-show="tableData.aqlEdit" type="text" placeholder="Pos" ng-model="tableData.form.param.offset" size="1">
-        <input class="form-control" ng-show="tableData.aqlEdit" type="text" placeholder="AQL Filter..." ng-model="tableData.form.param.filter" size="30">
-        <input class="form-control" ng-show="tableData.aqlEdit" type="text" placeholder="Order By..." ng-model="tableData.form.param.orderby" size="20">
-        <button class="btn" ng-show="tableData.aqlEdit" ng-click="query(tableData.form)">Query</button>
+<div full-height="185">
+    <span class="text-center" ng-show="loading">Loading....</span>
+    <form class="form-inline" ng-show="tableData.aqlEdit">
+        <input class="form-control" type="text" placeholder="Limit" ng-model="tableData.form.param.limit" size="1">
+        <input class="form-control" type="text" placeholder="Pos" ng-model="tableData.form.param.offset" size="1">
+        <input class="form-control" type="text" placeholder="AQL Filter..." ng-model="tableData.form.param.filter" size="30">
+        <input class="form-control" type="text" placeholder="Order By..." ng-model="tableData.form.param.orderby" size="20">
+        <button class="btn" ng-click="query(tableData.form)">Query</button>
     </form>
     <table class="table table-striped">
         <thead>
