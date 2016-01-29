@@ -130,7 +130,9 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
     $scope.aqlQuery = function (form, aql){
         var form = clone(form);
         form['ref-link'] = aql.tableName;
-        form.collection = aql.fields.split(",") + " Where " + aql.where;
+        form.collection = aql.fields;
+        if (aql.where.trim().length > 0)
+            form.collection += " Where " + aql.where;
         delete form.param;
         $scope.query(form);
     };
@@ -148,21 +150,27 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
         $http.post('/am/rest', form).success(function (data) {
             $scope.loading = false;
             if (data instanceof Object) {
-                if (data.entities instanceof Array)
-                    $scope.tableData = data;
-                else if (data.type == 'Buffer') {
-                    $scope.tableData.count = 0;
+                if (data.Query){
+                    $scope.tableData = data.Query;
+                    $scope.tableData.count = data.Query.Result[0].Row.length;
                 } else {
-                    $scope.tableData.count = 1;
-                    $scope.tableData.entities = [];
-                    $scope.tableData.entities.push(data);
+                    if (data.entities instanceof Array)
+                        $scope.tableData = data;
+                    else if (data.type == 'Buffer') {
+                        $scope.tableData.count = 0;
+                    } else {
+                        $scope.tableData.count = 1;
+                        $scope.tableData.entities = [];
+                        $scope.tableData.entities.push(data);
+                    }                    
                 }
+
                 $scope.tableData.form = form;
 
                 $scope.tableData.aql = {
                     tableName: "aql/" + $scope.tableName + "/",
-                    where: form.param.filter,
-                    fields: form.param.fields.join(",")
+                    where: (form.param) ? form.param.filter : "",
+                    fields: (form.param) ? form.param.fields.join(",") : ""
                 };
 
             } else {

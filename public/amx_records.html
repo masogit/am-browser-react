@@ -1,8 +1,8 @@
 <h4><strong>{{ tableName }} </strong>
     <small>
         <a ng-click="query(tableData.form)" class="badge"><span class="glyphicon glyphicon-refresh"></span></a>
-        <a ng-click="tableData.restEdit=!tableData.restEdit" class="badge"><span class="glyphicon glyphicon-pencil"></span></a>
-        <a ng-click="tableData.aqlEdit=!tableData.aqlEdit" class="badge">AQL</a>
+        <a ng-click="tableData.restEdit=!tableData.restEdit" class="badge"><span class="glyphicon glyphicon-pencil"></span> DB</a>
+        <a ng-click="tableData.aqlEdit=!tableData.aqlEdit" class="badge"><span class="glyphicon glyphicon-pencil"></span> AQL</a>
         <small>Count: {{ tableData.count }} Elapsed time: {{ tableData.timeEnd - tableData.timeStart }}ms</small>
     </small>
     <small class="pull-right">
@@ -30,7 +30,7 @@
         <input class="form-control" type="text" placeholder="Where, group, order by" ng-model="tableData.aql.where" size="30">
         <button class="btn" ng-click="aqlQuery(tableData.form, tableData.aql)">Query</button>
     </form>
-    <table class="table table-striped">
+    <table class="table table-striped" ng-show="tableData.entities">
         <thead>
             <tr ng-repeat="e in tableData.entities" ng-if="$first">
                 <th ng-show="e['ref-link']">
@@ -55,6 +55,22 @@
                 </td>
                 <td ng-repeat="(key, value) in e" ng-show="key!='ref-link'">
                     {{ formatValue(key, value) }}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-striped" ng-show="tableData.Schema">
+        <thead>
+            <tr>
+                <th ng-repeat="col in tableData.Schema[0].Column">
+                    {{ col['$']['Content'] }}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="row in tableData.Result[0].Row">
+                <td ng-repeat="col in row.Column">
+                    {{ col['_'] }}
                 </td>
             </tr>
         </tbody>
