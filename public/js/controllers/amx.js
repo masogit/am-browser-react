@@ -166,7 +166,12 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
             }
             $scope.tableData['timeStart'] = timeStart;
             $scope.tableData['timeEnd'] = Date.now();
-        });
+        }).error(function (data) {
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: data
+                });
+            });
         //        $scope.store();
     };
 
@@ -360,7 +365,12 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
                 }
             }
 
-        });
+        }).error(function (data) {
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: data
+                });
+            });
     };
 
     $scope.expandLink = function (link) {
@@ -488,7 +498,12 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
 
         $http.get('/json/template').success(function (data) {
             $scope.templates = data;
-        });
+        }).error(function (data) {
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: data
+                });
+            });
     };
 
     $scope.loadOneTemp = function (temp) {
@@ -509,7 +524,12 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
             $http.post('/json/template/delete', temp).success(function (data) {
                 $scope.loadTemplates();
                 $scope.tab = "templates";
-            });
+            }).error(function (data) {
+                    $scope.alerts.push({
+                        type: 'danger',
+                        msg: data
+                    });
+                });
 
         $scope.backTableList();
     };
@@ -522,7 +542,12 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
 
             $scope.loadTemplates();
             $scope.tab = "templates";
-        });
+        }).error(function (data) {
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: data
+                });
+            });
 
         $scope.backTableList();
     };
@@ -597,7 +622,12 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
 
             }
 
-        });
+        }).error(function (data) {
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: data
+                });
+            });
 
     };
 
@@ -666,7 +696,12 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
 
                 }
 
-            });
+            }).error(function (data) {
+                    $scope.alerts.push({
+                        type: 'danger',
+                        msg: data
+                    });
+                });
 
     };
 
@@ -786,7 +821,12 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
                     });
 
                 }
-            });
+            }).error(function (data) {
+                    $scope.alerts.push({
+                        type: 'danger',
+                        msg: data
+                    });
+                });
         }
     };
 
