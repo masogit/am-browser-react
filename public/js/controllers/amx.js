@@ -229,9 +229,12 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
             var link = temp.link.filter(function (obj) {
                 return obj['$']['sqlname'] == linkName;
             })[0];
-            var newKey = links.join(".");
-            linkName = (showLabel) ? link['$']['label'] : linkName;
-            return linkName + "." + $scope.getCaptionByTemp(newKey, link.table, showLabel);
+
+            if (link) {
+                var newKey = links.join(".");
+                linkName = (showLabel) ? link['$']['label'] : linkName;
+                return linkName + "." + $scope.getCaptionByTemp(newKey, link.table, showLabel);
+            }
         }
 
     };
