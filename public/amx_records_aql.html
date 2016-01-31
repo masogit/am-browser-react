@@ -1,0 +1,60 @@
+<div class="row">
+    <div class="col-md-9">
+        <textarea class="form-control" ng-model="aqlString" placeholder="AQL..." style="height: 68px"></textarea>
+    </div>
+    <div class="col-md-3">
+        <input type="text" class="form-control" ng-model="aqlAlias" placeholder="AQL alias name">
+        <button class="btn btn-primary form-control" ng-click="aqlQuery(formData, aqlString, aqlAlias)">Query</button>
+    </div>
+</div>
+<h4><strong>{{ tableName }} </strong>
+    <small>
+        <small>Count: {{ aqlData.Result[0].Row.length }} Elapsed time: {{ aqlData.timeEnd - aqlData.timeStart }}ms</small>
+    </small>
+    <small class="pull-right">
+        Search
+        <input type="text" placeholder="Dynamic Search" ng-model="aqlSearch">
+        <!--Page
+        <select ng-model="formData.pageSize" ng-options="o as o for o in [10, 50, 100]">
+        </select>-->
+    </small>
+</h4>
+
+<div full-height="200">
+    <span class="text-center" ng-show="loading">Loading....</span>
+
+    <table class="table table-striped" ng-show="aqlData.Schema">
+        <thead>
+            <tr>
+                <th ng-repeat="col in aqlData.Schema[0].Column">
+                    {{ col['$']['Name'] }}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <!--<tr ng-repeat="row in aqlData.Result[0].Row|filter:aqlSearch|orderBy:predicate:reverse|startFrom:currentPage*formData.pageSize|limitTo:formData.pageSize">-->
+            <tr ng-repeat="row in aqlData.Result[0].Row|filter:aqlSearch">
+                <td ng-repeat="col in row.Column">
+                    {{ col['_'] }}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<!--<nav class="pull-right">
+    <ul class="pagination">
+        <li>
+            <a aria-label="Previous" ng-click="jump((currentPage-1)<0?0:currentPage-1)">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        <li ng-repeat="i in [] |range:aqlData.Result[0].Row.length/formData.pageSize" ng-class="{active: currentPage==i}" ng-click="jump(i)"><a>{{ i + 1 }}</a></li>
+        <li>
+            <a aria-label="Next" ng-click="jump((currentPage+1)>aqlData.Result[0].Row.length/formData.pageSize?currentPage:currentPage+1)">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    </ul>
+</nav>-->

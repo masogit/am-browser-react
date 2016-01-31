@@ -13,6 +13,8 @@ var am = angular.module('am', ['ui.bootstrap', 'ngRoute', 'mobile-angular-ui', '
 
 am.controller('amCtl', function ($scope, $http, $uibModal) {
     var AM_FORM_DATA = "amFormData";
+    var AM_AQL_HIST = "amAQLHist";
+
     $scope.title = "AM Browser";
     $scope.formData = {
         server: "16.165.217.186:8081", // "16.165.217.186:8081",
@@ -32,7 +34,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
         password: "",
 
         pageSize: 10,
-//        showError: false,
+        //        showError: false,
         showLabel: false
     };
 
@@ -55,12 +57,12 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
                 $scope.logining = false;
             }
         }).error(function (data) {
-                $scope.alerts.push({
-                    type: 'danger',
-                    msg: 'Server can not be reached!'
-                });
-                $scope.logining = false;
+            $scope.alerts.push({
+                type: 'danger',
+                msg: 'Server can not be reached!'
             });
+            $scope.logining = false;
+        });
     };
 
     $scope.logout = function () {
@@ -76,7 +78,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
                 password: $scope.formData.password,
                 pageSize: $scope.formData.pageSize,
                 showLabel: $scope.formData.showLabel,
-//                showError: $scope.formData.showError,
+                //                showError: $scope.formData.showError,
                 limit: $scope.formData.param.limit,
                 offset: $scope.formData.param.offset
             };
@@ -93,7 +95,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
         $scope.formData.password = form.password;
         $scope.formData.pageSize = form.pageSize;
         $scope.formData.showLabel = form.showLabel;
-//        $scope.formData.showError = form.showError;
+        //        $scope.formData.showError = form.showError;
         $scope.formData.param.limit = form.limit;
         $scope.formData.param.offset = form.offset;
     }
@@ -126,34 +128,113 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
         $scope.query(form);
         $scope.hiddenRelations();
     };
+    
+    /**
+     * build native AQL query
+     */
+    $scope.loadAQLs = function () {
+        if (localStorage && localStorage[AM_AQL_HIST])
+            $scope.aqlHist = JSON.parse(localStorage.getItem(AM_AQL_HIST));
+    };
+    
+    $scope.loadAQL = function (aql) {
+        $scope.aqlString = aql.str; 
+        $scope.aqlAlias = aql.name; 
+        $scope.selectedAQL = aql.name;
+    };
 
-    $scope.aqlQuery = function (form, aql){
+    $scope.saveAQL = function (name, str) {
+        // init
+        if (!$scope.aqlHist)
+            $scope.aqlHist = [];
+        
+        var aql = $scope.aqlHist.filter(function(obj){
+            return obj.name == name;
+        })[0];
+        
+        if(aql){
+            aql.str=str;
+            aql.time = Date.now();
+        } else {
+            $scope.aqlHist.push({
+                name: name,
+                str: str,
+                time: Date.now()
+            });
+        }
+            
+        if (localStorage) {
+            localStorage.setItem(AM_AQL_HIST, JSON.stringify($scope.aqlHist));
+        }
+
+    };
+
+    $scope.str2AQL = function (str) {
+        var aql = {
+            tableName: "",
+            where: "",
+            fields: ""
+        };
+        
+        // get key word position
+        // todo: check if AQL can contain multipule key words
+        var idx_SELECT = str.toLowerCase().indexOf("select");
+        var idx_FROM = str.toLowerCase().indexOf("from");
+        var idx_WHERE = str.toLowerCase().indexOf("where");
+        
+        // get fields from SELECT .. FROM
+        aql.fields = str.substring(idx_SELECT + 6, idx_FROM).trim();
+        
+        // get tableName from FROM .. WHERE (WHERE is optional)
+        aql.tableName = (idx_WHERE > -1) ? str.substring(idx_FROM + 4, idx_WHERE).trim() : str.substring(idx_FROM + 4).trim();
+        
+        // get where start from WHERE (not include WHERE, where is optional)
+        aql.where = (idx_WHERE < 0) ? "" : str.substring(idx_WHERE + 5).trim();
+
+        return aql;
+    };
+
+    $scope.aqlQuery = function (form, str, name) {
         var form = clone(form);
-        form['ref-link'] = aql.tableName;
+        var aql = $scope.str2AQL(str);
+
+        form['ref-link'] = "aql/" + aql.tableName + "/";
         form.collection = aql.fields;
         if (aql.where.trim().length > 0)
             form.collection += " Where " + aql.where;
-        delete form.param;
         $scope.query(form);
+
+        if (name && name.trim() != "")
+            $scope.saveAQL(name, str);
     };
 
     // amx_record query
     $scope.query = function (form) {
         $scope.loading = true;
-        $scope.tableData = {};
         $scope.tableName = form["ref-link"].split("/")[1];
         // if param is query form, use it
         var form = form ? form : clone($scope.formData);
 
         form.method = "get";
         var timeStart = Date.now();
-        $http.post('/am/rest', form).success(function (data) {
+        
+        // encodeURI
+        var form_encode = clone(form);
+        form_encode.collection = encodeURI(form_encode.collection);
+        form_encode.param.filter = encodeURI(form_encode.param.filter);
+        form_encode.param.fields = encodeURI(form_encode.param.fields);
+
+        $http.post('/am/rest', form_encode).success(function (data) {
             $scope.loading = false;
             if (data instanceof Object) {
-                if (data.Query){
-                    $scope.tableData = data.Query;
-                    $scope.tableData.count = data.Query.Result[0].Row.length;
+                if (data.Query) {
+                    $scope.aqlData = data.Query;
+                    $scope.aqlData.count = data.Query.Result[0].Row.length;
+                    $scope.aqlData['timeStart'] = timeStart;
+                    $scope.aqlData['timeEnd'] = Date.now();
+
                 } else {
+                    $scope.tableData = {};
                     if (data.entities instanceof Array)
                         $scope.tableData = data;
                     else if (data.type == 'Buffer') {
@@ -162,16 +243,12 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
                         $scope.tableData.count = 1;
                         $scope.tableData.entities = [];
                         $scope.tableData.entities.push(data);
-                    }                    
+                    }
+                    // save last query condition
+                    $scope.tableData.form = form;
+                    $scope.tableData['timeStart'] = timeStart;
+                    $scope.tableData['timeEnd'] = Date.now();
                 }
-
-                $scope.tableData.form = form;
-
-                $scope.tableData.aql = {
-                    tableName: "aql/" + $scope.tableName + "/",
-                    where: (form.param) ? form.param.filter : "",
-                    fields: (form.param) ? form.param.fields.join(",") : ""
-                };
 
             } else {
 
@@ -186,14 +263,12 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
                 });
 
             }
-            $scope.tableData['timeStart'] = timeStart;
-            $scope.tableData['timeEnd'] = Date.now();
         }).error(function (data) {
-                $scope.alerts.push({
-                    type: 'danger',
-                    msg: data
-                });
+            $scope.alerts.push({
+                type: 'danger',
+                msg: data
             });
+        });
         //        $scope.store();
     };
 
@@ -388,11 +463,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
             }
 
         }).error(function (data) {
-                $scope.alerts.push({
-                    type: 'danger',
-                    msg: data
-                });
+            $scope.alerts.push({
+                type: 'danger',
+                msg: data
             });
+        });
     };
 
     $scope.expandLink = function (link) {
@@ -521,11 +596,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
         $http.get('/json/template').success(function (data) {
             $scope.templates = data;
         }).error(function (data) {
-                $scope.alerts.push({
-                    type: 'danger',
-                    msg: data
-                });
+            $scope.alerts.push({
+                type: 'danger',
+                msg: data
             });
+        });
     };
 
     $scope.loadOneTemp = function (temp) {
@@ -547,11 +622,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
                 $scope.loadTemplates();
                 $scope.tab = "templates";
             }).error(function (data) {
-                    $scope.alerts.push({
-                        type: 'danger',
-                        msg: data
-                    });
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: data
                 });
+            });
 
         $scope.backTableList();
     };
@@ -565,11 +640,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
             $scope.loadTemplates();
             $scope.tab = "templates";
         }).error(function (data) {
-                $scope.alerts.push({
-                    type: 'danger',
-                    msg: data
-                });
+            $scope.alerts.push({
+                type: 'danger',
+                msg: data
             });
+        });
 
         $scope.backTableList();
     };
@@ -645,11 +720,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
             }
 
         }).error(function (data) {
-                $scope.alerts.push({
-                    type: 'danger',
-                    msg: data
-                });
+            $scope.alerts.push({
+                type: 'danger',
+                msg: data
             });
+        });
 
     };
 
@@ -719,11 +794,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
                 }
 
             }).error(function (data) {
-                    $scope.alerts.push({
-                        type: 'danger',
-                        msg: data
-                    });
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: data
                 });
+            });
 
     };
 
@@ -844,11 +919,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
 
                 }
             }).error(function (data) {
-                    $scope.alerts.push({
-                        type: 'danger',
-                        msg: data
-                    });
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: data
                 });
+            });
         }
     };
 
