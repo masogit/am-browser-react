@@ -57,12 +57,12 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
                 $scope.logining = false;
             }
         }).error(function (data) {
-            $scope.alerts.push({
-                type: 'danger',
-                msg: 'Server can not be reached!'
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: 'Server can not be reached!'
+                });
+                $scope.logining = false;
             });
-            $scope.logining = false;
-        });
     };
 
     $scope.logout = function () {
@@ -128,32 +128,52 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
         $scope.query(form);
         $scope.hiddenRelations();
     };
-    
+
     /**
      * build native AQL query
      */
     $scope.loadAQLs = function () {
         if (localStorage && localStorage[AM_AQL_HIST])
             $scope.aqlHist = JSON.parse(localStorage.getItem(AM_AQL_HIST));
+
+        var form = clone($scope.formData);
+        form['ref-link'] = "db/amInToolReport";
+        $http.post('/am/rest', form).success(function (data) {
+            $scope.amInToolRepoprt = data;
+        });
     };
-    
-    $scope.loadAQL = function (aql) {
-        $scope.aqlString = aql.str; 
-        $scope.aqlAlias = aql.name; 
-        $scope.selectedAQL = aql.name;
+
+    $scope.loadAQL = function (aql, name) {
+        $scope.aqlString = aql;
+        $scope.aqlAlias = name;
+        $scope.selectedAQL = name;
+    };
+
+    $scope.removeAQL = function (name) {
+        if ($scope.aqlHist) {
+            var pos = $scope.aqlHist.map(function (obj) {
+                return obj.name;
+            }).indexOf(name);
+
+            $scope.aqlHist.splice(pos, 1);
+
+            if (localStorage) {
+                localStorage.setItem(AM_AQL_HIST, JSON.stringify($scope.aqlHist));
+            }
+        }
     };
 
     $scope.saveAQL = function (name, str) {
         // init
         if (!$scope.aqlHist)
             $scope.aqlHist = [];
-        
-        var aql = $scope.aqlHist.filter(function(obj){
+
+        var aql = $scope.aqlHist.filter(function (obj) {
             return obj.name == name;
         })[0];
-        
-        if(aql){
-            aql.str=str;
+
+        if (aql) {
+            aql.str = str;
             aql.time = Date.now();
         } else {
             $scope.aqlHist.push({
@@ -162,7 +182,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
                 time: Date.now()
             });
         }
-            
+
         if (localStorage) {
             localStorage.setItem(AM_AQL_HIST, JSON.stringify($scope.aqlHist));
         }
@@ -175,21 +195,21 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
             where: "",
             fields: ""
         };
-        
+
         // get key word position
         // todo: check if AQL can contain multipule key words
         var idx_SELECT = str.toLowerCase().indexOf("select");
         var idx_FROM = str.toLowerCase().indexOf("from");
         var idx_WHERE = str.toLowerCase().indexOf("where");
-        
+
         // get fields from SELECT .. FROM
         aql.fields = str.substring(idx_SELECT + 6, idx_FROM).trim();
-        
+
         // get tableName from FROM .. WHERE (WHERE is optional)
         aql.tableName = (idx_WHERE > -1) ? str.substring(idx_FROM + 4, idx_WHERE).trim() : str.substring(idx_FROM + 4).trim();
-        
+
         // get where start from WHERE (not include WHERE, where is optional)
-        aql.where = (idx_WHERE < 0) ? "" : str.substring(idx_WHERE + 5).trim();
+        aql.where = (idx_WHERE < 0) ? "" : str.substring(idx_WHERE).trim();
 
         return aql;
     };
@@ -200,8 +220,8 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
 
         form['ref-link'] = "aql/" + aql.tableName + "/";
         form.collection = aql.fields;
-        if (aql.where.trim().length > 0)
-            form.collection += " Where " + aql.where;
+        if (aql.where)
+            form.collection += " " + aql.where;
         $scope.query(form);
 
         if (name && name.trim() != "")
@@ -217,7 +237,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
 
         form.method = "get";
         var timeStart = Date.now();
-        
+
         // encodeURI
         var form_encode = clone(form);
         form_encode.collection = encodeURI(form_encode.collection);
@@ -264,11 +284,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
 
             }
         }).error(function (data) {
-            $scope.alerts.push({
-                type: 'danger',
-                msg: data
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: data
+                });
             });
-        });
         //        $scope.store();
     };
 
@@ -463,11 +483,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
             }
 
         }).error(function (data) {
-            $scope.alerts.push({
-                type: 'danger',
-                msg: data
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: data
+                });
             });
-        });
     };
 
     $scope.expandLink = function (link) {
@@ -596,11 +616,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
         $http.get('/json/template').success(function (data) {
             $scope.templates = data;
         }).error(function (data) {
-            $scope.alerts.push({
-                type: 'danger',
-                msg: data
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: data
+                });
             });
-        });
     };
 
     $scope.loadOneTemp = function (temp) {
@@ -622,11 +642,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
                 $scope.loadTemplates();
                 $scope.tab = "templates";
             }).error(function (data) {
-                $scope.alerts.push({
-                    type: 'danger',
-                    msg: data
+                    $scope.alerts.push({
+                        type: 'danger',
+                        msg: data
+                    });
                 });
-            });
 
         $scope.backTableList();
     };
@@ -640,11 +660,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
             $scope.loadTemplates();
             $scope.tab = "templates";
         }).error(function (data) {
-            $scope.alerts.push({
-                type: 'danger',
-                msg: data
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: data
+                });
             });
-        });
 
         $scope.backTableList();
     };
@@ -720,11 +740,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
             }
 
         }).error(function (data) {
-            $scope.alerts.push({
-                type: 'danger',
-                msg: data
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: data
+                });
             });
-        });
 
     };
 
@@ -794,11 +814,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
                 }
 
             }).error(function (data) {
-                $scope.alerts.push({
-                    type: 'danger',
-                    msg: data
+                    $scope.alerts.push({
+                        type: 'danger',
+                        msg: data
+                    });
                 });
-            });
 
     };
 
@@ -919,11 +939,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
 
                 }
             }).error(function (data) {
-                $scope.alerts.push({
-                    type: 'danger',
-                    msg: data
+                    $scope.alerts.push({
+                        type: 'danger',
+                        msg: data
+                    });
                 });
-            });
         }
     };
 

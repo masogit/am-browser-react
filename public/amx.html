@@ -103,32 +103,7 @@
         </div>
         <div ng-include="(module=='explorer' && tempRecords && !relations)?'amx_temp_records_full.html':''"></div>
         <div class="col-md-12" ng-show="relations" ng-include="'amx.relations.html'"></div>
-        <div class="row" ng-show="module=='aql'">
-            <div class="col-md-3">
-                <table class="table table-striped" ng-show="aqlHist" ng-init="loadAQLs()">
-                    <thead>
-                        <tr>
-                            <th>
-                                <input type="text" class="form-control" ng-model="aqlsSearch" placeholder="Search AQL...">
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="aql in aqlHist|filter:aqlsSearch|orderBy:'-time'" ng-click="loadAQL(aql)"
-                            ng-class="{selected: aql.name == selectedAQL}">
-                            <td> 
-                                <h5>
-                                    {{ aql.name }}
-                                    <small class="pull-right">{{ aql.time | date }}</small>
-                                <h5>
-                                <small>{{ aql.str }}</small>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="col-md-9" ng-include="'amx_records_aql.html'"></div>
-        </div>
+        <div class="row" ng-include="(module=='aql')?'amx_aqls.html':''"></div>
         <div class="row" ng-show="module=='builder'">
             <!--   nav bar -->
 

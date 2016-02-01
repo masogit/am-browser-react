@@ -1,0 +1,49 @@
+<div class="col-md-3">
+    <input type="text" class="form-control" ng-model="aqlsSearch" placeholder="Search AQL...">
+    <div full-height="120">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>
+                    <ul class="nav nav-pills nav-justified" ng-init="aql_tab='intool'; loadAQLs()">
+                        <li ng-class="{active: aql_tab=='intool'}"><a ng-click="aql_tab='intool'">OOTB</a></li>
+                        <li ng-class="{active: aql_tab=='history'}"><a ng-click="aql_tab='history'">History</a></li>
+                    </ul>
+                </th>
+            </tr>
+            </thead>
+            <tbody ng-show="aqlHist && (aql_tab=='history')">
+            <tr ng-repeat="aql in aqlHist|filter:aqlsSearch|orderBy:'-time'" ng-click="loadAQL(aql.str, aql.name)"
+                ng-class="{selected: aql.name == selectedAQL}">
+                <td>
+                    <h5>
+                        {{ aql.name }}
+                        <small class="pull-right">{{ aql.time | date }}
+                            <span class="glyphicon glyphicon-trash" ng-confirm-click="Remove this history?" ng-click="removeAQL(aql.name)"></span>
+                        </small>
+                    </h5>
+                    <small>{{ aql.str }}
+                    </small>
+                </td>
+            </tr>
+            </tbody>
+            <tbody ng-show="amInToolRepoprt && (aql_tab=='intool')">
+            <tr ng-repeat="report in amInToolRepoprt.entities|filter:aqlsSearch|orderBy:'-dtLastModif'"
+                ng-click="loadAQL(report.AQL, report.Name)"
+                ng-class="{selected: report.Name == selectedAQL}">
+                <td>
+                    <h5>
+                        {{ report.Name }}
+                        <small class="pull-right">{{ report.dtLastModif | date }}
+                            <span class="glyphicon glyphicon-log-out" ng-click=""></span>
+                        </small>
+                    </h5>
+                    <small>{{ report.AQL }}
+                    </small>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="col-md-9" ng-include="'amx_records_aql.html'"></div>

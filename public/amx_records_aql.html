@@ -4,13 +4,13 @@
     </div>
     <div class="col-md-3">
         <input type="text" class="form-control" ng-model="aqlAlias" placeholder="AQL alias name">
-        <button class="btn btn-primary form-control" ng-click="aqlQuery(formData, aqlString, aqlAlias)">Query</button>
+        <button class="btn btn-primary form-control" ng-click="aqlQuery(formData, aqlString, aqlAlias)">
+            Query<span ng-show="aqlAlias"> & Save</span>
+        </button>
     </div>
 </div>
-<h4><strong>{{ tableName }} </strong>
-    <small>
-        <small>Count: {{ aqlData.Result[0].Row.length }} Elapsed time: {{ aqlData.timeEnd - aqlData.timeStart }}ms</small>
-    </small>
+<h4>
+    <small>Count: {{ aqlData.Result[0].Row.length }} Elapsed time: {{ aqlData.timeEnd - aqlData.timeStart }}ms</small>
     <small class="pull-right">
         Search
         <input type="text" placeholder="Dynamic Search" ng-model="aqlSearch">
@@ -25,19 +25,20 @@
 
     <table class="table table-striped" ng-show="aqlData.Schema">
         <thead>
-            <tr>
-                <th ng-repeat="col in aqlData.Schema[0].Column">
-                    {{ col['$']['Name'] }}
-                </th>
-            </tr>
+        <tr>
+            <th ng-repeat="col in aqlData.Schema[0].Column">
+                <!--{{ col['$']['Content'] }}-->
+                {{ col['$']['Name'] }}
+            </th>
+        </tr>
         </thead>
         <tbody>
-            <!--<tr ng-repeat="row in aqlData.Result[0].Row|filter:aqlSearch|orderBy:predicate:reverse|startFrom:currentPage*formData.pageSize|limitTo:formData.pageSize">-->
-            <tr ng-repeat="row in aqlData.Result[0].Row|filter:aqlSearch">
-                <td ng-repeat="col in row.Column">
-                    {{ col['_'] }}
-                </td>
-            </tr>
+        <!--<tr ng-repeat="row in aqlData.Result[0].Row|filter:aqlSearch|orderBy:predicate:reverse|startFrom:currentPage*formData.pageSize|limitTo:formData.pageSize">-->
+        <tr ng-repeat="row in aqlData.Result[0].Row|filter:aqlSearch">
+            <td ng-repeat="col in row.Column">
+                {{ col['_'] }}
+            </td>
+        </tr>
         </tbody>
     </table>
 </div>
