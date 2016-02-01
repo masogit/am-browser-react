@@ -4,7 +4,9 @@
     </div>
     <div class="col-md-3">
         <input type="text" class="form-control" ng-model="aqlAlias" placeholder="AQL alias name">
-        <button class="btn btn-primary form-control" ng-click="aqlQuery(formData, aqlString, aqlAlias)">
+        <button class="btn btn-primary form-control"
+                ng-click="aqlQuery(formData, aqlString, aqlAlias)"
+                ng-disabled="!aqlString">
             Query<span ng-show="aqlAlias"> & Save</span>
         </button>
     </div>
@@ -12,6 +14,12 @@
 <h4>
     <small>Count: {{ aqlData.Result[0].Row.length }} Elapsed time: {{ aqlData.timeEnd - aqlData.timeStart }}ms</small>
     <small class="pull-right">
+        <span style="padding-right: 20px" ng-init="aqlData_display='name'">
+            Show
+            <input type="radio" ng-model="aqlData_display" value="name">Name
+            <input type="radio" ng-model="aqlData_display" value="content">Content
+        </span>
+
         Search
         <input type="text" placeholder="Dynamic Search" ng-model="aqlSearch">
         <!--Page
@@ -27,8 +35,7 @@
         <thead>
         <tr>
             <th ng-repeat="col in aqlData.Schema[0].Column">
-                <!--{{ col['$']['Content'] }}-->
-                {{ col['$']['Name'] }}
+                {{ (aqlData_display=='name') ? col['$']['Name'] : col['$']['Content'] }}
             </th>
         </tr>
         </thead>
