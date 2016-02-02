@@ -8,7 +8,8 @@
     </div>
 
     <div class="{{(tempRecords.showDetail)?'col-md-9':'col-md-12'}}">
-        <a ng-click="backTableList()" class="badge"><span class="glyphicon glyphicon-chevron-left"></span></a> Back
+        <a ng-click="backTableList()" class="badge"><span class="glyphicon glyphicon-chevron-left"></span></a>
+        <a ng-click="saveHtml('to_save')" class="badge"><span class="glyphicon glyphicon-heart"></span></a>
         <small style="padding-left: 20px" ng-show="tempRecords.timeEnd1">
             Count: {{ tempRecords.count }}
             Elapsed time: {{ tempRecords.timeEnd1 - tempRecords.timeStart1 }}ms
@@ -21,7 +22,7 @@
     </div>
 
     <div class="{{(tempRecords.showDetail)?'col-md-9':'col-md-12'}}" full-height="130">
-        <table class="table table-striped" ng-show="tempRecords">
+        <table class="table table-striped" ng-show="tempRecords" id="to_save">
             <thead ng-repeat="e in tempRecords.records" ng-if="$first">
                 <tr>
                     <th>

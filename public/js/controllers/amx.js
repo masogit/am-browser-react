@@ -57,12 +57,12 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
                 $scope.logining = false;
             }
         }).error(function (data) {
-                $scope.alerts.push({
-                    type: 'danger',
-                    msg: 'Server can not be reached!'
-                });
-                $scope.logining = false;
+            $scope.alerts.push({
+                type: 'danger',
+                msg: 'Server can not be reached!'
             });
+            $scope.logining = false;
+        });
     };
 
     $scope.logout = function () {
@@ -133,8 +133,8 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
      * build native AQL query
      */
     $scope.loadAQLs = function () {
-//        if (localStorage && localStorage[AM_AQL_HIST])
-//            $scope.aqlHist = JSON.parse(localStorage.getItem(AM_AQL_HIST));
+        //        if (localStorage && localStorage[AM_AQL_HIST])
+        //            $scope.aqlHist = JSON.parse(localStorage.getItem(AM_AQL_HIST));
 
         var form = clone($scope.formData);
         form['ref-link'] = "db/amInToolReport";
@@ -157,9 +157,9 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
 
             $scope.aqlHist.splice(pos, 1);
 
-//            if (localStorage) {
-//                localStorage.setItem(AM_AQL_HIST, JSON.stringify($scope.aqlHist));
-//            }
+            //            if (localStorage) {
+            //                localStorage.setItem(AM_AQL_HIST, JSON.stringify($scope.aqlHist));
+            //            }
         }
     };
 
@@ -183,9 +183,9 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
             });
         }
 
-//        if (localStorage) {
-//            localStorage.setItem(AM_AQL_HIST, JSON.stringify($scope.aqlHist));
-//        }
+        //        if (localStorage) {
+        //            localStorage.setItem(AM_AQL_HIST, JSON.stringify($scope.aqlHist));
+        //        }
 
     };
 
@@ -284,11 +284,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
 
             }
         }).error(function (data) {
-                $scope.alerts.push({
-                    type: 'danger',
-                    msg: data
-                });
+            $scope.alerts.push({
+                type: 'danger',
+                msg: data
             });
+        });
         //        $scope.store();
     };
 
@@ -483,11 +483,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
             }
 
         }).error(function (data) {
-                $scope.alerts.push({
-                    type: 'danger',
-                    msg: data
-                });
+            $scope.alerts.push({
+                type: 'danger',
+                msg: data
             });
+        });
     };
 
     $scope.expandLink = function (link) {
@@ -616,11 +616,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
         $http.get('/json/template').success(function (data) {
             $scope.templates = data;
         }).error(function (data) {
-                $scope.alerts.push({
-                    type: 'danger',
-                    msg: data
-                });
+            $scope.alerts.push({
+                type: 'danger',
+                msg: data
             });
+        });
     };
 
     $scope.loadOneTemp = function (temp) {
@@ -642,11 +642,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
                 $scope.loadTemplates();
                 $scope.tab = "templates";
             }).error(function (data) {
-                    $scope.alerts.push({
-                        type: 'danger',
-                        msg: data
-                    });
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: data
                 });
+            });
 
         $scope.backTableList();
     };
@@ -660,11 +660,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
             $scope.loadTemplates();
             $scope.tab = "templates";
         }).error(function (data) {
-                $scope.alerts.push({
-                    type: 'danger',
-                    msg: data
-                });
+            $scope.alerts.push({
+                type: 'danger',
+                msg: data
             });
+        });
 
         $scope.backTableList();
     };
@@ -740,11 +740,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
             }
 
         }).error(function (data) {
-                $scope.alerts.push({
-                    type: 'danger',
-                    msg: data
-                });
+            $scope.alerts.push({
+                type: 'danger',
+                msg: data
             });
+        });
 
     };
 
@@ -814,11 +814,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
                 }
 
             }).error(function (data) {
-                    $scope.alerts.push({
-                        type: 'danger',
-                        msg: data
-                    });
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: data
                 });
+            });
 
     };
 
@@ -939,11 +939,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
 
                 }
             }).error(function (data) {
-                    $scope.alerts.push({
-                        type: 'danger',
-                        msg: data
-                    });
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: data
                 });
+            });
         }
     };
 
@@ -1032,6 +1032,13 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
     $scope.checkDateType = function (type) {
         return (type == 'Date+Time' || type == 'Date' || type == 'Time');
     };
+    
+    // save html
+    $scope.saveHtml = function (id) {
+        var element = document.getElementById(id);
+        console.log(element.outerHTML);
+        var randomFileName = (Math.random() + 1).toString(36).substring(7);
+    }
 });
 
 am.directive('fullHeight', function ($window) {
