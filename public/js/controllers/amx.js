@@ -133,8 +133,8 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
      * build native AQL query
      */
     $scope.loadAQLs = function () {
-        if (localStorage && localStorage[AM_AQL_HIST])
-            $scope.aqlHist = JSON.parse(localStorage.getItem(AM_AQL_HIST));
+//        if (localStorage && localStorage[AM_AQL_HIST])
+//            $scope.aqlHist = JSON.parse(localStorage.getItem(AM_AQL_HIST));
 
         var form = clone($scope.formData);
         form['ref-link'] = "db/amInToolReport";
@@ -157,9 +157,9 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
 
             $scope.aqlHist.splice(pos, 1);
 
-            if (localStorage) {
-                localStorage.setItem(AM_AQL_HIST, JSON.stringify($scope.aqlHist));
-            }
+//            if (localStorage) {
+//                localStorage.setItem(AM_AQL_HIST, JSON.stringify($scope.aqlHist));
+//            }
         }
     };
 
@@ -183,9 +183,9 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
             });
         }
 
-        if (localStorage) {
-            localStorage.setItem(AM_AQL_HIST, JSON.stringify($scope.aqlHist));
-        }
+//        if (localStorage) {
+//            localStorage.setItem(AM_AQL_HIST, JSON.stringify($scope.aqlHist));
+//        }
 
     };
 
