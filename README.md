@@ -7,6 +7,7 @@ A Simple AM Browser developed based on AM DB and Metadata REST services. Try it 
 1. Clone the repository
 1. Install nodejs from [nodejs.org](http://nodejs.org)
 1. Install related packages: `npm install`
+		note: if you run into erros like SSL issue, run command: npm config set strict-ssl false 
 	- Configure npm proxy in HP intranet:
 	`npm config set proxy http://web-proxy.sgp.hp.com:8080`
 1. Start the server: `node server.js`
