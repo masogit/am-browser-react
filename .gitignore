@@ -13,5 +13,6 @@ results
 db
 
 npm-debug.log
+launch.json
 node_modules
 .idea
