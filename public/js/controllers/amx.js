@@ -638,7 +638,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
     $scope.removeTemplate = function (temp) {
 
         if (temp.$loki)
-            $http.post('/json/template/delete', temp).success(function (data) {
+            $http.delete('/json/template', temp).success(function (data) {
                 $scope.loadTemplates();
                 $scope.tab = "templates";
             }).error(function (data) {

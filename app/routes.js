@@ -16,40 +16,43 @@ module.exports = function (app) {
         }
     });
     // Configuration
-    app.get('/json/template', function (req, res) {
+    app.get('/json/:collection', function (req, res) {
+        var collectionName = req.params.collection;
         db.loadDatabase({}, function () {
-            var temp = db.getCollection('template');
-            if (!temp) {
-                temp = db.addCollection("template");
+            var coll = db.getCollection(collectionName);
+            if (!coll) {
+                coll = db.addCollection(collectionName);
             } else {
                 // console.log(temp.data);
-                res.json(temp.data);
+                res.json(coll.data);
             }
             db.saveDatabase();
         });
     });
 
-    app.post('/json/template', function (req, res) {
-        var temp = db.getCollection("template");
-        if (!temp) {
-            temp = db.addCollection("template");
+    app.post('/json/:collection', function (req, res) {
+        var collectionName = req.params.collection;
+        var coll = db.getCollection(collectionName);
+        if (!coll) {
+            coll = db.addCollection(collectionName);
         }
         var obj = req.body;
-//        console.log("template insert or update: " + JSON.stringify(obj));
+
         var data;
         if (obj.$loki)
-            data = temp.update(obj);
+            data = coll.update(obj);
         else
-            data = temp.insert(obj);
+            data = coll.insert(obj);
         res.json(data);
 
         db.saveDatabase();
     });
 
-    app.post('/json/template/delete', function (req, res) {
-        var temp = db.getCollection("template");
-        console.log("template delete: " + JSON.stringify(req.body));
-        var data = temp.remove(req.body);
+    app.delete('/json/:collection', function (req, res) {
+        var collectionName = req.params.collection;
+        var coll = db.getCollection(collectionName);
+        console.log("collection delete: " + JSON.stringify(req.body));
+        var data = coll.remove(req.body);
         res.json(data);
 
         db.saveDatabase();
