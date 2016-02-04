@@ -48,11 +48,12 @@ module.exports = function (app) {
         db.saveDatabase();
     });
 
-    app.delete('/json/:collection', function (req, res) {
+    app.delete('/json/:collection/:id', function (req, res) {
         var collectionName = req.params.collection;
+        var id = req.params.id;
         var coll = db.getCollection(collectionName);
-        console.log("collection delete: " + JSON.stringify(req.body));
-        var data = coll.remove(req.body);
+        console.log("Delete collection: " + collectionName + " id: " + id);
+        var data = coll.remove({$loki: id});
         res.json(data);
 
         db.saveDatabase();
