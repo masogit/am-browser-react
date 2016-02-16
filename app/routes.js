@@ -267,7 +267,7 @@ module.exports = function (app) {
     //    });
 
     app.get('/amx', function (req, res) {
-        res.sendfile('./public/amx.html');
+        res.sendfile('./public/browser/amx.html');
     });
 
     app.get('/m', function (req, res) {

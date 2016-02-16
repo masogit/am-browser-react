@@ -279,7 +279,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
 
                 $scope.alerts.push({
                     type: 'danger',
-                    msg: data
+                    msg: 'returned data: ' + data
                 });
 
             }
@@ -389,7 +389,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
     $scope.load = function (data) {
         var modalInstance = $uibModal.open({
             animation: true,
-            templateUrl: 'am_modal.html',
+            templateUrl: 'browser/amx_modal.html',
             controller: 'amModalCtrl',
             size: "modal-lg",
             resolve: {

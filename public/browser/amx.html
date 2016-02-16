@@ -55,7 +55,7 @@
                         <span class="glyphicon glyphicon-menu-right" ng-show="serverbar"></span>
                     </a>
                     </li>
-                    <li>
+                    <li ng-show="alerts.length>0">
                         <a href="#" ng-click="formData.showError=!formData.showError">
                         Error
                         <span class="badge" style="background-color: #F04953"
@@ -65,7 +65,7 @@
                     </a>
                     </li>
                     <li>
-                        <a href="#" ng-click="logout()">Exit</a>
+                        <a href="#" ng-click="logout()">Logout</a>
                     </li>
                 </ul>
             </div>
@@ -101,9 +101,9 @@
 
 
         </div>
-        <div ng-include="(module=='explorer' && tempRecords && !relations)?'amx_temp_records_full.html':''"></div>
-        <div class="col-md-12" ng-show="(module=='explorer'||module=='builder') && relations" ng-include="'amx.relations.html'"></div>
-        <div class="row" ng-include="(module=='aql')?'amx_aqls.html':''"></div>
+        <div ng-include="(module=='explorer' && tempRecords && !relations)?'browser/amx_temp_records_full.html':''"></div>
+        <div class="col-md-12" ng-show="(module=='explorer'||module=='builder') && relations" ng-include="'browser/amx.relations.html'"></div>
+        <div class="row" ng-include="(module=='aql')?'browser/amx_aqls.html':''"></div>
         <div class="row" ng-show="module=='builder'">
             <!--   nav bar -->
 
@@ -115,16 +115,16 @@
                 </ul>
                 <br>
 
-                <div ng-include="'amx_templates.html'" ng-init="loadTemplates()" ng-show="tab=='templates'"></div>
-                <div ng-include="'amx_tree.html'" ng-init="metadata('all')" ng-show="tab=='tables'"></div>
+                <div ng-include="'browser/amx_templates.html'" ng-init="loadTemplates()" ng-show="tab=='templates'"></div>
+                <div ng-include="'browser/amx_tree.html'" ng-init="metadata('all')" ng-show="tab=='tables'"></div>
             </div>
 
 
-            <div class="col-md-9" ng-show="tableData && !relations" ng-include="'amx_records.html'"></div>
+            <div class="col-md-9" ng-show="tableData && !relations" ng-include="'browser/amx_records.html'"></div>
 
-            <div class="col-md-3" ng-show="tempTable && !tableData && !relations" ng-include="'amx_temp_edit.html'"></div>
-            <div class="col-md-3" ng-show="tempRecords && !tableData && !relations" ng-include="'amx_temp_records.html'" full-height="85"></div>
-            <div class="col-md-3" ng-show="tempRecord && !tableData && !relations" ng-include="'amx_temp_record.html'" full-height="85"></div>
+            <div class="col-md-3" ng-show="tempTable && !tableData && !relations" ng-include="'browser/amx_temp_edit.html'"></div>
+            <div class="col-md-3" ng-show="tempRecords && !tableData && !relations" ng-include="'browser/amx_temp_records.html'" full-height="85"></div>
+            <div class="col-md-3" ng-show="tempRecord && !tableData && !relations" ng-include="'browser/amx_temp_record.html'" full-height="85"></div>
 
         </div>
     </div>
