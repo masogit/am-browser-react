@@ -55,7 +55,7 @@
                         <span class="glyphicon glyphicon-menu-right" ng-show="serverbar"></span>
                     </a>
                     </li>
-                    <li ng-show="alerts.length>0">
+                    <li ng-show="alerts.length>0" ng-init="formData.showError=true">
                         <a href="#" ng-click="formData.showError=!formData.showError">
                         Error
                         <span class="badge" style="background-color: #F04953"
@@ -77,30 +77,7 @@
     </uib-alert>
 
     <div class="container-fluid" ng-hide="formData.showError && alerts.length>0">
-        <div class="container" ng-show="module=='explorer'">
-            <div ng-show="!tempRecords" class="row">
-                <div class="col-md-2"></div>
-                <div class="col-md-8">
-                    <input type="text" ng-show="!relations" class="form-control" ng-model="globalSearch" placeholder="Search view...">
-                </div>
-            </div>
-
-            <div ng-show="!tempRecords" class="col-md-3" style="height: 150px;padding-top: 30px; margin-bottom: 20px" ng-repeat="temp in templates|orderBy:'-last.time'|filter:globalSearch">
-                <span class="thumbnail" ng-click="backTableList();loadOneTemp(temp)">
-                    <h4 style="padding-left: 10px">{{ temp.name }}
-                        <strong class="badge pull-right">{{temp.last.count}}</strong>
-                    </h4>
-
-                    <small class="pull-left">{{ temp.description }}</small>
-
-                    <h6 style="padding-top: 90px;">
-                        <small class="pull-right">{{temp.last.time | date:'yyyy-MM-dd HH:mm:ss'}}</small>
-                    </h6>
-                </span>
-            </div>
-
-
-        </div>
+        <div ng-include="(module=='explorer' && !relations)?'browser/amx_explorer.html':''"></div>
         <div ng-include="(module=='explorer' && tempRecords && !relations)?'browser/amx_temp_records_full.html':''"></div>
         <div class="col-md-12" ng-show="(module=='explorer'||module=='builder') && relations" ng-include="'browser/amx.relations.html'"></div>
         <div class="row" ng-include="(module=='aql')?'browser/amx_aqls.html':''"></div>

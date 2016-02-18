@@ -953,6 +953,21 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
         }
     };
 
+    $scope.cacheSearch = function (keyword) {
+        if (keyword) {
+            var timeStart = Date.now();
+            $http.post('/cache/search', {keyword: keyword}).success(function (data) {
+                $scope.cachedRefLinks = data;
+                $scope.cacheSearch.timeEnd = Date.now();
+                $scope.cacheSearch.timeStart = timeStart;
+
+            });
+        }
+        else {
+            $scope.cachedRefLinks = null;
+        }
+    };
+
     $scope.hiddenRelations = function (record) {
         //        console.log("record: " + JSON.stringify(record));
         if (record && record.link) {

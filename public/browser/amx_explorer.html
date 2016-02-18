@@ -1,0 +1,54 @@
+<div ng-show="!tempRecords" class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <input type="text" ng-show="!relations" class="form-control"
+               ng-model="globalSearch" ng-change="cacheSearch(globalSearch)" placeholder="Search records by keyword">
+    </div>
+</div>
+<div ng-show="!tempRecords && cachedRefLinks && cachedRefLinks.length>0">
+    <h4>Records
+        <small>
+            ({{cachedRefLinks.length}})
+            Elapsed time: {{ cacheSearch.timeEnd - cacheSearch.timeStart }}ms
+        </small>
+    </h4>
+    <div full-height="400">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Ref-Link</th>
+                <th>Self</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="ref in cachedRefLinks">
+                <td>
+                    <a ng-click="showRelations({'ref-link': ref.split(':')[0]})">
+                        <span class="glyphicon glyphicon-zoom-in"></span> {{ ref.split(':')[0] }}
+                    </a>
+                </td>
+                <td>{{ ref.substring(ref.indexOf(':')+1, ref.length) }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="col-md-12">
+    <h4 ng-show="!tempRecords">Views</h4>
+
+    <div ng-show="!tempRecords" class="col-md-3" style="height: 150px;padding-top: 10px; margin-bottom: 20px"
+         ng-repeat="temp in templates|orderBy:'-last.time'|filter:globalSearch">
+
+    <span class="thumbnail" ng-click="backTableList();loadOneTemp(temp)">
+        <h4 style="padding-left: 10px">{{ temp.name }}
+            <strong class="badge pull-right">{{temp.last.count}}</strong>
+        </h4>
+
+        <small class="pull-left">{{ temp.description }}</small>
+
+        <h6 style="padding-top: 90px;">
+            <small class="pull-right">{{temp.last.time | date:'yyyy-MM-dd HH:mm:ss'}}</small>
+        </h6>
+    </span>
+    </div>
+</div>
