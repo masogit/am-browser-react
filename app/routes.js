@@ -221,6 +221,8 @@ module.exports = function (app, rds_client) {
             }
         };
 
+        var cache = req.body.cache;
+        var cacheView = req.body.cacheView;
         if (req.body.method == "get") {
             request = client.get(url, args,function (data, response) {
                 var prefix = req.body['ref-link'].split("/")[0];
@@ -228,7 +230,7 @@ module.exports = function (app, rds_client) {
                     res.send(data);
 
                     // redis
-                    if (data.entities)
+                    if (cache && cacheView && data.entities)
                         data.entities.forEach(function (obj) {
                             search.index(JSON.stringify(obj), obj['ref-link'] + ":" + obj['self']);
                         });

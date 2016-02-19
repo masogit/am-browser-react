@@ -34,6 +34,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
         password: "",
 
         pageSize: 10,
+        cache: false,
         //        showError: false,
         showLabel: false
     };
@@ -80,7 +81,8 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
                 showLabel: $scope.formData.showLabel,
                 //                showError: $scope.formData.showError,
                 limit: $scope.formData.param.limit,
-                offset: $scope.formData.param.offset
+                offset: $scope.formData.param.offset,
+                cache: $scope.formData.cache
             };
             localStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
         }
@@ -98,6 +100,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
         //        $scope.formData.showError = form.showError;
         $scope.formData.param.limit = form.limit;
         $scope.formData.param.offset = form.offset;
+        $scope.formData.cache = form.cache;
     }
 
     // console.log(window.location.pathname);
@@ -704,6 +707,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
         $scope.tempRecords['timeStart1'] = Date.now();
         $scope.tempRecords.loading1 = true;
 
+        form.cacheView = true;
         $http.post('/am/rest', form).success(function (data) {
             if (data instanceof Object) {
                 $scope.tempRecords.records = data.entities;
@@ -954,7 +958,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
     };
 
     $scope.cacheSearch = function (keyword) {
-        if (keyword) {
+        if (keyword && $scope.formData.cache) {
             var timeStart = Date.now();
             $http.post('/cache/search', {keyword: keyword}).success(function (data) {
                 $scope.cachedRefLinks = data;
