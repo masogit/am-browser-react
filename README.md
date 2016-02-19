@@ -12,6 +12,10 @@ Try in demo server [http://16.165.217.57:8088](http://16.165.217.57:8088).
 	`npm config set proxy http://web-proxy.sgp.hp.com:8080`
     - Note: if you run into erros like SSL issue, run command: 
     `npm config set strict-ssl false` 
+1. Install Redis from [redis.io](http://redis.io/)
+	- Start Redis Server in local, default port should be: 6379
+	- (Optional) Configure Redis Client in server.js 
+	`client = redis.createClient({host: '127.0.0.1', port: 6379});`
 1. Start the server: `node server.js`
 	- Configure port (default is 8080):
 	Windows `set PORT=8080`
