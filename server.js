@@ -7,7 +7,8 @@ var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 
 // initial db folder and files =================================================
-require('./app/db.js')('db');
+var db = require('./app/db.js');
+db.init('db');
 
 // init redis search client, need redis service on 127.0.0.1:6379
 var redis = require("redis"),

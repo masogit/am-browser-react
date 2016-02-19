@@ -1,9 +1,10 @@
+var db = require('./db.js');
 module.exports = function (app, rds_client) {
     var SSH = require('simple-ssh');
     var Client = require('node-rest-client').Client;
     var client = new Client();
     var loki = require('lokijs');
-    var db = new loki('db/template.json');
+//    var db = new loki('db/template.json');
     var db2 = new loki('db/metadata.json');
     var parseString = require('xml2js').parseString;
     var metadata;
@@ -25,49 +26,10 @@ module.exports = function (app, rds_client) {
         client: rds_client          // The redis client instance. Set if you want customize redis connect. Default connect to local.
     });
 
-    // Configuration
-    app.get('/json/:collection', function (req, res) {
-        var collectionName = req.params.collection;
-        db.loadDatabase({}, function () {
-            var coll = db.getCollection(collectionName);
-            if (!coll) {
-                coll = db.addCollection(collectionName);
-            } else {
-                // console.log(temp.data);
-                res.json(coll.data);
-            }
-            db.saveDatabase();
-        });
-    });
-
-    app.post('/json/:collection', function (req, res) {
-        var collectionName = req.params.collection;
-        var coll = db.getCollection(collectionName);
-        if (!coll) {
-            coll = db.addCollection(collectionName);
-        }
-        var obj = req.body;
-
-        var data;
-        if (obj.$loki)
-            data = coll.update(obj);
-        else
-            data = coll.insert(obj);
-        res.json(data);
-
-        db.saveDatabase();
-    });
-
-    app.delete('/json/:collection/:id', function (req, res) {
-        var collectionName = req.params.collection;
-        var id = req.params.id;
-        var coll = db.getCollection(collectionName);
-        console.log("Delete collection: " + collectionName + " id: " + id);
-        var data = coll.remove({$loki: id});
-        res.json(data);
-
-        db.saveDatabase();
-    });
+    // CRUD local loki file json db
+    app.get('/json/:collection', db.get);
+    app.post('/json/:collection', db.set);
+    app.delete('/json/:collection/:id', db.del);
 
     function getMetadata(url, callback) {
         if (metadata) {
