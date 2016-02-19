@@ -14,6 +14,7 @@
     "xml2js"          : "~0.4.15",
     "redis-search"    : "~0.0.1",
     "redis"           : "~2.4.2",
+    "node-cache"      : "~3.1.0",
     "node-rest-client": "~1.5.1"
   }
 }

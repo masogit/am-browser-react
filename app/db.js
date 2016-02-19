@@ -1,4 +1,5 @@
 var loki = require('lokijs');
+var db = new loki('db/template.json');
 
 // check db folder and files
 exports.init = function (dbFolder) {
@@ -27,23 +28,21 @@ exports.init = function (dbFolder) {
                     console.log("The template file was created!");
                 });
         });
-        fs.exists(dbFolder + '/metadata.json', function (metadata) {
-            if (!metadata)
-                fs.writeFile(dbFolder + "/metadata.json", "", function (err) {
-                    if (err) {
-                        return console.log(err);
-                    }
-
-                    console.log("The metadata file was created!");
-                });
-        });
+//        fs.exists(dbFolder + '/metadata.json', function (metadata) {
+//            if (!metadata)
+//                fs.writeFile(dbFolder + "/metadata.json", "", function (err) {
+//                    if (err) {
+//                        return console.log(err);
+//                    }
+//
+//                    console.log("The metadata file was created!");
+//                });
+//        });
 
     });
 };
 
 exports.get = function (req, res) {
-    var db = new loki('db/template.json');
-
     var collectionName = req.params.collection;
     db.loadDatabase({}, function () {
         var coll = db.getCollection(collectionName);
@@ -58,8 +57,6 @@ exports.get = function (req, res) {
 };
 
 exports.set = function (req, res) {
-    var db = new loki('db/template.json');
-
     var collectionName = req.params.collection;
     var coll = db.getCollection(collectionName);
     if (!coll) {
@@ -78,8 +75,6 @@ exports.set = function (req, res) {
 };
 
 exports.del = function (req, res) {
-    var db = new loki('db/template.json');
-
     var collectionName = req.params.collection;
     var id = req.params.id;
     var coll = db.getCollection(collectionName);
