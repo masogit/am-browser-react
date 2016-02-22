@@ -76,7 +76,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
             var form = {
                 server: $scope.formData.server,
                 user: $scope.formData.user,
-                password: $scope.formData.password,
+//                password: $scope.formData.password,
                 pageSize: $scope.formData.pageSize,
                 showLabel: $scope.formData.showLabel,
                 //                showError: $scope.formData.showError,
@@ -94,7 +94,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
         var form = JSON.parse(localStorage.getItem(AM_FORM_DATA));
         $scope.formData.server = form.server;
         $scope.formData.user = form.user;
-        $scope.formData.password = form.password;
+//        $scope.formData.password = form.password;
         $scope.formData.pageSize = form.pageSize;
         $scope.formData.showLabel = form.showLabel;
         //        $scope.formData.showError = form.showError;
