@@ -672,6 +672,22 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
         $scope.backTableList();
     };
 
+    $scope.visitTemplate = function (temp) {
+        if (temp.visit)
+            temp.visit = temp.visit + 1;
+        else
+            temp.visit = 1;
+
+        $http.post('/json/template', temp).success(function (data) {
+            temp = data;
+        }).error(function (data) {
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: data
+                });
+            });
+    };
+
     $scope.closeTemplate = function () {
         delete $scope.tempTable;
     };
