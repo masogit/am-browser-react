@@ -1,11 +1,14 @@
-<div ng-show="!tempRecords" class="row">
+<!--<div ng-include="(module=='explorer' && !relations)?'/browser/amx_explorer.html':''"></div>-->
+<!--<div ng-include="(module=='explorer' && tempRecords && !relations)?'/browser/records.html':''"></div>-->
+
+<div class="row">
     <div class="col-md-2"></div>
     <div class="col-md-8">
         <input type="text" ng-show="!relations" class="form-control"
                ng-model="globalSearch" ng-change="cacheSearch(globalSearch)" placeholder="Search records by keyword">
     </div>
 </div>
-<div ng-show="!tempRecords && cachedRefLinks && cachedRefLinks.length>0">
+<div ng-show="cachedRefLinks && cachedRefLinks.length>0">
     <h4>Records
         <small>
             ({{cachedRefLinks.length}})
@@ -33,23 +36,25 @@
         </table>
     </div>
 </div>
-<div class="col-md-12">
-    <h4 ng-show="!tempRecords">Views</h4>
+<div class="col-md-12" ng-init="loadTemplates()">
+    <h4>Views</h4>
 
-    <div ng-show="!tempRecords" class="col-md-3" style="height: 150px;padding-top: 10px; margin-bottom: 20px"
+    <div class="col-md-3" style="height: 150px;padding-top: 10px; margin-bottom: 20px"
          ng-repeat="temp in templates|orderBy:'-last.visit'|filter:globalSearch">
 
-    <span class="thumbnail" ng-click="backTableList();loadOneTemp(temp);visitTemplate(temp)">
-        <h4 style="padding-left: 10px">{{ temp.name }}
-            <strong class="badge pull-right">{{temp.last.count}}</strong>
-        </h4>
+        <a href="#explorer/records">
+            <span class="thumbnail" ng-click="backTableList();loadOneTemp(temp);visitTemplate(temp);">
+                <h4 style="padding-left: 10px">{{ temp.name }}
+                    <strong class="badge pull-right">{{temp.last.count}}</strong>
+                </h4>
 
-        <small class="pull-left">{{ temp.description }}</small>
+                <small class="pull-left">{{ temp.description }}</small>
 
-        <h6 style="padding-top: 90px;">
-            <span ng-show="temp.visit">Visit: {{ temp.visit }}</span>
-            <small class="pull-right">{{temp.last.time | date:'yyyy-MM-dd HH:mm:ss'}}</small>
-        </h6>
-    </span>
+                <h6 style="padding-top: 90px;">
+                    <span ng-show="temp.visit">Visit: {{ temp.visit }}</span>
+                    <small class="pull-right">{{temp.last.time | date:'yyyy-MM-dd HH:mm:ss'}}</small>
+                </h6>
+            </span>
+        </a>
     </div>
 </div>

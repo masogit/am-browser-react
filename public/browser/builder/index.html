@@ -1,0 +1,19 @@
+<div class="col-md-3" ng-show="!relations">
+    <ul class="nav nav-pills nav-justified" ng-init="tab='templates'">
+        <li ng-class="{active: tab=='templates'}"><a ng-click="tab='templates'">Views</a></li>
+        <li ng-class="{active: tab=='tables'}"><a ng-click="tab='tables'">Tables</a></li>
+    </ul>
+    <br>
+
+    <div ng-include="'/browser/amx_templates.html'" ng-init="loadTemplates()" ng-show="tab=='templates'"></div>
+    <div ng-include="'/browser/amx_tree.html'" ng-init="metadata('all')" ng-show="tab=='tables'"></div>
+</div>
+
+
+<div class="col-md-9" ng-show="tableData && !relations" ng-include="'/browser/amx_records.html'"></div>
+
+<div class="col-md-3" ng-show="tempTable && !tableData && !relations" ng-include="'/browser/amx_temp_edit.html'"></div>
+<div class="col-md-3" ng-show="tempRecords && !tableData && !relations" ng-include="'/browser/amx_temp_records.html'"
+     full-height="85"></div>
+<div class="col-md-3" ng-show="tempRecord && !tableData && !relations" ng-include="'/browser/amx_temp_record.html'"
+     full-height="85"></div>

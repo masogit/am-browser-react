@@ -8,7 +8,7 @@
     <div class="panel-body" full-height="201">
         <ul class="nav sidebar">
             <li ng-repeat="table in metadata.tables | filter: tableSearch">
-                <a href="#" ng-click="metadata(table.id)">{{ (!formData.showLabel) ? table.id : table.Label }} 
+                <a ng-click="metadata(table.id)">{{ (!formData.showLabel) ? table.id : table.Label }}
                     <span ng-show="table.loading" class="pull-right">loading...</span>
                 </a>
             </li>

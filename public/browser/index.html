@@ -30,9 +30,9 @@
             </a>
             </div>
             <ul class="nav navbar-nav" style="padding-left: 50px" ng-init="module='explorer'">
-                <li ng-click="module='explorer'; backTableList()" ng-class="{active: module=='explorer'}"><a>Explorer</a></li>
-                <li ng-click="module='builder'" ng-class="{active: module=='builder'}"><a>Builder</a></li>
-                <li ng-click="module='aql'" ng-class="{active: module=='aql'}"><a>AQL</a></li>
+                <li ng-click="module='explorer'" ng-class="{active: module=='explorer'}"><a href="#explorer">Explorer</a></li>
+                <li ng-click="module='builder'" ng-class="{active: module=='builder'}"><a href="#builder">Builder</a></li>
+                <li ng-click="module='aql'" ng-class="{active: module=='aql'}"><a href="#aql">AQL</a></li>
                 <!--<li ng-click="module='slo'" ng-class="{active: module=='slo'}"><a>SLO</a></li>-->
             </ul>
             <div class="navbar-collapse collapse">
@@ -77,35 +77,37 @@
         {{alert.msg}}
     </uib-alert>
 
-    <div class="container-fluid" ng-hide="formData.showError && alerts.length>0">
-        <div ng-include="(module=='explorer' && !relations)?'browser/amx_explorer.html':''"></div>
-        <div ng-include="(module=='explorer' && tempRecords && !relations)?'browser/amx_temp_records_full.html':''"></div>
-        <div class="col-md-12" ng-show="(module=='explorer'||module=='builder') && relations" ng-include="'browser/amx.relations.html'"></div>
-        <div class="row" ng-include="(module=='aql')?'browser/amx_aqls.html':''"></div>
-        <div class="row" ng-show="module=='builder'">
-            <!--   nav bar -->
+    <div ng-view ng-hide="formData.showError && alerts.length>0"></div>
+
+    <!--<div class="container-fluid" ng-hide="formData.showError && alerts.length>0">-->
+        <!--<div ng-include="(module=='explorer' && !relations)?'/browser/amx_explorer.html':''"></div>-->
+        <!--<div ng-include="(module=='explorer' && tempRecords && !relations)?'/browser/records.html':''"></div>-->
+        <!--<div class="col-md-12" ng-show="(module=='explorer'||module=='builder') && relations" ng-include="'/browser/relations.html'"></div>-->
+        <!--<div class="row" ng-include="(module=='aql')?'/browser/index.html':''"></div>-->
+        <!--<div class="row" ng-show="module=='builder'">-->
+            <!--&lt;!&ndash;   nav bar &ndash;&gt;-->
 
 
-            <div class="col-md-3" ng-show="!relations">
-                <ul class="nav nav-pills nav-justified" ng-init="tab='templates'">
-                    <li ng-class="{active: tab=='templates'}"><a ng-click="tab='templates'">Views</a></li>
-                    <li ng-class="{active: tab=='tables'}"><a ng-click="tab='tables'">Tables</a></li>
-                </ul>
-                <br>
+            <!--<div class="col-md-3" ng-show="!relations">-->
+                <!--<ul class="nav nav-pills nav-justified" ng-init="tab='templates'">-->
+                    <!--<li ng-class="{active: tab=='templates'}"><a ng-click="tab='templates'">Views</a></li>-->
+                    <!--<li ng-class="{active: tab=='tables'}"><a ng-click="tab='tables'">Tables</a></li>-->
+                <!--</ul>-->
+                <!--<br>-->
 
-                <div ng-include="'browser/amx_templates.html'" ng-init="loadTemplates()" ng-show="tab=='templates'"></div>
-                <div ng-include="'browser/amx_tree.html'" ng-init="metadata('all')" ng-show="tab=='tables'"></div>
-            </div>
+                <!--<div ng-include="'/browser/amx_templates.html'" ng-init="loadTemplates()" ng-show="tab=='templates'"></div>-->
+                <!--<div ng-include="'/browser/amx_tree.html'" ng-init="metadata('all')" ng-show="tab=='tables'"></div>-->
+            <!--</div>-->
 
 
-            <div class="col-md-9" ng-show="tableData && !relations" ng-include="'browser/amx_records.html'"></div>
+            <!--<div class="col-md-9" ng-show="tableData && !relations" ng-include="'/browser/amx_records.html'"></div>-->
 
-            <div class="col-md-3" ng-show="tempTable && !tableData && !relations" ng-include="'browser/amx_temp_edit.html'"></div>
-            <div class="col-md-3" ng-show="tempRecords && !tableData && !relations" ng-include="'browser/amx_temp_records.html'" full-height="85"></div>
-            <div class="col-md-3" ng-show="tempRecord && !tableData && !relations" ng-include="'browser/amx_temp_record.html'" full-height="85"></div>
+            <!--<div class="col-md-3" ng-show="tempTable && !tableData && !relations" ng-include="'/browser/amx_temp_edit.html'"></div>-->
+            <!--<div class="col-md-3" ng-show="tempRecords && !tableData && !relations" ng-include="'/browser/amx_temp_records.html'" full-height="85"></div>-->
+            <!--<div class="col-md-3" ng-show="tempRecord && !tableData && !relations" ng-include="'/browser/amx_temp_record.html'" full-height="85"></div>-->
 
-        </div>
-    </div>
+        <!--</div>-->
+    <!--</div>-->
 
 </body>
 

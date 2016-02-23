@@ -10,15 +10,15 @@ module.exports = function (app) {
 
     // AM Metadata ---------------------------------------------------------
     app.post('/am/metadata', metadata.get);
+    app.post('/am/rest', rest.db);
 
     // redis cache search --------------------------------------------------
     app.post('/cache/search', rest.cacheSearch);
 
-    // AM REST -------------------------------------------------------------
-    app.post('/am/rest', rest.db);
 
-    app.get('/amx', function (req, res) {
-        res.sendfile('./public/browser/amx.html');
+
+    app.get('/browser', function (req, res) {
+        res.sendfile('./public/browser/index.html');
     });
 
     app.get('/m', function (req, res) {
@@ -30,7 +30,7 @@ module.exports = function (app) {
     });
 
     app.get('/', function (req, res) {
-        res.sendfile('./public/login.html');
+        res.redirect("/login");
     });
 
 };

@@ -1,15 +1,14 @@
 var am = angular.module('am', ['ui.bootstrap', 'ngRoute', 'mobile-angular-ui', 'mobile-angular-ui.gestures']);
 
-//am.run(function ($transform) {
-//    window.$transform = $transform;
-//});
-//
-//am.config(function ($routeProvider) {
-//    $routeProvider.when('/m/temp_edit', { templateUrl: '/mobile/temp_edit.html', reloadOnSearch: false });
-//    $routeProvider.when('/m/temp_records', { templateUrl: '/mobile/temp_records.html', reloadOnSearch: false });
-//    $routeProvider.when('/m/temp_record', { templateUrl: '/mobile/temp_record.html', reloadOnSearch: false });
-//    $routeProvider.when('/m/tab_tree', { templateUrl: '/mobile/tab_tree.html', reloadOnSearch: false });
-//});
+am.config(function ($routeProvider) {
+    $routeProvider.when('/explorer', { templateUrl: '/browser/explorer/index.html'});
+    $routeProvider.when('/explorer/records', { templateUrl: '/browser/explorer/records.html'});
+    $routeProvider.when('/explorer/relations', { templateUrl: '/browser/builder/relations.html'});
+    $routeProvider.when('/builder', { templateUrl: '/browser/builder/index.html'});
+    $routeProvider.when('/aql', { templateUrl: '/browser/aql/index.html'});
+    $routeProvider.otherwise({ redirectTo: '/explorer' });
+
+});
 
 am.controller('amCtl', function ($scope, $http, $uibModal) {
     var AM_FORM_DATA = "amFormData";
@@ -49,7 +48,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
         $http.post('/am/rest', form).success(function (data) {
             if (data instanceof Object) {
                 $scope.store();
-                window.location.href = "/amx";
+                window.location.href = "/browser";
             } else {
                 $scope.alerts.push({
                     type: 'danger',
@@ -392,7 +391,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
     $scope.load = function (data) {
         var modalInstance = $uibModal.open({
             animation: true,
-            templateUrl: 'browser/amx_modal.html',
+            templateUrl: '/browser/amx_modal.html',
             controller: 'amModalCtrl',
             size: "modal-lg",
             resolve: {
