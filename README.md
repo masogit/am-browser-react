@@ -29,4 +29,4 @@ Try in demo server [http://16.165.217.57:8088](http://16.165.217.57:8088).
 4. Further query from a record to its links data, customized display fields
 5. Create views by customized fields, links and AQL
 6. Explorer view's record with table and tree format
-7. Support quick search records in views
+7. Support quick search records in views (optional, need configure to Redis service)
