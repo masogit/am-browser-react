@@ -3,7 +3,8 @@ var am = angular.module('am', ['ui.bootstrap', 'ngRoute', 'mobile-angular-ui', '
 am.config(function ($routeProvider) {
     $routeProvider.when('/explorer', { templateUrl: '/browser/explorer/index.html'});
     $routeProvider.when('/explorer/records', { templateUrl: '/browser/explorer/records.html'});
-    $routeProvider.when('/relations', { templateUrl: '/browser/relations.html'});
+    $routeProvider.when('/explorer/relations', { templateUrl: '/browser/relations.html'});
+    $routeProvider.when('/builder/relations', { templateUrl: '/browser/relations.html'});
     $routeProvider.when('/builder', { templateUrl: '/browser/builder/index.html'});
     $routeProvider.when('/aql', { templateUrl: '/browser/aql/index.html'});
     $routeProvider.otherwise({ redirectTo: '/explorer' });
@@ -72,6 +73,11 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
 
     $scope.back = function () {
         $window.history.back();
+    };
+
+    $scope.inHash = function (module) {
+        var hash = $window.location.hash;
+        return hash.indexOf(module) > -1;
     };
 
     $scope.store = function () {

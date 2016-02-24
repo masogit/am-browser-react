@@ -1,15 +1,15 @@
 <div ng-show="templates" full-height="140">
 
     <table class="table table-striped" ng-show="templates">
-        <!--<thead>-->
-        <!--<tr>-->
-            <!--<th>View Name</th>-->
-            <!--&lt;!&ndash;<th ng-click="tempAction=!tempAction">Table Name</th>&ndash;&gt;-->
-            <!--<th ng-show="tempAction">Actions</th>-->
-        <!--</tr>-->
-        <!--</thead>-->
+        <thead>
+        <tr>
+            <th>
+                <input type="text" class="form-control" placeholder="Search views..." ng-model="templates.search">
+            </th>
+        </tr>
+        </thead>
         <tbody>
-        <tr ng-repeat="temp in templates|orderBy:'-last.time'" ng-class="{selected: templates['selected']==temp['$loki']}" ng-click="backTableList();loadOneTemp(temp)">
+        <tr ng-repeat="temp in templates | filter: templates.search" ng-class="{selected: templates['selected']==temp['$loki']}" ng-click="backTableList();loadOneTemp(temp)">
             <td><a>{{ temp.name }}</a>
                 <small class="badge pull-right">{{temp.last.count}}</small>
                 <h6>

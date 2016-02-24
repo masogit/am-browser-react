@@ -43,7 +43,7 @@
         <tbody>
             <tr ng-repeat="e in tableData.entities|filter:search|orderBy:predicate:reverse|startFrom:currentPage*formData.pageSize|limitTo:formData.pageSize">
                 <td ng-show="e['ref-link']">
-                    <a href="#relations" ng-click="showRelations(e)">
+                    <a href="#builder/relations" ng-click="showRelations(e)">
                         <span class="glyphicon glyphicon-zoom-in"></span>{{ e['ref-link'] }}
                     </a>
                     <a ng-click="load(e)"><span class="glyphicon glyphicon-edit"></span></a>
