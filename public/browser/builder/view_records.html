@@ -22,7 +22,7 @@
             ng-class="{selected: tempRecords['selected']==record['ref-link']}"
             ng-click="getRecordByTemp(record, tempRecords, true)">
             <td>
-                <a href="#relations" ng-click="showRelations(record)"><span class="glyphicon glyphicon-zoom-in"></span></a>
+                <a href="#builder/relations" ng-click="showRelations(record)"><span class="glyphicon glyphicon-zoom-in"></span></a>
                 {{ record['self'] }}
             </td>
         </tr>
