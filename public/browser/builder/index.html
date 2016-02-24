@@ -5,15 +5,15 @@
     </ul>
     <br>
 
-    <div ng-include="'/browser/amx_templates.html'" ng-init="loadTemplates()" ng-show="tab=='templates'"></div>
-    <div ng-include="'/browser/amx_tree.html'" ng-init="metadata('all')" ng-show="tab=='tables'"></div>
+    <div ng-include="'/browser/builder/views.html'" ng-init="loadTemplates()" ng-show="tab=='templates'"></div>
+    <div ng-include="'/browser/builder/metadata.html'" ng-init="metadata('all')" ng-show="tab=='tables'"></div>
 </div>
 
 
-<div class="col-md-9" ng-show="tableData && !relations" ng-include="'/browser/amx_records.html'"></div>
+<div class="col-md-9" ng-show="tableData && !relations" ng-include="'/browser/builder/records.html'"></div>
 
-<div class="col-md-3" ng-show="tempTable && !tableData && !relations" ng-include="'/browser/amx_temp_edit.html'"></div>
-<div class="col-md-3" ng-show="tempRecords && !tableData && !relations" ng-include="'/browser/amx_temp_records.html'"
+<div class="col-md-3" ng-show="tempTable && !tableData && !relations" ng-include="'/browser/builder/view_edit.html'"></div>
+<div class="col-md-3" ng-show="tempRecords && !tableData && !relations" ng-include="'/browser/builder/view_records.html'"
      full-height="85"></div>
-<div class="col-md-3" ng-show="tempRecord && !tableData && !relations" ng-include="'/browser/amx_temp_record.html'"
+<div class="col-md-3" ng-show="tempRecord && !tableData && !relations" ng-include="'/browser/record_tree.html'"
      full-height="85"></div>

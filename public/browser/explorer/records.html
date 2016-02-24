@@ -1,14 +1,11 @@
 <div ng-show="tempRecords">
-    <div class="row">
-        <div class="col-md-2"></div>
-        <div class="col-md-8">
+    <div class="container">
             <input type="text" class="form-control" ng-model="recordSearch"
                    my-enter="dbSearch(recordSearch)" placeholder="Search record...">
-        </div>
     </div>
 
     <div class="{{(tempRecords.showDetail)?'col-md-9':'col-md-12'}}">
-        <a ng-click="backTableList()" class="badge"><span class="glyphicon glyphicon-chevron-left"></span></a>
+        <!--<a ng-click="backTableList(); back()" class="badge"><span class="glyphicon glyphicon-chevron-left"></span></a>-->
         <a ng-click="saveHtml('to_save')" class="badge"><span class="glyphicon glyphicon-heart"></span></a>
         <small style="padding-left: 20px" ng-show="tempRecords.timeEnd1">
             Count: {{ tempRecords.count }}
@@ -29,7 +26,7 @@
                         <a ng-click="order('self')">Self
                             <span class="glyphicon glyphicon-arrow-up" ng-show="predicate=='self' && !reverse"></span>
                             <span class="glyphicon glyphicon-arrow-down" ng-show="predicate=='self' && reverse"></span>
-                        </a>                        
+                        </a>
                     </th>
                     <th ng-repeat="(key, value) in e" ng-show="!(key==('self')||key==('ref-link'))">
                         <a ng-click="order(key)">{{ getCaptionByTemp(key, tempTable, tempTable.showLabel) }}
@@ -44,7 +41,7 @@
                     ng-class="{selected: tempRecords['selected']==record['ref-link']}"
                     ng-click="getRecordByTemp(record, tempRecords, true)">
                     <td>
-                        <a href="#explorer/relations" ng-click="showRelations(record)">
+                        <a href="#relations" ng-click="showRelations(record)">
                             <span class="glyphicon glyphicon-zoom-in"></span> {{ record['self'] }}
                         </a>
                     </td>
@@ -56,7 +53,7 @@
         </table>
     </div>
     <div class="col-md-3" ng-show="tempRecord && !tableData && !relations && tempRecords.showDetail" full-height="130">
-        <div ng-show="tempRecord" ng-include="'/browser/amx_temp_record.html'"></div>
+        <div ng-show="tempRecord" ng-include="'/browser/record_tree.html'"></div>
     </div>
 
 </div>

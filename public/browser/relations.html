@@ -1,5 +1,6 @@
 <span style="display: none">{{ r.child = relations }}</span>
-<div ng-show="r.child" ng-include="'amNexLevel'"></div>
+
+<div class="col-md-12" ng-show="r.child" ng-include="'amNexLevel'"></div>
 
 
 <script type="text/ng-template" id="amNexLevel">
@@ -58,7 +59,9 @@
                 <tbody>
                 <tr ng-repeat="e in r.records">
                     <td ng-show="e['ref-link']">
-                        <a ng-click="showRelations(e, r)" ng-if="pos>0">{{ e['ref-link'] }}</a>
+                        <a ng-click="showRelations(e, r)" ng-if="pos>0">
+                            <span class="glyphicon glyphicon-zoom-in"></span>{{ e['ref-link'] }}
+                        </a>
                         <span ng-if="pos==0">{{ e['ref-link'] }}</span>
                         <a ng-click="load(e)"><span class="glyphicon glyphicon-edit"></span></a>
                     </td>

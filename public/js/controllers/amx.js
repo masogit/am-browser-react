@@ -3,14 +3,14 @@ var am = angular.module('am', ['ui.bootstrap', 'ngRoute', 'mobile-angular-ui', '
 am.config(function ($routeProvider) {
     $routeProvider.when('/explorer', { templateUrl: '/browser/explorer/index.html'});
     $routeProvider.when('/explorer/records', { templateUrl: '/browser/explorer/records.html'});
-    $routeProvider.when('/explorer/relations', { templateUrl: '/browser/builder/relations.html'});
+    $routeProvider.when('/relations', { templateUrl: '/browser/relations.html'});
     $routeProvider.when('/builder', { templateUrl: '/browser/builder/index.html'});
     $routeProvider.when('/aql', { templateUrl: '/browser/aql/index.html'});
     $routeProvider.otherwise({ redirectTo: '/explorer' });
 
 });
 
-am.controller('amCtl', function ($scope, $http, $uibModal) {
+am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
     var AM_FORM_DATA = "amFormData";
     var AM_AQL_HIST = "amAQLHist";
 
@@ -68,6 +68,10 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
     $scope.logout = function () {
         $scope.formData.password = "";
         window.location.href = "/login";
+    };
+
+    $scope.back = function () {
+        $window.history.back();
     };
 
     $scope.store = function () {
@@ -391,7 +395,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal) {
     $scope.load = function (data) {
         var modalInstance = $uibModal.open({
             animation: true,
-            templateUrl: '/browser/amx_modal.html',
+            templateUrl: '/browser/record_edit.html',
             controller: 'amModalCtrl',
             size: "modal-lg",
             resolve: {
