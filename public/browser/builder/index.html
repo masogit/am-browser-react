@@ -10,10 +10,7 @@
 </div>
 
 
-<div class="col-md-9" ng-show="tableData && !relations" ng-include="'/browser/builder/records.html'"></div>
-
-<div class="col-md-3" ng-show="tempTable && !tableData && !relations" ng-include="'/browser/builder/view_edit.html'"></div>
-<div class="col-md-3" ng-show="tempRecords && !tableData && !relations" ng-include="'/browser/builder/view_records.html'"
-     full-height="85"></div>
-<div class="col-md-3" ng-show="tempRecord && !tableData && !relations" ng-include="'/browser/record_tree.html'"
-     full-height="85"></div>
+<div class="col-md-9" ng-show="tableData" ng-include="'/browser/builder/records.html'"></div>
+<div class="col-md-3" ng-show="tempTable && !tableData" ng-include="'/browser/builder/view_edit.html'"></div>
+<div class="col-md-3" ng-show="tempRecords && !tableData" ng-include="'/browser/builder/view_records.html'" full-height="85"></div>
+<div class="col-md-3" ng-show="tempRecord && !tableData" ng-include="'/browser/record_tree.html'" full-height="85"></div>
