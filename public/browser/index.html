@@ -25,7 +25,7 @@
         <div class="container-fluid">
             <div class="navbar-header">
                 <img src="/img/22 icon.png" class="pull-left" style="padding-top: 6px; margin-right: 10px;">
-                <a class="navbar-brand" href="#" style="font-size: 150%;"> {{ title }}
+                <a class="navbar-brand" style="font-size: 150%;"> {{ title }}
                 <span style="font-size: 50%">({{ formData.server }})</span>
             </a>
             </div>
@@ -51,13 +51,13 @@
                 </form>
                 <ul class="nav navbar-nav navbar-right">
                     <li>
-                        <a href="#" ng-click="serverbar=!serverbar">Setting
+                        <a ng-click="serverbar=!serverbar">Setting
                         <!--<span class="glyphicon glyphicon-cog"></span> Setting-->
                         <span class="glyphicon glyphicon-menu-right" ng-show="serverbar"></span>
                     </a>
                     </li>
                     <li ng-show="alerts.length>0" ng-init="formData.showError=true">
-                        <a href="#" ng-click="formData.showError=!formData.showError">
+                        <a ng-click="formData.showError=!formData.showError">
                         Error
                         <span class="badge" style="background-color: #F04953"
                               ng-show="formData.showError || alerts.length>0">
@@ -66,7 +66,7 @@
                     </a>
                     </li>
                     <li>
-                        <a href="#" ng-click="logout()">Logout</a>
+                        <a ng-click="logout()">Logout</a>
                     </li>
                 </ul>
             </div>
