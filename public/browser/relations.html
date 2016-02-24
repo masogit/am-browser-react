@@ -11,8 +11,10 @@
         <!-- Display links -->
         <div class="panel-heading">
             <ul class="nav nav-pills">
-                <li role="presentation"><a ng-click="hiddenRelations(r)"><span
-                        class="glyphicon glyphicon-remove"></span>Close</a></li>
+                <li role="presentation">
+                    <a ng-click="hiddenRelations(r)" ng-show="r.link"><span class="glyphicon glyphicon-remove"></span>Close</a>
+                    <a ng-click="back()" ng-hide="r.link"><span class="glyphicon glyphicon-chevron-left"></span>Back</a>
+                </li>
                 <li role="presentation" ng-repeat="r in childs" ng-class="{active: r.active}"
                     ng-show="r.records.length>0"
                     ng-init="getRecords(r)">

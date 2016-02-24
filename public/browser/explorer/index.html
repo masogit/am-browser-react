@@ -27,7 +27,7 @@
             <tbody>
             <tr ng-repeat="ref in cachedRefLinks">
                 <td>
-                    <a ng-click="showRelations({'ref-link': ref.split(':')[0]})">
+                    <a href="#explorer/relations" ng-click="showRelations({'ref-link': ref.split(':')[0]})">
                         <span class="glyphicon glyphicon-zoom-in"></span> {{ ref.split(':')[0] }}
                     </a>
                 </td>
