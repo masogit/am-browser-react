@@ -4,6 +4,16 @@
         <h4>Asset Manager</h4>
 
         <div class="form-group">
+            <label>Server and port</label>
+            <input type="text" class="form-control" placeholder="Server and port" ng-model="formData.server" disabled>
+        </div>
+
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" class="form-control" placeholder="Username" ng-model="formData.user" disabled>
+        </div>
+
+        <div class="form-group">
             <label>Limit</label>
             <input type="text" class="form-control" placeholder="Limit" ng-model="formData.param.limit">
         </div>
@@ -21,6 +31,12 @@
         <div class="checkbox">
             <label>
                 <input type="checkbox" ng-model="formData.showLabel"> Show Label
+            </label>
+        </div>
+
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" ng-model="formData.cache"> Enable cache (quick search)
             </label>
         </div>
     </div>
@@ -64,11 +80,6 @@
 
         <button class="btn">Test connection</button>
 
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" ng-model="formData.cache"> Enable cache (quick search)
-            </label>
-        </div>
     </div>
     <button class="btn btn-primary btn-block" ng-click="store()">Save</button>
 </div>
