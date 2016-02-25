@@ -6,6 +6,7 @@ am.config(function ($routeProvider) {
     $routeProvider.when('/explorer/relations', { templateUrl: '/browser/relations.html'});
     $routeProvider.when('/builder/relations', { templateUrl: '/browser/relations.html'});
     $routeProvider.when('/builder', { templateUrl: '/browser/builder/index.html'});
+    $routeProvider.when('/setting', { templateUrl: '/browser/setting.html'});
     $routeProvider.when('/aql', { templateUrl: '/browser/aql/index.html'});
     $routeProvider.otherwise({ redirectTo: '/explorer' });
 

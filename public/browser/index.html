@@ -30,9 +30,9 @@
                 </a>
             </div>
             <ul class="nav navbar-nav" style="padding-left: 50px">
-                <li ng-click="module='explorer'" ng-class="{active: inHash('explorer')}"><a href="#explorer">Explorer</a></li>
-                <li ng-click="module='builder'" ng-class="{active: inHash('builder')}"><a href="#builder">Builder</a></li>
-                <li ng-click="module='aql'" ng-class="{active: inHash('aql')}"><a href="#aql">AQL</a></li>
+                <li ng-class="{active: inHash('explorer')}"><a href="#explorer">Explorer</a></li>
+                <li ng-class="{active: inHash('builder')}"><a href="#builder">Builder</a></li>
+                <li ng-class="{active: inHash('aql')}"><a href="#aql">AQL</a></li>
                 <!--<li ng-click="module='slo'" ng-class="{active: module=='slo'}"><a>SLO</a></li>-->
             </ul>
             <div class="navbar-collapse collapse">
@@ -50,11 +50,8 @@
                     <button class="btn" type="button" ng-click="store()">Save</button>
                 </form>
                 <ul class="nav navbar-nav navbar-right">
-                    <li>
-                        <a ng-click="serverbar=!serverbar">Setting
-                        <!--<span class="glyphicon glyphicon-cog"></span> Setting-->
-                        <span class="glyphicon glyphicon-menu-right" ng-show="serverbar"></span>
-                    </a>
+                    <li ng-class="{active: inHash('setting')}">
+                        <a href="#setting">Setting</a>
                     </li>
                     <li ng-show="alerts.length>0" ng-init="formData.showError=true">
                         <a ng-click="formData.showError=!formData.showError">
