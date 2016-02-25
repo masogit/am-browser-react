@@ -1,7 +1,7 @@
 <div class="col-md-3">
-    <ul class="nav nav-pills nav-justified" ng-init="tab='templates'">
-        <li ng-class="{active: tab=='templates'}"><a ng-click="tab='templates'">Views</a></li>
-        <li ng-class="{active: tab=='tables'}"><a ng-click="tab='tables'">Tables</a></li>
+    <ul class="nav nav-pills nav-justified" ng-init="inHash('tables')?tab='tables':tab='templates'">
+        <li ng-class="{active: tab=='templates'}"><a href="#/builder?tab=views">Views</a></li>
+        <li ng-class="{active: tab=='tables'}"><a href="#/builder?tab=tables">Tables</a></li>
     </ul>
     <br>
 
