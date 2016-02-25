@@ -61,11 +61,11 @@
                 <tbody>
                 <tr ng-repeat="e in r.records">
                     <td ng-show="e['ref-link']">
-                        <a ng-click="showRelations(e, r)" ng-if="pos>0">
-                            <span class="glyphicon glyphicon-zoom-in"></span>{{ e['ref-link'] }}
+                        <a href="#builder/relations" ng-click="showRelations(e, r)" ng-if="pos>0">
+                            <span class="glyphicon glyphicon-zoom-in"></span>
                         </a>
-                        <span ng-if="pos==0">{{ e['ref-link'] }}</span>
-                        <a ng-click="load(e)"><span class="glyphicon glyphicon-edit"></span></a>
+                        {{ e['ref-link'] }}
+                        <a ng-click="load(e)" ng-if="pos==0"><span class="glyphicon glyphicon-edit"></span></a>
                     </td>
                     <td ng-repeat="(key, value) in e" ng-show="key!='ref-link'">
                         {{ formatValue(key, value, r.fields) }}

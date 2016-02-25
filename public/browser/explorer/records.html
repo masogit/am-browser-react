@@ -42,8 +42,9 @@
                     ng-click="getRecordByTemp(record, tempRecords, true)">
                     <td>
                         <a href="#explorer/relations" ng-click="showRelations(record)">
-                            <span class="glyphicon glyphicon-zoom-in"></span> {{ record['self'] }}
+                            <span class="glyphicon glyphicon-zoom-in"></span>
                         </a>
+                        {{ record['self'] }}
                     </td>
                     <td ng-repeat="(key, value) in record" ng-show="!(key==('self')||key==('ref-link'))">
                         {{ formatValue(key, value) }}
