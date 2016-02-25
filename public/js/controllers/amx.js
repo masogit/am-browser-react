@@ -664,7 +664,9 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
     };
 
     $scope.saveTemplate = function (temp) {
-        //        console.log("saveTemplate: " + JSON.stringify(temp));
+        if(!temp.visit)
+            temp.visit = 0;
+
         $http.post('/json/template', temp).success(function (data) {
             //            console.log("saveTemplate: " + JSON.stringify(data));
             temp = data;

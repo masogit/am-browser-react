@@ -40,7 +40,7 @@
     <h4>Views</h4>
 
     <div class="col-md-3" style="height: 150px;padding-top: 10px; margin-bottom: 20px"
-         ng-repeat="temp in templates|orderBy:'-last.visit'|filter:globalSearch">
+         ng-repeat="temp in templates|orderBy:'-visit'|filter:globalSearch">
 
         <a href="#explorer/records">
             <span class="thumbnail" ng-click="backTableList();loadOneTemp(temp);visitTemplate(temp);">
@@ -51,7 +51,7 @@
                 <small class="pull-left">{{ temp.description }}</small>
 
                 <h6 style="padding-top: 90px;">
-                    <span ng-show="temp.visit">Visit: {{ temp.visit }}</span>
+                    <span>Visit: {{ temp.visit }}</span>
                     <small class="pull-right">{{temp.last.time | date:'yyyy-MM-dd HH:mm:ss'}}</small>
                 </h6>
             </span>
