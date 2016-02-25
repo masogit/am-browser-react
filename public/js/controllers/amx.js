@@ -14,7 +14,6 @@ am.config(function ($routeProvider) {
 
 am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
     var AM_FORM_DATA = "amFormData";
-    var AM_AQL_HIST = "amAQLHist";
 
     $scope.title = "AM Browser";
     $scope.formData = {
@@ -96,8 +95,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
             };
             localStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
         }
-//        delete $scope.serverbar;
-//        $scope.metadata('all');
+
     };
 
     if (localStorage && localStorage[AM_FORM_DATA]) {
@@ -146,9 +144,6 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
      * build native AQL query
      */
     $scope.loadAQLs = function () {
-        //        if (localStorage && localStorage[AM_AQL_HIST])
-        //            $scope.aqlHist = JSON.parse(localStorage.getItem(AM_AQL_HIST));
-
         var form = clone($scope.formData);
         form['ref-link'] = "db/amInToolReport";
         $http.post('/am/rest', form).success(function (data) {
@@ -170,9 +165,6 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
 
             $scope.aqlHist.splice(pos, 1);
 
-            //            if (localStorage) {
-            //                localStorage.setItem(AM_AQL_HIST, JSON.stringify($scope.aqlHist));
-            //            }
         }
     };
 
@@ -195,10 +187,6 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
                 time: Date.now()
             });
         }
-
-        //        if (localStorage) {
-        //            localStorage.setItem(AM_AQL_HIST, JSON.stringify($scope.aqlHist));
-        //        }
 
     };
 
