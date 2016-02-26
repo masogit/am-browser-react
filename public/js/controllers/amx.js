@@ -3,8 +3,7 @@ var am = angular.module('am', ['ui.bootstrap', 'ngRoute', 'mobile-angular-ui', '
 am.config(function ($routeProvider) {
     $routeProvider.when('/explorer', { templateUrl: '/browser/explorer/index.html'});
     $routeProvider.when('/explorer/records', { templateUrl: '/browser/explorer/records.html'});
-    $routeProvider.when('/explorer/relations', { templateUrl: '/browser/relations.html'});
-    $routeProvider.when('/builder/relations', { templateUrl: '/browser/relations.html'});
+    $routeProvider.when('/relations', { templateUrl: '/browser/relations.html'});
     $routeProvider.when('/builder', { templateUrl: '/browser/builder/index.html'});
     $routeProvider.when('/setting', { templateUrl: '/browser/setting.html'});
     $routeProvider.when('/aql', { templateUrl: '/browser/aql/index.html'});
