@@ -16,7 +16,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
 
     $scope.title = "AM Browser";
     $scope.formData = {
-        server: "16.165.217.186:8081", // "16.165.217.186:8081",
+        server: "", // "16.165.217.186:8081",
         context: "/AssetManagerWebService/rs/",
         "ref-link": "",     // "db/amLocation/126874",
         collection: "",     // "EmplDepts",
