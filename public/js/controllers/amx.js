@@ -1,4 +1,4 @@
-var am = angular.module('am', ['ui.bootstrap', 'ngRoute', 'mobile-angular-ui', 'mobile-angular-ui.gestures', 'angular.filter']);
+var am = angular.module('am', ['ui.bootstrap', 'ngRoute', 'mobile-angular-ui', 'mobile-angular-ui.gestures']);
 
 am.config(function ($routeProvider) {
     $routeProvider.when('/explorer', { templateUrl: '/browser/explorer/index.html'});
@@ -1170,6 +1170,34 @@ am.filter('range', function () {
         return input;
     };
 });
+
+am.filter('groupBy', function ($timeout) {
+    return function (data, key) {
+        if (!key) return data;
+        if(data) {
+            var outputPropertyName = '__groupBy__' + key;
+            if(!data[outputPropertyName]){
+                var result = {};  
+                for (var i=0;i<data.length;i++) {
+                    var objKey = (data[i][key] instanceof Object) ? data[i][key][Object.keys(data[i][key])[0]] : data[i][key];
+                    if (!result[objKey])
+                        result[objKey]=[];
+                    else {
+                        // if (data[i] instanceof Object) {
+                        //     var objValue = data[i]; 
+                        //     var objKey = Object.keys(objValue)[0];
+                        //     result[data[i][key]].push(objValue[objKey]);
+                        // } else
+                        result[objKey].push(data[i]);
+                    }
+                }
+                Object.defineProperty(data, outputPropertyName, {enumerable:false, configurable:true, writable: false, value:result});
+                $timeout(function(){delete data[outputPropertyName];},0,false);
+            }
+            return data[outputPropertyName];            
+        }
+    };
+})
 
 am.directive('myEnter', function () {
     return function (scope, element, attrs) {
