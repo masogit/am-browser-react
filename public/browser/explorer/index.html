@@ -65,41 +65,7 @@
     
     <div class="row" ng-show="formData.viewStyle=='list'">
         <div class="col-md-3" ng-include="'/browser/builder/views.html'"></div>
-        <div class="col-md-6" full-height="130">
-            <table class="table table-striped" ng-show="tempRecords" id="to_save">
-                <thead ng-repeat="e in tempRecords.records" ng-if="$first">
-                    <tr>
-                        <th>
-                            <a ng-click="order('self')">Self
-                                <span class="glyphicon glyphicon-arrow-up" ng-show="predicate=='self' && !reverse"></span>
-                                <span class="glyphicon glyphicon-arrow-down" ng-show="predicate=='self' && reverse"></span>
-                            </a>
-                        </th>
-                        <th ng-repeat="(key, value) in e" ng-show="!(key==('self')||key==('ref-link'))">
-                            <a ng-click="order(key)">{{ getCaptionByTemp(key, tempTable, tempTable.showLabel) }}
-                                <span class="glyphicon glyphicon-arrow-up" ng-show="predicate==key && !reverse"></span>
-                                <span class="glyphicon glyphicon-arrow-down" ng-show="predicate==key && reverse"></span>
-                            </a>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="record in tempRecords.records|filter:recordSearch|orderBy:predicate:reverse"
-                        ng-class="{selected: tempRecords['selected']==record['ref-link']}"
-                        ng-click="getRecordByTemp(record, tempRecords, true)">
-                        <td>
-                            <a href="#relations" ng-click="showRelations(record)">
-                                <span class="glyphicon glyphicon-zoom-in"></span>
-                            </a>
-                            {{ record['self'] }}
-                        </td>
-                        <td ng-repeat="(key, value) in record" ng-show="!(key==('self')||key==('ref-link'))">
-                            {{ formatValue(key, value) }}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>            
-        </div>
+        <div class="col-md-6" ng-include="'/browser/record_list.html'" full-height="130"></div>
         <div class="col-md-3" ng-include="'/browser/record_tree.html'" full-height="130"></div>
     </div>
 </div>

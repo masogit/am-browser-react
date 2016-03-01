@@ -1,4 +1,4 @@
-var am = angular.module('am', ['ui.bootstrap', 'ngRoute', 'mobile-angular-ui', 'mobile-angular-ui.gestures']);
+var am = angular.module('am', ['ui.bootstrap', 'ngRoute', 'mobile-angular-ui', 'mobile-angular-ui.gestures', 'angular.filter']);
 
 am.config(function ($routeProvider) {
     $routeProvider.when('/explorer', { templateUrl: '/browser/explorer/index.html'});
@@ -671,7 +671,6 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
                 });
             });
 
-        $scope.backTableList();
     };
 
     $scope.visitTemplate = function (temp) {
@@ -1052,6 +1051,15 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
             } else {
                 $scope.tableData.form.param.orderby = "";
             }
+    };
+    
+    $scope.group = function (key) {
+        if(key)
+            $scope.tempTable.groupByKey = key; 
+        else
+            $scope.tempTable.groupByKey = ""; 
+            
+        $scope.saveTemplate($scope.tempTable);
     };
 
     $scope.jump = function (i) {
