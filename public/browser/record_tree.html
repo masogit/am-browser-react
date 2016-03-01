@@ -8,33 +8,46 @@
 
     <span style="display: none">{{table = (isStructure) ? l.table: (t)?t:tempRecord }}</span>
 
-    <h5>
-        <small>
+    <h5 class="breadcrumb">
+        <!--<small ng-show="l">
             <span class="glyphicon glyphicon-eye-close" ng-click="table.showSelf=!table.showSelf"
                   ng-show="!table.showSelf"></span>
             <span class="glyphicon glyphicon-eye-open" ng-click="table.showSelf=!table.showSelf"
                   ng-show="table.showSelf"></span>
-        </small>
+        </small>-->
         {{ (tempTable.showLabel)?(l['$']['label']) ? l['$']['label'] : table['$']['sqlname']:(l['$']['sqlname']) ?
         l['$']['sqlname'] : table['$']['sqlname'] }}
         <small>({{ table['ID'] }})</small>
         <small class="pull-right" ng-show="!l">Elapsed time: {{ tempRecord.timeEnd - tempRecord.timeStart }}ms</small>
+        <a ng-click="table.showSelf=!table.showSelf" class="pull-right" ng-show="l">
+            <span class="glyphicon glyphicon-menu-{{(table.showSelf)?'down':'up'}}"></span>
+        </a>
     </h5>
 
-    <ul ng-show="!table.showSelf">
+    <!--<ul ng-show="!table.showSelf">
         <li ng-repeat="f in table.field"><strong>{{(f.aliasName)?f.aliasName:(tempTable.showLabel)?f['$']['label']:f['$']['sqlname']}}:</strong>
             {{ formatValue(f['$']['sqlname'], f.data) }}
         </li>
-    </ul>
-
+    </ul>-->
+    <table ng-show="!table.showSelf" width="90%" class="table-condensed">
+        <tbody>
+            <tr ng-repeat="f in table.field">
+                <td width="30%" style="padding: 0px"><strong>{{(f.aliasName)?f.aliasName:(tempTable.showLabel)?f['$']['label']:f['$']['sqlname']}}:</strong></td>
+                <td width="70%" style="padding: 0px">{{ formatValue(f['$']['sqlname'], f.data) }}</td>
+            </tr>
+        </tbody>
+    </table>
     <span ng-show="!table.showSelf" ng-repeat="l in table.link">
-        <div ng-show="l.table && l['$']['card11']=='yes'" ng-include="'amTempRecord'" style="padding-left: 20px"
+        <div ng-show="l.table && l['$']['card11']=='yes'" ng-include="'amTempRecord'"
              ng-init="isStructure=true"></div>
-        <div ng-show="l.tables && !l['$']['card11']" style="padding-left: 20px">
-            <a ng-click="l.showChild=!l.showChild" ng-show="!l.showChild"><span class="glyphicon glyphicon-plus"></span></a>
-            <a ng-click="l.showChild=!l.showChild" ng-show="l.showChild"><span class="glyphicon glyphicon-minus"></span></a>
-            {{l['$']['sqlname']}} ({{l.tables.length}})
-            <div ng-show="l.showChild" ng-repeat="t in l.tables" ng-include="'amTempRecord'" style="padding-left: 18px"
+        <div ng-show="l.tables && !l['$']['card11']">
+            <h5 class="breadcrumb">
+                {{l['$']['sqlname']}} ({{l.tables.length}})
+                <a ng-click="l.showChild=!l.showChild" class="pull-right">
+                    <span class="glyphicon glyphicon-menu-{{(l.showChild)?'up':'down'}}"></span>
+                </a>
+            </h5>
+            <div ng-show="l.showChild" ng-repeat="t in l.tables" ng-include="'amTempRecord'"
                  ng-init="isStructure=false"></div>
         </div>
     </span>
