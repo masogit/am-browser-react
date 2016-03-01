@@ -1182,17 +1182,10 @@ am.filter('groupBy', function ($timeout) {
                     var objKey = (data[i][key] instanceof Object) ? data[i][key][Object.keys(data[i][key])[0]] : data[i][key];
                     if (!result[objKey])
                         result[objKey]=[];
-                    else {
-                        // if (data[i] instanceof Object) {
-                        //     var objValue = data[i]; 
-                        //     var objKey = Object.keys(objValue)[0];
-                        //     result[data[i][key]].push(objValue[objKey]);
-                        // } else
-                        result[objKey].push(data[i]);
-                    }
+                    result[objKey].push(data[i]);
                 }
                 Object.defineProperty(data, outputPropertyName, {enumerable:false, configurable:true, writable: false, value:result});
-                $timeout(function(){delete data[outputPropertyName];},0,false);
+                // $timeout(function(){delete data[outputPropertyName];},0,false);
             }
             return data[outputPropertyName];            
         }
