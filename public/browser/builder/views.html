@@ -10,7 +10,7 @@
         </thead>
         <tbody>
         <tr ng-repeat="temp in templates | filter: templates.search" ng-class="{selected: templates['selected']==temp['$loki']}"
-            ng-click="backTableList();loadOneTemp(temp)">
+            ng-click="backTableList();loadOneTemp(temp);visitTemplate(temp);">
             <td><a>{{ temp.name }}</a>
                 <small class="badge pull-right">{{temp.last.count}}</small>
                 <h6>
