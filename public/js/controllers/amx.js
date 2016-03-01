@@ -101,16 +101,16 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
 
     if (localStorage && localStorage[AM_FORM_DATA]) {
         var form = JSON.parse(localStorage.getItem(AM_FORM_DATA));
-        $scope.formData.server = form.server;
-        $scope.formData.user = form.user;
+        if (form.server) $scope.formData.server = form.server;
+        if (form.user) $scope.formData.user = form.user;
 //        $scope.formData.password = form.password;
-        $scope.formData.pageSize = form.pageSize;
-        $scope.formData.showLabel = form.showLabel;
+        if (form.pageSize) $scope.formData.pageSize = form.pageSize;
+        if (form.showLabel) $scope.formData.showLabel = form.showLabel;
         //        $scope.formData.showError = form.showError;
-        $scope.formData.param.limit = form.limit;
-        $scope.formData.param.offset = form.offset;
-        $scope.formData.cache = form.cache;
-        $scope.formData.viewStyle = form.viewStyle;
+        if (form.limit) $scope.formData.param.limit = form.limit;
+        if (form.offset) $scope.formData.param.offset = form.offset;
+        if (form.cache) $scope.formData.cache = form.cache;
+        if (form.viewStyle) $scope.formData.viewStyle = form.viewStyle;
     }
 
     // console.log(window.location.pathname);
