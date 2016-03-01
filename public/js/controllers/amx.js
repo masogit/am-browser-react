@@ -34,6 +34,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
 
         pageSize: 10,
         cache: false,
+        viewStyle: "tile",
         //        showError: false,
         showLabel: false
     };
@@ -90,7 +91,8 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
                 //                showError: $scope.formData.showError,
                 limit: $scope.formData.param.limit,
                 offset: $scope.formData.param.offset,
-                cache: $scope.formData.cache
+                cache: $scope.formData.cache,
+                viewStyle: $scope.formData.viewStyle
             };
             localStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
         }
@@ -108,6 +110,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
         $scope.formData.param.limit = form.limit;
         $scope.formData.param.offset = form.offset;
         $scope.formData.cache = form.cache;
+        $scope.formData.viewStyle = form.viewStyle;
     }
 
     // console.log(window.location.pathname);

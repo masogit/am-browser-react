@@ -1,6 +1,6 @@
-<div ng-show="templates" full-height="140">
+<div full-height="140">
 
-    <table class="table table-striped" ng-show="templates">
+    <table class="table table-striped" ng-init="loadTemplates()">
         <thead>
         <tr>
             <th>
@@ -9,7 +9,8 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="temp in templates | filter: templates.search" ng-class="{selected: templates['selected']==temp['$loki']}" ng-click="backTableList();loadOneTemp(temp)">
+        <tr ng-repeat="temp in templates | filter: templates.search" ng-class="{selected: templates['selected']==temp['$loki']}"
+            ng-click="backTableList();loadOneTemp(temp)">
             <td><a>{{ temp.name }}</a>
                 <small class="badge pull-right">{{temp.last.count}}</small>
                 <h6>

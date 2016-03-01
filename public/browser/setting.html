@@ -39,6 +39,16 @@
                 <input type="checkbox" ng-model="formData.cache"> Enable cache (quick search)
             </label>
         </div>
+        
+        <div class="form-group">
+            <label>Explorer view style</label><br>
+            <label class="radio-inline">        
+                <input type="radio" ng-model="formData.viewStyle" value="list"> <span class="glyphicon glyphicon-list"></span> List
+            </label>
+            <label class="radio-inline">  
+                <input type="radio" ng-model="formData.viewStyle" value="tile"> <span class="glyphicon glyphicon-th"></span> Tile
+            </label>
+        </div>
     </div>
     <div class="col-md-4">
         <h4>UCMDB</h4>
