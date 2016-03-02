@@ -1059,7 +1059,8 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
         else
             $scope.tempTable.groupByKey = ""; 
             
-        $scope.saveTemplate($scope.tempTable);
+        if ($scope.tempTable)
+            $scope.saveTemplate($scope.tempTable);
     };
 
     $scope.jump = function (i) {
