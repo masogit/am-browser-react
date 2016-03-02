@@ -42,10 +42,9 @@
             <input type="radio" ng-model="formData.viewStyle" value="tile"> <span class="glyphicon glyphicon-th"></span> Tile
         </small>
     </h4>-->
-<div class="col-md-12" ng-init="loadTemplates()" full-height="120">
+<div class="col-md-12" ng-init="loadTemplates()" ng-show="formData.viewStyle=='tile'" full-height="100">
 
-    <div ng-show="formData.viewStyle=='tile'" class="col-md-12" 
-        ng-repeat="(key, value) in templates|filter:globalSearch|groupBy:'group'">
+    <div class="col-md-12" ng-repeat="(key, value) in templates|filter:globalSearch|groupBy:'group'">
         <h3>{{ key }} <small>({{ value.length }})</small></h3>
         <div class="col-md-3" style="height: 150px;padding-top: 10px; margin-bottom: 20px"
              ng-repeat="temp in value|orderBy:'-visit'|filter:globalSearch">
@@ -67,9 +66,11 @@
         </div>
     </div>  
   
-    <div class="row" ng-show="formData.viewStyle=='list'">
-        <div class="col-md-3" ng-include="'/browser/builder/views.html'"></div>
-        <div class="col-md-6" ng-include="'/browser/record_list.html'" full-height="130"></div>
-        <div class="col-md-3" ng-include="'/browser/record_tree.html'" full-height="130"></div>
-    </div>
+
+</div>
+
+<div class="col-md-12" ng-show="formData.viewStyle=='list'">
+    <div class="col-md-3" ng-include="'/browser/builder/views.html'"></div>
+    <div class="col-md-6" ng-include="'/browser/record_list.html'" full-height="100"></div>
+    <div class="col-md-3" ng-include="'/browser/record_tree.html'" full-height="100"></div>
 </div>
