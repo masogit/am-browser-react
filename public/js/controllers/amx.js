@@ -1,4 +1,4 @@
-var am = angular.module('am', ['ui.bootstrap', 'ngRoute', 'mobile-angular-ui', 'mobile-angular-ui.gestures']);
+var am = angular.module('am', ['ui.bootstrap', 'ngRoute', 'mobile-angular-ui', 'mobile-angular-ui.gestures', 'chart.js']);
 
 am.config(function ($routeProvider) {
     $routeProvider.when('/explorer', { templateUrl: '/browser/explorer/index.html'});
@@ -151,6 +151,16 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
         $http.post('/am/rest', form).success(function (data) {
             $scope.amInToolRepoprt = data;
         });
+
+        $http.get('/json/aql').success(function (data) {
+            $scope.aqlHist = data;
+        }).error(function (data) {
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: data
+                });
+            });
+
     };
 
     $scope.loadAQL = function (aql, name) {
@@ -159,18 +169,27 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
         $scope.selectedAQL = name;
     };
 
-    $scope.removeAQL = function (name) {
-        if ($scope.aqlHist) {
-            var pos = $scope.aqlHist.map(function (obj) {
-                return obj.name;
-            }).indexOf(name);
-
-            $scope.aqlHist.splice(pos, 1);
-
-        }
+    $scope.removeAQL = function (aql) {
+//        if ($scope.aqlHist) {
+//            var pos = $scope.aqlHist.map(function (obj) {
+//                return obj.name;
+//            }).indexOf(name);
+//
+//            $scope.aqlHist.splice(pos, 1);
+//
+//        }
+        if (aql.$loki)
+            $http.delete('/json/aql/' + aql.$loki).success(function (data) {
+                $scope.loadAQLs();
+            }).error(function (data) {
+                    $scope.alerts.push({
+                        type: 'danger',
+                        msg: data
+                    });
+                });
     };
 
-    $scope.saveAQL = function (name, str) {
+    $scope.saveAQL = function (name, str, aqlChart) {
         // init
         if (!$scope.aqlHist)
             $scope.aqlHist = [];
@@ -183,11 +202,22 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
             aql.str = str;
             aql.time = Date.now();
         } else {
-            $scope.aqlHist.push({
+            var aqlObj = {
                 name: name,
                 str: str,
-                time: Date.now()
-            });
+                time: Date.now(),
+                data: aqlChart
+            };
+            $scope.aqlHist.push(aqlObj);
+
+            $http.post('/json/aql', aqlObj).success(function (data) {
+
+            }).error(function (data) {
+                    $scope.alerts.push({
+                        type: 'danger',
+                        msg: data
+                    });
+                });
         }
 
     };
@@ -218,6 +248,9 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
     };
 
     $scope.aqlQuery = function (form, str, name) {
+        $scope.aqlAlias = name;
+        $scope.aqlString = str;
+
         var form = clone(form);
         var aql = $scope.str2AQL(str);
 
@@ -227,8 +260,8 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
             form.collection += " " + aql.where;
         $scope.query(form);
 
-        if (name && name.trim() != "")
-            $scope.saveAQL(name, str);
+//        if (name && name.trim() != "")
+//            $scope.saveAQL(name, str);
     };
 
     // amx_record query
@@ -255,6 +288,21 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
                     $scope.aqlData.count = data.Query.Result[0].Row.length;
                     $scope.aqlData['timeStart'] = timeStart;
                     $scope.aqlData['timeEnd'] = Date.now();
+
+                    // output charts data
+                    $scope.aqlChart = {};
+                    var data_1 = [];
+                    $scope.aqlChart.series = ['A'];
+                    $scope.aqlChart.labels = [];
+                    $scope.aqlChart.data = [data_1];
+                    $scope.aqlData.Result[0].Row.forEach(function (obj) {
+                        $scope.aqlChart.labels.push(obj.Column[0]['_']);
+                        data_1.push(obj.Column[1]['_']);
+                    });
+
+                    // save AQL
+                    if ($scope.aqlAlias && $scope.aqlAlias.trim() != "")
+                        $scope.saveAQL($scope.aqlAlias, $scope.aqlString, $scope.aqlChart);
 
                 } else {
                     $scope.tableData = {};
@@ -655,7 +703,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
     };
 
     $scope.saveTemplate = function (temp) {
-        if(!temp.visit)
+        if (!temp.visit)
             temp.visit = 0;
 
         $http.post('/json/template', temp).success(function (data) {
@@ -1052,13 +1100,13 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
                 $scope.tableData.form.param.orderby = "";
             }
     };
-    
+
     $scope.group = function (key) {
-        if(key)
-            $scope.tempTable.groupByKey = key; 
+        if (key)
+            $scope.tempTable.groupByKey = key;
         else
-            $scope.tempTable.groupByKey = ""; 
-            
+            $scope.tempTable.groupByKey = "";
+
         if ($scope.tempTable)
             $scope.saveTemplate($scope.tempTable);
     };
@@ -1175,20 +1223,20 @@ am.filter('range', function () {
 am.filter('groupBy', function ($timeout) {
     return function (data, key) {
         if (!key) return data;
-        if(data) {
+        if (data) {
             var outputPropertyName = '__groupBy__' + key;
-            if(!data[outputPropertyName]){
-                var result = {};  
-                for (var i=0;i<data.length;i++) {
+            if (!data[outputPropertyName]) {
+                var result = {};
+                for (var i = 0; i < data.length; i++) {
                     var objKey = (data[i][key] instanceof Object) ? data[i][key][Object.keys(data[i][key])[0]] : data[i][key];
                     if (!result[objKey])
-                        result[objKey]=[];
+                        result[objKey] = [];
                     result[objKey].push(data[i]);
                 }
-                Object.defineProperty(data, outputPropertyName, {enumerable:false, configurable:true, writable: false, value:result});
+                Object.defineProperty(data, outputPropertyName, {enumerable: false, configurable: true, writable: false, value: result});
                 // $timeout(function(){delete data[outputPropertyName];},0,false);
             }
-            return data[outputPropertyName];            
+            return data[outputPropertyName];
         }
     };
 })

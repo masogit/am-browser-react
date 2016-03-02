@@ -30,7 +30,21 @@
 
 <div full-height="200">
     <span class="text-center" ng-show="loading">Loading....</span>
+    <div class="col-md-12">
+        <!-- CHART -->
+        <div class="col-md-4">
+            <canvas id="line" class="chart chart-line" chart-data="aqlChart.data" chart-labels="aqlChart.labels"
+                    chart-legend="false" chart-series="aqlChart.series"></canvas>
+        </div>
+        <div class="col-md-4">
+            <canvas id="bar" class="chart chart-bar" chart-data="aqlChart.data" chart-labels="aqlChart.labels"
+                    chart-legend="false" chart-series="aqlChart.series"></canvas>
 
+        </div>
+        <div class="col-md-4">
+            <canvas id="doughnut" class="chart chart-doughnut" chart-data="aqlChart.data[0]" chart-labels="aqlChart.labels"></canvas>
+        </div>
+    </div>
     <table class="table table-striped" ng-show="aqlData.Schema">
         <thead>
         <tr>
