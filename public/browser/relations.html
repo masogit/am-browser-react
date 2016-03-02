@@ -61,7 +61,7 @@
                 <tbody>
                 <tr ng-repeat="e in r.records">
                     <td ng-show="e['ref-link']">
-                        <a href="#builder/relations" ng-click="showRelations(e, r)" ng-if="pos>0">
+                        <a href="#relations" ng-click="showRelations(e, r)" ng-if="pos>0">
                             <span class="glyphicon glyphicon-zoom-in"></span>
                         </a>
                         {{ e['ref-link'] }}
