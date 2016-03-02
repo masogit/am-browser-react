@@ -23,7 +23,7 @@
         <input class="form-control" type="text" placeholder="Order By..." ng-model="tableData.form.param.orderby" size="20">
         <button class="btn" ng-click="query(tableData.form)">Query</button>
     </form>
-    <table class="table table-striped" ng-show="tableData.entities">
+    <table class="table table-striped table-condensed" ng-show="tableData.entities">
         <thead>
             <tr ng-repeat="e in tableData.entities" ng-if="$first">
                 <th ng-show="e['ref-link']">

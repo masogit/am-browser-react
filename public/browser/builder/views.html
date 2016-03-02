@@ -1,29 +1,30 @@
 <div full-height="140">
 
-    <table class="table table-striped" ng-init="loadTemplates()">
+    <table class="table table-hover table-condensed" ng-init="loadTemplates()">
         <thead>
         <tr>
-            <th>
+            <th colspan="0">
                 <input type="text" class="form-control" placeholder="Search views..." ng-model="templates.search">
             </th>
         </tr>
         </thead>
-        <tbody>
-        <tr ng-repeat="temp in templates | filter: templates.search" ng-class="{selected: templates['selected']==temp['$loki']}"
-            ng-click="backTableList();loadOneTemp(temp);visitTemplate(temp);">
+        <tbody ng-repeat="(key, value) in templates | filter: templates.search | groupBy: 'group'" >
+        <tr ng-click="viewGroupShow[key]=!viewGroupShow[key]">
+            <td width="20px">
+                <span class="glyphicon glyphicon-menu-{{(viewGroupShow[key])?'right':'down'}}"></span>
+            </td>
+            <td>
+                {{ key }} ({{ value.length }})
+            </td>
+        </tr>
+        <tr ng-repeat="temp in value | filter: templates.search" ng-class="{selected: templates['selected']==temp['$loki']}"
+            ng-show="viewGroupShow[key]" ng-click="backTableList();loadOneTemp(temp);visitTemplate(temp);">
+            <td></td>
             <td><a>{{ temp.name }}</a>
                 <small class="badge pull-right">{{temp.last.count}}</small>
-                <h6>
+                <!--<h6>
                     <small class="pull-left">{{ temp.description }}</small>
-                    <small class="pull-right">{{temp.last.time | date:'yyyy-MM-dd HH:mm:ss'}}</small></h6>
-                <!--<small class="badge">{{temp.last.count}}</small>-->
-            </td>
-            <!--<td>{{ temp['$']['sqlname'] }}</td>-->
-            <td ng-show="tempAction">
-                <!--<a ng-click="queryRootByTemp(temp)" class="badge"><span class="glyphicon glyphicon-eye-open"></span>-->
-                    <!--Query</a>-->
-                <a ng-click="removeTemplate(temp)" class="badge"><span class="glyphicon glyphicon-trash"></span>
-                    Delete</a>
+                    <small class="pull-right">{{temp.last.time | date:'yyyy-MM-dd HH:mm:ss'}}</small></h6>-->
             </td>
         </tr>
         </tbody>

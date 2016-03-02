@@ -29,7 +29,7 @@
             {{ formatValue(f['$']['sqlname'], f.data) }}
         </li>
     </ul>-->
-    <table ng-show="!table.showSelf" width="100%" class="table-condensed">
+    <table ng-show="!table.showSelf" width="100%" class="table-condensed table-condensed">
         <tbody>
             <tr ng-repeat="f in table.field">
                 <td width="30%" style="padding: 0px"><strong>{{(f.aliasName)?f.aliasName:(tempTable.showLabel)?f['$']['label']:f['$']['sqlname']}}:</strong></td>
