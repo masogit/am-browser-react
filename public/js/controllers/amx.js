@@ -40,6 +40,10 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
     };
 
     $scope.alerts = [];
+    $scope.AQL = {
+        alias: "",
+        str: ""
+    };
 
     $scope.login = function () {
         var form = clone($scope.formData);
@@ -164,20 +168,12 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
     };
 
     $scope.loadAQL = function (aql, name) {
-        $scope.aqlString = aql;
-        $scope.aqlAlias = name;
+        $scope.AQL.str = aql;
+        $scope.AQL.alias = name;
         $scope.selectedAQL = name;
     };
 
     $scope.removeAQL = function (aql) {
-//        if ($scope.aqlHist) {
-//            var pos = $scope.aqlHist.map(function (obj) {
-//                return obj.name;
-//            }).indexOf(name);
-//
-//            $scope.aqlHist.splice(pos, 1);
-//
-//        }
         if (aql.$loki)
             $http.delete('/json/aql/' + aql.$loki).success(function (data) {
                 $scope.loadAQLs();
@@ -198,28 +194,29 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
             return obj.name == name;
         })[0];
 
+        var aqlObj;
+
         if (aql) {
             aql.str = str;
             aql.time = Date.now();
+            aql.data = aqlChart;
+            aqlObj = aql;
         } else {
-            var aqlObj = {
+            aqlObj = {
                 name: name,
                 str: str,
                 time: Date.now(),
                 data: aqlChart
             };
-            $scope.aqlHist.push(aqlObj);
-
-            $http.post('/json/aql', aqlObj).success(function (data) {
-
-            }).error(function (data) {
-                    $scope.alerts.push({
-                        type: 'danger',
-                        msg: data
-                    });
-                });
         }
-
+        $http.post('/json/aql', aqlObj).success(function (data) {
+            $scope.loadAQLs();
+        }).error(function (data) {
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: data
+                });
+            });
     };
 
     $scope.str2AQL = function (str) {
@@ -248,8 +245,8 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
     };
 
     $scope.aqlQuery = function (form, str, name) {
-        $scope.aqlAlias = name;
-        $scope.aqlString = str;
+        $scope.AQL.alias = name;
+        $scope.AQL.str = str;
 
         var form = clone(form);
         var aql = $scope.str2AQL(str);
@@ -264,6 +261,14 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
 //            $scope.saveAQL(name, str);
     };
 
+    $scope.setChartData = function (aql){
+        if(aql){
+            $scope.tempTable.chartData = aql.data;
+        } else {
+            delete $scope.tempTable.chartType;
+            delete $scope.tempTable.chartData;
+        }
+    };
     // amx_record query
     $scope.query = function (form) {
         $scope.loading = true;
@@ -301,8 +306,8 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
                     });
 
                     // save AQL
-                    if ($scope.aqlAlias && $scope.aqlAlias.trim() != "")
-                        $scope.saveAQL($scope.aqlAlias, $scope.aqlString, $scope.aqlChart);
+                    if ($scope.AQL.alias && $scope.AQL.alias.trim() != "")
+                        $scope.saveAQL($scope.AQL.alias, $scope.AQL.str, $scope.aqlChart);
 
                 } else {
                     $scope.tableData = {};

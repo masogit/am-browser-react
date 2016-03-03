@@ -1,13 +1,13 @@
 <div class="row">
     <div class="col-md-9">
-        <textarea class="form-control" ng-model="aqlString" placeholder="AQL..." style="height: 68px"></textarea>
+        <textarea class="form-control" ng-model="AQL.str" placeholder="AQL..." style="height: 68px"></textarea>
     </div>
     <div class="col-md-3">
-        <input type="text" class="form-control" ng-model="aqlAlias" placeholder="AQL alias name">
+        <input type="text" class="form-control" ng-model="AQL.alias" placeholder="AQL alias name">
         <button class="btn btn-primary form-control"
-                ng-click="aqlQuery(formData, aqlString, aqlAlias)"
-                ng-disabled="!aqlString">
-            Query<span ng-show="aqlAlias"> & Save</span>
+                ng-click="aqlQuery(formData, AQL.str, AQL.alias)"
+                ng-disabled="!AQL.str">
+            Query<span ng-show="AQL.alias"> & Save</span>
         </button>
     </div>
 </div>
@@ -30,8 +30,7 @@
 
 <div full-height="200">
     <span class="text-center" ng-show="loading">Loading....</span>
-    <div class="col-md-12">
-        <!-- CHART -->
+    <div class="col-md-12" ng-init="aqlData_Type='bar'">
         <div class="col-md-4">
             <canvas id="line" class="chart chart-line" chart-data="aqlChart.data" chart-labels="aqlChart.labels"
                     chart-legend="false" chart-series="aqlChart.series"></canvas>

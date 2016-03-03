@@ -20,6 +20,21 @@
             <input type="text" class="form-control" name="tempGroup" ng-model="tempTable.group" placeholder="Input a Group Name" ng-required="true">
         </div>
     </div>
+    <div class="form-group" ng-class="{'has-error': !tempForm.tempName.$valid}">
+        <label class="col-md-4">Chart</label>
+
+        <div class="col-md-8" ng-init="loadAQLs()">
+            <select ng-model="tempTable.aqlName" class="form-control">
+                <option value="" ng-click="setChartData()">-Select a chart-</option>
+                <option ng-repeat="aql in aqlHist" value="{{aql.name}}" ng-click="setChartData(aql)">{{aql.name}}</option>
+            </select>
+
+            <input type="radio" ng-model="tempTable.chartType" value="line" ng-disabled="!tempTable.aqlName"> Line
+            <input type="radio" ng-model="tempTable.chartType" value="bar" ng-disabled="!tempTable.aqlName"> Bar
+            <input type="radio" ng-model="tempTable.chartType" value="pie" ng-disabled="!tempTable.aqlName"> Pie
+
+        </div>
+    </div>
     <div class="panel panel-default">
         <div class="panel-heading">
             <input type="checkbox" ng-click="tempTable.showLabel=!tempTable.showLabel" ng-checked="tempTable.showLabel"> Show Label
@@ -31,7 +46,7 @@
             <a ng-click="queryRootByTemp(tempTable)" class="badge"><span class="glyphicon glyphicon-play"></span></a>
             </span>
         </div>
-        <div class="panel-body" full-height="280">
+        <div class="panel-body" full-height="345">
             <div ng-show="tempTable" ng-include="'amTemp'"></div>
         </div>
     </div>

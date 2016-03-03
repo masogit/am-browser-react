@@ -55,7 +55,22 @@
                         <strong class="badge pull-right">{{temp.last.count}}</strong>
                     </h4>
 
-                    <small class="pull-left">{{ temp.description }}</small>
+                    <div class="col-md-7" ng-show="temp.chartData">
+                        <canvas id="line" class="chart chart-line" chart-data="temp.chartData.data" chart-labels="temp.chartData.labels"
+                                chart-legend="false" chart-series="temp.chartData.series" ng-show="temp.chartType=='line'"
+                                chart-options="{scaleFontSize: 0}"></canvas>
+                        <canvas id="bar" class="chart chart-bar" chart-data="temp.chartData.data" chart-labels="temp.chartData.labels"
+                                chart-legend="false" chart-series="temp.chartData.series" ng-show="temp.chartType=='bar'"
+                                chart-options="{scaleFontSize: 0}"></canvas>
+                        <canvas id="doughnut" class="chart chart-doughnut" chart-data="temp.chartData.data[0]"
+                                chart-labels="temp.chartData.labels" ng-show="temp.chartType=='pie'"></canvas>
+                    </div>
+                    <div class="col-md-5" style="height: 80px; overflow: hidden" ng-show="temp.chartData">
+                        <span ng-repeat="l in temp.chartData.labels">{{l}}<br></span>
+                    </div>
+
+
+                    <small class="pull-left" ng-hide="temp.chartData">{{ temp.description }}</small>
 
                     <h6 style="padding-top: 90px;">
                         <span>Visit: {{ temp.visit }}</span>
