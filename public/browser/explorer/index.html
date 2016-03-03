@@ -61,7 +61,10 @@
                                 chart-labels="temp.chartData.labels" ng-show="temp.chartType=='pie'"></canvas>
                     </div>
                     <div class="col-md-5" style="height: 80px; overflow: hidden" ng-show="temp.chartData">
-                        <span ng-repeat="l in temp.chartData.labels">{{l}}<br></span>
+                        <span ng-repeat="l in temp.chartData.labels">
+                            {{l}}: {{temp.chartData.data[0][$index]}}
+                            <br>
+                        </span>
                     </div>
 
 
