@@ -33,11 +33,11 @@
     <div class="col-md-12" ng-init="aqlData_Type='bar'">
         <div class="col-md-4">
             <canvas id="line" class="chart chart-line" chart-data="aqlChart.data" chart-labels="aqlChart.labels"
-                    chart-legend="false" chart-series="aqlChart.series"></canvas>
+                    chart-legend="false" chart-series="aqlChart.series" chart-options="{scaleFontSize: 0}"></canvas>
         </div>
         <div class="col-md-4">
             <canvas id="bar" class="chart chart-bar" chart-data="aqlChart.data" chart-labels="aqlChart.labels"
-                    chart-legend="false" chart-series="aqlChart.series"></canvas>
+                    chart-legend="false" chart-series="aqlChart.series" chart-options="{scaleFontSize: 0}"></canvas>
 
         </div>
         <div class="col-md-4">
@@ -62,20 +62,3 @@
         </tbody>
     </table>
 </div>
-
-
-<!--<nav class="pull-right">
-    <ul class="pagination">
-        <li>
-            <a aria-label="Previous" ng-click="jump((currentPage-1)<0?0:currentPage-1)">
-                <span aria-hidden="true">&laquo;</span>
-            </a>
-        </li>
-        <li ng-repeat="i in [] |range:aqlData.Result[0].Row.length/formData.pageSize" ng-class="{active: currentPage==i}" ng-click="jump(i)"><a>{{ i + 1 }}</a></li>
-        <li>
-            <a aria-label="Next" ng-click="jump((currentPage+1)>aqlData.Result[0].Row.length/formData.pageSize?currentPage:currentPage+1)">
-                <span aria-hidden="true">&raquo;</span>
-            </a>
-        </li>
-    </ul>
-</nav>-->
