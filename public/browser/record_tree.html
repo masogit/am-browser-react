@@ -33,7 +33,10 @@
         <tbody>
             <tr ng-repeat="f in table.field">
                 <td width="30%" style="padding: 0px"><strong>{{(f.aliasName)?f.aliasName:(tempTable.showLabel)?f['$']['label']:f['$']['sqlname']}}:</strong></td>
-                <td width="70%" style="padding: 0px">{{ formatValue(f['$']['sqlname'], f.data) }}</td>
+                <td width="70%" style="padding: 0px">
+                    {{ formatValue(f['$']['sqlname'], f.data) }}
+                    <span ng-show="f['$']['sqlname']=='GlobalId'"><a ng-href="{{urlUCMDB(f.data)}}" target="_blank">Open UCMDB Browser</a></span>
+                </td>
             </tr>
         </tbody>
     </table>

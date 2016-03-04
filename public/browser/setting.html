@@ -55,20 +55,21 @@
 
         <div class="form-group">
             <label>Server and port</label>
-            <input type="text" class="form-control" placeholder="Server and port" ng-model="formData.ucmdb.server">
+            <input type="text" class="form-control" placeholder="Server and port" ng-model="ucmdb.server">
         </div>
 
         <div class="form-group">
             <label>Username</label>
-            <input type="text" class="form-control" placeholder="Username" ng-model="formData.ucmdb.user">
+            <input type="text" class="form-control" placeholder="Username" ng-model="ucmdb.user">
         </div>
 
         <div class="form-group">
             <label>Password</label>
-            <input type="password" class="form-control" placeholder="Password" ng-model="formData.ucmdb.password">
+            <input type="password" class="form-control" placeholder="Password" ng-model="ucmdb.password">
         </div>
 
-        <button class="btn">Test connection</button>
+        <!--<button class="btn">Test connection</button>-->
+        <a ng-href="{{urlUCMDB(f.data)}}" class="btn btn-primary" target="_blank">Test connection</a>
     </div>
     <div class="col-md-4">
         <h4>Redis</h4>

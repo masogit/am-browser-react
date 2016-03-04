@@ -44,6 +44,12 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
         alias: "",
         str: ""
     };
+    $scope.ucmdb = {
+        server: "",
+        user: "",
+        password: "",
+        path: "/ucmdb-browser/ucmdb_widget.jsp?server=Default%20Client&locale=en#widget=properties;refocus-selection="
+    };
 
     $scope.login = function () {
         var form = clone($scope.formData);
@@ -101,6 +107,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
             localStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
         }
 
+        if ($scope.ucmdb && $scope.ucmdb.server) $scope.saveUCMDB();
     };
 
     if (localStorage && localStorage[AM_FORM_DATA]) {
@@ -144,6 +151,37 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
         //        $scope.formData.param.fields = fields;
         $scope.query(form);
         $scope.hiddenRelations();
+    };
+
+    /**
+     * save UCMDB info
+     */
+    $scope.loadUCMDB = function () {
+        $http.get('/json/ucmdb').success(function (data) {
+            $scope.ucmdb = data[0];
+        }).error(function (data) {
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: data
+                });
+            });
+    };
+    $scope.loadUCMDB();
+
+    $scope.saveUCMDB = function () {
+        if ($scope.ucmdb && $scope.ucmdb.server)
+            $http.post('/json/ucmdb', $scope.ucmdb).success(function (data) {
+
+            }).error(function (data) {
+                    $scope.alerts.push({
+                        type: 'danger',
+                        msg: data
+                    });
+                });
+    };
+
+    $scope.urlUCMDB = function (gId) {
+        return $scope.ucmdb.server + $scope.ucmdb.path + gId + ";username=" + $scope.ucmdb.user + ";password=" + $scope.ucmdb.password;
     };
 
     /**
@@ -261,8 +299,8 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
 //            $scope.saveAQL(name, str);
     };
 
-    $scope.setChartData = function (aql){
-        if(aql){
+    $scope.setChartData = function (aql) {
+        if (aql) {
             $scope.tempTable.chartData = aql.data;
         } else {
             delete $scope.tempTable.chartType;
