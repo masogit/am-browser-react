@@ -41,7 +41,7 @@
 
     <div class="col-md-12" ng-show="formData.viewStyle=='tile'" ng-repeat="(key, value) in templates|groupBy:'group'">
         <h3>{{ key }} <small>({{ value.length }})</small></h3>
-        <div class="col-md-3" style="height: 150px;padding-top: 10px; margin-bottom: 20px"
+        <div class="col-md-3" style="width: 360px; height: 150px;padding-top: 10px; margin-bottom: 20px"
              ng-repeat="temp in value|orderBy:'-visit'|filter:globalSearch">
 
             <a href="#explorer/records">
