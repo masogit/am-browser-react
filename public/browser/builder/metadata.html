@@ -7,7 +7,7 @@
         <span class="text-center" ng-show="metadata.loading">Loading....</span>
         <ul class="nav sidebar">
             <li ng-repeat="table in metadata.tables | filter: tableSearch">
-                <a ng-click="metadata(table.id)">{{ (!formData.showLabel) ? table.id : table.Label }}
+                <a ng-click="metadata(table.id)">{{ (!formData.showLabel) ? table.id + " ("+table.Label+")": table.Label + " ("+table.id+")" }}
                     <span ng-show="table.loading" class="pull-right">loading...</span>
                 </a>
             </li>
@@ -53,7 +53,7 @@
         <input type="checkbox"
                ng-checked="ifChecked(field, metadata.table.fields, link.table.parent)"
                ng-click="checkTreeFields(field, metadata.table.fields, link.table.parent)">
-        {{ (!formData.showLabel) ? field['$']['sqlname'] : field['$']['label'] }}<br>
+        <a title="{{ (!formData.showLabel) ? field['$']['label'] : field['$']['sqlname'] }}">{{ (!formData.showLabel) ? field['$']['sqlname'] : field['$']['label'] }}</a><br>
     </span>
     <span ng-repeat="link in link.table.link | filter: filterFields(linkSearch)" ng-init="link['parent']=parent">
         <a ng-click="metadata(link['$']['desttable'], link)" ng-show="!link.table ">
