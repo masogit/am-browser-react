@@ -47,12 +47,11 @@ exports.get = function (req, res) {
     db.loadDatabase({}, function () {
         var coll = db.getCollection(collectionName);
         if (!coll) {
-            coll = db.addCollection(collectionName);
+            res.json({});
         } else {
             // console.log(temp.data);
             res.json(coll.data);
         }
-        db.saveDatabase();
     });
 };
 
