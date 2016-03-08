@@ -37,7 +37,7 @@
         </table>
     </div>
 </div>
-<div class="col-md-{{(cachedRefLinks && cachedRefLinks.length>0)?'9':'12'}}" ng-init="loadTemplates()" full-height="100">
+<div ng-hide="formData.viewStyle=='list'" class="col-md-{{(cachedRefLinks && cachedRefLinks.length>0)?'9':'12'}}" ng-init="loadTemplates()" full-height="100">
 
     <div class="col-md-12" ng-show="formData.viewStyle=='tile'" ng-repeat="(key, value) in templates|groupBy:'group'">
         <h3>{{ key }} <small>({{ value.length }})</small></h3>
