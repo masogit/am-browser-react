@@ -30,3 +30,4 @@ Try in demo server [http://16.165.217.57:8088](http://16.165.217.57:8088).
 5. Create views by customized fields, links and AQL
 6. Explorer view's record with table and tree format
 7. Support quick search records in views (optional, need configure to Redis service)
+8. Support federate CI from specified UCMDB server
