@@ -29,7 +29,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
         },
 
         method: "get",
-        user: "admin", // admin
+        user: "", // admin
         password: "",
 
         pageSize: 10,
@@ -44,13 +44,43 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
         alias: "",
         str: ""
     };
+    
     $scope.ucmdb = {
         server: "",
         user: "",
         password: "",
         path: "/ucmdb-browser/ucmdb_widget.jsp?server=Default%20Client&locale=en#widget=properties;refocus-selection="
     };
+    
+    $scope.getAM = function () {
+        $http.get("/am/conf").success(function (data) {
+            $scope.formData.server = data.server;
+            $scope.formData.user = data.user;
+        }).error(function (data) {
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: data
+                });
+            });
+    };
+    
+    $scope.getAM();
+    
+    // console.log(window.location.pathname);
+    if (window.location.pathname.indexOf("login") < 0) {
+        if (sessionStorage && sessionStorage[AM_FORM_DATA]) {
+            var form = JSON.parse(sessionStorage.getItem(AM_FORM_DATA));
+            
+            if (form.server == "" || form.user == "") {
+                $scope.lastPath = window.location.pathname;
+                window.location.href = "/login";
+            }
+        } else {
+            window.location.href = "/login";
+        }
 
+    }
+    
     $scope.login = function () {
         var form = clone($scope.formData);
         form['ref-link'] = "db/amEmplDept";
@@ -93,8 +123,8 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
     $scope.store = function () {
         if (localStorage) {
             var form = {
-                server: $scope.formData.server,
-                user: $scope.formData.user,
+                // server: $scope.formData.server,
+                // user: $scope.formData.user,
 //                password: $scope.formData.password,
                 pageSize: $scope.formData.pageSize,
                 showLabel: $scope.formData.showLabel,
@@ -107,13 +137,21 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
             localStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
         }
 
+        if (sessionStorage) {
+            var form = {
+                server: $scope.formData.server,
+                user: $scope.formData.user
+            };
+            sessionStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
+        }        
+
         if ($scope.ucmdb && $scope.ucmdb.server) $scope.saveUCMDB();
     };
 
     if (localStorage && localStorage[AM_FORM_DATA]) {
         var form = JSON.parse(localStorage.getItem(AM_FORM_DATA));
-        if (form.server) $scope.formData.server = form.server;
-        if (form.user) $scope.formData.user = form.user;
+        // if (form.server) $scope.formData.server = form.server;
+        // if (form.user) $scope.formData.user = form.user;
 //        $scope.formData.password = form.password;
         if (form.pageSize) $scope.formData.pageSize = form.pageSize;
         if (form.showLabel) $scope.formData.showLabel = form.showLabel;
@@ -122,14 +160,6 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
         if (form.offset) $scope.formData.param.offset = form.offset;
         if (form.cache) $scope.formData.cache = form.cache;
         if (form.viewStyle) $scope.formData.viewStyle = form.viewStyle;
-    }
-
-    // console.log(window.location.pathname);
-    if (window.location.pathname.indexOf("login") < 0) {
-        if ($scope.formData.server == "" || $scope.formData.user == "") {
-            $scope.lastPath = window.location.pathname;
-            window.location.href = "/login";
-        }
     }
 
     $scope.toggleCheckbox = function (array, field) {

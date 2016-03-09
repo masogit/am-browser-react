@@ -17,9 +17,11 @@ app.use(bodyParser.json()); // parse application/json
 app.use(bodyParser.json({ type: 'application/vnd.api+json' })); // parse application/vnd.api+json as json
 app.use(methodOverride('X-HTTP-Method-Override')); // override with the X-HTTP-Method-Override header in the request
 
+// initial AM server
+var am_href = process.env.AM_WEB_TIER || "http://admin:@16.186.74.164:8081";    //http://user:pass@hostname:8081
 
 // routes ======================================================================
-require('./app/routes.js')(app);
+require('./app/routes.js')(app, am_href);
 
 // listen (start app with node server.js) ======================================
 app.listen(port);
