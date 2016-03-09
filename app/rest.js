@@ -4,7 +4,7 @@ var parseString = require('xml2js').parseString;
 
 // init redis search client, need redis service on 127.0.0.1:6379
 var redis = require("redis"),
-    rds_client = redis.createClient({host: '127.0.0.1', port: 6379});
+    rds_client = redis.createClient({host: '127.0.0.1', port: 6379, auth_pass: '234'});
 rds_client.on("error", function (err) {
     console.log("Redis Error " + err);
 });

@@ -52,6 +52,14 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
         path: "/ucmdb-browser/ucmdb_widget.jsp?server=Default%20Client&locale=en#widget=properties;refocus-selection="
     };
     
+    $scope.redis = {
+        host: "",
+        port: "",
+        auth_pass: "",
+        enabled: false,
+        ttl: 0  
+    };
+    
     $scope.getAM = function () {
         $http.get("/am/conf").success(function (data) {
             $scope.formData.server = data.server;
@@ -148,6 +156,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
         }        
 
         if ($scope.ucmdb && $scope.ucmdb.server) $scope.saveUCMDB();
+        if ($scope.redis && $scope.redis.host && $scope.redis.port) $scope.saveRedis();
     };
 
     if (localStorage && localStorage[AM_FORM_DATA]) {
@@ -190,7 +199,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
      */
     $scope.loadUCMDB = function () {
         $http.get('/json/ucmdb').success(function (data) {
-            $scope.ucmdb = data[0];
+            if (data[0]) $scope.ucmdb = data[0];
         }).error(function (data) {
                 $scope.alerts.push({
                     type: 'danger',
@@ -211,6 +220,33 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
                     });
                 });
     };
+    
+    /**
+     * save Redis info
+     */
+    $scope.loadRedis = function () {
+        $http.get('/json/redis').success(function (data) {
+            if (data[0]) $scope.redis = data[0];
+        }).error(function (data) {
+                $scope.alerts.push({
+                    type: 'danger',
+                    msg: data
+                });
+            });
+    };
+    $scope.loadRedis();
+
+    $scope.saveRedis = function () {
+        if ($scope.redis && $scope.redis.host && $scope.redis.port)
+            $http.post('/json/redis', $scope.redis).success(function (data) {
+
+            }).error(function (data) {
+                    $scope.alerts.push({
+                        type: 'danger',
+                        msg: data
+                    });
+                });
+    };    
 
     $scope.urlUCMDB = function (gId) {
         return $scope.ucmdb.server + $scope.ucmdb.path + gId + ";username=" + $scope.ucmdb.user + ";password=" + $scope.ucmdb.password;

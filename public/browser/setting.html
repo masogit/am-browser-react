@@ -75,20 +75,31 @@
         <h4>Redis</h4>
 
         <div class="form-group">
-            <label>Server and port</label>
-            <input type="text" class="form-control" placeholder="Server and port" ng-model="formData.redis.server">
+            <label>Host</label>
+            <input type="text" class="form-control" placeholder="Server" ng-model="redis.host">
         </div>
 
         <div class="form-group">
-            <label>Username</label>
-            <input type="text" class="form-control" placeholder="Username" ng-model="formData.redis.user">
+            <label>Port</label>
+            <input type="text" class="form-control" placeholder="Port" ng-model="redis.port">
         </div>
 
         <div class="form-group">
-            <label>Password</label>
-            <input type="password" class="form-control" placeholder="Password" ng-model="formData.redis.password">
+            <label>Auth Pass</label>
+            <input type="password" class="form-control" placeholder="Password" ng-model="redis.auth_pass">
         </div>
-
+ 
+        <div class="form-group">
+            <label>Cache time(ttl)</label>
+            <input type="text" class="form-control" placeholder="seconds" ng-model="redis.ttl">
+        </div>
+        
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" ng-model="redis.enabled"> Enable cache (quick search)
+            </label>
+        </div>
+                
         <button class="btn">Test connection</button>
 
     </div>
