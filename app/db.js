@@ -1,8 +1,9 @@
 var loki = require('lokijs');
-var db = new loki('db/template.json');
+var db;
 
 // check db folder and files
-exports.init = function (dbFolder) {
+exports.init = function (dbFolder, json) {
+    db = new loki(dbFolder + json);
     const fs = require('fs');
     fs.exists(dbFolder, function (db) {
         if (!db) {
@@ -18,9 +19,9 @@ exports.init = function (dbFolder) {
 
         }
 
-        fs.exists(dbFolder + '/template.json', function (template) {
+        fs.exists(dbFolder + json, function (template) {
             if (!template)
-                fs.writeFile(dbFolder + "/template.json", "", function (err) {
+                fs.writeFile(dbFolder + json, "", function (err) {
                     if (err) {
                         return console.log(err);
                     }
@@ -47,10 +48,22 @@ exports.get = function (req, res) {
     db.loadDatabase({}, function () {
         var coll = db.getCollection(collectionName);
         if (!coll) {
-            res.json({});
+            res.json([]);
         } else {
             // console.log(temp.data);
             res.json(coll.data);
+        }
+    });
+
+};
+
+exports.getColl = function (collectionName) {
+    db.loadDatabase({}, function () {
+        var coll = db.getCollection(collectionName);
+        if (!coll) {
+            return [];
+        } else {
+            return coll.data;
         }
     });
 };

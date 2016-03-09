@@ -1,3 +1,5 @@
+var db = require('./db.js');
+
 module.exports = function (app, am_href) {
     var URL = require('url');    
     var amUrl = URL.parse(am_href);
@@ -7,7 +9,6 @@ module.exports = function (app, am_href) {
         password:   amUrl.auth.split(":")[1]
     };   
     
-    var db = require('./db.js');
     var Metadata = require('./metadata.js');
     var metadata = new Metadata(am);
     var REST = require('./rest.js');

@@ -221,6 +221,10 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
                 });
     };
     
+    $scope.urlUCMDB = function (gId) {
+        return $scope.ucmdb.server + $scope.ucmdb.path + gId + ";username=" + $scope.ucmdb.user + ";password=" + $scope.ucmdb.password;
+    };
+    
     /**
      * save Redis info
      */
@@ -247,10 +251,6 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
                     });
                 });
     };    
-
-    $scope.urlUCMDB = function (gId) {
-        return $scope.ucmdb.server + $scope.ucmdb.path + gId + ";username=" + $scope.ucmdb.user + ";password=" + $scope.ucmdb.password;
-    };
 
     /**
      * build native AQL query
