@@ -30,6 +30,14 @@ module.exports = function (db, am, redisConf) {
 
         if (redisConf.enabled && redisConf.ttl > 0) {                
             // cache view data
+            console.log("start to load views: ");
+            db.getColl("template", function (data) {
+                data.forEach(function (view) {
+                    getViewData(view, am, db, search, 0);
+                });
+                // console.log("views: " + JSON.stringify(views));
+            });
+            
             intervalObject = setInterval(function () {
                 console.log("start to load views: ");
                 db.getColl("template", function (data) {
