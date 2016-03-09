@@ -17,9 +17,12 @@ Try in demo server [http://16.165.217.57:8088](http://16.165.217.57:8088).
 	- (Optional) Configure Redis Client in ***server.js*** 
 	`client = redis.createClient({host: '127.0.0.1', port: 6379});`
 1. Start the server: `node server.js`
-	- Configure port (default is 8080):
-	Windows `set PORT=8080`
-	Linux `export PORT=8080`
+	- Configure browser port (default is 8080):
+		- Windows `set PORT=8080`
+		- Linux `export PORT=8080`
+	- Configure AM web tire: (for example: http://admin:@16.186.74.164:8081)
+		- Windows `set AM_WEB_TIER=http://user:password@server:port`
+		- Linux `export AM_WEB_TIER=http://user:password@server:port`
 1. View in browser at `http://localhost:8080`
 
 ## Features
