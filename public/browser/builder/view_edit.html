@@ -13,14 +13,14 @@
             <input type="text" class="form-control" ng-model="tempTable.description" placeholder="Input description">
         </div>
     </div>
-    <div class="form-group" ng-class="{'has-error': !tempForm.tempName.$valid}">
+    <div class="form-group" ng-class="{'has-error': !tempForm.tempGroup.$valid}">
         <label class="col-md-4">Group</label>
 
         <div class="col-md-8">
             <input type="text" class="form-control" name="tempGroup" ng-model="tempTable.group" placeholder="Input a Group Name" ng-required="true">
         </div>
     </div>
-    <div class="form-group" ng-class="{'has-error': !tempForm.tempName.$valid}">
+    <div class="form-group">
         <label class="col-md-4">Chart</label>
 
         <div class="col-md-8" ng-init="loadAQLs()">
@@ -40,10 +40,10 @@
             <input type="checkbox" ng-click="tempTable.showLabel=!tempTable.showLabel" ng-checked="tempTable.showLabel"> Show Label
             <span class="pull-right">
         <!--<a ng-click="closeTemplate()" class="badge"><span class="glyphicon glyphicon-remove"></span>                Close</a>-->
-            <a ng-click="saveTemplate(tempTable)" class="badge" ng-show="tempForm.$valid" ng-confirm-click="Save this template?"><span class="glyphicon glyphicon-floppy-save"></span></a>
-            <a ng-click="removeTemplate(tempTable)" class="badge" ng-confirm-click="Delete this template?"><span
+            <a href="#/builder?tab=views" ng-click="saveTemplate(tempTable)" class="badge" ng-show="tempForm.$valid" ng-confirm-click="Save this template?"><span class="glyphicon glyphicon-floppy-save"></span></a>
+            <a href="#/builder?tab=views" ng-click="removeTemplate(tempTable)" class="badge" ng-confirm-click="Delete this template?"><span
                 class="glyphicon glyphicon-floppy-remove"></span></a>
-            <a ng-click="queryRootByTemp(tempTable)" class="badge"><span class="glyphicon glyphicon-play"></span></a>
+            <a href="#/builder?tab=views" ng-click="queryRootByTemp(tempTable)" class="badge"><span class="glyphicon glyphicon-play"></span></a>
             </span>
         </div>
         <div class="panel-body" full-height="345">
