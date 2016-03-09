@@ -15,13 +15,11 @@ Try in demo server [http://16.165.217.57:8088](http://16.165.217.57:8088).
 1. Install Redis from [redis.io](http://redis.io/)
 	- Start Redis Server in local, default port should be: 6379
 	- Configure Redis Client in ***server.js*** or set environment variables
-	`var redis = {
-	    host:       process.env.REDIS_HOST || "127.0.0.1",
-	    port:       process.env.REDIS_PORT || "6379",
-	    auth_pass:  process.env.REDIS_PASS || "",
-	    enabled:    process.env.REDIS_ENABLED || true,
-	    ttl:        process.env.REDIS_TTL || 600  
-};`
+	    - host:  `process.env.REDIS_HOST || "127.0.0.1"`
+	    - port:  `process.env.REDIS_PORT || "6379"`
+	    - auth_pass:  `process.env.REDIS_PASS || ""`
+	    - enabled:  `process.env.REDIS_ENABLED || true`
+	    - ttl:  `process.env.REDIS_TTL || 600` 
 1. Start the server: `node server.js`
 	- Configure browser port (default is 8080):
 		- Windows `set PORT=8080`
