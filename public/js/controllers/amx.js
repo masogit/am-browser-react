@@ -107,7 +107,9 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
     };
 
     $scope.logout = function () {
-        $scope.formData.password = "";
+        if (sessionStorage)
+            sessionStorage.removeItem(AM_FORM_DATA);
+
         window.location.href = "/login";
     };
 
