@@ -1,19 +1,25 @@
 var db = require('./db.js');
 
-module.exports = function (app, am_href) {
-    var URL = require('url');    
-    var amUrl = URL.parse(am_href);
-    var am = {
-        server:     amUrl.host,
-        user:       amUrl.auth.split(":")[0],
-        password:   amUrl.auth.split(":")[1]
-    };   
+module.exports = function (app, am, redis) {
     
     var Metadata = require('./metadata.js');
     var metadata = new Metadata(am);
+    
     var REST = require('./rest.js');
-    var rest = new REST(am)
-         
+    var rest = new REST(am);
+    
+    var Cache = require('./cache.js');
+    var cache = new Cache(db, am, redis);
+    
+    // Redis Server Info
+    app.get('/redis', function (req, res) {
+        res.json(redis);
+    }); 
+        
+    app.post('/redis', function (req, res) {
+        redis = req.body       
+    });
+        
     // CRUD local loki file json db
     app.get('/json/:collection', db.get);
     app.post('/json/:collection', db.set);
@@ -35,7 +41,7 @@ module.exports = function (app, am_href) {
     app.post('/am/rest', rest.db);
 
     // redis cache search --------------------------------------------------
-    app.post('/cache/search', rest.cacheSearch);
+    app.post('/cache/search', cache.search);
 
 
 

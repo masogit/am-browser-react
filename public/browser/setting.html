@@ -33,12 +33,6 @@
                 <input type="checkbox" ng-model="formData.showLabel"> Show Label
             </label>
         </div>
-
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" ng-model="formData.cache"> Enable cache (quick search)
-            </label>
-        </div>
         
         <div class="form-group">
             <label>Explorer view style</label><br>
@@ -76,27 +70,27 @@
 
         <div class="form-group">
             <label>Host</label>
-            <input type="text" class="form-control" placeholder="Server" ng-model="redis.host">
+            <input type="text" class="form-control" placeholder="Server" ng-model="redis.host" disabled>
         </div>
 
         <div class="form-group">
             <label>Port</label>
-            <input type="text" class="form-control" placeholder="Port" ng-model="redis.port">
+            <input type="text" class="form-control" placeholder="Port" ng-model="redis.port" disabled>
         </div>
 
         <div class="form-group">
             <label>Auth Pass</label>
-            <input type="password" class="form-control" placeholder="Password" ng-model="redis.auth_pass">
+            <input type="password" class="form-control" placeholder="Password" ng-model="redis.auth_pass" disabled>
         </div>
  
         <div class="form-group">
             <label>Cache time(ttl)</label>
-            <input type="text" class="form-control" placeholder="seconds" ng-model="redis.ttl">
+            <input type="text" class="form-control" placeholder="seconds" ng-model="redis.ttl" disabled>
         </div>
         
         <div class="checkbox">
             <label>
-                <input type="checkbox" ng-model="redis.enabled"> Enable cache (quick search)
+                <input type="checkbox" ng-model="redis.enabled" disabled> Enable cache (quick search)
             </label>
         </div>
                 

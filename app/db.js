@@ -29,16 +29,6 @@ exports.init = function (dbFolder, json) {
                     console.log("The template file was created!");
                 });
         });
-//        fs.exists(dbFolder + '/metadata.json', function (metadata) {
-//            if (!metadata)
-//                fs.writeFile(dbFolder + "/metadata.json", "", function (err) {
-//                    if (err) {
-//                        return console.log(err);
-//                    }
-//
-//                    console.log("The metadata file was created!");
-//                });
-//        });
 
     });
 };
@@ -57,14 +47,11 @@ exports.get = function (req, res) {
 
 };
 
-exports.getColl = function (collectionName) {
+exports.getColl = function (collectionName, callback) {
     db.loadDatabase({}, function () {
         var coll = db.getCollection(collectionName);
-        if (!coll) {
-            return [];
-        } else {
-            return coll.data;
-        }
+        if (callback instanceof Function && coll && coll.data)
+            callback(coll.data);
     });
 };
 
@@ -84,6 +71,21 @@ exports.set = function (req, res) {
     res.json(data);
 
     db.saveDatabase();
+};
+
+exports.setColl = function (collectionName, obj) {
+    var coll = db.getCollection(collectionName);
+    if (!coll) {
+        coll = db.addCollection(collectionName);
+    }
+
+    var data;
+    if (obj.$loki)
+        data = coll.update(obj);
+    else
+        data = coll.insert(obj);
+
+    db.saveDatabase();    
 };
 
 exports.del = function (req, res) {

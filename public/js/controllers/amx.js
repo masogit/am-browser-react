@@ -33,7 +33,6 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
         password: "",
 
         pageSize: 10,
-        cache: false,
         viewStyle: "tile",
         //        showError: false,
         showLabel: false
@@ -52,13 +51,13 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
         path: "/ucmdb-browser/ucmdb_widget.jsp?server=Default%20Client&locale=en#widget=properties;refocus-selection="
     };
     
-    $scope.redis = {
-        host: "",
-        port: "",
-        auth_pass: "",
-        enabled: false,
-        ttl: 0  
-    };
+    // $scope.redis = {
+    //     host: "",
+    //     port: "",
+    //     auth_pass: "",
+    //     enabled: false,
+    //     ttl: 0  
+    // };
     
     $scope.getAM = function () {
         $http.get("/am/conf").success(function (data) {
@@ -141,7 +140,6 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
                 //                showError: $scope.formData.showError,
                 limit: $scope.formData.param.limit,
                 offset: $scope.formData.param.offset,
-                cache: $scope.formData.cache,
                 viewStyle: $scope.formData.viewStyle
             };
             localStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
@@ -156,7 +154,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
         }        
 
         if ($scope.ucmdb && $scope.ucmdb.server) $scope.saveUCMDB();
-        if ($scope.redis && $scope.redis.host && $scope.redis.port) $scope.saveRedis();
+        // if ($scope.redis && $scope.redis.host && $scope.redis.port) $scope.saveRedis();
     };
 
     if (localStorage && localStorage[AM_FORM_DATA]) {
@@ -169,7 +167,6 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
         //        $scope.formData.showError = form.showError;
         if (form.limit) $scope.formData.param.limit = form.limit;
         if (form.offset) $scope.formData.param.offset = form.offset;
-        if (form.cache) $scope.formData.cache = form.cache;
         if (form.viewStyle) $scope.formData.viewStyle = form.viewStyle;
     }
 
@@ -229,8 +226,8 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
      * save Redis info
      */
     $scope.loadRedis = function () {
-        $http.get('/json/redis').success(function (data) {
-            if (data[0]) $scope.redis = data[0];
+        $http.get('/redis').success(function (data) {
+            $scope.redis = data;
         }).error(function (data) {
                 $scope.alerts.push({
                     type: 'danger',
@@ -242,7 +239,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
 
     $scope.saveRedis = function () {
         if ($scope.redis && $scope.redis.host && $scope.redis.port)
-            $http.post('/json/redis', $scope.redis).success(function (data) {
+            $http.post('/redis', $scope.redis).success(function (data) {
 
             }).error(function (data) {
                     $scope.alerts.push({
@@ -883,7 +880,6 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
         $scope.tempRecords['timeStart1'] = Date.now();
         $scope.tempRecords.loading1 = true;
 
-        form.cacheView = true;
         $http.post('/am/rest', form).success(function (data) {
             if (data instanceof Object) {
                 $scope.tempRecords.records = data.entities;
@@ -891,16 +887,6 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
 
                 $scope.tempRecords['timeEnd1'] = Date.now();
                 $scope.tempRecords.loading1 = false;
-
-                if (temp.$loki && !keyword) {
-                    temp['last'] = {
-                        time: Date.now(),
-                        count: data.count
-                    };
-                    $http.post('/json/template', temp).success(function (data) {
-
-                    });
-                }
 
                 if (data.entities[0])
                     $scope.getRecordByTemp(data.entities[0], template, true);
@@ -1134,7 +1120,7 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
     };
 
     $scope.cacheSearch = function (keyword) {
-        if (keyword && $scope.formData.cache) {
+        if (keyword && $scope.redis.enabled) {
             var timeStart = Date.now();
             $http.post('/cache/search', {keyword: keyword}).success(function (data) {
                 $scope.cachedRefLinks = data;
