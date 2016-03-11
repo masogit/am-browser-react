@@ -45,8 +45,8 @@ function cache(db, am, redisConf) {
         var Search = require('redis-search');
         var search = Search.createSearch({
             service: 'am-browser',  // The name of your service. used for namespacing. Default 'search'.
-            key: am.server,              // The name of this search. used for namespacing. So that you may have several searches in the same db. Default 'ngram'.
-            n: 4,                   // The size of n-gram. Note that this method cannot match the word which length shorter then this size. Default '3'.
+            key: "db",              // The name of this search. used for namespacing. So that you may have several searches in the same db. Default 'ngram'.
+            n: 3,                   // The size of n-gram. Note that this method cannot match the word which length shorter then this size. Default '3'.
             cache_time: 60,         // The second of cache retention. Default '60'.
             client: rds_client      // The redis client instance. Set if you want customize redis connect. Default connect to local.
         });
@@ -85,7 +85,7 @@ function getViewData(search, view, am, db, offset) {
         "ref-link": "db/" + view['$']['sqlname'],     // "db/amLocation/126874",
         collection: "",     // "EmplDepts",
         param: {
-            limit: 1000,
+            limit: 10,
             offset: offset,
             filter: view['AQL'] || "",
             orderby: "",

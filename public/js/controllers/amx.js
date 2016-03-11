@@ -888,6 +888,16 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
                 $scope.tempRecords['timeEnd1'] = Date.now();
                 $scope.tempRecords.loading1 = false;
 
+                if (temp.$loki && !keyword) {
+                    temp['last'] = {
+                        time: Date.now(),
+                        count: data.count
+                    };
+                    $http.post('/json/template', temp).success(function (data) {
+
+                    });
+                }
+
                 if (data.entities[0])
                     $scope.getRecordByTemp(data.entities[0], template, true);
 
