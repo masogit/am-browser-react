@@ -43,7 +43,7 @@
             <a href="#/builder?tab=views" ng-click="saveTemplate(tempTable)" class="badge" ng-show="tempForm.$valid" ng-confirm-click="Save this template?"><span class="glyphicon glyphicon-floppy-save"></span></a>
             <a href="#/builder?tab=views" ng-click="removeTemplate(tempTable)" class="badge" ng-confirm-click="Delete this template?"><span
                 class="glyphicon glyphicon-floppy-remove"></span></a>
-            <a href="#/builder?tab=views" ng-click="queryRootByTemp(tempTable)" class="badge"><span class="glyphicon glyphicon-play"></span></a>
+            <a ng-click="queryRootByTemp(tempTable)" class="badge"><span class="glyphicon glyphicon-play"></span></a>
             </span>
         </div>
         <div class="panel-body" full-height="345">
