@@ -1123,7 +1123,8 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
         if (keyword && $scope.redis.enabled) {
             var timeStart = Date.now();
             $http.post('/cache/search', {keyword: keyword}).success(function (data) {
-                $scope.cachedRefLinks = data;
+                $scope.cachedRefLinks = data.ids;
+                $scope.cacheSearch.count = data.count;
                 $scope.cacheSearch.timeEnd = Date.now();
                 $scope.cacheSearch.timeStart = timeStart;
 

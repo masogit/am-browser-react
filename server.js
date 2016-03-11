@@ -5,23 +5,27 @@ var port = process.env.PORT || 8080; 				// set the port
 var morgan = require('morgan');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
-var am_href = process.env.AM_WEB_TIER || "http://admin:@16.186.74.164:8081";    //http://user:pass@hostname:8081
+var am_href = process.env.AM_WEB_TIER || "";    // http://user:pass@hostname:8081
 var dbFile = { folder: 'db', json: '/template.json' };
 var redis = {
-    host:       process.env.REDIS_HOST || "127.0.0.1",
-    port:       process.env.REDIS_PORT || "6379",
-    auth_pass:  process.env.REDIS_PASS || "",
-    enabled:    process.env.REDIS_ENABLED || true,
-    ttl:        process.env.REDIS_TTL || 10
+    host: process.env.REDIS_HOST || "127.0.0.1",
+    port: process.env.REDIS_PORT || "6379",
+    auth_pass: process.env.REDIS_PASS || "",
+    enabled: process.env.REDIS_ENABLED || false,
+    ttl: process.env.REDIS_TTL || 1200
 };
 // initial AM server
-var URL = require('url');    
-var amUrl = URL.parse(am_href);
-var am = {
-    server:     amUrl.host,
-    user:       amUrl.auth.split(":")[0],
-    password:   amUrl.auth.split(":")[1]
-}; 
+var URL = require('url');
+
+var am;
+if (am_href != "") {
+    am = {
+        server: URL.parse(am_href).host,
+        user: URL.parse(am_href).auth.split(":")[0],
+        password: URL.parse(am_href).auth.split(":")[1]
+    };
+}
+
 
 // initial db folder and files =================================================
 var db = require('./app/db.js');
@@ -42,10 +46,11 @@ require('./app/routes.js')(app, am, redis);
 app.listen(port);
 console.log("App listening on port " + port);
 
-var cp = require('child_process');
-var child = cp.fork('./app/worker.js',{
-   execArgv: ['--debug=40894']
-});
+// sub process to cache view data in Redis
+if (redis.enabled && redis.ttl > 0 && am) {
+    var cp = require('child_process');
+    var child = cp.fork('./app/worker.js');
 
-// Send child process some work
-child.send(JSON.stringify({am: am, db: dbFile, redis: redis}));
+    // Send child process some work
+    child.send(JSON.stringify({ am: am, db: dbFile, redis: redis }));
+}

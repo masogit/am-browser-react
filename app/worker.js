@@ -12,7 +12,7 @@ var redis;
 var dbFile;
 var db;
 
-process.on('message', function(m) {
+process.on('message', function (m) {
     process.send("receive message: " + m);
     param = JSON.parse(m);
     am = param.am;
@@ -24,33 +24,37 @@ process.on('message', function(m) {
 });
 
 
-function cache (db, am, redisConf) {
-    // init redis search client, need redis service on 127.0.0.1:6379
-    var redis = require("redis"),
-        rds_client = redis.createClient({
-            host: redisConf.host,
-            port: redisConf.port,
-            auth_pass: redisConf.auth_pass
+function cache(db, am, redisConf) {
+
+        // init redis search client, need redis service on 127.0.0.1:6379
+        var redis = require("redis"),
+            rds_client = redis.createClient({
+                host: redisConf.host,
+                port: redisConf.port,
+                auth_pass: redisConf.auth_pass,
+                socket_keepalive: false,
+                disable_resubscribing: true,
+                enable_offline_queue: false
+            });
+
+        rds_client.on("error", function (err) {
+            console.log("Redis Error " + err);
+            rds_client.end();
         });
 
-    rds_client.on("error", function (err) {
-        console.log("Redis Error " + err);
-        rds_client.end();
-    });
-    
-    var Search = require('redis-search');
-    var search = Search.createSearch({
-        service: 'am-browser',  // The name of your service. used for namespacing. Default 'search'.
-        key: am.server,              // The name of this search. used for namespacing. So that you may have several searches in the same db. Default 'ngram'.
-        n: 3,                   // The size of n-gram. Note that this method cannot match the word which length shorter then this size. Default '3'.
-        cache_time: redisConf.ttl,         // The second of cache retention. Default '60'.
-        client: rds_client      // The redis client instance. Set if you want customize redis connect. Default connect to local.
-    });
+        var Search = require('redis-search');
+        var search = Search.createSearch({
+            service: 'am-browser',  // The name of your service. used for namespacing. Default 'search'.
+            key: am.server,              // The name of this search. used for namespacing. So that you may have several searches in the same db. Default 'ngram'.
+            n: 4,                   // The size of n-gram. Note that this method cannot match the word which length shorter then this size. Default '3'.
+            cache_time: 60,         // The second of cache retention. Default '60'.
+            client: rds_client      // The redis client instance. Set if you want customize redis connect. Default connect to local.
+        });
 
-    rds_client.on("connect", function () {
-        console.log("Redis connected");
+        rds_client.on("connect", function () {
+            console.log("Redis connected");
 
-        if (redisConf.enabled && redisConf.ttl > 0) {                
+
             // cache view data
             console.log("start to load views: ");
             db.getColl("template", function (data) {
@@ -58,7 +62,7 @@ function cache (db, am, redisConf) {
                     getViewData(search, view, am, db, 0);
                 });
             });
-            
+
             intervalObject = setInterval(function () {
                 console.log("start to load views: ");
                 db.getColl("template", function (data) {
@@ -67,8 +71,8 @@ function cache (db, am, redisConf) {
                     });
                 });
             }, redisConf.ttl * 1000);
-        }
-    });
+
+        });
 
 };
 
@@ -107,19 +111,22 @@ function getViewData(search, view, am, db, offset) {
 
     var request = client.get(url, args, function (data, response) {
 
-        view['last'] = {
-            time: Date.now(),
-            count: data.count
-        };
-        db.setColl("template", view);
-        
+        if (offset == 0) {
+            view['last'] = {
+                time: Date.now(),
+                count: data.count
+            };
+            db.setColl("template", view);
+        }
+
         if (data.entities) {
+
             data.entities.forEach(function (obj) {
-                search.index(JSON.stringify(obj), obj['ref-link'] + ":" + obj['self']);
+                    search.index(JSON.stringify(obj), obj['ref-link'] + ":" + obj['self']);
             });
-            
+
             if (data.count > restParam.param.limit + offset) {
-                getViewData(search, view, am, db, restParam.param.limit + offset);                
+                getViewData(search, view, am, db, restParam.param.limit + offset);
             }
 
         }

@@ -3,12 +3,13 @@ var client = new Client();
 var parseString = require('xml2js').parseString;
 
 module.exports = function (am) {
-    this.am = am;
-    
+
     this.db = function (req, res) {
-        req.body.server = am.server;       
-        req.body.user = am.user;
-        req.body.password = am.password;
+        if (am) {
+            req.body.server = am.server;
+            req.body.user = am.user;
+            req.body.password = am.password;
+        }
         
         var url = "http://${server}${context}${ref-link}${collection}";
         var auth = 'Basic ' + new Buffer(req.body.user + ':' + req.body.password).toString('base64');

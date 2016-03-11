@@ -6,12 +6,13 @@ var NodeCache = require("node-cache");
 var myCache = new NodeCache({ stdTTL: 100, checkperiod: 120 });
 
 module.exports = function (am) {
-    this.am = am;
     
     this.get = function (req, res) {
-        req.body.server = am.server;       
-        req.body.user = am.user;
-        req.body.password = am.password;
+        if (am) {
+            req.body.server = am.server;
+            req.body.user = am.user;
+            req.body.password = am.password;
+        }
         
         // all Table = "metadata/tables";
         // a Table = "metadata/schema/amNews";
