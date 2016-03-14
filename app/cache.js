@@ -1,4 +1,4 @@
-module.exports = function (db, am, redisConf) {
+module.exports = function (db, redisConf) {
 
     // init redis search client, need redis service on 127.0.0.1:6379
     var redis = require("redis"),

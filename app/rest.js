@@ -5,14 +5,9 @@ var parseString = require('xml2js').parseString;
 module.exports = function (am) {
 
     this.db = function (req, res) {
-        if (am) {
-            req.body.server = am.server;
-            req.body.user = am.user;
-            req.body.password = am.password;
-        }
-        
+
         var url = "http://${server}${context}${ref-link}${collection}";
-        var auth = 'Basic ' + new Buffer(req.body.user + ':' + req.body.password).toString('base64');
+        var auth = (req.body.user!="") ? 'Basic ' + new Buffer(req.body.user + ':' + req.body.password).toString('base64') : undefined;
         var request;
         if (req.body.param && req.body.param['orderby'].isEmpty())
             delete req.body.param['orderby'];
@@ -21,10 +16,10 @@ module.exports = function (am) {
             path: req.body,
             parameters: req.body.param,
             data: req.body.data,
-            headers: {
+            headers: (auth) ? {
                 "Content-Type": "application/json",
                 "Authorization": auth
-            }
+            } : undefined
         };
 
         if (req.body.method == "get") {

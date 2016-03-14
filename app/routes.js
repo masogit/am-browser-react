@@ -3,13 +3,13 @@ var db = require('./db.js');
 module.exports = function (app, am, redis) {
     
     var Metadata = require('./metadata.js');
-    var metadata = new Metadata(am);
+    var metadata = new Metadata();
     
     var REST = require('./rest.js');
-    var rest = new REST(am);
+    var rest = new REST();
     
     var Cache = require('./cache.js');
-    var cache = new Cache(db, am, redis);
+    var cache = new Cache(db, redis);
     
     // Redis Server Info
     app.get('/redis', function (req, res) {
