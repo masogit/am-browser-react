@@ -11,7 +11,7 @@
             Count: {{ tempRecords.count }}
             Elapsed time: {{ tempRecords.timeEnd1 - tempRecords.timeStart1 }}ms
         </small>
-        <a class="pull-right badge" ng-click="tempRecords.showDetail=!tempRecords.showDetail" ng-init="tempRecords.showDetail=true">
+        <a class="pull-right badge" ng-click="tempRecords.showDetail=!tempRecords.showDetail" ng-init="tempRecords.showDetail=false">
             <span class="glyphicon glyphicon glyphicon-step-{{(tempRecords.showDetail)?'forward':'backward'}}"></span>
         </a>
 
