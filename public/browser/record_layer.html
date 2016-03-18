@@ -1,0 +1,57 @@
+<div ng-show="tempRecord" ng-include="'amRecordLayer'"></div>
+
+<script type="text/ng-template" id="amRecordLayer">
+
+    <span style="display: none">{{table = (isStructure) ? l.table: (t)?t:tempRecord }}</span>
+
+    <h5 class="breadcrumb">
+        <!--<small ng-show="l">
+            <span class="glyphicon glyphicon-eye-close" ng-click="table.showSelf=!table.showSelf"
+                  ng-show="!table.showSelf"></span>
+            <span class="glyphicon glyphicon-eye-open" ng-click="table.showSelf=!table.showSelf"
+                  ng-show="table.showSelf"></span>
+        </small>-->
+        {{ (tempTable.showLabel)?(l['$']['label']) ? l['$']['label'] : table['$']['sqlname']:(l['$']['sqlname']) ?
+        l['$']['sqlname'] : table['$']['sqlname'] }}
+        <small>({{ table['ID'] }})</small>
+        <small class="pull-right" ng-show="!l">Elapsed time: {{ tempRecord.timeEnd - tempRecord.timeStart }}ms</small>
+        <a ng-click="table.showSelf=!table.showSelf" class="pull-right" ng-show="l">
+            <span class="glyphicon glyphicon-menu-{{(table.showSelf)?'down':'up'}}"></span>
+        </a>
+    </h5>
+
+    <table ng-show="!table.showSelf" width="100%" class="table table-striped">
+        <thead>
+            <tr>
+                <td ng-repeat="f in table.field">
+                    {{(f.aliasName)?f.aliasName:(tempTable.showLabel)?f['$']['label']:f['$']['sqlname']}}
+                </td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td ng-repeat="f in table.field">
+                    {{ formatValue(f['$']['sqlname'], f.data) }}
+                        <span ng-show="f['$']['sqlname']=='GlobalId'||f['$']['sqlname']=='CMDBId'">
+                            <a ng-href="{{urlUCMDB(f.data)}}" target="_blank">Open UCMDB Browser</a>
+                        </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <span ng-show="!table.showSelf" ng-repeat="l in table.link">
+        <div ng-show="l.table && l['$']['card11']=='yes'" ng-include="'amRecordLayer'"
+             ng-init="isStructure=true"></div>
+        <div ng-show="l.tables && !l['$']['card11']">
+            <h5 class="breadcrumb">
+                {{l['$']['sqlname']}} ({{l.tables.length}})
+                <a ng-click="l.showChild=!l.showChild" class="pull-right">
+                    <span class="glyphicon glyphicon-menu-{{(l.showChild)?'up':'down'}}"></span>
+                </a>
+            </h5>
+            <div ng-show="l.showChild" ng-repeat="t in l.tables" ng-include="'amRecordLayer'"
+                 ng-init="isStructure=false" style="padding-left: 50px"></div>
+        </div>
+    </span>
+
+</script>
