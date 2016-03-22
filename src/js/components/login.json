@@ -1,0 +1,80 @@
+{
+  "count": 1,
+  "entities": [
+    {
+      "bAdminRight": {
+        "1": "Yes"
+      },
+      "Phone": "(408) 536-6000",
+      "seLoginClass": {
+        "0": "Named"
+      },
+      "BarCode": "ADMIN",
+      "EMail": "AM:Admin",
+      "dLeave": "",
+      "dEndValidity": "",
+      "sLvl": 0,
+      "IDNo": "ADMIN",
+      "dStartValidity": "",
+      "bSharedData": {
+        "1": "Yes"
+      },
+      "UserName": "",
+      "bIsRCManager": {
+        "0": "No"
+      },
+      "self": "Admin, ",
+      "bFixedPwd": {
+        "0": "No"
+      },
+      "LoginFailures": 0,
+      "bNeverExpirePwd": {
+        "0": "No"
+      },
+      "HomePhone": "(408) 536-6000",
+      "bIsRCHotliner": {
+        "0": "No"
+      },
+      "bDepartment": {
+        "0": "No"
+      },
+      "UserDesc": "",
+      "FullName": "/Admin, , ADMIN/",
+      "UserDomain": "",
+      "FirstName": "",
+      "bCreatedOnTheFly": {
+        "0": "No"
+      },
+      "Identifier": "",
+      "MobilePhone": "(408) 536-6000",
+      "dHire": 1450656000000,
+      "LdapDN": "",
+      "ref-link": "db/amEmplDept/240",
+      "Field3": "",
+      "UserLogin": "Admin",
+      "Field2": "",
+      "dtLastModif": 1457048184000,
+      "MailLogin": "",
+      "bHDAdmin": {
+        "0": "No"
+      },
+      "FirstName2": "",
+      "Fax": "(650) 572-9099",
+      "MrMrs": "",
+      "bResetPwd": {
+        "0": "No"
+      },
+      "dPwdExpiration": "",
+      "bCanReadArchive": {
+        "0": "No"
+      },
+      "seLoginStatus": {
+        "0": "Active"
+      },
+      "dtLogonFailure": "",
+      "Field1": "",
+      "Title": "",
+      "Name": "Admin"
+    }
+  ]
+}
