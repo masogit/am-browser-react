@@ -2,7 +2,7 @@
 
 import Ferret from './components/Ferret';
 import Login from './components/Login';
-import Dashboard from './components/Dashboard';
+import Explorer from './components/Explorer';
 import TBD from 'grommet/components/TBD';
 
 import Items from './components/Items';
@@ -26,8 +26,8 @@ const categoryRoutes = CATEGORIES.map((category) => {
   let result = {
     path: category, component: Items,
     childRoutes: [
-      { path: 'details/*', component: Details },
-      { path: '*', component: Item }
+      {path: 'details/*', component: Details},
+      {path: '*', component: Item}
     ]
   };
   return result;
@@ -40,34 +40,39 @@ module.exports = {
   path: (path) => (rootPath + path.slice(1)),
 
   routes: [
-    { path: rootPath, component: Ferret,
+    {
+      path: rootPath, component: Ferret,
       // TODO: crashes react-router, wait for fix
       //indexRoute: {
       //  onEnter: function (nextState, replaceState) {
-      //    replaceState(null, '/dashboard')
-      //  }},
+      //    replaceState(null, '/explorer');
+      //  }
+      //},
       childRoutes: [
-        { path: 'login', component: Login },
-        { path: 'dashboard', component: Dashboard },
-        { path: 'reports', component: TBD },
-        { path: 'settings', component: TBD },
-        { path: 'activity', component: Items,
+        {path: 'login', component: Login},
+        {path: 'explorer', component: Explorer},
+        {path: 'builder', component: TBD},
+        {path: 'aql', component: TBD},
+        {
+          path: 'activity', component: Items,
           childRoutes: [
-            { path: '*', component: Item }
+            {path: '*', component: Item}
           ]
         },
-        { path: 'server-profiles', component: Items,
+        {
+          path: 'server-profiles', component: Items,
           childRoutes: [
-            { path: 'add', component: ServerProfileAdd },
-            { path: 'edit/*', component: ServerProfileEdit },
-            { path: 'details/*', component: Details },
-            { path: '*', component: ServerProfile }
+            {path: 'add', component: ServerProfileAdd},
+            {path: 'edit/*', component: ServerProfileEdit},
+            {path: 'details/*', component: Details},
+            {path: '*', component: ServerProfile}
           ]
         },
-        { path: 'enclosures', component: Items,
+        {
+          path: 'enclosures', component: Items,
           childRoutes: [
-            { path: 'details/*', component: Details },
-            { path: '*', component: Enclosure }
+            {path: 'details/*', component: Details},
+            {path: '*', component: Enclosure}
           ]
         },
         ...categoryRoutes

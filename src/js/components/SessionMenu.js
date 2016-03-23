@@ -25,6 +25,7 @@ class SessionMenu extends Component {
     var icon = <Gravatar email={email || ''} default="mm"/>;
     return (
       <Menu icon={icon} dropAlign={dropAlign} a11yTitle="Session">
+        <Anchor href="#" className="active">Settings</Anchor>
         <Anchor href="#" onClick={this._onLogout}>Logout</Anchor>
       </Menu>
     );
