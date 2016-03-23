@@ -3,6 +3,8 @@
 import Ferret from './components/Ferret';
 import Login from './components/Login';
 import Explorer from './components/explorer/Explorer';
+import Builder from './components/builder/Builder';
+import AQL from './components/aql/AQL';
 import TBD from 'grommet/components/TBD';
 
 import Items from './components/Items';
@@ -51,8 +53,8 @@ module.exports = {
       childRoutes: [
         {path: 'login', component: Login},
         {path: 'explorer', component: Explorer},
-        {path: 'builder', component: TBD},
-        {path: 'aql', component: TBD},
+        {path: 'builder', component: Builder},
+        {path: 'aql', component: AQL},
         {
           path: 'activity', component: Items,
           childRoutes: [
@@ -60,7 +62,7 @@ module.exports = {
           ]
         },
         {
-          path: 'server-profiles', component: Items,
+          path: 'server-profiles', component: TBD,
           childRoutes: [
             {path: 'add', component: ServerProfileAdd},
             {path: 'edit/*', component: ServerProfileEdit},
