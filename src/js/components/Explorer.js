@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-//import Header from 'grommet/components/Header';
+import Header from 'grommet/components/Header';
 //import Title from 'grommet/components/Title';
 //import Logo from './Logo'; // './HPELogo';
 //import NavHeader from './NavHeader';
@@ -15,7 +15,7 @@ import Meter from 'grommet/components/Meter';
 //import Footer from 'grommet/components/Footer';
 //import Menu from 'grommet/components/Menu';
 //import Button from 'grommet/components/Button';
-//import Section from 'grommet/components/Section';
+import Section from 'grommet/components/Section';
 //import SearchInput from 'grommet/components/SearchInput';
 //import Box from 'grommet/components/Box';
 //import App from 'grommet/components/App';
@@ -52,49 +52,60 @@ export default class Explorer extends Component {
     //var links = this.state.links;
     //console.log(links);
 
-    var ids = this.state.ids;
-    var tileComponents = ids.map(function (id) {
-      return <Tile>Hello, {id}!</Tile>;
-    });
+    //var ids = this.state.ids;
+    //var tileComponents = ids.map(function (id) {
+    //  return <Tile>Hello, {id}!</Tile>;
+    //});
     return (
       <div>
         <div className="searchviews">
           <Search inline={true} placeholder="Search views" size="medium"
                   fill={true} responsive={false} onDOMChange={this._onSearch}/>
         </div>
-        <Tiles fill={true} flush={false}>
-          {tileComponents}
-          <Tile>
-            <Meter value={70} total={100} units="GB" vertical="true"/>
-            <t value={40} type="arc"/>
-          </Tile>
-          <Tile>
-            <Meter value={80} total={100} units="GB" type="circle"/>
-          </Tile>
-          <Tile>
-            <Meter value={90} units="GB" min={{"value": 0, "label": "0 GB"}}
-                   max={{"value": 80, "label": "80 GB"}}
-                   threshold={75}/>
-          </Tile>
-          <Tile>
-            <Meter type="arc" legend={true} series={[
+        <Section>
+          <Header>
+            <h3 className="searchviews">Sample Content</h3>
+          </Header>
+          <Tiles fill={true} flush={false}>
+            <Tile>
+              <Meter value={70} total={100} units="GB" vertical="true"/>
+              <t value={40} type="arc"/>
+            </Tile>
+            <Tile>
+              <Meter value={80} total={100} units="GB" type="circle"/>
+            </Tile>
+            <Tile>
+              <Meter value={90} units="GB" min={{"value": 0, "label": "0 GB"}}
+                     max={{"value": 80, "label": "80 GB"}}
+                     threshold={75}/>
+            </Tile>
+          </Tiles>
+        </Section>
+        <Section>
+          <Header>
+            <h3 className="searchviews">Sample Content</h3>
+          </Header>
+          <Tiles fill={true} flush={false}>
+            <Tile>
+              <Meter type="arc" legend={true} series={[
             {"label": "Gen 7", "value": 50, "colorIndex": "graph-1"},
             {"label": "Gen 8", "value": 200, "colorIndex": "graph-2"},
             {"label": "Gen 9", "value": 100, "colorIndex": "graph-3"},
             {"label": "Gen 10", "value": 300, "colorIndex": "graph-4"}
             ]}/>
-          </Tile>
-          <Tile>
-            <Meter type="arc" legend={true} series={[
+            </Tile>
+            <Tile>
+              <Meter type="arc" legend={true} series={[
              {"label": "Gen 7", "value": 50, "colorIndex": "graph-1"},
              {"label": "Gen 8", "value": 200, "colorIndex": "graph-2"},
              {"label": "Gen 9", "value": 100, "colorIndex": "graph-3"},
              {"label": "Gen 10", "value": 300, "colorIndex": "graph-4"}]}/>
-          </Tile>
-          <Tile>
-            <Meter value={40} type="arc" size="large"/>
-          </Tile>
-        </Tiles>
+            </Tile>
+            <Tile>
+              <Meter value={40} type="arc" size="large"/>
+            </Tile>
+          </Tiles>
+        </Section>
       </div>
     );
   }
