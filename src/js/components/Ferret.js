@@ -22,7 +22,6 @@ class Indexer extends Component {
   render() {
     //const { active: navActive } = this.props;
 
-    console.log('localStorage.email:' + localStorage.email);
     var pane1 = localStorage.email && localStorage.token ? <NavHeader /> : null; //navActive ? <NavSidebar /> : null;
     var pane2 = this.props.children;
 

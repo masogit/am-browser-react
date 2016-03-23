@@ -91,8 +91,7 @@ export default class Explorer extends Component {
             {"label": "Gen 7", "value": 50, "colorIndex": "graph-1"},
             {"label": "Gen 8", "value": 200, "colorIndex": "graph-2"},
             {"label": "Gen 9", "value": 100, "colorIndex": "graph-3"},
-            {"label": "Gen 10", "value": 300, "colorIndex": "graph-4"}
-            ]}/>
+            {"label": "Gen 10", "value": 300, "colorIndex": "graph-4"}]}/>
             </Tile>
             <Tile>
               <Meter type="arc" legend={true} series={[

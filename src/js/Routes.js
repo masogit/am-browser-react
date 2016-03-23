@@ -2,7 +2,7 @@
 
 import Ferret from './components/Ferret';
 import Login from './components/Login';
-import Explorer from './components/Explorer';
+import Explorer from './components/explorer/Explorer';
 import TBD from 'grommet/components/TBD';
 
 import Items from './components/Items';
