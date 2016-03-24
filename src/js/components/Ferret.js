@@ -4,8 +4,9 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { navResponsive } from '../actions';
 import App from 'grommet/components/App';
-import Split from 'grommet/components/Split';
-import NavSidebar from './NavSidebar';
+//import Split from 'grommet/components/Split';
+//import NavSidebar from './NavSidebar';
+import NavHeader from './NavHeader';
 
 class Indexer extends Component {
 
@@ -19,17 +20,15 @@ class Indexer extends Component {
   }
 
   render() {
-    const { active: navActive } = this.props;
+    //const { active: navActive } = this.props;
 
-    var pane1 = navActive ? <NavSidebar /> : null;
+    var pane1 = localStorage.email && localStorage.token ? <NavHeader /> : null; //navActive ? <NavSidebar /> : null;
     var pane2 = this.props.children;
 
     return (
       <App centered={false}>
-        <Split flex="right" onResponsive={this._onResponsive} priority="left">
           {pane1}
           {pane2}
-        </Split>
       </App>
     );
   }
