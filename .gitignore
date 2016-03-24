@@ -1,8 +1,10 @@
 **bower_components**
 node_modules
+db
 **/dist*/**
 **/dist-bower*/**
 .DS_Store
+.vscode
 .sass-cache
 *.log
 *tmp*
