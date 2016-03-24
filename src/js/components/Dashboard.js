@@ -54,12 +54,12 @@ export default class Dashboard extends Component {
   render() {
     //var links = this.state.links;
     //console.log(links);
-    var linkComponents = links.map(function (link) {
-      return <Anchor href="/browser/#{link.value}">{link.label}</Anchor>;
+    var linkComponents = links.map(function (link, index) {
+      return <Anchor href="/browser/#{link.value}" key={index}>{link.label}</Anchor>;
     });
     var ids = this.state.ids;
-    var tileComponents = ids.map(function (id) {
-      return <Tile>Hello, {id}!</Tile>;
+    var tileComponents = ids.map(function (id, index) {
+      return <Tile key={index}>Hello, {id}!</Tile>;
     });
     return (
       <App centered='true'>
@@ -83,7 +83,7 @@ export default class Dashboard extends Component {
         <Tiles fill={true} flush={false}>
           {tileComponents}
           <Tile>
-            <Meter value={70} total={100} units="GB" vertical="true"/>
+            <Meter value={70} total={100} units="GB" vertical={true}/>
             <t value={40} type="arc"/>
           </Tile>
           <Tile>

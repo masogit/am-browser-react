@@ -68,7 +68,7 @@ export default class Explorer extends Component {
           </Header>
           <Tiles fill={true} flush={false}>
             <Tile>
-              <Meter value={70} total={100} units="GB" vertical="true"/>
+              <Meter value={70} total={100} units="GB" vertical={true}/>
               <t value={40} type="arc"/>
             </Tile>
             <Tile>
