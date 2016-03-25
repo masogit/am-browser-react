@@ -1,7 +1,7 @@
 # AM Browser
 
 A lightweight Asset Manager web browser, to search AM database, build simple data views, quick search and execute AQL, etc.
-Try in demo server [http://16.165.217.57:8088](http://16.165.217.57:8088).
+
 
 ## Installation
 
