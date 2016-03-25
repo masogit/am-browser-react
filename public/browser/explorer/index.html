@@ -1,0 +1,90 @@
+<!--<div ng-include="(module=='explorer' && !relations)?'/browser/amx_explorer.html':''"></div>-->
+<!--<div ng-include="(module=='explorer' && tempRecords && !relations)?'/browser/records.html':''"></div>-->
+
+<div class="col-md-12" ng-hide="formData.viewStyle=='list'">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <input type="text" class="form-control" ng-model="globalSearch" ng-change="cacheSearch(globalSearch)"
+               placeholder="{{ (redis.enabled)?'Quick search enabled!  type to search records in views': 'Search views' }}">
+    </div>
+</div>
+
+<div ng-show="cachedRefLinks && cachedRefLinks.length>0" class="col-md-3" full-height="100">
+    <h4>Quick Search
+        <small>
+            ({{cacheSearch.count}})
+            Elapsed time: {{ cacheSearch.timeEnd - cacheSearch.timeStart }}ms
+        </small>
+    </h4>
+    <div>
+        <table class="table table-striped table-condensed">
+            <!--<thead>-->
+            <!--<tr>-->
+            <!--<th>Ref-Link</th>-->
+            <!--<th>Self</th>-->
+            <!--</tr>-->
+            <!--</thead>-->
+            <tbody>
+            <tr ng-repeat="ref in cachedRefLinks">
+                <td>
+                    <a href="#relations" ng-click="showRelations({'ref-link': ref.split(':')[0]})">
+                        <span class="glyphicon glyphicon-zoom-in"></span>
+                    </a>{{ ref.substring(ref.indexOf(':')+1, ref.length) }}
+                </td>
+                <!--<td>{{ ref.substring(ref.indexOf(':')+1, ref.length) }}</td>-->
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div ng-hide="formData.viewStyle=='list'" class="col-md-{{(cachedRefLinks && cachedRefLinks.length>0)?'9':'12'}}" ng-init="loadTemplates()" full-height="100">
+
+    <div class="col-md-12" ng-show="formData.viewStyle=='tile'" ng-repeat="(key, value) in templates|groupBy:'group'">
+        <h3>{{ key }} <small>({{ value.length }})</small></h3>
+        <div class="col-md-3" style="width: 360px; height: 150px;padding-top: 10px; margin-bottom: 20px"
+             ng-repeat="temp in value|orderBy:'-visit'|filter:globalSearch">
+
+            <a href="#explorer/records">
+                <span class="thumbnail" ng-click="backTableList();loadOneTemp(temp);visitTemplate(temp);">
+                    <h4 style="padding-left: 10px">{{ temp.name }}
+                        <strong class="badge pull-right">{{temp.last.count}}</strong>
+                    </h4>
+
+                    <div class="col-md-7" ng-show="temp.chartData">
+                        <canvas id="line" class="chart chart-line" chart-data="temp.chartData.data" chart-labels="temp.chartData.labels"
+                                chart-legend="false" chart-series="temp.chartData.series" ng-show="temp.chartType=='line'"
+                                chart-options="{scaleFontSize: 0,animation: false}"></canvas>
+                        <canvas id="bar" class="chart chart-bar" chart-data="temp.chartData.data" chart-labels="temp.chartData.labels"
+                                chart-legend="false" chart-series="temp.chartData.series" ng-show="temp.chartType=='bar'"
+                                chart-options="{scaleFontSize: 0,animation: false}"></canvas>
+                        <canvas id="doughnut" class="chart chart-doughnut" chart-data="temp.chartData.data[0]"
+                                chart-options="{scaleFontSize: 0,animation: false}"
+                                chart-labels="temp.chartData.labels" ng-show="temp.chartType=='pie'"></canvas>
+                    </div>
+                    <div class="col-md-5" style="height: 80px; overflow: hidden" ng-show="temp.chartData">
+                        <span ng-repeat="l in temp.chartData.labels">
+                            {{l}}: {{temp.chartData.data[0][$index]}}
+                            <br>
+                        </span>
+                    </div>
+
+
+                    <small class="pull-left" ng-hide="temp.chartData">{{ temp.description }}</small>
+
+                    <h6 style="padding-top: 90px;">
+                        <small>Visit: {{ temp.visit }}</small>
+                        <small class="pull-right">{{temp.last.time | date:'yyyy-MM-dd HH:mm:ss'}}</small>
+                    </h6>
+                </span>
+            </a>
+        </div>
+    </div>  
+  
+
+</div>
+
+<div class="col-md-12" ng-show="formData.viewStyle=='list'">
+    <div class="col-md-3" ng-include="'/browser/builder/views.html'"></div>
+    <div class="col-md-6" ng-include="'/browser/record_list.html'" full-height="100"></div>
+    <div class="col-md-3" ng-include="'/browser/record_tree.html'" full-height="100"></div>
+</div>

@@ -1,0 +1,74 @@
+<!--<div ui-content-for="title">
+    <span>Tables</span>
+</div>-->
+
+<div class="scrollable" ng-init="metadata('all')">
+    <input type="text" placeholder="Search table..." class="form-control" ng-show="!formData.showLabel && !metadata.table" ng-model="tableSearch.id">
+    <input type="text" placeholder="Search table..." class="form-control" ng-show="formData.showLabel && !metadata.table" ng-model="tableSearch.Label">
+
+    <div class="scrollable-content">
+
+        <div class="list-group" ng-show="metadata.tables && !metadata.table">
+            <span ng-repeat="table in metadata.tables | filter: tableSearch" ng-click="metadata(table.id)" class="list-group-item">
+                {{ (!formData.showLabel) ? table.id : table.Label }} 
+                <i class="fa fa-chevron-right pull-right"></i>
+                <span ng-show="table.loading" class="pull-right">loading... </span>
+            </span>
+        </div>
+
+        <div ng-show="metadata.table && !tempEdit">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <a ng-click="backTableList()">
+                        <span class="fa fa-arrow-left"></span> {{ metadata.table['$']['sqlname'] }}</a>
+                    <span class="pull-right">
+                    <a ng-click="toNewTemp(metadata.table, true);tempEdit=true" ng-show="metadata.table.fields.length > 0"><span
+                        class="fa fa-plus"></span> Add</a>
+                    <a ng-click="toNewTemp(metadata.table);tempEdit=true" ng-show="metadata.table.fields.length > 0 && tempTable"><span
+                        class="fa fa-random"></span> Edit</a>
+                    <!--<a ng-click="addFields(metadata.table.fields)">
+                        <span class="fa fa-search"></span> Query</a>-->
+                    </span>
+                    
+                </div>
+                <div class="panel-body">
+                        <span style="display: none">{{link.table = metadata.table}}</span>
+                        <div ng-show="link.table" ng-include="'amTree'"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div ng-show="tempEdit" class="section" ng-include="'/mobile/template.html'"></div>
+    </div>
+</div>
+
+
+
+<script type="text/ng-template" id="amTree">
+
+    <span style="display: none">{{parent = link.table.parent}}</span>
+    <span ng-repeat="field in link.table.field | filter: filterFields(fieldSearch)">
+        <input type="checkbox"
+               ng-checked="ifChecked(field, metadata.table.fields, link.table.parent)"
+               ng-click="checkTreeFields(field, metadata.table.fields, link.table.parent)">
+        {{ (!formData.showLabel) ? field['$']['sqlname'] : field['$']['label'] }}<br>
+    </span>
+    <span ng-repeat="link in link.table.link | filter: filterFields(linkSearch)" ng-init="link['parent']=parent;expandLink(link)">
+        <a ng-click="metadata(link['$']['desttable'], link)" ng-show="!link.table ">
+            <i class="fa fa-plus"></i>
+            [{{ ((link['parent'])?(link['parent']+'.'):'')+link["$"]["sqlname"] }}]
+        </a>
+
+        <a ng-click="foldChild(link)" ng-show="link.table">
+            <i class="fa fa-minus"></i>
+            [{{ ((link['parent'])?(link['parent']+'.'):'')+link["$"]["sqlname"] }}]
+        </a>
+
+        <!--<a ng-click="metadata(link['$']['desttable'])" ng-init="expandLink(link)">[{{ ((link['parent'])?(link['parent']+'.'):'')+link["$"]["sqlname"] }}]</a>-->
+    <!--loading-->
+    <span class="text-center" ng-show="link.loading">Loading....</span>
+
+    <br>
+    <div ng-show="link.table" ng-include="'amTree'" style="padding-left: 10px"></div>
+    </span>
+</script>

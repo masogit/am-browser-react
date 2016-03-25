@@ -1,0 +1,43 @@
+<!--<div ui-content-for="title">
+    <span>Forms</span>
+</div>-->
+
+<div class="scrollable">
+    <h4 class="scrollable-header app-name">Configuration</h4>
+    <div class="scrollable-content section">
+        <form role="form">
+            <div class="form-group">
+                <label>Server and port</label>
+                <input type="text" class="form-control" placeholder="Server and port" ng-model="formData.server">
+            </div>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" class="form-control" placeholder="Username" ng-model="formData.user">
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" class="form-control" placeholder="Password" ng-model="formData.password">
+            </div>
+            <hr>
+
+            <div class="form-group">
+                <label>Limit</label>
+                <input type="text" class="form-control" placeholder="Limit" ng-model="formData.param.limit">
+            </div>
+            <div class="form-group">
+                <label>Position</label>
+                <input type="text" class="form-control" placeholder="Pos" ng-model="formData.param.offset">
+            </div>
+            <div class="form-group">
+                <label>Page Size</label>
+                <input type="text" class="form-control" placeholder="Page" ng-model="formData.pageSize">
+            </div>
+            <div class="form-group">
+                <label>Show Label</label>
+                <ui-switch ng-model="formData.showLabel"></ui-switch>
+            </div>
+            <button class="btn btn-primary btn-block" type="button" ng-click="store()" ui-turn-off='uiSidebarLeft'>Save</button>
+        </form>
+    </div>
+</div>

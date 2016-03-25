@@ -1,0 +1,64 @@
+<div class="row">
+    <div class="col-md-9">
+        <textarea class="form-control" ng-model="AQL.str" placeholder="AQL..." style="height: 68px"></textarea>
+    </div>
+    <div class="col-md-3">
+        <input type="text" class="form-control" ng-model="AQL.alias" placeholder="AQL alias name">
+        <button class="btn btn-primary form-control"
+                ng-click="aqlQuery(formData, AQL.str, AQL.alias)"
+                ng-disabled="!AQL.str">
+            Query<span ng-show="AQL.alias"> & Save</span>
+        </button>
+    </div>
+</div>
+<h4>
+    <small>Count: {{ aqlData.Result[0].Row.length }} Elapsed time: {{ aqlData.timeEnd - aqlData.timeStart }}ms</small>
+    <small class="pull-right">
+        <span style="padding-right: 20px" ng-init="aqlData_display='name'">
+            Show
+            <input type="radio" ng-model="aqlData_display" value="name">Name
+            <input type="radio" ng-model="aqlData_display" value="content">Content
+        </span>
+
+        Search
+        <input type="text" placeholder="Dynamic Search" ng-model="aqlSearch">
+        <!--Page
+        <select ng-model="formData.pageSize" ng-options="o as o for o in [10, 50, 100]">
+        </select>-->
+    </small>
+</h4>
+
+<div full-height="200">
+    <span class="text-center" ng-show="loading">Loading....</span>
+    <div class="col-md-12" ng-init="aqlData_Type='bar'">
+        <div class="col-md-4">
+            <canvas id="line" class="chart chart-line" chart-data="aqlChart.data" chart-labels="aqlChart.labels"
+                    chart-legend="false" chart-series="aqlChart.series" chart-options="{scaleFontSize: 0}"></canvas>
+        </div>
+        <div class="col-md-4">
+            <canvas id="bar" class="chart chart-bar" chart-data="aqlChart.data" chart-labels="aqlChart.labels"
+                    chart-legend="false" chart-series="aqlChart.series" chart-options="{scaleFontSize: 0}"></canvas>
+
+        </div>
+        <div class="col-md-4">
+            <canvas id="doughnut" class="chart chart-doughnut" chart-data="aqlChart.data[0]" chart-labels="aqlChart.labels"></canvas>
+        </div>
+    </div>
+    <table class="table table-striped" ng-show="aqlData.Schema">
+        <thead>
+        <tr>
+            <th ng-repeat="col in aqlData.Schema[0].Column">
+                {{ (aqlData_display=='name') ? col['$']['Name'] : col['$']['Content'] }}
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <!--<tr ng-repeat="row in aqlData.Result[0].Row|filter:aqlSearch|orderBy:predicate:reverse|startFrom:currentPage*formData.pageSize|limitTo:formData.pageSize">-->
+        <tr ng-repeat="row in aqlData.Result[0].Row|filter:aqlSearch">
+            <td ng-repeat="col in row.Column">
+                {{ col['_'] }}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

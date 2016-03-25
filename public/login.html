@@ -1,0 +1,65 @@
+<!doctype html>
+<html ng-app="am">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AM Browser</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/hpe.css" />
+    <link rel="shortcut icon" href="/img/favicon.png" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="/img/favicon.png" type="image/x-icon" />
+    <script src="/js/lib/angular.min.js"></script>
+    <script src="/js/lib/ui-bootstrap-tpls-0.14.3.min.js"></script>
+    <script src="/js/lib/angular-route.min.js"></script>
+    <script src="/js/lib/mobile-angular-ui.min.js"></script>
+    <script src="/js/lib/mobile-angular-ui.gestures.min.js"></script>
+    <script src="/js/lib/Chart.min.js"></script>
+    <script src="/js/lib/angular-chart.min.js"></script>
+    <script src="/js/controllers/amx.js"></script>
+
+    <style>
+        #Login {
+            /*margin-top: 200px;*/
+        }
+    </style>
+</head>
+<!-- SET THE CONTROLLER -->
+
+<body ng-controller="amCtl" style="background-image: url('/img/login.jpg');">
+        <img src="/img/hpe_logo.png" width="150px" style="padding-left: 50px; padding-top: 20px">
+
+        <div id="Login">
+            <div class="col-sm-3 col-md-4 col-lg-7"></div>
+            <div class="col-sm-6 col-md-4 col-lg-3" style="background: rgba(255, 255, 255, 0.75) none repeat scroll 0% 0%;margin-top: 15%">
+                    <h1>
+                        Asset Manager Browser
+                    </h1>
+                    <form role="form" style="padding-bottom: 30px" ng-init="getAM()">
+                        <div class="form-group">
+                            <label>Server and port</label>
+                            <input type="text" class="form-control" placeholder="AM Web tier, default port is 8081" ng-model="formData.server" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" class="form-control" placeholder="Username" ng-model="formData.user">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" class="form-control" placeholder="Password" ng-model="formData.password">
+                        </div>
+                        <uib-alert ng-repeat="alert in alerts" dismiss-on-timeout="5000"
+                                   type="{{alert.type}}" close="closeAlert($index)">
+                            {{alert.msg}}
+                        </uib-alert>
+                        <button class="btn btn-primary btn-block" ng-disabled="logining" ng-click="login()">
+                            login<span ng-show="logining">ing...</span>
+                        </button>
+                    </form>
+            </div>
+        </div>
+
+</body>
+
+</html>

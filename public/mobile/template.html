@@ -1,0 +1,47 @@
+<form name="tempForm">
+    <div class="form-group" ng-class="{'has-error': !tempForm.tempName.$valid}">
+        <label>View Name</label>
+        <input type="text" class="form-control" name="tempName" ng-model="tempTable.name" placeholder="Input a Template Name" ng-required="true">
+    </div>
+    <div class="form-group">
+        <label>Description</label>
+        <input type="text" class="form-control" ng-model="tempTable.description" placeholder="Input description">
+    </div>
+    <div class="form-group">
+        <label>Show Label</label>
+        <ui-switch ng-model="tempTable.showLabel"></ui-switch>
+    </div>
+    <button class="btn btn-primary btn-block" type="button" ng-click="saveTemplate(tempTable);tempEdit=false" ng-confirm-click="Save this template?">Save</button>
+    <hr>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Structure
+            <!--<a ng-click="tempEdit=false" class="pull-right"><i class="fa fa-pencil"></i></a>-->
+        </div>
+        <div class="panel-body">
+            <div ng-show="tempTable" ng-include="'amTemp'"></div>
+        </div>
+    </div>
+    <button class="btn btn-danger btn-block" type="button" ng-click="removeTemplate(tempTable);tempEdit=false" ng-confirm-click="Delete this template?">Delete</button>
+</form>
+
+
+<script type="text/ng-template" id="amTemp">
+    <span style="display: none">{{table = (l.table)?l.table:tempTable}}</span>
+    <span style="display: none">{{isCard11 = (l['$']['card11'])?true:false}}</span>
+    <h5>{{ (l['$']['sqlname'])?l['$']['sqlname']:table['$']['sqlname'] }}
+        <small ng-show="!isCard11"><a ng-click="table.AQL=' '" ng-show="!table.AQL">Set AQL</a></small>
+    </h5>
+    <ul>
+        <span ng-show="table.AQL">Set AQL: <input class="form-control" type="text" ng-model="table.AQL"></span>
+        <li ng-repeat="f in table.field">
+            <span ng-click="f.aliasName=(tempTable.showLabel)?f['$']['label']:f['$']['sqlname']">{{ (tempTable.showLabel)?f['$']['label']:f['$']['sqlname'] }}</span>
+            <small ng-show="f.aliasName">
+                <span class="glyphicon glyphicon-pencil" contenteditable ng-model="f.aliasName"></span>
+            </small>
+        </li>
+    </ul>
+    <span ng-repeat="l in table.link">
+        <div ng-show="l.table" ng-include="'amTemp'" style="padding-left: 20px"></div>
+    </span>
+</script>
