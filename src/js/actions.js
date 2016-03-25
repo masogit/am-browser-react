@@ -55,6 +55,7 @@ export const ITEM_NOTIFICATIONS_FAILURE = 'ITEM_NOTIFICATIONS_FAILURE';
 export const ITEM_MAP_SUCCESS = 'ITEM_MAP_SUCCESS';
 export const ITEM_MAP_FAILURE = 'ITEM_MAP_FAILURE';
 export const METADATA_SUCCESS = 'METADATA_SUCCESS';
+export const METADATA_FILTER_SUCCESS = 'METADATA_FILTER_SUCCESS';
 
 let HOST_NAME = NODE_ENV === 'development' ? 'http://localhost:8080' : window.location.host;
 
@@ -178,10 +179,27 @@ export function metadataLoad() {
   };
 }
 
+export function metadataSearch(rows, value) {
+  return function (dispatch) {
+    let data = rows.filter(function(obj) {
+      return obj.id.indexOf(value) > -1;
+    });
+    dispatch(metadataFilterSuccess(data));
+  };
+}
+
 export function metadataSuccess(result) {
   return {
     type: METADATA_SUCCESS,
-    rows: result
+    rows: result,
+    filterRows: result
+  };
+}
+
+export function metadataFilterSuccess(result) {
+  return {
+    type: METADATA_FILTER_SUCCESS,
+    filterRows: result
   };
 }
 

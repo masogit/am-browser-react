@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { metadataLoad } from '../../actions';
+import { metadataLoad, metadataSearch } from '../../actions';
 import Sidebar from 'grommet/components/Sidebar';
 import Header from 'grommet/components/Header';
 //import Footer from 'grommet/components/Footer';
@@ -20,7 +20,7 @@ export default class Builder extends Component {
 
   constructor() {
     super();
-    //this._onSearch = this._onSearch.bind(this);
+    this._onSearch = this._onSearch.bind(this);
     //this.state = {ids: ['test1', 'test2', 'test3']};
   }
 
@@ -28,8 +28,17 @@ export default class Builder extends Component {
     this.props.dispatch(metadataLoad());
   }
 
+  _onSearch(event) {
+    let sidebarsearch = event.target;
+    if (sidebarsearch.value.length > 2) {
+      setTimeout(() => {
+        this.props.dispatch(metadataSearch(this.props.rows, sidebarsearch.value));
+      }, 500);
+    }
+  }
+
   render() {
-    let item = this.props.rows;
+    let item = this.props.filterRows;
     let items = item.map(function (row, index) {
       return <TableRow key={index}><td>{row.id}</td></TableRow>;
     });
@@ -45,7 +54,7 @@ export default class Builder extends Component {
             </Tab>
             <Tab title="Tables">
               <Header large={true} flush={false}>
-                <input className="sidebarsearch" type="text" placeholder="Search tables..."/>
+                <input className="sidebarsearch" type="text" placeholder="Search tables..." onChange={this._onSearch}/>
               </Header>
               <h3>Tables</h3>
               <Table>
@@ -67,12 +76,14 @@ export default class Builder extends Component {
 }
 
 Builder.propTypes = {
-  rows: PropTypes.array.isRequired
+  rows: PropTypes.array.isRequired,
+  filterRows: PropTypes.array.isRequired
 };
 
 let select = (state, props) => {
   return {
-    rows: state.metadata.rows
+    rows: state.metadata.rows,
+    filterRows: state.metadata.filterRows
   };
 };
 

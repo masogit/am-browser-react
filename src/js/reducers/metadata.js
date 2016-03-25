@@ -1,15 +1,22 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import { METADATA_SUCCESS } from '../actions';
+import { METADATA_SUCCESS, METADATA_FILTER_SUCCESS } from '../actions';
 
 const initialState = {
-  rows: []
+  rows: [],
+  filterRows: []
 };
 
 const handlers = {
   [METADATA_SUCCESS]: (state, action) => {
     return {
-      rows: action.rows
+      rows: action.rows,
+      filterRows: action.filterRows
+    };
+  },
+  [METADATA_FILTER_SUCCESS]: (state, action) => {
+    return {
+      filterRows: action.filterRows
     };
   }
 };
