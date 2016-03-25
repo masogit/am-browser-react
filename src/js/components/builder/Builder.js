@@ -72,7 +72,7 @@ Builder.propTypes = {
 
 let select = (state, props) => {
   return {
-    rows: state.item.rows
+    rows: state.metadata.rows
   };
 };
 
