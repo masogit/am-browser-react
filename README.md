@@ -8,7 +8,7 @@ To run this application, execute the following commands:
   2. Start the server
 
     ```
-    $ cd server
+    $ cd app
     $ gulp dev
     ```
 
