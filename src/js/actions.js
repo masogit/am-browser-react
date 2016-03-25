@@ -1,11 +1,9 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
 import Rest from 'grommet/utils/Rest';
-import history from './RouteHistory';
-import Query from 'grommet-index/utils/Query';
+//import history from './RouteHistory';
+//import Query from 'grommet-index/utils/Query';
 import IndexApi from './Api';
-import _omit from 'lodash/object/omit';
-import _isEmpty from 'lodash/lang/isEmpty';
 
 // session
 export const INIT = 'INIT';
@@ -60,7 +58,7 @@ export const ITEM_MAP_FAILURE = 'ITEM_MAP_FAILURE';
 let HOST_NAME = NODE_ENV === 'development' ? 'http://localhost:8080' : window.location.host;
 
 export function init(email, token) {
-  return { type: INIT, email: email, token: token };
+  return {type: INIT, email: email, token: token};
 }
 
 //export function login(email, password) {
@@ -151,31 +149,31 @@ export function login(username, password) {
 }
 
 export function loginSuccess(email, token) {
-  return { type: LOGIN_SUCCESS, email: email, token: token };
+  return {type: LOGIN_SUCCESS, email: email, token: token};
 }
 
 export function loginFailure(error) {
-  return { type: LOGIN_FAILURE, error: error };
+  return {type: LOGIN_FAILURE, error: error};
 }
 
 export function logout() {
-  return { type: LOGOUT };
+  return {type: LOGOUT};
 }
 
 export function routeChanged(route, prefix) {
-  return { type: ROUTE_CHANGED, route: route, prefix: prefix };
+  return {type: ROUTE_CHANGED, route: route, prefix: prefix};
 }
 
 export function navPeek(peek) {
-  return { type: NAV_PEEK, peek: peek };
+  return {type: NAV_PEEK, peek: peek};
 }
 
 export function navActivate(active) {
-  return { type: NAV_ACTIVATE, active: active };
+  return {type: NAV_ACTIVATE, active: active};
 }
 
 export function navResponsive(responsive) {
-  return { type: NAV_RESPONSIVE, responsive: responsive };
+  return {type: NAV_RESPONSIVE, responsive: responsive};
 }
 
 export function dashboardLayout(graphicSize, count, legendPlacement, tiles) {
@@ -205,7 +203,7 @@ export function dashboardLayout(graphicSize, count, legendPlacement, tiles) {
 
 export function dashboardLoad(tiles) {
   return function (dispatch) {
-    dispatch({ type: DASHBOARD_LOAD });
+    dispatch({type: DASHBOARD_LOAD});
     tiles.forEach((tile) => {
       let params = {
         category: tile.category,
@@ -223,7 +221,7 @@ export function dashboardLoad(tiles) {
 
 export function dashboardUnload(tiles) {
   return function (dispatch) {
-    dispatch({ type: DASHBOARD_UNLOAD });
+    dispatch({type: DASHBOARD_UNLOAD});
     tiles.forEach((tile) => {
       IndexApi.stopWatching(tile.watcher);
     });
@@ -232,7 +230,7 @@ export function dashboardUnload(tiles) {
 
 export function dashboardSearch(text) {
   return function (dispatch) {
-    dispatch({ type: DASHBOARD_SEARCH, text: text });
+    dispatch({type: DASHBOARD_SEARCH, text: text});
     if (text && text.length > 0) {
       let params = {
         start: 0,
@@ -243,299 +241,39 @@ export function dashboardSearch(text) {
         if (err) {
           throw err;
         } else if (res.ok) {
-          dispatch({ type: DASHBOARD_SEARCH_SUCCESS, result: res.body });
+          dispatch({type: DASHBOARD_SEARCH_SUCCESS, result: res.body});
         }
       });
     }
   };
 }
 
-function defaultParams(category, index) {
+export const REQUEST_VIEWS = 'REQUEST_VIEWS';
+export const RECEIVE_VIEWS = 'RECEIVE_VIEWS';
+
+
+function requestViews() {
   return {
-    category: index.category || category,
-    count: IndexApi.pageSize,
-    sort: index.sort,
-    start: 0
+    type: REQUEST_VIEWS
   };
 }
 
-export function indexNav(path, category, query) {
-  let queryString = '';
-  for (let name in query) {
-    queryString += (queryString.length === 0 ? '?' : '&');
-    queryString += `${name}=${encodeURIComponent(query[name])}`;
-  }
-  history.pushState(null, (path || `/${category}`) + queryString);
-  return { type: INDEX_NAV, category, query };
-}
-
-export function indexLoad(category, index, selection) {
-  return function (dispatch) {
-    // bring in any query from the location
-    const loc = history.createLocation(document.location.pathname + document.location.search);
-    const queryFilters = _omit(loc.query, 'q');
-    let filters = !_isEmpty(queryFilters) ? {} : index.filters;
-    let params = defaultParams(category, index);
-    let query = index.query;
-
-    for (let filter in queryFilters) {
-      let value = queryFilters[filter];
-      if (!Array.isArray(value)) {
-        value = [value];
-      }
-      filters = { ...filters, [filter]: value };
-    }
-
-    if (loc.query.q) {
-      query = new Query(loc.query.q);
-    }
-    if (query) {
-      params = { ...params, ...{ query } };
-    }
-    if (filters) {
-      params = { ...params, ...{ filters } };
-    }
-    if (selection) {
-      params = { ...params, ...{referenceUri: selection } };
-    }
-    dispatch({ type: INDEX_LOAD, category, query, filters });
-    let watcher = IndexApi.watchItems(params, (result) => {
-      dispatch(indexSuccess(watcher, category, result));
-    });
-  };
-}
-
-export function indexUnload(index) {
-  return function (dispatch) {
-    if (index.activeCategory) {
-      IndexApi.stopWatching(index.watcher);
-      dispatch({ type: INDEX_UNLOAD });
-    }
-  };
-}
-
-export function indexSelect(category, selection) {
-  // We have to special case activity since it's a combo category
-  if ('tasks' === category || 'alerts' === category) {
-    category = 'activity';
-  }
-  history.pushState(null, '/' + category + selection + document.location.search);
-  return { type: INDEX_SELECT, selection: selection };
-}
-
-export function indexMore(category, index) {
-  return function (dispatch) {
-    IndexApi.stopWatching(index.watcher);
-    let params = defaultParams(category, index);
-    let query = index.query;
-    let filters = index.filters;
-    params = { ...params, ...{ query, filters,
-      count: (index.result.count + IndexApi.pageSize) } };
-    let watcher = IndexApi.watchItems(params, (result) => {
-      dispatch(indexSuccess(watcher, category, result));
-    });
-  };
-}
-
-export function indexMoreBefore(category, index) {
-  return function (dispatch) {
-    IndexApi.stopWatching(index.watcher);
-    let params = defaultParams(category, index);
-    let query = index.query;
-    let filters = index.filters;
-    params = { ...params, ...{ query, filters,
-        start: (Math.max(index.result.start -= IndexApi.pageSize)),
-        count: (index.result.count + IndexApi.pageSize) } };
-    let watcher = IndexApi.watchItems(params, (result) => {
-      dispatch(indexSuccess(watcher, category, result));
-    });
-  };
-}
-
-export function indexQuery(category, index, query, filters) {
-  return function (dispatch) {
-    filters = _omit(filters, _isEmpty);
-    let historyState = {
-      ...filters
-    };
-    if (query) {
-      historyState.q = query.text;
-    }
-    history.pushState(null, document.location.pathname, historyState);
-    IndexApi.stopWatching(index.watcher);
-    dispatch({ type: INDEX_QUERY, category, query, filters });
-    let params = defaultParams(category, index);
-    params = { ...params, ...{ query }, ...{ filters } };
-    // TODO: Need to get the query into the store, similar to how indexLoad does
-    let watcher = IndexApi.watchItems(params, (result) => {
-      dispatch(indexSuccess(watcher, category, result));
-    });
-  };
-}
-
-export function indexSuccess(watcher, category, result) {
+function receiveViews(json) {
   return {
-    type: INDEX_SUCCESS,
-    watcher: watcher,
-    category: category,
-    result: result
+    type: RECEIVE_VIEWS,
+    items: json
   };
 }
 
-export function indexAggregateSuccess(watcher, id, result) {
-  return {
-    type: INDEX_AGGREGATE_SUCCESS,
-    watcher: watcher,
-    id: id,
-    result: result
-  };
-}
-
-function watchNotifications(dispatch, uri, activityUri) {
-  let params = { category: ['alerts', 'tasks'], start: 0, count: 10 };
-  let specialUri = (activityUri ? " OR uri:" + activityUri : '');
-  let query = "associatedResourceUri:" + uri +
-    " AND (state:Active OR state:Locked OR state:Running" + specialUri + ")";
-  params.query = query;
-  let notificationsWatcher = IndexApi.watchItems(params, (result) => {
-    dispatch(itemNotificationsSuccess(notificationsWatcher, uri, result));
-  }, (error) => {
-    dispatch(itemNotificationsFailure(notificationsWatcher, uri, error));
-  });
-}
-
-export function itemLoad(uri) {
-  return function (dispatch) {
-    dispatch({ type: ITEM_LOAD, uri: uri });
-
-    let watcher = IndexApi.watchItem(uri, (result) => {
-      dispatch(itemSuccess(watcher, uri, result));
-    }, (error) => {
-      dispatch(itemFailure(watcher, uri, error));
-    });
-
-    watchNotifications(dispatch, uri);
-
-    let mapWatcher = IndexApi.watchMap(uri, (result) => {
-      dispatch(itemMapSuccess(mapWatcher, uri, result));
-    }, (error) => {
-      dispatch(itemMapFailure(mapWatcher, uri, error));
-    });
-  };
-}
-
-export function itemUnload(item) {
-  return function (dispatch) {
-    dispatch({ type: ITEM_UNLOAD });
-    IndexApi.stopWatching(item.watcher);
-    IndexApi.stopWatching(item.notificationsWatcher);
-  };
-}
-
-export function itemNew(category) {
-  return { type: ITEM_NEW, category: category };
-}
-
-export function itemAdd(item) {
-  return function (dispatch) {
-    dispatch({ type: ITEM_ADD, item: item });
-    Rest.post('/rest/' + item.category, item).end((err, res) => {
+export function loadViews() {
+  return dispatch => {
+    dispatch(requestViews());
+    Rest.get(HOST_NAME + '/json/template').end((err, res) => {
       if (err) {
-        dispatch(itemAddFailure(err));
+        throw err;
       } else if (res.ok) {
-        Rest.get(res.body.taskUri).end((err, res) => {
-          if (err) {
-            throw err;
-          } else if (res.ok) {
-            var task = res.body;
-            dispatch(itemAddSuccess());
-            dispatch(indexSelect(item.category,
-              task.attributes.associatedResourceUri));
-          }
-        });
+        dispatch(receiveViews(res.body));
       }
     });
   };
-}
-
-export function itemEdit(category, item) {
-  history.pushState(null, '/' + category + '/edit' + item.uri + document.location.search);
-  return { type: ITEM_EDIT, item: item };
-}
-
-export function itemUpdate(item) {
-  return function (dispatch) {
-    Rest.put(item.uri, item).end((err, res) => {
-      if (err) {
-        dispatch(itemAddFailure(err));
-      } else if (res.ok) {
-        Rest.get(res.body.taskUri).end((err, res) => {
-          if (err) {
-            throw err;
-          } else if (res.ok) {
-            //var task = res.body;
-            history.pushState(null, '/' + item.category + '/' + item.uri +
-              document.location.search);
-          }
-        });
-      }
-    });
-  };
-}
-
-export function itemRemove(category, item) {
-  return function (dispatch) {
-    Rest.del(item.uri).end((err, res) => {
-      const taskUri = res.body.taskUri;
-      IndexApi.stopWatching(item.notificationsWatcher);
-      dispatch({ type: ITEM_REMOVE, uri: item.uri, deleteTaskUri: taskUri });
-      watchNotifications(dispatch, item.uri, taskUri);
-      //history.pushState(null, '/' + category + document.location.search);
-    });
-  };
-}
-
-export function itemSuccess(watcher, uri, result) {
-  return {
-    type: ITEM_SUCCESS,
-    watcher: watcher,
-    uri: uri,
-    item: result
-  };
-}
-
-export function itemFailure(watcher, uri, error) {
-  return {
-    type: ITEM_FAILURE,
-    watcher: watcher,
-    uri: uri,
-    error: error
-  };
-}
-
-export function itemAddSuccess() {
-  return { type: ITEM_ADD_SUCCESS };
-}
-
-export function itemAddFailure(error) {
-  return {
-    type: ITEM_ADD_FAILURE,
-    error: error
-  };
-}
-
-export function itemNotificationsSuccess(watcher, uri, result) {
-  return { type: ITEM_NOTIFICATIONS_SUCCESS, watcher: watcher, uri: uri, result: result };
-}
-
-export function itemNotificationsFailure(watcher, uri, result) {
-  return { type: ITEM_NOTIFICATIONS_FAILURE, watcher: watcher, uri: uri, result: result };
-}
-
-export function itemMapSuccess(watcher, uri, result) {
-  return { type: ITEM_MAP_SUCCESS, watcher: watcher, uri: uri, result: result };
-}
-
-export function itemMapFailure(watcher, uri, result) {
-  return { type: ITEM_MAP_FAILURE, watcher: watcher, uri: uri, result: result };
 }
