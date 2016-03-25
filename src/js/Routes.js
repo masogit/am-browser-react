@@ -4,36 +4,14 @@ import Ferret from './components/Ferret';
 import Login from './components/Login';
 import Explorer from './components/explorer/Explorer';
 import Builder from './components/builder/Builder';
+import Views from './components/builder/Views';
 import AQL from './components/aql/AQL';
 import TBD from 'grommet/components/TBD';
-
-import Items from './components/Items';
-import Item from './components/Item';
-import Details from './components/Details';
-import ServerProfile from './components/server-profiles/ServerProfile';
-import ServerProfileAdd from './components/server-profiles/ServerProfileAdd';
-import ServerProfileEdit from './components/server-profiles/ServerProfileEdit';
-import Enclosure from './components/enclosures/Enclosure';
 
 var rootPath = "/"; //"/ferret/";
 //if (NODE_ENV === 'development') {
 //  rootPath = "/"; // webpack-dev-server
 //}
-
-const CATEGORIES = [
-  'server-hardware'
-];
-
-const categoryRoutes = CATEGORIES.map((category) => {
-  let result = {
-    path: category, component: Items,
-    childRoutes: [
-      {path: 'details/*', component: Details},
-      {path: '*', component: Item}
-    ]
-  };
-  return result;
-});
 
 module.exports = {
 
@@ -55,29 +33,9 @@ module.exports = {
         {path: 'explorer', component: Explorer},
         {path: 'builder', component: Builder},
         {path: 'aql', component: AQL},
-        {
-          path: 'activity', component: Items,
-          childRoutes: [
-            {path: '*', component: Item}
-          ]
-        },
-        {
-          path: 'server-profiles', component: TBD,
-          childRoutes: [
-            {path: 'add', component: ServerProfileAdd},
-            {path: 'edit/*', component: ServerProfileEdit},
-            {path: 'details/*', component: Details},
-            {path: '*', component: ServerProfile}
-          ]
-        },
-        {
-          path: 'enclosures', component: Items,
-          childRoutes: [
-            {path: 'details/*', component: Details},
-            {path: '*', component: Enclosure}
-          ]
-        },
-        ...categoryRoutes
+        {path: 'views', component: Views},
+        //{path: 'views/:id', component: Views},
+        {path: 'tbd', component: TBD}
       ]
     }
   ]

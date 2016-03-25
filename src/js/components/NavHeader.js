@@ -30,6 +30,9 @@ class NavHeader extends Component {
           <Link key="3" to="/aql" activeClassName="active">
             AQL
           </Link>
+          <Link key="4" to="/views" activeClassName="active">
+            Views
+          </Link>
           <SessionMenu />
         </Menu>
       </Header>

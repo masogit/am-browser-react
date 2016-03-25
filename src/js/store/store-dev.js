@@ -8,11 +8,10 @@ import DevTools from '../DevTools';
 import session from '../reducers/session';
 import route from '../reducers/route';
 import nav from '../reducers/nav';
-import dashboard from '../reducers/dashboard';
 import index from '../reducers/index';
-import item from '../reducers/item';
+import views from '../reducers/views';
 
 export default compose(
   applyMiddleware(thunk),
   DevTools.instrument()
-)(createStore)(combineReducers({session, route, nav, dashboard, index, item}));
+)(createStore)(combineReducers({session, route, nav, index, views}));
