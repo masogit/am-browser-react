@@ -1,7 +1,7 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
 import { ITEM_LOAD, ITEM_SUCCESS, ITEM_FAILURE, ITEM_NEW, ITEM_ADD, ITEM_ADD_SUCCESS,
-  ITEM_NOTIFICATIONS_SUCCESS, ITEM_MAP_SUCCESS, ITEM_UNLOAD } from '../actions';
+  ITEM_NOTIFICATIONS_SUCCESS, ITEM_MAP_SUCCESS, ITEM_UNLOAD, METADATA_SUCCESS } from '../actions';
 
 const NEW_ITEMS = {
   'server-profiles': {
@@ -27,7 +27,8 @@ const initialState = {
   uri: null,
   changing: false,
   item: {},
-  notifications: []
+  notifications: [],
+  rows: []
 };
 
 const handlers = {
@@ -40,6 +41,11 @@ const handlers = {
       item: action.item,
       name: action.item.name,
       watcher: action.watcher
+    };
+  },
+  [METADATA_SUCCESS]: (state, action) => {
+    return {
+      rows: action.rows
     };
   },
   [ITEM_FAILURE]: (state, action) => {

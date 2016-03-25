@@ -54,6 +54,7 @@ export const ITEM_NOTIFICATIONS_SUCCESS = 'ITEM_NOTIFICATIONS_SUCCESS';
 export const ITEM_NOTIFICATIONS_FAILURE = 'ITEM_NOTIFICATIONS_FAILURE';
 export const ITEM_MAP_SUCCESS = 'ITEM_MAP_SUCCESS';
 export const ITEM_MAP_FAILURE = 'ITEM_MAP_FAILURE';
+export const METADATA_SUCCESS = 'METADATA_SUCCESS';
 
 let HOST_NAME = NODE_ENV === 'development' ? 'http://localhost:8080' : window.location.host;
 
@@ -75,32 +76,33 @@ export function init(email, token) {
 //  };
 //}
 
+let formData = {
+  server: "localhost:8081", // "16.165.217.186:8081",
+  context: "/AssetManagerWebService/rs/",
+  "ref-link": "",     // "db/amLocation/126874",
+  collection: "",     // "EmplDepts",
+  param: {
+    limit: "100",
+    offset: "0",
+    filter: "",
+    orderby: "",
+    fields: []
+  },
+
+  method: "get",
+  user: "", // admin
+  password: "",
+
+  pageSize: 10,
+  viewStyle: "tile",
+  //        showError: false,
+  showLabel: false
+};
+
 export function login(username, password) {
   return function (dispatch) {
 
     var AM_FORM_DATA = "amFormData";
-    var formData = {
-      server: "localhost:8081", // "16.165.217.186:8081",
-      context: "/AssetManagerWebService/rs/",
-      "ref-link": "",     // "db/amLocation/126874",
-      collection: "",     // "EmplDepts",
-      param: {
-        limit: "100",
-        offset: "0",
-        filter: "",
-        orderby: "",
-        fields: []
-      },
-
-      method: "get",
-      user: "", // admin
-      password: "",
-
-      pageSize: 10,
-      viewStyle: "tile",
-      //        showError: false,
-      showLabel: false
-    };
     formData['ref-link'] = "db/amEmplDept";
     formData.param.filter = "UserLogin='" + username.trim() + "'";
     formData.user = username;
@@ -145,6 +147,41 @@ export function login(username, password) {
           }
         }
       });
+  };
+}
+
+export function metadataLoad() {
+  return function (dispatch) {
+    var AM_FORM_DATA = "amFormData";
+    if (localStorage && localStorage[AM_FORM_DATA]) {
+      var form = JSON.parse(localStorage.getItem(AM_FORM_DATA));
+      if (form.server) formData.server = form.server;
+      if (form.user) formData.user = form.user;
+      if (form.password) formData.password = form.password;
+      if (form.pageSize) formData.pageSize = form.pageSize;
+      if (form.showLabel) formData.showLabel = form.showLabel;
+      //        $scope.formData.showError = form.showError;
+      if (form.limit) formData.param.limit = form.limit;
+      if (form.offset) formData.param.offset = form.offset;
+      if (form.viewStyle) formData.viewStyle = form.viewStyle;
+    }
+    let metadata = "metadata/tables";
+    formData.metadata = metadata;
+    Rest.post(HOST_NAME + '/am/metadata', formData)
+      .end(function (err, res) {
+        let data=[];
+        for (var t in  res.body.Tables.Table) {
+          data.push(res.body.Tables.Table[t].$);
+        }
+        dispatch(metadataSuccess(data));
+      });
+  };
+}
+
+export function metadataSuccess(result) {
+  return {
+    type: METADATA_SUCCESS,
+    rows: result
   };
 }
 
@@ -277,3 +314,5 @@ export function loadViews() {
     });
   };
 }
+
+

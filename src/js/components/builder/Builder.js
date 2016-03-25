@@ -1,4 +1,6 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
+import { metadataLoad } from '../../actions';
 import Sidebar from 'grommet/components/Sidebar';
 import Header from 'grommet/components/Header';
 //import Footer from 'grommet/components/Footer';
@@ -11,6 +13,8 @@ import Header from 'grommet/components/Header';
 //import Section from 'grommet/components/Section';
 import Tabs from 'grommet/components/Tabs';
 import Tab from 'grommet/components/Tab';
+import Table from 'grommet/components/Table';
+import TableRow from 'grommet/components/TableRow';
 
 export default class Builder extends Component {
 
@@ -20,7 +24,15 @@ export default class Builder extends Component {
     //this.state = {ids: ['test1', 'test2', 'test3']};
   }
 
+  componentDidMount() {
+    this.props.dispatch(metadataLoad());
+  }
+
   render() {
+    let item = this.props.rows;
+    let items = item.map(function (row, index) {
+      return <TableRow key={index}><td>{row.id}</td></TableRow>;
+    });
     return (
       <div className="example">
         <Sidebar primary={true} pad="small" size="large">
@@ -36,10 +48,32 @@ export default class Builder extends Component {
                 <input className="sidebarsearch" type="text" placeholder="Search tables..."/>
               </Header>
               <h3>Tables</h3>
+              <Table>
+                <thead>
+                  <tr>
+                    <th>column1</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items}
+                </tbody>
+              </Table>
             </Tab>
           </Tabs>
         </Sidebar>
       </div>
     );
   }
+}
+
+Builder.propTypes = {
+  rows: PropTypes.array.isRequired
 };
+
+let select = (state, props) => {
+  return {
+    rows: state.item.rows
+  };
+};
+
+export default connect(select)(Builder);
