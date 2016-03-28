@@ -1,10 +1,12 @@
 var loki = require('lokijs');
 var db;
+var path = require('path');
 
 // check db folder and files
 exports.init = function (dbFolder, json) {
-    db = new loki(dbFolder + json);
+    db = new loki(path.resolve(dbFolder + json));
     const fs = require('fs');
+    dbFolder = path.resolve(dbFolder);
     fs.exists(dbFolder, function (db) {
         if (!db) {
             console.log("not found db folder");
@@ -85,7 +87,7 @@ exports.setColl = function (collectionName, obj) {
     else
         data = coll.insert(obj);
 
-    db.saveDatabase();    
+    db.saveDatabase();
 };
 
 exports.del = function (req, res) {

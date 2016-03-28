@@ -22,7 +22,7 @@ class Indexer extends Component {
   render() {
     //const { active: navActive } = this.props;
 
-    var pane1 = localStorage.email && localStorage.token ? <NavHeader /> : null; //navActive ? <NavSidebar /> : null;
+    var pane1 = localStorage.token ? <NavHeader /> : null; //navActive ? <NavSidebar /> : null;
     var pane2 = this.props.children;
 
     return (

@@ -1,7 +1,9 @@
 import React, { Component /*, PropTypes*/ } from 'react';
+//import PureRenderMixin from 'react-addons-pure-render-mixin';
 import { connect } from 'react-redux';
 import Sidebar from 'grommet/components/Sidebar';
 import Header from 'grommet/components/Header';
+import Split from 'grommet/components/Split';
 //import Footer from 'grommet/components/Footer';
 //import Title from 'grommet/components/Title';
 //import Menu from 'grommet/components/Menu';
@@ -14,63 +16,73 @@ import { Link } from 'react-router';
 import Tabs from 'grommet/components/Tabs';
 import Tab from 'grommet/components/Tab';
 import {loadViews} from '../../actions';
+import View from './View';
 
 class Views extends Component {
 
   constructor() {
     super();
+    //this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
   }
 
   componentDidMount() {
     const { dispatch } = this.props;
+    console.log('views - componentDidMount()');
     dispatch(loadViews());
   }
 
   componentWillReceiveProps(newProps) {
   }
 
-  renderItems(items) {
-    return items.map((item) => {
+  shouldComponentUpdate(nextProps, nextState) {
+    return true;
+  }
+
+  renderItems(views) {
+    return views.map((view) => {
       return (
-        <p key={item.id}><Link to={`/views/${item.$loki}`}>{item.name}</Link></p>
+        <p key={view.$loki}><Link to={`/views/${view.$loki}`}>{view.name}</Link></p>
       );
     });
   }
 
   render() {
-    const { items, isFetching } = this.props;
+    const { views, isFetching } = this.props;
+    console.log('views render()');
     return (
-    <div className="example">
-      <Sidebar primary={true} pad="small" size="large">
-        <Tabs initialIndex={0} justify="start">
-          <Tab title="Views">
-            <Header large={true} flush={false}>
-              <input className="sidebarsearch" type="text" placeholder="Search views..."/>
-            </Header>
-            <div>
-              { items.length > 0 &&
-              <div>{this.renderItems(items)}</div>
-              }
-              { !isFetching && items.length === 0 &&
-              <h2>No data to display!</h2>
-              }
-              {isFetching &&
+      <Split flex="right">
+        <Sidebar primary={true} pad="small" size="large">
+          <Tabs initialIndex={0} justify="start">
+            <Tab title="Views">
+              <Header large={true} flush={false}>
+                <input className="sidebarsearch" type="text" placeholder="Search views..."/>
+              </Header>
+
               <div>
-                <h2>Fetching Items</h2>
+                {views.length > 0 &&
+                <div>{this.renderItems(views)}</div>
+                }
+                {!isFetching && views.length === 0 &&
+                <h2>No data to display!</h2>
+                }
+                {isFetching &&
+                <div>
+                  <h2>Fetching views</h2>
+                </div>
+                }
               </div>
-              }
-            </div>
-          </Tab>
-        </Tabs>
-      </Sidebar>
-    </div>
+            </Tab>
+          </Tabs>
+        </Sidebar>
+        <View view={views.filter(view => view.$loki == this.props.params.id)}/>
+      </Split>
     );
   }
 }
 
 let mapStateToProps = (state) => {
   return {
-    items: state.views.items  // see store-dev.js or store-prod.js
+    views: state.views.views  // see store-dev.js or store-prod.js
   };
 };
 

@@ -4,7 +4,8 @@ import { REQUEST_VIEWS, RECEIVE_VIEWS } from '../actions';
 
 const initialState = {
   isFetching: false,
-  items: []
+  views: [],
+  selectedView: ''
 };
 
 const handlers = {
@@ -12,7 +13,7 @@ const handlers = {
   [RECEIVE_VIEWS]: (state, action) => {
     return {
       isFetching: false,
-      items: action.items
+      views: action.views
     };
   }
 };

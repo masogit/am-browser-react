@@ -35,6 +35,18 @@ if (am_href != "") {
 var db = require('./db.js');
 db.init(dbFile.folder, dbFile.json);
 
+var path = require('path');
+
+app.use('/', express.static(path.join(__dirname, '/../dist')));
+var indexHtml = function (req, res) {
+  res.sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));
+};
+app.get('/login', indexHtml);
+app.get('/explorer/*', indexHtml);
+app.get('/builder/*', indexHtml);
+app.get('/aql/*', indexHtml);
+app.get('/views/*', indexHtml);
+
 app.use(express.static(__dirname + '/public')); 		// set the static files location /public/img will be /img for users
 app.use(morgan('dev')); // log every request to the console
 app.use(bodyParser.urlencoded({'extended': 'true'})); // parse application/x-www-form-urlencoded

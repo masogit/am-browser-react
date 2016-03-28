@@ -33,7 +33,12 @@ module.exports = {
         {path: 'explorer', component: Explorer},
         {path: 'builder', component: Builder},
         {path: 'aql', component: AQL},
-        {path: 'views', component: Views},
+        {
+          path: 'views', component: Views
+        },
+        {
+          path: 'views/:id', component: Views
+        },
         //{path: 'views/:id', component: Views},
         {path: 'tbd', component: TBD}
       ]

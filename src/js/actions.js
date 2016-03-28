@@ -57,7 +57,7 @@ export const ITEM_MAP_FAILURE = 'ITEM_MAP_FAILURE';
 export const METADATA_SUCCESS = 'METADATA_SUCCESS';
 export const METADATA_FILTER_SUCCESS = 'METADATA_FILTER_SUCCESS';
 
-let HOST_NAME = NODE_ENV === 'development' ? 'http://localhost:8080' : window.location.host;
+let HOST_NAME = NODE_ENV === 'development' ? 'http://localhost:8080' : '';
 
 export function init(email, token) {
   return {type: INIT, email: email, token: token};
@@ -316,7 +316,7 @@ function requestViews() {
 function receiveViews(json) {
   return {
     type: RECEIVE_VIEWS,
-    items: json
+    views: json
   };
 }
 

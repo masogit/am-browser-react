@@ -21,5 +21,5 @@ To run this application, execute the following commands:
     ```
     $ cd am-browser
     $ gulp dist
-    $ node server/server.js
+    $ node app/server.js
     ```
