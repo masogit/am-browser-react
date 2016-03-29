@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { metadataLoad, metadataSearch } from '../../actions';
+import { metadataLoad, metadataSearch, metadataLoadDetail } from '../../actions';
 import Sidebar from 'grommet/components/Sidebar';
 import Header from 'grommet/components/Header';
 //import Footer from 'grommet/components/Footer';
@@ -11,6 +11,7 @@ import Header from 'grommet/components/Header';
 //import Gravatar from 'react-gravatar';
 //import Article from 'grommet/components/Article';
 //import Section from 'grommet/components/Section';
+import Anchor from 'grommet/components/Anchor';
 import Tabs from 'grommet/components/Tabs';
 import Tab from 'grommet/components/Tab';
 import Table from 'grommet/components/Table';
@@ -21,10 +22,15 @@ export default class Builder extends Component {
   constructor() {
     super();
     this._onSearch = this._onSearch.bind(this);
+    this._onBack = this._onBack.bind(this);
     //this.state = {ids: ['test1', 'test2', 'test3']};
   }
 
   componentDidMount() {
+    this.props.dispatch(metadataLoad());
+  }
+
+  _onBack() {
     this.props.dispatch(metadataLoad());
   }
 
@@ -37,10 +43,18 @@ export default class Builder extends Component {
     }
   }
 
+  _onClick(id) {
+    this.props.dispatch(metadataLoadDetail(id));
+  }
+
   render() {
     let item = this.props.filterRows;
-    let items = item.map(function (row, index) {
-      return <TableRow key={index}><td>{row.id}</td></TableRow>;
+    let items = item.map((row, index) => {
+      return <TableRow key={index} onClick={this._onClick.bind(this, row.id)}><td>{row.id}</td></TableRow>;
+    });
+    let field = this.props.filterFields;
+    let fields = field.map((row, index) => {
+      return <TableRow key={index}><td>{row.name}</td></TableRow>;
     });
     return (
       <div className="example">
@@ -57,6 +71,7 @@ export default class Builder extends Component {
                 <input className="sidebarsearch" type="text" placeholder="Search tables..." onChange={this._onSearch}/>
               </Header>
               <h3>Tables</h3>
+              <Anchor key="back" onClick={this._onBack}>Back</Anchor>
               <Table>
                 <thead>
                   <tr>
@@ -65,6 +80,7 @@ export default class Builder extends Component {
                 </thead>
                 <tbody>
                   {items}
+                  {fields}
                 </tbody>
               </Table>
             </Tab>
@@ -77,13 +93,15 @@ export default class Builder extends Component {
 
 Builder.propTypes = {
   rows: PropTypes.array.isRequired,
-  filterRows: PropTypes.array.isRequired
+  filterRows: PropTypes.array.isRequired,
+  filterFields: PropTypes.array.isRequired
 };
 
 let select = (state, props) => {
   return {
     rows: state.metadata.rows,
-    filterRows: state.metadata.filterRows
+    filterRows: state.metadata.filterRows,
+    filterFields: state.metadata.filterFields
   };
 };
 
