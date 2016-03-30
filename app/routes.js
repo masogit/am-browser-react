@@ -46,7 +46,8 @@ module.exports = function (app, am, redis) {
     // Proxy the backend rest service /rs/db -> /am/db
     console.log(am);
     app.use('/am/db', function(req, res){
-        // TODO: need to take care of https 
+        // TODO: need to take care of https
+        console.log('http://'+am.server+'/AssetManagerWebService/rs/db');
         apiProxy.web(req,res,{target: 'http://'+am.server+'/AssetManagerWebService/rs/db'});
     })
 
