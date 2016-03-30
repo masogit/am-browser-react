@@ -57,7 +57,9 @@ export const ITEM_MAP_SUCCESS = 'ITEM_MAP_SUCCESS';
 export const ITEM_MAP_FAILURE = 'ITEM_MAP_FAILURE';
 export const METADATA_SUCCESS = 'METADATA_SUCCESS';
 export const METADATA_DETAIL_SUCCESS = 'METADATA_DETAIL_SUCCESS';
-export const METADATA_FILTER_SUCCESS = 'METADATA_FILTER_SUCCESS';
+export const METADATA_NODE_SUCCESS = 'METADATA_NODE_SUCCESS';
+export const METADATA_CURSOR_SUCCESS = 'METADATA_CURSOR_SUCCESS';
+
 
 export function init(email, token) {
   return {type: INIT, email: email, token: token};
@@ -210,46 +212,84 @@ export function metadataLoadDetail(schema) {
     formData.metadata = metadata;
     Rest.post(HOST_NAME + '/am/metadata', formData)
       .end(function (err, res) {
-        let data=[];
-        for (var t in  res.body.table.field) {
-          data.push(res.body.table.field[t].$);
-        }
+        let data= {
+          name: schema,
+          toggled: true,
+          children: [
+          ]
+        };
         for (var t in  res.body.table.link) {
-          data.push(res.body.table.link[t].$);
+          var link = res.body.table.link[t].$;
+          link.children = [];
+          data.children.push(link);
+        }
+        for (var t in  res.body.table.field) {
+          data.children.push(res.body.table.field[t].$);
         }
         dispatch(metadataDetailSuccess(data));
       });
   };
 }
 
-export function metadataSearch(rows, value) {
+export function metadataLoadNode(schema, node) {
   return function (dispatch) {
-    let data = rows.filter(function(obj) {
-      return obj.id.indexOf(value) > -1;
-    });
-    dispatch(metadataFilterSuccess(data));
+    var AM_FORM_DATA = "amFormData";
+    if (localStorage && localStorage[AM_FORM_DATA]) {
+      var form = JSON.parse(localStorage.getItem(AM_FORM_DATA));
+      if (form.server) formData.server = form.server;
+      if (form.user) formData.user = form.user;
+      if (form.password) formData.password = form.password;
+      if (form.pageSize) formData.pageSize = form.pageSize;
+      if (form.showLabel) formData.showLabel = form.showLabel;
+      //        $scope.formData.showError = form.showError;
+      if (form.limit) formData.param.limit = form.limit;
+      if (form.offset) formData.param.offset = form.offset;
+      if (form.viewStyle) formData.viewStyle = form.viewStyle;
+    }
+    let metadata = "metadata/schema/" + schema;
+    formData.metadata = metadata;
+    Rest.post(HOST_NAME + '/am/metadata', formData)
+      .end(function (err, res) {
+        if (node.children && node.children.length == 0) {
+          for (var t in  res.body.table.link) {
+            var link = res.body.table.link[t].$;
+            link.children = [];
+            node.children.push(link);
+          }
+          for (var t in  res.body.table.field) {
+            node.children.push(res.body.table.field[t].$);
+          }
+          dispatch(metadataNodeSuccess(node));
+        }
+      });
   };
 }
 
 export function metadataSuccess(result) {
   return {
     type: METADATA_SUCCESS,
-    rows: result,
-    filterRows: result
+    rows: result
   };
 }
 
 export function metadataDetailSuccess(result) {
   return {
     type: METADATA_DETAIL_SUCCESS,
-    filterFields: result
+    data: result
   };
 }
 
-export function metadataFilterSuccess(result) {
+export function metadataNodeSuccess(result) {
   return {
-    type: METADATA_FILTER_SUCCESS,
-    filterRows: result
+    type: METADATA_NODE_SUCCESS,
+    node: result
+  };
+}
+
+export function metadataCursorSuccess(result) {
+  return {
+    type: METADATA_CURSOR_SUCCESS,
+    cursor: result
   };
 }
 

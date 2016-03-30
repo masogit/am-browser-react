@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { metadataLoad, metadataSearch, metadataLoadDetail } from '../../actions';
+import { Treebeard } from 'react-treebeard';
+import { metadataLoad, metadataLoadDetail, metadataLoadNode, metadataCursorSuccess } from '../../actions';
 import Sidebar from 'grommet/components/Sidebar';
 import Header from 'grommet/components/Header';
 //import Footer from 'grommet/components/Footer';
@@ -12,25 +13,19 @@ import Header from 'grommet/components/Header';
 //import Article from 'grommet/components/Article';
 //import Section from 'grommet/components/Section';
 import Anchor from 'grommet/components/Anchor';
+import Menu from 'grommet/components/Menu';
 import Tabs from 'grommet/components/Tabs';
 import Tab from 'grommet/components/Tab';
-import Table from 'grommet/components/Table';
-import TableRow from 'grommet/components/TableRow';
 
 export default class Builder extends Component {
 
   constructor() {
     super();
     this._onSearch = this._onSearch.bind(this);
-    this._onBack = this._onBack.bind(this);
-    //this.state = {ids: ['test1', 'test2', 'test3']};
+    this._onToggle = this._onToggle.bind(this);
   }
 
   componentDidMount() {
-    this.props.dispatch(metadataLoad());
-  }
-
-  _onBack() {
     this.props.dispatch(metadataLoad());
   }
 
@@ -47,15 +42,31 @@ export default class Builder extends Component {
     this.props.dispatch(metadataLoadDetail(id));
   }
 
+  _onToggle(node, toggled) {
+    if (this.props.cursor) {
+      this.props.cursor.active = false;
+    }
+    node.active = true;
+    if (node.children) {
+      this.props.dispatch(metadataLoadNode(node.desttable, node));
+      node.toggled = toggled;
+    }
+    this.props.dispatch(metadataCursorSuccess(node));
+  }
+
   render() {
-    let item = this.props.filterRows;
+    let item = this.props.rows;
     let items = item.map((row, index) => {
-      return <TableRow key={index} onClick={this._onClick.bind(this, row.id)}><td>{row.id}</td></TableRow>;
+      return <Anchor key={index} className="active" onClick={this._onClick.bind(this, row.id)}>{row.id}</Anchor>;
     });
-    let field = this.props.filterFields;
-    let fields = field.map((row, index) => {
-      return <TableRow key={index}><td>{row.name}</td></TableRow>;
-    });
+    //let field = this.props.filterFields;
+    //let fields = field.map((row, index) => {
+    //  return <TableRow key={index}><td>***{row.name}</td></TableRow>;
+    //});
+    //let link = this.props.filterLinks;
+    //let links = link.map((row, index) => {
+    //  return <TableRow key={index} onClick={this._onLinkClick.bind(this, row.desttable)}><td>***{row.name}</td></TableRow>;
+    //});
     return (
       <div className="example">
         <Sidebar primary={true} pad="small" size="large">
@@ -67,22 +78,16 @@ export default class Builder extends Component {
               <h3>Views</h3>
             </Tab>
             <Tab title="Tables">
-              <Header large={true} flush={false}>
-                <input className="sidebarsearch" type="text" placeholder="Search tables..." onChange={this._onSearch}/>
-              </Header>
-              <h3>Tables</h3>
-              <Anchor key="back" onClick={this._onBack}>Back</Anchor>
-              <Table>
-                <thead>
-                  <tr>
-                    <th>column1</th>
-                  </tr>
-                </thead>
-                <tbody>
+                <Menu label="Tables">
                   {items}
-                  {fields}
-                </tbody>
-              </Table>
+                </Menu>
+              <Header large={true} flush={false}>
+                <input className="sidebarsearch" type="text" placeholder="Search fields and links..." onChange={this._onSearch}/>
+              </Header>
+              <Treebeard
+                data={this.props.data}
+                onToggle={this._onToggle}
+              />
             </Tab>
           </Tabs>
         </Sidebar>
@@ -93,15 +98,17 @@ export default class Builder extends Component {
 
 Builder.propTypes = {
   rows: PropTypes.array.isRequired,
-  filterRows: PropTypes.array.isRequired,
-  filterFields: PropTypes.array.isRequired
+  data: PropTypes.object.isRequired,
+  node: PropTypes.object.isRequired,
+  cursor: PropTypes.object.isRequired
 };
 
 let select = (state, props) => {
   return {
     rows: state.metadata.rows,
-    filterRows: state.metadata.filterRows,
-    filterFields: state.metadata.filterFields
+    data: state.metadata.data,
+    node: state.metadata.node,
+    cursor: state.metadata.cursor
   };
 };
 
