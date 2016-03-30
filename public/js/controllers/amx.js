@@ -66,7 +66,6 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
                 $scope.formData.user = data.user;
                 $scope.disabledServer = true;              
             }
-
         }).error(function (data) {
                 $scope.alerts.push({
                     type: 'danger',
