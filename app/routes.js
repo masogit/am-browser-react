@@ -11,6 +11,9 @@ module.exports = function (app, am, redis) {
     var Cache = require('./cache.js');
     var cache = new Cache(db, redis);
 
+    var httpProxy = require('http-proxy');
+    var apiProxy = httpProxy.createProxyServer();
+
     // Redis Server Info
     app.get('/redis', function (req, res) {
         res.json(redis);
@@ -39,6 +42,13 @@ module.exports = function (app, am, redis) {
     // AM Metadata ---------------------------------------------------------
     app.post('/am/metadata', metadata.get);
     app.post('/am/rest', rest.db);
+
+    // Proxy the backend rest service /rs/db -> /am/db
+    console.log(am);
+    app.use('/am/db', function(req, res){
+        // TODO: need to take care of https 
+        apiProxy.web(req,res,{target: 'http://'+am.server+'/AssetManagerWebService/rs/db'});
+    })
 
     // redis cache search --------------------------------------------------
     app.post('/cache/search', cache.search);
