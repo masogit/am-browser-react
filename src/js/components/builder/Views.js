@@ -15,7 +15,7 @@ import Split from 'grommet/components/Split';
 import { Link } from 'react-router';
 import Tabs from 'grommet/components/Tabs';
 import Tab from 'grommet/components/Tab';
-import {loadViews} from '../../actions';
+import {loadViews} from '../../actions/viewActions';
 import View from './View';
 
 class Views extends Component {
@@ -48,7 +48,6 @@ class Views extends Component {
 
   render() {
     const { views, isFetching } = this.props;
-    console.log('views render()');
     return (
       <Split flex="right">
         <Sidebar primary={true} pad="small" size="large">

@@ -4,6 +4,7 @@ import Rest from 'grommet/utils/Rest';
 //import history from './RouteHistory';
 //import Query from 'grommet-index/utils/Query';
 import IndexApi from './Api';
+import {HOST_NAME} from './constants/Config';
 
 // session
 export const INIT = 'INIT';
@@ -57,8 +58,6 @@ export const ITEM_MAP_FAILURE = 'ITEM_MAP_FAILURE';
 export const METADATA_SUCCESS = 'METADATA_SUCCESS';
 export const METADATA_DETAIL_SUCCESS = 'METADATA_DETAIL_SUCCESS';
 export const METADATA_FILTER_SUCCESS = 'METADATA_FILTER_SUCCESS';
-
-let HOST_NAME = NODE_ENV === 'development' ? 'http://localhost:8080' : '';
 
 export function init(email, token) {
   return {type: INIT, email: email, token: token};
@@ -339,36 +338,6 @@ export function dashboardSearch(text) {
         }
       });
     }
-  };
-}
-
-export const REQUEST_VIEWS = 'REQUEST_VIEWS';
-export const RECEIVE_VIEWS = 'RECEIVE_VIEWS';
-
-
-function requestViews() {
-  return {
-    type: REQUEST_VIEWS
-  };
-}
-
-function receiveViews(json) {
-  return {
-    type: RECEIVE_VIEWS,
-    views: json
-  };
-}
-
-export function loadViews() {
-  return dispatch => {
-    dispatch(requestViews());
-    Rest.get(HOST_NAME + '/json/template').end((err, res) => {
-      if (err) {
-        throw err;
-      } else if (res.ok) {
-        dispatch(receiveViews(res.body));
-      }
-    });
   };
 }
 

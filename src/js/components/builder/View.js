@@ -12,7 +12,6 @@ class View extends Component {
 
   render() {
     const { view } = this.props;
-    console.log('view render()');
     return (
       <Split flex="right">
         <Sidebar primary={true} pad="small" size="large">

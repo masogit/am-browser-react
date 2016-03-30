@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import {HOST_NAME} from '../../constants/Config';
 import Header from 'grommet/components/Header';
 //import Title from 'grommet/components/Title';
 //import Logo from './Logo'; // './HPELogo';
@@ -21,8 +22,6 @@ import Section from 'grommet/components/Section';
 //import App from 'grommet/components/App';
 //import Status from 'grommet/components/icons/Status';
 import Rest from 'grommet/utils/Rest';
-
-let HOST_NAME = NODE_ENV === 'development' ? 'http://localhost:8080' : window.location.host;
 
 export default class Explorer extends Component {
 

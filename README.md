@@ -23,3 +23,16 @@ To run this application, execute the following commands:
     $ gulp dist
     $ node app/server.js
     ```
+
+For unit testing and code coverage, run the following commands:
+
+  1. Unit tests:
+    $ cd am-browser
+    $ npm run test
+  
+  2. Code coverage:
+    $ cd am-browser
+    $ npm run coverage
+    
+    The code coverage report is generated in am-browser/coverage folder.
+      

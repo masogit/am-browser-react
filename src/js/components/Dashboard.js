@@ -18,8 +18,7 @@ import Menu from 'grommet/components/Menu';
 import App from 'grommet/components/App';
 //import Status from 'grommet/components/icons/Status';
 import Rest from 'grommet/utils/Rest';
-
-let HOST_NAME = NODE_ENV === 'development' ? 'http://localhost:8080' : window.location.host;
+import {HOST_NAME} from '../constants/Config';
 
 const links = [
   {label: 'Explorer', value: 'explorer'},
