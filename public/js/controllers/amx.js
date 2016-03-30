@@ -61,9 +61,12 @@ am.controller('amCtl', function ($scope, $http, $uibModal, $window) {
 
     $scope.getAM = function () {
         $http.get("/am/conf").success(function (data) {
-            $scope.formData.server = data.server;
-            $scope.formData.user = data.user;
-            $scope.formData.password = "";
+            if (data) {
+                $scope.formData.server = data.server;
+                $scope.formData.user = data.user;
+                $scope.disabledServer = true;              
+            }
+
         }).error(function (data) {
                 $scope.alerts.push({
                     type: 'danger',

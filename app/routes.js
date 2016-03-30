@@ -26,8 +26,13 @@ module.exports = function (app, am, redis) {
     app.delete('/json/:collection/:id', db.del);
     
     // AM Server Conf
-    app.get('/am/conf', function (req, res) {
-        res.json(am);
+    app.get('/am/conf', function(req, res) {
+        if (am) {
+            var am_rest = Object.assign({}, am);
+            am_rest['password'] = "";
+            res.json(am_rest);
+        } else
+            res.json(am);
     });
     
     app.post('/am/conf', function (req, res) {
