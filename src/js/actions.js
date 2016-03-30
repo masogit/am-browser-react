@@ -102,52 +102,64 @@ let formData = {
 
 export function login(username, password) {
   return function (dispatch) {
+    var auth = 'Basic ' + new Buffer(username + ':' + password).toString('base64');
+    Rest.setHeader("Authorization", auth);
+    Rest.get(HOST_NAME + '/am/conf').end((err, res) => {
+          if (err) {
+            throw err;
+          } else if (res.ok) {
 
-    var AM_FORM_DATA = "amFormData";
-    formData['ref-link'] = "db/amEmplDept";
-    formData.param.filter = "UserLogin='" + username.trim() + "'";
-    formData.user = username;
-    formData.password = password;
-    Rest.post(HOST_NAME + '/am/rest', formData)
-      .end(function (err, res) {
-        //console.log(error);
-        console.log(res);
-        if (err || !res.ok) {
-          dispatch(loginFailure({message: 'LoginFailed'}));
-          console.log("error");
-        } else {
-          if (res.body instanceof Object) {
-            if (localStorage) {
-              var form = {
-                server: formData.server,
-                user: formData.user,
-                password: formData.password,
-                pageSize: formData.pageSize,
-                showLabel: formData.showLabel,
-                //                showError: $scope.formData.showError,
-                limit: formData.param.limit,
-                offset: formData.param.offset,
-                viewStyle: formData.viewStyle
-              };
-              localStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
-            }
+          // set AM server address
+          formData['server'] = res.body.server;
 
-            if (sessionStorage) {
-              var form = {
-                server: formData.server,
-                user: formData.user
-              };
-              sessionStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
-            }
-            console.log("pass");
-            console.log('res.body: ' + res.body);
-            dispatch(loginSuccess(username, 'faketoken123456789'/*res.body.sessionID*/));
-          } else {
-            console.log("failed");
-            dispatch(loginFailure({message: 'LoginFailed'}));
+          var AM_FORM_DATA = "amFormData";
+          formData['ref-link'] = "db/amEmplDept";
+          formData.param.filter = "UserLogin='" + username.trim() + "'";
+          formData.user = username;
+          formData.password = password;
+          Rest.post(HOST_NAME + '/am/rest', formData)
+            .end(function (err, res) {
+              //console.log(error);
+              console.log(res);
+              if (err || !res.ok) {
+                dispatch(loginFailure({message: 'LoginFailed'}));
+                console.log("error");
+              } else {
+                if (res.body instanceof Object) {
+                  if (localStorage) {
+                    var form = {
+                      server: formData.server,
+                      user: formData.user,
+                      password: formData.password,
+                      pageSize: formData.pageSize,
+                      showLabel: formData.showLabel,
+                      //                showError: $scope.formData.showError,
+                      limit: formData.param.limit,
+                      offset: formData.param.offset,
+                      viewStyle: formData.viewStyle
+                    };
+                    localStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
+                  }
+
+                  if (sessionStorage) {
+                    var form = {
+                      server: formData.server,
+                      user: formData.user
+                    };
+                    sessionStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
+                  }
+                  console.log("pass");
+                  console.log('res.body: ' + res.body);
+                  dispatch(loginSuccess(username, 'faketoken123456789'/*res.body.sessionID*/));
+                } else {
+                  console.log("failed");
+                  dispatch(loginFailure({message: 'LoginFailed'}));
+                }
+              }
+            });
           }
-        }
-      });
+        });
+
   };
 }
 
