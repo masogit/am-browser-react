@@ -1,12 +1,10 @@
 var loki = require('lokijs');
 var db;
-var path = require('path');
 
 // check db folder and files
 exports.init = function (dbFolder, json) {
-    db = new loki(path.resolve(dbFolder + json));
+    db = new loki(dbFolder + json);
     const fs = require('fs');
-    dbFolder = path.resolve(dbFolder);
     fs.exists(dbFolder, function (db) {
         if (!db) {
             console.log("not found db folder");
@@ -32,6 +30,22 @@ exports.init = function (dbFolder, json) {
                 });
         });
 
+    });
+
+    // init create public/csv folder
+    fs.exists("csv", function (db) {
+        if (!db) {
+            console.log("not found csv folder");
+
+            fs.mkdir("csv", function (err) {
+                if (err) {
+                    return console.log(err);
+                }
+
+                console.log("The csv folder was created!");
+            })
+
+        }
     });
 };
 
