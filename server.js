@@ -12,7 +12,7 @@ var redis = {
     port: process.env.REDIS_PORT || "6379",
     auth_pass: process.env.REDIS_PASS || "",
     enabled: process.env.REDIS_ENABLED || false,
-    ttl: process.env.REDIS_TTL || 1200
+    ttl: process.env.REDIS_TTL || 600
 };
 // initial AM server
 var URL = require('url');
@@ -47,7 +47,7 @@ app.listen(port);
 console.log("App listening on port " + port);
 
 // sub process to cache view data in Redis
-if (redis.enabled && redis.ttl > 0 && am) {
+if (am) {
     var cp = require('child_process');
     var child = cp.fork('./app/worker.js');
 

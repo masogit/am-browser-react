@@ -31,6 +31,22 @@ exports.init = function (dbFolder, json) {
         });
 
     });
+
+    // init create public/csv folder
+    fs.exists("public/csv", function (db) {
+        if (!db) {
+            console.log("not found public/csv folder");
+
+            fs.mkdir("public/csv", function (err) {
+                if (err) {
+                    return console.log(err);
+                }
+
+                console.log("The public/csv folder was created!");
+            })
+
+        }
+    });
 };
 
 exports.get = function (req, res) {
