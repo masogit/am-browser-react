@@ -5,6 +5,7 @@ import Rest from 'grommet/utils/Rest';
 //import Query from 'grommet-index/utils/Query';
 import IndexApi from './Api';
 import {HOST_NAME} from './constants/Config';
+import * as filters from './components/builder/TreeFilter';
 
 // session
 export const INIT = 'INIT';
@@ -57,6 +58,7 @@ export const ITEM_MAP_SUCCESS = 'ITEM_MAP_SUCCESS';
 export const ITEM_MAP_FAILURE = 'ITEM_MAP_FAILURE';
 export const METADATA_SUCCESS = 'METADATA_SUCCESS';
 export const METADATA_DETAIL_SUCCESS = 'METADATA_DETAIL_SUCCESS';
+export const METADATA_FILTER_SUCCESS = 'METADATA_FILTER_SUCCESS';
 export const METADATA_NODE_SUCCESS = 'METADATA_NODE_SUCCESS';
 export const METADATA_CURSOR_SUCCESS = 'METADATA_CURSOR_SUCCESS';
 
@@ -265,6 +267,19 @@ export function metadataLoadNode(schema, node) {
   };
 }
 
+export function metadataSearch(data, value, allData) {
+  return function (dispatch) {
+    const filter = value.trim();
+    if (!filter) {
+      dispatch(metadataFilterSuccess(allData));
+    } else {
+      var filtered = filters.filterTree(allData, filter);
+      filtered = filters.expandFilteredNodes(filtered, filter);
+      dispatch(metadataFilterSuccess(filtered));
+    }
+  };
+}
+
 export function metadataSuccess(result) {
   return {
     type: METADATA_SUCCESS,
@@ -275,6 +290,14 @@ export function metadataSuccess(result) {
 export function metadataDetailSuccess(result) {
   return {
     type: METADATA_DETAIL_SUCCESS,
+    allData: result,
+    data: result
+  };
+}
+
+export function metadataFilterSuccess(result) {
+  return {
+    type: METADATA_FILTER_SUCCESS,
     data: result
   };
 }

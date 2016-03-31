@@ -1,7 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Treebeard } from 'react-treebeard';
-import { metadataLoad, metadataLoadDetail, metadataLoadNode, metadataCursorSuccess } from '../../actions';
+import { Treebeard, decorators } from 'react-treebeard';
+import { metadataLoad, metadataLoadDetail, metadataSearch, metadataLoadNode, metadataCursorSuccess } from '../../actions';
+import TreeTheme from './TreeTheme';
 import Sidebar from 'grommet/components/Sidebar';
 import Header from 'grommet/components/Header';
 //import Footer from 'grommet/components/Footer';
@@ -17,6 +18,22 @@ import Menu from 'grommet/components/Menu';
 import Tabs from 'grommet/components/Tabs';
 import Tab from 'grommet/components/Tab';
 
+// Example: Customising The Header Decorator To Include Icons
+decorators.Header = (props) => {
+  const style = props.style;
+  const iconType = props.node.children ? 'folder' : 'file-text';
+  const iconClass = `fa fa-${iconType}`;
+  const iconStyle = { marginRight: '5px' };
+  return (
+    <div style={style.base}>
+      <div style={style.title}>
+        <i className={iconClass} style={iconStyle}/>
+                {props.node.name}
+      </div>
+    </div>
+  );
+};
+
 export default class Builder extends Component {
 
   constructor() {
@@ -31,11 +48,7 @@ export default class Builder extends Component {
 
   _onSearch(event) {
     let sidebarsearch = event.target;
-    if (sidebarsearch.value.length > 2) {
-      setTimeout(() => {
-        this.props.dispatch(metadataSearch(this.props.rows, sidebarsearch.value));
-      }, 500);
-    }
+    this.props.dispatch(metadataSearch(this.props.data, sidebarsearch.value, this.props.allData));
   }
 
   _onClick(id) {
@@ -47,7 +60,7 @@ export default class Builder extends Component {
       this.props.cursor.active = false;
     }
     node.active = true;
-    if (node.children) {
+    if (node.children && node.desttable) {
       this.props.dispatch(metadataLoadNode(node.desttable, node));
       node.toggled = toggled;
     }
@@ -59,14 +72,6 @@ export default class Builder extends Component {
     let items = item.map((row, index) => {
       return <Anchor key={index} className="active" onClick={this._onClick.bind(this, row.id)}>{row.id}</Anchor>;
     });
-    //let field = this.props.filterFields;
-    //let fields = field.map((row, index) => {
-    //  return <TableRow key={index}><td>***{row.name}</td></TableRow>;
-    //});
-    //let link = this.props.filterLinks;
-    //let links = link.map((row, index) => {
-    //  return <TableRow key={index} onClick={this._onLinkClick.bind(this, row.desttable)}><td>***{row.name}</td></TableRow>;
-    //});
     return (
       <div className="example">
         <Sidebar primary={true} pad="small" size="large">
@@ -87,6 +92,8 @@ export default class Builder extends Component {
               <Treebeard
                 data={this.props.data}
                 onToggle={this._onToggle}
+                style={TreeTheme}
+                decorators={decorators}
               />
             </Tab>
           </Tabs>
@@ -98,6 +105,7 @@ export default class Builder extends Component {
 
 Builder.propTypes = {
   rows: PropTypes.array.isRequired,
+  allData: PropTypes.object.isRequired,
   data: PropTypes.object.isRequired,
   node: PropTypes.object.isRequired,
   cursor: PropTypes.object.isRequired
@@ -106,6 +114,7 @@ Builder.propTypes = {
 let select = (state, props) => {
   return {
     rows: state.metadata.rows,
+    allData: state.metadata.allData,
     data: state.metadata.data,
     node: state.metadata.node,
     cursor: state.metadata.cursor
