@@ -27,7 +27,7 @@ class Views extends Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    dispatch && dispatch(loadViews());
+    dispatch(loadViews());
   }
 
   renderItems(views) {
