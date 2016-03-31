@@ -112,7 +112,8 @@ export function login(username, password) {
       } else if (res.ok) {
 
         // set AM server address
-        formData.server = res.body.server;
+        if (res.body.server)
+          formData.server = res.body.server;
 
         var AM_FORM_DATA = "amFormData";
         formData['ref-link'] = "db/amEmplDept";
