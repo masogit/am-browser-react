@@ -2,14 +2,14 @@ import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import nock from 'nock';
 import expect from 'expect';
-import * as actions from '../../src/js/actions/viewActions';
+import * as actions from '../../src/js/actions/views';
 import * as types from '../../src/js/constants/ActionTypes';
 import {HOST_NAME, HOST_NAME_DEV} from '../../src/js/constants/Config';
 
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
 
-describe('load views', () => {
+describe('views - actions/views-spec.js', () => {
   afterEach(() => {
     nock.cleanAll();
   })

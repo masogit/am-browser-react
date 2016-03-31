@@ -18,7 +18,7 @@
     "grommet": "https://github.com/grommet/grommet/tarball/stable",
     "grommet-index": "https://github.com/grommet/grommet-index/tarball/stable",
     "history": "^1.17.0",
-    "istanbul": "^1.0.0-alpha.2",
+    "http-proxy": "^1.13.2",
     "json-server": "^0.5.5",
     "json-stringify-pretty-compact": "^1.0.1",
     "lodash": "^3.8.0",
@@ -29,7 +29,6 @@
     "node-rest-client": "^1.8.0",
     "react-addons-pure-render-mixin": "^0.14.7",
     "react-debounce-input": "^2.2.0",
-    "react-dom": "^0.14.7",
     "react-intl": "^2.0.0-rc-1",
     "react-redux": "^3.1.0",
     "react-router": "^1.0.0-rc3",
@@ -43,8 +42,7 @@
     "superagent": "^1.8.3",
     "superagent-bluebird-promise": "^3.0.0",
     "ws": "^0.7.2",
-    "xml2js": "^0.4.16",
-	"http-proxy": "^1.13.2"
+    "xml2js": "^0.4.16"
   },
   "devDependencies": {
     "babel-core": "^6.7.4",
@@ -60,9 +58,13 @@
     "gulp-nodemon": "^2.0.3",
     "gulp-rsync": "0.0.5",
     "istanbul": "^1.0.0-alpha.2",
+    "jsdom": "^8.2.0",
     "mkdirp": "^0.5.1",
     "mocha": "^2.4.5",
     "nock": "^7.7.2",
+    "react": "^0.14.7",
+    "react-addons-test-utils": "^0.14.7",
+    "react-dom": "^0.14.7",
     "react-hot-loader": "^1.3.0",
     "redux-devtools": "^3.0.1",
     "redux-devtools-dock-monitor": "^1.0.1",
@@ -73,8 +75,8 @@
   "scripts": {
     "build": "gulp dist",
     "start": "node server/server.js",
-    "test": "node_modules/.bin/mocha -R spec --compilers js:babel-register --recursive",
-    "coverage": "node_modules/.bin/istanbul cover -v --report html --dir ./coverage --hook-run-in-context node_modules/mocha/bin/_mocha -- -R spec --compilers js:babel-register --recursive",
+    "test": "node_modules/.bin/mocha -R spec --compilers js:babel-register --recursive --require ./test/setup.js",
+    "coverage": "node_modules/.bin/istanbul cover -v --report html --dir ./coverage --hook-run-in-context node_modules/mocha/bin/_mocha -- -R spec --compilers js:babel-register --recursive --require ./test/setup.js",
     "test:watch": "npm test -- --watch"
   }
 }

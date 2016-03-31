@@ -15,7 +15,7 @@ import Split from 'grommet/components/Split';
 import { Link } from 'react-router';
 import Tabs from 'grommet/components/Tabs';
 import Tab from 'grommet/components/Tab';
-import {loadViews} from '../../actions/viewActions';
+import {loadViews} from '../../actions/views';
 import View from './View';
 
 class Views extends Component {
@@ -27,15 +27,7 @@ class Views extends Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    console.log('views - componentDidMount()');
-    dispatch(loadViews());
-  }
-
-  componentWillReceiveProps(newProps) {
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    return true;
+    dispatch && dispatch(loadViews());
   }
 
   renderItems(views) {

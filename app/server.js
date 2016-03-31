@@ -42,6 +42,10 @@ var indexHtml = function (req, res) {
   res.sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));
 };
 app.get('/login', indexHtml);
+app.get('/explorer', indexHtml);
+app.get('/builder', indexHtml);
+app.get('/aql', indexHtml);
+app.get('/views', indexHtml);
 app.get('/explorer/*', indexHtml);
 app.get('/builder/*', indexHtml);
 app.get('/aql/*', indexHtml);

@@ -35,4 +35,10 @@ For unit testing and code coverage, run the following commands:
     $ npm run coverage
     
     The code coverage report is generated in am-browser/coverage folder.
-      
+  
+  If you failed to run the test/coverage, try to:
+  
+    1. Install node.js 4.4.0+
+    2. Install latest npm (currently 3.8.3) by running:
+      npm install -g npm
+  
