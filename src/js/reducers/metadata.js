@@ -4,7 +4,7 @@ import { METADATA_SUCCESS, METADATA_DETAIL_SUCCESS, METADATA_FILTER_SUCCESS, MET
 
 const initialState = {
   rows: [],
-  allData: [],
+  allData: {},
   data: {},
   node: {},
   cursor: {}

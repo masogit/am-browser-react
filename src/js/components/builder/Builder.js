@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Treebeard, decorators } from 'react-treebeard';
-import { metadataLoad, metadataLoadDetail, metadataSearch, metadataLoadNode, metadataCursorSuccess } from '../../actions';
+import { metadataLoad, metadataLoadDetail, metadataSearch, metadataLoadNode, metadataCursorSuccess, metadataNodeSuccess } from '../../actions';
 import TreeTheme from './TreeTheme';
 import Sidebar from 'grommet/components/Sidebar';
 import Header from 'grommet/components/Header';
@@ -20,15 +20,19 @@ import Tab from 'grommet/components/Tab';
 
 // Example: Customising The Header Decorator To Include Icons
 decorators.Header = (props) => {
+  var self = new Builder();
   const style = props.style;
-  const iconType = props.node.children ? 'folder' : 'file-text';
-  const iconClass = `fa fa-${iconType}`;
+  //const iconType = props.node.children ? 'folder' : '';
+  const checkItem = props.node.children ?  '' : (<input type="checkbox" onClick={self._onItemClick.bind(self, props.node)} value={props.node.checked}></input>);
+  //const iconClass = `fa fa-${iconType}`;
   const iconStyle = { marginRight: '5px' };
+
   return (
     <div style={style.base}>
       <div style={style.title}>
-        <i className={iconClass} style={iconStyle}/>
-                {props.node.name}
+        {checkItem}
+        <i style={iconStyle}/>
+        {props.node.name}
       </div>
     </div>
   );
@@ -65,6 +69,11 @@ export default class Builder extends Component {
       node.toggled = toggled;
     }
     this.props.dispatch(metadataCursorSuccess(node));
+  }
+
+  _onItemClick(node) {
+    node.checked = !node.checked;
+    //this.props.dispatch(metadataNodeSuccess(node));
   }
 
   render() {
