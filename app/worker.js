@@ -145,7 +145,7 @@ function getViewData(view, am, db, offset) {
             // Cache in Redis
             if (param.redis.enabled && param.redis.ttl > 0)
                 data.entities.forEach(function (obj) {
-                        search.index(JSON.stringify(obj), obj['ref-link'] + ":" + obj['self']);
+                    search.index(JSON.stringify(obj), obj['ref-link'] + ":" + obj['self']);
                 });
 
             if (data.count > restParam.param.limit + offset) {
@@ -159,7 +159,7 @@ function getViewData(view, am, db, offset) {
         console.log(err);
     });
 
-    console.log("request.options: " + JSON.stringify(request.options));
+//    console.log("getViewData: " + JSON.stringify(request.options));
 }
 
 
