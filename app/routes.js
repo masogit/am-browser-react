@@ -3,7 +3,7 @@ var db = require('./db.js');
 module.exports = function (app, am, redis) {
 
 
-    var PushAdapter = require('./pushadapter.js');
+    var PushAdapter = require('./adapter.js');
     var pushAdapter = new PushAdapter();
     var Metadata = require('./metadata.js');
     var metadata = new Metadata();

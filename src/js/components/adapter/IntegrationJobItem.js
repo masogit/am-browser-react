@@ -4,8 +4,8 @@ import React, { Component } from 'react';
 import Table from 'grommet/components/Table';
 var Status = require('grommet/components/icons/Status');
 import { connect } from 'react-redux';
-import { getIntegrationJobItem } from '../actions';
-import {statusAdapter} from '../constants/StatusAdapter.js';
+import { getIntegrationJobItem } from '../../actions';
+import {statusAdapter} from '../../constants/StatusAdapter.js';
 
 class IntegrationJobItem extends Component {
 
@@ -114,10 +114,10 @@ class IntegrationJobItem extends Component {
 }
 let select = (state, props) => {
   return {
-    integrationJobName: state.pushadapter.integrationJobName,
-    tabName: state.pushadapter.tabName,
-    selectedLinkName: state.pushadapter.selectedLinkName,
-    integrationJobItemData: state.pushadapter.integrationJobItemData
+    integrationJobName: state.adapter.integrationJobName,
+    tabName: state.adapter.tabName,
+    selectedLinkName: state.adapter.selectedLinkName,
+    integrationJobItemData: state.adapter.integrationJobItemData
   };
 };
 

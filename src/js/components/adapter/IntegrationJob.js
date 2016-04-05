@@ -7,8 +7,8 @@ import CustomTab from './CustomTab.js';
 var Status = require('grommet/components/icons/Status');
 import Split from 'grommet/components/Split';
 import { connect } from 'react-redux';
-import { getIntegrationJob, integrationJobSelect, integrationJobTabSwitch } from '../actions';
-import {statusAdapter} from '../constants/StatusAdapter.js';
+import { getIntegrationJob, integrationJobSelect, integrationJobTabSwitch } from '../../actions';
+import {statusAdapter} from '../../constants/StatusAdapter.js';
 
 
 class IntegrationJob extends Component {
@@ -114,39 +114,39 @@ class IntegrationJob extends Component {
       );
     }
     return (
-          <Tabs justify="start" initialIndex={tabName === 'populationJobs' ? 0: 1}>
-            <CustomTab title="Population" clickHandler={this._onTabClick.bind(this, "populationJobs")}>
-              <Split separator={true}>
-                <div className="integrationJobTable">
-                  <Table selectable={true} onSelect={this._onIntegrationJobSelect}>
-                    {tableHeader}
-                    {tableBody}
-                  </Table>
-                </div>
-                {this.props.children}
-              </Split>
-            </CustomTab>
-            <CustomTab title="Data Push" clickHandler={this._onTabClick.bind(this, "pushJobs")}>
-              <Split flex="both" separator={true}>
-                <div className="integrationJobTable">
-                  <Table selectable={true} onSelect={this._onIntegrationJobSelect}>
-                    {tableHeader}
-                    {tableBody}
-                  </Table>
-                </div>
-                {this.props.children}
-              </Split>
-            </CustomTab>
-          </Tabs>
+        <Tabs justify="start" initialIndex={tabName === 'populationJobs' ? 0: 1}>
+          <CustomTab title="Population" clickHandler={this._onTabClick.bind(this, "populationJobs")}>
+            <Split separator={true}>
+              <div className="integrationJobTable">
+                <Table selectable={true} onSelect={this._onIntegrationJobSelect}>
+                  {tableHeader}
+                  {tableBody}
+                </Table>
+              </div>
+              {this.props.children}
+            </Split>
+          </CustomTab>
+          <CustomTab title="Data Push" clickHandler={this._onTabClick.bind(this, "pushJobs")}>
+            <Split flex="both" separator={true}>
+              <div className="integrationJobTable">
+                <Table selectable={true} onSelect={this._onIntegrationJobSelect}>
+                  {tableHeader}
+                  {tableBody}
+                </Table>
+              </div>
+              {this.props.children}
+            </Split>
+          </CustomTab>
+        </Tabs>
     );
   }
 }
 let select = (state, props) => {
   return {
-    tabName: state.pushadapter.tabName,
-    selectedLinkName: state.pushadapter.selectedLinkName,
-    integrationJobData: state.pushadapter.integrationJobData,
-    integrationJobName: state.pushadapter.integrationJobName
+    tabName: state.adapter.tabName,
+    selectedLinkName: state.adapter.selectedLinkName,
+    integrationJobData: state.adapter.integrationJobData,
+    integrationJobName: state.adapter.integrationJobName
   };
 };
 

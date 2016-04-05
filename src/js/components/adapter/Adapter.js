@@ -3,19 +3,19 @@
 import React, { Component } from 'react';
 import Split from 'grommet/components/Split';
 import { connect } from 'react-redux';
-import { getIntegrationPoint, pushAdapterSideBarClick } from '../actions';
+import { getIntegrationPoint, adapterSideBarClick } from '../../actions';
 var Status = require('grommet/components/icons/Status');
 var Sidebar = require('grommet/components/Sidebar');
 var Menu = require('grommet/components/Menu');
 import { Link } from 'react-router';
 import Header from 'grommet/components/Header';
 import Title from 'grommet/components/Title';
-import history from '../RouteHistory';
-import {statusAdapter} from '../constants/StatusAdapter.js';
+import history from '../../RouteHistory';
+import {statusAdapter} from '../../constants/StatusAdapter.js';
 
 let firstStart = true;
 
-class AmPushAdapter extends Component {
+class Adapter extends Component {
 
   constructor () {
     super();
@@ -31,8 +31,8 @@ class AmPushAdapter extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (firstStart && nextProps.data.length > 0) {
-      this.props.dispatch(pushAdapterSideBarClick(nextProps.data[0].name));
-      history.pushState(null, `/pushAdapter/populationJobs/${nextProps.data[0].name}`);
+      this.props.dispatch(adapterSideBarClick(nextProps.data[0].name));
+      history.pushState(null, `/adapter/populationJobs/${nextProps.data[0].name}`);
       firstStart = false;
     }
   }
@@ -42,15 +42,15 @@ class AmPushAdapter extends Component {
     clearInterval(this.integrationPointInterval);
   }
 
-  _pushAdapterSideBarClick(selectedLinkName) {
-    this.props.dispatch(pushAdapterSideBarClick(selectedLinkName));
+  _adapterSideBarClick(selectedLinkName) {
+    this.props.dispatch(adapterSideBarClick(selectedLinkName));
   }
 
   render () {
     const {data} = this.props;
     let menuItems = data.map((data) => {
       return (
-          <Link key={data.name} to={`/pushAdapter/${this.props.params.tabName}/${data.name}`} activeClassName="active" onClick={this._pushAdapterSideBarClick.bind(this,data.name)}>
+          <Link key={data.name} to={`/adapter/${this.props.params.tabName}/${data.name}`} activeClassName="active" onClick={this._adapterSideBarClick.bind(this,data.name)}>
             <Status value={statusAdapter[data.status]}/>
             <span>{data.name}</span>
           </Link>
@@ -73,8 +73,8 @@ class AmPushAdapter extends Component {
 }
 let select = (state, props) => {
   return {
-    data: state.pushadapter.data
+    data: state.adapter.data
   };
 };
 
-export default connect(select)(AmPushAdapter);
+export default connect(select)(Adapter);

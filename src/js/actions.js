@@ -62,12 +62,12 @@ export const METADATA_DETAIL_SUCCESS = 'METADATA_DETAIL_SUCCESS';
 export const METADATA_FILTER_SUCCESS = 'METADATA_FILTER_SUCCESS';
 export const METADATA_NODE_SUCCESS = 'METADATA_NODE_SUCCESS';
 export const METADATA_CURSOR_SUCCESS = 'METADATA_CURSOR_SUCCESS';
-export const PUSH_ADAPTER_DATA_SUCCESS = 'PUSH_ADAPTER_DATA_SUCCESS';
+export const ADAPTER_DATA_SUCCESS = 'ADAPTER_DATA_SUCCESS';
 export const INTEGRATION_JOB_DATA_SUCCESS = 'INTEGRATION_JOB_DATA_SUCCESS';
 export const INTEGRATION_JOB_ITEM_DATA_SUCCESS = 'INTEGRATION_JOB_ITEM_DATA_SUCCESS';
 export const JOB_SELECT_SUCCESS = 'JOB_SELECT_SUCCESS';
 export const TAB_SWITCH_SUCCESS = 'TAB_SWITCH_SUCCESS';
-export const PUSH_ADAPTER_SIDEBAR_CLICK = 'PUSH_ADAPTER_SIDEBAR_CLICK';
+export const ADAPTER_SIDEBAR_CLICK = 'ADAPTER_SIDEBAR_CLICK';
 
 export function init(email, token) {
   return {type: INIT, email: email, token: token};
@@ -450,14 +450,14 @@ export function getIntegrationPoint() {
               data.push(res.body[list]);
             }
           }
-          dispatch(pushAdapterDataSuccess(data));
+          dispatch(adapterDataSuccess(data));
         });
   };
 }
 
-function pushAdapterDataSuccess(result) {
+function adapterDataSuccess(result) {
   return {
-    type: PUSH_ADAPTER_DATA_SUCCESS,
+    type: ADAPTER_DATA_SUCCESS,
     data: result
   };
 }
@@ -510,17 +510,17 @@ function integrationJobItemDataSuccess(result) {
   };
 }
 
-export function pushAdapterSideBarClick(selectedLinkName) {
-  return { type: PUSH_ADAPTER_SIDEBAR_CLICK, selectedLinkName: selectedLinkName };
+export function adapterSideBarClick(selectedLinkName) {
+  return { type: ADAPTER_SIDEBAR_CLICK, selectedLinkName: selectedLinkName };
 }
 
 export function integrationJobSelect(tabName, selectedLinkName, integrationJobName) {
-  history.pushState(null, '/pushAdapter/' + tabName + '/' + selectedLinkName + '/' + integrationJobName);
+  history.pushState(null, '/adapter/' + tabName + '/' + selectedLinkName + '/' + integrationJobName);
   return { type: JOB_SELECT_SUCCESS, integrationJobName: integrationJobName };
 }
 
 export function integrationJobTabSwitch(selectedLinkName, tabName) {
-  history.pushState(null, '/pushAdapter/' + tabName + '/' + selectedLinkName);
+  history.pushState(null, '/adapter/' + tabName + '/' + selectedLinkName);
   return {
     type: TAB_SWITCH_SUCCESS,
     tabName: tabName,

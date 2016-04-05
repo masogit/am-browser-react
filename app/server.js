@@ -50,9 +50,9 @@ app.get('/explorer/*', indexHtml);
 app.get('/builder/*', indexHtml);
 app.get('/aql/*', indexHtml);
 app.get('/views/*', indexHtml);
-app.get('/pushAdapter', indexHtml);
-app.get('/pushAdapter/*', indexHtml);
-app.get('/pushAdapter/*/*', indexHtml);
+app.get('/adapter', indexHtml);
+app.get('/adapter/*', indexHtml);
+app.get('/adapter/*/*', indexHtml);
 
 app.use(express.static(__dirname + '/public')); 		// set the static files location /public/img will be /img for users
 app.use(morgan('dev')); // log every request to the console
