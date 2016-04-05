@@ -6,6 +6,7 @@ import Rest from 'grommet/utils/Rest';
 import IndexApi from './Api';
 import {HOST_NAME} from './constants/Config';
 import * as filters from './components/builder/TreeFilter';
+import history from './RouteHistory';
 
 // session
 export const INIT = 'INIT';
@@ -61,7 +62,12 @@ export const METADATA_DETAIL_SUCCESS = 'METADATA_DETAIL_SUCCESS';
 export const METADATA_FILTER_SUCCESS = 'METADATA_FILTER_SUCCESS';
 export const METADATA_NODE_SUCCESS = 'METADATA_NODE_SUCCESS';
 export const METADATA_CURSOR_SUCCESS = 'METADATA_CURSOR_SUCCESS';
-
+export const PUSH_ADAPTER_DATA_SUCCESS = 'PUSH_ADAPTER_DATA_SUCCESS';
+export const INTEGRATION_JOB_DATA_SUCCESS = 'INTEGRATION_JOB_DATA_SUCCESS';
+export const INTEGRATION_JOB_ITEM_DATA_SUCCESS = 'INTEGRATION_JOB_ITEM_DATA_SUCCESS';
+export const JOB_SELECT_SUCCESS = 'JOB_SELECT_SUCCESS';
+export const TAB_SWITCH_SUCCESS = 'TAB_SWITCH_SUCCESS';
+export const PUSH_ADAPTER_SIDEBAR_CLICK = 'PUSH_ADAPTER_SIDEBAR_CLICK';
 
 export function init(email, token) {
   return {type: INIT, email: email, token: token};
@@ -415,5 +421,111 @@ export function dashboardSearch(text) {
     }
   };
 }
+
+function handleLocalStorage() {
+  const AM_FORM_DATA = "amFormData";
+  if (localStorage && localStorage[AM_FORM_DATA]) {
+    var form = JSON.parse(localStorage.getItem(AM_FORM_DATA));
+    if (form.server) formData.server = form.server;
+    if (form.user) formData.user = form.user;
+    if (form.password) formData.password = form.password;
+    if (form.pageSize) formData.pageSize = form.pageSize;
+    if (form.showLabel) formData.showLabel = form.showLabel;
+    //        $scope.formData.showError = form.showError;
+    if (form.limit) formData.param.limit = form.limit;
+    if (form.offset) formData.param.offset = form.offset;
+    if (form.viewStyle) formData.viewStyle = form.viewStyle;
+  }
+}
+
+export function getIntegrationPoint() {
+  return function (dispatch) {
+    handleLocalStorage();
+    formData.metadata = 'integration/ucmdbAdapter/points';
+    Rest.post(HOST_NAME + '/am/ucmdbPoint', formData)
+        .end(function (err, res) {
+          let data=[];
+          if (res && res.ok && res.body) {
+            for (var list in res.body) {
+              data.push(res.body[list]);
+            }
+          }
+          dispatch(pushAdapterDataSuccess(data));
+        });
+  };
+}
+
+function pushAdapterDataSuccess(result) {
+  return {
+    type: PUSH_ADAPTER_DATA_SUCCESS,
+    data: result
+  };
+}
+
+export function getIntegrationJob(pointName, jobType) {
+  return function (dispatch) {
+    handleLocalStorage();
+    formData.metadata = 'integration/ucmdbAdapter/points/' + pointName + '/' + jobType;
+    Rest.post(HOST_NAME + '/am/ucmdbJob', formData)
+        .end(function (err, res) {
+          let data=[];
+          if (res && res.ok && res.body) {
+            for (var list in res.body) {
+              data.push(res.body[list]);
+            }
+          }
+          dispatch(integrationJobDataSuccess(data));
+        });
+  };
+}
+
+function integrationJobDataSuccess(result) {
+  return {
+    type: INTEGRATION_JOB_DATA_SUCCESS,
+    integrationJobData: result
+  };
+}
+
+export function getIntegrationJobItem(pointName, pointType, jobName) {
+  return function (dispatch) {
+    handleLocalStorage();
+    formData.metadata = 'integration/ucmdbAdapter/points/' + pointName + '/' + pointType + '/' + jobName;
+    Rest.post(HOST_NAME + '/am/ucmdbJobItem', formData)
+        .end(function (err, res) {
+          let data=[];
+          if (res && res.ok && res.body) {
+            for (var list in res.body) {
+              data.push(res.body[list]);
+            }
+          }
+          dispatch(integrationJobItemDataSuccess(data));
+        });
+  };
+}
+
+function integrationJobItemDataSuccess(result) {
+  return {
+    type: INTEGRATION_JOB_ITEM_DATA_SUCCESS,
+    integrationJobItemData: result
+  };
+}
+
+export function pushAdapterSideBarClick(selectedLinkName) {
+  return { type: PUSH_ADAPTER_SIDEBAR_CLICK, selectedLinkName: selectedLinkName };
+}
+
+export function integrationJobSelect(tabName, selectedLinkName, integrationJobName) {
+  history.pushState(null, '/pushAdapter/' + tabName + '/' + selectedLinkName + '/' + integrationJobName);
+  return { type: JOB_SELECT_SUCCESS, integrationJobName: integrationJobName };
+}
+
+export function integrationJobTabSwitch(selectedLinkName, tabName) {
+  history.pushState(null, '/pushAdapter/' + tabName + '/' + selectedLinkName);
+  return {
+    type: TAB_SWITCH_SUCCESS,
+    tabName: tabName,
+    integrationJobName: ''
+  };
+};
 
 

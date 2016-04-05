@@ -33,6 +33,9 @@ class NavHeader extends Component {
           <Link key="4" to="/views" activeClassName="active">
             Views
           </Link>
+          <Link key="5" to="/pushAdapter" activeClassName="active">
+            AmPushAdapter
+          </Link>
           <SessionMenu />
         </Menu>
       </Header>

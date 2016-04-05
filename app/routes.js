@@ -2,6 +2,9 @@ var db = require('./db.js');
 
 module.exports = function (app, am, redis) {
 
+
+    var PushAdapter = require('./pushadapter.js');
+    var pushAdapter = new PushAdapter();
     var Metadata = require('./metadata.js');
     var metadata = new Metadata();
 
@@ -38,6 +41,15 @@ module.exports = function (app, am, redis) {
         am.user = req.body.user;
         am.password = req.body.password;
     });
+
+    // get ucmdb point data
+    app.post('/am/ucmdbPoint', pushAdapter.getUCMDB);
+
+    // get ucmdb job data
+    app.post('/am/ucmdbJob', pushAdapter.getUCMDB);
+
+    // get ucmdb job item data
+    app.post('/am/ucmdbJobItem', pushAdapter.getUCMDBJob);
 
     // AM Metadata ---------------------------------------------------------
     app.post('/am/metadata', metadata.get);

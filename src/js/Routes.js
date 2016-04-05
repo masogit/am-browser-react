@@ -7,6 +7,9 @@ import Builder from './components/builder/Builder';
 import Views from './components/builder/Views';
 import AQL from './components/aql/AQL';
 import TBD from 'grommet/components/TBD';
+import AmPushAdapter from './components/AmPushAdapter';
+import IntegrationJob from './components/IntegrationJob';
+import IntegrationJobItem from './components/IntegrationJobItem';
 
 var rootPath = "/"; //"/ferret/";
 //if (NODE_ENV === 'development') {
@@ -38,6 +41,16 @@ module.exports = {
         },
         {
           path: 'views/:id', component: Views
+        },
+        {path: 'views', component: Views},
+        {path: 'pushAdapter', component: AmPushAdapter,
+          childRoutes: [
+            { path: ':tabName/:selectedLinkName', component: IntegrationJob,
+              childRoutes: [
+                { path: ':integrationJobName', component: IntegrationJobItem }
+              ]
+            }
+          ]
         },
         //{path: 'views/:id', component: Views},
         {path: 'tbd', component: TBD}
