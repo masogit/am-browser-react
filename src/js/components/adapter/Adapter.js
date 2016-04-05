@@ -58,7 +58,7 @@ class Adapter extends Component {
     });
     return (
         <Split flex="right" separator={true} priority="left" fixed={false}>
-          <Sidebar colorIndex="light-2" className="pushAdapterSideBar">
+          <Sidebar colorIndex="light-2" className="adapterSideBar">
             <Header pad="medium" justify="between">
               <Title>Integration Point</Title>
             </Header>

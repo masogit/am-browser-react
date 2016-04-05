@@ -3,8 +3,8 @@ var db = require('./db.js');
 module.exports = function (app, am, redis) {
 
 
-    var PushAdapter = require('./adapter.js');
-    var pushAdapter = new PushAdapter();
+    var Adapter = require('./adapter.js');
+    var adapter = new Adapter();
     var Metadata = require('./metadata.js');
     var metadata = new Metadata();
 
@@ -43,13 +43,13 @@ module.exports = function (app, am, redis) {
     });
 
     // get ucmdb point data
-    app.post('/am/ucmdbPoint', pushAdapter.getUCMDB);
+    app.post('/am/ucmdbPoint', adapter.getUCMDB);
 
     // get ucmdb job data
-    app.post('/am/ucmdbJob', pushAdapter.getUCMDB);
+    app.post('/am/ucmdbJob', adapter.getUCMDB);
 
     // get ucmdb job item data
-    app.post('/am/ucmdbJobItem', pushAdapter.getUCMDBJob);
+    app.post('/am/ucmdbJobItem', adapter.getUCMDBJob);
 
     // AM Metadata ---------------------------------------------------------
     app.post('/am/metadata', metadata.get);
