@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Treebeard, decorators } from 'react-treebeard';
-import { metadataLoad, metadataLoadDetail, metadataSearch, metadataLoadNode, metadataCursorSuccess, metadataNodeSuccess } from '../../actions';
+import { metadataLoad, metadataLoadDetail, metadataSearch, metadataLoadNode, metadataCursorSuccess/**, metadataNodeSuccess**/ } from '../../actions';
 import TreeTheme from './TreeTheme';
 import Sidebar from 'grommet/components/Sidebar';
 import Header from 'grommet/components/Header';
