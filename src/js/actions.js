@@ -444,21 +444,24 @@ export function getIntegrationPoint() {
     formData.metadata = 'integration/ucmdbAdapter/points';
     Rest.post(HOST_NAME + '/am/ucmdbPoint', formData)
         .end(function (err, res) {
-          let data=[];
+          let data = [], error = null;
           if (res && res.ok && res.body) {
             for (var list in res.body) {
               data.push(res.body[list]);
             }
+          } else if (res && !res.ok) {
+            error = res.body || res.text;
           }
-          dispatch(adapterDataSuccess(data));
+          dispatch(adapterDataFetch(data, error));
         });
   };
 }
 
-function adapterDataSuccess(result) {
+function adapterDataFetch(result, error) {
   return {
     type: ADAPTER_DATA_SUCCESS,
-    data: result
+    data: result,
+    error: error
   };
 }
 
@@ -468,21 +471,24 @@ export function getIntegrationJob(pointName, jobType) {
     formData.metadata = 'integration/ucmdbAdapter/points/' + pointName + '/' + jobType;
     Rest.post(HOST_NAME + '/am/ucmdbJob', formData)
         .end(function (err, res) {
-          let data=[];
+          let data = [], error = null;
           if (res && res.ok && res.body) {
             for (var list in res.body) {
               data.push(res.body[list]);
             }
+          } else if (res && !res.ok) {
+            error = res.body || res.text;
           }
-          dispatch(integrationJobDataSuccess(data));
+          dispatch(integrationJobDataSuccess(data, error));
         });
   };
 }
 
-function integrationJobDataSuccess(result) {
+function integrationJobDataSuccess(result, error) {
   return {
     type: INTEGRATION_JOB_DATA_SUCCESS,
-    integrationJobData: result
+    integrationJobData: result,
+    error: error
   };
 }
 
@@ -492,21 +498,24 @@ export function getIntegrationJobItem(pointName, pointType, jobName) {
     formData.metadata = 'integration/ucmdbAdapter/points/' + pointName + '/' + pointType + '/' + jobName;
     Rest.post(HOST_NAME + '/am/ucmdbJobItem', formData)
         .end(function (err, res) {
-          let data=[];
+          let data = [], error = null;
           if (res && res.ok && res.body) {
-            for (var list in res.body) {
+            for (let list in res.body) {
               data.push(res.body[list]);
             }
+          } else if (res && !res.ok) {
+            error = res.body || res.text;
           }
-          dispatch(integrationJobItemDataSuccess(data));
+          dispatch(integrationJobItemDataSuccess(data, error));
         });
   };
 }
 
-function integrationJobItemDataSuccess(result) {
+function integrationJobItemDataSuccess(result, error) {
   return {
     type: INTEGRATION_JOB_ITEM_DATA_SUCCESS,
-    integrationJobItemData: result
+    integrationJobItemData: result,
+    error: error
   };
 }
 

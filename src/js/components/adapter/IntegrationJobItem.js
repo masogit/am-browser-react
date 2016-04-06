@@ -18,7 +18,7 @@ class IntegrationJobItem extends Component {
     dispatch(getIntegrationJobItem(selectedLinkName, tabName, integrationJobName));
     this.integrationJobItemInterval = setInterval(() => {
       dispatch(getIntegrationJobItem(this.props.selectedLinkName, this.props.tabName, this.props.integrationJobName));
-    },30*1000);
+    },60*1000);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -33,7 +33,7 @@ class IntegrationJobItem extends Component {
   }
 
   render () {
-    const {integrationJobItemData, tabName} = this.props;
+    const {integrationJobItemData, tabName, integrationJobItemDataError} = this.props;
     let statisticsHeader, bodyData;
     integrationJobItemData.sort((a,b) => a.name.localeCompare(b.name));
     if (tabName === 'populationJobs') {
@@ -104,10 +104,20 @@ class IntegrationJobItem extends Component {
     );
     return (
         <div className="integrationJobItemTable">
-          <Table selectable={false}>
-            {statisticsHeader}
-            {tableBody}
-          </Table>
+          {
+            integrationJobItemDataError && integrationJobItemDataError
+          }
+          {
+            integrationJobItemData.length === 0 && !integrationJobItemDataError &&
+            <h2>No data to display!</h2>
+          }
+          {
+            integrationJobItemData.length > 0 && !integrationJobItemDataError &&
+            <Table selectable={false}>
+              {statisticsHeader}
+              {tableBody}
+            </Table>
+          }
         </div>
     );
   }
@@ -117,7 +127,8 @@ let select = (state, props) => {
     integrationJobName: state.adapter.integrationJobName,
     tabName: state.adapter.tabName,
     selectedLinkName: state.adapter.selectedLinkName,
-    integrationJobItemData: state.adapter.integrationJobItemData
+    integrationJobItemData: state.adapter.integrationJobItemData,
+    integrationJobItemDataError: state.adapter.integrationJobItemDataError
   };
 };
 

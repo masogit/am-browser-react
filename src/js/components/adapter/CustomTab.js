@@ -8,7 +8,7 @@ class CustomTab extends Tab {
   componentDidMount() {
     let clickHandler = this.props.clickHandler;
     if (typeof clickHandler === 'function') {
-      let originalClick = this._onClickTab.bind(this);
+      let originalClick = Tab.prototype._onClickTab.bind(this);
       if (originalClick) {
         this._onClickTab = (event) => {
           originalClick(event);

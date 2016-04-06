@@ -23,7 +23,7 @@ class IntegrationJob extends Component {
     dispatch(getIntegrationJob(selectedLinkName, tabName));
     this.integrationJobInterval = setInterval(() => {
       dispatch(getIntegrationJob(this.props.selectedLinkName, this.props.tabName));
-    },30*1000);
+    },60*1000);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -53,7 +53,7 @@ class IntegrationJob extends Component {
   }
 
   render () {
-    const {integrationJobData, tabName} = this.props;
+    const {integrationJobData, tabName, integrationJobDataError} = this.props;
     let bodyData, tableBody, tableHeader;
     integrationJobData.sort((a,b) => a.name.localeCompare(b.name));
     if (this.props.tabName === 'populationJobs') {
@@ -118,10 +118,20 @@ class IntegrationJob extends Component {
           <CustomTab title="Population" clickHandler={this._onTabClick.bind(this, "populationJobs")}>
             <Split separator={true}>
               <div className="integrationJobTable">
-                <Table selectable={true} onSelect={this._onIntegrationJobSelect}>
-                  {tableHeader}
-                  {tableBody}
-                </Table>
+                {
+                  integrationJobData.length === 0 && !integrationJobDataError &&
+                  <h2>No data to display!</h2>
+                }
+                {
+                  integrationJobDataError && integrationJobDataError
+                }
+                {
+                  integrationJobData.length > 0 && !integrationJobDataError &&
+                  <Table selectable={true} onSelect={this._onIntegrationJobSelect}>
+                    {tableHeader}
+                    {tableBody}
+                  </Table>
+                }
               </div>
               {this.props.children}
             </Split>
@@ -129,10 +139,20 @@ class IntegrationJob extends Component {
           <CustomTab title="Data Push" clickHandler={this._onTabClick.bind(this, "pushJobs")}>
             <Split flex="both" separator={true}>
               <div className="integrationJobTable">
-                <Table selectable={true} onSelect={this._onIntegrationJobSelect}>
-                  {tableHeader}
-                  {tableBody}
-                </Table>
+                {
+                  integrationJobData.length === 0 && !integrationJobDataError &&
+                  <h2>No data to display!</h2>
+                }
+                {
+                  integrationJobDataError && integrationJobDataError
+                }
+                {
+                  integrationJobData.length > 0 && !integrationJobDataError &&
+                  <Table selectable={true} onSelect={this._onIntegrationJobSelect}>
+                    {tableHeader}
+                    {tableBody}
+                  </Table>
+                }
               </div>
               {this.props.children}
             </Split>
@@ -146,6 +166,7 @@ let select = (state, props) => {
     tabName: state.adapter.tabName,
     selectedLinkName: state.adapter.selectedLinkName,
     integrationJobData: state.adapter.integrationJobData,
+    integrationJobDataError: state.adapter.integrationJobDataError,
     integrationJobName: state.adapter.integrationJobName
   };
 };

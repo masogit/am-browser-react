@@ -11,7 +11,7 @@ module.exports = function (am) {
         "Authorization": auth
       }
     };
-    var request = client.get(url, args,function (data, response) {
+    var request = client.get(url, args, function (data, response) {
       var arrayData = [];
       if (Array.isArray(data) && data.length > 0) {
         for (var i = 0; i < data.length; i++) {
@@ -21,9 +21,6 @@ module.exports = function (am) {
       res.json(arrayData);
     }).on('error', function (err) {
       res.status(500).send(err.toString());
-    });
-    request.on('error', function (err) {
-      console.log('request error: ' + err);
     });
   };
 
@@ -36,7 +33,7 @@ module.exports = function (am) {
         "Authorization": auth
       }
     };
-    var request = client.get(url, args,function (data, response) {
+    var request = client.get(url, args, function (data, response) {
       var arrayData = [],origData = data["jobStatuses"];
       if (Array.isArray(origData) && origData.length > 0) {
         for (var i = 0; i < origData.length; i++) {
@@ -46,9 +43,6 @@ module.exports = function (am) {
       res.json(arrayData);
     }).on('error', function (err) {
       res.status(500).send(err.toString());
-    });
-    request.on('error', function (err) {
-      console.log('request error: ' + err);
     });
   };
 

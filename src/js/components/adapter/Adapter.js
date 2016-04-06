@@ -26,7 +26,7 @@ class Adapter extends Component {
     dispatch(getIntegrationPoint());
     this.integrationPointInterval = setInterval(() => {
       dispatch(getIntegrationPoint());
-    },30*1000);
+    },60*1000);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -47,7 +47,7 @@ class Adapter extends Component {
   }
 
   render () {
-    const {data} = this.props;
+    const {data, dataError} = this.props;
     let menuItems = data.map((data) => {
       return (
           <Link key={data.name} to={`/adapter/${this.props.params.tabName}/${data.name}`} activeClassName="active" onClick={this._adapterSideBarClick.bind(this,data.name)}>
@@ -58,6 +58,7 @@ class Adapter extends Component {
     });
     return (
         <Split flex="right" separator={true} priority="left" fixed={false}>
+          {!dataError &&
           <Sidebar colorIndex="light-2" className="adapterSideBar">
             <Header pad="medium" justify="between">
               <Title>Integration Point</Title>
@@ -66,6 +67,8 @@ class Adapter extends Component {
               {menuItems}
             </Menu>
           </Sidebar>
+          }
+          {dataError && dataError}
           {this.props.children}
         </Split>
     );
@@ -73,7 +76,8 @@ class Adapter extends Component {
 }
 let select = (state, props) => {
   return {
-    data: state.adapter.data
+    data: state.adapter.data,
+    dataError: state.adapter.dataError
   };
 };
 

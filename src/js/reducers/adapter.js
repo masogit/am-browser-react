@@ -10,17 +10,20 @@ import { ADAPTER_DATA_SUCCESS,
 
 const initialState = {
   data: [],
+  dataError: null,
   selectedLinkName: "",
   integrationJobData: [],
+  integrationJobDataError: null,
   tabName: "populationJobs",
   integrationJobItemData: [],
+  integrationJobItemDataError: null,
   integrationJobName: ""
 };
 
 const handlers = {
-  [ADAPTER_DATA_SUCCESS]: (state, action) => ({data: action.data}),
-  [INTEGRATION_JOB_DATA_SUCCESS]: (state, action) => ({integrationJobData: action.integrationJobData}),
-  [INTEGRATION_JOB_ITEM_DATA_SUCCESS]: (state, action) => ({integrationJobItemData: action.integrationJobItemData}),
+  [ADAPTER_DATA_SUCCESS]: (state, action) => ({data: action.data, dataError: action.error}),
+  [INTEGRATION_JOB_DATA_SUCCESS]: (state, action) => ({integrationJobData: action.integrationJobData, integrationJobDataError: action.error}),
+  [INTEGRATION_JOB_ITEM_DATA_SUCCESS]: (state, action) => ({integrationJobItemData: action.integrationJobItemData, integrationJobItemDataError: action.error}),
   [JOB_SELECT_SUCCESS]: (state, action) => ({integrationJobName: action.integrationJobName}),
   [TAB_SWITCH_SUCCESS]: (state, action) => ({
     tabName: action.tabName,
