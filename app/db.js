@@ -33,16 +33,16 @@ exports.init = function (dbFolder, json) {
     });
 
     // init create public/csv folder
-    fs.exists("public/csv", function (db) {
+    fs.exists("csv", function (db) {
         if (!db) {
-            console.log("not found public/csv folder");
+            console.log("not found csv folder");
 
-            fs.mkdir("public/csv", function (err) {
+            fs.mkdir("csv", function (err) {
                 if (err) {
                     return console.log(err);
                 }
 
-                console.log("The public/csv folder was created!");
+                console.log("The csv folder was created!");
             })
 
         }
@@ -101,7 +101,7 @@ exports.setColl = function (collectionName, obj) {
     else
         data = coll.insert(obj);
 
-    db.saveDatabase();    
+    db.saveDatabase();
 };
 
 exports.del = function (req, res) {

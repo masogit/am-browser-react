@@ -127,13 +127,13 @@ function getViewData(view, am, db, offset) {
 //                console.log(csv);
                 // delete file
                 if (offset == 0)
-                    fs.unlink("public/csv/"+view.name+".csv", function (err) {
+                    fs.unlink("csv/"+view.name+".csv", function (err) {
                         if (err)
 //                            throw err;
                             console.log(err);
                     });
                 // append file
-                fs.appendFile("public/csv/"+view.name+".csv", csv, function (err) {
+                fs.appendFile("csv/"+view.name+".csv", csv, function (err) {
                     if (err)
                         console.log(err);
 //                    throw err;
@@ -145,7 +145,7 @@ function getViewData(view, am, db, offset) {
             // Cache in Redis
             if (param.redis.enabled && param.redis.ttl > 0)
                 data.entities.forEach(function (obj) {
-                    search.index(JSON.stringify(obj), obj['ref-link'] + ":" + obj['self']);
+                        search.index(JSON.stringify(obj), obj['ref-link'] + ":" + obj['self']);
                 });
 
             if (data.count > restParam.param.limit + offset) {
@@ -159,7 +159,7 @@ function getViewData(view, am, db, offset) {
         console.log(err);
     });
 
-//    console.log("getViewData: " + JSON.stringify(request.options));
+    console.log("request.options: " + JSON.stringify(request.options));
 }
 
 
