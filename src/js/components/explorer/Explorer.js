@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import {HOST_NAME} from '../../constants/Config';
-import { loadTemplates, loadRecords } from '../../actions';
+import { loadTemplates, loadRecords, loadDetailRecord } from '../../actions';
 import Header from 'grommet/components/Header';
 //import Title from 'grommet/components/Title';
 //import Logo from './Logo'; // './HPELogo';
@@ -59,9 +59,15 @@ export default class Explorer extends Component {
   _onClick(template) {
     this.props.dispatch(loadRecords(template));
   }
+
+  _onListClick(template, record) {
+    this.props.dispatch(loadDetailRecord(template, record));
+  }
+
   render() {
     var templates = this.props.templates;
     var records = this.props.records;
+    var record = this.props.record;
     //console.log(links);
 
     var templateComponents = templates.map((template, index) => {
@@ -69,7 +75,11 @@ export default class Explorer extends Component {
     });
 
     var recordComponents = records.map((record, index) => {
-      return <TableRow key={index}><td>Hello, {record.self}!</td></TableRow>;
+      return <TableRow key={index}><td><Anchor key={index} onClick={this._onListClick.bind(this, templates[0], record)}>Hello, {record.self}!</Anchor></td></TableRow>;
+    });
+
+    var fields = record.map((field, index) => {
+      return <p key={index}><label key={index}>{field.$.label}:{field.value}</label></p>;
     });
 
     return (
@@ -83,6 +93,7 @@ export default class Explorer extends Component {
             <h3 className="searchviews">Sample Content</h3>
           </Header>
           <Tiles fill={true} flush={false}>
+            List:
             {templateComponents}
             <Tile>
               <Meter value={70} total={100} units="GB" vertical={true}/>
@@ -103,6 +114,8 @@ export default class Explorer extends Component {
           {recordComponents}
           </tbody>
         </Table>
+        Detail:
+        {fields}
       </div>
     );
   }
@@ -110,13 +123,15 @@ export default class Explorer extends Component {
 
 Explorer.propTypes = {
   templates: PropTypes.array.isRequired,
-  records: PropTypes.array.isRequired
+  records: PropTypes.array.isRequired,
+  record: PropTypes.array.isRequired
 };
 
 let select = (state, props) => {
   return {
     templates: state.explorer.templates,
-    records: state.explorer.records
+    records: state.explorer.records,
+    record: state.explorer.record
   };
 };
 

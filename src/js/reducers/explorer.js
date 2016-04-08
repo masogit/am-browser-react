@@ -1,10 +1,11 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import { TEMPLATE_LOAD_SUCCESS, RECORD_LOAD_SUCCESS } from '../actions';
+import { TEMPLATE_LOAD_SUCCESS, RECORD_LOAD_SUCCESS, DETAIL_RECORD_LOAD_SUCCESS } from '../actions';
 
 const initialState = {
   templates: [],
-  records: []
+  records: [],
+  record: []
 };
 
 const handlers = {
@@ -16,6 +17,11 @@ const handlers = {
   [RECORD_LOAD_SUCCESS]: (state, action) => {
     return {
       records: action.records
+    };
+  },
+  [DETAIL_RECORD_LOAD_SUCCESS]: (state, action) => {
+    return {
+      record: action.record
     };
   }
 };

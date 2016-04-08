@@ -71,6 +71,7 @@ export const ADAPTER_SIDEBAR_CLICK = 'ADAPTER_SIDEBAR_CLICK';
 
 export const TEMPLATE_LOAD_SUCCESS = 'TEMPLATE_LOAD_SUCCESS';
 export const RECORD_LOAD_SUCCESS = 'RECORD_LOAD_SUCCESS';
+export const DETAIL_RECORD_LOAD_SUCCESS = 'DETAIL_RECORD_LOAD_SUCCESS';
 
 export function init(email, token) {
   return {type: INIT, email: email, token: token};
@@ -322,6 +323,16 @@ export function loadRecords(template) {
   };
 };
 
+export function loadDetailRecord(template, record) {
+  return function (dispatch) {
+    for (var i in template.field) {
+      var sqlname = template.field[i].$.sqlname;
+      template.field[i].value = record[sqlname];
+    }
+    dispatch(detailRecordLoadSuccess(template.field));
+  };
+};
+
 export function metadataSuccess(result) {
   return {
     type: METADATA_SUCCESS,
@@ -369,6 +380,13 @@ export function recordsLoadSuccess(result) {
   return {
     type: RECORD_LOAD_SUCCESS,
     records: result
+  };
+}
+
+export function detailRecordLoadSuccess(result) {
+  return {
+    type: DETAIL_RECORD_LOAD_SUCCESS,
+    record: result
   };
 }
 
