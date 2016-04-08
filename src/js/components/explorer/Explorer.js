@@ -1,5 +1,7 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import {HOST_NAME} from '../../constants/Config';
+import { loadTemplates, loadRecords } from '../../actions';
 import Header from 'grommet/components/Header';
 //import Title from 'grommet/components/Title';
 //import Logo from './Logo'; // './HPELogo';
@@ -10,6 +12,9 @@ import Search from 'grommet/components/Search';
 import Tiles from 'grommet/components/Tiles';
 import Tile from 'grommet/components/Tile';
 import Meter from 'grommet/components/Meter';
+import Anchor from 'grommet/components/Anchor';
+import Table from 'grommet/components/Table';
+import TableRow from 'grommet/components/TableRow';
 //import Table from 'grommet/components/Table';
 //import LoginForm from 'grommet/components/LoginForm';
 //import Anchor from 'grommet/components/Anchor';
@@ -28,7 +33,11 @@ export default class Explorer extends Component {
   constructor() {
     super();
     this._onSearch = this._onSearch.bind(this);
-    this.state = {ids: ['test1', 'test2', 'test3']};
+    //this.state = {ids: ['test1', 'test2', 'test3']};
+  }
+
+  componentDidMount() {
+    this.props.dispatch(loadTemplates());
   }
 
   _onSearch(value) {
@@ -47,25 +56,34 @@ export default class Explorer extends Component {
     });
   }
 
+  _onClick(template) {
+    this.props.dispatch(loadRecords(template));
+  }
   render() {
-    //var links = this.state.links;
+    var templates = this.props.templates;
+    var records = this.props.records;
     //console.log(links);
 
-    //var ids = this.state.ids;
-    //var tileComponents = ids.map(function (id) {
-    //  return <Tile>Hello, {id}!</Tile>;
-    //});
+    var templateComponents = templates.map((template, index) => {
+      return <Anchor key={index} onClick={this._onClick.bind(this, template)}>Hello, {template.name}!</Anchor>;
+    });
+
+    var recordComponents = records.map((record, index) => {
+      return <TableRow key={index}><td>Hello, {record.self}!</td></TableRow>;
+    });
+
     return (
       <div>
         <div className="searchviews">
           <Search inline={true} placeholder="Search views" size="medium"
-                  fill={true} responsive={false} onDOMChange={this._onSearch}/>
+            fill={true} responsive={false} onDOMChange={this._onSearch}/>
         </div>
         <Section>
           <Header>
             <h3 className="searchviews">Sample Content</h3>
           </Header>
           <Tiles fill={true} flush={false}>
+            {templateComponents}
             <Tile>
               <Meter value={70} total={100} units="GB" vertical={true}/>
               <t value={40} type="arc"/>
@@ -75,36 +93,31 @@ export default class Explorer extends Component {
             </Tile>
             <Tile>
               <Meter value={90} units="GB" min={{"value": 0, "label": "0 GB"}}
-                     max={{"value": 80, "label": "80 GB"}}
-                     threshold={75}/>
+                max={{"value": 80, "label": "80 GB"}}
+                threshold={75}/>
             </Tile>
           </Tiles>
         </Section>
-        <Section>
-          <Header>
-            <h3 className="searchviews">Sample Content</h3>
-          </Header>
-          <Tiles fill={true} flush={false}>
-            <Tile>
-              <Meter type="arc" legend={true} series={[
-            {"label": "Gen 7", "value": 50, "colorIndex": "graph-1"},
-            {"label": "Gen 8", "value": 200, "colorIndex": "graph-2"},
-            {"label": "Gen 9", "value": 100, "colorIndex": "graph-3"},
-            {"label": "Gen 10", "value": 300, "colorIndex": "graph-4"}]}/>
-            </Tile>
-            <Tile>
-              <Meter type="arc" legend={true} series={[
-             {"label": "Gen 7", "value": 50, "colorIndex": "graph-1"},
-             {"label": "Gen 8", "value": 200, "colorIndex": "graph-2"},
-             {"label": "Gen 9", "value": 100, "colorIndex": "graph-3"},
-             {"label": "Gen 10", "value": 300, "colorIndex": "graph-4"}]}/>
-            </Tile>
-            <Tile>
-              <Meter value={40} type="arc" size="large"/>
-            </Tile>
-          </Tiles>
-        </Section>
+        <Table>
+          <tbody>
+          {recordComponents}
+          </tbody>
+        </Table>
       </div>
     );
   }
+}
+
+Explorer.propTypes = {
+  templates: PropTypes.array.isRequired,
+  records: PropTypes.array.isRequired
 };
+
+let select = (state, props) => {
+  return {
+    templates: state.explorer.templates,
+    records: state.explorer.records
+  };
+};
+
+export default connect(select)(Explorer);

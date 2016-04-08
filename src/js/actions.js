@@ -69,6 +69,9 @@ export const JOB_SELECT_SUCCESS = 'JOB_SELECT_SUCCESS';
 export const TAB_SWITCH_SUCCESS = 'TAB_SWITCH_SUCCESS';
 export const ADAPTER_SIDEBAR_CLICK = 'ADAPTER_SIDEBAR_CLICK';
 
+export const TEMPLATE_LOAD_SUCCESS = 'TEMPLATE_LOAD_SUCCESS';
+export const RECORD_LOAD_SUCCESS = 'RECORD_LOAD_SUCCESS';
+
 export function init(email, token) {
   return {type: INIT, email: email, token: token};
 }
@@ -286,6 +289,39 @@ export function metadataSearch(data, value, allData) {
   };
 }
 
+export function loadTemplates() {
+  return function (dispatch) {
+    Rest.get(HOST_NAME + '/json/template').end(function (err, res) {
+      var templates = res.body;
+      dispatch(templatesLoadSuccess(templates));
+    });
+  };
+};
+
+export function loadRecords(template) {
+  return function (dispatch) {
+    var AM_FORM_DATA = "amFormData";
+    if (localStorage && localStorage[AM_FORM_DATA]) {
+      var form = JSON.parse(localStorage.getItem(AM_FORM_DATA));
+      if (form.server) formData.server = form.server;
+      if (form.user) formData.user = form.user;
+      if (form.password) formData.password = form.password;
+      if (form.pageSize) formData.pageSize = form.pageSize;
+      if (form.showLabel) formData.showLabel = form.showLabel;
+      //        $scope.formData.showError = form.showError;
+      if (form.limit) formData.param.limit = form.limit;
+      if (form.offset) formData.param.offset = form.offset;
+      if (form.viewStyle) formData.viewStyle = form.viewStyle;
+    }
+    formData["ref-link"] = "db/" + template.$.sqlname;
+    formData.param.fields = template.fields;
+    Rest.post(HOST_NAME + '/am/rest', formData).end(function (err, res) {
+      var records = res.body.entities;
+      dispatch(recordsLoadSuccess(records));
+    });
+  };
+};
+
 export function metadataSuccess(result) {
   return {
     type: METADATA_SUCCESS,
@@ -319,6 +355,20 @@ export function metadataCursorSuccess(result) {
   return {
     type: METADATA_CURSOR_SUCCESS,
     cursor: result
+  };
+}
+
+export function templatesLoadSuccess(result) {
+  return {
+    type: TEMPLATE_LOAD_SUCCESS,
+    templates: result
+  };
+}
+
+export function recordsLoadSuccess(result) {
+  return {
+    type: RECORD_LOAD_SUCCESS,
+    records: result
   };
 }
 

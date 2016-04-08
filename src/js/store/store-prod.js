@@ -12,7 +12,8 @@ import views from '../reducers/views';
 import metadata from '../reducers/metadata';
 import aql from '../reducers/aql';
 import adapter from '../reducers/adapter';
+import explorer from '../reducers/explorer';
 
 export default compose(
   applyMiddleware(thunk)
-)(createStore)(combineReducers({session, route, nav, index, views, metadata, aql, adapter}));
+)(createStore)(combineReducers({session, route, nav, index, views, metadata, aql, adapter, explorer}));
