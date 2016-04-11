@@ -19,6 +19,7 @@
     "grommet-index": "https://github.com/grommet/grommet-index/tarball/stable",
     "history": "^1.17.0",
     "http-proxy": "^1.13.2",
+    "json-2-csv": "~2.0.18",
     "json-server": "^0.5.5",
     "json-stringify-pretty-compact": "^1.0.1",
     "lodash": "^3.8.0",
@@ -36,14 +37,14 @@
     "redis": "^2.5.2",
     "redis-search": "0.0.1",
     "redux": "^3.0.2",
+    "redux-router": "^1.0.0-beta8",
     "redux-thunk": "^1.0.0",
     "request": "^2.53.0",
     "serve-static": "^1.7.1",
     "superagent": "^1.8.3",
     "superagent-bluebird-promise": "^3.0.0",
     "ws": "^0.7.2",
-    "xml2js": "^0.4.16",
-    "json-2-csv": "~2.0.18"
+    "xml2js": "^0.4.16"
   },
   "devDependencies": {
     "babel-core": "^6.7.4",

@@ -4,7 +4,7 @@ import Rest from 'grommet/utils/Rest';
 //import history from './RouteHistory';
 //import Query from 'grommet-index/utils/Query';
 import IndexApi from './Api';
-import {HOST_NAME} from './constants/Config';
+import {HOST_NAME} from './util/Config';
 import * as filters from './components/builder/TreeFilter';
 import history from './RouteHistory';
 

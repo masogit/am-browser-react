@@ -1,8 +1,8 @@
 import expect from 'expect';
 import React from 'react';
 import TestUtils from 'react-addons-test-utils';
-import View from '../../../src/js/components/builder/View';
-import Views from '../../../src/js/components/builder/Views';
+import View from '../../../src/js/components/builder/ViewDefDetail';
+import Views from '../../../src/js/components/builder/ViewDefList';
 import Sidebar from 'grommet/components/Sidebar';
 import Split from 'grommet/components/Split';
 import { Link } from 'react-router';

@@ -18,7 +18,7 @@ import Menu from 'grommet/components/Menu';
 import App from 'grommet/components/App';
 //import Status from 'grommet/components/icons/Status';
 import Rest from 'grommet/utils/Rest';
-import {HOST_NAME} from '../constants/Config';
+import {HOST_NAME} from '../util/Config';
 
 const links = [
   {label: 'Explorer', value: 'explorer'},

@@ -1,6 +1,6 @@
 // import request from 'superagent-bluebird-promise';
 // import * as types from '../constants/ActionTypes';
-import {HOST_NAME} from '../constants/Config';
+import {HOST_NAME} from '../util/Config';
 import Rest from 'grommet/utils/Rest';
 
 export function loadAQLs() {

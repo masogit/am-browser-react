@@ -13,7 +13,10 @@ import metadata from '../reducers/metadata';
 import aql from '../reducers/aql';
 import adapter from '../reducers/adapter';
 import explorer from '../reducers/explorer';
+import { routerStateReducer, reduxReactRouter } from 'redux-router';
+import history from '../RouteHistory';
 
 export default compose(
+  reduxReactRouter({history}),
   applyMiddleware(thunk)
-)(createStore)(combineReducers({session, route, nav, index, views, metadata, aql, adapter, explorer}));
+)(createStore)(combineReducers({session, route, nav, index, views, metadata, aql, adapter, explorer, router: routerStateReducer}));

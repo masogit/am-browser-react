@@ -15,19 +15,27 @@ import Split from 'grommet/components/Split';
 import { Link } from 'react-router';
 import Tabs from 'grommet/components/Tabs';
 import Tab from 'grommet/components/Tab';
-import {loadViews} from '../../actions/views';
-import View from './View';
+import {loadViews/*, loadTemplateTable, setSelectedView*/} from '../../actions/views';
+//import View from './View';
+//import store from '../../store';
 
 class Views extends Component {
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+    //store.subscribe(() => {console.log("store.getState():");console.log(store);});
     //this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
   }
 
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch(loadViews());
+    //console.log("Views - componentDidMount()");
+    this.props.dispatch(loadViews(this.props.params.id));
+  }
+
+  componentWillReceiveProps(nextProps) {
+  }
+
+  componentWillUpdate(nextProps, nextState) {
   }
 
   renderItems(views) {
@@ -39,7 +47,7 @@ class Views extends Component {
   }
 
   render() {
-    const { views, isFetching } = this.props;
+    const { views, isFetchingViewList, selectedView } = this.props;
     return (
       <Split flex="right">
         <Sidebar primary={true} pad="small" size="large">
@@ -53,10 +61,10 @@ class Views extends Component {
                 {views.length > 0 &&
                 <div>{this.renderItems(views)}</div>
                 }
-                {!isFetching && views.length === 0 &&
+                {!isFetchingViewList && views.length === 0 &&
                 <h2>No data to display!</h2>
                 }
-                {isFetching &&
+                {isFetchingViewList &&
                 <div>
                   <h2>Fetching views</h2>
                 </div>
@@ -65,7 +73,9 @@ class Views extends Component {
             </Tab>
           </Tabs>
         </Sidebar>
-        <View view={views.filter(view => view.$loki == this.props.params.id)}/>
+        { this.props.children && React.cloneElement(this.props.children, {
+          selectedView: selectedView
+        })}
       </Split>
     );
   }
@@ -73,7 +83,10 @@ class Views extends Component {
 
 let mapStateToProps = (state) => {
   return {
-    views: state.views.views  // see store-dev.js or store-prod.js
+    views: state.views.views,  // see store-dev.js or store-prod.js
+    selectedView: state.views.selectedView,
+    selectedViewId: state.views.selectedViewId,
+    templateTable: state.views.templateTable
   };
 };
 

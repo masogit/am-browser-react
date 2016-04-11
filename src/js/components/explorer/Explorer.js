@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import {HOST_NAME} from '../../constants/Config';
+import {HOST_NAME} from '../../util/Config';
 import { loadTemplates, loadRecords, loadDetailRecord } from '../../actions';
 import Header from 'grommet/components/Header';
 //import Title from 'grommet/components/Title';

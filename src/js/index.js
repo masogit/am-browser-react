@@ -4,7 +4,7 @@ import 'index.scss';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Router from 'react-router';
+//import Router from 'react-router';
 import Rest from 'grommet/utils/Rest';
 //import RestWatch from './RestWatch';
 import { getCurrentLocale, getLocaleData } from 'grommet/utils/Locale';
@@ -19,6 +19,8 @@ import store from './store';
 import history from './RouteHistory';
 import { init, routeChanged/*, loginSuccess*/ } from './actions';
 
+import { ReduxRouter } from 'redux-router';
+
 // The port number needs to align with devServerProxy and websocketHost in gulpfile.js
 //let hostName = NODE_ENV === 'development' ? 'localhost:8010' : window.location.host;
 
@@ -32,25 +34,25 @@ Rest.setHeaders({
 // From a comment in https://github.com/rackt/redux/issues/637
 // this factory returns a history implementation which reads the current state
 // from the redux store and delegates push state to a different history.
-let createStoreHistory = () => {
-  return {
-    listen: (callback) => {
-      // subscribe to the redux store. when `route` changes, notify the listener
-      let notify = () => {
-        const route = store.getState().route;
-        if (route) {
-          callback(route);
-        }
-      };
-      const unsubscribe = store.subscribe(notify);
-
-      return unsubscribe;
-    },
-    createHref: history.createHref,
-    pushState: history.pushState,
-    push: history.push
-  };
-};
+//let createStoreHistory = () => {
+//  return {
+//    listen: (callback) => {
+//      // subscribe to the redux store. when `route` changes, notify the listener
+//      let notify = () => {
+//        const route = store.getState().route;
+//        if (route) {
+//          callback(route);
+//        }
+//      };
+//      const unsubscribe = store.subscribe(notify);
+//
+//      return unsubscribe;
+//    },
+//    createHref: history.createHref,
+//    pushState: history.pushState,
+//    push: history.push
+//  };
+//};
 
 let element = document.getElementById('content');
 
@@ -70,7 +72,7 @@ if (process.env.NODE_ENV === 'production') {
     <div>
       <Provider store={store}>
         <IntlProvider locale={localeData.locale} messages={localeData.messages}>
-          <Router routes={Routes.routes} history={createStoreHistory()}/>
+          <ReduxRouter routes={Routes.routes}/>
         </IntlProvider>
       </Provider>
     </div>
@@ -81,7 +83,7 @@ if (process.env.NODE_ENV === 'production') {
       <Provider store={store}>
         <IntlProvider locale={localeData.locale} messages={localeData.messages}>
           <div>
-            <Router routes={Routes.routes} history={createStoreHistory()}/>
+            <ReduxRouter routes={Routes.routes}/>
             <DevTools store={store}/>
           </div>
         </IntlProvider>
