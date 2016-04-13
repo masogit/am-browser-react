@@ -1,8 +1,11 @@
+var Engine = require('tingodb')();
 var loki = require('lokijs');
 var db;
+var tingodbFolder;
 
 // check db folder and files
 exports.init = function (dbFolder, json) {
+    tingodbFolder = dbFolder;
     db = new loki(dbFolder + json);
     const fs = require('fs');
     fs.exists(dbFolder, function (db) {
@@ -46,6 +49,48 @@ exports.init = function (dbFolder, json) {
             })
 
         }
+    });
+};
+
+// tingodb Create
+exports.read = function (req, res) {
+    var db = new Engine.Db(tingodbFolder, {});
+    var collectionName = req.params.collection;
+    db.collection(collectionName).find().toArray(function(err, documents) {
+      if (err)
+        console.log(err);
+       res.json(documents);
+       db.close();
+    });
+};
+
+// tingodb Insert or Update
+exports.upsert = function (req, res) {
+    var db = new Engine.Db(tingodbFolder, {});
+    var collectionName = req.params.collection;
+    var obj = req.body;
+
+    if (!obj._id)
+      obj._id = new Engine.ObjectID().toString();
+
+    db.collection(collectionName).update({_id: obj._id}, obj, {upsert: true}, function(err, result){
+      if (err)
+        console.log(err);
+      res.json(result);
+      db.close();
+    });
+};
+
+// tingodb Delete
+exports.delete = function (req, res) {
+    var db = new Engine.Db(tingodbFolder, {});
+    var collectionName = req.params.collection;
+    var id = req.params.id;
+    db.collection(collectionName).remove([{_id: id}], function(err, result){
+      if (err)
+        console.log(err);
+      res.json(result);
+      db.close();
     });
 };
 
