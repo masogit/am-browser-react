@@ -47,7 +47,7 @@ class Views extends Component {
   }
 
   render() {
-    const { views, isFetchingViewList, selectedView } = this.props;
+    const { views, isFetchingViewList } = this.props;
     return (
       <Split flex="right">
         <Sidebar primary={true} pad="small" size="large">
@@ -73,9 +73,7 @@ class Views extends Component {
             </Tab>
           </Tabs>
         </Sidebar>
-        { this.props.children && React.cloneElement(this.props.children, {
-          selectedView: selectedView
-        })}
+        { this.props.children }
       </Split>
     );
   }

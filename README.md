@@ -8,20 +8,23 @@ To run this application, execute the following commands:
   2. Start the server
 
     ```
-    $ cd app
-    $ gulp dev
+    $ cd am-browser
+    $ node app\server.js
+      or 'node app/server.js' if you use git bash.
     ```
 
   3. Start the UI development server
     ```
+    $ cd am-browser
     $ gulp dev
     ```
 
-  4. Check Ferret production server
+  4. Distribution build
     ```
     $ cd am-browser
     $ gulp dist
     $ node app/server.js
+      or 'node app/server.js' if you use git bash.
     ```
 
 For unit testing and code coverage, run the following commands:

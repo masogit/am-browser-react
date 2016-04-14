@@ -7,17 +7,20 @@ import Box from 'grommet/components/Box';
 import Form from 'grommet/components/Form';
 import FormFields from 'grommet/components/FormFields';
 import FormField from 'grommet/components/FormField';
-import Header from 'grommet/components/Header';
-import CheckBox from 'grommet/components/CheckBox';
+//import Header from 'grommet/components/Header';
+//import CheckBox from 'grommet/components/CheckBox';
 import RadioButton from 'grommet/components/RadioButton';
 //import SearchInput from 'grommet/components/SearchInput';
 //import Calendar from 'grommet/components/Calendar';
 //import NumberInput from 'grommet/components/NumberInput';
-import Section from 'grommet/components/Section';
-import Menu from 'grommet/components/Menu';
-import Button from 'grommet/components/Button';
+//import Section from 'grommet/components/Section';
+//import Menu from 'grommet/components/Menu';
+import Table from 'grommet/components/Table';
+//import TableRow from 'grommet/components/TableRow';
+import Anchor from 'grommet/components/Anchor';
+//import Button from 'grommet/components/Button';
 import Add from 'grommet/components/icons/base/Add';
-import Delete from 'grommet/components/icons/base/Trash';
+import Delete from 'grommet/components/icons/base/Close.js';
 import Right from 'grommet/components/icons/base/Play';
 import _ from 'lodash';
 import store from '../../store';
@@ -113,11 +116,53 @@ class View extends Component {
     console.log("View - componentWillUnmount()");
   }
 
+  renderTemplateTable(table) {
+    return table.field.map((field) => {
+      return (
+        <tr>
+          <td>{field.$.sqlname}</td>
+          <td>{field.$.label}</td>
+          <td><Anchor tag="span" className="tbBtnIcon"><Delete /></Anchor></td>
+        </tr>
+      );
+    });
+  }
+
   render() {
     const { selectedView } = this.props;
     //console.log("View - render() - this.props.params.id:" + this.props.params.id);
     //console.log("View - render() - this.props.selectedViewId: " + this.props.selectedViewId);
     let p = "input";
+    let tableHeader = (
+      <thead>
+      <tr>
+        <th>Field</th>
+        <th>Alias</th>
+        <th></th>
+      </tr>
+      </thead>
+    );
+
+    //let tableBody = (
+    //  <tbody>
+    //  <tr>
+    //    <td>first</td>
+    //    <td>note 1</td>
+    //    <td><Anchor tag="span" className="tbBtnIcon"><Delete /></Anchor></td>
+    //  </tr>
+    //  <tr>
+    //    <td>second</td>
+    //    <td>note 2</td>
+    //    <td><Anchor tag="span" className="tbBtnIcon"><Delete /></Anchor></td>
+    //  </tr>
+    //  <tr>
+    //    <td>third</td>
+    //    <td>note 3</td>
+    //    <td><Anchor tag="span" className="tbBtnIcon"><Delete /></Anchor></td>
+    //  </tr>
+    //  </tbody>
+    //);
+
     return (
       <Split flex="right">
         <Sidebar primary={true} pad="small" size="large">
@@ -132,57 +177,71 @@ class View extends Component {
             //  <li>Description: {view[0].description}</li>
             //  <li>Group: {view[0].group}</li>
             //</ul>
-          <Form onSubmit={this.props.onSubmit} compact={this.props.compact}>
-            <FormFields>
-              <fieldset>
-                <FormField label="Name" htmlFor={p + "item1"}>
-                  <input id={p + "item1"} name="item-1" type="text" onChange={this._onChange}
-                         value={selectedView[0].name}/>
-                </FormField>
-                <FormField label="Description" htmlFor={p + "item2"}>
-                  <input id={p + "item2"} name="item-2" type="text" onChange={this._onChange}
-                         value={selectedView[0].description}/>
-                </FormField>
-                <FormField label="Group" htmlFor={p + "item3"}>
-                  <input id={p + "item3"} name="item-3" type="text" onChange={this._onChange}
-                         value={selectedView[0].group}/>
-                </FormField>
-                <FormField label="Chart" htmlFor={p + "item7"}>
-                  <select id={p + "item7"} name="item-7">
-                    <option></option>
-                    <option>first</option>
-                    <option>second</option>
-                    <option>third</option>
-                  </select>
-                </FormField>
-                <FormField>
-                  <Box direction="row" justify="end">
-                    <RadioButton id={p + "item4-1"} name="item-4" label="Line"
-                                 onChange={this._onChange}/>
-                    <RadioButton id={p + "item4-2"} name="item-4" label="Bar"
-                                 onChange={this._onChange}/>
-                    <RadioButton id={p + "item4-3"} name="item-4" label="Pie"
-                                 onChange={this._onChange}/>
-                  </Box>
-                </FormField>
-              </fieldset>
-            </FormFields>
-          </Form>
+          <Box direction="row">
+            <Form onSubmit={this.props.onSubmit} compact={this.props.compact}>
+              <FormFields>
+                <fieldset>
+                  <FormField label="Name" htmlFor={p + "item1"}>
+                    <input id={p + "item1"} name="item-1" type="text" onChange={this._onChange}
+                           value={selectedView[0].name}/>
+                  </FormField>
+                  <FormField label="Description" htmlFor={p + "item2"}>
+                    <textarea id={p + "item2"} name="item-2" value={selectedView[0].description}></textarea>
+                  </FormField>
+                  <FormField label="Group" htmlFor={p + "item3"}>
+                    <select id={p + "item3"} name="item-7">
+                      <option>Assets</option>
+                    </select>
+                  </FormField>
+                  <FormField label="Chart">
+                    <Box direction="row" justify="left" className="formfieldRadios">
+                      <RadioButton id={p + "item4-1"} name="item-4" label="Line"
+                                   onChange={this._onChange}/>
+                      <RadioButton id={p + "item4-2"} name="item-4" label="Bar"
+                                   onChange={this._onChange}/>
+                      <RadioButton id={p + "item4-3"} name="item-4" label="Pie"
+                                   onChange={this._onChange}/>
+                    </Box>
+                  </FormField>
+                  <FormField label="Aggregate">
+                    <Box direction="row" justify="left" className="formfieldRadios">
+                      <RadioButton id={p + "item5-1"} name="item-5" label="Count"
+                                   onChange={this._onChange}/>
+                      <RadioButton id={p + "item5-2"} name="item-5" label="Sum"
+                                   onChange={this._onChange}/>
+                      <select id={p + "item7"} name="item-7">
+                        <option>fQty</option>
+                      </select>
+
+                    </Box>
+                  </FormField>
+                </fieldset>
+              </FormFields>
+            </Form>
+            <Box>
+              <Anchor tag="span"><Add /></Anchor>
+              <Anchor tag="span"><Delete /></Anchor>
+              <Anchor tag="span"><Right /></Anchor>
+            </Box>
+          </Box>
           }
           {selectedView && selectedView[0] &&
-          <Section>
-            <Header justify="between">
-              <CheckBox id={p + "item5-1"} label="Show Label" toggle={true} onChange={this._onChange}/>
-              <Menu direction="row" size="small" justify="end">
-                <Button icon={<Add />} plain={true} />
-                <Button icon={<Delete />} plain={true} />
-                <Button icon={<Right />} plain={true} />
-              </Menu>
-            </Header>
-
-            <p>
-            </p>
-          </Section>
+          <Table>
+            {tableHeader}
+            <tbody>
+            {this.renderTemplateTable(selectedView[0])}
+            </tbody>
+          </Table>
+            //<Section>
+            //  <Header justify="between">
+            //    <CheckBox id={p + "item5-1"} label="Show Label" toggle={true} onChange={this._onChange}/>
+            //    <Menu direction="row" size="small" justify="end">
+            //      <Button icon={<Add />} plain={true}/>
+            //      <Button icon={<Delete />} plain={true}/>
+            //      <Button icon={<Right />} plain={true}/>
+            //    </Menu>
+            //  </Header>
+            //</Section>
           }
         </Sidebar>
 
