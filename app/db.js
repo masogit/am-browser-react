@@ -71,7 +71,8 @@ exports.upsert = function (req, res) {
     var obj = req.body;
 
     if (!obj._id)
-      obj._id = new Engine.ObjectID().toString();
+      obj._id = (Math.random() + 1).toString(36).substring(7);
+      // obj._id = new Engine.ObjectID().toString();
 
     db.collection(collectionName).update({_id: obj._id}, obj, {upsert: true}, function(err, result){
       if (err)
