@@ -4,8 +4,8 @@ import Ferret from './components/Ferret';
 import Login from './components/Login';
 import Explorer from './components/explorer/Explorer';
 import Builder from './components/builder/Builder';
-import ViewDefList from './components/builder/ViewDefList';
-import ViewDefDetail from './components/builder/ViewDefDetail';
+import ViewDefListContainer from './components/builder/ViewDefListContainer';
+//import ViewDefDetail from './components/builder/ViewDefDetail';
 import AQL from './components/aql/AQL';
 import TBD from 'grommet/components/TBD';
 import Adapter from './components/adapter/Adapter';
@@ -38,13 +38,16 @@ module.exports = {
         {path: 'builder', component: Builder},
         {path: 'aql', component: AQL},
         {
-          path: 'views', component: ViewDefList,
-          childRoutes: [
-            {
-              path: ':id', component: ViewDefDetail
-            }
-          ]
+          path: 'views(/:id)', component: ViewDefListContainer
         },
+        //{
+        //  path: 'views', component: ViewDefList,
+        //  childRoutes: [
+        //    {
+        //      path: ':id', component: ViewDefDetail
+        //    }
+        //  ]
+        //},
         {path: 'adapter', component: Adapter,
           childRoutes: [
             { path: ':tabName/:selectedLinkName', component: IntegrationJob,

@@ -2,7 +2,7 @@
 import request from 'superagent-bluebird-promise';
 import * as types from '../constants/ActionTypes';
 import {HOST_NAME/*, getFormData*/} from '../util/Config';
-import history from '../RouteHistory';
+//import history from '../RouteHistory';
 
 function requestViews() {
   return {
@@ -128,21 +128,15 @@ export function loadViews(selectedViewId) {
     return request.get(HOST_NAME + '/json/template').then(function (res) {
       dispatch(receiveViewsSuccess(res.body));
       let views = res.body;
-      //console.log("loadViews - views:");
-      //console.log(views);
+      // Load first record of the list in detail.
       if (views.length > 0) {
-        //console.log("loadViews - selectedViewId: " + selectedViewId);
         let selectedView = selectedViewId ? views.filter(view => view.$loki == selectedViewId)[0] : views[0];
-        //console.log("loadViews - selectedView: ");
-        //console.log(selectedView);
-        if (!selectedViewId) {
-          dispatch({
-            type: types.SET_SELECTED_VIEW,
-            selectedViewId: selectedViewId,
-            selectedView: selectedView
-          });
-          history.push("/views/" + selectedView.$loki); // display the first one as default
-        }
+        dispatch({
+          type: types.SET_SELECTED_VIEW,
+          selectedViewId: selectedView.$loki,
+          selectedView: selectedView
+        });
+        //history.push("/views/" + selectedView.$loki); // display the first one as default
       }
     }, function (error) {
       dispatch(receiveViewsFailure(error));
@@ -152,7 +146,7 @@ export function loadViews(selectedViewId) {
 
 export function setSelectedView(selectedViewId, selectedView) {
   return dispatch => {
-    console.log("setSelectedView: " + selectedViewId);
+    //console.log("setSelectedView: " + selectedViewId);
     dispatch({
       type: types.SET_SELECTED_VIEW,
       selectedViewId: selectedViewId,

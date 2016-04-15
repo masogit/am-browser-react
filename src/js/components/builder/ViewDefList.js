@@ -1,9 +1,9 @@
-import React, { Component /*, PropTypes*/ } from 'react';
+import React, { Component/*, PropTypes*/ } from 'react';
 //import PureRenderMixin from 'react-addons-pure-render-mixin';
-import { connect } from 'react-redux';
+//import { connect } from 'react-redux';
 import Sidebar from 'grommet/components/Sidebar';
 import Header from 'grommet/components/Header';
-import Split from 'grommet/components/Split';
+//import Split from 'grommet/components/Split';
 //import Footer from 'grommet/components/Footer';
 //import Title from 'grommet/components/Title';
 //import Menu from 'grommet/components/Menu';
@@ -15,21 +15,17 @@ import Split from 'grommet/components/Split';
 import { Link } from 'react-router';
 import Tabs from 'grommet/components/Tabs';
 import Tab from 'grommet/components/Tab';
-import {loadViews/*, loadTemplateTable, setSelectedView*/} from '../../actions/views';
-//import View from './View';
+//import {loadViews/*, loadTemplateTable, setSelectedView*/} from '../../actions/views';
+//import ViewDefDetail from './ViewDefDetail';
 //import store from '../../store';
 
-class Views extends Component {
+export default class ViewsDefList extends Component {
 
   constructor(props) {
     super(props);
-    //store.subscribe(() => {console.log("store.getState():");console.log(store);});
-    //this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
   }
 
   componentDidMount() {
-    //console.log("Views - componentDidMount()");
-    this.props.dispatch(loadViews(this.props.params.id));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -49,7 +45,6 @@ class Views extends Component {
   render() {
     const { views, isFetchingViewList } = this.props;
     return (
-      <Split flex="right">
         <Sidebar primary={true} pad="small" size="large">
           <Tabs initialIndex={0} justify="start">
             <Tab title="Views">
@@ -73,19 +68,6 @@ class Views extends Component {
             </Tab>
           </Tabs>
         </Sidebar>
-        { this.props.children }
-      </Split>
     );
   }
 }
-
-let mapStateToProps = (state) => {
-  return {
-    views: state.views.views,  // see store-dev.js or store-prod.js
-    selectedView: state.views.selectedView,
-    selectedViewId: state.views.selectedViewId,
-    templateTable: state.views.templateTable
-  };
-};
-
-export default connect(mapStateToProps)(Views);

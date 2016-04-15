@@ -33,7 +33,7 @@ class NavHeader extends Component {
           <Link key="4" to="/views" activeClassName="active link-disabled">
             Views
           </Link>
-          <Link key="5" to="/adapter" activeClassName="active">
+          <Link key="5" to="/adapter" activeClassName="active link-disabled">
             Adapter
           </Link>
           <SessionMenu />

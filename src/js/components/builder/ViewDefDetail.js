@@ -1,5 +1,5 @@
-import React, { Component /*, PropTypes*/ } from 'react';
-import { connect } from 'react-redux';
+import React, { Component/*, PropTypes*/ } from 'react';
+//import { connect } from 'react-redux';
 //import PureRenderMixin from 'react-addons-pure-render-mixin';
 import Sidebar from 'grommet/components/Sidebar';
 import Split from 'grommet/components/Split';
@@ -23,62 +23,46 @@ import Add from 'grommet/components/icons/base/Add';
 import Delete from 'grommet/components/icons/base/Close.js';
 import Right from 'grommet/components/icons/base/Play';
 import _ from 'lodash';
-import store from '../../store';
-import { setSelectedView, loadTemplateTable } from '../../actions/views';
+//import store from '../../store';
+//import { setSelectedView, loadTemplateTable } from '../../actions/views';
 
-class View extends Component {
+export default class ViewDefDetail extends Component {
 
   constructor(props) {
     super(props);
-    this.unsubscribe = null;
-    this.viewsWatcher = () => {
-      let {views} = store.getState();
-      if (views.views.length > 0) {
-        //console.log("viewsWatcher - views loaded.");
-        this.unsubscribe();
-        //console.log("viewsWatcher - this.props.params.id: " + this.props.params.id);
-        let views = store.getState().views.views;
-        if (views && this.props.params.id) {
-          let view = views.filter(view => view.$loki == this.props.params.id);
-          this.props.dispatch(setSelectedView(this.props.params.id, view));
-        }
-      }
-    };
-    this.componentMounted = false;
+    //this.unsubscribe = null;
+    //this.viewsWatcher = () => {
+    //  let {views} = store.getState();
+    //  if (views.views.length > 0) {
+    //    //console.log("viewsWatcher - views loaded.");
+    //    this.unsubscribe();
+    //    //console.log("viewsWatcher - this.props.params.id: " + this.props.params.id);
+    //    let views = store.getState().views.views;
+    //    if (views && this.props.params.id) {
+    //      let view = views.filter(view => view.$loki == this.props.params.id);
+    //      this.props.dispatch(setSelectedView(this.props.params.id, view));
+    //    }
+    //  }
+    //};
+    //this.componentMounted = false;
     //this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
   }
 
   _onChange(event) {
-    // console.log('!!! FullForm changed', event.target, 'to', event.target.value);
+    console.log('!!! FullForm changed', event.target, 'to', event.target.value);
   }
 
   componentWillMount() {
-    //const {dispatch} = this.props
-    //let { userId } = this.props.params || props.params
-    //dispatch(fetchPersonById(userId))
-    //console.info('userId in will mount: ', userId)
   }
 
   componentDidMount() {
-    //console.log("View - componentDidMount() - this.props.params.id:" + this.props.params.id);
-    //console.log("View - componentDidMount() -  views:");
-    //console.log(store.getState().views.views);
-    if (store.getState().views.views.length == 0) {
-      this.unsubscribe = store.subscribe(this.viewsWatcher);
-      //console.log("after unsubscribe - store:");
-      //console.log(store);
-    }
-    // setSelectedView on first click in the views list
-    let views = store.getState().views.views;
-    if (views && !this.props.selectedViewId) {
-      let view = views.filter(view => view.$loki == this.props.params.id);
-      this.props.dispatch(setSelectedView(this.props.params.id, view));
-    }
+    //console.log("ViewDefDetail - componentDidMount()");
   }
 
   componentWillReceiveProps(nextProps) {
-    //console.log("nextState:");
-    //console.log(nextState);
+    //console.log("ViewDefDetail - componentWillReceiveProps()");
+    //console.log("ViewDefDetail - nextProps:");
+    //console.log(nextProps);
     //console.log("this.props.params.id: " + this.props.params.id);
     //console.log("View - componentWillReceiveProps() - this.props.params.id:" + this.props.params.id);
     //console.log("View - componentWillReceiveProps() - nextProps.params.id:" + nextProps.params.id);
@@ -90,36 +74,33 @@ class View extends Component {
     // if this.props.params.id && (this.props.params.id != nextProps.selectedViewId), dispatch to setSelectedView
     // if nextProps.selectedViewId && (nextProps.selectedViewId != this.props.selectedViewId), dispatch to loadTemplateTable
 
-    let views = store.getState().views.views;
-    // setSelectedView - if already clicked a link in the views list
-    if (views && nextProps.selectedViewId && ( nextProps.selectedViewId == this.props.selectedViewId)
-      && nextProps.params.id && (nextProps.params.id != this.props.params.id)) {
-      let view = views.filter(view => view.$loki == nextProps.params.id);
-      this.props.dispatch(setSelectedView(nextProps.params.id, view));
-    }
-    // load template table after setSelectedView
-    if (views && nextProps.selectedViewId && ( nextProps.selectedViewId != this.props.selectedViewId)) { // first click
-      let view = views.filter(view => view.$loki == nextProps.selectedViewId);
-      this.props.dispatch(loadTemplateTable(nextProps.selectedViewId, view));
-    }
+    //let views = store.getState().views.views;
+    //// setSelectedView - if already clicked a link in the views list
+    //if (views && nextProps.selectedViewId && ( nextProps.selectedViewId == this.props.selectedViewId)
+    //  && nextProps.params.id && (nextProps.params.id != this.props.params.id)) {
+    //  let view = views.filter(view => view.$loki == nextProps.params.id);
+    //  this.props.dispatch(setSelectedView(nextProps.params.id, view));
+    //}
+    //// load template table after setSelectedView
+    //if (views && nextProps.selectedViewId && ( nextProps.selectedViewId != this.props.selectedViewId)) { // first click
+    //  let view = views.filter(view => view.$loki == nextProps.selectedViewId);
+    //  this.props.dispatch(loadTemplateTable(nextProps.selectedViewId, view));
+    //}
   }
 
   componentWillUpdate(nextProps, nextState) {
-    console.log("View - componentDidMount() - this.props.params.id:" + this.props.params.id);
   }
 
   componentDidUpdate(prevProps, prevState) {
-    console.log("View - componentDidUpdate() - this.props.params.id:" + this.props.params.id);
   }
 
   componentWillUnmount() {
-    console.log("View - componentWillUnmount()");
   }
 
   renderTemplateTable(table) {
     return table.field.map((field) => {
       return (
-        <tr>
+        <tr key={table.$.sqlname + "_" + field.$.sqlname}>
           <td>{field.$.sqlname}</td>
           <td>{field.$.label}</td>
           <td><Anchor tag="span" className="tbBtnIcon"><Delete /></Anchor></td>
@@ -130,8 +111,6 @@ class View extends Component {
 
   render() {
     const { selectedView } = this.props;
-    //console.log("View - render() - this.props.params.id:" + this.props.params.id);
-    //console.log("View - render() - this.props.selectedViewId: " + this.props.selectedViewId);
     let p = "input";
     let tableHeader = (
       <thead>
@@ -143,26 +122,6 @@ class View extends Component {
       </thead>
     );
 
-    //let tableBody = (
-    //  <tbody>
-    //  <tr>
-    //    <td>first</td>
-    //    <td>note 1</td>
-    //    <td><Anchor tag="span" className="tbBtnIcon"><Delete /></Anchor></td>
-    //  </tr>
-    //  <tr>
-    //    <td>second</td>
-    //    <td>note 2</td>
-    //    <td><Anchor tag="span" className="tbBtnIcon"><Delete /></Anchor></td>
-    //  </tr>
-    //  <tr>
-    //    <td>third</td>
-    //    <td>note 3</td>
-    //    <td><Anchor tag="span" className="tbBtnIcon"><Delete /></Anchor></td>
-    //  </tr>
-    //  </tbody>
-    //);
-
     return (
       <Split flex="right">
         <Sidebar primary={true} pad="small" size="large">
@@ -171,22 +130,18 @@ class View extends Component {
             <p>Loading....
             </p>
           }
-          {selectedView && selectedView[0] &&
-            //<ul style={{listStyle:"none"}}>
-            //  <li>Name: {view[0].name}</li>
-            //  <li>Description: {view[0].description}</li>
-            //  <li>Group: {view[0].group}</li>
-            //</ul>
+          {selectedView &&
           <Box direction="row">
             <Form onSubmit={this.props.onSubmit} compact={this.props.compact}>
               <FormFields>
                 <fieldset>
                   <FormField label="Name" htmlFor={p + "item1"}>
                     <input id={p + "item1"} name="item-1" type="text" onChange={this._onChange}
-                           value={selectedView[0].name}/>
+                           value={selectedView.name}/>
                   </FormField>
                   <FormField label="Description" htmlFor={p + "item2"}>
-                    <textarea id={p + "item2"} name="item-2" value={selectedView[0].description}></textarea>
+                    <textarea id={p + "item2"} name="item-2" value={selectedView.description}
+                              onChange={this._onChange}></textarea>
                   </FormField>
                   <FormField label="Group" htmlFor={p + "item3"}>
                     <select id={p + "item3"} name="item-7">
@@ -194,7 +149,7 @@ class View extends Component {
                     </select>
                   </FormField>
                   <FormField label="Chart">
-                    <Box direction="row" justify="left" className="formfieldRadios">
+                    <Box direction="row" justify="start" className="formfieldRadios">
                       <RadioButton id={p + "item4-1"} name="item-4" label="Line"
                                    onChange={this._onChange}/>
                       <RadioButton id={p + "item4-2"} name="item-4" label="Bar"
@@ -204,12 +159,12 @@ class View extends Component {
                     </Box>
                   </FormField>
                   <FormField label="Aggregate">
-                    <Box direction="row" justify="left" className="formfieldRadios">
+                    <Box direction="row" justify="start" className="formfieldRadios">
                       <RadioButton id={p + "item5-1"} name="item-5" label="Count"
                                    onChange={this._onChange}/>
                       <RadioButton id={p + "item5-2"} name="item-5" label="Sum"
                                    onChange={this._onChange}/>
-                      <select id={p + "item7"} name="item-7">
+                      <select id={p + "item7"} name="item-7" onChange={this._onChange}>
                         <option>fQty</option>
                       </select>
 
@@ -225,23 +180,13 @@ class View extends Component {
             </Box>
           </Box>
           }
-          {selectedView && selectedView[0] &&
+          {selectedView &&
           <Table>
             {tableHeader}
             <tbody>
-            {this.renderTemplateTable(selectedView[0])}
+            {selectedView.field && this.renderTemplateTable(selectedView)}
             </tbody>
           </Table>
-            //<Section>
-            //  <Header justify="between">
-            //    <CheckBox id={p + "item5-1"} label="Show Label" toggle={true} onChange={this._onChange}/>
-            //    <Menu direction="row" size="small" justify="end">
-            //      <Button icon={<Add />} plain={true}/>
-            //      <Button icon={<Delete />} plain={true}/>
-            //      <Button icon={<Right />} plain={true}/>
-            //    </Menu>
-            //  </Header>
-            //</Section>
           }
         </Sidebar>
 
@@ -252,14 +197,3 @@ class View extends Component {
     );
   }
 }
-
-let mapStateToProps = (state, props) => {
-  return {
-    views: state.views.views,  // see store-dev.js or store-prod.js
-    selectedView: state.views.selectedView,
-    selectedViewId: state.views.selectedViewId,
-    templateTable: state.views.templateTable
-  };
-};
-
-export default connect(mapStateToProps)(View);
