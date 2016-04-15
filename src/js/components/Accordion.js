@@ -32,7 +32,7 @@ export default class Accordion extends Component {
     return (
       <div style={{"backgroundColor": "#01a982", "color": "#ffffff"}}>
         <Header large={true} flush={false}>
-          <input className="sidebarsearch" type="text" placeholder="Search views..." onChange={this.onSearch} style={{"backgroundColor": "#ffffff"}}/>
+          <input className="sidebarsearch" type="text" placeholder="Search views..." onChange={this.onSearch} style={{"backgroundColor": "#ffffff", "color": "#000000"}}/>
         </Header>
         <div>
           {viewsState.length > 0 &&
