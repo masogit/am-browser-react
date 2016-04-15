@@ -31,10 +31,10 @@ export default class AccordionItem extends Component {
     return (
       <Section>
         <a onClick={this._onToggle}>
-            {this.props.summary}
+            {this.props.group}
         </a>
         <p style={stateStyle}>
-            {this.props.details}
+            {this.props.children}
         </p>
       </Section>
     );
@@ -42,6 +42,5 @@ export default class AccordionItem extends Component {
 }
 
 AccordionItem.propTypes = {
-  summary: PropTypes.string.isRequired,
-  details: PropTypes.string.isRequired
+  group: PropTypes.string.isRequired
 };
