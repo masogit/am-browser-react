@@ -3,10 +3,12 @@ import Section from 'grommet/components/Section';
 
 const styles = {
   active: {
-    display: 'inherit'
+    display: 'inherit',
+    backgroundColor: '#008667'
   },
   inactive: {
-    display: 'none'
+    display: 'none',
+    backgroundColor: '#008667'
   }
 };
 
@@ -29,7 +31,7 @@ export default class AccordionItem extends Component {
   render() {
     const stateStyle = this.state.active ? styles.active : styles.inactive;
     return (
-      <Section>
+      <Section pad={{"horizontal": "medium", "vertical": "medium", "between": "medium"}}>
         <a onClick={this._onToggle}>
             {this.props.group}
         </a>

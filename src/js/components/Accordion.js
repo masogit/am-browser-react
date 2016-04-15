@@ -30,9 +30,9 @@ export default class Accordion extends Component {
     const { views, isFetching } = this.props;
     var viewsState = (typeof (this.state.filtered) != 'undefined') ? this.state.filtered : views;
     return (
-      <div>
+      <div style={{"backgroundColor": "#01a982", "color": "#ffffff"}}>
         <Header large={true} flush={false}>
-          <input className="sidebarsearch" type="text" placeholder="Search views..." onChange={this.onSearch}/>
+          <input className="sidebarsearch" type="text" placeholder="Search views..." onChange={this.onSearch} style={{"backgroundColor": "#ffffff"}}/>
         </Header>
         <div>
           {viewsState.length > 0 &&
