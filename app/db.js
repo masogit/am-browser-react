@@ -88,24 +88,21 @@ exports.download = function (req, res) {
 exports.find = function (req, res) {
     var db = new Engine.Db(tingodbFolder, {});
     var collectionName = req.params.collection;
-    db.collection(collectionName).find().toArray(function(err, documents) {
-      if (err)
-        console.log(err);
-      res.json(documents);
-      db.close();
-    });
-};
-
-exports.findOne = function (req, res) {
-    var db = new Engine.Db(tingodbFolder, {});
-    var collectionName = req.params.collection;
     var id = req.params.id;
-    db.collection(collectionName).findOne({_id: id}, function(err, documents) {
-      if (err)
-        console.log(err);
-      res.json(documents);
-      db.close();
-    });
+    if (id)
+      db.collection(collectionName).findOne({_id: id}, function(err, documents) {
+        if (err)
+          console.log(err);
+        res.json(documents);
+        db.close();
+      });
+    else
+      db.collection(collectionName).find().toArray(function(err, documents) {
+        if (err)
+          console.log(err);
+        res.json(documents);
+        db.close();
+      });
 };
 
 // tingodb Insert or Update
