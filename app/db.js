@@ -52,15 +52,35 @@ exports.init = function (dbFolder, json) {
     });
 };
 
-// tingodb Download
+/**
+ * tingodb Collection download
+ * /download/:collectionName?id=:id
+ */
 exports.download = function (req, res) {
   var collectionName = req.params.collection;
-  var file = fs.readFileSync(tingodbFolder+'/'+collectionName, 'binary');
-  res.setHeader('Content-disposition', 'attachment; filename='+collectionName);
-  res.setHeader('Content-type', 'text/plain');
-  res.setHeader('Content-Length', file.length);
-  res.write(file, 'binary');
-  res.end();
+  var id = req.params.id;
+  if (id) {
+    var db = new Engine.Db(tingodbFolder, {});
+    db.collection(collectionName).findOne({_id: id}, function(err, documents) {
+      if (err)
+        console.log(err);
+      res.setHeader('Content-disposition', 'attachment; filename='+collectionName+'_'+id+'.json');
+      res.setHeader('Content-type', 'application/json');
+      res.setHeader('Content-Length', Object.keys(documents).length);
+      res.write(JSON.stringify(documents), 'binary');
+      res.end();
+      db.close();
+    });
+  }
+  else {
+    var file = fs.readFileSync(tingodbFolder+'/'+collectionName, 'binary');
+    res.setHeader('Content-disposition', 'attachment; filename='+collectionName);
+    res.setHeader('Content-type', 'application/json');
+    res.setHeader('Content-Length', file.length);
+    res.write(file, 'binary');
+    res.end();
+  }
+
 };
 
 
