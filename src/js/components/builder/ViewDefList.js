@@ -33,7 +33,7 @@ export default class ViewsDefList extends Component {
   render() {
     const { views, isFetchingViewList } = this.props;
     return (
-        <Accordion views={views} isFetching={isFetchingViewList}/>
+        <Accordion views={views} isFetching={isFetchingViewList} type="views"/>
     );
   }
 }

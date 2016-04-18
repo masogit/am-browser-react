@@ -21,17 +21,20 @@ class NavHeader extends Component {
       <Header size="small" justify="between" colorIndex="neutral-1" pad={{vertical: 'small'}}>
         <Title><Logo /> AM Browser</Title>
         <Menu direction="row" align="center" responsive={false}>
+          <Link key="0" to="/home" activeClassName="active link-disabled">
+            Home
+          </Link>
           <Link key="1" to="/explorer" activeClassName="active link-disabled">
             Explorer
           </Link>
-          <Link key="2" to="/builder" activeClassName="active link-disabled">
-            Builder
-          </Link>
-          <Link key="3" to="/aql" activeClassName="active link-disabled">
-            AQL
-          </Link>
-          <Link key="4" to="/views" activeClassName="active link-disabled">
+          <Link key="2" to="/views" activeClassName="active link-disabled">
             Views
+          </Link>
+          <Link key="3" to="/builder" activeClassName="active link-disabled">
+            MetaData Tree
+          </Link>
+          <Link key="4" to="/aql" activeClassName="active link-disabled">
+            AQL
           </Link>
           <Link key="5" to="/adapter" activeClassName="active link-disabled">
             Adapter

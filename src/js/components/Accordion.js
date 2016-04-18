@@ -20,9 +20,10 @@ export default class Accordion extends Component {
   }
 
   renderItems(views) {
+    const {type} = this.props;
     return views.map((view, key) => {
       return (
-        <AccordionItem group={view.group} key={key}><Link to={`/views/${view.$loki}`}>{view.name}</Link></AccordionItem>
+        <AccordionItem group={view.group} key={key}><Link to={`/${type}/${view.$loki}`}>{view.name}</Link></AccordionItem>
       );
     });
   }
@@ -56,5 +57,6 @@ export default class Accordion extends Component {
 }
 
 Accordion.propTypes = {
-  views: PropTypes.array.isRequired
+  views: PropTypes.array.isRequired,
+  type: PropTypes.string.isRequired
 };

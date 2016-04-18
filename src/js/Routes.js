@@ -2,6 +2,7 @@
 
 import Ferret from './components/Ferret';
 import Login from './components/Login';
+import Home from './components/Home';
 import Explorer from './components/explorer/Explorer';
 import Builder from './components/builder/Builder';
 import ViewDefListContainer from './components/builder/ViewDefListContainer';
@@ -34,11 +35,15 @@ module.exports = {
       //},
       childRoutes: [
         {path: 'login', component: Login},
+        {path: 'home', component: Home},
         {path: 'explorer', component: Explorer},
         {path: 'builder', component: Builder},
         {path: 'aql', component: AQL},
         {
           path: 'views(/:id)', component: ViewDefListContainer
+        },
+        {
+          path: 'explorer(/:id)', component: Explorer
         },
         //{
         //  path: 'views', component: ViewDefList,
