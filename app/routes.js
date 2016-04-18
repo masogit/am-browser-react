@@ -27,7 +27,8 @@ module.exports = function (app, am, redis) {
     });
 
     // CRUD Tingodb
-    app.get('/coll/:collection', db.read);
+    app.get('/coll/:collection', db.find);
+    app.get('/coll/:collection/:id', db.findOne);
     app.post('/coll/:collection', db.upsert);
     app.delete('/coll/:collection/:id', db.delete);
     // CRUD local loki file json db
