@@ -52,7 +52,7 @@ exports.init = function (dbFolder, json) {
     });
 };
 
-// tingodb Create
+// tingodb Read all or one
 exports.find = function (req, res) {
     var db = new Engine.Db(tingodbFolder, {});
     var collectionName = req.params.collection;
