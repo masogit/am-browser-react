@@ -32,6 +32,58 @@ module.exports = function (app, am, redis) {
     app.get('/coll/:collection/:id', db.find);
     app.post('/coll/:collection', db.upsert);
     app.delete('/coll/:collection/:id', db.delete);
+
+    // app.get('/view/:collection/:id/count', function(req, res){
+
+    // });
+
+    app.get('/coll/:collection/:id/list', function(req, res){
+      if (am) {
+        req.body.method = "get";
+        req.body.server = am.server;
+        req.body.user = am.user;
+        req.body.password = am.password;
+
+        var collectionName = req.params.collection;
+        var id = req.params.id;
+
+        db.findOne(collectionName, id, function(view){
+          if (view.body) {
+            var fields = [];
+            view.body.fields.forEach(function(field){
+              fields.push(field.sqlname);
+            });
+            req.body.context = "/AssetManagerWebService/rs/";
+            req.body['ref-link'] = 'db/'+view.body.sqlname;
+            req.body.collection = "";
+            req.body.param = {
+              limit: (req.query.limit) ? req.query.limit:"100",
+              offset: (req.query.offset) ? req.query.offset:"0",
+              filter: view.body.filter,
+              orderby: view.body.orderby,
+              fields: fields.join()
+            }
+          }
+
+          if (req.query.form) // show REST obj
+            res.json(req.body);
+          else
+            rest.db(req, res);
+        });
+      }
+    });
+
+    // app.get('/view/:collection/:id/csv', function(req, res){
+
+    // });
+
+    // app.get('/view/:collection/:id/list/:ref', function(req, res){
+
+    // });
+
+    // app.get('/view/:collection/:id/list/:ref/link', function(req, res){
+
+    // });
     // CRUD local loki file json db
     app.get('/json/:collection', db.get);
     app.post('/json/:collection', db.set);

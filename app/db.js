@@ -105,6 +105,19 @@ exports.find = function (req, res) {
       });
 };
 
+exports.findOne = function (collectionName, id, callback) {
+    var db = new Engine.Db(tingodbFolder, {});
+
+    db.collection(collectionName).findOne({_id: id}, function(err, documents) {
+      if (err)
+        console.log(err);
+      if (typeof callback == 'function')
+        callback(documents);
+      db.close();
+    });
+
+};
+
 // tingodb Insert or Update
 exports.upsert = function (req, res) {
     var db = new Engine.Db(tingodbFolder, {});
