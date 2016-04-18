@@ -27,6 +27,7 @@ module.exports = function (app, am, redis) {
     });
 
     // CRUD Tingodb
+    app.get('/download/:collection', db.download);
     app.get('/coll/:collection', db.find);
     app.get('/coll/:collection/:id', db.findOne);
     app.post('/coll/:collection', db.upsert);

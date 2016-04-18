@@ -2,12 +2,12 @@ var Engine = require('tingodb')();
 var loki = require('lokijs');
 var db;
 var tingodbFolder;
+const fs = require('fs');
 
 // check db folder and files
 exports.init = function (dbFolder, json) {
     tingodbFolder = dbFolder;
     db = new loki(dbFolder + json);
-    const fs = require('fs');
     fs.exists(dbFolder, function (db) {
         if (!db) {
             console.log("not found db folder");
@@ -51,6 +51,18 @@ exports.init = function (dbFolder, json) {
         }
     });
 };
+
+// tingodb Download
+exports.download = function (req, res) {
+  var collectionName = req.params.collection;
+  var file = fs.readFileSync(tingodbFolder+'/'+collectionName, 'binary');
+  res.setHeader('Content-disposition', 'attachment; filename='+collectionName);
+  res.setHeader('Content-type', 'text/plain');
+  res.setHeader('Content-Length', file.length);
+  res.write(file, 'binary');
+  res.end();
+};
+
 
 // tingodb Read all or one
 exports.find = function (req, res) {
