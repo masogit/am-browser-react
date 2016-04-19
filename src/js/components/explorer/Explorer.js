@@ -4,7 +4,8 @@ import { bindActionCreators } from 'redux';
 import * as ExplorerActions from '../../actions';
 import Split from 'grommet/components/Split';
 import Accordion from '../Accordion';
-import RecordListDetail from './RecordListDetail';
+import RecordList from './RecordList';
+import RecordDetail from './RecordDetail';
 
 export default class Explorer extends Component {
 
@@ -36,18 +37,20 @@ export default class Explorer extends Component {
   }
 
   _onListClick(template, record) {
-    //this.props.dispatch(ExplorerActions.loadDetailRecord(template, record));
+    this.props.actions.loadDetailRecord(template, record);
   }
 
   render() {
     var templates = this.props.templates;
     var records = this.props.records;
+    var record = this.props.record;
     let { dispatch } = this.props;
     let boundActionCreators = bindActionCreators(ExplorerActions, dispatch);
     return (
       <Split flex="right">
         <Accordion views={templates} isFetching={false} type="explorer"/>
-        <RecordListDetail records={records} {...boundActionCreators}/>
+        <RecordList records={records} {...boundActionCreators}/>
+        <RecordDetail record={record} {...boundActionCreators}/>
       </Split>
     );
   }
