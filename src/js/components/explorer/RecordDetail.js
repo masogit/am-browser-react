@@ -1,7 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import Anchor from 'grommet/components/Anchor';
-import Table from 'grommet/components/Table';
-import TableRow from 'grommet/components/TableRow';
 
 export default class RecordDetail extends Component {
 
