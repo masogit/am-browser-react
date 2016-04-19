@@ -127,4 +127,11 @@ gulp.task('release:heroku', ['dist', 'release:createTmp'], function(done) {
   }
 });
 
+gulp.task('copy-demo', function () {
+  console.log('Copy files in ./demo/ folder into the corespondent folders.');
+  gulp.src('./demo/**').pipe(gulp.dest('./'));
+});
+
+gulp.task('amdev',['copy-demo','dev']);
+
 gulpTasks(gulp, opts);

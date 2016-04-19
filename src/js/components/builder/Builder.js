@@ -85,12 +85,6 @@ export default class Builder extends Component {
       <div className="example">
         <Sidebar primary={true} pad="small" size="large">
           <Tabs initialIndex={0} justify="start">
-            <Tab title="Views">
-              <Header large={true} flush={false}>
-                <input className="sidebarsearch" type="text" placeholder="Search views..."/>
-              </Header>
-              <h3>Views</h3>
-            </Tab>
             <Tab title="Tables">
                 <Menu label="Tables">
                   {items}
