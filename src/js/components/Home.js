@@ -1,29 +1,36 @@
-import React, { Component } from 'react';
-import Search from 'grommet/components/Search';
+import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
+import { loadTemplates } from '../actions';
+import Widget from './Widget';
 
 export default class Home extends Component {
 
   constructor() {
     super();
-    this._onSearch = this._onSearch.bind(this);
   }
 
   componentDidMount() {
-    //this.props.dispatch(loadTemplates());
-  }
-
-  _onSearch(value) {
-    console.log(value);
+    this.props.dispatch(loadTemplates());
   }
 
   render() {
+    const {templates} = this.props;
     return (
       <div>
-        <div className="searchviews">
-          <Search inline={true} placeholder="Search views" size="medium"
-            fill={true} responsive={false} onDOMChange={this._onSearch}/>
-        </div>
+        <Widget templates={templates}/>
       </div>
     );
   }
 }
+
+Home.propTypes = {
+  templates: PropTypes.array.isRequired
+};
+
+let select = (state, props) => {
+  return {
+    templates: state.explorer.templates
+  };
+};
+
+export default connect(select)(Home);
