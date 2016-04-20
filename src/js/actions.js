@@ -197,7 +197,7 @@ export function metadataLoad() {
         for (var t in  res.body.Tables.Table) {
           data.push(res.body.Tables.Table[t].$);
         }
-        dispatch(metadataSuccess(data));
+        dispatch(metadataSuccess(data, []));
       });
   };
 }
@@ -279,10 +279,11 @@ export function loadDetailRecord(template, record) {
   };
 };
 
-export function metadataSuccess(result) {
+export function metadataSuccess(result, elements) {
   return {
     type: METADATA_SUCCESS,
-    rows: result
+    rows: result,
+    elements: elements
   };
 }
 

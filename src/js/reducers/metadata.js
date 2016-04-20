@@ -10,7 +10,8 @@ const initialState = {
 const handlers = {
   [METADATA_SUCCESS]: (state, action) => {
     return {
-      rows: action.rows
+      rows: action.rows,
+      elements: action.elements
     };
   },
   [METADATA_DETAIL_SUCCESS]: (state, action) => {
