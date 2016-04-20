@@ -96,7 +96,7 @@ module.exports = function (app, am, redis) {
                             var reverseField = link.reversefield;
                             var reverse = link.reverse;
                             var AQL = reverse+'.PK='+ data[reverseField];
-                            link.body.filter += ' AND ' + AQL;
+                            link.body.filter += (link.body.filter)?' AND ':'' + AQL;
 
                             list (req, link.body, function (link_data) {
                               callback(link_data);
