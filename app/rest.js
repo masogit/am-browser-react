@@ -76,7 +76,7 @@ this.query = function (req, callback) {
         client.get(url, args, function (data, response) {
           callback(data);
         }).on('error', function (err) {
-          res.status(500).send(err.toString());
+          callback(err.toString());
         });
 
     };
