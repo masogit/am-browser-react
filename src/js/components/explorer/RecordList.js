@@ -24,10 +24,19 @@ export default class RecordList extends Component {
       return <TableRow key={index}><td><Anchor key={index} onClick={this._onClick.bind(this, template, record)}>{record.self}</Anchor></td></TableRow>;
     });
 
+    var header = template.body.fields.map((field, index) => {
+      return !field.PK && <th>{ field.alias?field.alias:(field.label?field.label:field.sqlname)}</th>;
+    });
+
     return (
       <div>
         List:
         <Table>
+          <thead>
+            <tr>
+              {header}
+            </tr>
+          </thead>
           <tbody>
           {recordComponents}
           </tbody>
