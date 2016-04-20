@@ -26,6 +26,14 @@ To run this application, execute the following commands:
     $ node app/server.js
       or 'node app/server.js' if you use git bash.
     ```
+  5. (Optional) Setup DEMO env
+  ```
+  $ gulp copy-demo
+  ```
+  or run dev env with demo data
+  ```
+  $ gulp amdev
+  ```
 
 For unit testing and code coverage, run the following commands:
 
@@ -45,3 +53,23 @@ For unit testing and code coverage, run the following commands:
     2. Install latest npm (currently 3.8.3) by running:
       npm install -g npm
   
+For generating the SSL certificate for dev
+  1. Set the SSL CONF in the git bash 
+  ```
+  $ export OPENSSL_CONF=/ssl/openssl.cnf
+  ```
+
+  2. Server key
+  ```
+  $ openssl genrsa -out server-key.pem 1024
+  ```
+  
+  3. CSR for the server key
+  ```
+  $ openssl req -new -key server-key.pem -out server-csr.pem
+  ```
+  
+  4. Self signed certificate
+  ```
+  $ openssl x509 -req -in server-csr.pem -signkey server-key.pem -out server-cert.pem
+  ```

@@ -1,11 +1,12 @@
 // set up ======================================================================
 var express = require('express');
 var app = express(); 								// create our app w/ express
-
+var fs = require('fs'), https = require('https'), http = require('http');
 var cors = require('cors');
 app.use(cors());
 
 var port = process.env.PORT || 8080; 				// set the port
+var https_port = process.env.HTTPS_PORT || 8443;     // set the https port
 var morgan = require('morgan');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
@@ -67,7 +68,27 @@ require('./routes.js')(app, am, redis);
 
 // listen (start app with node server.js) ======================================
 app.listen(port);
-console.log("App listening on port " + port);
+console.log("App listening HTTP on port " + port );
+
+// TODO: 1. Enable this in production. 2. There are some hardcoded HTTP requests in front-end JS, which causes mixed content issues
+const KEY = 'ssl/server-key.pem';
+const CERT = 'ssl/server-cert.pem';
+try {
+    fs.statSync(KEY);
+    fs.statSync(CERT);
+    var server_options = {
+        key  : fs.readFileSync( KEY ),
+        cert : fs.readFileSync( CERT ),
+        ca   : fs.readFileSync( CERT ) //Optional for dev machine, but for production it's necessary!!!
+    };
+    https.createServer(server_options, app).listen(https_port);
+    console.log("App listening HTTPS on port " + https_port);
+}
+catch (e){
+    console.warn("HTTPS is not set correctly");
+}
+
+
 
 // sub process to cache view data in Redis
 if (am) {
