@@ -10,13 +10,17 @@ export default class BreadCrumb extends Component {
   componentDidMount() {
   }
 
+  _onClick() {
+    this.props.metadataLoad();
+  }
+
   render() {
     var elements = this.props.elements;
     var breadcrumbs = elements.map((element, index) => {
       if (index == 0) {
-        return <div key={index}>{element.label}</div>;
+        return <div key={index}><Anchor onClick={this._onClick.bind(this)}>{element}</Anchor></div>;
       } else {
-        return <div key={index}><b>  --  </b><Anchor>{element.label}</Anchor></div>;
+        return <div key={index}><b>  --  </b><Anchor>{element}</Anchor></div>;
       }
     });
 

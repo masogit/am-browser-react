@@ -22,7 +22,6 @@ export default class MetaData extends Component {
   }
 
   _onClick(id) {
-    console.log(id);
     this.props.metadataLoadDetail(id);
   }
 

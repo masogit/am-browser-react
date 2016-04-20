@@ -3,7 +3,8 @@
 import { METADATA_SUCCESS, METADATA_DETAIL_SUCCESS } from '../actions';
 
 const initialState = {
-  rows: []
+  rows: [],
+  elements: []
 };
 
 const handlers = {
@@ -14,7 +15,8 @@ const handlers = {
   },
   [METADATA_DETAIL_SUCCESS]: (state, action) => {
     return {
-      rows: action.rows
+      rows: action.rows,
+      elements: action.elements
     };
   }
 };

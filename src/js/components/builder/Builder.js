@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as BuilderActions from '../../actions';
 import MetaData from './MetaData';
+import BreadCrumb from './BreadCrumb';
 import Sidebar from 'grommet/components/Sidebar';
 
 export default class Builder extends Component {
@@ -25,12 +26,14 @@ export default class Builder extends Component {
 
   render() {
     let item = this.props.rows;
+    let elements = this.props.elements;
     let { dispatch } = this.props;
     let boundActionCreators = bindActionCreators(BuilderActions, dispatch);
     console.log(boundActionCreators);
     return (
       <div className="example">
         <Sidebar primary={true} pad="small" size="large">
+          <BreadCrumb elements={elements} {...boundActionCreators}/>
           <MetaData rows={item} {...boundActionCreators}/>
         </Sidebar>
       </div>
@@ -39,12 +42,14 @@ export default class Builder extends Component {
 }
 
 Builder.propTypes = {
-  rows: PropTypes.array.isRequired
+  rows: PropTypes.array.isRequired,
+  elements: PropTypes.array.isRequired
 };
 
 let select = (state, props) => {
   return {
-    rows: state.metadata.rows
+    rows: state.metadata.rows,
+    elements: state.metadata.elements
   };
 };
 

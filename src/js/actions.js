@@ -222,6 +222,8 @@ export function metadataLoadDetail(schema) {
     Rest.post(HOST_NAME + '/am/metadata', formData)
       .end(function (err, res) {
         let data = [];
+        let breadcrumbs = [];
+        breadcrumbs.push(schema);
         for (var t in  res.body.table.link) {
           var link = res.body.table.link[t].$;
           data.push(link);
@@ -229,7 +231,7 @@ export function metadataLoadDetail(schema) {
         for (var t in  res.body.table.field) {
           data.push(res.body.table.field[t].$);
         }
-        dispatch(metadataDetailSuccess(data));
+        dispatch(metadataDetailSuccess(data, breadcrumbs));
       });
   };
 }
@@ -284,10 +286,11 @@ export function metadataSuccess(result) {
   };
 }
 
-export function metadataDetailSuccess(result) {
+export function metadataDetailSuccess(result, elements) {
   return {
     type: METADATA_DETAIL_SUCCESS,
-    rows: result
+    rows: result,
+    elements: elements
   };
 }
 
