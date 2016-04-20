@@ -1,11 +1,11 @@
-To run this application, execute the following commands:
+# To run this application, execute the following commands: 
 
-  1. Install NPM modules
+===  1. Install NPM modules
     ```
     $ cd am-browser
     $ npm install
     ```
-  2. Start the server
+===  2. Start the server
 
     ```
     $ cd am-browser
@@ -13,7 +13,7 @@ To run this application, execute the following commands:
       or 'node app/server.js' if you use git bash.
     ```
 
-  3. Start the UI development server
+===  3. Start the UI development server
     ```
     $ cd am-browser
     $ gulp dev
@@ -54,22 +54,19 @@ For unit testing and code coverage, run the following commands:
       npm install -g npm
   
 For generating the SSL certificate for dev
-  1. Set the SSL CONF in the git bash 
+ 1. Set the SSL CONF in the git bash 
   ```
   $ export OPENSSL_CONF=/ssl/openssl.cnf
   ```
-
-  2. Server key
+ 2. Server key
   ```
   $ openssl genrsa -out server-key.pem 1024
   ```
-  
-  3. CSR for the server key
+ 3. CSR for the server key
   ```
   $ openssl req -new -key server-key.pem -out server-csr.pem
   ```
-  
-  4. Self signed certificate
+ 1. Self signed certificate
   ```
   $ openssl x509 -req -in server-csr.pem -signkey server-key.pem -out server-cert.pem
   ```
