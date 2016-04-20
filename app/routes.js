@@ -76,39 +76,57 @@ module.exports = function (app, am, redis) {
                   fields: fields.join()
                 }
 
-                var ref = req.params.ref;
+                var id = req.params.ref;
                 var linkName = req.params.link;
-                if (ref)
-                    req.body['ref-link'] = 'db/'+body.sqlname+'/'+ref;
+
+                if (id)
+                    req.body['ref-link'] = 'db/'+body.sqlname+'/'+id;
                 else
                     req.body['ref-link'] = 'db/'+body.sqlname;
 
                 rest.query(req, function (data) {
-                  if (ref) {
+                  if (req.params.ref) {
                       if (body.links && body.links.length > 0) {
                         if (linkName) {
                             var link = body.links.filter(function (link) {
                               return link.sqlname == linkName;
                             })[0];
 
-                            req.params.ref = undefined;
+                            if (link) {
+                              if (req.params.linkid) {
+                                req.params.ref = req.params.linkid;
+                                req.params.linkid = undefined;
+                              } else
+                                req.params.ref = undefined;
 
-                            var reverseField = link.reversefield;
-                            var reverse = link.reverse;
-                            var AQL = reverse+'.PK='+ data[reverseField];
-                            link.body.filter += (link.body.filter)?' AND ':'' + AQL;
+                              req.params.link = (req.params.link2) ? req.params.link2 : req.params.link;
 
-                            list (req, link.body, function (link_data) {
-                              callback(link_data);
-                            });
+                              var reverseField = link.reversefield;
+                              var reverse = link.reverse;
+                              var AQL = reverse+'.PK='+ data[reverseField];
+                              link.body.filter += (link.body.filter)?' AND ':'' + AQL;
+
+                              list (req, link.body, function (link_data) {
+                                callback(link_data);
+                              });
+                            } else {
+                                data.links = [];
+                                body.links.forEach(function (link) {
+                                  var body = link.body;
+                                  delete link.body;
+                                  data.links.push(link);
+                                });
+
+                              callback(data);
+                            }
 
                         } else {
                             data.links = [];
                             body.links.forEach(function (link) {
-                            var body = link.body;
-                            delete link.body;
-                            data.links.push(link);
-                          });
+                              var body = link.body;
+                              delete link.body;
+                              data.links.push(link);
+                            });
 
                           callback(data);
                         }
@@ -117,6 +135,15 @@ module.exports = function (app, am, redis) {
                         callback(data);
 
                   } else {
+                    if (req.params.linkid) {
+                      data.links = [];
+                      body.links.forEach(function (link) {
+                        var body = link.body;
+                        delete link.body;
+                        data.links.push(link);
+                      });
+                    }
+
                     callback(data);
                   }
 
@@ -134,6 +161,14 @@ module.exports = function (app, am, redis) {
     });
 
     app.get('/coll/:collection/:id/list/:ref/:link', function(req, res){
+      view(req, res, db);
+    });
+
+    app.get('/coll/:collection/:id/list/:ref/:link/:linkid', function(req, res){
+      view(req, res, db);
+    });
+
+    app.get('/coll/:collection/:id/list/:ref/:link/:linkid/:link2', function(req, res){
       view(req, res, db);
     });
 
