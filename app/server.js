@@ -10,7 +10,7 @@ var https_port = process.env.HTTPS_PORT || 8443;     // set the https port
 var morgan = require('morgan');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
-var am_href = process.env.AM_WEB_TIER || "http://Admin@localhost:8081";    // http://user:pass@hostname:8081
+var am_href = process.env.AM_WEB_TIER || "http://admin:@localhost:8081";    // http://user:pass@hostname:8081
 var dbFile = { folder: './db', json: '/template.json' };
 var redis = {
     host: process.env.REDIS_HOST || "127.0.0.1",

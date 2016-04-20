@@ -25,7 +25,7 @@ export default class Explorer extends Component {
       if (!currentId && !nextId) { // Click navigation link, no id param.
         this.props.dispatch(ExplorerActions.loadRecords(templates[0]));
       } else if (nextId && nextId != currentId) { // Click item in the list, with link like '/views/2', '2' is the id param.
-        let selectedView = templates.filter(template => template.$loki == nextId)[0];
+        let selectedView = templates.filter(template => template._id == nextId)[0];
         this.props.dispatch(ExplorerActions.loadRecords(selectedView));
       }
     }

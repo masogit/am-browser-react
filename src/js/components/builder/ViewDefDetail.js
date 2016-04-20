@@ -1,19 +1,19 @@
 import React, { Component/*, PropTypes*/ } from 'react';
 //import { connect } from 'react-redux';
 //import PureRenderMixin from 'react-addons-pure-render-mixin';
-import Sidebar from 'grommet/components/Sidebar';
+//import Sidebar from 'grommet/components/Sidebar';
 import Split from 'grommet/components/Split';
 import Box from 'grommet/components/Box';
 import Form from 'grommet/components/Form';
 import FormFields from 'grommet/components/FormFields';
 import FormField from 'grommet/components/FormField';
-//import Header from 'grommet/components/Header';
+import Header from 'grommet/components/Header';
 //import CheckBox from 'grommet/components/CheckBox';
 import RadioButton from 'grommet/components/RadioButton';
 //import SearchInput from 'grommet/components/SearchInput';
 //import Calendar from 'grommet/components/Calendar';
 //import NumberInput from 'grommet/components/NumberInput';
-//import Section from 'grommet/components/Section';
+import Section from 'grommet/components/Section';
 //import Menu from 'grommet/components/Menu';
 import Table from 'grommet/components/Table';
 //import TableRow from 'grommet/components/TableRow';
@@ -25,6 +25,7 @@ import Right from 'grommet/components/icons/base/Play';
 import _ from 'lodash';
 //import store from '../../store';
 //import { setSelectedView, loadTemplateTable } from '../../actions/views';
+//import GrommetTableTest from '../GrommetTable';
 
 export default class ViewDefDetail extends Component {
 
@@ -46,6 +47,8 @@ export default class ViewDefDetail extends Component {
     //};
     //this.componentMounted = false;
     //this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
+    this.renderTemplateTable = this.renderTemplateTable.bind(this);
+    this.renderLinks = this.renderLinks.bind(this);
   }
 
   _onChange(event) {
@@ -97,16 +100,51 @@ export default class ViewDefDetail extends Component {
   componentWillUnmount() {
   }
 
-  renderTemplateTable(table) {
-    return table.field.map((field) => {
+  renderLinks(links, table) {
+    let selfTable = table;
+    links = selfTable.body.links.map((link) => {
       return (
-        <tr key={table.$.sqlname + "_" + field.$.sqlname}>
-          <td>{field.$.sqlname}</td>
-          <td>{field.$.label}</td>
+        <tr key={"link_" + link.sqlname}>
+          <td colSpan={4}>
+            <Header size="small">
+              <h3>{link.sqlname}</h3>
+            </Header>
+            <Table>
+              <thead>
+              <tr>
+                <th>Field</th>
+                <th>Alias</th>
+                <th></th>
+              </tr>
+              </thead>
+              <tbody>
+              {link.body && link.body.fields && this.renderTemplateTable(link, false)}
+              </tbody>
+            </Table>
+          </td>
+        </tr>
+      );
+    });
+    return links;
+  }
+
+  renderTemplateTable(table, root) {
+    let selfTable = table;
+    let fields = selfTable.body.fields.map((field) => {
+      return (
+        <tr key={selfTable.body.sqlname + "_" + field.sqlname}>
+          <td>{field.sqlname}</td>
+          <td>{field.label}</td>
+          {root && <td>{"search"}</td>}
           <td><Anchor tag="span" className="tbBtnIcon"><Delete /></Anchor></td>
         </tr>
       );
     });
+    let links = [];
+    if (selfTable.body.links && selfTable.body.links.length > 0) {
+      links = this.renderLinks(links, selfTable);
+    }
+    return fields.concat(links);
   }
 
   render() {
@@ -117,6 +155,7 @@ export default class ViewDefDetail extends Component {
       <tr>
         <th>Field</th>
         <th>Alias</th>
+        <th>Search</th>
         <th></th>
       </tr>
       </thead>
@@ -124,7 +163,7 @@ export default class ViewDefDetail extends Component {
 
     return (
       <Split flex="right">
-        <Sidebar primary={true} pad="small" size="large">
+        <Box>
           {
             _.isEmpty(selectedView) &&
             <p>Loading....
@@ -140,10 +179,10 @@ export default class ViewDefDetail extends Component {
                            value={selectedView.name}/>
                   </FormField>
                   <FormField label="Description" htmlFor={p + "item2"}>
-                    <textarea id={p + "item2"} name="item-2" value={selectedView.description}
+                    <textarea id={p + "item2"} name="item-2" value={selectedView.desc}
                               onChange={this._onChange}></textarea>
                   </FormField>
-                  <FormField label="Group" htmlFor={p + "item3"}>
+                  <FormField label="Category" htmlFor={p + "item3"}>
                     <select id={p + "item3"} name="item-7">
                       <option>Assets</option>
                     </select>
@@ -180,19 +219,18 @@ export default class ViewDefDetail extends Component {
             </Box>
           </Box>
           }
-          {selectedView &&
+        </Box>
+
+        {selectedView &&
+        <Section>
           <Table>
             {tableHeader}
             <tbody>
-            {selectedView.field && this.renderTemplateTable(selectedView)}
+            {selectedView.body && selectedView.body.fields && this.renderTemplateTable(selectedView, true)}
             </tbody>
           </Table>
-          }
-        </Sidebar>
-
-        <div>
-
-        </div>
+        </Section>
+        }
       </Split>
     );
   }

@@ -35,7 +35,7 @@ export default class Widget extends Component {
             <strong>Description:{template.description}</strong>
           </Header>
           <Box pad="small">
-            <p><Link to={`/explorer/${template.$loki}`}>{template.name}</Link></p>
+            <p><Link to={`/explorer/${template._id}`}>{template.name}</Link></p>
           </Box>
           <Footer justify="between">
             <span>Group:{template.group}</span>

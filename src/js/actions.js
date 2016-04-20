@@ -236,7 +236,7 @@ export function metadataLoadDetail(schema) {
 
 export function loadTemplates() {
   return function (dispatch) {
-    Rest.get(HOST_NAME + '/json/template').end(function (err, res) {
+    Rest.get(HOST_NAME + '/coll/view').end(function (err, res) {
       var templates = res.body;
       dispatch(templatesLoadSuccess(templates));
     });
@@ -258,9 +258,9 @@ export function loadRecords(template) {
       if (form.offset) formData.param.offset = form.offset;
       if (form.viewStyle) formData.viewStyle = form.viewStyle;
     }
-    formData["ref-link"] = "db/" + template.$.sqlname;
-    formData.param.fields = template.fields;
-    Rest.post(HOST_NAME + '/am/rest', formData).end(function (err, res) {
+    formData["ref-link"] = "db/" + template.body.sqlname;
+    formData.param.fields = template.body.fields;
+    Rest.get(HOST_NAME + '/coll/view/' + template._id + '/list').end(function (err, res) {
       var records = res.body.entities;
       dispatch(recordsLoadSuccess(records));
     });
@@ -269,11 +269,11 @@ export function loadRecords(template) {
 
 export function loadDetailRecord(template, record) {
   return function (dispatch) {
-    for (var i in template.field) {
-      var sqlname = template.field[i].$.sqlname;
-      template.field[i].value = record[sqlname];
+    for (var i in template.body.fields) {
+      var sqlname = template.body.fields[i].sqlname;
+      template.body.fields[i].value = record[sqlname];
     }
-    dispatch(detailRecordLoadSuccess(template.field));
+    dispatch(detailRecordLoadSuccess(template.body.fields));
   };
 };
 

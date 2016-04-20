@@ -125,15 +125,15 @@ function receiveViewsFailure(err) {
 export function loadViews(selectedViewId) {
   return dispatch => {
     dispatch(requestViews());
-    return request.get(HOST_NAME + '/json/template').then(function (res) {
+    return request.get(HOST_NAME + '/coll/view').then(function (res) {
       dispatch(receiveViewsSuccess(res.body));
       let views = res.body;
       // Load first record of the list in detail.
       if (views.length > 0) {
-        let selectedView = selectedViewId ? views.filter(view => view.$loki == selectedViewId)[0] : views[0];
+        let selectedView = selectedViewId ? views.filter(view => view._id == selectedViewId)[0] : views[0];
         dispatch({
           type: types.SET_SELECTED_VIEW,
-          selectedViewId: selectedView.$loki,
+          selectedViewId: selectedView._id,
           selectedView: selectedView
         });
         //history.push("/views/" + selectedView.$loki); // display the first one as default

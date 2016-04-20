@@ -20,7 +20,7 @@ import Split from 'grommet/components/Split';
 import ViewDefDetail from './ViewDefDetail';
 import ViewDefList from './ViewDefList';
 import * as ViewDefActions from '../../actions/views';
-//import store from '../../store';
+import store from '../../store';
 
 class ViewDefListContainer extends Component {
 
@@ -42,9 +42,9 @@ class ViewDefListContainer extends Component {
     let { views } = nextProps;
     if (views && views.length > 0) {
       if (!currentId && !nextId) { // Click navigation link, no id param.
-        this.props.actions.setSelectedView(views[0].$loki, views[0]);
+        this.props.actions.setSelectedView(views[0]._id, views[0]);
       } else if (nextId && nextId != currentId) { // Click item in the list, with link like '/views/2', '2' is the id param.
-        let selectedView = views.filter(view => view.$loki == nextId)[0];
+        let selectedView = views.filter(view => view._id == nextId)[0];
         this.props.actions.setSelectedView(nextId, selectedView);
       }
     }
@@ -55,7 +55,7 @@ class ViewDefListContainer extends Component {
 
   render() {
     const { views, isFetchingViewList, selectedView } = this.props;
-    let { dispatch } = this.props;
+    let { dispatch } = store;
     let boundActionCreators = bindActionCreators(ViewDefActions, dispatch);
     return (
       <Split flex="right">

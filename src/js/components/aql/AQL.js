@@ -61,7 +61,7 @@ class AQL extends Component {
                 {
                   AQLs.map((aql) => {
                     return (
-                      <ListItem key={aql.$loki}>{aql.name}</ListItem>
+                      <ListItem key={aql._id}>{aql.name}</ListItem>
                     );
                   })
                 }

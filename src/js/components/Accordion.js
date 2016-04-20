@@ -23,7 +23,7 @@ export default class Accordion extends Component {
     const {type} = this.props;
     return views.map((view, key) => {
       return (
-        <AccordionItem group={view.group} key={key}><Link to={`/${type}/${view.$loki}`}>{view.name}</Link></AccordionItem>
+        <AccordionItem catagory={view.catagory} key={key}><Link to={`/${type}/${view._id}`}>{view.name}</Link></AccordionItem>
       );
     });
   }
