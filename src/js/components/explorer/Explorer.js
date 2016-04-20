@@ -11,11 +11,10 @@ export default class Explorer extends Component {
 
   constructor() {
     super();
-    this._onSearch = this._onSearch.bind(this);
   }
 
   componentDidMount() {
-    this.props.actions.loadTemplates();
+    this.props.dispatch(ExplorerActions.loadTemplates());
   }
 
   componentWillReceiveProps(nextProps) {
@@ -24,20 +23,12 @@ export default class Explorer extends Component {
     let { templates } = nextProps;
     if (templates && templates.length > 0) {
       if (!currentId && !nextId) { // Click navigation link, no id param.
-        this.props.actions.loadRecords(templates[0]);
+        this.props.dispatch(ExplorerActions.loadRecords(templates[0]));
       } else if (nextId && nextId != currentId) { // Click item in the list, with link like '/views/2', '2' is the id param.
         let selectedView = templates.filter(template => template.$loki == nextId)[0];
-        this.props.actions.loadRecords(selectedView);
+        this.props.dispatch(ExplorerActions.loadRecords(selectedView));
       }
     }
-  }
-
-  _onSearch(value) {
-    console.log(value);
-  }
-
-  _onListClick(template, record) {
-    this.props.actions.loadDetailRecord(template, record);
   }
 
   render() {
@@ -49,7 +40,7 @@ export default class Explorer extends Component {
     return (
       <Split flex="right">
         <Accordion views={templates} isFetching={false} type="explorer"/>
-        <RecordList records={records} {...boundActionCreators}/>
+        <RecordList template={templates[0]} records={records} {...boundActionCreators}/>
         <RecordDetail record={record} {...boundActionCreators}/>
       </Split>
     );
@@ -62,7 +53,7 @@ Explorer.propTypes = {
   record: PropTypes.array.isRequired
 };
 
-let mapStateToProps = (state) => {
+let select = (state, props) => {
   return {
     templates: state.explorer.templates,
     records: state.explorer.records,
@@ -70,8 +61,4 @@ let mapStateToProps = (state) => {
   };
 };
 
-let mapDispatchToProps = (dispatch) => ({
-  actions: bindActionCreators(ExplorerActions, dispatch)
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Explorer);
+export default connect(select)(Explorer);

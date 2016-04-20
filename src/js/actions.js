@@ -5,7 +5,6 @@ import Rest from 'grommet/utils/Rest';
 //import Query from 'grommet-index/utils/Query';
 import IndexApi from './Api';
 import {HOST_NAME} from './util/Config';
-import * as filters from './components/builder/TreeFilter';
 import history from './RouteHistory';
 
 // session
@@ -59,9 +58,6 @@ export const ITEM_MAP_SUCCESS = 'ITEM_MAP_SUCCESS';
 export const ITEM_MAP_FAILURE = 'ITEM_MAP_FAILURE';
 export const METADATA_SUCCESS = 'METADATA_SUCCESS';
 export const METADATA_DETAIL_SUCCESS = 'METADATA_DETAIL_SUCCESS';
-export const METADATA_FILTER_SUCCESS = 'METADATA_FILTER_SUCCESS';
-export const METADATA_NODE_SUCCESS = 'METADATA_NODE_SUCCESS';
-export const METADATA_CURSOR_SUCCESS = 'METADATA_CURSOR_SUCCESS';
 export const ADAPTER_DATA_SUCCESS = 'ADAPTER_DATA_SUCCESS';
 export const INTEGRATION_JOB_DATA_SUCCESS = 'INTEGRATION_JOB_DATA_SUCCESS';
 export const INTEGRATION_JOB_ITEM_DATA_SUCCESS = 'INTEGRATION_JOB_ITEM_DATA_SUCCESS';
@@ -225,68 +221,16 @@ export function metadataLoadDetail(schema) {
     formData.metadata = metadata;
     Rest.post(HOST_NAME + '/am/metadata', formData)
       .end(function (err, res) {
-        let data = {
-          name: schema,
-          toggled: true,
-          children: []
-        };
+        let data = [];
         for (var t in  res.body.table.link) {
           var link = res.body.table.link[t].$;
-          link.children = [];
-          data.children.push(link);
+          data.push(link);
         }
         for (var t in  res.body.table.field) {
-          data.children.push(res.body.table.field[t].$);
+          data.push(res.body.table.field[t].$);
         }
         dispatch(metadataDetailSuccess(data));
       });
-  };
-}
-
-export function metadataLoadNode(schema, node) {
-  return function (dispatch) {
-    var AM_FORM_DATA = "amFormData";
-    if (localStorage && localStorage[AM_FORM_DATA]) {
-      var form = JSON.parse(localStorage.getItem(AM_FORM_DATA));
-      if (form.server) formData.server = form.server;
-      if (form.user) formData.user = form.user;
-      if (form.password) formData.password = form.password;
-      if (form.pageSize) formData.pageSize = form.pageSize;
-      if (form.showLabel) formData.showLabel = form.showLabel;
-      //        $scope.formData.showError = form.showError;
-      if (form.limit) formData.param.limit = form.limit;
-      if (form.offset) formData.param.offset = form.offset;
-      if (form.viewStyle) formData.viewStyle = form.viewStyle;
-    }
-    let metadata = "metadata/schema/" + schema;
-    formData.metadata = metadata;
-    Rest.post(HOST_NAME + '/am/metadata', formData)
-      .end(function (err, res) {
-        if (node.children && node.children.length == 0) {
-          for (var t in  res.body.table.link) {
-            var link = res.body.table.link[t].$;
-            link.children = [];
-            node.children.push(link);
-          }
-          for (var t in  res.body.table.field) {
-            node.children.push(res.body.table.field[t].$);
-          }
-          dispatch(metadataNodeSuccess(node));
-        }
-      });
-  };
-}
-
-export function metadataSearch(data, value, allData) {
-  return function (dispatch) {
-    const filter = value.trim();
-    if (!filter) {
-      dispatch(metadataFilterSuccess(allData));
-    } else {
-      var filtered = filters.filterTree(allData, filter);
-      filtered = filters.expandFilteredNodes(filtered, filter);
-      dispatch(metadataFilterSuccess(filtered));
-    }
   };
 }
 
@@ -343,29 +287,7 @@ export function metadataSuccess(result) {
 export function metadataDetailSuccess(result) {
   return {
     type: METADATA_DETAIL_SUCCESS,
-    allData: result,
-    data: result
-  };
-}
-
-export function metadataFilterSuccess(result) {
-  return {
-    type: METADATA_FILTER_SUCCESS,
-    data: result
-  };
-}
-
-export function metadataNodeSuccess(result) {
-  return {
-    type: METADATA_NODE_SUCCESS,
-    node: result
-  };
-}
-
-export function metadataCursorSuccess(result) {
-  return {
-    type: METADATA_CURSOR_SUCCESS,
-    cursor: result
+    rows: result
   };
 }
 

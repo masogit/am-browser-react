@@ -12,11 +12,16 @@ export default class RecordList extends Component {
   componentDidMount() {
   }
 
+  _onClick(template, record) {
+    this.props.loadDetailRecord(template, record);
+  }
+
   render() {
     var records = this.props.records;
+    var template = this.props.template;
 
     var recordComponents = records.map((record, index) => {
-      return <TableRow key={index}><td><Anchor key={index}>{record.self}!</Anchor></td></TableRow>;
+      return <TableRow key={index}><td><Anchor key={index} onClick={this._onClick.bind(this, template, record)}>{record.self}</Anchor></td></TableRow>;
     });
 
     return (
