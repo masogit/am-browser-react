@@ -22,7 +22,7 @@ export default class RecordDetail extends Component {
   render() {
     var record = this.props.record;
     var fields = record.map((field, index) => {
-      return <p key={index}><label key={index}>{field.$.label}:{field.value}</label></p>;
+      return <p key={index}><label key={index}>{field.label}:{field.value}</label></p>;
     });
 
     return (
