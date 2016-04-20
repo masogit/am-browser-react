@@ -57,6 +57,29 @@ module.exports = function (am) {
 
     };
 
+this.query = function (req, callback) {
+        var url = "http://${server}${context}${ref-link}${collection}";
+        var auth = (req.body.user!="") ? 'Basic ' + new Buffer(req.body.user + ':' + req.body.password).toString('base64') : undefined;
+        if (req.body.param && req.body.param['orderby'].isEmpty())
+            delete req.body.param['orderby'];
+
+        var args = {
+            path: req.body,
+            parameters: req.body.param,
+            data: req.body.data,
+            headers: (auth) ? {
+                "Content-Type": "application/json",
+                "Authorization": auth
+            } : undefined
+        };
+
+        client.get(url, args, function (data, response) {
+          callback(data);
+        }).on('error', function (err) {
+          res.status(500).send(err.toString());
+        });
+
+    };
 };
 
 
