@@ -82,7 +82,7 @@ module.exports = function (app, am, redis) {
                     req.body['ref-link'] = 'db/'+body.sqlname+'/'+ref;
                 else
                     req.body['ref-link'] = 'db/'+body.sqlname;
-                // console.log(rest.query(req));
+
                 rest.query(req, function (data) {
                   if (ref) {
                       if (body.links && body.links.length > 0) {
@@ -91,7 +91,16 @@ module.exports = function (app, am, redis) {
                               return link.sqlname == linkName;
                             })[0];
 
-                            callback(link);
+                            req.params.ref = undefined;
+
+                            var reverseField = link.reversefield;
+                            var reverse = link.reverse;
+                            var AQL = reverse+'.PK='+ data[reverseField];
+                            link.body.filter += ' AND ' + AQL;
+
+                            list (req, link.body, function (link_data) {
+                              callback(link_data);
+                            });
 
                         } else {
                             data.links = [];

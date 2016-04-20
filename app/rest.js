@@ -73,11 +73,13 @@ this.query = function (req, callback) {
             } : undefined
         };
 
-        client.get(url, args, function (data, response) {
+        var request = client.get(url, args, function (data, response) {
           callback(data);
         }).on('error', function (err) {
           callback(err.toString());
         });
+
+        console.log("request.options: " + JSON.stringify(request.options));
 
     };
 };
