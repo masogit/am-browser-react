@@ -26,6 +26,7 @@ class ViewDefListContainer extends Component {
 
   constructor(props) {
     super(props);
+    this.onValueChange = this.onValueChange.bind(this);
   }
 
   componentWillMount() {
@@ -33,10 +34,12 @@ class ViewDefListContainer extends Component {
 
   componentDidMount() {
     // Initialize list data, called only once.
-    this.props.actions.loadViews(this.props.params.id);
+    this.props.actions.loadViews(this.props.params.id, this.props.location.pathname);
   }
 
   componentWillReceiveProps(nextProps) {
+    //console.log("ViewDefListContainer - nextProps");
+    //console.log(nextProps);
     let currentId = this.props.params.id;
     let nextId = nextProps.params.id;
     let { views } = nextProps;
@@ -53,6 +56,14 @@ class ViewDefListContainer extends Component {
   componentWillUpdate(nextProps, nextState) {
   }
 
+  onValueChange(path, newValue) {
+    //console.log("ViewDefListContainer - onValueChange - path: ");
+    //console.log(path);
+    //console.log("ViewDefListContainer - onValueChange - newValue: ");
+    //console.log(newValue);
+    this.props.actions.updateSelectedView(this.props.selectedView, path, newValue);
+  }
+
   render() {
     const { views, isFetchingViewList, selectedView } = this.props;
     let { dispatch } = store;
@@ -60,7 +71,7 @@ class ViewDefListContainer extends Component {
     return (
       <Split flex="right">
         <ViewDefList views={views} isFetchingViewList={isFetchingViewList} {...boundActionCreators}/>
-        <ViewDefDetail selectedView={selectedView} {...boundActionCreators}/>
+        <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange} {...boundActionCreators}/>
       </Split>
     );
   }

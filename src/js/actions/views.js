@@ -2,7 +2,7 @@
 import request from 'superagent-bluebird-promise';
 import * as types from '../constants/ActionTypes';
 import {HOST_NAME/*, getFormData*/} from '../util/Config';
-//import history from '../RouteHistory';
+import history from '../RouteHistory';
 
 function requestViews() {
   return {
@@ -122,7 +122,7 @@ function receiveViewsFailure(err) {
 //  });
 //}
 
-export function loadViews(selectedViewId) {
+export function loadViews(selectedViewId, currentPathName) {
   return dispatch => {
     dispatch(requestViews());
     return request.get(HOST_NAME + '/coll/view').then(function (res) {
@@ -131,12 +131,15 @@ export function loadViews(selectedViewId) {
       // Load first record of the list in detail.
       if (views.length > 0) {
         let selectedView = selectedViewId ? views.filter(view => view._id == selectedViewId)[0] : views[0];
+        console.log("selectedView:");
+        console.log(selectedView);
         dispatch({
           type: types.SET_SELECTED_VIEW,
           selectedViewId: selectedView._id,
           selectedView: selectedView
         });
-        //history.push("/views/" + selectedView.$loki); // display the first one as default
+        if (!selectedViewId)
+          history.push(currentPathName + "/" + selectedView._id); // display the first one as default
       }
     }, function (error) {
       dispatch(receiveViewsFailure(error));
@@ -153,8 +156,19 @@ export function setSelectedView(selectedViewId, selectedView) {
       selectedView: selectedView
     });
   };
-
 }
+
+export function updateSelectedView(selectedView, path, newValue) {
+  return dispatch => {
+    dispatch({
+      type: types.UPDATE_SELECTED_VIEW,
+      selectedView: selectedView,
+      path: path,
+      newValue: newValue
+    });
+  };
+}
+
 export function loadTemplateTable(selectedViewId, selectedView) {
   return dispatch => {
     console.log("action - loadTemplateTable - selectedViewId: " + selectedViewId);

@@ -1,4 +1,4 @@
-import React, { Component/*, PropTypes*/ } from 'react';
+import React, { Component, PropTypes } from 'react';
 //import { connect } from 'react-redux';
 //import PureRenderMixin from 'react-addons-pure-render-mixin';
 //import Sidebar from 'grommet/components/Sidebar';
@@ -22,10 +22,12 @@ import Anchor from 'grommet/components/Anchor';
 import Add from 'grommet/components/icons/base/Add';
 import Delete from 'grommet/components/icons/base/Close.js';
 import Right from 'grommet/components/icons/base/Play';
+//import MDSave from 'react-icons/lib/md/save';
 import _ from 'lodash';
 //import store from '../../store';
 //import { setSelectedView, loadTemplateTable } from '../../actions/views';
 //import GrommetTableTest from '../GrommetTable';
+//import ReactSelect from 'react-select';
 
 export default class ViewDefDetail extends Component {
 
@@ -49,10 +51,12 @@ export default class ViewDefDetail extends Component {
     //this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
     this.renderTemplateTable = this.renderTemplateTable.bind(this);
     this.renderLinks = this.renderLinks.bind(this);
+    this._onChange = this._onChange.bind(this);
   }
 
   _onChange(event) {
-    console.log('!!! FullForm changed', event.target, 'to', event.target.value);
+    let path = event.target.name; // why not 'event.target.id'? because of radio button.
+    this.props.onValueChange(path.substring(2), event.target.value);
   }
 
   componentWillMount() {
@@ -128,11 +132,11 @@ export default class ViewDefDetail extends Component {
     return links;
   }
 
-  renderTemplateTable(table, root) {
-    let selfTable = table;
-    let fields = selfTable.body.fields.map((field) => {
+  renderTemplateTable(selectedView, root) {
+    let selfView = selectedView;
+    let fields = selfView.body.fields.map((field) => {
       return (
-        <tr key={selfTable.body.sqlname + "_" + field.sqlname}>
+        <tr key={selfView.body.sqlname + "_" + field.sqlname}>
           <td>{field.sqlname}</td>
           <td>{field.label}</td>
           {root && <td>{"search"}</td>}
@@ -141,14 +145,27 @@ export default class ViewDefDetail extends Component {
       );
     });
     let links = [];
-    if (selfTable.body.links && selfTable.body.links.length > 0) {
-      links = this.renderLinks(links, selfTable);
+    if (selfView.body.links && selfView.body.links.length > 0) {
+      links = this.renderLinks(links, selfView);
     }
     return fields.concat(links);
   }
 
+  renderAggregateOptions(selectedView) {
+    let selfView = selectedView;
+    let fields = selfView.body.fields.filter(view => !view.PK);
+    let options = fields.map((field) => {
+      return (
+        <option key={"agg_" + field.sqlname} value={field.sqlname}>{field.sqlname}</option>
+      );
+    });
+    return options;
+  }
+
   render() {
     const { selectedView } = this.props;
+    console.log("ViewDefDetail.js - selectedView:");
+    console.log(selectedView);
     let p = "input";
     let tableHeader = (
       <thead>
@@ -163,7 +180,7 @@ export default class ViewDefDetail extends Component {
 
     return (
       <Split flex="right">
-        <Box>
+        <Section>
           {
             _.isEmpty(selectedView) &&
             <p>Loading....
@@ -175,40 +192,51 @@ export default class ViewDefDetail extends Component {
               <FormFields>
                 <fieldset>
                   <FormField label="Name" htmlFor={p + "item1"}>
-                    <input id={p + "item1"} name="item-1" type="text" onChange={this._onChange}
+                    <input id="v.name" name="v.name" type="text" onChange={this._onChange}
                            value={selectedView.name}/>
                   </FormField>
                   <FormField label="Description" htmlFor={p + "item2"}>
-                    <textarea id={p + "item2"} name="item-2" value={selectedView.desc}
+                    <textarea id="v.desc" name="v.desc" value={selectedView.desc}
                               onChange={this._onChange}></textarea>
                   </FormField>
                   <FormField label="Category" htmlFor={p + "item3"}>
-                    <select id={p + "item3"} name="item-7">
-                      <option>Assets</option>
-                    </select>
+                    <input id="v.catagory" name="v.catagory" type="text" onChange={this._onChange}
+                           value={selectedView.catagory}/>
                   </FormField>
-                  <FormField label="Chart">
-                    <Box direction="row" justify="start" className="formfieldRadios">
-                      <RadioButton id={p + "item4-1"} name="item-4" label="Line"
-                                   onChange={this._onChange}/>
-                      <RadioButton id={p + "item4-2"} name="item-4" label="Bar"
-                                   onChange={this._onChange}/>
-                      <RadioButton id={p + "item4-3"} name="item-4" label="Pie"
-                                   onChange={this._onChange}/>
-                    </Box>
-                  </FormField>
-                  <FormField label="Aggregate">
-                    <Box direction="row" justify="start" className="formfieldRadios">
-                      <RadioButton id={p + "item5-1"} name="item-5" label="Count"
-                                   onChange={this._onChange}/>
-                      <RadioButton id={p + "item5-2"} name="item-5" label="Sum"
-                                   onChange={this._onChange}/>
-                      <select id={p + "item7"} name="item-7" onChange={this._onChange}>
-                        <option>fQty</option>
-                      </select>
-
-                    </Box>
-                  </FormField>
+                  {
+                    selectedView.chart && selectedView.chart.type &&
+                    <FormField label="Chart">
+                      <Box direction="row" justify="start" className="formfieldRadios">
+                        <RadioButton id={p + "item4-1"} name="v.chart.type" label="Line" value="line"
+                                     checked={selectedView.chart.type == 'line'}
+                                     onChange={this._onChange}/>
+                        <RadioButton id={p + "item4-2"} name="v.chart.type" label="Bar" value="bar"
+                                     checked={selectedView.chart.type == 'bar'}
+                                     onChange={this._onChange}/>
+                        <RadioButton id={p + "item4-3"} name="v.chart.type" label="Pie" value="pie"
+                                     checked={selectedView.chart.type == 'pie'}
+                                     onChange={this._onChange}/>
+                      </Box>
+                    </FormField>
+                  }
+                  {
+                    selectedView.chart && selectedView.chart.aggregate &&
+                    <FormField label="Aggregate">
+                      <Box direction="row" justify="start" className="formfieldRadios">
+                        <RadioButton id={p + "item5-1"} name="v.chart.aggregate" label="Count" value="count"
+                                     checked={selectedView.chart.aggregate == 'count'}
+                                     onChange={this._onChange}/>
+                        <RadioButton id={p + "item5-2"} name="v.chart.aggregate" label="Sum" value="sum"
+                                     checked={selectedView.chart.aggregate == 'sum'}
+                                     onChange={this._onChange}/>
+                        <select id="v.chart.groupby" name="v.chart.groupby" value={selectedView.chart.groupby} onChange={this._onChange}
+                                disabled={selectedView.chart.aggregate != 'sum'} placeholder="">
+                          <option value=""></option>
+                          {selectedView.body && selectedView.body.fields && this.renderAggregateOptions(selectedView)}
+                        </select>
+                      </Box>
+                    </FormField>
+                  }
                 </fieldset>
               </FormFields>
             </Form>
@@ -219,7 +247,7 @@ export default class ViewDefDetail extends Component {
             </Box>
           </Box>
           }
-        </Box>
+        </Section>
 
         {selectedView &&
         <Section>
@@ -235,3 +263,7 @@ export default class ViewDefDetail extends Component {
     );
   }
 }
+
+ViewDefDetail.propTypes = {
+  onValueChange: PropTypes.func.isRequired
+};

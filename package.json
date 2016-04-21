@@ -30,9 +30,11 @@
     "node-rest-client": "^1.8.0",
     "react-addons-pure-render-mixin": "^0.14.7",
     "react-debounce-input": "^2.2.0",
+    "react-icons": "^2.0.1",
     "react-intl": "^2.0.0-rc-1",
     "react-redux": "^3.1.0",
     "react-router": "^1.0.0-rc3",
+    "react-select": "^1.0.0-beta12",
     "react-treebeard": "^1.1.1",
     "redis": "^2.5.2",
     "redis-search": "0.0.1",
@@ -43,9 +45,9 @@
     "serve-static": "^1.7.1",
     "superagent": "^1.8.3",
     "superagent-bluebird-promise": "^3.0.0",
+    "tingodb": "^0.4.2",
     "ws": "^0.7.2",
-    "xml2js": "^0.4.16",
-    "tingodb": "^0.4.2"
+    "xml2js": "^0.4.16"
   },
   "devDependencies": {
     "babel-core": "^6.7.4",
