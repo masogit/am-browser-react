@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import Anchor from 'grommet/components/Anchor';
+// import Anchor from 'grommet/components/Anchor';
 import Table from 'grommet/components/Table';
 import TableRow from 'grommet/components/TableRow';
 
@@ -24,7 +24,7 @@ export default class RecordList extends Component {
               {
                 template.body.fields.map((field, tdindex) => {
                   return !field.PK &&
-                    <td key={tdindex} onClick={this._onClick.bind(this, template, record)}>{record[field.sqlname]}</td>
+                    <td key={tdindex} onClick={this._onClick.bind(this, template, record)}>{record[field.sqlname]}</td>;
                 })
               }
              </TableRow>;
