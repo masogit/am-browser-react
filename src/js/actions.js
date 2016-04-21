@@ -268,8 +268,35 @@ export function loadRecords(template) {
     });
   };
 };
+export function loadDetailRecordLinks (viewid, recordid, linksArray, linksObj) {
+  return function (dispatch) {
+    var link = linksArray.pop();
+    if (link) {
+      var linkname = link.sqlname;
+      Rest.get(HOST_NAME + `/coll/view/${viewid}/list/${recordid}/${linkname}`).end(function (err, res) {
+        if (res.body && res.body.entities) {
+          linksObj[linkname] = res.body.entities;
+          dispatch(loadDetailRecordLinks(viewid, recordid, linksArray, linksObj));
+        }
+      });
+    } else {
+
+      dispatch(loadDetailLinkSuccess(linksObj));
+    }
+
+  };
+};
+
+export function loadDetailLinkSuccess(links) {
+  console.log('links: ' + JSON.stringify(links));
+  return {
+    type: "LOAD_DETAIL_LINK_SUCCESS",
+    links: links
+  };
+}
 
 export function loadDetailRecord(template, record) {
+
   return function (dispatch) {
 
     var fields = template.body.fields.filter(function(field) {
@@ -278,6 +305,11 @@ export function loadDetailRecord(template, record) {
         return field;
       }
     });
+
+    var links = {};
+    var linksArray = Object.assign([], template.body.links);
+
+    dispatch(loadDetailRecordLinks(template._id, record['ref-link'].split('/')[2], linksArray, links));
 
     dispatch(detailRecordLoadSuccess(fields));
   };

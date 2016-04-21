@@ -35,6 +35,7 @@ export default class Explorer extends Component {
     var templates = this.props.templates;
     var records = this.props.records;
     var record = this.props.record;
+    var links = this.props.links;
     let currentId = this.props.params.id;
     let selectedView = templates.filter(template => template._id == currentId)[0];
     let { dispatch } = this.props;
@@ -42,8 +43,10 @@ export default class Explorer extends Component {
     return (
       <Split flex="right">
         <Accordion views={templates} isFetching={false} type="explorer"/>
-        <RecordList template={selectedView} records={records} {...boundActionCreators}/>
-        <RecordDetail record={record} {...boundActionCreators}/>
+        <Split flex="both">
+          <RecordList template={selectedView} records={records} {...boundActionCreators}/>
+          <RecordDetail template={selectedView} record={record} links={links} {...boundActionCreators}/>
+        </Split>
       </Split>
     );
   }
@@ -59,7 +62,8 @@ let select = (state, props) => {
   return {
     templates: state.explorer.templates,
     records: state.explorer.records,
-    record: state.explorer.record
+    record: state.explorer.record,
+    links: state.explorer.links
   };
 };
 

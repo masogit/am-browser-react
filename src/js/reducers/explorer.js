@@ -5,7 +5,8 @@ import { TEMPLATE_LOAD_SUCCESS, RECORD_LOAD_SUCCESS, DETAIL_RECORD_LOAD_SUCCESS 
 const initialState = {
   templates: [],
   records: [],
-  record: []
+  record: [],
+  links: {}
 };
 
 const handlers = {
@@ -22,6 +23,11 @@ const handlers = {
   [DETAIL_RECORD_LOAD_SUCCESS]: (state, action) => {
     return {
       record: action.record
+    };
+  },
+  ["LOAD_DETAIL_LINK_SUCCESS"]: (state, action) => {
+    return {
+      links: action.links
     };
   }
 };
