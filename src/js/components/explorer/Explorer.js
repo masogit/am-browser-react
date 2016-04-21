@@ -35,12 +35,14 @@ export default class Explorer extends Component {
     var templates = this.props.templates;
     var records = this.props.records;
     var record = this.props.record;
+    let currentId = this.props.params.id;
+    let selectedView = templates.filter(template => template._id == currentId)[0];
     let { dispatch } = this.props;
     let boundActionCreators = bindActionCreators(ExplorerActions, dispatch);
     return (
       <Split flex="right">
         <Accordion views={templates} isFetching={false} type="explorer"/>
-        <RecordList template={templates[0]} records={records} {...boundActionCreators}/>
+        <RecordList template={selectedView} records={records} {...boundActionCreators}/>
         <RecordDetail record={record} {...boundActionCreators}/>
       </Split>
     );

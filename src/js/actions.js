@@ -271,11 +271,15 @@ export function loadRecords(template) {
 
 export function loadDetailRecord(template, record) {
   return function (dispatch) {
-    for (var i in template.body.fields) {
-      var sqlname = template.body.fields[i].sqlname;
-      template.body.fields[i].value = record[sqlname];
-    }
-    dispatch(detailRecordLoadSuccess(template.body.fields));
+
+    var fields = template.body.fields.filter(function(field) {
+      if (!field.PK) {
+        field.value = record[field.sqlname];
+        return field;
+      }
+    });
+
+    dispatch(detailRecordLoadSuccess(fields));
   };
 };
 

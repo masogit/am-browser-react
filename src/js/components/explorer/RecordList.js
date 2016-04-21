@@ -19,14 +19,21 @@ export default class RecordList extends Component {
   render() {
     var records = this.props.records;
     var template = this.props.template;
-
     var recordComponents = records.map((record, index) => {
-      return <TableRow key={index}><td><Anchor key={index} onClick={this._onClick.bind(this, template, record)}>{record.self}</Anchor></td></TableRow>;
+      return <TableRow key={index}>
+              {
+                template.body.fields.map((field, tdindex) => {
+                  return !field.PK &&
+                    <td key={tdindex} onClick={this._onClick.bind(this, template, record)}>{record[field.sqlname]}</td>
+                })
+              }
+             </TableRow>;
     });
 
     var header = template.body.fields.map((field, index) => {
-      return !field.PK && <th>{ field.alias?field.alias:(field.label?field.label:field.sqlname)}</th>;
+      return !field.PK && <th key={index}>{ field.alias?field.alias:(field.label?field.label:field.sqlname)}</th>;
     });
+
 
     return (
       <div>
