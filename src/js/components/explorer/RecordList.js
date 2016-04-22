@@ -25,6 +25,7 @@ export default class RecordList extends Component {
     var template = this.props.template;
     var recordComponents = records.map((record, index) => {
       return <TableRow key={index}>
+              <td>{record.self}</td>
               {
                 template.body.fields.map((field, tdindex) => {
                   return !field.PK &&
@@ -40,16 +41,17 @@ export default class RecordList extends Component {
 
 
     return (
-      <Table selectable={true} scrollable={true}>
-        <thead>
+        <Table selectable={true} scrollable={true}>
+          <thead>
           <tr>
+            <th>Self</th>
             {header}
           </tr>
-        </thead>
-        <tbody>
-        {recordComponents}
-        </tbody>
-      </Table>
+          </thead>
+          <tbody>
+          {recordComponents}
+          </tbody>
+        </Table>
     );
   }
 }

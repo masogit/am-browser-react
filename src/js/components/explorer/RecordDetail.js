@@ -35,17 +35,20 @@ export default class RecordDetail extends Component {
 
     return (
       <div>
-        <Table>
-          <thead>
-            <tr>
-              <th>Field</th><th>Value</th>
-            </tr>
-          </thead>
-          <tbody>
-          {fields}
-          </tbody>
-        </Table>
+
         <Tabs justify="start" initialIndex={0}>
+          <Tab title={template.body.label}>
+            <Table>{/*
+              <thead>
+              <tr>
+                <th>Field</th><th>Value</th>
+              </tr>
+              </thead>*/}
+              <tbody>
+              {fields}
+              </tbody>
+            </Table>
+          </Tab>
           {linkTabs}
         </Tabs>
       </div>

@@ -17,6 +17,7 @@ export default class RecordDetailLink extends Component {
     var records = this.props.records;
     var recordComponents = records.map((record, index) => {
       return <TableRow key={index}>
+              <td>{record.self}</td>
               {
                 link.body.fields.map((field, tdindex) => {
                   return !field.PK &&
@@ -34,6 +35,7 @@ export default class RecordDetailLink extends Component {
         <Table selectable={true} scrollable={true}>
           <thead>
             <tr>
+              <th>Self</th>
               {header}
             </tr>
           </thead>
