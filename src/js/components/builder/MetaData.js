@@ -3,6 +3,7 @@ import Anchor from 'grommet/components/Anchor';
 import Header from 'grommet/components/Header';
 import Table from 'grommet/components/Table';
 import TableRow from 'grommet/components/TableRow';
+import CheckBox from 'grommet/components/CheckBox';
 
 export default class MetaData extends Component {
 
@@ -16,20 +17,45 @@ export default class MetaData extends Component {
   }
 
   _onSearch(event) {
-    this.setState({
-      filtered: this.props.rows.filter((obj) => obj.id.toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1)
-    });
+    //let rows = this.props.rows;
+    //let entities = rows.entities ? rows.entities : [];
+    //let links = rows.links ? rows.links : [];
+    //let fields = rows.fields ? rows.fields : [];
+    //entities = entities.filter((obj) => obj.sqlname.toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1);
+    //links = links.filter((obj) => obj.sqlname.toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1);
+    //fields = fields.filter((obj) => obj.sqlname.toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1);
+    //this.setState({
+    //  filtered: {
+    //    "entities": entities,
+    //    "links": links,
+    //    "fields": fields
+    //  }
+    //});
   }
 
-  _onClick(id) {
-    this.props.metadataLoadDetail(id);
+  _onClick(obj) {
+    this.props.metadataLoadDetail(obj, this.props.elements);
+  }
+
+  _onChange(row) {
+    row.checked = !row.checked;
+    console.log(row);
   }
 
   render() {
-    var rows = this.props.rows;
-    var rowsState = (typeof (this.state.filtered) != 'undefined') ? this.state.filtered : rows;
-    var rowComponents = rowsState.map((row, index) => {
-      return <TableRow key={index}><td><Anchor key={index} onClick={this._onClick.bind(this, row.id)}>{row.id}-{row.name}</Anchor></td></TableRow>;
+    let rows = this.props.rows;
+    let rowsState = (typeof (this.state.filtered) != 'undefined') ? this.state.filtered : rows;
+    let entities = rowsState.entities ? rowsState.entities : [];
+    let links = rowsState.links ? rowsState.links : [];
+    let fields = rowsState.fields ? rowsState.fields : [];
+    var entitiesComponents = entities.map((row, index) => {
+      return <TableRow key={index}><td><Anchor key={index} onClick={this._onClick.bind(this, {label: row.label, url: row["ref-link"]})}>{row.sqlname}</Anchor></td></TableRow>;
+    });
+    var linksComponents = links.map((row, index) => {
+      return <TableRow key={index}><td><Anchor key={index} onClick={this._onClick.bind(this, {label: row.label, url: row.dest_table["ref-link"]})}>{row.sqlname}</Anchor></td></TableRow>;
+    });
+    var fieldsComponents = fields.map((row, index) => {
+      return <TableRow key={index}><td><CheckBox key={index} id={`checkbox_${row.sqlname}`} checked={row.checked} onChange={this._onChange.bind(this, row)}/>{row.sqlname}</td></TableRow>;
     });
     return (
       <div>
@@ -38,7 +64,9 @@ export default class MetaData extends Component {
         </Header>
         <Table>
           <tbody>
-            {rowComponents}
+            {entitiesComponents}
+            {linksComponents}
+            {fieldsComponents}
           </tbody>
         </Table>
       </div>
@@ -47,5 +75,6 @@ export default class MetaData extends Component {
 }
 
 MetaData.propTypes = {
-  rows: PropTypes.array.isRequired
+  rows: PropTypes.object.isRequired,
+  elements: PropTypes.array.isRequired
 };

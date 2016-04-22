@@ -3,7 +3,7 @@
 import { METADATA_SUCCESS, METADATA_DETAIL_SUCCESS } from '../actions';
 
 const initialState = {
-  rows: [],
+  rows: {},
   elements: []
 };
 

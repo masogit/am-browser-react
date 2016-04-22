@@ -29,12 +29,11 @@ export default class Builder extends Component {
     let elements = this.props.elements;
     let { dispatch } = this.props;
     let boundActionCreators = bindActionCreators(BuilderActions, dispatch);
-    console.log(boundActionCreators);
     return (
       <div className="example">
         <Sidebar primary={true} pad="small" size="large">
           <BreadCrumb elements={elements} {...boundActionCreators}/>
-          <MetaData rows={item} {...boundActionCreators}/>
+          <MetaData elements={elements} rows={item} {...boundActionCreators}/>
         </Sidebar>
       </div>
     );
@@ -42,7 +41,7 @@ export default class Builder extends Component {
 }
 
 Builder.propTypes = {
-  rows: PropTypes.array.isRequired,
+  rows: PropTypes.object.isRequired,
   elements: PropTypes.array.isRequired
 };
 

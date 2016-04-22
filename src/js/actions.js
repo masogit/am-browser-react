@@ -189,20 +189,23 @@ export function metadataLoad() {
       if (form.offset) formData.param.offset = form.offset;
       if (form.viewStyle) formData.viewStyle = form.viewStyle;
     }
-    let metadata = "metadata/tables";
-    formData.metadata = metadata;
-    Rest.post(HOST_NAME + '/am/metadata', formData)
+    let auth = 'Basic ' + new Buffer(formData.user + ':' + formData.password).toString('base64');
+    let  headers = {
+      "Content-Type": "text/xml",
+      "Authorization": auth
+    };
+    Rest.setHeaders(headers);
+    Rest.get(HOST_NAME + '/am/v1/schema')
       .end(function (err, res) {
-        let data = [];
-        for (var t in  res.body.Tables.Table) {
-          data.push(res.body.Tables.Table[t].$);
+        if (!err) {
+          let data = JSON.parse(res.text);
+          dispatch(metadataSuccess(data, []));
         }
-        dispatch(metadataSuccess(data, []));
       });
   };
 }
 
-export function metadataLoadDetail(schema) {
+export function metadataLoadDetail(obj, elements, index) {
   return function (dispatch) {
     var AM_FORM_DATA = "amFormData";
     if (localStorage && localStorage[AM_FORM_DATA]) {
@@ -217,21 +220,25 @@ export function metadataLoadDetail(schema) {
       if (form.offset) formData.param.offset = form.offset;
       if (form.viewStyle) formData.viewStyle = form.viewStyle;
     }
-    let metadata = "metadata/schema/" + schema;
-    formData.metadata = metadata;
-    Rest.post(HOST_NAME + '/am/metadata', formData)
+    //let  headers = { 'Accept': 'application/json' };
+    //Rest.setHeaders(headers);
+    let auth = 'Basic ' + new Buffer(formData.user + ':' + formData.password).toString('base64');
+    let  headers = {
+      "Content-Type": "text/xml",
+      "Authorization": auth
+    };
+    Rest.setHeaders(headers);
+    Rest.get(HOST_NAME + '/am/v1/' + obj.url)
       .end(function (err, res) {
-        let data = [];
-        let breadcrumbs = [];
-        breadcrumbs.push(schema);
-        for (var t in  res.body.table.link) {
-          var link = res.body.table.link[t].$;
-          data.push(link);
+        if (!err) {
+          let data = JSON.parse(res.text);
+          if (!index) {
+            elements.push(obj);
+          } else {
+            elements = elements.slice(0, index + 1);
+          }
+          dispatch(metadataDetailSuccess(data, elements));
         }
-        for (var t in  res.body.table.field) {
-          data.push(res.body.table.field[t].$);
-        }
-        dispatch(metadataDetailSuccess(data, breadcrumbs));
       });
   };
 }

@@ -1,5 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import Anchor from 'grommet/components/Anchor';
+import Table from 'grommet/components/Table';
+import TableRow from 'grommet/components/TableRow';
 
 export default class BreadCrumb extends Component {
 
@@ -14,20 +16,28 @@ export default class BreadCrumb extends Component {
     this.props.metadataLoad();
   }
 
+  _onDetailClick(obj, index) {
+    this.props.metadataLoadDetail(obj, this.props.elements, index);
+  }
+
   render() {
     var elements = this.props.elements;
     var breadcrumbs = elements.map((element, index) => {
       if (index == 0) {
-        return <div key={index}><Anchor onClick={this._onClick.bind(this)}>{element}</Anchor></div>;
+        return <td key={index}><Anchor key={index} onClick={this._onClick.bind(this)}>{element.label}</Anchor></td>;
       } else {
-        return <div key={index}><b>  --  </b><Anchor>{element}</Anchor></div>;
+        return <td key={index}>&nbsp;&gt;&nbsp;<Anchor key={index} onClick={this._onDetailClick.bind(this, element, index)}>{element.label}</Anchor></td>;
       }
     });
 
     return (
-      <div>
-        {breadcrumbs}
-      </div>
+      <Table>
+        <tbody>
+          <TableRow>
+          {breadcrumbs}
+          </TableRow>
+        </tbody>
+      </Table>
     );
   }
 }
