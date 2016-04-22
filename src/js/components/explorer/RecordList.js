@@ -40,18 +40,16 @@ export default class RecordList extends Component {
 
 
     return (
-      <div>
-        <Table>
-          <thead>
-            <tr>
-              {header}
-            </tr>
-          </thead>
-          <tbody>
-          {recordComponents}
-          </tbody>
-        </Table>
-      </div>
+      <Table selectable={true} scrollable={true}>
+        <thead>
+          <tr>
+            {header}
+          </tr>
+        </thead>
+        <tbody>
+        {recordComponents}
+        </tbody>
+      </Table>
     );
   }
 }

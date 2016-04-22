@@ -31,8 +31,7 @@ export default class RecordDetailLink extends Component {
     });
 
     return (
-      <div>
-        <Table>
+        <Table selectable={true} scrollable={true}>
           <thead>
             <tr>
               {header}
@@ -42,7 +41,6 @@ export default class RecordDetailLink extends Component {
           {recordComponents}
           </tbody>
         </Table>
-      </div>
     );
   }
 }
