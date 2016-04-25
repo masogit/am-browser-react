@@ -24,6 +24,10 @@ export default class Builder extends Component {
     node.checked = !node.checked;
   }
 
+  _clearFilter() {
+    document.getElementById("metadataFilter").value="";
+  }
+
   render() {
     let item = this.props.rows;
     let elements = this.props.elements;
@@ -32,8 +36,8 @@ export default class Builder extends Component {
     return (
       <div className="example">
         <Sidebar primary={true} pad="small" size="large">
-          <BreadCrumb elements={elements} {...boundActionCreators}/>
-          <MetaData elements={elements} rows={item} {...boundActionCreators}/>
+          <BreadCrumb elements={elements} {...boundActionCreators} clearFilter={this._clearFilter}/>
+          <MetaData elements={elements} rows={item} {...boundActionCreators} clearFilter={this._clearFilter}/>
         </Sidebar>
       </div>
     );

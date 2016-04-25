@@ -13,10 +13,12 @@ export default class BreadCrumb extends Component {
   }
 
   _onClick() {
+    this.props.clearFilter();
     this.props.metadataLoad();
   }
 
   _onDetailClick(obj, index) {
+    this.props.clearFilter();
     this.props.metadataLoadDetail(obj, this.props.elements, index);
   }
 

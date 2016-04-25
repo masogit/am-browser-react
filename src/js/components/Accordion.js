@@ -8,8 +8,6 @@ export default class Accordion extends Component {
 
   constructor() {
     super();
-    this.state = {
-    };
     this.onSearch = this.onSearch.bind(this);
   }
 
@@ -30,7 +28,7 @@ export default class Accordion extends Component {
 
   render() {
     const { views, isFetching } = this.props;
-    var viewsState = (typeof (this.state.filtered) != 'undefined') ? this.state.filtered : views;
+    var viewsState = this.state && this.state.filtered ? this.state.filtered : views;
     return (
       <Sidebar primary={true} pad="small" fixed={false} full={false}>
       <div style={{"backgroundColor": "#01a982", "color": "#ffffff", "width": "280px", "height": "820px"}}>

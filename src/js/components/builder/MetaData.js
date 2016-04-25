@@ -9,7 +9,6 @@ export default class MetaData extends Component {
 
   constructor() {
     super();
-    this.state = {};
     this._onSearch = this._onSearch.bind(this);
   }
 
@@ -17,23 +16,24 @@ export default class MetaData extends Component {
   }
 
   _onSearch(event) {
-    //let rows = this.props.rows;
-    //let entities = rows.entities ? rows.entities : [];
-    //let links = rows.links ? rows.links : [];
-    //let fields = rows.fields ? rows.fields : [];
-    //entities = entities.filter((obj) => obj.sqlname.toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1);
-    //links = links.filter((obj) => obj.sqlname.toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1);
-    //fields = fields.filter((obj) => obj.sqlname.toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1);
-    //this.setState({
-    //  filtered: {
-    //    "entities": entities,
-    //    "links": links,
-    //    "fields": fields
-    //  }
-    //});
+    let rows = this.props.rows;
+    let entities = rows.entities ? rows.entities : [];
+    let links = rows.links ? rows.links : [];
+    let fields = rows.fields ? rows.fields : [];
+    entities = entities.filter((obj) => obj.sqlname.toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1);
+    links = links.filter((obj) => obj.sqlname.toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1);
+    fields = fields.filter((obj) => obj.sqlname.toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1);
+    this.setState({
+      filtered: {
+        "entities": entities,
+        "links": links,
+        "fields": fields
+      }
+    });
   }
 
   _onClick(obj) {
+    this.props.clearFilter();
     this.props.metadataLoadDetail(obj, this.props.elements);
   }
 
@@ -44,7 +44,8 @@ export default class MetaData extends Component {
 
   render() {
     let rows = this.props.rows;
-    let rowsState = (typeof (this.state.filtered) != 'undefined') ? this.state.filtered : rows;
+    let filterValue = document.getElementById("metadataFilter")? document.getElementById("metadataFilter").value : "";
+    let rowsState = this.state && this.state.filtered && (filterValue && filterValue != "") ? this.state.filtered : rows;
     let entities = rowsState.entities ? rowsState.entities : [];
     let links = rowsState.links ? rowsState.links : [];
     let fields = rowsState.fields ? rowsState.fields : [];
@@ -60,7 +61,7 @@ export default class MetaData extends Component {
     return (
       <div>
         <Header large={true} flush={false}>
-          <input className="sidebarsearch" type="text" placeholder="Search fields and links..." onChange={this._onSearch}/>
+          <input id="metadataFilter" className="sidebarsearch" type="text" placeholder="Search fields and links..." onChange={this._onSearch}/>
         </Header>
         <Table>
           <tbody>

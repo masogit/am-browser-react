@@ -11,7 +11,6 @@ export default class Widget extends Component {
 
   constructor() {
     super();
-    this.state = {};
     this._onSearch = this._onSearch.bind(this);
   }
 
@@ -27,7 +26,7 @@ export default class Widget extends Component {
 
   render() {
     const {templates} = this.props;
-    var templatesState = (typeof (this.state.filtered) != 'undefined') ? this.state.filtered : templates;
+    var templatesState = this.state && this.state.filtered ? this.state.filtered : templates;
     let widgets = templatesState.map((template, key) => {
       return (
         <Tile key={key} selected={true} align="start" separator="top" colorIndex="light-1">

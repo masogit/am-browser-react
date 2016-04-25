@@ -179,15 +179,8 @@ export function metadataLoad() {
     var AM_FORM_DATA = "amFormData";
     if (localStorage && localStorage[AM_FORM_DATA]) {
       var form = JSON.parse(localStorage.getItem(AM_FORM_DATA));
-      if (form.server) formData.server = form.server;
       if (form.user) formData.user = form.user;
       if (form.password) formData.password = form.password;
-      if (form.pageSize) formData.pageSize = form.pageSize;
-      if (form.showLabel) formData.showLabel = form.showLabel;
-      //        $scope.formData.showError = form.showError;
-      if (form.limit) formData.param.limit = form.limit;
-      if (form.offset) formData.param.offset = form.offset;
-      if (form.viewStyle) formData.viewStyle = form.viewStyle;
     }
     let auth = 'Basic ' + new Buffer(formData.user + ':' + formData.password).toString('base64');
     let  headers = {
@@ -210,15 +203,8 @@ export function metadataLoadDetail(obj, elements, index) {
     var AM_FORM_DATA = "amFormData";
     if (localStorage && localStorage[AM_FORM_DATA]) {
       var form = JSON.parse(localStorage.getItem(AM_FORM_DATA));
-      if (form.server) formData.server = form.server;
       if (form.user) formData.user = form.user;
       if (form.password) formData.password = form.password;
-      if (form.pageSize) formData.pageSize = form.pageSize;
-      if (form.showLabel) formData.showLabel = form.showLabel;
-      //        $scope.formData.showError = form.showError;
-      if (form.limit) formData.param.limit = form.limit;
-      if (form.offset) formData.param.offset = form.offset;
-      if (form.viewStyle) formData.viewStyle = form.viewStyle;
     }
     //let  headers = { 'Accept': 'application/json' };
     //Rest.setHeaders(headers);
