@@ -11,7 +11,6 @@ export default class List extends Component {
     super();
     this.state = {
       records: [],
-      // links: [],
       record: null
     };
     this._onClick.bind(this);
@@ -25,24 +24,19 @@ export default class List extends Component {
     });
   }
 
-  _onClick(record) {
-    this.setState({
-      record: record
+  componentWillReceiveProps(nextProps) {
+    let self = this;
+    ExplorerActions.loadRecordsByBody(nextProps.body, function (data) {
+      self._setState(data);
     });
+  }
 
-    // if (this.props.body.links && this.props.body.links.length > 0) {
-    //   var links = [];
-    //   this.props.body.links.map((link, index) => {
-    //     var linkCom = <Tab title={link.label + ' (0)'} key={index}>
-    //       <List body={this._genLinkBody(link, record)}/>
-    //     </Tab>;
-    //     links.push(linkCom);
-    //   });
-    //
-    //   this.setState({
-    //     links: links
-    //   });
-    // }
+  _onClick(record) {
+    if (this.props.body.links && this.props.body.links.length > 0) {
+      this.setState({
+        record: record
+      });
+    }
   }
 
   _setState(data) {
