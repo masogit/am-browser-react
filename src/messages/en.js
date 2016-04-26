@@ -21,5 +21,11 @@ module.exports = {
   flavor: 'Flavor',
   switches: 'Switches',
   Arc: 'Arc',
-  LoginFailed: 'Login failed'
+  LoginFailed: 'Login failed',
+  play: 'play',
+  home: 'home',
+  'caret-next': 'caret-next',
+  notes: 'notes',
+  'link-next': 'link-next',
+  'Close  Layer': 'Close  Layer'
 };
