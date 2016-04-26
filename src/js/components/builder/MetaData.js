@@ -3,7 +3,6 @@ import Anchor from 'grommet/components/Anchor';
 import Header from 'grommet/components/Header';
 import Table from 'grommet/components/Table';
 import TableRow from 'grommet/components/TableRow';
-import CheckBox from 'grommet/components/CheckBox';
 
 export default class MetaData extends Component {
 
@@ -42,6 +41,16 @@ export default class MetaData extends Component {
     console.log(row);
   }
 
+  _sortSqlName(a, b) {
+    var nameA = a.sqlname.toLowerCase();
+    var nameB = b.sqlname.toLowerCase();
+    if (nameA < nameB) //sort string ascending
+      return -1;
+    if (nameA > nameB)
+      return 1;
+    return 0; //default return value (no sorting)
+  }
+
   render() {
     let rows = this.props.rows;
     let filterValue = document.getElementById("metadataFilter")? document.getElementById("metadataFilter").value : "";
@@ -49,14 +58,19 @@ export default class MetaData extends Component {
     let entities = rowsState.entities ? rowsState.entities : [];
     let links = rowsState.links ? rowsState.links : [];
     let fields = rowsState.fields ? rowsState.fields : [];
-    var entitiesComponents = entities.map((row, index) => {
-      return <TableRow key={index}><td><Anchor key={index} onClick={this._onClick.bind(this, {label: row.label, url: row["ref-link"]})}>{row.sqlname}</Anchor></td></TableRow>;
+    let LinkNext = require('grommet/components/icons/base/LinkNext');
+    let Notes = require('grommet/components/icons/base/Notes');
+    let entitiesComponents = entities.sort(this._sortSqlName).map((row, index) => {
+      return <TableRow key={index}><td><Anchor key={index} icon={<LinkNext size="large" colorIndex="brand"/>} onClick={this._onClick.bind(this, {label: row.label, url: row["ref-link"]})}>{row.sqlname}</Anchor></td></TableRow>;
     });
-    var linksComponents = links.map((row, index) => {
-      return <TableRow key={index}><td><Anchor key={index} onClick={this._onClick.bind(this, {label: row.label, url: row.dest_table["ref-link"]})}>{row.sqlname}</Anchor></td></TableRow>;
+    let linksComponents = links.sort(this._sortSqlName).map((row, index) => {
+      return <TableRow key={index}><td><Anchor key={index} icon={<LinkNext size="large" colorIndex="brand"/>} onClick={this._onClick.bind(this, {label: row.label, url: row.dest_table["ref-link"]})}>{row.sqlname}</Anchor></td></TableRow>;
     });
-    var fieldsComponents = fields.map((row, index) => {
-      return <TableRow key={index}><td><CheckBox key={index} id={`checkbox_${row.sqlname}`} checked={row.checked} onChange={this._onChange.bind(this, row)}/>{row.sqlname}</td></TableRow>;
+    //let fieldsComponents = fields.sort().map((row, index) => {
+    //  return <TableRow key={index}><td><CheckBox key={index} id={`checkbox_${row.sqlname}`} checked={row.checked} onChange={this._onChange.bind(this, row)}/><Notes size="large" colorIndex="brand"/>{row.sqlname}</td></TableRow>;
+    //});
+    let fieldsComponents = fields.sort(this._sortSqlName).map((row, index) => {
+      return <TableRow key={index}><td><Anchor key={index} icon={<Notes size="large" colorIndex="brand"/>} onClick={this._onChange.bind(this, row)}>{row.sqlname}</Anchor></td></TableRow>;
     });
     return (
       <div>
