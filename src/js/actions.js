@@ -240,27 +240,13 @@ export function loadTemplates() {
 
 export function loadRecords(template) {
   return function (dispatch) {
-    // var AM_FORM_DATA = "amFormData";
-    // if (localStorage && localStorage[AM_FORM_DATA]) {
-    //   var form = JSON.parse(localStorage.getItem(AM_FORM_DATA));
-    //   if (form.server) formData.server = form.server;
-    //   if (form.user) formData.user = form.user;
-    //   if (form.password) formData.password = form.password;
-    //   if (form.pageSize) formData.pageSize = form.pageSize;
-    //   if (form.showLabel) formData.showLabel = form.showLabel;
-    //   //        $scope.formData.showError = form.showError;
-    //   if (form.limit) formData.param.limit = form.limit;
-    //   if (form.offset) formData.param.offset = form.offset;
-    //   if (form.viewStyle) formData.viewStyle = form.viewStyle;
-    // }
-    // formData["ref-link"] = "db/" + template.body.sqlname;
-    // formData.param.fields = template.body.fields;
     Rest.get(HOST_NAME + '/coll/view/' + template._id + '/list').end(function (err, res) {
       var records = res.body.entities;
       dispatch(recordsLoadSuccess(records));
     });
   };
 };
+
 export function loadDetailRecordLinks (viewid, recordid, linksArray, linksObj) {
   return function (dispatch) {
     var link = linksArray.pop();
