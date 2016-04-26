@@ -16,6 +16,12 @@ module.exports = function (app, am, redis) {
 
     var httpProxy = require('http-proxy');
     var apiProxy = httpProxy.createProxyServer();
+    var auth = 'Basic ' + new Buffer(am.user + ':' + am.password).toString('base64');
+    console.log("auth: " + auth);
+    apiProxy.on('proxyReq', function(proxyReq, req, res, options) {
+      console.log("set request header: " + auth);
+      proxyReq.setHeader('Authorization', auth);
+    });
 
     // Redis Server Info
     app.get('/redis', function (req, res) {
@@ -212,7 +218,7 @@ module.exports = function (app, am, redis) {
         // TODO: need to take care of https
         console.log('http://'+am.server+'/AssetManagerWebService/rs/db');
         apiProxy.web(req,res,{target: 'http://'+am.server+'/AssetManagerWebService/rs/db'});
-    })
+    });
 
     // redis cache search --------------------------------------------------
     app.post('/cache/search', cache.search);
