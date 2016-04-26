@@ -23,12 +23,16 @@ export default class BreadCrumb extends Component {
   }
 
   render() {
-    var elements = this.props.elements;
-    var breadcrumbs = elements.map((element, index) => {
+    let elements = this.props.elements;
+    let Home = require('grommet/components/icons/base/Home');
+    let CaretNext = require('grommet/components/icons/base/CaretNext');
+    let breadcrumbs = elements.map((element, index) => {
       if (index == 0) {
-        return <td key={index}><Anchor key={index} onClick={this._onClick.bind(this)}>{element.label}</Anchor></td>;
+        return <td key={index}>&nbsp;&nbsp;<Home size="large" colorIndex="brand"/>&nbsp;&nbsp;<Anchor key={index} onClick={this._onClick.bind(this)}>{element.label}</Anchor></td>;
+      } else if (index == elements.length - 1) {
+        return <td key={index}>&nbsp;&nbsp;<CaretNext size="large" colorIndex="brand"/>&nbsp;&nbsp;{element.label}</td>;
       } else {
-        return <td key={index}>&nbsp;&gt;&nbsp;<Anchor key={index} onClick={this._onDetailClick.bind(this, element, index)}>{element.label}</Anchor></td>;
+        return <td key={index}>&nbsp;&nbsp;<CaretNext size="large" colorIndex="brand"/>&nbsp;&nbsp;<Anchor key={index} onClick={this._onDetailClick.bind(this, element, index)}>{element.label}</Anchor></td>;
       }
     });
 
