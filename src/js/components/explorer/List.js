@@ -72,7 +72,6 @@ export default class List extends Component {
     var fields;
     var linkTabs;
     if (this.state.record && this.props) {
-      console.log("this.state.record: " + JSON.stringify(this.state.record));
       fields = this.props.body.fields.map((field, index) => {
         return !field.PK &&
           <TableRow key={index}>
