@@ -74,10 +74,11 @@ export default class List extends Component {
     if (this.state.record && this.props) {
       console.log("this.state.record: " + JSON.stringify(this.state.record));
       fields = this.props.body.fields.map((field, index) => {
-        return <TableRow key={index}>
-          <td>{field.label}</td>
-          <td>{this.state.record[field.sqlname]}</td>
-        </TableRow>;
+        return !field.PK &&
+          <TableRow key={index}>
+            <td>{field.label}</td>
+            <td>{this.state.record[field.sqlname]}</td>
+          </TableRow>;
       });
       if (this.props.body.links && this.props.body.links.length > 0) {
         linkTabs = this.props.body.links.map((link, index) => {
