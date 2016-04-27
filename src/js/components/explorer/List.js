@@ -5,6 +5,11 @@ import * as ExplorerActions from '../../actions/explorer';
 import Split from 'grommet/components/Split';
 import Tabs from 'grommet/components/Tabs';
 import Tab from 'grommet/components/Tab';
+import Search from 'grommet/components/Search';
+import Box from 'grommet/components/Box';
+import Header from 'grommet/components/Header';
+import Title from 'grommet/components/Title';
+import Distribution from 'grommet/components/Distribution';
 export default class List extends Component {
 
   constructor() {
@@ -15,12 +20,21 @@ export default class List extends Component {
     };
     this._onClick.bind(this);
     this._setState.bind(this);
+    this._onGroupBy.bind(this);
+    this._getFieldStrVal.bind(this);
   }
 
   componentDidMount() {
     let self = this;
     ExplorerActions.loadRecordsByBody(self.props.body, function (data) {
       self._setState(data);
+    });
+    var groups_select = this.props.body.fields.map((field, index) => {
+      return !field.PK &&
+        <option key={index} value={JSON.stringify(field)}>{this._getDisplayLabel(field)}</option>;
+    });
+    this.setState({
+      group_select: groups_select
     });
   }
 
@@ -65,13 +79,54 @@ export default class List extends Component {
     return val;
   }
 
+  _getDisplayLabel(field) {
+    return field.alias ? field.alias : (field.label ? field.label : field.sqlname);
+  }
+
+  _onSearch(event) {
+    // var records = this.state.records;
+    // console.log(records);
+    console.log("event: " + JSON.stringify(event));
+    this.setState({
+      filtered: this.state.records.filter((obj) => JSON.stringify(obj).toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1)
+    });
+  }
+
+  _onGroupBy(event) {
+    var field = JSON.parse(event.target.value);
+    console.log("_onGroupBy field: " + JSON.stringify(field));
+    let groups = [];
+    this.state.records.forEach(function (record) {
+      var val = record[field.sqlname];
+      val = (val instanceof Object)?val[Object.keys(val)[0]]:val;
+
+      var group = groups.filter(function (group) {
+        return group.label == val; //_getFieldStrVal(record, field);
+      })[0];
+
+      if (group) {
+        group.value += 1;
+        group.records.push(record);
+      } else {
+        let g = {label: val, value: 1, records: [record]};
+        groups.push(g);
+      }
+
+    });
+
+    this.setState({
+      groups_dist: groups
+    });
+  }
+
   render() {
     var body = this.props.body;
+    var records = (this.state.filtered)?this.state.filtered:this.state.records;
     var header = body.fields.map((field, index) => {
       return !field.PK &&
-        <th key={index}>{ field.alias ? field.alias : (field.label ? field.label : field.sqlname)}</th>;
+        <th key={index}>{ this._getDisplayLabel(field)}</th>;
     });
-    var recordComponents = this.state.records.map((record, index) => {
+    var recordComponents = records.map((record, index) => {
       return <TableRow key={index} onClick={this._onClick.bind(this, record)}>
         <td>{record.self}</td>
         {
@@ -90,7 +145,7 @@ export default class List extends Component {
       fields = this.props.body.fields.map((field, index) => {
         return !field.PK &&
           <TableRow key={index}>
-            <td>{field.label}</td>
+            <td>{this._getDisplayLabel(field)}</td>
             <td>{this._getFieldStrVal(this.state.record, field)}</td>
           </TableRow>;
       });
@@ -105,17 +160,35 @@ export default class List extends Component {
 
     return (
       <Split flex="both">
-        <Table selectable={true} scrollable={true}>
-          <thead>
-          <tr>
-            <th>Self</th>
-            {header}
-          </tr>
-          </thead>
-          <tbody>
-          {recordComponents}
-          </tbody>
-        </Table>
+        <div>
+          <Header justify="between">
+            <Title>
+              Count: {(this.state.filtered)?this.state.filtered.length:this.state.records.length}
+            </Title>
+            <Search inline={true} className="flex" placeHolder="Filter Records" size="small" onDOMChange={this._onSearch.bind(this)}/>
+            <select onChange={this._onGroupBy.bind(this)}>
+              <option>Group By</option>
+              {this.state.group_select}
+            </select>
+          </Header>
+          {
+            this.state.groups_dist && this.state.groups_dist.length > 0 &&
+            <Box dirction="row">
+              <Distribution size="small" series={this.state.groups_dist} a11yTitleId="distribution-title-1" a11yDescId="distribution-desc-1" />
+            </Box>
+          }
+          <Table selectable={true} scrollable={true}>
+            <thead>
+            <tr>
+              <th>Self</th>
+              {header}
+            </tr>
+            </thead>
+            <tbody>
+            {recordComponents}
+            </tbody>
+          </Table>
+        </div>
         {
           this.state.record &&
           <Tabs justify="start" initialIndex={0}>
