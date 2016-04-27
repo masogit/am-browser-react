@@ -93,30 +93,38 @@ export default class List extends Component {
   }
 
   _onGroupBy(event) {
-    var field = JSON.parse(event.target.value);
-    console.log("_onGroupBy field: " + JSON.stringify(field));
-    let groups = [];
-    this.state.records.forEach(function (record) {
-      var val = record[field.sqlname];
-      val = (val instanceof Object)?val[Object.keys(val)[0]]:val;
+    console.log("_onGroupBy event: " + JSON.stringify(event));
+    if (event.target.value) {
+      var field = JSON.parse(event.target.value);
+      console.log("_onGroupBy field: " + JSON.stringify(field));
+      let groups = [];
+      this.state.records.forEach(function (record) {
+        var val = record[field.sqlname];
+        val = (val instanceof Object)?val[Object.keys(val)[0]]:val;
 
-      var group = groups.filter(function (group) {
-        return group.label == val; //_getFieldStrVal(record, field);
-      })[0];
+        var group = groups.filter(function (group) {
+          return group.label == val; //_getFieldStrVal(record, field);
+        })[0];
 
-      if (group) {
-        group.value += 1;
-        group.records.push(record);
-      } else {
-        let g = {label: val, value: 1, records: [record]};
-        groups.push(g);
-      }
+        if (group) {
+          group.value += 1;
+          group.records.push(record);
+        } else {
+          let g = {label: val, value: 1, records: [record]};
+          groups.push(g);
+        }
 
-    });
+      });
 
-    this.setState({
-      groups_dist: groups
-    });
+      this.setState({
+        groups_dist: groups
+      });
+    } else {
+      this.setState({
+        groups_dist: null
+      });
+    }
+
   }
 
   render() {
@@ -167,7 +175,7 @@ export default class List extends Component {
             </Title>
             <Search inline={true} className="flex" placeHolder="Filter Records" size="small" onDOMChange={this._onSearch.bind(this)}/>
             <select onChange={this._onGroupBy.bind(this)}>
-              <option>Group By</option>
+              <option value="">Group By</option>
               {this.state.group_select}
             </select>
           </Header>
