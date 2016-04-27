@@ -165,7 +165,6 @@ export default class ViewDefDetail extends Component {
   render() {
     const { selectedView } = this.props;
     console.log("ViewDefDetail.js - selectedView:");
-    console.log(selectedView);
     let p = "input";
     let tableHeader = (
       <thead>

@@ -37,8 +37,7 @@ export default class MetaData extends Component {
   }
 
   _onChange(row) {
-    row.checked = !row.checked;
-    console.log(row);
+    this.props.syncSelectedView(this.props.elements, row);
   }
 
   _sortSqlName(a, b) {
@@ -61,10 +60,10 @@ export default class MetaData extends Component {
     let LinkNext = require('grommet/components/icons/base/LinkNext');
     let Notes = require('grommet/components/icons/base/Notes');
     let entitiesComponents = entities.sort(this._sortSqlName).map((row, index) => {
-      return <TableRow key={index}><td><Anchor key={index} icon={<LinkNext size="large" colorIndex="brand"/>} onClick={this._onClick.bind(this, {label: row.label, url: row["ref-link"]})}>{row.sqlname}</Anchor></td></TableRow>;
+      return <TableRow key={index}><td><Anchor key={index} icon={<LinkNext size="large" colorIndex="brand"/>} onClick={this._onClick.bind(this, {label: row.label, sqlname: row.sqlname, url: row["ref-link"]})}>{row.sqlname}</Anchor></td></TableRow>;
     });
     let linksComponents = links.sort(this._sortSqlName).map((row, index) => {
-      return <TableRow key={index}><td><Anchor key={index} icon={<LinkNext size="large" colorIndex="brand"/>} onClick={this._onClick.bind(this, {label: row.label, url: row.dest_table["ref-link"]})}>{row.sqlname}</Anchor></td></TableRow>;
+      return <TableRow key={index}><td><Anchor key={index} icon={<LinkNext size="large" colorIndex="brand"/>} onClick={this._onClick.bind(this, {label: row.label, sqlname: row.sqlname, url: row.dest_table["ref-link"]})}>{row.sqlname}</Anchor></td></TableRow>;
     });
     //let fieldsComponents = fields.sort().map((row, index) => {
     //  return <TableRow key={index}><td><CheckBox key={index} id={`checkbox_${row.sqlname}`} checked={row.checked} onChange={this._onChange.bind(this, row)}/><Notes size="large" colorIndex="brand"/>{row.sqlname}</td></TableRow>;

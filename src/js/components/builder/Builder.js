@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as BuilderActions from '../../actions';
+import * as ViewDefActions from '../../actions/views';
 import MetaData from './MetaData';
 import BreadCrumb from './BreadCrumb';
 import Sidebar from 'grommet/components/Sidebar';
@@ -16,14 +17,6 @@ export default class Builder extends Component {
     this.props.dispatch(BuilderActions.metadataLoad());
   }
 
-  _onClick(id) {
-    this.props.dispatch(BuilderActions.metadataLoadDetail(id));
-  }
-
-  _onItemClick(node) {
-    node.checked = !node.checked;
-  }
-
   _clearFilter() {
     document.getElementById("metadataFilter").value="";
   }
@@ -33,11 +26,12 @@ export default class Builder extends Component {
     let elements = this.props.elements;
     let { dispatch } = this.props;
     let boundActionCreators = bindActionCreators(BuilderActions, dispatch);
+    let boundActionCreators_views = bindActionCreators(ViewDefActions, dispatch);
     return (
       <div className="example">
         <Sidebar primary={true} pad="small" size="large">
           <BreadCrumb elements={elements} {...boundActionCreators} clearFilter={this._clearFilter}/>
-          <MetaData elements={elements} rows={item} {...boundActionCreators} clearFilter={this._clearFilter}/>
+          <MetaData elements={elements} rows={item} {...boundActionCreators} {...boundActionCreators_views} clearFilter={this._clearFilter}/>
         </Sidebar>
       </div>
     );

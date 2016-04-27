@@ -169,6 +169,16 @@ export function updateSelectedView(selectedView, path, newValue) {
   };
 }
 
+export function syncSelectedView(elements, row) {
+  return dispatch => {
+    dispatch({
+      type: types.SYNC_SELECTED_VIEW,
+      elements: elements,
+      row: row
+    });
+  };
+}
+
 export function loadTemplateTable(selectedViewId, selectedView) {
   return dispatch => {
     console.log("action - loadTemplateTable - selectedViewId: " + selectedViewId);
