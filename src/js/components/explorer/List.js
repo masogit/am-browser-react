@@ -52,6 +52,18 @@ export default class List extends Component {
     return body;
   }
 
+  _getFieldStrVal(record, field) {
+    var val = record[field.sqlname];
+    if (field.user_type && field.user_type == 'System Itemized List')
+      val = val[Object.keys(val)[0]];
+    else if (field.type && field.type == 'Date+Time') {
+      var d = new Date(val);
+      val = d.toLocaleString();
+    }
+
+    return val;
+  }
+
   render() {
     var body = this.props.body;
     var header = body.fields.map((field, index) => {
@@ -64,7 +76,9 @@ export default class List extends Component {
         {
           body.fields.map((field, tdindex) => {
             return !field.PK &&
-              <td key={tdindex}>{record[field.sqlname]}</td>;
+              <td key={tdindex}>
+                {this._getFieldStrVal(record, field)}
+              </td>;
           })
         }
       </TableRow>;
@@ -76,7 +90,7 @@ export default class List extends Component {
         return !field.PK &&
           <TableRow key={index}>
             <td>{field.label}</td>
-            <td>{this.state.record[field.sqlname]}</td>
+            <td>{this._getFieldStrVal(this.state.record, field)}</td>
           </TableRow>;
       });
       if (this.props.body.links && this.props.body.links.length > 0) {
