@@ -59,7 +59,8 @@ export default class List extends Component {
     else if (field.type && field.type == 'Date+Time') {
       var d = new Date(val);
       val = d.toLocaleString();
-    }
+    } else if (val instanceof Object)
+      val = val[Object.keys(val)[0]];
 
     return val;
   }
