@@ -7,11 +7,11 @@ import Rest from 'grommet/utils/Rest';
 function param2aql(param) {
 
   let aql = '';
-  aql += '?limit='+param.limit;
-  aql += '&offset='+param.offset;
-  aql += '&fields='+param.fields.join(',');
-  aql += param.filter?'&filter='+param.filter:'';
-  aql += param.orderby?'&orderby='+param.orderby:'';
+  aql += '?limit=' + param.limit;
+  aql += '&offset=' + param.offset;
+  aql += '&fields=' + param.fields.join(',');
+  aql += param.filter ? '&filter=' + param.filter : '';
+  aql += param.orderby ? '&orderby=' + param.orderby : '';
 
   return encodeURI(aql);
 }
@@ -19,7 +19,7 @@ function param2aql(param) {
 export function loadRecordsByBody(body, callback) {
 
   var fields = [];
-  body.fields.forEach(function(field) {
+  body.fields.forEach(function (field) {
     fields.push(field.sqlname);
   });
 
@@ -35,9 +35,13 @@ export function loadRecordsByBody(body, callback) {
   var aql = param2aql(param);
 
   Rest.get(HOST_NAME + '/am/db/' + query + aql).end(function (err, res) {
-    var records = res.body.entities;
-    callback(records);
+    if (err)
+      console.log(err);
+    else if (res.body.count && res.body.entities)
+      callback(res.body);
+    else
+      callback({count: 0, entities: []});
   });
 
-};
+}
 

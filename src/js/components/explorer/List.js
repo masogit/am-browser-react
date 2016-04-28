@@ -15,6 +15,7 @@ export default class List extends Component {
   constructor() {
     super();
     this.state = {
+      total: 0,
       records: [],
       record: null
     };
@@ -26,7 +27,8 @@ export default class List extends Component {
   componentDidMount() {
     ExplorerActions.loadRecordsByBody(this.props.body, (data) => {
       this.setState({
-        records: data
+        total: data.count,
+        records: data.entities
       });
     });
     var groups_select = this.props.body.fields.map((field, index) => {
@@ -41,7 +43,8 @@ export default class List extends Component {
   componentWillReceiveProps(nextProps) {
     ExplorerActions.loadRecordsByBody(nextProps.body, (data) => {
       this.setState({
-        records: data
+        total: data.count,
+        records: data.entities
       });
     });
   }
@@ -169,7 +172,7 @@ export default class List extends Component {
         <div>
           <Header justify="between">
             <Title>
-              Count: {(this.state.filtered) ? this.state.filtered.length : this.state.records.length}
+              Count: {(this.state.filtered) ? this.state.filtered.length : this.state.records.length}/{this.state.total}
             </Title>
             <Search inline={true} className="flex" placeHolder="Filter Records" size="small"
                     onDOMChange={this._onSearch.bind(this)}/>
