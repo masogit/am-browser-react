@@ -25,9 +25,8 @@ export default class List extends Component {
   }
 
   componentDidMount() {
-    let self = this;
-    ExplorerActions.loadRecordsByBody(self.props.body, function (data) {
-      self._setState(data);
+    ExplorerActions.loadRecordsByBody(this.props.body, (data) => {
+      this._setState(data);
     });
     var groups_select = this.props.body.fields.map((field, index) => {
       return !field.PK &&
@@ -39,9 +38,8 @@ export default class List extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    let self = this;
-    ExplorerActions.loadRecordsByBody(nextProps.body, function (data) {
-      self._setState(data);
+    ExplorerActions.loadRecordsByBody(nextProps.body, (data) => {
+      this._setState(data);
     });
   }
 
@@ -84,23 +82,24 @@ export default class List extends Component {
   }
 
   _onSearch(event) {
-    // var records = this.state.records;
-    // console.log(records);
-    console.log("event: " + JSON.stringify(event));
     this.setState({
       filtered: this.state.records.filter((obj) => JSON.stringify(obj).toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1)
-    });
+    }, this._onGroupBy);
   }
 
-  _onGroupBy(event) {
-    console.log("_onGroupBy event: " + JSON.stringify(event));
-    if (event.target.value) {
-      var field = JSON.parse(event.target.value);
-      console.log("_onGroupBy field: " + JSON.stringify(field));
+  _onGroupBy() {
+    this.setState({
+      groups_dist: null
+    });
+    if (this.refs.select_group.value) {
+      var field = JSON.parse(this.refs.select_group.value);
+
       let groups = [];
-      this.state.records.forEach(function (record) {
+      let records = (this.state.filtered) ? this.state.filtered : this.state.records;
+
+      records.forEach((record) => {
         var val = record[field.sqlname];
-        val = (val instanceof Object)?val[Object.keys(val)[0]]:val;
+        val = this._getFieldStrVal(record, field);
 
         var group = groups.filter(function (group) {
           return group.label == val; //_getFieldStrVal(record, field);
@@ -110,7 +109,14 @@ export default class List extends Component {
           group.value += 1;
           group.records.push(record);
         } else {
-          let g = {label: val, value: 1, records: [record]};
+          let g = {
+            label: val, value: 1, records: [record], onClick: (event) => {
+              var group = this.state.groups_dist.filter((group) => group.label == val)[0];
+              this.setState({
+                filtered: group.records
+              });
+            }
+          };
           groups.push(g);
         }
 
@@ -119,17 +125,12 @@ export default class List extends Component {
       this.setState({
         groups_dist: groups
       });
-    } else {
-      this.setState({
-        groups_dist: null
-      });
     }
-
   }
 
   render() {
     var body = this.props.body;
-    var records = (this.state.filtered)?this.state.filtered:this.state.records;
+    var records = (this.state.filtered) ? this.state.filtered : this.state.records;
     var header = body.fields.map((field, index) => {
       return !field.PK &&
         <th key={index}>{ this._getDisplayLabel(field)}</th>;
@@ -171,10 +172,11 @@ export default class List extends Component {
         <div>
           <Header justify="between">
             <Title>
-              Count: {(this.state.filtered)?this.state.filtered.length:this.state.records.length}
+              Count: {(this.state.filtered) ? this.state.filtered.length : this.state.records.length}
             </Title>
-            <Search inline={true} className="flex" placeHolder="Filter Records" size="small" onDOMChange={this._onSearch.bind(this)}/>
-            <select onChange={this._onGroupBy.bind(this)}>
+            <Search inline={true} className="flex" placeHolder="Filter Records" size="small"
+                    onDOMChange={this._onSearch.bind(this)}/>
+            <select onChange={this._onGroupBy.bind(this)} ref="select_group">
               <option value="">Group By</option>
               {this.state.group_select}
             </select>
@@ -182,7 +184,8 @@ export default class List extends Component {
           {
             this.state.groups_dist && this.state.groups_dist.length > 0 &&
             <Box dirction="row">
-              <Distribution size="small" series={this.state.groups_dist} a11yTitleId="distribution-title-1" a11yDescId="distribution-desc-1" />
+              <Distribution size="small" series={this.state.groups_dist} a11yTitleId="distribution-title-1"
+                            a11yDescId="distribution-desc-1"/>
             </Box>
           }
           <Table selectable={true} scrollable={true}>
