@@ -19,14 +19,15 @@ export default class List extends Component {
       record: null
     };
     this._onClick.bind(this);
-    this._setState.bind(this);
     this._onGroupBy.bind(this);
     this._getFieldStrVal.bind(this);
   }
 
   componentDidMount() {
     ExplorerActions.loadRecordsByBody(this.props.body, (data) => {
-      this._setState(data);
+      this.setState({
+        records: data
+      });
     });
     var groups_select = this.props.body.fields.map((field, index) => {
       return !field.PK &&
@@ -39,7 +40,9 @@ export default class List extends Component {
 
   componentWillReceiveProps(nextProps) {
     ExplorerActions.loadRecordsByBody(nextProps.body, (data) => {
-      this._setState(data);
+      this.setState({
+        records: data
+      });
     });
   }
 
@@ -49,12 +52,6 @@ export default class List extends Component {
         record: record
       });
     }
-  }
-
-  _setState(data) {
-    this.setState({
-      records: data
-    });
   }
 
   _genLinkBody(link, record) {
