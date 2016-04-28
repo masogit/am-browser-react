@@ -7,7 +7,9 @@ import Box from 'grommet/components/Box';
 import Form from 'grommet/components/Form';
 import FormFields from 'grommet/components/FormFields';
 import FormField from 'grommet/components/FormField';
+import Button from 'grommet/components/Button';
 import Header from 'grommet/components/Header';
+import Footer from 'grommet/components/Footer';
 //import CheckBox from 'grommet/components/CheckBox';
 import RadioButton from 'grommet/components/RadioButton';
 //import SearchInput from 'grommet/components/SearchInput';
@@ -238,6 +240,9 @@ export default class ViewDefDetail extends Component {
                   }
                 </fieldset>
               </FormFields>
+              <Footer pad={{vertical: 'medium'}}>
+                <Button label="Save" primary={true} strong={true} onClick={this.props.onSubmit} />
+              </Footer>
             </Form>
             <Box>
               <Anchor tag="span"><Add /></Anchor>

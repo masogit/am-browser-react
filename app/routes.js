@@ -220,6 +220,12 @@ module.exports = function (app, am, redis) {
         apiProxy.web(req,res,{target: 'http://'+am.server+'/AssetManagerWebService/rs/db'});
     });
 
+    app.use('/am/v1/schema', function (req, res) {
+        // TODO: need to take care of https
+        console.log('http://' + am.server + '/AssetManagerWebService/rs/v1/schema');
+        apiProxy.web(req, res, {target: 'http://' + am.server + '/AssetManagerWebService/rs/v1/schema'});
+    })
+
     // redis cache search --------------------------------------------------
     app.post('/cache/search', cache.search);
 

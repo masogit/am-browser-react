@@ -83,6 +83,7 @@ const handlers = {
     };
   },
   [SYNC_SELECTED_VIEW]: (state, action) => {
+    //console.log(state.selectedView);
     let clonedView = _.cloneDeep(state.selectedView);
     let elements = action.elements;
     let row = action.row;

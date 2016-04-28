@@ -1,4 +1,4 @@
-//import Rest from 'grommet/utils/Rest';
+import Rest from 'grommet/utils/Rest';
 import request from 'superagent-bluebird-promise';
 import * as types from '../constants/ActionTypes';
 import {HOST_NAME/*, getFormData*/} from '../util/Config';
@@ -131,8 +131,8 @@ export function loadViews(selectedViewId, currentPathName) {
       // Load first record of the list in detail.
       if (views.length > 0) {
         let selectedView = selectedViewId ? views.filter(view => view._id == selectedViewId)[0] : views[0];
-        console.log("selectedView:");
-        console.log(selectedView);
+        //console.log("selectedView:");
+        //console.log(selectedView);
         dispatch({
           type: types.SET_SELECTED_VIEW,
           selectedViewId: selectedView._id,
@@ -144,6 +144,34 @@ export function loadViews(selectedViewId, currentPathName) {
     }, function (error) {
       dispatch(receiveViewsFailure(error));
     });
+  };
+}
+
+export function saveTemplates(selectedView) {
+  //console.log(selectedView);
+  return function (dispatch) {
+    let formData = {
+    };
+    var AM_FORM_DATA = "amFormData";
+    if (localStorage && localStorage[AM_FORM_DATA]) {
+      var form = JSON.parse(localStorage.getItem(AM_FORM_DATA));
+      if (form.user) formData.user = form.user;
+      if (form.password) formData.password = form.password;
+    }
+    //let  headers = { 'Accept': 'application/json' };
+    //Rest.setHeaders(headers);
+    let auth = 'Basic ' + new Buffer(formData.user + ':' + formData.password).toString('base64');
+    let  headers = {
+      "Content-Type": "application/json",
+      "Authorization": auth
+    };
+    Rest.setHeaders(headers);
+    Rest.post(HOST_NAME + '/coll/view', JSON.stringify(selectedView))
+      .end(function (err, res) {
+        if (!err) {
+          console.log("save successfully.");
+        }
+      });
   };
 }
 

@@ -27,6 +27,7 @@ class ViewDefListContainer extends Component {
   constructor(props) {
     super(props);
     this.onValueChange = this.onValueChange.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
   }
 
   componentWillMount() {
@@ -64,6 +65,10 @@ class ViewDefListContainer extends Component {
     this.props.actions.updateSelectedView(this.props.selectedView, path, newValue);
   }
 
+  onSubmit() {
+    this.props.actions.saveTemplates(this.props.selectedView);
+  }
+
   render() {
     const { views, isFetchingViewList, selectedView } = this.props;
     let { dispatch } = store;
@@ -71,7 +76,7 @@ class ViewDefListContainer extends Component {
     return (
       <Split flex="right">
         <ViewDefList views={views} isFetchingViewList={isFetchingViewList} {...boundActionCreators}/>
-        <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange} {...boundActionCreators}/>
+        <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange} onSubmit={this.onSubmit} {...boundActionCreators}/>
       </Split>
     );
   }
