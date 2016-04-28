@@ -29,7 +29,7 @@ export default class List extends Component {
       this.setState({
         total: data.count,
         records: data.entities
-      });
+      }, this._onGroupBy);
     });
     var groups_select = this.props.body.fields.map((field, index) => {
       return !field.PK &&
@@ -45,7 +45,7 @@ export default class List extends Component {
       this.setState({
         total: data.count,
         records: data.entities
-      });
+      }, this._onGroupBy);
     });
   }
 
