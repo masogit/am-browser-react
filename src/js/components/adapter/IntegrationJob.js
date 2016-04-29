@@ -69,7 +69,7 @@ class IntegrationJob extends Component {
       );
       bodyData = integrationJobData.map((data) => {
         return (
-            <tr>
+            <tr key={data.name}>
               <td>{data.name}</td>
               <td>
                 <Status value={statusAdapter[data.status]}/>
@@ -97,7 +97,7 @@ class IntegrationJob extends Component {
       );
       bodyData = integrationJobData.map((data) => {
         return (
-            <tr>
+            <tr key={data.name}>
               <td>{data.name}</td>
               <td>
                 <Status value={statusAdapter[data.status]}/>
@@ -161,7 +161,7 @@ class IntegrationJob extends Component {
     );
   }
 }
-let select = (state, props) => {
+let select = (state) => {
   return {
     tabName: state.adapter.tabName,
     selectedLinkName: state.adapter.selectedLinkName,

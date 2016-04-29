@@ -51,7 +51,7 @@ class IntegrationJobItem extends Component {
       );
       bodyData = integrationJobItemData.map((data) => {
         return (
-            <tr>
+            <tr key={data.name}>
               <td>{data.name}</td>
               <td>{data.created}</td>
               <td>{data.updated}</td>
@@ -81,7 +81,7 @@ class IntegrationJobItem extends Component {
       );
       bodyData = integrationJobItemData.map((data) => {
         return (
-            <tr>
+            <tr key={data.name}>
               <td>{data.name}</td>
               <td>{data.created}</td>
               <td>{data.updated}</td>
@@ -122,7 +122,7 @@ class IntegrationJobItem extends Component {
     );
   }
 }
-let select = (state, props) => {
+let select = (state) => {
   return {
     integrationJobName: state.adapter.integrationJobName,
     tabName: state.adapter.tabName,
