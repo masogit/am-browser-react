@@ -25,19 +25,34 @@ export function loadRecordsByBody(body, callback) {
 
   var query = body.sqlname;
   var param = {
-    limit: "100",
-    offset: "0",
+    limit: 100,
+    offset: 0,
     filter: body.filter,
     orderby: body.orderby,
     fields: fields
   };
 
+  var userParam = body.param;
+  if (userParam) {
+    if (userParam.orderby)
+      param.orderby = userParam.orderby;
+    if (userParam.limit)
+      param.limit = userParam.limit;
+    if (userParam.offset)
+      param.offset = userParam.offset;
+    if (userParam.filters.length > 0) {
+      var userFilters = userParam.filters.join(" AND ");
+      param.filter = param.filter ? param.filter + ' AND ' + userFilters : userFilters;
+    }
+  }
+
   var aql = param2aql(param);
 
   Rest.get(HOST_NAME + '/am/db/' + query + aql).end(function (err, res) {
-    if (err)
+    if (err) {
       console.log(err);
-    else if (res.body.count && res.body.entities)
+      callback({count: 0, entities: []});
+    }  else if (res.body.count && res.body.entities)
       callback(res.body);
     else
       callback({count: 0, entities: []});
