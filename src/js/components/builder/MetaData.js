@@ -36,8 +36,8 @@ export default class MetaData extends Component {
     this.props.metadataLoadDetail(obj, this.props.elements);
   }
 
-  _onChange(row) {
-    this.props.syncSelectedView(this.props.elements, row);
+  _onChange(baseInfo, row) {
+    this.props.syncSelectedView(this.props.elements, baseInfo, row);
   }
 
   _sortSqlName(a, b) {
@@ -63,13 +63,25 @@ export default class MetaData extends Component {
       return <TableRow key={index}><td><Anchor key={index} icon={<LinkNext size="large" colorIndex="brand"/>} onClick={this._onClick.bind(this, {label: row.label, sqlname: row.sqlname, url: row["ref-link"]})}>{row.sqlname}</Anchor></td></TableRow>;
     });
     let linksComponents = links.sort(this._sortSqlName).map((row, index) => {
-      return <TableRow key={index}><td><Anchor key={index} icon={<LinkNext size="large" colorIndex="brand"/>} onClick={this._onClick.bind(this, {label: row.label, sqlname: row.sqlname, url: row.dest_table["ref-link"]})}>{row.sqlname}</Anchor></td></TableRow>;
+      let newRow = {
+        label: row.label,
+        sqlname: row.sqlname,
+        url: row.dest_table["ref-link"],
+        card11: row.card11,
+        reverse: row.reverse,
+        reversefield: row.src_field.sqlname
+      };
+      return <TableRow key={index}><td><Anchor key={index} icon={<LinkNext size="large" colorIndex="brand"/>} onClick={this._onClick.bind(this, newRow)}>{row.sqlname}</Anchor></td></TableRow>;
     });
     //let fieldsComponents = fields.sort().map((row, index) => {
     //  return <TableRow key={index}><td><CheckBox key={index} id={`checkbox_${row.sqlname}`} checked={row.checked} onChange={this._onChange.bind(this, row)}/><Notes size="large" colorIndex="brand"/>{row.sqlname}</td></TableRow>;
     //});
     let fieldsComponents = fields.sort(this._sortSqlName).map((row, index) => {
-      return <TableRow key={index}><td><Anchor key={index} icon={<Notes size="large" colorIndex="brand"/>} onClick={this._onChange.bind(this, row)}>{row.sqlname}</Anchor></td></TableRow>;
+      let baseInfo = {
+        sqlname: rowsState.sqlname,
+        label: rowsState.label
+      };
+      return <TableRow key={index}><td><Anchor key={index} icon={<Notes size="large" colorIndex="brand"/>} onClick={this._onChange.bind(this, baseInfo, row)}>{row.sqlname}</Anchor></td></TableRow>;
     });
     return (
       <div>
