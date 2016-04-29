@@ -3,7 +3,7 @@ var db = require('./db.js');
 module.exports = function (app, am, redis) {
 
 
-    var Adapter = require('./adapter.js');
+    var Adapter = require('./ucmdbAdapter.js');
     var adapter = new Adapter();
     var Metadata = require('./metadata.js');
     var metadata = new Metadata();
