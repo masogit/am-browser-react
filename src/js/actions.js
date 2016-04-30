@@ -534,12 +534,12 @@ export function adapterSideBarClick(selectedLinkName) {
 }
 
 export function integrationJobSelect(tabName, selectedLinkName, integrationJobName) {
-  history.pushState(null, '/adapter/' + tabName + '/' + selectedLinkName + '/' + integrationJobName);
+  history.pushState(null, '/ucmdbAdapter/' + tabName + '/' + selectedLinkName + '/' + integrationJobName);
   return { type: JOB_SELECT_SUCCESS, integrationJobName: integrationJobName };
 }
 
 export function integrationJobTabSwitch(selectedLinkName, tabName) {
-  history.pushState(null, '/adapter/' + tabName + '/' + selectedLinkName);
+  history.pushState(null, '/ucmdbAdapter/' + tabName + '/' + selectedLinkName);
   return {
     type: TAB_SWITCH_SUCCESS,
     tabName: tabName,

@@ -32,7 +32,7 @@ class Adapter extends Component {
   componentWillReceiveProps(nextProps) {
     if (firstStart && nextProps.data.length > 0) {
       this.props.dispatch(adapterSideBarClick(nextProps.data[0].name));
-      history.pushState(null, `/adapter/populationJobs/${nextProps.data[0].name}`);
+      history.pushState(null, `/ucmdbAdapter/populationJobs/${nextProps.data[0].name}`);
       firstStart = false;
     }
   }
@@ -50,7 +50,7 @@ class Adapter extends Component {
     const {data, dataError} = this.props;
     let menuItems = data.map((data) => {
       return (
-          <Link key={data.name} to={`/adapter/${this.props.params.tabName}/${data.name}`} activeClassName="active" onClick={this._adapterSideBarClick.bind(this,data.name)}>
+          <Link key={data.name} to={`/ucmdbAdapter/${this.props.params.tabName}/${data.name}`} activeClassName="active" onClick={this._adapterSideBarClick.bind(this,data.name)}>
             <Status value={statusAdapter[data.status]}/>
             <span>{data.name}</span>
           </Link>
@@ -74,7 +74,7 @@ class Adapter extends Component {
     );
   }
 }
-let select = (state, props) => {
+let select = (state) => {
   return {
     data: state.adapter.data,
     dataError: state.adapter.dataError
