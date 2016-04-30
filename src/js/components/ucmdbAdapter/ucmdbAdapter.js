@@ -15,7 +15,7 @@ import {statusAdapter} from '../../constants/StatusAdapter.js';
 
 let firstStart = true;
 
-class Adapter extends Component {
+class ucmdbAdapter extends Component {
 
   constructor () {
     super();
@@ -76,9 +76,9 @@ class Adapter extends Component {
 }
 let select = (state) => {
   return {
-    data: state.adapter.data,
-    dataError: state.adapter.dataError
+    data: state.ucmdbAdapter.data,
+    dataError: state.ucmdbAdapter.dataError
   };
 };
 
-export default connect(select)(Adapter);
+export default connect(select)(ucmdbAdapter);

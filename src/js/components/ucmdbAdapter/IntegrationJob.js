@@ -163,11 +163,11 @@ class IntegrationJob extends Component {
 }
 let select = (state) => {
   return {
-    tabName: state.adapter.tabName,
-    selectedLinkName: state.adapter.selectedLinkName,
-    integrationJobData: state.adapter.integrationJobData,
-    integrationJobDataError: state.adapter.integrationJobDataError,
-    integrationJobName: state.adapter.integrationJobName
+    tabName: state.ucmdbAdapter.tabName,
+    selectedLinkName: state.ucmdbAdapter.selectedLinkName,
+    integrationJobData: state.ucmdbAdapter.integrationJobData,
+    integrationJobDataError: state.ucmdbAdapter.integrationJobDataError,
+    integrationJobName: state.ucmdbAdapter.integrationJobName
   };
 };
 
