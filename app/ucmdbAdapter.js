@@ -12,12 +12,7 @@ module.exports = function (am) {
       }
     };
     var request = client.get(url, args, function (data, response) {
-      var arrayData = [];
-      if (Array.isArray(data) && data.length > 0) {
-        for (var i = 0; i < data.length; i++) {
-          arrayData.push(data[i]);
-        }
-      }
+      var arrayData = Array.isArray(data) ? data : [];
       res.json(arrayData);
     }).on('error', function (err) {
       res.status(500).send(err.toString());
@@ -34,17 +29,11 @@ module.exports = function (am) {
       }
     };
     var request = client.get(url, args, function (data, response) {
-      var arrayData = [],origData = data["jobStatuses"];
-      if (Array.isArray(origData) && origData.length > 0) {
-        for (var i = 0; i < origData.length; i++) {
-          arrayData.push(origData[i]);
-        }
-      }
+      var arrayData = Array.isArray(data["jobStatuses"]) ? data["jobStatuses"] : [];
       res.json(arrayData);
     }).on('error', function (err) {
       res.status(500).send(err.toString());
     });
   };
-
 };
 
