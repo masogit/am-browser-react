@@ -31,7 +31,7 @@ export default class Builder extends Component {
       <div className="example">
         <Sidebar primary={true} pad="small" size="large">
           <BreadCrumb elements={elements} {...boundActionCreators} clearFilter={this._clearFilter}/>
-          <MetaData elements={elements} rows={item} {...boundActionCreators} {...boundActionCreators_views} clearFilter={this._clearFilter}/>
+          <MetaData elements={elements} rows={item} {...boundActionCreators} {...boundActionCreators_views} clearFilter={this._clearFilter} filterEntities={this.props.filterEntities}/>
         </Sidebar>
       </div>
     );

@@ -22,8 +22,13 @@ export default class Accordion extends Component {
     });
   }
 
-  _onOpen(event) {
-    this.setState({active: true});
+  _onOpen(viewId) {
+    this.setState(
+      {
+        active: true,
+        viewId: viewId
+      }
+    );
   }
 
   _onClose(event) {
@@ -33,9 +38,16 @@ export default class Accordion extends Component {
     this.setState({active: false});
   }
 
-  renderItems(views, editButton) {
+  renderItems(views, isEditable) {
     const {type} = this.props;
+    let editButton = null;
+    let Edit = require('grommet/components/icons/base/Edit');
     return views.map((view, key) => {
+      if (isEditable) {
+        editButton = (
+          <Button icon={<Edit size="large" colorIndex="brand"/>} onClick={this._onOpen.bind(this, view._id)}/>
+        );
+      }
       return (
         <AccordionItem catagory={view.catagory} key={key}><Link to={`/${type}/${view._id}`}>{view.name}</Link>{editButton}</AccordionItem>
       );
@@ -44,18 +56,12 @@ export default class Accordion extends Component {
 
   render() {
     const { views, isFetching, isEditable } = this.props;
-    let editButton = null;
-    let Edit = require('grommet/components/icons/base/Edit');
-    if (isEditable) {
-      editButton = (
-        <Button icon={<Edit size="large" colorIndex="brand"/>} onClick={this._onOpen}/>
-      );
-    }
     let activeLayer = null;
-    if (this.state && this.state.active) {
+    if (this.state && this.state.active && this.state.viewId) {
+      let selectedView = views.filter(view => view._id == this.state.viewId)[0];
       activeLayer = (
         <Layer onClose={this._onClose} closer={true} align="left">
-          <Builder/>
+          <Builder filterEntities={selectedView.body.sqlname}/>
         </Layer>
       );
     }
@@ -68,7 +74,7 @@ export default class Accordion extends Component {
         </Header>
         <div>
           {viewsState.length > 0 &&
-          <div>{this.renderItems(viewsState, editButton)}</div>
+          <div>{this.renderItems(viewsState, isEditable)}</div>
           }
           {!isFetching && viewsState.length === 0 &&
           <h2>No data to display!</h2>

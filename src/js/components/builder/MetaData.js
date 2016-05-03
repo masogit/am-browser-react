@@ -52,9 +52,10 @@ export default class MetaData extends Component {
 
   render() {
     let rows = this.props.rows;
+    let filterEntities = this.props.filterEntities;
     let filterValue = document.getElementById("metadataFilter")? document.getElementById("metadataFilter").value : "";
     let rowsState = this.state && this.state.filtered && (filterValue && filterValue != "") ? this.state.filtered : rows;
-    let entities = rowsState.entities ? rowsState.entities : [];
+    let entities = rowsState.entities ? ((filterEntities ? rowsState.entities.filter((obj) => obj.sqlname.toLowerCase().indexOf(filterEntities.toLowerCase().trim()) !== -1) : rowsState.entities)) : [];
     let links = rowsState.links ? rowsState.links : [];
     let fields = rowsState.fields ? rowsState.fields : [];
     let LinkNext = require('grommet/components/icons/base/LinkNext');
