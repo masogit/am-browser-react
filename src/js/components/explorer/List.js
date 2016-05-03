@@ -219,7 +219,7 @@ export default class List extends Component {
     var body = this.props.body;
     var records = (this.state.filtered) ? this.state.filtered : this.state.records;
     var header = body.fields.map((field, index) => {
-      return !field.PK &&
+      return !field.PK && index < 5 &&
         <th key={index}>
           <Anchor href="#" ref={'Header_' + field.sqlname} onClick={this._onOrderBy.bind(this, field.sqlname)}>
             { this._getDisplayLabel(field)}
@@ -231,7 +231,7 @@ export default class List extends Component {
         <td>{record.self}</td>
         {
           body.fields.map((field, tdindex) => {
-            return !field.PK &&
+            return !field.PK && tdindex < 5 &&
               <td key={tdindex}>
                 {this._getFieldStrVal(record, field)}
               </td>;
