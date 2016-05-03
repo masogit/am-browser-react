@@ -1,11 +1,11 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
 import React, { Component } from 'react';
-import Table from 'grommet/components/Table';
 var Status = require('grommet/components/icons/Status');
 import { connect } from 'react-redux';
 import { getIntegrationJobItem } from '../../actions';
 import {statusAdapter} from '../../constants/StatusAdapter.js';
+import {IntegrationJobItemContainer} from './Templates.js';
 
 class IntegrationJobItem extends Component {
 
@@ -14,17 +14,17 @@ class IntegrationJobItem extends Component {
   }
 
   componentDidMount() {
-    const {dispatch, selectedLinkName, tabName, integrationJobName} = this.props;
-    dispatch(getIntegrationJobItem(selectedLinkName, tabName, integrationJobName));
+    const { pointName, tabName, integrationJobName} = this.props;
+    this.props.getIntegrationJobItem(pointName, tabName, integrationJobName);
     this.integrationJobItemInterval = setInterval(() => {
-      dispatch(getIntegrationJobItem(this.props.selectedLinkName, this.props.tabName, this.props.integrationJobName));
+      this.props.getIntegrationJobItem(this.props.pointName, this.props.tabName, this.props.integrationJobName);
     },60*1000);
   }
 
   componentWillReceiveProps(nextProps) {
-    const {dispatch, selectedLinkName, tabName, integrationJobName} = this.props;
+    const { pointName, tabName, integrationJobName} = this.props;
     if (integrationJobName !== nextProps.integrationJobName) {
-      dispatch(getIntegrationJobItem(selectedLinkName, tabName, nextProps.integrationJobName));
+      this.props.getIntegrationJobItem(pointName, tabName, nextProps.integrationJobName);
     }
   }
 
@@ -33,92 +33,8 @@ class IntegrationJobItem extends Component {
   }
 
   render () {
-    const {integrationJobItemData, tabName, integrationJobItemDataError} = this.props;
-    let statisticsHeader, bodyData;
-    integrationJobItemData.sort((a,b) => a.name.localeCompare(b.name));
-    if (tabName === 'populationJobs') {
-      statisticsHeader = (
-          <thead>
-          <tr>
-            <th>Query Name</th>
-            <th>Created</th>
-            <th>Updated</th>
-            <th>Deleted</th>
-            <th>Failed</th>
-            <th>Query Status</th>
-          </tr>
-          </thead>
-      );
-      bodyData = integrationJobItemData.map((data) => {
-        return (
-            <tr key={data.name}>
-              <td>{data.name}</td>
-              <td>{data.created}</td>
-              <td>{data.updated}</td>
-              <td>{data.deleted}</td>
-              <td>{data.failed}</td>
-              <td>
-                <Status value={statusAdapter[data.status]}/>
-                <span>{data.status}</span>
-              </td>
-            </tr>
-        );
-      });
-    } else {
-      statisticsHeader = (
-          <thead>
-          <tr>
-            <th>Query Name</th>
-            <th>Created</th>
-            <th>Updated</th>
-            <th>Deleted</th>
-            <th>Failed</th>
-            <th>Query Status</th>
-            <th>Start Time</th>
-            <th>Finish Time</th>
-          </tr>
-          </thead>
-      );
-      bodyData = integrationJobItemData.map((data) => {
-        return (
-            <tr key={data.name}>
-              <td>{data.name}</td>
-              <td>{data.created}</td>
-              <td>{data.updated}</td>
-              <td>{data.deleted}</td>
-              <td>{data.failed}</td>
-              <td>
-                <Status value={statusAdapter[data.status]}/>
-                <span>{data.status}</span>
-              </td>
-              <td>{new Date(data.startTime).toDateString()}</td>
-              <td>{new Date(data.stopTime).toDateString()}</td>
-            </tr>
-        );
-      });
-    }
-    let tableBody = (
-        <tbody>
-        {bodyData}
-        </tbody>
-    );
     return (
-        <div className="integrationJobItemTable">
-          {
-            integrationJobItemDataError && integrationJobItemDataError
-          }
-          {
-            integrationJobItemData.length === 0 && !integrationJobItemDataError &&
-            <h2>No data to display!</h2>
-          }
-          {
-            integrationJobItemData.length > 0 && !integrationJobItemDataError &&
-            <Table selectable={false}>
-              {statisticsHeader}
-              {tableBody}
-            </Table>
-          }
-        </div>
+      <IntegrationJobItemContainer {...this.props} />
     );
   }
 }
@@ -126,10 +42,17 @@ let select = (state) => {
   return {
     integrationJobName: state.ucmdbAdapter.integrationJobName,
     tabName: state.ucmdbAdapter.tabName,
-    selectedLinkName: state.ucmdbAdapter.selectedLinkName,
+    pointName: state.ucmdbAdapter.pointName,
     integrationJobItemData: state.ucmdbAdapter.integrationJobItemData,
     integrationJobItemDataError: state.ucmdbAdapter.integrationJobItemDataError
   };
 };
 
-export default connect(select)(IntegrationJobItem);
+const jobItemDispatch = (dispatch) => {
+  return {
+    getIntegrationJobItem: (pointName, tabName, integrationJobName) => {
+      dispatch(getIntegrationJobItem(pointName, tabName, integrationJobName));
+    }
+  };
+};
+export default connect(select, jobItemDispatch)(IntegrationJobItem);

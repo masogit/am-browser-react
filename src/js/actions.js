@@ -529,17 +529,17 @@ function integrationJobItemDataSuccess(result, error) {
   };
 }
 
-export function adapterSideBarClick(selectedLinkName) {
-  return { type: ADAPTER_SIDEBAR_CLICK, selectedLinkName: selectedLinkName };
+export function adapterSideBarClick(pointName) {
+  return { type: ADAPTER_SIDEBAR_CLICK, pointName: pointName };
 }
 
-export function integrationJobSelect(tabName, selectedLinkName, integrationJobName) {
-  history.pushState(null, '/ucmdbAdapter/' + tabName + '/' + selectedLinkName + '/' + integrationJobName);
+export function integrationJobSelect(tabName, pointName, integrationJobName) {
+  history.pushState(null, '/ucmdbAdapter/' + tabName + '/' + pointName + '/' + integrationJobName);
   return { type: JOB_SELECT_SUCCESS, integrationJobName: integrationJobName };
 }
 
-export function integrationJobTabSwitch(selectedLinkName, tabName) {
-  history.pushState(null, '/ucmdbAdapter/' + tabName + '/' + selectedLinkName);
+export function integrationJobTabSwitch(pointName, tabName) {
+  history.pushState(null, '/ucmdbAdapter/' + tabName + '/' + pointName);
   return {
     type: TAB_SWITCH_SUCCESS,
     tabName: tabName,

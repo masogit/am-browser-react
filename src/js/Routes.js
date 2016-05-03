@@ -8,7 +8,7 @@ import ViewDefListContainer from './components/builder/ViewDefListContainer';
 //import ViewDefDetail from './components/builder/ViewDefDetail';
 import AQL from './components/aql/AQL';
 import TBD from 'grommet/components/TBD';
-import ucmdbAdapter from './components/ucmdbAdapter/ucmdbAdapter';
+import ucmdbAdapter from './components/ucmdbAdapter/UCMDBAdapter';
 import IntegrationJob from './components/ucmdbAdapter/IntegrationJob';
 import IntegrationJobItem from './components/ucmdbAdapter/IntegrationJobItem';
 
@@ -53,7 +53,7 @@ module.exports = {
         //},
         {path: 'ucmdbAdapter', component: ucmdbAdapter,
           childRoutes: [
-            { path: ':tabName/:selectedLinkName', component: IntegrationJob,
+            { path: ':tabName/:pointName', component: IntegrationJob,
               childRoutes: [
                 { path: ':integrationJobName', component: IntegrationJobItem }
               ]

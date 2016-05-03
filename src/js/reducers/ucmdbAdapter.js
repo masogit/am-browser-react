@@ -11,7 +11,7 @@ import { ADAPTER_DATA_SUCCESS,
 const initialState = {
   data: [],
   dataError: null,
-  selectedLinkName: "",
+  pointName: "",
   integrationJobData: [],
   integrationJobDataError: null,
   tabName: "populationJobs",
@@ -30,7 +30,7 @@ const handlers = {
     integrationJobName: action.integrationJobName
   }),
   [ADAPTER_SIDEBAR_CLICK]: (state, action) => ({
-    selectedLinkName: action.selectedLinkName
+    pointName: action.pointName
   })
 };
 
