@@ -2,25 +2,32 @@ import React, {Component} from 'react';
 import Table from 'grommet/components/Table';
 import TableRow from 'grommet/components/TableRow';
 import * as ExplorerActions from '../../actions/explorer';
-import Split from 'grommet/components/Split';
+// import Split from 'grommet/components/Split';
 import Tabs from 'grommet/components/Tabs';
 import Tab from 'grommet/components/Tab';
 // import Search from 'grommet/components/Search';
 import Box from 'grommet/components/Box';
+import DocumentCsv from 'grommet/components/icons/base/DocumentCsv';
+import Ascend from 'grommet/components/icons/base/Ascend';
+import Descend from 'grommet/components/icons/base/Descend';
+import Anchor from 'grommet/components/Anchor';
 import Header from 'grommet/components/Header';
 import Title from 'grommet/components/Title';
 import Button from 'grommet/components/Button';
 import Close from 'grommet/components/icons/base/Close';
 import Distribution from 'grommet/components/Distribution';
+import Layer from 'grommet/components/Layer';
 export default class List extends Component {
 
   constructor() {
     super();
     this.state = {
       total: 0,
+      time: 0,
       records: [],
       record: null,
       param: {
+        orderby: "",
         offset: 0,
         limit: 30,
         filters: []
@@ -33,6 +40,8 @@ export default class List extends Component {
     this._onOrderBy.bind(this);
     this._onMore.bind(this);
     this._onFilterClear.bind(this);
+    this._setOrderByIcon.bind(this);
+    this._onClose.bind(this);
   }
 
   componentDidMount() {
@@ -65,9 +74,11 @@ export default class List extends Component {
    */
   _getRecords(more) {
     var body = {...this.props.body, param: this.state.param};
+    var timeStart = Date.now();
     ExplorerActions.loadRecordsByBody(body, (data) => {
       var records = this.state.records;
       this.setState({
+        time: Date.now() - timeStart,
         total: data.count,
         records: (more) ? records.concat(data.entities) : data.entities,
         filtered: null
@@ -77,14 +88,25 @@ export default class List extends Component {
 
   _onOrderBy(sqlname) {
     console.log(sqlname);
-    // var param = {...this.state.param};
-    // if (param.orderby == sqlname)
-    //   param.orderby = sqlname + ' desc';
-    // else
-    //   param.orderby = sqlname;
-    // this.setState({
-    //   param: param
-    // }, this._getRecords);
+    var param = {...this.state.param};
+    if (param.orderby == sqlname)
+      param.orderby = sqlname + ' desc';
+    else
+      param.orderby = sqlname;
+    this.setState({
+      param: param
+    }, this._getRecords);
+
+    // this._setOrderByIcon(sqlname);
+  }
+
+  _setOrderByIcon(sqlname) {
+    var orderby = this.state.param.orderby;
+    var a = this.refs['Header_'+sqlname];
+    console.log(a);
+    var icon = (orderby.indexOf(sqlname) > -1) ? ((orderby.indexOf('desc') > -1) ? <Descend /> : <Ascend />) : "";
+    console.log(icon);
+    a.icon = icon;
   }
 
   _onClick(record) {
@@ -186,12 +208,23 @@ export default class List extends Component {
     }
   }
 
+  _onClose(event) {
+    if (event) {
+      event.preventDefault();
+    }
+    this.setState({record: null});
+  }
+
   render() {
     var body = this.props.body;
     var records = (this.state.filtered) ? this.state.filtered : this.state.records;
     var header = body.fields.map((field, index) => {
       return !field.PK &&
-        <th key={index}>{ this._getDisplayLabel(field)}</th>;
+        <th key={index}>
+          <Anchor href="#" ref={'Header_' + field.sqlname} onClick={this._onOrderBy.bind(this, field.sqlname)}>
+            { this._getDisplayLabel(field)}
+          </Anchor>
+        </th>;
     });
     var recordComponents = records.map((record, index) => {
       return <TableRow key={index} onClick={this._onClick.bind(this, record)}>
@@ -230,14 +263,15 @@ export default class List extends Component {
     });
 
     return (
-      <Split flex="both">
         <div>
           <Header justify="between">
             <Title>
               Count: {(this.state.filtered) ? this.state.filtered.length : this.state.records.length}/{this.state.total}
+              Time: {this.state.time}ms
             </Title>
             <input type="text" inline={true} className="flex" placeholder="Filter Records"
                    onKeyDown={this._onFilter.bind(this)}/>
+            <DocumentCsv size="large"/>
             <select onChange={this._onGroupBy.bind(this)} ref="select_group">
               <option value="">Group By</option>
               {this.state.group_select}
@@ -247,14 +281,13 @@ export default class List extends Component {
           {
             this.state.groups_dist && this.state.groups_dist.length > 0 &&
             <Box dirction="row">
-              <Distribution size="small" series={this.state.groups_dist} legend={false}
-                            a11yTitleId="distribution-title-1" a11yDescId="distribution-desc-1"/>
+              <Distribution size="small" series={this.state.groups_dist} legend={false} />
             </Box>
           }
           <Table selectable={true} scrollable={true} onMore={this._onMore.bind(this)}>
             <thead>
             <tr>
-              <th>Self</th>
+              <th><Anchor href="#" onClick={this._onOrderBy.bind(this, 'self')}>Self</Anchor></th>
               {header}
             </tr>
             </thead>
@@ -262,27 +295,29 @@ export default class List extends Component {
             {recordComponents}
             </tbody>
           </Table>
-        </div>
+
         {
           this.state.record &&
-          <Tabs justify="start" initialIndex={0}>
-            <Tab title={this.props.body.label}>
-              <Table>
-                <thead>
-                <tr>
-                  <th>Field</th>
-                  <th>Value</th>
-                </tr>
-                </thead>
-                <tbody>
-                {fields}
-                </tbody>
-              </Table>
-            </Tab>
-            {linkTabs}
-          </Tabs>
+          <Layer closer={true} align="right" onClose={this._onClose.bind(this)}>
+            <Tabs justify="start" initialIndex={0}>
+              <Tab title={this.props.body.label}>
+                <Table>
+                  <thead>
+                  <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {fields}
+                  </tbody>
+                </Table>
+              </Tab>
+              {linkTabs}
+            </Tabs>
+          </Layer>
         }
-      </Split>
+        </div>
     );
   }
 }
