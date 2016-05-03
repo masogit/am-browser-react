@@ -3,7 +3,7 @@ import Section from 'grommet/components/Section';
 
 const styles = {
   active: {
-    display: 'inherit',
+    display: 'block',
     backgroundColor: '#008667'
   },
   inactive: {

@@ -38,18 +38,42 @@ export default class Accordion extends Component {
     this.setState({active: false});
   }
 
+  getGroups(views) {
+    var groups = [];
+    for (var i = 0; i < views.length; i++) {
+      for (var j = 0; j < groups.length; j++) {
+        if (views[i].catagory == groups[j]) {
+          break;
+        }
+        if (j == groups.length - 1) {
+          groups.push(views[i].catagory);
+        }
+      }
+      if (i == 0) {
+        groups.push(views[i].catagory);
+      }
+    }
+    return groups;
+  }
+
   renderItems(views, isEditable) {
     const {type} = this.props;
     let editButton = null;
     let Edit = require('grommet/components/icons/base/Edit');
-    return views.map((view, key) => {
-      if (isEditable) {
-        editButton = (
-          <Button icon={<Edit size="large" colorIndex="brand"/>} onClick={this._onOpen.bind(this, view._id)}/>
+    let groups = this.getGroups(views);
+    return groups.map((group, key) => {
+      let links = views.filter(view => view.catagory == group).map((view, link_key) => {
+        if (isEditable) {
+          editButton = (
+            <Button icon={<Edit size="large" colorIndex="brand"/>} onClick={this._onOpen.bind(this, view._id)}/>
+          );
+        }
+        return (
+          <Link to={`/${type}/${view._id}`} key={link_key}>{view.name}{editButton}</Link>
         );
-      }
+      });
       return (
-        <AccordionItem catagory={view.catagory} key={key}><Link to={`/${type}/${view._id}`}>{view.name}</Link>{editButton}</AccordionItem>
+        <AccordionItem catagory={group} key={key}>{links}</AccordionItem>
       );
     });
   }
