@@ -284,7 +284,7 @@ export default class List extends Component {
               <Distribution size="small" series={this.state.groups_dist} legend={false} />
             </Box>
           }
-          <Table selectable={true} scrollable={true} onMore={this._onMore.bind(this)}>
+          <Table selectable={true} onMore={this._onMore.bind(this)}>
             <thead>
             <tr>
               <th><Anchor href="#" onClick={this._onOrderBy.bind(this, 'self')}>Self</Anchor></th>
