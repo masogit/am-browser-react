@@ -15,8 +15,69 @@ import {statusAdapter} from '../../constants/StatusAdapter.js';
 
 let firstStart = true;
 
-class ucmdbAdapter extends Component {
+const MenuItem = ({
+    linkTo,
+    onClick,
+    status,
+    name
+  }) => (
+  <Link to={linkTo} activeClassName="active" onClick={onClick}>
+    <Status value={status}/>
+    <span>{name}</span>
+  </Link>
+);
 
+const menuState = (state, ownProps) => {
+  return {
+    status: statusAdapter[ownProps.data.status],
+    linkTo: `/ucmdbAdapter/${state.ucmdbAdapter.tabName}/${ownProps.data.name}`,
+    name: ownProps.data.name
+  }
+};
+
+const menuAction = (dispatch, ownProps) => {
+  return {
+    onClick: () => {
+      dispatch(adapterSideBarClick(ownProps.data.name));
+    }
+  }
+};
+
+const MenuItemsComponent = connect(menuState, menuAction)(MenuItem);
+
+const UCMDBMenu = ({
+  adapters
+}) => {
+  return (
+    <Menu primary={true}> {
+      adapters.map(adapter => (
+        <MenuItemsComponent key={adapter.name} data={adapter}/>
+      ))
+    }
+    </Menu>
+  );
+};
+
+const UCMDBAdapterContainer = ({
+    dataError,
+    adapters,
+    children
+  }) => (
+  <Split flex="right" separator={true} priority="left" fixed={false}>
+    {!dataError &&
+    <Sidebar colorIndex="light-2" className="adapterSideBar">
+      <Header pad="medium" justify="between">
+        <Title>Integration Point</Title>
+      </Header>
+      <UCMDBMenu adapters={adapters}/>
+    </Sidebar>
+    }
+    {dataError && dataError}
+    {children}
+  </Split>
+);
+
+class ucmdbAdapter extends Component {
   constructor () {
     super();
   }
@@ -42,35 +103,13 @@ class ucmdbAdapter extends Component {
     clearInterval(this.integrationPointInterval);
   }
 
-  _adapterSideBarClick(selectedLinkName) {
-    this.props.dispatch(adapterSideBarClick(selectedLinkName));
-  }
-
   render () {
-    const {data, dataError} = this.props;
-    let menuItems = data.map((data) => {
-      return (
-          <Link key={data.name} to={`/ucmdbAdapter/${this.props.params.tabName}/${data.name}`} activeClassName="active" onClick={this._adapterSideBarClick.bind(this,data.name)}>
-            <Status value={statusAdapter[data.status]}/>
-            <span>{data.name}</span>
-          </Link>
-      );
-    });
+    const {data, dataError, children} = this.props;
     return (
-        <Split flex="right" separator={true} priority="left" fixed={false}>
-          {!dataError &&
-          <Sidebar colorIndex="light-2" className="adapterSideBar">
-            <Header pad="medium" justify="between">
-              <Title>Integration Point</Title>
-            </Header>
-            <Menu primary={true}>
-              {menuItems}
-            </Menu>
-          </Sidebar>
-          }
-          {dataError && dataError}
-          {this.props.children}
-        </Split>
+        <UCMDBAdapterContainer
+          dataError={dataError}
+          adapters={data}
+          children={children}/>
     );
   }
 }
