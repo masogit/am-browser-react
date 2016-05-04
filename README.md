@@ -28,8 +28,20 @@ $ gulp amdev
 ##  1. Unit tests:
     $ cd am-browser
     $ npm run test
+
+##  2. Run a single test file
+
+    For example: 
+    
+    $ cd am-browser
+    $ npm run test --grep ./test/actions/views-spec.js   
+     
+    or:
+    
+    $ npm run test --grep ./test/actions/views-*.js   
+            
   
-## 2. Code coverage:
+## 3. Code coverage:
     $ cd am-browser
     $ npm run coverage
     
