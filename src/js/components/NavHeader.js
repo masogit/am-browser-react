@@ -30,13 +30,10 @@ class NavHeader extends Component {
           <Link key="2" to="/views" activeClassName="active link-disabled">
             Views
           </Link>
-          <Link key="3" to="/builder" activeClassName="active link-disabled">
-            MetaData Tree
-          </Link>
-          <Link key="4" to="/aql" activeClassName="active link-disabled">
+          <Link key="3" to="/aql" activeClassName="active link-disabled">
             AQL
           </Link>
-          <Link key="5" to="/adapter" activeClassName="active link-disabled">
+          <Link key="4" to="/adapter" activeClassName="active link-disabled">
             Adapter
           </Link>
           <SessionMenu />
