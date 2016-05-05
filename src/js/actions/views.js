@@ -188,6 +188,14 @@ export function setSelectedView(selectedViewId, selectedView) {
   };
 }
 
+export function newSelectedView() {
+  return dispatch => {
+    dispatch({
+      type: types.NEW_SELECTED_VIEW
+    });
+  };
+}
+
 export function updateSelectedView(selectedView, path, newValue) {
   return dispatch => {
     dispatch({

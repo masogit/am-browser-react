@@ -2,7 +2,7 @@
 
 import { REQUEST_VIEWS, RECEIVE_VIEWS_SUCCESS, RECEIVE_VIEWS_FAILURE, SET_SELECTED_VIEW,
   REQUEST_TEMPLATE_TABLE, RECEIVE_TEMPLATE_TABLE_SUCCESS, RECEIVE_TEMPLATE_TABLE_FAILURE,
-  UPDATE_SELECTED_VIEW, SYNC_SELECTED_VIEW}
+  NEW_SELECTED_VIEW, UPDATE_SELECTED_VIEW, SYNC_SELECTED_VIEW}
   from '../constants/ActionTypes';
 import _ from 'lodash';
 
@@ -86,7 +86,9 @@ const generateLinks= (body, elements, row) => {
       } else {
         generateLinks(link.body, elements.slice(i + 1), row);
       }
-      body.links.push(link);
+      if (filterLinks && filterLinks.length == 0) {
+        body.links.push(link);
+      }
       // one2many links will break the loop
       break;
     } else {
@@ -145,6 +147,11 @@ const handlers = {
       err: action.err
     };
   },
+  [NEW_SELECTED_VIEW]: (state, action) => {
+    return {
+      selectedView: {}
+    };
+  },
   [UPDATE_SELECTED_VIEW]: (state, action) => {
     //console.log("reducer - action.selectedView:");
     //console.log(action.selectedView);
@@ -166,9 +173,17 @@ const handlers = {
     let body = clonedView.body;
     // only sqlname is same as current table
     let elemLength = elements.length;
-    if (elemLength > 0 && body.sqlname == elements[0].sqlname) {
+    if (elemLength > 0 && (!body || !body.sqlname || body.sqlname == elements[0].sqlname)) {
+      // new a view
+      if (!body) {
+        //clonedView.sqlname = elements[0].sqlname;
+        body = {};
+      }
       // fields
       if (elemLength == 1) {
+        if (!body.fields) {
+          body.fields = [];
+        }
         let filterFields = body.fields.filter(field => field.sqlname == row.sqlname);
         if (filterFields && filterFields.length == 0 ) {
           body.fields.push({
@@ -183,6 +198,7 @@ const handlers = {
         generateLinks(body, elements.slice(1), row);
       }
     }
+    clonedView.body = body;
     //setValueByJsonPath(action.path, action.newValue, clonedView);
     return {
       selectedView: clonedView

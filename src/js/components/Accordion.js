@@ -13,6 +13,7 @@ export default class Accordion extends Component {
     super();
     this.onSearch = this.onSearch.bind(this);
     this._onOpen = this._onOpen.bind(this);
+    this._onNew = this._onNew.bind(this);
     this._onClose = this._onClose.bind(this);
   }
 
@@ -20,6 +21,11 @@ export default class Accordion extends Component {
     this.setState({
       filtered : this.props.views.filter((obj) => obj.name.toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1)
     });
+  }
+
+  _onNew() {
+    this.setState({active: true});
+    this.props.newSelectedView();
   }
 
   _onOpen(viewId) {
@@ -81,18 +87,27 @@ export default class Accordion extends Component {
   render() {
     const { views, isFetching, isEditable } = this.props;
     let activeLayer = null;
-    if (this.state && this.state.active && this.state.viewId) {
-      let selectedView = views.filter(view => view._id == this.state.viewId)[0];
-      activeLayer = (
-        <Layer onClose={this._onClose} closer={true} align="left">
-          <Builder filterEntities={selectedView.body.sqlname}/>
-        </Layer>
-      );
+    if (this.state && this.state.active) {
+      if (this.state.viewId) {
+        let selectedView = views.filter(view => view._id == this.state.viewId)[0];
+        activeLayer = (
+          <Layer onClose={this._onClose} closer={true} align="left">
+            <Builder filterEntities={selectedView.body.sqlname}/>
+          </Layer>
+        );
+      } else {
+        activeLayer = (
+          <Layer onClose={this._onClose} closer={true} align="left">
+            <Builder/>
+          </Layer>
+        );
+      }
     }
     let viewsState = this.state && this.state.filtered ? this.state.filtered : views;
     return (
       <Sidebar primary={true} pad="small" fixed={false} full={false}>
       <div style={{"backgroundColor": "#01a982", "color": "#ffffff", "width": "280px", "height": "820px"}}>
+        <Button label="Add" onClick={this._onNew}/>
         <Header large={true} flush={false}>
           <input className="sidebarsearch" type="text" placeholder="Search views..." onChange={this.onSearch} style={{"backgroundColor": "#ffffff", "color": "#000000", "margin": "40px 24px 24px"}}/>
         </Header>

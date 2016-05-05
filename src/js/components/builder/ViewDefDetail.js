@@ -142,7 +142,7 @@ export default class ViewDefDetail extends Component {
         <tr key={selfView.body.sqlname + "_" + field.sqlname}>
           <td>{field.sqlname}</td>
           <td>{field.label}</td>
-          {root && <td><CheckBox id="v.search" name="v.search" checked={selfView.search.indexOf(field.sqlname) >= 0} onChange={this._onChange}/></td>}
+          {root && <td><CheckBox id="v.search" name="v.search" checked={selfView.search && selfView.search.indexOf(field.sqlname) >= 0} onChange={this._onChange}/></td>}
           <td><Anchor tag="span" className="tbBtnIcon"><Delete /></Anchor></td>
         </tr>
       );
