@@ -37,7 +37,6 @@ function setupViews(fetching) {
     </Provider>
   );
   return {
-    store,
     output
   }
 }
@@ -56,7 +55,7 @@ describe('views - components/builder/Views-spec.js', () => {
   })
 
   it('should render Views correctly', () => {
-    let { store, output } = setupViews(true);
+    let { output } = setupViews(true);
     let links = TestUtils.scryRenderedComponentsWithType(output, Link);
     expect(links.length).toEqual(3);
     let [link1, link2, link3] = links.map(link => link);
@@ -66,7 +65,7 @@ describe('views - components/builder/Views-spec.js', () => {
   })
 
   it('should render Views with no data', () => {
-    let { store, output } = setupViews(false);
+    let { output } = setupViews(false);
     let links = TestUtils.scryRenderedComponentsWithType(output, Link);
     expect(links.length).toEqual(0);
   })
