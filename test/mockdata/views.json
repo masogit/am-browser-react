@@ -2,7 +2,7 @@
   {
     "name": "Computer Push From UCMDB",
     "desc": "Create a view based on AM Push Mapping (only IBM)",
-    "catagory": "Assets",
+    "category": "Assets",
     "search": [
       "Portfolio.AssetTag",
       "Portfolio.Asset.SerialNo"
@@ -123,7 +123,7 @@
   {
     "name": "Nature",
     "desc": "Create a view based on AM Push Mapping (only IBM)",
-    "catagory": "Assets",
+    "category": "Assets",
     "search": [
       "Code",
       "Name"
@@ -229,7 +229,7 @@
   {
     "name": "Nature",
     "desc": "Create a view based on AM Push Mapping (only IBM)",
-    "catagory": "Assets",
+    "category": "Assets",
     "search": [
       "Code",
       "Name"
