@@ -60,33 +60,25 @@ export default class List extends Component {
   }
 
   _onMore() {
-    console.log('get more records');
-    console.log('this.state.numTotal: ' + this.state.numTotal);
-    console.log('this.state.records.length: ' + this.state.records.length);
     if (this.state.numTotal > this.state.records.length) {
       var param = {...this.state.param};
-      param.offset = this.state.records.length + 1;
-      this.setState({
-        param: param
-      }, this._getRecords(true));
+      param.offset = this.state.records.length;
+      this._getRecords(param);  // sync pass param to query, then records append
     } else {
       console.log('no more record');
       return null;
     }
   }
 
-  /**
-   * @param more true: append records
-   */
-  _getRecords(more) {
-    var body = {...this.props.body, param: this.state.param};
+  _getRecords(param) {
+    var body = {...this.props.body, param: (param) ? param : this.state.param}; // if sync pass param to query, then records append
     var timeStart = Date.now();
     ExplorerActions.loadRecordsByBody(body, (data) => {
       var records = this.state.records;
       this.setState({
         time: Date.now() - timeStart,
         numTotal: data.count,
-        records: (more) ? records.concat(data.entities) : data.entities,
+        records: (param) ? records.concat(data.entities) : data.entities, // if sync pass param to query, then records append
         filtered: null
       }, this._onGroupBy);
     });
@@ -230,8 +222,9 @@ export default class List extends Component {
     var header = body.fields.map((field, index) => {
       return !field.PK && index <= this.state.numColumn &&
         <th key={index}>
-          <Anchor href="#" reverse={true} icon={this._getOrderByIcon(field.sqlname)} label={this._getDisplayLabel(field)}
-                  onClick={this._onOrderBy.bind(this, field.sqlname)} />
+          <Anchor href="#" reverse={true} icon={this._getOrderByIcon(field.sqlname)}
+                  label={this._getDisplayLabel(field)}
+                  onClick={this._onOrderBy.bind(this, field.sqlname)}/>
         </th>;
     });
     var recordComponents = records.map((record, index) => {
@@ -267,41 +260,42 @@ export default class List extends Component {
     }
     var filters = this.state.param.filters.map((filter, index) => {
       return (<Button key={index} label={filter} plain={true} icon={<Close />}
-                     onClick={this._onFilterClear.bind(this, index)}/>);
+                      onClick={this._onFilterClear.bind(this, index)}/>);
     });
 
     return (
-        <div>
-          <Header justify="between">
-            <input type="text" inline={true} className="flex" placeholder="Filter Records"
-                   onKeyDown={this._onFilter.bind(this)} onChange={this._onFilter.bind(this)}/>
-            {(this.state.filtered) ? this.state.filtered.length : this.state.records.length}/{this.state.numTotal}
-            ({this.state.time}ms)
-            <Anchor href="#" label="CSV" icon={<DocumentCsv />} />
-            <select onChange={this._onGroupBy.bind(this)} ref="select_group">
-              <option value="">Group By</option>
-              {this.state.group_select}
-            </select>
-          </Header>
-          {filters}
-          {
-            this.state.groups_dist && this.state.groups_dist.length > 0 &&
-            <Box dirction="row">
-              <Distribution size="small" series={this.state.groups_dist} legend={false} />
-            </Box>
-          }
-          <Table selectable={true} onMore={this._onMore.bind(this)}>
-            <thead>
-            <tr>
-              <th><Anchor href="#" reverse={true} icon={this._getOrderByIcon('self')} label="Self"
-                          onClick={this._onOrderBy.bind(this, 'self')} /></th>
-              {header}
-            </tr>
-            </thead>
-            <tbody>
-            {recordComponents}
-            </tbody>
-          </Table>
+      <div>
+        <Header justify="between">
+          <input type="text" inline={true} className="flex" placeholder="Filter Records"
+                 onKeyDown={this._onFilter.bind(this)} onChange={this._onFilter.bind(this)}/>
+          {(this.state.filtered) ? this.state.filtered.length : this.state.records.length}/{this.state.numTotal}
+          ({this.state.time}ms)
+          <Anchor href="#" label="CSV" icon={<DocumentCsv />}/>
+          <select onChange={this._onGroupBy.bind(this)} ref="select_group">
+            <option value="">Group By</option>
+            {this.state.group_select}
+          </select>
+        </Header>
+        {filters}
+        {
+          this.state.groups_dist && this.state.groups_dist.length > 0 &&
+          <Box dirction="row">
+            <Distribution size="small" series={this.state.groups_dist} legend={false}/>
+          </Box>
+        }
+        <Table selectable={true}
+               onMore={(this.state.numTotal > this.state.records.length)?this._onMore.bind(this):null}>
+          <thead>
+          <tr>
+            <th><Anchor href="#" reverse={true} icon={this._getOrderByIcon('self')} label="Self"
+                        onClick={this._onOrderBy.bind(this, 'self')}/></th>
+            {header}
+          </tr>
+          </thead>
+          <tbody>
+          {recordComponents}
+          </tbody>
+        </Table>
 
         {
           this.state.record &&
@@ -324,7 +318,7 @@ export default class List extends Component {
             </Tabs>
           </Layer>
         }
-        </div>
+      </div>
     );
   }
 }
