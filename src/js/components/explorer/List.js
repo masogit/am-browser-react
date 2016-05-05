@@ -42,6 +42,7 @@ export default class List extends Component {
     this._onFilterClear.bind(this);
     this._setOrderByIcon.bind(this);
     this._onClose.bind(this);
+    this._onDownload.bind(this);
   }
 
   componentDidMount() {
@@ -83,6 +84,13 @@ export default class List extends Component {
         records: (more) ? records.concat(data.entities) : data.entities,
         filtered: null
       }, this._onGroupBy);
+    });
+  }
+
+  _onDownload() {
+    var body = {...this.props.body, param: this.state.param};
+    ExplorerActions.exportRecordsByBody(body, (data) => {
+      this.setState({});
     });
   }
 
@@ -271,7 +279,7 @@ export default class List extends Component {
             </Title>
             <input type="text" inline={true} className="flex" placeholder="Filter Records"
                    onKeyDown={this._onFilter.bind(this)}/>
-            <DocumentCsv size="large"/>
+            <Anchor href="#" label="CSV" icon={<DocumentCsv size="large"/>} />
             <select onChange={this._onGroupBy.bind(this)} ref="select_group">
               <option value="">Group By</option>
               {this.state.group_select}

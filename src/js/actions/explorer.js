@@ -16,6 +16,10 @@ function param2aql(param) {
   return encodeURI(aql);
 }
 
+export function exportRecordsByBody(body, callback) {
+  loadRecordsByBody(body, callback);
+}
+
 export function loadRecordsByBody(body, callback) {
 
   var fields = [];
