@@ -1,22 +1,19 @@
 import React, {Component} from 'react';
 import Table from 'grommet/components/Table';
 import TableRow from 'grommet/components/TableRow';
-import * as ExplorerActions from '../../actions/explorer';
-// import Split from 'grommet/components/Split';
 import Tabs from 'grommet/components/Tabs';
 import Tab from 'grommet/components/Tab';
-// import Search from 'grommet/components/Search';
 import Box from 'grommet/components/Box';
-import DocumentCsv from 'grommet/components/icons/base/DocumentCsv';
-import Ascend from 'grommet/components/icons/base/Ascend';
-import Descend from 'grommet/components/icons/base/Descend';
 import Anchor from 'grommet/components/Anchor';
 import Header from 'grommet/components/Header';
-import Title from 'grommet/components/Title';
 import Button from 'grommet/components/Button';
 import Close from 'grommet/components/icons/base/Close';
 import Distribution from 'grommet/components/Distribution';
 import Layer from 'grommet/components/Layer';
+import DocumentCsv from 'grommet/components/icons/base/DocumentCsv';
+import Ascend from 'grommet/components/icons/base/Ascend';
+import Descend from 'grommet/components/icons/base/Descend';
+import * as ExplorerActions from '../../actions/explorer';
 export default class List extends Component {
 
   constructor() {
@@ -63,12 +60,18 @@ export default class List extends Component {
   }
 
   _onMore() {
+    console.log('get more records');
+    console.log('this.state.numTotal: ' + this.state.numTotal);
+    console.log('this.state.records.length: ' + this.state.records.length);
     if (this.state.numTotal > this.state.records.length) {
       var param = {...this.state.param};
       param.offset = this.state.records.length + 1;
       this.setState({
         param: param
       }, this._getRecords(true));
+    } else {
+      console.log('no more record');
+      return null;
     }
   }
 
@@ -232,7 +235,7 @@ export default class List extends Component {
         </th>;
     });
     var recordComponents = records.map((record, index) => {
-      return <TableRow key={index} onClick={this._onClick.bind(this, record)}>
+      return (<TableRow key={index} onClick={this._onClick.bind(this, record)}>
         <td>{record.self}</td>
         {
           body.fields.map((field, tdindex) => {
@@ -242,7 +245,7 @@ export default class List extends Component {
               </td>;
           })
         }
-      </TableRow>;
+      </TableRow>);
     });
     var fields;
     var linkTabs;
@@ -256,27 +259,25 @@ export default class List extends Component {
       });
       if (this.props.body.links && this.props.body.links.length > 0) {
         linkTabs = this.props.body.links.map((link, index) => {
-          return <Tab title={link.label} key={index}>
+          return (<Tab title={link.label} key={index}>
             <List body={this._getLinkBody(link, this.state.record)}/>
-          </Tab>;
+          </Tab>);
         });
       }
     }
     var filters = this.state.param.filters.map((filter, index) => {
-      return <Button key={index} label={filter} plain={true} icon={<Close />}
-                     onClick={this._onFilterClear.bind(this, index)}/>;
+      return (<Button key={index} label={filter} plain={true} icon={<Close />}
+                     onClick={this._onFilterClear.bind(this, index)}/>);
     });
 
     return (
         <div>
           <Header justify="between">
-            <Title>
-              Count: {(this.state.filtered) ? this.state.filtered.length : this.state.records.length}/{this.state.numTotal}
-              Time: {this.state.time}ms
-            </Title>
             <input type="text" inline={true} className="flex" placeholder="Filter Records"
-                   onKeyDown={this._onFilter.bind(this)}/>
-            <Anchor href="#" label="CSV" icon={<DocumentCsv size="large"/>} />
+                   onKeyDown={this._onFilter.bind(this)} onChange={this._onFilter.bind(this)}/>
+            {(this.state.filtered) ? this.state.filtered.length : this.state.records.length}/{this.state.numTotal}
+            ({this.state.time}ms)
+            <Anchor href="#" label="CSV" icon={<DocumentCsv />} />
             <select onChange={this._onGroupBy.bind(this)} ref="select_group">
               <option value="">Group By</option>
               {this.state.group_select}
@@ -289,7 +290,7 @@ export default class List extends Component {
               <Distribution size="small" series={this.state.groups_dist} legend={false} />
             </Box>
           }
-          <Table selectable={true} onMore={(this.state.numTotal > this.state.records.length)?this._onMore.bind(this):null}>
+          <Table selectable={true} onMore={this._onMore.bind(this)}>
             <thead>
             <tr>
               <th><Anchor href="#" reverse={true} icon={this._getOrderByIcon('self')} label="Self"
