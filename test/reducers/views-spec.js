@@ -1,6 +1,7 @@
 import expect from 'expect'
 import reducer from '../../src/js/reducers/views'
 import * as types from '../../src/js/constants/ActionTypes'
+import mockViews from '../mockdata/views.json';
 
 describe('views - reducers/views-spec.js', () => {
   it('should return the initial state', () => {
@@ -8,9 +9,12 @@ describe('views - reducers/views-spec.js', () => {
       reducer(undefined, {})
     ).toEqual(
       {
-        isFetching: false,
+        isFetchingViewList: false,
+        isFetchingTemplateTable: false,
         views: [],
-        selectedView: '',
+        selectedView: {},
+        selectedViewId: '',
+        templateTable: {},
         err: ''
       }
     )
@@ -23,7 +27,7 @@ describe('views - reducers/views-spec.js', () => {
       })
     ).toEqual(
       {
-        isFetching: true
+        isFetchingViewList: true
       }
     )
   })
@@ -32,20 +36,12 @@ describe('views - reducers/views-spec.js', () => {
     expect(
       reducer({}, {
         type: types.RECEIVE_VIEWS_SUCCESS,
-        views: [{
-          "name": "Asset template 1",
-          "description": "Asset template 1",
-          "group": "Assets",
-        }]
+        views: mockViews
       })
     ).toEqual(
       {
-        isFetching: false,
-        views: [{
-          "name": "Asset template 1",
-          "description": "Asset template 1",
-          "group": "Assets",
-        }]
+        isFetchingViewList: false,
+        views: mockViews
       }
     )
   })
@@ -58,7 +54,7 @@ describe('views - reducers/views-spec.js', () => {
       })
     ).toEqual(
       {
-        isFetching: false,
+        isFetchingViewList: false,
         err: "error"
       }
     )

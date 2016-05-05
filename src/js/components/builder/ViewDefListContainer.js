@@ -21,6 +21,7 @@ import ViewDefDetail from './ViewDefDetail';
 import ViewDefList from './ViewDefList';
 import * as ViewDefActions from '../../actions/views';
 import store from '../../store';
+import history from '../../RouteHistory';
 
 class ViewDefListContainer extends Component {
 
@@ -35,7 +36,12 @@ class ViewDefListContainer extends Component {
 
   componentDidMount() {
     // Initialize list data, called only once.
-    this.props.actions.loadViews(this.props.params.id, this.props.location.pathname);
+    this.props.actions.loadViews(this.props.params.id, this.props.location.pathname).then(function (urlOfFirstRecord) {
+      if (urlOfFirstRecord) {
+        history.push(urlOfFirstRecord); // display the first record
+      }
+    }, function (err) {
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -76,7 +82,8 @@ class ViewDefListContainer extends Component {
     return (
       <Split flex="right">
         <ViewDefList views={views} isFetchingViewList={isFetchingViewList} {...boundActionCreators}/>
-        <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange} onSubmit={this.onSubmit} {...boundActionCreators}/>
+        <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange}
+                       onSubmit={this.onSubmit} {...boundActionCreators}/>
       </Split>
     );
   }

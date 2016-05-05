@@ -1,8 +1,8 @@
 import Rest from 'grommet/utils/Rest';
 import request from 'superagent-bluebird-promise';
 import * as types from '../constants/ActionTypes';
-import {HOST_NAME/*, getFormData*/} from '../util/Config';
-import history from '../RouteHistory';
+import {HOST_NAME, VIEW_DEF_URL/*, getFormData*/} from '../util/Config';
+//import history from '../RouteHistory';
 
 function requestViews() {
   return {
@@ -125,7 +125,7 @@ function receiveViewsFailure(err) {
 export function loadViews(selectedViewId, currentPathName) {
   return dispatch => {
     dispatch(requestViews());
-    return request.get(HOST_NAME + '/coll/view').then(function (res) {
+    return request.get(HOST_NAME + VIEW_DEF_URL).then(function (res) {
       dispatch(receiveViewsSuccess(res.body));
       let views = res.body;
       // Load first record of the list in detail.
@@ -138,11 +138,13 @@ export function loadViews(selectedViewId, currentPathName) {
           selectedViewId: selectedView._id,
           selectedView: selectedView
         });
-        if (!selectedViewId)
-          history.push(currentPathName + "/" + selectedView._id); // display the first one as default
+        // return the url of the first record
+        // don't call 'history.push()' here, because unit test will fail ('history' can't be mocked).
+        return !selectedViewId ? currentPathName + "/" + selectedView._id : null;
       }
     }, function (error) {
       dispatch(receiveViewsFailure(error));
+      return null;
     });
   };
 }
@@ -166,7 +168,7 @@ export function saveTemplates(selectedView) {
       "Authorization": auth
     };
     Rest.setHeaders(headers);
-    Rest.post(HOST_NAME + '/coll/view', JSON.stringify(selectedView))
+    Rest.post(HOST_NAME + VIEW_DEF_URL, JSON.stringify(selectedView))
       .end(function (err, res) {
         if (!err) {
           console.log("save successfully.");

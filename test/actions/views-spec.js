@@ -4,7 +4,8 @@ import nock from 'nock';
 import expect from 'expect';
 import * as actions from '../../src/js/actions/views';
 import * as types from '../../src/js/constants/ActionTypes';
-import {HOST_NAME, HOST_NAME_DEV} from '../../src/js/util/Config';
+import {HOST_NAME, HOST_NAME_DEV, VIEW_DEF_URL} from '../../src/js/util/Config';
+import mockResponse from '../mockdata/views.json';
 
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
@@ -17,22 +18,19 @@ describe('views - actions/views-spec.js', () => {
   it('load views - success', (done) => {
     expect(HOST_NAME).toEqual(HOST_NAME_DEV);
     nock(HOST_NAME)
-      .get('/json/template')
-      .reply(200, [{
-        "name": "Asset template 1",
-        "description": "Asset template 1",
-        "group": "Assets",
-      }]);
+      .get(VIEW_DEF_URL)
+      .reply(200, mockResponse);
 
     const expectedActions = [
       {type: types.REQUEST_VIEWS},
       {
         type: types.RECEIVE_VIEWS_SUCCESS,
-        views: [{
-          "name": "Asset template 1",
-          "description": "Asset template 1",
-          "group": "Assets",
-        }]
+        views: mockResponse
+      },
+      {
+        type: types.SET_SELECTED_VIEW,
+        selectedViewId: mockResponse[0]._id,
+        selectedView: mockResponse[0]
       }
     ]
 
@@ -51,7 +49,7 @@ describe('views - actions/views-spec.js', () => {
   it('load views - failure', (done) => {
     expect(HOST_NAME).toEqual(HOST_NAME_DEV);
     nock(HOST_NAME)
-      .get('/json/template')
+      .get(VIEW_DEF_URL)
       .reply(500, "Server error");
 
     const expectedActions = [

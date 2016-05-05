@@ -16,6 +16,7 @@ import RadioButton from 'grommet/components/RadioButton';
 //import Calendar from 'grommet/components/Calendar';
 //import NumberInput from 'grommet/components/NumberInput';
 import Section from 'grommet/components/Section';
+import CheckBox from 'grommet/components/CheckBox';
 //import Menu from 'grommet/components/Menu';
 import Table from 'grommet/components/Table';
 //import TableRow from 'grommet/components/TableRow';
@@ -141,7 +142,7 @@ export default class ViewDefDetail extends Component {
         <tr key={selfView.body.sqlname + "_" + field.sqlname}>
           <td>{field.sqlname}</td>
           <td>{field.label}</td>
-          {root && <td>{"search"}</td>}
+          {root && <td><CheckBox id="v.search" name="v.search" checked={selfView.search.indexOf(field.sqlname) >= 0} onChange={this._onChange}/></td>}
           <td><Anchor tag="span" className="tbBtnIcon"><Delete /></Anchor></td>
         </tr>
       );
@@ -166,7 +167,6 @@ export default class ViewDefDetail extends Component {
 
   render() {
     const { selectedView } = this.props;
-    console.log("ViewDefDetail.js - selectedView:");
     let p = "input";
     let tableHeader = (
       <thead>

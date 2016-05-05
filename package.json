@@ -15,7 +15,7 @@
     "ddos": "^0.1.7",
     "express": "^4.10.6",
     "express-http-proxy": "^0.6.0",
-    "grommet": "https://github.com/grommet/grommet/tarball/stable",
+    "grommet": "0.5.5",
     "grommet-index": "https://github.com/grommet/grommet-index/tarball/stable",
     "history": "^1.17.0",
     "http-proxy": "^1.13.2",

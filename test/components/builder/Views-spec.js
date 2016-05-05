@@ -9,27 +9,13 @@ import { Link } from 'react-router';
 import * as types from '../../../src/js/constants/ActionTypes'
 import { Provider } from 'react-redux';
 import store from '../../store/views';
-
-let views = [{
-  "$loki": 1,
-  "name": "Asset template 1",
-  "description": "Asset template 1",
-  "group": "Assets"
-}, {
-  "$loki": 2,
-  "name": "Asset template 2",
-  "description": "Asset template 2",
-  "group": "Assets"
-}, {
-  "$loki": 3,
-  "name": "Asset template 3",
-  "description": "Asset template 3",
-  "group": "Assets"
-}];
+import mockViews from '../../mockdata/views.json';
 
 function setupView() {
   let props = {
-    view: views //expect.createSpy()
+    selectedView: mockViews[0],
+    onValueChange: () => console.log('onValueChange'),
+    onSubmit: () => console.log('onSubmit')
   }
   let output = TestUtils.renderIntoDocument(
     <View {...props} />
@@ -42,8 +28,8 @@ function setupView() {
 
 function setupViews(fetching) {
   let props = {
-    isFetching: fetching,
-    params: {id: 1}
+    isFetchingViewList: fetching,
+    views: fetching ? mockViews : []
   }
   let output = TestUtils.renderIntoDocument(
     <Provider store={store}>
@@ -59,37 +45,28 @@ function setupViews(fetching) {
 describe('views - components/builder/Views-spec.js', () => {
   it('should render View correctly', () => {
     let { output } = setupView();
-    let lis = TestUtils.scryRenderedDOMComponentsWithTag(output, 'li');
-    expect(lis.length).toEqual(3);
-    let [li1, li2, li3] = lis.map(li => li.textContent);
-    expect(li1).toEqual("Asset template 1");
-    expect(li2).toEqual("Asset template 1");
-    expect(li3).toEqual("Assets");
+    let form = TestUtils.findRenderedDOMComponentWithTag(output, 'form');
+    expect(form).toExist();
+    var inputs = TestUtils.scryRenderedDOMComponentsWithTag(output, 'input');
+    expect(inputs.length).toEqual(12);
+    //let [li1, li2, li3] = lis.map(li => li.textContent);
+    //expect(li1).toEqual("Asset template 1");
+    //expect(li2).toEqual("Asset template 1");
+    //expect(li3).toEqual("Assets");
   })
 
   it('should render Views correctly', () => {
     let { store, output } = setupViews(true);
-    store.dispatch({
-      type: types.RECEIVE_VIEWS_SUCCESS,
-      views: views
-    });
     let links = TestUtils.scryRenderedComponentsWithType(output, Link);
     expect(links.length).toEqual(3);
     let [link1, link2, link3] = links.map(link => link);
-    expect(link1.props.children).toEqual("Asset template 1");
-    expect(link1.props.to).toEqual("/views/1");
-    expect(link2.props.children).toEqual("Asset template 2");
-    expect(link2.props.to).toEqual("/views/2");
-    expect(link3.props.children).toEqual("Asset template 3");
-    expect(link3.props.to).toEqual("/views/3");
+    expect(link1.props.to).toEqual("/views/" + mockViews[0]._id);
+    expect(link2.props.to).toEqual("/views/" + mockViews[1]._id);
+    expect(link3.props.to).toEqual("/views/" + mockViews[2]._id);
   })
 
   it('should render Views with no data', () => {
     let { store, output } = setupViews(false);
-    store.dispatch({
-      type: types.RECEIVE_VIEWS_SUCCESS,
-      views: []
-    });
     let links = TestUtils.scryRenderedComponentsWithType(output, Link);
     expect(links.length).toEqual(0);
   })
