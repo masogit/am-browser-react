@@ -63,7 +63,7 @@
   },
   "scripts": {
     "build": "gulp dist",
-    "start": "node server/server.js",
+    "start": "gulp amdev",
     "test": "node_modules/.bin/mocha -R spec --compilers js:babel-register --recursive --require ./test/setup.js",
     "coverage": "node_modules/.bin/istanbul cover -v --report html --dir ./coverage --hook-run-in-context node_modules/mocha/bin/_mocha -- -R spec --compilers js:babel-register --recursive --require ./test/setup.js",
     "test:watch": "npm test -- --watch"

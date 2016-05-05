@@ -14,7 +14,12 @@
     $ cd am-browser
     $ gulp dist
     $ node app/server.js
-##  5. (Optional) Setup DEMO env
+##  5. (Trial) One click to start server
+  It combines the express server and UI dev server together, and copy the demo data into db folder.
+```
+$ npm start
+```
+##  6. (Optional) Setup DEMO env
  * Setup demo data for AM Browser
 ```
 $ gulp copy-demo

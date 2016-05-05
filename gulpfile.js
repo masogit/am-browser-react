@@ -6,6 +6,7 @@ var gulpTasks = require('grommet/utils/gulp/gulp-tasks');
 var git = require('gulp-git');
 var del = require('del');
 var mkdirp = require('mkdirp');
+var spawn = require('child_process').spawn;
 
 var opts = {
   base: '.',
@@ -132,6 +133,19 @@ gulp.task('copy-demo', function () {
   gulp.src('./demo/**').pipe(gulp.dest('./'));
 });
 
-gulp.task('amdev',['copy-demo','dev']);
+var express;
+gulp.task('start-node', function () {
+  console.log('Starting node app/server.js');
+  if (express) express.kill();
+  express = spawn('node', ['app/server.js'], {stdio: 'inherit'});
+  express.on('close', function (code) {
+    console.log('Close express child_process by signal:' + code);
+  });
+});
+process.on('exit', function() {
+    if (express) express.kill();
+});
+
+gulp.task('amdev',['copy-demo','start-node','dev']);
 
 gulpTasks(gulp, opts);
