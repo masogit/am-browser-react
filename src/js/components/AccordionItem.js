@@ -33,7 +33,7 @@ export default class AccordionItem extends Component {
     return (
       <Section pad={{"horizontal": "medium", "vertical": "medium", "between": "medium"}}>
         <a onClick={this._onToggle}>
-            {this.props.catagory}
+            {this.props.category}
         </a>
         <p style={stateStyle}>
             {this.props.children}
@@ -44,5 +44,5 @@ export default class AccordionItem extends Component {
 }
 
 AccordionItem.propTypes = {
-  catagory: PropTypes.string.isRequired
+  category: PropTypes.string.isRequired
 };

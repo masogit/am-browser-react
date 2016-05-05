@@ -199,12 +199,11 @@ export function updateSelectedView(selectedView, path, newValue) {
   };
 }
 
-export function syncSelectedView(elements, baseInfo, row) {
+export function syncSelectedView(elements, row) {
   return dispatch => {
     dispatch({
       type: types.SYNC_SELECTED_VIEW,
       elements: elements,
-      baseInfo: baseInfo,
       row: row
     });
   };

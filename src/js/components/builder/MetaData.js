@@ -24,9 +24,9 @@ export default class MetaData extends Component {
     fields = fields.filter((obj) => obj.sqlname.toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1);
     this.setState({
       filtered: {
-        "entities": entities,
-        "links": links,
-        "fields": fields
+        entities: entities,
+        links: links,
+        fields: fields
       }
     });
   }
@@ -36,8 +36,8 @@ export default class MetaData extends Component {
     this.props.metadataLoadDetail(obj, this.props.elements);
   }
 
-  _onChange(baseInfo, row) {
-    this.props.syncSelectedView(this.props.elements, baseInfo, row);
+  _onChange(obj) {
+    this.props.syncSelectedView(this.props.elements, obj);
   }
 
   _sortSqlName(a, b) {
@@ -78,11 +78,7 @@ export default class MetaData extends Component {
     //  return <TableRow key={index}><td><CheckBox key={index} id={`checkbox_${row.sqlname}`} checked={row.checked} onChange={this._onChange.bind(this, row)}/><Notes size="large" colorIndex="brand"/>{row.sqlname}</td></TableRow>;
     //});
     let fieldsComponents = fields.sort(this._sortSqlName).map((row, index) => {
-      let baseInfo = {
-        sqlname: rowsState.sqlname,
-        label: rowsState.label
-      };
-      return <TableRow key={index}><td><Anchor key={index} icon={<Notes size="large" colorIndex="brand"/>} onClick={this._onChange.bind(this, baseInfo, row)}>{row.sqlname}</Anchor></td></TableRow>;
+      return <TableRow key={index}><td><Anchor key={index} icon={<Notes size="large" colorIndex="brand"/>} onClick={this._onChange.bind(this, row)}>{row.sqlname}</Anchor></td></TableRow>;
     });
     return (
       <div>

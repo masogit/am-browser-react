@@ -201,8 +201,8 @@ export default class ViewDefDetail extends Component {
                               onChange={this._onChange}></textarea>
                   </FormField>
                   <FormField label="Category" htmlFor={p + "item3"}>
-                    <input id="v.catagory" name="v.catagory" type="text" onChange={this._onChange}
-                           value={selectedView.catagory}/>
+                    <input id="v.category" name="v.category" type="text" onChange={this._onChange}
+                           value={selectedView.category}/>
                   </FormField>
                   {
                     selectedView.chart && selectedView.chart.type &&

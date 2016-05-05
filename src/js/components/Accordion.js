@@ -42,15 +42,15 @@ export default class Accordion extends Component {
     var groups = [];
     for (var i = 0; i < views.length; i++) {
       for (var j = 0; j < groups.length; j++) {
-        if (views[i].catagory == groups[j]) {
+        if (views[i].category == groups[j]) {
           break;
         }
         if (j == groups.length - 1) {
-          groups.push(views[i].catagory);
+          groups.push(views[i].category);
         }
       }
       if (i == 0) {
-        groups.push(views[i].catagory);
+        groups.push(views[i].category);
       }
     }
     return groups;
@@ -62,7 +62,7 @@ export default class Accordion extends Component {
     let Edit = require('grommet/components/icons/base/Edit');
     let groups = this.getGroups(views);
     return groups.map((group, key) => {
-      let links = views.filter(view => view.catagory == group).map((view, link_key) => {
+      let links = views.filter(view => view.category == group).map((view, link_key) => {
         if (isEditable) {
           editButton = (
             <Button icon={<Edit size="large" colorIndex="brand"/>} onClick={this._onOpen.bind(this, view._id)}/>
@@ -73,7 +73,7 @@ export default class Accordion extends Component {
         );
       });
       return (
-        <AccordionItem catagory={group} key={key}>{links}</AccordionItem>
+        <AccordionItem category={group} key={key}>{links}</AccordionItem>
       );
     });
   }

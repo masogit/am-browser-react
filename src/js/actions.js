@@ -219,6 +219,8 @@ export function metadataLoadDetail(obj, elements, index) {
         if (!err) {
           let data = JSON.parse(res.text);
           if (!index) {
+            obj.body_label = data.label;
+            obj.body_sqlname = data.sqlname;
             elements.push(obj);
           } else {
             elements = elements.slice(0, index + 1);

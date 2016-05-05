@@ -32,18 +32,78 @@ const setValueByJsonPath = (path, val, obj) => {
   }
 };
 
-const createObj= (reverse, baseInfo) => {
+const createObj= (reverse) => {
   var obj = {
     reversefield: reverse.reversefield,
     sqlname: reverse.sqlname,
     label: reverse.label,
     reverse: reverse.reverse,
     body: {
-      sqlname: baseInfo.sqlname,
-      label: baseInfo.label
+      sqlname: reverse.body_sqlname,
+      label: reverse.body_label
     }
   };
   return obj;
+};
+
+const generateLinks= (body, elements, row) => {
+  // initialize sqlname
+  var sqlname = "";
+  // check current row if it is one2one link
+  for (var i = 0; i < elements.length; i++) {
+    var element = elements[i];
+    sqlname += ((i == 0) ? "" : ".") + element.sqlname;
+    if (!element.card11) {
+      if (!body.links) {
+        body.links = [];
+      }
+      let filterLinks = body.links.filter(link => link.sqlname == sqlname);
+      let link;
+      if (filterLinks && filterLinks.length == 0) {
+        // include one2many links
+        link = createObj({
+          reversefield: element.reversefield,
+          sqlname: sqlname,
+          label: element.label,
+          reverse: element.reverse,
+          body_label: element.body_label,
+          body_sqlname: element.body_sqlname
+        });
+      } else {
+        link = filterLinks[0];
+      }
+      // generate fields
+      if (i == elements.length - 1) {
+        if (!link.body.fields) {
+          link.body.fields = [];
+        }
+        link.body.fields.push({
+          label: row.label,
+          size: row.size,
+          sqlname: row.sqlname,
+          type: row.type
+        });
+      } else {
+        generateLinks(link.body, elements.slice(i + 1), row);
+      }
+      body.links.push(link);
+      // one2many links will break the loop
+      break;
+    } else {
+      // one2one links will push into fields
+      if (i == elements.length - 1) {
+        if (!body.fields) {
+          body.fields = [];
+        }
+        body.fields.push({
+          label: row.label,
+          size: row.size,
+          sqlname: sqlname + "." + row.sqlname,
+          type: row.type
+        });
+      }
+    }
+  }
 };
 
 const handlers = {
@@ -103,72 +163,24 @@ const handlers = {
     let clonedView = _.cloneDeep(state.selectedView);
     let elements = action.elements;
     let row = action.row;
-    let baseInfo = action.baseInfo;
     let body = clonedView.body;
-    // sqlname is same as current table
+    // only sqlname is same as current table
     let elemLength = elements.length;
     if (elemLength > 0 && body.sqlname == elements[0].sqlname) {
       // fields
-      if (elements.length == 1) {
-        body.fields.push({
-          alias: row.label,
-          label: row.label,
-          size: row.size,
-          sqlname: row.sqlname,
-          type: row.type
-        });
-      } else {
-        var isLink = false;
-        var sqlname = "";
-        // first one2many position
-        var one2manyPosition = 1;
-        // check current row if it is one2one link
-        for (var i = 1; i < elemLength; i ++) {
-          var element = elements[i];
-          if (!element.card11) {
-            isLink = true;
-            one2manyPosition = i;
-            break;
-          }
-          // one2one sqlname
-          if (i != elemLength - 1) {
-            sqlname += element.sqlname + ".";
-          } else {
-            sqlname += element.sqlname;
-          }
-        }
-        // one2one links will push into fields
-        if (!isLink) {
+      if (elemLength == 1) {
+        let filterFields = body.fields.filter(field => field.sqlname == row.sqlname);
+        if (filterFields && filterFields.length == 0 ) {
           body.fields.push({
-            alias: row.label,
             label: row.label,
             size: row.size,
-            sqlname: sqlname,
+            sqlname: row.sqlname,
             type: row.type
           });
-        } else {
-          if (one2manyPosition == elemLength - 1) {
-            // include one2many links
-            let link = createObj({
-              reversefield: elements[one2manyPosition].reversefield,
-              sqlname: elements[one2manyPosition].sqlname,
-              label: elements[one2manyPosition].label,
-              reverse: elements[one2manyPosition].reverse
-            }, baseInfo);
-            link.body.fields = [];
-            link.body.fields.push({
-              alias: row.label,
-              label: row.label,
-              size: row.size,
-              sqlname: row.sqlname,
-              type: row.type
-            });
-            body.links.push(link);
-            console.log(body);
-          } else {
-            // other cases need to handle
-          }
         }
+      } else {
+        // for loop to generate links forever
+        generateLinks(body, elements.slice(1), row);
       }
     }
     //setValueByJsonPath(action.path, action.newValue, clonedView);
