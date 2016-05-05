@@ -8,9 +8,7 @@ import ViewDefListContainer from './components/builder/ViewDefListContainer';
 //import ViewDefDetail from './components/builder/ViewDefDetail';
 import AQL from './components/aql/AQL';
 import TBD from 'grommet/components/TBD';
-import ucmdbAdapter from './components/ucmdbAdapter/UCMDBAdapter';
-import IntegrationJob from './components/ucmdbAdapter/IntegrationJob';
-import IntegrationJobItem from './components/ucmdbAdapter/IntegrationJobItem';
+import UCMDBAdapterContainer from './components/ucmdbAdapter/UCMDBAdapterContainer';
 
 var rootPath = "/"; //"/ferret/";
 //if (NODE_ENV === 'development') {
@@ -51,14 +49,8 @@ module.exports = {
         //    }
         //  ]
         //},
-        {path: 'ucmdbAdapter', component: ucmdbAdapter,
-          childRoutes: [
-            { path: ':tabName/:pointName', component: IntegrationJob,
-              childRoutes: [
-                { path: ':integrationJobName', component: IntegrationJobItem }
-              ]
-            }
-          ]
+        {
+          path: 'ucmdbAdapter(/:tabName/:pointName)(/:integrationJobName)', component: UCMDBAdapterContainer
         },
         //{path: 'views/:id', component: Views},
         {path: 'tbd', component: TBD}

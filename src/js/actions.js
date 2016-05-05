@@ -453,17 +453,17 @@ export function getIntegrationPoint() {
     handleLocalStorage();
     formData.metadata = 'integration/ucmdbAdapter/points';
     Rest.post(HOST_NAME + '/am/ucmdbPoint', formData)
-        .end(function (err, res) {
-          let data = [], error = null;
-          if (res && res.ok && res.body) {
-            for (var list in res.body) {
-              data.push(res.body[list]);
-            }
-          } else if (res && !res.ok) {
-            error = res.body || res.text;
+      .end(function (err, res) {
+        let data = [], error = null;
+        if (res && res.ok && res.body) {
+          for (var list in res.body) {
+            data.push(res.body[list]);
           }
-          dispatch(adapterDataFetch(data, error));
-        });
+        } else if (res && !res.ok) {
+          error = res.body || res.text;
+        }
+        dispatch(adapterDataFetch(data, error));
+      });
   };
 }
 
@@ -480,17 +480,17 @@ export function getIntegrationJob(pointName, jobType) {
     handleLocalStorage();
     formData.metadata = 'integration/ucmdbAdapter/points/' + pointName + '/' + jobType;
     Rest.post(HOST_NAME + '/am/ucmdbJob', formData)
-        .end(function (err, res) {
-          let data = [], error = null;
-          if (res && res.ok && res.body) {
-            for (var list in res.body) {
-              data.push(res.body[list]);
-            }
-          } else if (res && !res.ok) {
-            error = res.body || res.text;
+      .end(function (err, res) {
+        let data = [], error = null;
+        if (res && res.ok && res.body) {
+          for (var list in res.body) {
+            data.push(res.body[list]);
           }
-          dispatch(integrationJobDataSuccess(data, error));
-        });
+        } else if (res && !res.ok) {
+          error = res.body || res.text;
+        }
+        dispatch(integrationJobDataSuccess(data, error));
+      });
   };
 }
 
@@ -507,17 +507,17 @@ export function getIntegrationJobItem(pointName, pointType, jobName) {
     handleLocalStorage();
     formData.metadata = 'integration/ucmdbAdapter/points/' + pointName + '/' + pointType + '/' + jobName;
     Rest.post(HOST_NAME + '/am/ucmdbJobItem', formData)
-        .end(function (err, res) {
-          let data = [], error = null;
-          if (res && res.ok && res.body) {
-            for (let list in res.body) {
-              data.push(res.body[list]);
-            }
-          } else if (res && !res.ok) {
-            error = res.body || res.text;
+      .end(function (err, res) {
+        let data = [], error = null;
+        if (res && res.ok && res.body) {
+          for (let list in res.body) {
+            data.push(res.body[list]);
           }
-          dispatch(integrationJobItemDataSuccess(data, error));
-        });
+        } else if (res && !res.ok) {
+          error = res.body || res.text;
+        }
+        dispatch(integrationJobItemDataSuccess(data, error));
+      });
   };
 }
 
@@ -530,21 +530,19 @@ function integrationJobItemDataSuccess(result, error) {
 }
 
 export function adapterSideBarClick(pointName) {
-  return { type: ADAPTER_SIDEBAR_CLICK, pointName: pointName };
+  return { type: ADAPTER_SIDEBAR_CLICK, pointName: pointName};
 }
 
 export function integrationJobSelect(tabName, pointName, integrationJobName) {
-  history.pushState(null, '/ucmdbAdapter/' + tabName + '/' + pointName + '/' + integrationJobName);
+  history.pushState(null, '/ucmdbAdapter/' + tabName + '/' + pointName);
+  //history.pushState(null, '/ucmdbAdapter/' + tabName + '/' + pointName + '/' + integrationJobName);
   return { type: JOB_SELECT_SUCCESS, integrationJobName: integrationJobName };
 }
 
-export function integrationJobTabSwitch(pointName, tabName) {
+export function integrationJobTabSwitch(tabName, pointName) {
   history.pushState(null, '/ucmdbAdapter/' + tabName + '/' + pointName);
   return {
     type: TAB_SWITCH_SUCCESS,
-    tabName: tabName,
-    integrationJobName: ''
+    tabName: tabName
   };
 };
-
-

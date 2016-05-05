@@ -15,50 +15,6 @@ import {statusAdapter} from '../../constants/StatusAdapter.js';
 import Tabs from 'grommet/components/Tabs';
 import CustomTab from './CustomTab.js';
 
-const MenuItem = ({
-  name,
-  status,
-  tabName,
-  onMenuClick
-  }) => {
-  return (
-    <Link to={`/ucmdbAdapter/${tabName}/${name}`} activeClassName="active" onClick={() => onMenuClick(name)}>
-      <Status value={statusAdapter[status]}/>
-      <span>{name}</span>
-    </Link>
-  );
-};
-
-export const UCMDBAdapter = ({
-  dataError,
-  data,
-  tabName,
-  onMenuClick,
-  children
-  }) => (
-  <Split flex="right" separator={true} priority="left" fixed={false}>
-    {!dataError &&
-    <Sidebar colorIndex="light-2" className="adapterSideBar">
-      <Header pad="medium" justify="between">
-        <Title>Integration Point</Title>
-      </Header>
-      <Menu primary={true}>
-        {
-          data.map(adapter => (
-            <MenuItem key={adapter.name}
-                    status={adapter.status}
-                    name={adapter.name}
-                    tabName={tabName}
-                    onMenuClick={onMenuClick}/>
-          ))
-        }
-      </Menu>
-    </Sidebar>
-    }
-    {dataError && dataError}
-    {children}
-  </Split>
-);
 
 const IntegrationJobTable = ({
   integrationJobDataError,
@@ -139,7 +95,7 @@ const IntegrationJobTable = ({
   );
 };
 
-export const IntegrationJobContainer = ({
+export const IntegrationJobTemplate = ({
   integrationJobDataError,
   integrationJobData,
   pointName,
@@ -151,26 +107,26 @@ export const IntegrationJobContainer = ({
   integrationJobData.sort((a,b) => a.name.localeCompare(b.name));
   return (
     <Tabs justify="start" initialIndex={tabName === 'populationJobs' ? 0: 1}>
-      <CustomTab title="Population" onClick={() => onTabClick(pointName, 'populationJobs')} >
+      <CustomTab title="Population" onClick={() => onTabClick('populationJobs')} >
         <Split flex="both" separator={true}>
           <div className="integrationJobTable">
             <IntegrationJobTable
               tabName={tabName}
               integrationJobData={integrationJobData}
               integrationJobDataError={integrationJobDataError}
-              onIntegrationJobSelect={(selected) => onIntegrationJobSelect(pointName, tabName, integrationJobData[selected].name)}/>
+              onIntegrationJobSelect={(selected) => onIntegrationJobSelect(tabName, pointName, integrationJobData[selected].name)}/>
           </div>
           {children}
         </Split>
       </CustomTab>
-      <CustomTab title="Data Push" onClick={() => onTabClick(pointName, 'pushJobs')} >
+      <CustomTab title="Data Push" onClick={() => onTabClick('pushJobs')} >
         <Split flex="both" separator={true}>
           <div className="integrationJobTable">
             <IntegrationJobTable
               tabName={tabName}
               integrationJobData={integrationJobData}
               integrationJobDataError={integrationJobDataError}
-              onIntegrationJobSelect={(selected) => onIntegrationJobSelect(pointName, tabName, integrationJobData[selected].name)}/>
+              onIntegrationJobSelect={(selected) => onIntegrationJobSelect(tabName, pointName, integrationJobData[selected].name)}/>
           </div>
           {children}
         </Split>
@@ -179,7 +135,7 @@ export const IntegrationJobContainer = ({
   );
 };
 
-export const IntegrationJobItemContainer = ({
+export const IntegrationJobItemTemplate = ({
   integrationJobItemDataError,
   integrationJobItemData,
   tabName
@@ -275,5 +231,60 @@ export const IntegrationJobItemContainer = ({
         {tabName === 'populationJobs' ? populationTableBody : pushTableBody}
       </Table>
     </div>
+  );
+};
+
+
+const MenuItem = ({
+  name,
+  status,
+  tabName,
+  onMenuClick
+  }) => {
+  return (
+    <Link to={`/ucmdbAdapter/${tabName}/${name}`} query={{integrationJobName: undefined}} activeClassName="active" onClick={onMenuClick}>
+      <Status value={status}/>
+      <span>{name}</span>
+    </Link>
+  );
+};
+
+export const PointListContainer = ({
+  dataError,
+  data,
+  tabName,
+  onMenuClick
+  }) => {
+  if (dataError) {
+    return dataError;
+  }
+  return (
+    <Menu primary={true}>
+      {
+        data.map(adapter => (
+          <MenuItem key={adapter.name}
+                    status={statusAdapter[adapter.status]}
+                    name={adapter.name}
+                    tabName={tabName}
+                    onMenuClick={() => onMenuClick(adapter.name)}/>
+        ))
+      }
+    </Menu>
+  );
+};
+
+
+export const UCMDBAdapterContainerTemplate = ({pointList, jobList, jobItemList}) => {
+  return (
+    <Split flex="right" separator={true} priority="left" fixed={false}>
+      <Sidebar colorIndex="light-2" className="adapterSideBar">
+        <Header pad="medium" justify="between">
+          <Title>Integration Point</Title>
+        </Header>
+        {pointList}
+      </Sidebar>
+      {jobList}
+      {jobItemList}
+    </Split>
   );
 };

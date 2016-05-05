@@ -3,31 +3,23 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { getIntegrationJob, integrationJobSelect, integrationJobTabSwitch } from '../../actions';
-import {IntegrationJobContainer} from './Templates.js';
+import {IntegrationJobTemplate} from './Templates.js';
 
-
-class IntegrationJob extends Component {
-
+export default class IntegrationJobContainer extends Component {
   constructor () {
     super();
   }
 
   componentDidMount() {
-    const {pointName, tabName} = this.props;
-    this.props.getIntegrationJob(pointName, tabName);
+    this.props.getIntegrationJob(this.props);
     this.integrationJobInterval = setInterval(() => {
-      this.props.getIntegrationJob(this.props.pointName, this.props.tabName);
+      this.props.getIntegrationJob(this.props);
     },60*1000);
   }
 
   componentWillReceiveProps(nextProps) {
-    const {pointName, tabName} = this.props;
-    if (pointName !== nextProps.pointName || tabName !== nextProps.tabName) {
-      if (pointName !== nextProps.pointName) {
-        this.props.getIntegrationJob(nextProps.pointName, tabName);
-      } else {
-        this.props.getIntegrationJob(pointName, nextProps.tabName);
-      }
+    if (nextProps.pointName !== this.props.pointName || nextProps.tabName !== this.props.tabName) {
+      this.props.getIntegrationJob(nextProps);
     }
   }
 
@@ -35,32 +27,14 @@ class IntegrationJob extends Component {
     clearInterval(this.integrationJobInterval);
   }
 
+
+  onTabClick(tabName) {
+    this.props.onTabClick(tabName, this.props.pointName);
+  }
+
   render () {
     return (
-      <IntegrationJobContainer {...this.props}/>
+      <IntegrationJobTemplate {...this.props} onTabClick={this.onTabClick.bind(this)}/>
     );
   }
 }
-let select = (state) => {
-  return {
-    tabName: state.ucmdbAdapter.tabName,
-    pointName: state.ucmdbAdapter.pointName,
-    integrationJobData: state.ucmdbAdapter.integrationJobData,
-    integrationJobDataError: state.ucmdbAdapter.integrationJobDataError,
-    integrationJobName: state.ucmdbAdapter.integrationJobName
-  };
-};
-
-const integrationJobAction = (dispatch, ownProps) => {
-  return {
-    onIntegrationJobSelect: (pointName, jobType, jobName) => dispatch(integrationJobSelect(jobType, pointName, jobName)),
-    onTabClick: (pointName, tabName) => {
-      dispatch(integrationJobTabSwitch(pointName, tabName));
-    },
-    getIntegrationJob: (pointName, tabName) => {
-      return dispatch(getIntegrationJob(pointName, tabName));
-    }
-  };
-};
-
-export default connect(select, integrationJobAction)(IntegrationJob);
