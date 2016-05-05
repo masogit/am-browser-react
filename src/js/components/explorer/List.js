@@ -22,9 +22,11 @@ export default class List extends Component {
   constructor() {
     super();
     this.state = {
-      total: 0,
+      numColumn: 4, // default column number, not include Self
+      numTotal: 0,
       time: 0,
       records: [],
+      filtered: null,
       record: null,
       param: {
         orderby: "",
@@ -40,9 +42,9 @@ export default class List extends Component {
     this._onOrderBy.bind(this);
     this._onMore.bind(this);
     this._onFilterClear.bind(this);
-    this._setOrderByIcon.bind(this);
     this._onClose.bind(this);
     this._onDownload.bind(this);
+    this._getOrderByIcon.bind(this);
   }
 
   componentDidMount() {
@@ -61,7 +63,7 @@ export default class List extends Component {
   }
 
   _onMore() {
-    if (this.state.total > this.state.records.length) {
+    if (this.state.numTotal > this.state.records.length) {
       var param = {...this.state.param};
       param.offset = this.state.records.length + 1;
       this.setState({
@@ -80,7 +82,7 @@ export default class List extends Component {
       var records = this.state.records;
       this.setState({
         time: Date.now() - timeStart,
-        total: data.count,
+        numTotal: data.count,
         records: (more) ? records.concat(data.entities) : data.entities,
         filtered: null
       }, this._onGroupBy);
@@ -95,26 +97,22 @@ export default class List extends Component {
   }
 
   _onOrderBy(sqlname) {
-    console.log(sqlname);
     var param = {...this.state.param};
-    if (param.orderby == sqlname)
+    if (param.orderby == (sqlname + ' desc'))
+      param.orderby = "";
+    else if (param.orderby == sqlname)
       param.orderby = sqlname + ' desc';
     else
       param.orderby = sqlname;
     this.setState({
       param: param
     }, this._getRecords);
-
-    // this._setOrderByIcon(sqlname);
   }
 
-  _setOrderByIcon(sqlname) {
+  _getOrderByIcon(sqlname) {
     var orderby = this.state.param.orderby;
-    var a = this.refs['Header_'+sqlname];
-    console.log(a);
-    var icon = (orderby.indexOf(sqlname) > -1) ? ((orderby.indexOf('desc') > -1) ? <Descend /> : <Ascend />) : "";
-    console.log(icon);
-    a.icon = icon;
+    var icon = (orderby.indexOf(sqlname) > -1) ? ((orderby.indexOf('desc') > -1) ? <Descend /> : <Ascend />) : null;
+    return icon;
   }
 
   _onClick(record) {
@@ -227,11 +225,10 @@ export default class List extends Component {
     var body = this.props.body;
     var records = (this.state.filtered) ? this.state.filtered : this.state.records;
     var header = body.fields.map((field, index) => {
-      return !field.PK && index < 5 &&
+      return !field.PK && index <= this.state.numColumn &&
         <th key={index}>
-          <Anchor href="#" ref={'Header_' + field.sqlname} onClick={this._onOrderBy.bind(this, field.sqlname)}>
-            { this._getDisplayLabel(field)}
-          </Anchor>
+          <Anchor href="#" reverse={true} icon={this._getOrderByIcon(field.sqlname)} label={this._getDisplayLabel(field)}
+                  onClick={this._onOrderBy.bind(this, field.sqlname)} />
         </th>;
     });
     var recordComponents = records.map((record, index) => {
@@ -239,7 +236,7 @@ export default class List extends Component {
         <td>{record.self}</td>
         {
           body.fields.map((field, tdindex) => {
-            return !field.PK && tdindex < 5 &&
+            return !field.PK && tdindex <= this.state.numColumn &&
               <td key={tdindex}>
                 {this._getFieldStrVal(record, field)}
               </td>;
@@ -274,7 +271,7 @@ export default class List extends Component {
         <div>
           <Header justify="between">
             <Title>
-              Count: {(this.state.filtered) ? this.state.filtered.length : this.state.records.length}/{this.state.total}
+              Count: {(this.state.filtered) ? this.state.filtered.length : this.state.records.length}/{this.state.numTotal}
               Time: {this.state.time}ms
             </Title>
             <input type="text" inline={true} className="flex" placeholder="Filter Records"
@@ -292,10 +289,11 @@ export default class List extends Component {
               <Distribution size="small" series={this.state.groups_dist} legend={false} />
             </Box>
           }
-          <Table selectable={true} onMore={(this.state.total > this.state.records.length)?this._onMore.bind(this):null}>
+          <Table selectable={true} onMore={(this.state.numTotal > this.state.records.length)?this._onMore.bind(this):null}>
             <thead>
             <tr>
-              <th><Anchor href="#" onClick={this._onOrderBy.bind(this, 'self')}>Self</Anchor></th>
+              <th><Anchor href="#" reverse={true} icon={this._getOrderByIcon('self')} label="Self"
+                          onClick={this._onOrderBy.bind(this, 'self')} /></th>
               {header}
             </tr>
             </thead>
