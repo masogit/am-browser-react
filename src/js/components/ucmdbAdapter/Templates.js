@@ -23,7 +23,7 @@ const IntegrationJobTable = ({
   onIntegrationJobSelect
   }) => {
   if(integrationJobDataError) {
-    return integrationJobDataError;
+    return (<div>{integrationJobDataError}</div>);
   }
 
   if(integrationJobData.length === 0) {
@@ -256,7 +256,7 @@ export const PointListContainer = ({
   onMenuClick
   }) => {
   if (dataError) {
-    return dataError;
+    return (<div>{dataError}</div>);
   }
   return (
     <Menu primary={true}>

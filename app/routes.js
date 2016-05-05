@@ -2,9 +2,6 @@ var db = require('./db.js');
 
 module.exports = function (app, am, redis) {
 
-
-    var UCMDBAdapter = require('./ucmdbAdapter.js');
-    var ucmdbAdapter = new UCMDBAdapter();
     var Metadata = require('./metadata.js');
     var metadata = new Metadata();
 
@@ -199,13 +196,9 @@ module.exports = function (app, am, redis) {
     });
 
     // get ucmdb point data
-    app.post('/am/ucmdbPoint', ucmdbAdapter.getUCMDB);
-
-    // get ucmdb job data
-    app.post('/am/ucmdbJob', ucmdbAdapter.getUCMDB);
-
-    // get ucmdb job item data
-    app.post('/am/ucmdbJobItem', ucmdbAdapter.getUCMDBJob);
+    app.use('/am/ucmdbPoint/', function (req, res) {
+      apiProxy.web(req, res, {target: 'http://' + am.server + '/AssetManagerWebService/rs/integration/ucmdbAdapter/points'});
+    });
 
     // AM Metadata ---------------------------------------------------------
     app.post('/am/metadata', metadata.get);
