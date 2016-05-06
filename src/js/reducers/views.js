@@ -101,7 +101,7 @@ const generateFieldsLinks = (body, elements, row) => {
       var PK = {
         sqlname: ((prefix.length > 0) ? prefix + "." : prefix) + link.reversefield,
         PK: true
-      }
+      };
       var filterPK = body.fields.filter(field => field.sqlname == PK.sqlname);
       if (filterPK && filterPK.length == 0) {
         body.fields.push(PK);
