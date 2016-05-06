@@ -33,7 +33,7 @@ const setValueByJsonPath = (path, val, obj) => {
   }
 };
 
-const createObj= (reverse) => {
+const createReverse = (reverse) => {
   var obj = {
     reversefield: reverse.reversefield,
     sqlname: reverse.sqlname,
@@ -41,14 +41,16 @@ const createObj= (reverse) => {
     reverse: reverse.reverse,
     body: {
       sqlname: reverse.body_sqlname,
-      label: reverse.body_label
+      label: reverse.body_label,
+      fields: [],
+      links: []
     }
   };
   return obj;
 };
 
-const generateLinks= (body, elements, row) => {
-  // initialize sqlname
+const generateFieldsLinks = (body, elements, row) => {
+  // initialize variable sqlname
   var sqlname = "";
   // check current row if it is one2one link
   for (var i = 0; i < elements.length; i++) {
@@ -58,19 +60,17 @@ const generateLinks= (body, elements, row) => {
       if (!body.links) {
         body.links = [];
       }
-      let filterLinks = body.links.filter(link => link.sqlname == sqlname);
-      let link;
-      if (filterLinks && filterLinks.length == 0) {
-        // include one2many links
-        link = createObj({
-          reversefield: element.reversefield,
-          sqlname: sqlname,
-          label: element.label,
-          reverse: element.reverse,
-          body_label: element.body_label,
-          body_sqlname: element.body_sqlname
-        });
+      var filterLinks = body.links.filter(link => link.sqlname == sqlname);
+      var link = {};
+      var isLinkNotExisted = filterLinks && filterLinks.length == 0;
+      // check loop one2many link if exists in current links array
+      if (isLinkNotExisted) {
+        // create a new link with body
+        var reverse = element;
+        reverse.sqlname = sqlname;
+        link = createReverse(reverse);
       } else {
+        // get first match
         link = filterLinks[0];
       }
       // generate fields
@@ -78,32 +78,53 @@ const generateLinks= (body, elements, row) => {
         if (!link.body.fields) {
           link.body.fields = [];
         }
-        link.body.fields.push({
-          label: row.label,
-          size: row.size,
-          sqlname: row.sqlname,
-          type: row.type
-        });
+        link.body.fields.push(row);
       } else {
-        generateLinks(link.body, elements.slice(i + 1), row);
+        generateFieldsLinks(link.body, elements.slice(i + 1), row);
       }
-      if (filterLinks && filterLinks.length == 0) {
+      // push new link to links
+      if (isLinkNotExisted) {
         body.links.push(link);
+      }
+      if (!body.fields) {
+        body.fields = [];
+      }
+      // find prefix for PK
+      var position = sqlname.lastIndexOf(".");
+      var prefix = "";
+      if (position == -1) {
+        prefix = sqlname;
+      } else {
+        prefix = sqlname.substring(0, position);
+      }
+      // push PK to fields
+      var PK = {
+        sqlname: ((prefix.length > 0) ? prefix + "." : prefix) + link.reversefield,
+        PK: true
+      }
+      var filterPK = body.fields.filter(field => field.sqlname == PK.sqlname);
+      if (filterPK && filterPK.length == 0) {
+        body.fields.push(PK);
+      } else {
+        console.log("Current link PK exists on table:" + body.sqlname);
       }
       // one2many links will break the loop
       break;
     } else {
-      // one2one links will push into fields
+      // one2one links will be pushed into body fields
       if (i == elements.length - 1) {
         if (!body.fields) {
           body.fields = [];
         }
-        body.fields.push({
-          label: row.label,
-          size: row.size,
-          sqlname: sqlname + "." + row.sqlname,
-          type: row.type
-        });
+        var newRow = _.cloneDeep(row);
+        newRow.sqlname = sqlname + "." + row.sqlname;
+        var filterFields = body.fields.filter(field => field.sqlname == newRow.sqlname);
+        // current field can only be pushed once
+        if (filterFields && filterFields.length == 0) {
+          body.fields.push(newRow);
+        } else {
+          console.log("Current one2one field exists on table:" + body.sqlname);
+        }
       }
     }
   }
@@ -165,44 +186,40 @@ const handlers = {
     };
   },
   [SYNC_SELECTED_VIEW]: (state, action) => {
-    //console.log(state.selectedView);
     // temp logic only for function works
     // will refactor later
-    let clonedView = _.cloneDeep(state.selectedView);
-    let elements = action.elements;
-    let row = action.row;
-    let body = clonedView.body;
-    // only sqlname is same as current table
-    let elemLength = elements.length;
-    if (elemLength > 0 && (!body || !body.sqlname || body.sqlname == elements[0].sqlname)) {
+    var clonedView = _.cloneDeep(state.selectedView);
+    var elements = action.elements;
+    var row = action.row;
+    var body = clonedView.body;
+    var elemLength = elements.length;
+    // 1) create a new view: body.sqlname is empty
+    // 2) update an existed view: body.sqlname should be equal to root table
+    if (elemLength > 0 && (!body.sqlname || body.sqlname == elements[0].sqlname)) {
       // new a view
-      if (!body) {
-        body = {
-          sqlname : elements[0].sqlname,
-          label : elements[0].label
-        };
+      if (!body.sqlname) {
+        body.sqlname = elements[0].sqlname;
+        body.label = elements[0].label;
+        console.log("Created a new by sqlname:" + body.sqlname);
       }
       // fields
       if (elemLength == 1) {
+        // check first level fields if exists
         if (!body.fields) {
           body.fields = [];
         }
-        let filterFields = body.fields.filter(field => field.sqlname == row.sqlname);
-        if (filterFields && filterFields.length == 0 ) {
-          body.fields.push({
-            label: row.label,
-            size: row.size,
-            sqlname: row.sqlname,
-            type: row.type
-          });
+        var filterFields = body.fields.filter(field => field.sqlname == row.sqlname);
+        // current field can only be pushed once
+        if (filterFields && filterFields.length == 0) {
+          body.fields.push(row);
+        } else {
+          console.log("Current field exists on table:" + body.sqlname);
         }
       } else {
-        // for loop to generate links forever
-        generateLinks(body, elements.slice(1), row);
+        // for loop to generate links
+        generateFieldsLinks(body, elements.slice(1), row);
       }
     }
-    clonedView.body = body;
-    //setValueByJsonPath(action.path, action.newValue, clonedView);
     return {
       selectedView: clonedView
     };
