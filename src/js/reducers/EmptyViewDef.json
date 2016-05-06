@@ -1,0 +1,22 @@
+{
+  "name": "",
+  "desc": "",
+  "category": "",
+  "search": [
+  ],
+  "body": {
+    "orderby": "",
+    "filter": "",
+    "label": "",
+    "sqlname": "",
+    "fields": [
+    ],
+    "links": [
+    ]
+  },
+  "chart": {
+    "groupby": "",
+    "aggregate": "count",
+    "type": "line"
+  }
+}

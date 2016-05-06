@@ -230,8 +230,9 @@ export default class ViewDefDetail extends Component {
                         <RadioButton id={p + "item5-2"} name="v.chart.aggregate" label="Sum" value="sum"
                                      checked={selectedView.chart.aggregate == 'sum'}
                                      onChange={this._onChange}/>
-                        <select id="v.chart.groupby" name="v.chart.groupby" value={selectedView.chart.groupby} onChange={this._onChange}
-                                disabled={selectedView.chart.aggregate != 'sum'} placeholder="">
+                        <select id="v.chart.groupby" name="v.chart.groupby" value={selectedView.chart.groupby}
+                                onChange={this._onChange}
+                                placeholder="">
                           <option value=""></option>
                           {selectedView.body && selectedView.body.fields && this.renderAggregateOptions(selectedView)}
                         </select>

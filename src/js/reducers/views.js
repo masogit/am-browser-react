@@ -5,6 +5,7 @@ import { REQUEST_VIEWS, RECEIVE_VIEWS_SUCCESS, RECEIVE_VIEWS_FAILURE, SET_SELECT
   NEW_SELECTED_VIEW, UPDATE_SELECTED_VIEW, SYNC_SELECTED_VIEW}
   from '../constants/ActionTypes';
 import _ from 'lodash';
+import emptyViewDef from './EmptyViewDef.json';
 
 const initialState = {
   isFetchingViewList: false,
@@ -149,7 +150,7 @@ const handlers = {
   },
   [NEW_SELECTED_VIEW]: (state, action) => {
     return {
-      selectedView: {}
+      selectedView: _.cloneDeep(emptyViewDef)
     };
   },
   [UPDATE_SELECTED_VIEW]: (state, action) => {
