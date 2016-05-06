@@ -176,8 +176,10 @@ const handlers = {
     if (elemLength > 0 && (!body || !body.sqlname || body.sqlname == elements[0].sqlname)) {
       // new a view
       if (!body) {
-        //clonedView.sqlname = elements[0].sqlname;
-        body = {};
+        body = {
+          sqlname : elements[0].sqlname,
+          label : elements[0].label
+        };
       }
       // fields
       if (elemLength == 1) {
