@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 // import { bindActionCreators } from 'redux';
 import * as ExplorerActions from '../../actions';
 // import Accordion from '../Accordion';
-import List from './List';
+import RecordList from './RecordList';
 
 export default class Explorer extends Component {
 
@@ -24,7 +24,7 @@ export default class Explorer extends Component {
     let currentId = this.props.params.id;
     let selectedView = templates.filter(template => template._id == currentId)[0];
     return (
-      <List body={selectedView.body} />
+      <RecordList body={selectedView.body} />
     );
   }
 }

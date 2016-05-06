@@ -14,7 +14,7 @@ import DocumentCsv from 'grommet/components/icons/base/DocumentCsv';
 import Ascend from 'grommet/components/icons/base/Ascend';
 import Descend from 'grommet/components/icons/base/Descend';
 import * as ExplorerActions from '../../actions/explorer';
-export default class List extends Component {
+export default class RecordList extends Component {
 
   constructor() {
     super();
@@ -253,7 +253,7 @@ export default class List extends Component {
       if (this.props.body.links && this.props.body.links.length > 0) {
         linkTabs = this.props.body.links.map((link, index) => {
           return (<Tab title={link.label} key={index}>
-            <List body={this._getLinkBody(link, this.state.record)}/>
+            <RecordList body={this._getLinkBody(link, this.state.record)}/>
           </Tab>);
         });
       }
