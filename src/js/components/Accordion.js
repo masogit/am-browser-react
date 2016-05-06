@@ -24,7 +24,12 @@ export default class Accordion extends Component {
   }
 
   _onNew() {
-    this.setState({active: true});
+    this.setState(
+      {
+        active: true,
+        viewId: ""
+      }
+    );
     this.props.newSelectedView();
   }
 

@@ -57,11 +57,6 @@ export default class ViewDefDetail extends Component {
     this._onChange = this._onChange.bind(this);
   }
 
-  _onChange(event) {
-    let path = event.target.name; // why not 'event.target.id'? because of radio button.
-    this.props.onValueChange(path.substring(2), event.target.value);
-  }
-
   componentWillMount() {
   }
 
@@ -105,6 +100,11 @@ export default class ViewDefDetail extends Component {
   }
 
   componentWillUnmount() {
+  }
+
+  _onChange(event) {
+    let path = event.target.name; // why not 'event.target.id'? because of radio button.
+    this.props.onValueChange(path.substring(2), event.target.value);
   }
 
   renderLinks(links, table) {
