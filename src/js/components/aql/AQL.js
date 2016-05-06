@@ -1,31 +1,48 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import * as AQLActions from '../../actions/aql';
 import {
+  // Anchor
+  Box,
   Sidebar,
   Split,
-  // Footer,
+  Form,
+  FormFields,
+  FormField,
   SearchInput,
   List,
   ListItem,
   // Header,
+  Footer,
   Tabs,
-  Tab
+  Tab,
+  Table,
+  TableRow
 } from 'grommet';
-import {loadAQLs, loadReports} from '../../actions/aql';
+// import Descend from 'grommet/components/icons/base/Descend';
 
-class AQL extends Component {
-
+export default class AQL extends Component {
   constructor() {
     super();
-    //this._onSearch = this._onSearch.bind(this);
-    //this.state = {ids: ['test1', 'test2', 'test3']};
+    this.state = {
+      reports: {},
+      aqls: [],
+      data: null
+    };
+    // this._onQuery.bind(this);
   }
 
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch(loadAQLs());
-    dispatch(loadReports());
-    // console.log('AQLs: ' + JSON.stringify(AQLs));
+    AQLActions.loadAQLs((data) => {
+      // this.setState({
+      //   aqls: data
+      // });
+    });
+    AQLActions.loadReports((data) => {
+      console.log(data);
+      this.setState({
+        reports: data
+      });
+    });
   }
 
   componentWillReceiveProps(newProps) {
@@ -35,58 +52,93 @@ class AQL extends Component {
     return true;
   }
 
-  render() {
-    const { AQLs, reports } = this.props;
+  _onQuery(e) {
+    e.preventDefault();
+    AQLActions.queryAQL(this.refs.aql.value, (data) => {
+      console.log(data);
+      this.setState({
+        data: data
+      });
+    });
+  }
 
+  render() {
+    var header;
+    var rows;
+    console.log(this.state);
+    if (this.state.data) {
+      header = this.state.data.header.map((col) => {
+        return (<th key={col.Index}>{col.Content}</th>);
+      });
+
+      rows = this.state.data.rows.map((row, index) => {
+        return (<TableRow key={index}>
+          {
+            row.map((col, i) => {
+              return (<td key={i}>{col}</td>);
+            })
+          }
+        </TableRow>);
+      });
+
+    }
     return (
       <Split flex="right">
-        <Sidebar primary={true} pad="small" size="large">
+        <Sidebar primary={true} pad="small" size="small">
           <SearchInput suggestions={['123', '2344']}/>
           <Tabs initialIndex={0} justify="start">
             <Tab title="Reports">
               <List selectable={true}>
                 {
-                  reports.entities &&
-                  reports.entities.map((report) => {
+                  this.state.reports.entities &&
+                  this.state.reports.entities.map((report) => {
                     return (
                       <ListItem key={report['ref-link']}>{report.Name}</ListItem>
                     );
                   })
                 }
-
               </List>
             </Tab>
             <Tab title="Saved AQLs">
               <List selectable={true}>
                 {
-                  AQLs.map((aql) => {
+                  this.state.aqls.map((aql) => {
                     return (
                       <ListItem key={aql._id}>{aql.name}</ListItem>
                     );
                   })
                 }
-
               </List>
             </Tab>
           </Tabs>
         </Sidebar>
-        <List selectable={true}>
-          <ListItem>234</ListItem>
-          <ListItem>123</ListItem>
-          <ListItem>123</ListItem>
-          <ListItem>123</ListItem>
-        </List>
+        <div>
+          <Box dirction="row">
+            <Form>
+              <FormFields>
+                <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_Box">
+                  <textarea id="AQL_Box" ref="aql"></textarea>
+                </FormField>
+              </FormFields>
+              <Footer>
+                <button onClick={this._onQuery.bind(this)}>OK</button>
+              </Footer>
+            </Form>
+          </Box>
+          {
+            this.state.data &&
+            <Table>
+              <thead>
+              <tr>{header}</tr>
+              </thead>
+              <tbody>
+              {rows}
+              </tbody>
+            </Table>
+          }
+        </div>
       </Split>
     );
   }
 }
-;
 
-let mapStateToProps = (state) => {
-  return {
-    AQLs: state.aql.AQLs,  // see store-dev.js or store-prod.js
-    reports: state.aql.reports
-  };
-};
-
-export default connect(mapStateToProps)(AQL);
