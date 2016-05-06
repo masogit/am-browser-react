@@ -91,10 +91,10 @@ catch (e){
 
 
 // sub process to cache view data in Redis
-if (am) {
-    var cp = require('child_process');
-    var child = cp.fork('app/worker.js');
-
-    // Send child process some work
-    child.send(JSON.stringify({ am: am, db: dbFile, redis: redis }));
-}
+// if (am) {
+//     var cp = require('child_process');
+//     var child = cp.fork('app/worker.js');
+//
+//     // Send child process some work
+//     child.send(JSON.stringify({ am: am, db: dbFile, redis: redis }));
+// }
