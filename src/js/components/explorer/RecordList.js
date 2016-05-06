@@ -284,7 +284,7 @@ export default class RecordList extends Component {
           </Box>
         }
         <Table selectable={true}
-               onMore={(this.state.numTotal > this.state.records.length)?this._onMore.bind(this):null}>
+               onMore={(this.state.numTotal > this.state.records.length && !this.state.filtered)?this._onMore.bind(this):null}>
           <thead>
           <tr>
             <th><Anchor href="#" reverse={true} icon={this._getOrderByIcon('self')} label="Self"
