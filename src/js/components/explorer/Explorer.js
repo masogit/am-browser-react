@@ -13,10 +13,6 @@ export default class Explorer extends Component {
 
   componentDidMount() {
     this.props.dispatch(ExplorerActions.loadTemplates());
-    var templates = this.props.templates;
-    let currentId = this.props.params.id;
-    let selectedView = templates.filter(template => template._id == currentId)[0];
-    this.props.dispatch(ExplorerActions.loadRecords(selectedView));
   }
 
   render() {
