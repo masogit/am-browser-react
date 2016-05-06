@@ -3,6 +3,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router';
 import Header from 'grommet/components/Header';
+import Box from 'grommet/components/Box';
 import Title from 'grommet/components/Title';
 import Logo from './Logo'; // './HPELogo';
 //import UserSettingsIcon from 'grommet/components/icons/base/UserSettings';
@@ -18,7 +19,8 @@ class NavHeader extends Component {
 
   render() {
     return (
-      <Header size="small" justify="between" colorIndex="neutral-1" pad={{vertical: 'small'}}>
+      <Header fixed={true} size="small">
+      <Box full="horizontal" direction="row" justify="between" colorIndex="neutral-1" pad={{vertical: 'small'}}>
         <Title><Logo /> AM Browser</Title>
         <Menu direction="row" align="center" responsive={false}>
           <Link key="0" to="/home" activeClassName="active link-disabled">
@@ -35,6 +37,7 @@ class NavHeader extends Component {
           </Link>
           <SessionMenu />
         </Menu>
+      </Box>
       </Header>
     );
   }
