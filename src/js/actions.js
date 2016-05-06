@@ -5,7 +5,6 @@ import Rest from 'grommet/utils/Rest';
 //import Query from 'grommet-index/utils/Query';
 import IndexApi from './Api';
 import {HOST_NAME} from './util/Config';
-import history from './RouteHistory';
 
 // session
 export const INIT = 'INIT';

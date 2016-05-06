@@ -13,66 +13,85 @@ export const JOB_SELECT_SUCCESS = 'JOB_SELECT_SUCCESS';
 export const TAB_SWITCH_SUCCESS = 'TAB_SWITCH_SUCCESS';
 export const ADAPTER_SIDEBAR_CLICK = 'ADAPTER_SIDEBAR_CLICK';
 
+const dateFormatter = (date) => date == 0 ? '' : new Date(date).toUTCString();
+
 export const getIntegrationPoint = () =>
   (dispatch) =>{
     const url = `${HOST_NAME}/am/ucmdbPoint/`;
     Rest.get(url).end(function (err, res) {
       const data = res && res.ok && res.body || [];
-      const error = err && err.rawResponse;
+      const error = err && (err.rawResponse || err.message);
       dispatch(adapterDataFetch(data, error));
     });
   };
 
-const adapterDataFetch = (result, error) => ({
+const adapterDataFetch = (data, error) => ({
   type: ADAPTER_DATA_SUCCESS,
-  data: result,
-  error: error
+  data,
+  error
 });
 
 export const getIntegrationJob = (pointName, jobType) =>
-   (dispatch) => {
-      const url = `${HOST_NAME}/am/ucmdbPoint/${pointName}/${jobType}`;
-      Rest.get(url).end(function (err, res) {
-        const data = res && res.ok && res.body || [];
-        const error = err && err.rawResponse;
-        dispatch(integrationJobDataSuccess(data, error));
-        });
-   };
+  (dispatch) => {
+    const url = `${HOST_NAME}/am/ucmdbPoint/${pointName}/${jobType}`;
+    Rest.get(url).end(function (err, res) {
+      const data = res && res.ok && res.body || [];
+      const error = err && (err.rawResponse || err.message);
 
-const integrationJobDataSuccess = (result, error) =>({
+      const points = data.map((point)=> {
+        if(point.startTime !== undefined) point.startTime = dateFormatter(point.startTime);
+        if(point.stopTime !== undefined) point.stopTime =dateFormatter(point.stopTime);
+        return point;
+      });
+
+      dispatch(integrationJobDataSuccess(points, error));
+    });
+  };
+
+const integrationJobDataSuccess = (integrationJobData, error) =>({
   type: INTEGRATION_JOB_DATA_SUCCESS,
-  integrationJobData: result,
-  error: error
+  integrationJobData,
+  error
 });
 
 export const getIntegrationJobItem = (pointName, jobType, jobName) =>
   (dispatch) => {
     const url = `${HOST_NAME}/am/ucmdbPoint/${pointName}/${jobType}/${jobName}`;
     Rest.get(url).end(function (err, res) {
-        const data = res && res.ok && res.body && res.body.jobStatuses || [];
-        const error = err && err.rawResponse;
-        dispatch(integrationJobItemDataSuccess(data, error));
+      const data = res && res.ok && res.body && res.body.jobStatuses || [];
+      const error = err && (err.rawResponse || err.message);
+      const jobStatuses = data.map((jobStatus)=> {
+        if(jobStatus.startTime !== undefined) jobStatus.startTime = dateFormatter(jobStatus.startTime);
+        if(jobStatus.stopTime !== undefined) jobStatus.stopTime =dateFormatter(jobStatus.stopTime);
+        return jobStatus;
       });
+
+      dispatch(integrationJobItemDataSuccess(jobStatuses, error));
+    });
   };
 
-const integrationJobItemDataSuccess = (result, error) =>({
+const integrationJobItemDataSuccess = (integrationJobItemData, error) =>({
   type: INTEGRATION_JOB_ITEM_DATA_SUCCESS,
-  integrationJobItemData: result,
-  error: error
+  integrationJobItemData,
+  error
 });
 
-export const adapterSideBarClick = (pointName) => ({type: ADAPTER_SIDEBAR_CLICK, pointName: pointName});
+export const adapterSideBarClick = (pointName, tabName) => {
+  //history.pushState(null, '/ucmdbAdapter/' + pointName + '/' + tabName);
+  //return {type: ADAPTER_SIDEBAR_CLICK, pointName, tabName};
+  return {type: ADAPTER_SIDEBAR_CLICK, pointName};
+};
 
 export const integrationJobSelect = (tabName, pointName, integrationJobName) => {
-  history.pushState(null, '/ucmdbAdapter/' + tabName + '/' + pointName);
+  //history.pushState(null, '/ucmdbAdapter/' + pointName + '/' + tabName);
   //history.pushState(null, '/ucmdbAdapter/' + tabName + '/' + pointName + '/' + integrationJobName);
-  return { type: JOB_SELECT_SUCCESS, integrationJobName: integrationJobName };
+  return { type: JOB_SELECT_SUCCESS, integrationJobName };
 };
 
 export const integrationJobTabSwitch = (tabName, pointName) => {
-  history.pushState(null, '/ucmdbAdapter/' + tabName + '/' + pointName);
+  history.pushState(null, '/ucmdbAdapter/' + pointName + '/' + tabName);
   return {
     type: TAB_SWITCH_SUCCESS,
-    tabName: tabName
+    tabName
   };
 };

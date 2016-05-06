@@ -1,8 +1,30 @@
 export const statusAdapter = {
-  "SUCCESSFUL" :"ok",
-  "FAILED" : "critical",
-  "SUCCESS_WITH_WARNINGS" : "warning",
-  "DID_NOT_RUN" : "disabled",
-  "PASSED_WITH_FAILURES" : "warning",
-  "UNKNOWN" : "unknown"
+  "SUCESSFULL" : {
+    status: "ok",
+    text: 'Completed successfully'
+  },
+  "FAILED" : {
+    status: "critical",
+    text: 'Failed'
+  },
+  "SUCCESS_WITH_WARNINGS" : {
+    status: "warning",
+    text: 'Completed with warnings'
+  },
+  "DID_NOT_RUN" : {
+    status: "disabled",
+    text: 'Did not run'
+  },
+  "NEVER_RUN": {
+    status: "disabled",
+    text: 'Did not run'
+  },
+  "PASSED_WITH_FAILURES" : {
+    status: "warning",
+    text: 'Completed with failures'
+  },
+  "UNKNOWN" : {
+    status: "unknown",
+    text: 'Unknown'
+  }
 };

@@ -1,9 +1,7 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { getIntegrationJobItem } from '../../actions';
-import {IntegrationJobItemTemplate} from './Templates.js';
+import {IntegrationJobItemTemplate} from './IntegrationJobItemTemplate.js';
 
 export default class IntegrationJobItemContainer extends Component {
   constructor () {
@@ -19,7 +17,6 @@ export default class IntegrationJobItemContainer extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.pointName !== this.props.pointName || nextProps.tabName !== this.props.tabName || this.props.integrationJobName !== nextProps.integrationJobName) {
-      const integrationJobName = nextProps.integrationJobName;
       this.props.getIntegrationJobItem(nextProps);
     }
   }

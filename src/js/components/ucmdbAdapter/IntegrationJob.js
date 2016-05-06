@@ -1,9 +1,7 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { getIntegrationJob, integrationJobSelect, integrationJobTabSwitch } from '../../actions';
-import {IntegrationJobTemplate} from './Templates.js';
+import {IntegrationJobTemplate} from './IntegrationJobTemplate.js';
 
 export default class IntegrationJobContainer extends Component {
   constructor () {
@@ -18,8 +16,11 @@ export default class IntegrationJobContainer extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.pointName !== this.props.pointName || nextProps.tabName !== this.props.tabName) {
+    if ( nextProps.tabName && (this.props.pointName !== nextProps.pointName || this.props.tabName !== nextProps.tabName)) {
       this.props.getIntegrationJob(nextProps);
+    } else if(nextProps.params.tabName && nextProps.params.tabName != nextProps.tabName) {
+      // if use change url manually
+      this.onTabClick(nextProps.params.tabName, nextProps.pointName);
     }
   }
 
@@ -33,8 +34,6 @@ export default class IntegrationJobContainer extends Component {
   }
 
   render () {
-    return (
-      <IntegrationJobTemplate {...this.props} onTabClick={this.onTabClick.bind(this)}/>
-    );
+    return <IntegrationJobTemplate {...this.props} onTabClick={this.onTabClick.bind(this)} />;
   }
 }
