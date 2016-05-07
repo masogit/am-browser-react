@@ -34,27 +34,30 @@ export function queryAQL(str, callback) {
   var idx_FROM = str.toLowerCase().indexOf("from");
   var idx_WHERE = str.toLowerCase().indexOf("where");
 
-  // get fields from SELECT .. FROM
-  aql.fields = str.substring(idx_SELECT + 6, idx_FROM).trim();
+  if (idx_SELECT < 0 || idx_FROM < 0)
+    callback(null);
+  else {
+    // get fields from SELECT .. FROM
+    aql.fields = str.substring(idx_SELECT + 6, idx_FROM).trim();
 
-  // get tableName from FROM .. WHERE (WHERE is optional)
-  aql.tableName = (idx_WHERE > -1) ? str.substring(idx_FROM + 4, idx_WHERE).trim() : str.substring(idx_FROM + 4).trim();
+    // get tableName from FROM .. WHERE (WHERE is optional)
+    aql.tableName = (idx_WHERE > -1) ? str.substring(idx_FROM + 4, idx_WHERE).trim() : str.substring(idx_FROM + 4).trim();
 
-  // get where start from WHERE (not include WHERE, where is optional)
-  aql.where = (idx_WHERE < 0) ? "" : str.substring(idx_WHERE).trim();
+    // get where start from WHERE (not include WHERE, where is optional)
+    aql.where = (idx_WHERE < 0) ? "" : str.substring(idx_WHERE).trim();
 
-  var query = "/am/aql/" + aql.tableName + "/" + aql.fields;
-  if (aql.where)
-    query += " " + aql.where;
+    var query = "/am/aql/" + aql.tableName + "/" + aql.fields;
+    if (aql.where)
+      query += " " + aql.where;
 
-  Rest.get(HOST_NAME + query).end(function (err, res) {
-    if (err) {
-      console.log(err);
-    } else {
-      callback(simpleAQLResult(res.body.Query));
-    }
-  });
-
+    Rest.get(HOST_NAME + query).end(function (err, res) {
+      if (err) {
+        console.log(err);
+      } else {
+        callback(simpleAQLResult(res.body.Query));
+      }
+    });
+  }
 }
 
 function simpleAQLResult(Query) {
