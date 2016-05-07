@@ -68,7 +68,7 @@ export default class AQL extends Component {
     console.log(this.state);
     if (this.state.data) {
       header = this.state.data.header.map((col) => {
-        return (<th key={col.Index}>{col.Content}</th>);
+        return (<th key={col.Index}>{col.Name}</th>);
       });
 
       rows = this.state.data.rows.map((row, index) => {
@@ -114,7 +114,7 @@ export default class AQL extends Component {
         </Sidebar>
         <div>
           <Box dirction="row">
-            <Form>
+
               <FormFields>
                 <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_Box">
                   <textarea id="AQL_Box" ref="aql"></textarea>
@@ -123,7 +123,7 @@ export default class AQL extends Component {
               <Footer>
                 <button onClick={this._onQuery.bind(this)}>OK</button>
               </Footer>
-            </Form>
+            
           </Box>
           {
             this.state.data &&

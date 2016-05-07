@@ -73,32 +73,32 @@ function simpleAQLResult(Query) {
     data.header.push(Query.Schema.Column);
   }
 
-  var cols = [];
+
   if (Query.Result.Row instanceof Array) {
     Query.Result.Row.forEach((row) => {
-
+      var cols = [];
       if (row.Column instanceof Array) {
         row.Column.forEach((col) => {
           if (col.content)
             cols.push(col.content);
         });
-
       } else {
         if (row.Column.content)
           cols.push(row.Column.content);
 
       }
+      if (cols.length > 0)
+        data.rows.push(cols);
     });
 
   } else {
-
+    var cols = [];
     if (Query.Result.Row.Column.content)
       cols.push(Query.Result.Row.Column.content);
+    if (cols.length > 0)
+      data.rows.push(cols);
 
   }
-
-  if (cols.length > 0)
-    data.rows.push(cols);
 
   return data;
 }
