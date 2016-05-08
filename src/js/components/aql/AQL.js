@@ -1,8 +1,11 @@
 import React, {Component} from 'react';
+import AChart from './AChart';
 import * as AQLActions from '../../actions/aql';
 import {
   Anchor,
   // Box,
+  Chart,
+  Distribution,
   Sidebar,
   Split,
   Form,
@@ -18,7 +21,8 @@ import {
   Table,
   TableRow,
   Title,
-  Menu
+  Menu,
+  Meter
 } from 'grommet';
 import Play from 'grommet/components/icons/base/Play';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
@@ -31,7 +35,12 @@ export default class AQL extends Component {
       reports: {},
       aqls: [],
       data: null,
-      aql: ""
+      aql: "",
+      chart: null,
+      meter: null,
+      distribution: null,
+      value: null,
+      worldmap: null
     };
     // this._onQuery.bind(this);
   }
@@ -119,15 +128,15 @@ export default class AQL extends Component {
           </Tabs>
         </Sidebar>
         <div>
-            <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
-              <Title>AM Insight</Title>
-              <Menu direction="row" align="center" responsive={false}>
-                <Anchor link="#" icon={<Play />} onClick={this._onQuery.bind(this)}>Query</Anchor>
-                <Anchor link="#" icon={<Checkmark />} onClick={this._onQuery.bind(this)}>Save</Anchor>
-                <Anchor link="#" icon={<Close />} onClick={this._onQuery.bind(this)}>Delete</Anchor>
-              </Menu>
-            </Header>
-            <Tabs initialIndex={0} justify="start">
+          <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
+            <Title>AM Insight</Title>
+            <Menu direction="row" align="center" responsive={false}>
+              <Anchor link="#" icon={<Play />} onClick={this._onQuery.bind(this)}>Query</Anchor>
+              <Anchor link="#" icon={<Checkmark />} onClick={this._onQuery.bind(this)}>Save</Anchor>
+              <Anchor link="#" icon={<Close />} onClick={this._onQuery.bind(this)}>Delete</Anchor>
+            </Menu>
+          </Header>
+          <Tabs initialIndex={0} justify="start">
             <Tab title="Data">
               <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_Box">
                 <textarea id="AQL_Box" ref="aql"></textarea>
@@ -141,23 +150,91 @@ export default class AQL extends Component {
                 </tbody>
               </Table>
             </Tab>
-            <Tab title="Charts">
-              <Form pad="small">
-                <Header>Chart Definition</Header>
-                <FormFields>
-                  <FormField label="Chart Name" htmlFor="AQL_Box">
-                    <input type="text"></input>
-                  </FormField>
-                </FormFields>
-              </Form>
+            <Tab title="Chart">
+              <AChart data={this.state.data} />
             </Tab>
-            <Tab title="Meter">
 
+            <Tab title="Meter">
+              <Split flex="right">
+                <Form pad="small" compact={true}>
+                  <FormFields>
+                    <FormField label="Meter Type">
+                      <select name="meterType">
+                        <option>bar</option>
+                        <option>arc</option>
+                        <option>circle</option>
+                        <option>spiral</option>
+                      </select>
+                    </FormField>
+                  </FormFields>
+                </Form>
+                <Meter type="arc" legend={true} series={[
+                  {"label": "Physical", "value": 700},
+                  {"label": "Subscribed", "value": 1200},
+                  {"label": "Allocated", "value": 500}
+                ]} vertical={true} units="TB" a11yTitleId="meter-title-15" a11yDescId="meter-desc-15"/>
+              </Split>
             </Tab>
+
             <Tab title="Distribution">
+              <Split flex="right">
+                <Form pad="small" compact={true}>
+                  <FormFields>
+                    <FormField label="Meter Type">
+                      <select name="meterType">
+                        <option>bar</option>
+                        <option>arc</option>
+                        <option>circle</option>
+                        <option>spiral</option>
+                      </select>
+                    </FormField>
+                  </FormFields>
+                </Form>
+                <Distribution size="small" series={[
+                  {"label": "First", "value": 40, "colorIndex": "graph-1"},
+                  {"label": "Second", "value": 30, "colorIndex": "accent-2"},
+                  {"label": "Third", "value": 20, "colorIndex": "unset"},
+                  {"label": "Fourth", "value": 10, "colorIndex": "graph-1"}
+                ]} a11yTitleId="distribution-title-3" a11yDescId="distribution-desc-3" />
+              </Split>
             </Tab>
+
             <Tab title="Value">
+              <Split flex="right">
+                <Form pad="small" compact={true}>
+                  <FormFields>
+                    <FormField label="Meter Type">
+                      <select name="meterType">
+                        <option>bar</option>
+                        <option>arc</option>
+                        <option>circle</option>
+                        <option>spiral</option>
+                      </select>
+                    </FormField>
+                  </FormFields>
+                </Form>
+                <span>Value</span>
+              </Split>
             </Tab>
+
+            <Tab title="WorldMap">
+              <Split flex="right">
+                <Form pad="small" compact={true}>
+                  <FormFields>
+                    <FormField label="Meter Type">
+                      <select name="meterType">
+                        <option>bar</option>
+                        <option>arc</option>
+                        <option>circle</option>
+                        <option>spiral</option>
+                      </select>
+                    </FormField>
+                  </FormFields>
+                </Form>
+                <span>Wold Map</span>
+              </Split>
+            </Tab>
+
           </Tabs>
 
         </div>
