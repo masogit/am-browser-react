@@ -4,7 +4,7 @@ import * as AQLActions from '../../actions/aql';
 import {
   Anchor,
   // Box,
-  Chart,
+  // Chart,
   Distribution,
   Sidebar,
   Split,

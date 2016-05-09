@@ -4,7 +4,7 @@ import {
   Split,
   Form,
   FormFields,
-  FormField,
+  FormField
 } from 'grommet';
 
 export default class AChart extends Component {
@@ -14,7 +14,7 @@ export default class AChart extends Component {
       data: null,
       type: 'bar',
       series: [],
-      xAxis: {placement: 'top', data:[]},
+      xAxis: {placement: 'top', data: []},
       legend: {position: 'inline', total: true}
     };
   }
@@ -33,7 +33,7 @@ export default class AChart extends Component {
 
   _setSeries() {
     var index = this.refs.col4series.value;
-    if(index && this.state.data) {
+    if (index && this.state.data) {
       var series = [];
       this.state.data.rows.map((row, i) => {
         series.push([i, row[index]]);
@@ -46,7 +46,7 @@ export default class AChart extends Component {
 
   _setXaxis() {
     var index = this.refs.col4xAxis.value;
-    if(index && this.state.data) {
+    if (index && this.state.data) {
       var xAxis = this.state.xAxis;
       this.state.data.rows.map((row, i) => {
         xAxis.data.push({"label": row[index], "value": i});
@@ -67,8 +67,8 @@ export default class AChart extends Component {
     var col_options;
     if (this.state.data)
       col_options = this.state.data.header.map((header, index) => {
-      return <option key={index} value={header.Index}>{header.Name} (Type: {header.Type})</option>;
-    });
+        return <option key={index} value={header.Index}>{header.Name} (Type: {header.Type})</option>;
+      });
 
     return (
       <Split flex="right">
@@ -108,12 +108,8 @@ export default class AChart extends Component {
         </Form>
         {
           this.state.series.length > 0 &&
-          <Chart series={[
-                  {
-                    "values": this.state.series,
-                    "colorIndex": "graph-1"
-                  }
-                ]} xAxis={this.state.xAxis} max={5} threshold={3} type={this.state.type}
+          <Chart series={[{"values": this.state.series,"colorIndex": "graph-1"}]}
+                 xAxis={this.state.xAxis} max={5} threshold={3} type={this.state.type}
                  legend={this.state.legend}
                  a11yTitleId="lineChartTitle" a11yDescId="lineChartDesc"/>
         }
