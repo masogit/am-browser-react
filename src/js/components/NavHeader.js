@@ -32,7 +32,7 @@ class NavHeader extends Component {
           <Link key="2" to="/aql" activeClassName="active link-disabled">
             AQL
           </Link>
-          <Link key="3" to="/adapter" activeClassName="active link-disabled">
+          <Link key="3" to="/ucmdbAdapter" activeClassName="active link-disabled">
             Adapter
           </Link>
           <SessionMenu />
