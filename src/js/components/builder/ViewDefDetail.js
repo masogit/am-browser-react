@@ -120,7 +120,7 @@ export default class ViewDefDetail extends Component {
             <Header size="small">
               <h3>{link.sqlname}</h3>
             </Header>
-            <Table>
+            <table key={"table_" + link.sqlname}>
               <thead>
               <tr>
                 <th>Field</th>
@@ -131,7 +131,7 @@ export default class ViewDefDetail extends Component {
               <tbody>
               {link.body && link.body.fields && this.renderTemplateTable(link, false)}
               </tbody>
-            </Table>
+            </table>
           </td>
         </tr>
       );
