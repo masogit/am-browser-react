@@ -17,14 +17,15 @@ import RadioButton from 'grommet/components/RadioButton';
 //import NumberInput from 'grommet/components/NumberInput';
 import Section from 'grommet/components/Section';
 import CheckBox from 'grommet/components/CheckBox';
-//import Menu from 'grommet/components/Menu';
+import Menu from 'grommet/components/Menu';
 import Table from 'grommet/components/Table';
 //import TableRow from 'grommet/components/TableRow';
 import Anchor from 'grommet/components/Anchor';
 //import Button from 'grommet/components/Button';
 import Add from 'grommet/components/icons/base/Add';
-import Delete from 'grommet/components/icons/base/Close.js';
-import Right from 'grommet/components/icons/base/Play';
+import Close from 'grommet/components/icons/base/Close';
+import Play from 'grommet/components/icons/base/Play';
+import Checkmark from 'grommet/components/icons/base/Checkmark';
 //import MDSave from 'react-icons/lib/md/save';
 import _ from 'lodash';
 //import store from '../../store';
@@ -148,7 +149,7 @@ export default class ViewDefDetail extends Component {
           <td>{field.label}</td>
           {root && <td><CheckBox id="v.search" name={`v.body.fields.${index}.search`} checked={field.search}
                                  onChange={this._onChange}/></td>}
-          <td><Anchor tag="span" className="tbBtnIcon"><Delete /></Anchor></td>
+          <td><Anchor tag="span" className="tbBtnIcon"><Close /></Anchor></td>
         </tr>
       );
     });
@@ -186,88 +187,85 @@ export default class ViewDefDetail extends Component {
 
     return (
       <Split flex="right">
-        <Section>
-          {
-            _.isEmpty(selectedView) &&
-            <p>Loading....
-            </p>
-          }
-          {selectedView &&
-          <Box direction="row">
-            <Form onSubmit={this.props.onSubmit} compact={this.props.compact}>
-              <FormFields>
-                <fieldset>
-                  <FormField label="Name" htmlFor={p + "item1"}>
-                    <input id="v.name" name="v.name" type="text" onChange={this._onChange}
-                           value={selectedView.name}/>
-                  </FormField>
-                  <FormField label="Description" htmlFor={p + "item2"}>
+        {
+          _.isEmpty(selectedView) &&
+          <p>Loading....
+          </p>
+        }
+        {selectedView &&
+        <Box pad="small">
+          <Form onSubmit={this.props.onSubmit} compact={this.props.compact}>
+            <FormFields>
+              <fieldset>
+                <FormField label="Name" htmlFor={p + "item1"}>
+                  <input id="v.name" name="v.name" type="text" onChange={this._onChange}
+                         value={selectedView.name}/>
+                </FormField>
+                <FormField label="Description" htmlFor={p + "item2"}>
                     <textarea id="v.desc" name="v.desc" value={selectedView.desc}
                               onChange={this._onChange}></textarea>
+                </FormField>
+                <FormField label="Category" htmlFor={p + "item3"}>
+                  <input id="v.category" name="v.category" type="text" onChange={this._onChange}
+                         value={selectedView.category}/>
+                </FormField>
+                {
+                  selectedView.chart && selectedView.chart.type &&
+                  <FormField label="Chart">
+                    <Box direction="row" justify="start" className="formfieldRadios">
+                      <RadioButton id={p + "item4-1"} name="v.chart.type" label="Line" value="line"
+                                   checked={selectedView.chart.type == 'line'}
+                                   onChange={this._onChange}/>
+                      <RadioButton id={p + "item4-2"} name="v.chart.type" label="Bar" value="bar"
+                                   checked={selectedView.chart.type == 'bar'}
+                                   onChange={this._onChange}/>
+                      <RadioButton id={p + "item4-3"} name="v.chart.type" label="Pie" value="pie"
+                                   checked={selectedView.chart.type == 'pie'}
+                                   onChange={this._onChange}/>
+                    </Box>
                   </FormField>
-                  <FormField label="Category" htmlFor={p + "item3"}>
-                    <input id="v.category" name="v.category" type="text" onChange={this._onChange}
-                           value={selectedView.category}/>
+                }
+                {
+                  selectedView.chart && selectedView.chart.aggregate &&
+                  <FormField label="Aggregate">
+                    <Box direction="row" justify="start" className="formfieldRadios">
+                      <RadioButton id={p + "item5-1"} name="v.chart.aggregate" label="Count" value="count"
+                                   checked={selectedView.chart.aggregate == 'count'}
+                                   onChange={this._onChange}/>
+                      <RadioButton id={p + "item5-2"} name="v.chart.aggregate" label="Sum" value="sum"
+                                   checked={selectedView.chart.aggregate == 'sum'}
+                                   onChange={this._onChange}/>
+                      <select id="v.chart.groupby" name="v.chart.groupby" value={selectedView.chart.groupby}
+                              onChange={this._onChange}
+                              placeholder="">
+                        <option value=""></option>
+                        {selectedView.body && selectedView.body.fields && this.renderAggregateOptions(selectedView)}
+                      </select>
+                    </Box>
                   </FormField>
-                  {
-                    selectedView.chart && selectedView.chart.type &&
-                    <FormField label="Chart">
-                      <Box direction="row" justify="start" className="formfieldRadios">
-                        <RadioButton id={p + "item4-1"} name="v.chart.type" label="Line" value="line"
-                                     checked={selectedView.chart.type == 'line'}
-                                     onChange={this._onChange}/>
-                        <RadioButton id={p + "item4-2"} name="v.chart.type" label="Bar" value="bar"
-                                     checked={selectedView.chart.type == 'bar'}
-                                     onChange={this._onChange}/>
-                        <RadioButton id={p + "item4-3"} name="v.chart.type" label="Pie" value="pie"
-                                     checked={selectedView.chart.type == 'pie'}
-                                     onChange={this._onChange}/>
-                      </Box>
-                    </FormField>
-                  }
-                  {
-                    selectedView.chart && selectedView.chart.aggregate &&
-                    <FormField label="Aggregate">
-                      <Box direction="row" justify="start" className="formfieldRadios">
-                        <RadioButton id={p + "item5-1"} name="v.chart.aggregate" label="Count" value="count"
-                                     checked={selectedView.chart.aggregate == 'count'}
-                                     onChange={this._onChange}/>
-                        <RadioButton id={p + "item5-2"} name="v.chart.aggregate" label="Sum" value="sum"
-                                     checked={selectedView.chart.aggregate == 'sum'}
-                                     onChange={this._onChange}/>
-                        <select id="v.chart.groupby" name="v.chart.groupby" value={selectedView.chart.groupby}
-                                onChange={this._onChange}
-                                placeholder="">
-                          <option value=""></option>
-                          {selectedView.body && selectedView.body.fields && this.renderAggregateOptions(selectedView)}
-                        </select>
-                      </Box>
-                    </FormField>
-                  }
-                </fieldset>
-              </FormFields>
-              <Footer pad={{vertical: 'medium'}}>
-                <Button label="Save" primary={true} strong={true} onClick={this.props.onSubmit}/>
-              </Footer>
-            </Form>
-            <Box>
-              <Anchor tag="span"><Add /></Anchor>
-              <Anchor tag="span"><Delete /></Anchor>
-              <Anchor tag="span"><Right /></Anchor>
-            </Box>
-          </Box>
-          }
-        </Section>
+                }
+              </fieldset>
+            </FormFields>
+            <Footer pad={{vertical: 'medium'}}>
+              <Menu direction="row" align="center" responsive={false}>
+                <Anchor link="#" icon={<Checkmark />} onClick={this.props.onSubmit}>Save</Anchor>
+                <Anchor link="#" icon={<Close />}>Delete</Anchor>
+                <Anchor link="#" icon={<Play />}>Query</Anchor>
+              </Menu>
+            </Footer>
+          </Form>
+        </Box>
+        }
 
         {selectedView &&
-        <Section>
+        <Box>
           <Table>
             {tableHeader}
             <tbody>
             {selectedView.body && selectedView.body.fields && this.renderTemplateTable(selectedView, true)}
             </tbody>
           </Table>
-        </Section>
+        </Box>
         }
       </Split>
     );

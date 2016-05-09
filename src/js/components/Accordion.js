@@ -111,7 +111,7 @@ export default class Accordion extends Component {
     let viewsState = this.state && this.state.filtered ? this.state.filtered : views;
     return (
       <Sidebar primary={true} pad="small" fixed={false} full={false}>
-      <div style={{"backgroundColor": "#01a982", "color": "#ffffff", "width": "280px", "height": "820px"}}>
+      <div style={{"backgroundColor": "#01a982", "color": "#ffffff", "minHeight": "820px"}}>
         <Button label="Add" onClick={this._onNew}/>
         <Header large={true} flush={false}>
           <input className="sidebarsearch" type="text" placeholder="Search views..." onChange={this.onSearch} style={{"backgroundColor": "#ffffff", "color": "#000000", "margin": "40px 24px 24px"}}/>
