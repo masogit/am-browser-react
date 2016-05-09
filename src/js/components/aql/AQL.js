@@ -77,10 +77,16 @@ export default class AQL extends Component {
     });
   }
 
+  _setAQL() {
+    this.setState({
+      aql: this.refs.aql.value
+    });
+  }
+
   render() {
     var header;
     var rows;
-    console.log(this.state);
+    // console.log(this.state);
     if (this.state.data) {
       header = this.state.data.header.map((col) => {
         return (<th key={col.Index}>{col.Name}</th>);
@@ -139,7 +145,7 @@ export default class AQL extends Component {
           <Tabs initialIndex={0} justify="start">
             <Tab title="Data">
               <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_Box">
-                <textarea id="AQL_Box" ref="aql"></textarea>
+                <textarea id="AQL_Box" ref="aql" onChange={this._setAQL.bind(this)} value={this.state.aql}></textarea>
               </FormField>
               <Table>
                 <thead>
