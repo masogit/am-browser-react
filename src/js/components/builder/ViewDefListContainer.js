@@ -72,7 +72,16 @@ class ViewDefListContainer extends Component {
   }
 
   onSubmit() {
-    this.props.actions.saveTemplates(this.props.selectedView);
+    this.props.actions.saveViewDef(this.props.selectedView).then(function (updatedView) {
+      //console.log("updatedView");
+      //console.log(updatedView);
+      let views = store.getState().views.views;
+      let idx = _.findIndex(store.getState().views.views, {_id: updatedView._id});
+      //console.log("onSubmit - idx: " + idx);
+      if (idx >= 0) {
+        views[idx] = updatedView;
+      }
+    });
   }
 
   render() {

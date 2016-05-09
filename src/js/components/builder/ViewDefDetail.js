@@ -104,7 +104,11 @@ export default class ViewDefDetail extends Component {
 
   _onChange(event) {
     let path = event.target.name; // why not 'event.target.id'? because of radio button.
-    this.props.onValueChange(path.substring(2), event.target.value);
+    if (event.target.type == "checkbox") {
+      this.props.onValueChange(path.substring(2), event.target.checked ? true : false);
+    } else {
+      this.props.onValueChange(path.substring(2), event.target.value);
+    }
   }
 
   renderLinks(links, table) {
@@ -137,12 +141,13 @@ export default class ViewDefDetail extends Component {
 
   renderTemplateTable(selectedView, root) {
     let selfView = selectedView;
-    let fields = selfView.body.fields.map((field) => {
+    let fields = selfView.body.fields.map((field, index) => {
       return (
         <tr key={selfView.body.sqlname + "_" + field.sqlname}>
           <td>{field.sqlname}</td>
           <td>{field.label}</td>
-          {root && <td><CheckBox id="v.search" name="v.search" checked={selfView.search && selfView.search.indexOf(field.sqlname) >= 0} onChange={this._onChange}/></td>}
+          {root && <td><CheckBox id="v.search" name={`v.body.fields.${index}.search`} checked={field.search}
+                                 onChange={this._onChange}/></td>}
           <td><Anchor tag="span" className="tbBtnIcon"><Delete /></Anchor></td>
         </tr>
       );
@@ -242,7 +247,7 @@ export default class ViewDefDetail extends Component {
                 </fieldset>
               </FormFields>
               <Footer pad={{vertical: 'medium'}}>
-                <Button label="Save" primary={true} strong={true} onClick={this.props.onSubmit} />
+                <Button label="Save" primary={true} strong={true} onClick={this.props.onSubmit}/>
               </Footer>
             </Form>
             <Box>

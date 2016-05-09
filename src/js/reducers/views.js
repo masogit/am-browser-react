@@ -2,7 +2,7 @@
 
 import { REQUEST_VIEWS, RECEIVE_VIEWS_SUCCESS, RECEIVE_VIEWS_FAILURE, SET_SELECTED_VIEW,
   REQUEST_TEMPLATE_TABLE, RECEIVE_TEMPLATE_TABLE_SUCCESS, RECEIVE_TEMPLATE_TABLE_FAILURE,
-  NEW_SELECTED_VIEW, UPDATE_SELECTED_VIEW, SYNC_SELECTED_VIEW}
+  NEW_SELECTED_VIEW, UPDATE_SELECTED_VIEW, SYNC_SELECTED_VIEW, SAVE_VIEW_DEF}
   from '../constants/ActionTypes';
 import _ from 'lodash';
 import emptyViewDef from './EmptyViewDef.json';
@@ -14,7 +14,8 @@ const initialState = {
   selectedView: {},
   selectedViewId: '',
   templateTable: {},
-  err: ''
+  err: '',
+  editing: false
 };
 
 const setValueByJsonPath = (path, val, obj) => {
@@ -179,10 +180,15 @@ const handlers = {
     //console.log(action.selectedView);
     console.log(state);
     console.log(action);
-    let clonedView = _.cloneDeep(action.selectedView);
+    let editing = state.views.editing;
+    let clonedView = action.selectedView;
+    if (!editing) {
+      clonedView = _.cloneDeep(action.selectedView);
+    }
     setValueByJsonPath(action.path, action.newValue, clonedView);
     return {
-      selectedView: clonedView
+      selectedView: clonedView,
+      editing: true
     };
   },
   [SYNC_SELECTED_VIEW]: (state, action) => {
@@ -222,6 +228,13 @@ const handlers = {
     }
     return {
       selectedView: clonedView
+    };
+  },
+  [SAVE_VIEW_DEF]: (state, action) => {
+    return {
+      selectedViewId: action.selectedViewId,
+      selectedView: action.selectedView,
+      editing: action.editing
     };
   }
 };
