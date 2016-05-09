@@ -103,7 +103,11 @@ export default class AQL extends Component {
       });
 
     }
+    
+    var chartTab = <Tab title="Chart"> <AChart data={this.state.data} /> </Tab>;
+
     return (
+
       <Split flex="right">
         <Sidebar primary={true} pad="small" size="small">
           <SearchInput suggestions={['123', '2344']}/>
@@ -156,10 +160,7 @@ export default class AQL extends Component {
                 </tbody>
               </Table>
             </Tab>
-            <Tab title="Chart">
-              <AChart data={this.state.data} />
-            </Tab>
-
+            {chartTab}
             <Tab title="Meter">
               <Split flex="right">
                 <Form pad="small" compact={true}>
