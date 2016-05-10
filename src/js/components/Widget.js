@@ -1,21 +1,32 @@
-import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import React, {Component, PropTypes} from 'react';
+import {Link} from 'react-router';
 import Header from 'grommet/components/Header';
 import Box from 'grommet/components/Box';
 import Footer from 'grommet/components/Footer';
-import Search from 'grommet/components/Search';
 import Tiles from 'grommet/components/Tiles';
 import Tile from 'grommet/components/Tile';
+import RecordSearch from './explorer/RecordSearch';
 
 export default class Widget extends Component {
 
   constructor() {
     super();
     this._onSearch = this._onSearch.bind(this);
+    this._onEnter = this._onEnter.bind(this);
+    this.state={
+      keyword: ''
+    }
   }
 
   componentDidMount() {
     //this.props.dispatch(loadTemplates());
+  }
+
+  _onEnter(event) {
+    if ((event.keyCode === 13))
+      this.setState({
+        keyword: event.target.value.trim()
+      });
   }
 
   _onSearch(event) {
@@ -44,10 +55,14 @@ export default class Widget extends Component {
     });
     return (
       <div>
-        <div className="searchviews">
-          <Search inline={true} placeHolder="Search views" size="medium"
-            fill={true} responsive={false} onDOMChange={this._onSearch}/>
-        </div>
+        <Box direction="row">
+          <input type="search" inline={true} className="flex" placeholder="Global View and Record search..."
+                 onKeyDown={this._onEnter} onChange={this._onSearch}/>
+        </Box>
+        {
+          this.state.keyword &&
+          <RecordSearch keyword={this.state.keyword}/>
+        }
         <Tiles flush={false} colorIndex="light-2" full="horizontal">
           {widgets}
         </Tiles>
