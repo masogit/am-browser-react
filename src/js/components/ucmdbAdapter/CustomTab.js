@@ -5,15 +5,21 @@ class CustomTab extends Tab {
     super();
   }
 
-  componentDidMount() {
-    let clickHandler = this.props.onClick;
-    if (typeof clickHandler === 'function') {
-      let originalClick = Tab.prototype._onClickTab.bind(this);
-      if (originalClick) {
-        this._onClickTab = (event) => {
-          originalClick(event);
-          clickHandler();
-        };
+  componentWillReceiveProps() {
+    if (this.props.disabled) {
+      //TODO: set disabled style
+      this._onClickTab = () => {
+      };
+    } else {
+      let clickHandler = this.props.onClick;
+      if (typeof clickHandler === 'function') {
+        let originalClick = Tab.prototype._onClickTab.bind(this);
+        if (originalClick) {
+          this._onClickTab = (event) => {
+            originalClick(event);
+            clickHandler();
+          };
+        }
       }
     }
   }

@@ -26,7 +26,7 @@ const handlers = {
   [INTEGRATION_JOB_ITEM_DATA_SUCCESS]: (state, action) => ({integrationJobItemData: action.integrationJobItemData, integrationJobItemDataError: action.error}),
   [JOB_SELECT_SUCCESS]: (state, action) => ({integrationJobName: action.integrationJobName}),
   [TAB_SWITCH_SUCCESS]: (state, action) => ({tabName: action.tabName, integrationJobName: ''}),
-  [ADAPTER_SIDEBAR_CLICK]: (state, action) => ({pointName: action.pointName, /*tabName: action.tabName,*/ integrationJobName: ''})
+  [ADAPTER_SIDEBAR_CLICK]: (state, action) => ({pointName: action.pointName, tabName: action.tabName, integrationJobName: ''})
 };
 
 export default function pushAdapterReducer (state = initialState, action) {
