@@ -12,7 +12,7 @@ export const IntegrationJobItemTemplate = ({
   integrationJobItemData,
   tabName
   }) => {
-  if (integrationJobItemDataError) {
+  if(integrationJobItemDataError) {
     return (
       <div className="integrationJobItemTable">
         {integrationJobItemDataError}
@@ -20,7 +20,7 @@ export const IntegrationJobItemTemplate = ({
     );
   }
 
-  if (integrationJobItemData.length === 0) {
+  if(integrationJobItemData.length === 0) {
     return (
       <div className="integrationJobItemTable">
         <h2>No data to display!</h2>
@@ -28,8 +28,8 @@ export const IntegrationJobItemTemplate = ({
     );
   }
 
-  integrationJobItemData.sort((a, b) => a.name.localeCompare(b.name));
-  const populationStatisticsHeader = (
+  integrationJobItemData.sort((a,b) => a.name.localeCompare(b.name));
+  const tableHeader = tabName === 'populationJobs' ? (
     <thead>
     <tr>
       <th>Query Name</th>
@@ -40,8 +40,22 @@ export const IntegrationJobItemTemplate = ({
       <th>Query Status</th>
     </tr>
     </thead>
+  ) : (
+    <thead>
+    <tr>
+      <th>Query Name</th>
+      <th>Created</th>
+      <th>Updated</th>
+      <th>Deleted</th>
+      <th>Failed</th>
+      <th>Query Status</th>
+      <th>Start Time</th>
+      <th>Finish Time</th>
+    </tr>
+    </thead>
   );
-  const populationTableBody = (
+
+  const tableBody = tabName === 'populationJobs' ? (
     <tbody>{
       integrationJobItemData.map(data => {
         return (<tr key={data.name}>
@@ -58,23 +72,7 @@ export const IntegrationJobItemTemplate = ({
       })
     }
     </tbody>
-  );
-
-  const pushStatisticsHeader = (
-    <thead>
-    <tr>
-      <th>Query Name</th>
-      <th>Created</th>
-      <th>Updated</th>
-      <th>Deleted</th>
-      <th>Failed</th>
-      <th>Query Status</th>
-      <th>Start Time</th>
-      <th>Finish Time</th>
-    </tr>
-    </thead>
-  );
-  const pushTableBody = (
+  ) : (
     <tbody>{
       integrationJobItemData.map(data => {
         return (
@@ -99,10 +97,9 @@ export const IntegrationJobItemTemplate = ({
   return (
     <div className="integrationJobItemTable">
       <Table selectable={false}>
-        {tabName === 'populationJobs' ? populationStatisticsHeader : pushStatisticsHeader}
-        {tabName === 'populationJobs' ? populationTableBody : pushTableBody}
+        {tableHeader}
+        {tableBody}
       </Table>
     </div>
   );
 };
-

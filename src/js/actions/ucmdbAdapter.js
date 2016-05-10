@@ -13,7 +13,13 @@ export const JOB_SELECT_SUCCESS = 'JOB_SELECT_SUCCESS';
 export const TAB_SWITCH_SUCCESS = 'TAB_SWITCH_SUCCESS';
 export const ADAPTER_SIDEBAR_CLICK = 'ADAPTER_SIDEBAR_CLICK';
 
-const dateFormatter = (date) => date == 0 ? '' : new Date(date).toUTCString();
+const dateFormatter = (date) => date === 0 ? '' : new Date(date).toUTCString();
+
+const adapterDataFetch = (data, error) => ({
+  type: ADAPTER_DATA_SUCCESS,
+  data,
+  error
+});
 
 export const getIntegrationPoint = () =>
   (dispatch) => {
@@ -25,9 +31,9 @@ export const getIntegrationPoint = () =>
     });
   };
 
-const adapterDataFetch = (data, error) => ({
-  type: ADAPTER_DATA_SUCCESS,
-  data,
+const integrationJobDataSuccess = (integrationJobData, error) =>({
+  type: INTEGRATION_JOB_DATA_SUCCESS,
+  integrationJobData,
   error
 });
 
@@ -48,9 +54,9 @@ export const getIntegrationJob = (pointName, jobType) =>
     });
   };
 
-const integrationJobDataSuccess = (integrationJobData, error) =>({
-  type: INTEGRATION_JOB_DATA_SUCCESS,
-  integrationJobData,
+const integrationJobItemDataSuccess = (integrationJobItemData, error) =>({
+  type: INTEGRATION_JOB_ITEM_DATA_SUCCESS,
+  integrationJobItemData,
   error
 });
 
@@ -69,12 +75,6 @@ export const getIntegrationJobItem = (pointName, jobType, jobName) =>
       dispatch(integrationJobItemDataSuccess(jobStatuses, error));
     });
   };
-
-const integrationJobItemDataSuccess = (integrationJobItemData, error) =>({
-  type: INTEGRATION_JOB_ITEM_DATA_SUCCESS,
-  integrationJobItemData,
-  error
-});
 
 export const adapterSideBarClick = (pointName, tabName) => {
   //history.pushState(null, '/ucmdbAdapter/' + pointName + '/' + tabName);

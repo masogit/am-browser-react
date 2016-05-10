@@ -4,7 +4,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {getIntegrationPoint, getIntegrationJob, getIntegrationJobItem,
   adapterSideBarClick, integrationJobSelect, integrationJobTabSwitch} from '../../actions/ucmdbAdapter';
-import history from '../../RouteHistory';
 import {UCMDBAdapterContainerTemplate, PointListContainer} from './PointTemplates.js';
 import IntegrationJobContainer from './IntegrationJob.js';
 import IntegrationJobItemContainer from './IntegrationJobItem.js';

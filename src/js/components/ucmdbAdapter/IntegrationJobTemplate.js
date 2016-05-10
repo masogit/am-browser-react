@@ -14,6 +14,7 @@ const IntegrationJobTable = ({
   integrationJobDataError,
   integrationJobData,
   tabName,
+  integrationJobName,
   onIntegrationJobSelect
   }) => {
   if (integrationJobDataError) {
@@ -67,8 +68,7 @@ const IntegrationJobTable = ({
     );
     tableBody = (
       <tbody>{
-        integrationJobData.map((data) => {
-          return (
+        integrationJobData.map((data) => (
             <tr key={data.name}>
               <td>{data.name}</td>
               <td>
@@ -77,14 +77,16 @@ const IntegrationJobTable = ({
               </td>
               <td>{data.isFullSynchronization ? 'Full' : 'Changes'}</td>
             </tr>
-          );
-        })
+          )
+        )
       }
       </tbody>
     );
   }
+
+  const selected = integrationJobData.findIndex((item) => item.name == integrationJobName);
   return (
-    <Table selectable={true} onSelect={onIntegrationJobSelect}>
+    <Table selectable={true} selected={[selected]} onSelect={onIntegrationJobSelect}>
       {tableHeader}
       {tableBody}
     </Table>
@@ -97,6 +99,7 @@ export const IntegrationJobTemplate = ({
   integrationJobData,
   pointName,
   tabName,
+  integrationJobName,
   pushSupported,
   populationSupported,
   onIntegrationJobSelect,
@@ -112,6 +115,7 @@ export const IntegrationJobTemplate = ({
               tabName={tabName}
               integrationJobData={integrationJobData}
               integrationJobDataError={integrationJobDataError}
+              integrationJobName={integrationJobName}
               onIntegrationJobSelect={(selected) => onIntegrationJobSelect(tabName, pointName, integrationJobData[selected].name)}/>
           </div>
         </Split>
@@ -123,6 +127,7 @@ export const IntegrationJobTemplate = ({
               tabName={tabName}
               integrationJobData={integrationJobData}
               integrationJobDataError={integrationJobDataError}
+              integrationJobName={integrationJobName}
               onIntegrationJobSelect={(selected) => onIntegrationJobSelect(tabName, pointName, integrationJobData[selected].name)}/>
           </div>
         </Split>
