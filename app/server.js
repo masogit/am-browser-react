@@ -5,12 +5,9 @@ var fs = require('fs'), https = require('https'), http = require('http');
 var cors = require('cors');
 app.use(cors());
 
-var port = process.env.PORT || 8080; 				// set the port
-var https_port = process.env.HTTPS_PORT || 8443;     // set the https port
 var morgan = require('morgan');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
-var am_href = process.env.AM_WEB_TIER || "http://admin:@localhost:8081";    // http://user:pass@hostname:8081
 var dbFile = { folder: './db', json: '/template.json' };
 var redis = {
     host: process.env.REDIS_HOST || "127.0.0.1",
@@ -19,18 +16,27 @@ var redis = {
     enabled: process.env.REDIS_ENABLED || false,
     ttl: process.env.REDIS_TTL || 600
 };
-// initial AM server
-var URL = require('url');
 
-var am;
-if (am_href != "") {
-    am = {
-        server: URL.parse(am_href).host,
-        user: URL.parse(am_href).auth.split(":")[0],
-        password: URL.parse(am_href).auth.split(":")[1]
-    };
-}
+// initial AM REST server
+var PropertiesReader = require('properties-reader');
+var properties = PropertiesReader('am-browser-config.properties');
+var rest_protocol = properties.get('rest.protocol');
+var rest_server = properties.get('rest.server');
+var rest_port = properties.get('rest.port');
+var rest_username = properties.get('rest.username');
+var rest_password = properties.getRaw('rest.password');
+// initial AM node server
+//var protocol = properties.get('node.protocol'); 
+var server = properties.get('node.server'); 
+var port = properties.get('node.port'); 				// set the port
+var https_port = properties.get('node.https_port');     // set the https port
 
+var am = {
+    //server: rest_protocol + "://" + rest_server + ":" + rest_port,
+	server: rest_server + ":" + rest_port,
+    user: rest_username,
+    password: rest_password
+};
 
 // initial db folder and files =================================================
 var db = require('./db.js');
@@ -67,7 +73,7 @@ app.use(methodOverride('X-HTTP-Method-Override')); // override with the X-HTTP-M
 require('./routes.js')(app, am, redis);
 
 // listen (start app with node server.js) ======================================
-app.listen(port);
+app.listen(port, server);
 console.log("App listening HTTP on port " + port );
 
 // TODO: 1. Enable this in production. 2. There are some hardcoded HTTP requests in front-end JS, which causes mixed content issues

@@ -10,7 +10,11 @@ module.exports = function (app, am, redis) {
 
     var Cache = require('./cache.js');
     var cache = new Cache(db, redis);
-
+	
+    var PropertiesReader = require('properties-reader');
+    var properties = PropertiesReader('am-browser-config.properties');
+    var base = properties.get('rest.base'); 
+    console.log("base: " + base);
     var httpProxy = require('http-proxy');
     var apiProxy = httpProxy.createProxyServer();
     var auth = 'Basic ' + new Buffer(am.user + ':' + am.password).toString('base64');
@@ -208,20 +212,20 @@ module.exports = function (app, am, redis) {
     console.log(am);
     app.use('/am/db', function(req, res){
         // TODO: need to take care of https
-        console.log('http://'+am.server+'/AssetManagerWebService/rs/db');
-        apiProxy.web(req,res,{target: 'http://'+am.server+'/AssetManagerWebService/rs/db'});
+        console.log('http://' + am.server + base + '/db');
+        apiProxy.web(req,res,{target: 'http://' + am.server + base + '/db'});
     });
 
     app.use('/am/aql', function(req, res){
       // TODO: need to take care of https
-      console.log('http://'+am.server+'/AssetManagerWebService/rs/aql');
-      apiProxy.web(req,res,{target: 'http://'+am.server+'/AssetManagerWebService/rs/aql'});
+      console.log('http://' + am.server + base + '/aql');
+      apiProxy.web(req,res,{target: 'http://' + am.server + base + '/aql'});
     });
 
     app.use('/am/v1/schema', function (req, res) {
         // TODO: need to take care of https
-        console.log('http://' + am.server + '/AssetManagerWebService/rs/v1/schema');
-        apiProxy.web(req, res, {target: 'http://' + am.server + '/AssetManagerWebService/rs/v1/schema'});
+        console.log('http://' + am.server + base + '/v1/schema');
+        apiProxy.web(req, res, {target: 'http://' + am.server + base + '/v1/schema'});
     });
 
     // redis cache search --------------------------------------------------

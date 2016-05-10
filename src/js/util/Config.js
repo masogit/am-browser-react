@@ -1,7 +1,9 @@
-export const HOST_NAME_DEV = 'http://localhost:8080';
-export const HOST_NAME = (typeof NODE_ENV === 'undefined' || NODE_ENV === 'development') ? HOST_NAME_DEV : '';
+import devConfig from '../dev.json';
+
+export const HOST_NAME = (typeof NODE_ENV === 'undefined' || NODE_ENV === 'development') ? devConfig["node-server"] : '';
 export const VIEW_DEF_URL = "/coll/view";
 
+// will be removed later
 export function getFormData() {
   let formData = {
     server: "localhost:8081", // "16.165.217.186:8081",

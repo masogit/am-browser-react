@@ -4,7 +4,7 @@ import Rest from 'grommet/utils/Rest';
 //import history from './RouteHistory';
 //import Query from 'grommet-index/utils/Query';
 import IndexApi from './Api';
-import {HOST_NAME} from './util/Config';
+import {HOST_NAME, getFormData} from './util/Config';
 
 // session
 export const INIT = 'INIT';
@@ -80,28 +80,7 @@ export function init(email, token) {
 //  };
 //}
 
-let formData = {
-  server: "localhost:8081", // "16.165.217.186:8081",
-  context: "/AssetManagerWebService/rs/",
-  "ref-link": "",     // "db/amLocation/126874",
-  collection: "",     // "EmplDepts",
-  param: {
-    limit: "100",
-    offset: "0",
-    filter: "",
-    orderby: "",
-    fields: []
-  },
-
-  method: "get",
-  user: "", // admin
-  password: "",
-
-  pageSize: 10,
-  viewStyle: "tile",
-  //        showError: false,
-  showLabel: false
-};
+let formData = getFormData();
 
 export function login(username, password) {
   return function (dispatch) {
