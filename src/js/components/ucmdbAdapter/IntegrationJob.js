@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import {IntegrationJobTemplate} from './IntegrationJobTemplate.js';
 
 export default class IntegrationJobContainer extends Component {
-  constructor () {
+  constructor() {
     super();
   }
 
@@ -12,19 +12,19 @@ export default class IntegrationJobContainer extends Component {
     this.props.getIntegrationJob(this.props);
     this.integrationJobInterval = setInterval(() => {
       this.props.getIntegrationJob(this.props);
-    },60*1000);
+    }, 60 * 1000);
   }
 
   componentWillReceiveProps(nextProps) {
-    if ( nextProps.tabName && (this.props.pointName !== nextProps.pointName || this.props.tabName !== nextProps.tabName)) {
+    if (nextProps.tabName && (this.props.pointName !== nextProps.pointName || this.props.tabName !== nextProps.tabName)) {
       this.props.getIntegrationJob(nextProps);
-    } else if(nextProps.params.tabName && nextProps.params.tabName != nextProps.tabName) {
+    } else if (nextProps.params.tabName && nextProps.params.tabName != nextProps.tabName) {
       // if use change url manually
       this.onTabClick(nextProps.params.tabName, nextProps.pointName);
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     clearInterval(this.integrationJobInterval);
   }
 
@@ -33,7 +33,7 @@ export default class IntegrationJobContainer extends Component {
     this.props.onTabClick(tabName, this.props.pointName);
   }
 
-  render () {
-    return <IntegrationJobTemplate {...this.props} onTabClick={this.onTabClick.bind(this)} />;
+  render() {
+    return <IntegrationJobTemplate {...this.props} onTabClick={this.onTabClick.bind(this)}/>;
   }
 }

@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import {IntegrationJobItemTemplate} from './IntegrationJobItemTemplate.js';
 
 export default class IntegrationJobItemContainer extends Component {
-  constructor () {
+  constructor() {
     super();
   }
 
@@ -12,7 +12,7 @@ export default class IntegrationJobItemContainer extends Component {
     this.props.getIntegrationJobItem(this.props);
     this.integrationJobItemInterval = setInterval(() => {
       this.props.getIntegrationJobItem(this.props);
-    },60*1000);
+    }, 60 * 1000);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -21,11 +21,11 @@ export default class IntegrationJobItemContainer extends Component {
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     clearInterval(this.integrationJobItemInterval);
   }
 
-  render () {
+  render() {
     return (
       <IntegrationJobItemTemplate {...this.props} />
     );

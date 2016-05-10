@@ -16,16 +16,16 @@ const IntegrationJobTable = ({
   tabName,
   onIntegrationJobSelect
   }) => {
-  if(integrationJobDataError) {
+  if (integrationJobDataError) {
     return (<div>{integrationJobDataError}</div>);
   }
 
-  if(integrationJobData.length === 0) {
+  if (integrationJobData.length === 0) {
     return <h2>No data to display!</h2>;
   }
 
   let tableHeader, tableBody;
-  if(tabName === 'populationJobs') {
+  if (tabName === 'populationJobs') {
     tableHeader = (
       <thead>
       <tr>
@@ -55,7 +55,7 @@ const IntegrationJobTable = ({
       }
       </tbody>
     );
-  } else if(tabName === 'pushJobs') {
+  } else if (tabName === 'pushJobs') {
     tableHeader = (
       <thead>
       <tr>
@@ -102,10 +102,10 @@ export const IntegrationJobTemplate = ({
   onIntegrationJobSelect,
   onTabClick
   }) => {
-  integrationJobData.sort((a,b) => a.name.localeCompare(b.name));
+  integrationJobData.sort((a, b) => a.name.localeCompare(b.name));
   return (
     <Tabs justify="start" initialIndex={tabName === 'populationJobs' ? 0: 1}>
-      <CustomTab title="Population" onClick={() => onTabClick('populationJobs')} >
+      <CustomTab title="Population" onClick={() => onTabClick('populationJobs')}>
         <Split flex="both" separator={true}>
           <div className="integrationJobTable">
             <IntegrationJobTable
