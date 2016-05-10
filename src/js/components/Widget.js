@@ -13,9 +13,9 @@ export default class Widget extends Component {
     super();
     this._onSearch = this._onSearch.bind(this);
     this._onEnter = this._onEnter.bind(this);
-    this.state={
+    this.state = {
       keyword: ''
-    }
+    };
   }
 
   componentDidMount() {

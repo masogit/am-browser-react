@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import * as ExplorerActions from '../../actions/explorer';
+// import * as c from '../../actions/explorer';
 import {
   Tiles,
   Tile,
