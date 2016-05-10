@@ -1,8 +1,8 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
-
+import objectPath from 'object-path';
 import { REQUEST_VIEWS, RECEIVE_VIEWS_SUCCESS, RECEIVE_VIEWS_FAILURE, SET_SELECTED_VIEW,
   REQUEST_TEMPLATE_TABLE, RECEIVE_TEMPLATE_TABLE_SUCCESS, RECEIVE_TEMPLATE_TABLE_FAILURE,
-  NEW_SELECTED_VIEW, UPDATE_SELECTED_VIEW, SYNC_SELECTED_VIEW, SAVE_VIEW_DEF}
+  NEW_SELECTED_VIEW, UPDATE_SELECTED_VIEW, SYNC_SELECTED_VIEW, SAVE_VIEW_DEF, DELETE_TABLE_ROW}
   from '../constants/ActionTypes';
 import _ from 'lodash';
 import emptyViewDef from './EmptyViewDef.json';
@@ -16,22 +16,6 @@ const initialState = {
   templateTable: {},
   err: '',
   editing: false
-};
-
-const setValueByJsonPath = (path, val, obj) => {
-  var fields = path.split('.');
-  var result = obj;
-  for (var i = 0, n = fields.length; i < n && result !== undefined; i++) {
-    var field = fields[i];
-    if (i === n - 1) {
-      result[field] = val;
-    } else {
-      if (typeof result[field] === 'undefined' || !_.isObject(result[field])) {
-        result[field] = {};
-      }
-      result = result[field];
-    }
-  }
 };
 
 const createReverse = (reverse) => {
@@ -185,7 +169,21 @@ const handlers = {
     if (!editing) {
       clonedView = _.cloneDeep(action.selectedView);
     }
-    setValueByJsonPath(action.path, action.newValue, clonedView);
+    //setValueByJsonPath(action.path, action.newValue, clonedView);
+    objectPath.set(clonedView, action.path, action.newValue);
+    return {
+      selectedView: clonedView,
+      editing: true
+    };
+  },
+  [DELETE_TABLE_ROW]: (state, action) => {
+    let editing = state.views.editing;
+    let clonedView = action.selectedView;
+    if (!editing) {
+      clonedView = _.cloneDeep(action.selectedView);
+    }
+    //spliceArrayByJsonPath(clonedView, action.path);
+    objectPath.del(clonedView, action.path);
     return {
       selectedView: clonedView,
       editing: true

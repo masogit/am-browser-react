@@ -29,6 +29,7 @@ class ViewDefListContainer extends Component {
     super(props);
     this.onValueChange = this.onValueChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+    this.onDeleteTableRow = this.onDeleteTableRow.bind(this);
   }
 
   componentWillMount() {
@@ -84,6 +85,13 @@ class ViewDefListContainer extends Component {
     });
   }
 
+  onDeleteTableRow(event) {
+    event.preventDefault();
+    console.log("event: ");
+    console.log(event.currentTarget.name);
+    this.props.actions.deleteTableRow(this.props.selectedView, event.currentTarget.name);
+  }
+
   render() {
     const { views, isFetchingViewList, selectedView } = this.props;
     let { dispatch } = store;
@@ -92,7 +100,7 @@ class ViewDefListContainer extends Component {
       <Split flex="right">
         <ViewDefList views={views} isFetchingViewList={isFetchingViewList} {...boundActionCreators}/>
         <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange}
-                       onSubmit={this.onSubmit} {...boundActionCreators}/>
+                       onSubmit={this.onSubmit} onDeleteTableRow={this.onDeleteTableRow} {...boundActionCreators}/>
       </Split>
     );
   }

@@ -112,50 +112,58 @@ export default class ViewDefDetail extends Component {
     }
   }
 
-  renderLinks(links, table) {
+  renderLinks(links, table, path) {
     let selfTable = table;
-    links = selfTable.body.links.map((link) => {
-      return (
-        <tr key={"link_" + link.sqlname}>
-          <td colSpan={4}>
-            <Header size="small">
-              <h3>{link.sqlname}</h3>
-            </Header>
-            <table key={"table_" + link.sqlname}>
-              <thead>
-              <tr>
-                <th>Field</th>
-                <th>Alias</th>
-                <th></th>
-              </tr>
-              </thead>
-              <tbody>
-              {link.body && link.body.fields && this.renderTemplateTable(link, false)}
-              </tbody>
-            </table>
-          </td>
-        </tr>
-      );
+    links = selfTable.body.links.map((link, index) => {
+      if(link.body && link.body.fields && link.body.fields.length > 0){
+        let currentPath = path + "." + index;
+        return (
+          <tr key={"link_" + link.sqlname + "_" + index}>
+            <td colSpan={4}>
+              <Header size="small">
+                <h3>{link.sqlname}</h3>
+              </Header>
+              <table key={"table_" + link.sqlname}>
+                <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Alias</th>
+                  <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {link.body && link.body.fields && this.renderTemplateTable(link, false, currentPath)}
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        );
+      }
+      return null;
     });
     return links;
   }
 
-  renderTemplateTable(selectedView, root) {
+  renderTemplateTable(selectedView, root, path) {
+    let currentPath = root ? "" : path + ".";
     let selfView = selectedView;
     let fields = selfView.body.fields.map((field, index) => {
       return (
-        <tr key={selfView.body.sqlname + "_" + field.sqlname}>
+        <tr key={selfView.body.sqlname + "_" + field.sqlname + "_" + index}>
           <td>{field.sqlname}</td>
           <td>{field.label}</td>
-          {root && <td><CheckBox id="v.search" name={`v.body.fields.${index}.search`} checked={field.search}
-                                 onChange={this._onChange}/></td>}
-          <td><Anchor tag="span" className="tbBtnIcon"><Close /></Anchor></td>
+          {root &&
+          <td>{!field.PK &&
+          <CheckBox id="v.search" name={`v.${currentPath}body.fields.${index}.search`} checked={field.search}
+                        onChange={this._onChange}/>}</td>}
+          <td><a name={`${currentPath}body.fields.${index}`} className="tbBtnIcon" onClick={this.props.onDeleteTableRow}><Close /></a></td>
         </tr>
       );
     });
     let links = [];
     if (selfView.body.links && selfView.body.links.length > 0) {
-      links = this.renderLinks(links, selfView);
+      console.log("selfView.body.links.length" + selfView.body.links.length);
+      links = this.renderLinks(links, selfView, currentPath + "body.links");
     }
     return fields.concat(links);
   }
@@ -236,8 +244,8 @@ export default class ViewDefDetail extends Component {
                                    checked={selectedView.chart.aggregate == 'sum'}
                                    onChange={this._onChange}/>
                       <select id="v.chart.groupby" name="v.chart.groupby" value={selectedView.chart.groupby}
-                              onChange={this._onChange}
-                              placeholder="">
+                              onChange={this._onChange} title={selectedView.chart.groupby}
+                              placeholder="" style={{maxWidth: 200}}>
                         <option value=""></option>
                         {selectedView.body && selectedView.body.fields && this.renderAggregateOptions(selectedView)}
                       </select>

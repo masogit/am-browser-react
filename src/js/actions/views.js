@@ -211,6 +211,16 @@ export function updateSelectedView(selectedView, path, newValue) {
   };
 }
 
+export function deleteTableRow(selectedView, path) {
+  return dispatch => {
+    dispatch({
+      type: types.DELETE_TABLE_ROW,
+      selectedView: selectedView,
+      path: path
+    });
+  };
+}
+
 export function syncSelectedView(elements, row) {
   return dispatch => {
     dispatch({
