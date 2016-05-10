@@ -16,6 +16,15 @@ function param2aql(param) {
   return encodeURI(aql);
 }
 
+export function loadView(id, callback) {
+  Rest.get(HOST_NAME + '/coll/view/' + id).end(function (err, res) {
+    if (err) {
+      console.log(err);
+    } else
+      callback(res.body);
+  });
+}
+
 export function exportRecordsByBody(body, callback) {
   loadRecordsByBody(body, callback);
 }
