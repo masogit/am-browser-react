@@ -59,6 +59,55 @@ If you failed to run the test/coverage, try to:
       npm install -g npm
 
 # Configurations
+## Change default server and port
+### 1. Product mode
+  am-browser-config.properties
+  ```
+  # am browser contents of properties file
+  [node]
+  protocol = http
+  server = 15.107.5.19
+  port = 8080
+  https_port = 8443
+
+  [rest]
+  protocol = http
+  server = 15.107.5.19
+  port = 8081
+  username = admin
+  password =
+  base = /AssetManagerWebService/rs
+  ```
+### 2. Development mode
+  am-browser-config.properties
+  ```
+  # am browser contents of properties file
+  [node]
+  protocol = http
+  server = 15.107.5.19
+  port = 8080
+  https_port = 8443
+
+  [rest]
+  protocol = http
+  server = 15.107.5.19
+  port = 8081
+  username = admin
+  password =
+  base = /AssetManagerWebService/rs
+  ```
+  gulpfile.js
+  ```
+  devServerHost: '15.107.5.19',
+  devServerPort: 8001,
+  ```
+  src/js/dev.json
+  ```
+  {
+    "node-server": "http://15.107.5.19:8080"
+  }
+  ```
+
 ## For generating the SSL certificate for dev
 ### 1. Set the SSL CONF in the git bash 
   ```
