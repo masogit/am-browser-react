@@ -1,15 +1,16 @@
 import React, {Component} from 'react';
-import AChart from './AChart';
+// import AChart from './AChart';
+import ChartForm from './ChartForm';
 import * as AQLActions from '../../actions/aql';
 import {
   Anchor,
-  // Box,
-  // Chart,
-  Distribution,
+  Box,
+  Chart,
+  // Distribution,
   Sidebar,
   Split,
-  Form,
-  FormFields,
+  // Form,
+  // FormFields,
   FormField,
   SearchInput,
   List,
@@ -21,8 +22,8 @@ import {
   Table,
   TableRow,
   Title,
-  Menu,
-  Meter
+  Menu
+  // Meter
 } from 'grommet';
 import Play from 'grommet/components/icons/base/Play';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
@@ -36,11 +37,11 @@ export default class AQL extends Component {
       aqls: [],
       data: null,
       aql: "",
-      chart: null,
-      meter: null,
-      distribution: null,
-      value: null,
-      worldmap: null
+      chartForm: null,
+      meterForm: null,
+      distributionForm: null,
+      valueForm: null,
+      worldmapForm: null
     };
     // this._onQuery.bind(this);
   }
@@ -83,6 +84,28 @@ export default class AQL extends Component {
     });
   }
 
+  _genChart(form, type) {
+    if (type == 'chart') {
+      if (form.series_col) {
+        // gen series
+        var header = this.state.data.header.filter((h) => {
+          return h.Index == form.series_col;
+        })[0];
+        var s = {label: header.Name, values: []};
+        this.state.data.rows.map((row, i) => {
+          // gen series
+          s.values.push([i, row[form.series_col]]);
+          // gen xAxis
+          if (form.xAxis_col && form.xAxis.placement)
+            form.xAxis.data.push({"label": row[form.xAxis_col], "value": i});
+        });
+        form.series.push(s);
+        this.setState({chartForm: form});
+      }
+    }
+
+  }
+
   render() {
     var header;
     var rows;
@@ -103,8 +126,8 @@ export default class AQL extends Component {
       });
 
     }
-    
-    var chartTab = <Tab title="Chart"> <AChart data={this.state.data} /> </Tab>;
+
+    // var chartTab = <Tab title="Chart"> <AChart data={this.state.data}/> </Tab>;
 
     return (
 
@@ -146,11 +169,17 @@ export default class AQL extends Component {
               <Anchor link="#" icon={<Close />} onClick={this._onQuery.bind(this)}>Delete</Anchor>
             </Menu>
           </Header>
-          <Tabs initialIndex={0} justify="start">
-            <Tab title="Data">
-              <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_Box">
-                <textarea id="AQL_Box" ref="aql" onChange={this._setAQL.bind(this)} value={this.state.aql}></textarea>
-              </FormField>
+          <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_Box">
+            <textarea id="AQL_Box" ref="aql" onChange={this._setAQL.bind(this)} value={this.state.aql}></textarea>
+          </FormField>
+          <Split flex="left" fixed={false}>
+            <Box>
+              {
+                this.state.chartForm &&
+                <Chart a11yTitleId="lineChartTitle" a11yDescId="lineChartDesc" series={this.state.chartForm.series}
+                       xAxis={this.state.chartForm.xAxis} type={this.state.chartForm.type}
+                       legend={this.state.chartForm.legend} size={this.state.chartForm.size}/>
+              }
               <Table>
                 <thead>
                 <tr>{header}</tr>
@@ -159,91 +188,20 @@ export default class AQL extends Component {
                 {rows}
                 </tbody>
               </Table>
-            </Tab>
-            {chartTab}
-            <Tab title="Meter">
-              <Split flex="right">
-                <Form pad="small" compact={true}>
-                  <FormFields>
-                    <FormField label="Meter Type">
-                      <select name="meterType">
-                        <option>bar</option>
-                        <option>arc</option>
-                        <option>circle</option>
-                        <option>spiral</option>
-                      </select>
-                    </FormField>
-                  </FormFields>
-                </Form>
-                <Meter type="arc" legend={true} series={[
-                  {"label": "Physical", "value": 700},
-                  {"label": "Subscribed", "value": 1200},
-                  {"label": "Allocated", "value": 500}
-                ]} vertical={true} units="TB" a11yTitleId="meter-title-15" a11yDescId="meter-desc-15"/>
-              </Split>
-            </Tab>
-
-            <Tab title="Distribution">
-              <Split flex="right">
-                <Form pad="small" compact={true}>
-                  <FormFields>
-                    <FormField label="Meter Type">
-                      <select name="meterType">
-                        <option>bar</option>
-                        <option>arc</option>
-                        <option>circle</option>
-                        <option>spiral</option>
-                      </select>
-                    </FormField>
-                  </FormFields>
-                </Form>
-                <Distribution size="small" series={[
-                  {"label": "First", "value": 40, "colorIndex": "graph-1"},
-                  {"label": "Second", "value": 30, "colorIndex": "accent-2"},
-                  {"label": "Third", "value": 20, "colorIndex": "unset"},
-                  {"label": "Fourth", "value": 10, "colorIndex": "graph-1"}
-                ]} a11yTitleId="distribution-title-3" a11yDescId="distribution-desc-3" />
-              </Split>
-            </Tab>
-
-            <Tab title="Value">
-              <Split flex="right">
-                <Form pad="small" compact={true}>
-                  <FormFields>
-                    <FormField label="Meter Type">
-                      <select name="meterType">
-                        <option>bar</option>
-                        <option>arc</option>
-                        <option>circle</option>
-                        <option>spiral</option>
-                      </select>
-                    </FormField>
-                  </FormFields>
-                </Form>
-                <span>Value</span>
-              </Split>
-            </Tab>
-
-            <Tab title="WorldMap">
-              <Split flex="right">
-                <Form pad="small" compact={true}>
-                  <FormFields>
-                    <FormField label="Meter Type">
-                      <select name="meterType">
-                        <option>bar</option>
-                        <option>arc</option>
-                        <option>circle</option>
-                        <option>spiral</option>
-                      </select>
-                    </FormField>
-                  </FormFields>
-                </Form>
-                <span>Wold Map</span>
-              </Split>
-            </Tab>
-
-          </Tabs>
-
+            </Box>
+            {
+              this.state.data &&
+              <Tabs initialIndex={0} justify="start">
+                <Tab title="Chart">
+                  <ChartForm header={this.state.data.header} genChart={this._genChart.bind(this)}/>
+                </Tab>
+                <Tab title="Meter"></Tab>
+                <Tab title="Distribution"></Tab>
+                <Tab title="Value"></Tab>
+                <Tab title="WorldMap"></Tab>
+              </Tabs>
+            }
+          </Split>
         </div>
       </Split>
     );

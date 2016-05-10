@@ -12,6 +12,24 @@ export function loadAQLs(callback) {
   });
 }
 
+export function saveAQL(aql, callback) {
+  Rest.post(HOST_NAME + '/coll/aql', aql).end((err, res) => {
+    if (err) {
+      console.log(err);
+    } else
+      callback(res.body);
+  });
+}
+
+export function removeAQL(id, callback) {
+  Rest.del(HOST_NAME + '/coll/aql/' + id).end((err, res) => {
+    if (err) {
+      console.log(err);
+    } else
+      callback(res.body);
+  });
+}
+
 export function loadReports(callback) {
   Rest.get(HOST_NAME + '/am/db/amInToolReport').end(function (err, res) {
     if (err) {
