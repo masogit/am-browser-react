@@ -115,7 +115,7 @@ export default class ViewDefDetail extends Component {
   renderLinks(links, table, path) {
     let selfTable = table;
     links = selfTable.body.links.map((link, index) => {
-      if(link.body && link.body.fields && link.body.fields.length > 0){
+      if (link.body && link.body.fields && link.body.fields.length > 0) {
         let currentPath = path + "." + index;
         return (
           <tr key={"link_" + link.sqlname + "_" + index}>
