@@ -26,6 +26,7 @@ import Anchor from 'grommet/components/Anchor';
 import Close from 'grommet/components/icons/base/Close';
 import Play from 'grommet/components/icons/base/Play';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
+import Duplicate from 'grommet/components/icons/base/Duplicate';
 //import MDSave from 'react-icons/lib/md/save';
 import _ from 'lodash';
 //import store from '../../store';
@@ -55,6 +56,7 @@ export default class ViewDefDetail extends Component {
     //this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
     this.renderTemplateTable = this.renderTemplateTable.bind(this);
     this.renderLinks = this.renderLinks.bind(this);
+    this.renderMasterHeader = this.renderMasterHeader.bind(this);
     this._onChange = this._onChange.bind(this);
   }
 
@@ -112,10 +114,24 @@ export default class ViewDefDetail extends Component {
     }
   }
 
+  hasLinks(links) {
+    if (links) {
+      for (let i = 0; i < links.length; i++) {
+        if (links[i].body.fields && links[i].body.fields.length > 0) {
+          return true;
+        }
+        if (links[i].body.links) {
+          return hasLinks(links[i].body.links);
+        }
+      }
+    }
+    return false;
+  }
+
   renderLinks(links, table, path) {
     let selfTable = table;
     links = selfTable.body.links.map((link, index) => {
-      if (link.body && link.body.fields && link.body.fields.length > 0) {
+      if (link.body && ((link.body.fields && link.body.fields.length > 0) || this.hasLinks(link.body.links))) {
         let currentPath = path + "." + index;
         return (
           <tr key={"link_" + link.sqlname + "_" + index}>
@@ -154,18 +170,27 @@ export default class ViewDefDetail extends Component {
           <td>{field.label}</td>
           {root &&
           <td>{!field.PK &&
-          <CheckBox id="v.search" name={`v.${currentPath}body.fields.${index}.search`} checked={field.search}
-                        onChange={this._onChange}/>}</td>}
-          <td><a name={`${currentPath}body.fields.${index}`} className="tbBtnIcon" onClick={this.props.onDeleteTableRow}><Close /></a></td>
+          <CheckBox id="v.search" name={`v.${currentPath}body.fields.${index}.searchable`} checked={field.searchable}
+                    onChange={this._onChange}/>}</td>}
+          <td><a name={`${currentPath}body.fields.${index}`} className="tbBtnIcon"
+                 onClick={this.props.onDeleteTableRow}><Close /></a></td>
         </tr>
       );
     });
     let links = [];
     if (selfView.body.links && selfView.body.links.length > 0) {
-      console.log("selfView.body.links.length" + selfView.body.links.length);
+      //console.log("selfView.body.links.length" + selfView.body.links.length);
       links = this.renderLinks(links, selfView, currentPath + "body.links");
     }
     return fields.concat(links);
+  }
+
+  renderMasterHeader(selectedView) {
+    return (
+      <Header size="small">
+        <h3>{selectedView.body.label} ({selectedView.body.sqlname})</h3>
+      </Header>
+    );
   }
 
   renderAggregateOptions(selectedView) {
@@ -195,12 +220,7 @@ export default class ViewDefDetail extends Component {
 
     return (
       <Split flex="right">
-        {
-          _.isEmpty(selectedView) &&
-          <p>Loading....
-          </p>
-        }
-        {selectedView &&
+        {selectedView && !_.isEmpty(selectedView) &&
         <Box pad="small">
           <Form onSubmit={this.props.onSubmit} compact={this.props.compact}>
             <FormFields>
@@ -245,7 +265,7 @@ export default class ViewDefDetail extends Component {
                                    onChange={this._onChange}/>
                       <select id="v.chart.groupby" name="v.chart.groupby" value={selectedView.chart.groupby}
                               onChange={this._onChange} title={selectedView.chart.groupby}
-                              placeholder="" style={{maxWidth: 200}}>
+                              placeholder="" style={{maxWidth: 200, minWidth: 200}}>
                         <option value=""></option>
                         {selectedView.body && selectedView.body.fields && this.renderAggregateOptions(selectedView)}
                       </select>
@@ -257,7 +277,8 @@ export default class ViewDefDetail extends Component {
             <Footer pad={{vertical: 'medium'}}>
               <Menu direction="row" align="center" responsive={false}>
                 <Anchor link="#" icon={<Checkmark />} onClick={this.props.onSubmit}>Save</Anchor>
-                <Anchor link="#" icon={<Close />}>Delete</Anchor>
+                <Anchor link="#" icon={<Duplicate />} onClick={this.props.onDuplicateViewDef}>Duplicate</Anchor>
+                <Anchor link="#" icon={<Close />} onClick={this.props.onDeleteViewDef}>Delete</Anchor>
                 <Anchor link="#" icon={<Play />}>Query</Anchor>
               </Menu>
             </Footer>
@@ -265,8 +286,9 @@ export default class ViewDefDetail extends Component {
         </Box>
         }
 
-        {selectedView &&
+        {selectedView && !_.isEmpty(selectedView) &&
         <Box>
+          {selectedView.body && selectedView.body.fields && this.renderMasterHeader(selectedView)}
           <Table>
             {tableHeader}
             <tbody>

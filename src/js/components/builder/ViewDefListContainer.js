@@ -30,6 +30,8 @@ class ViewDefListContainer extends Component {
     this.onValueChange = this.onValueChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.onDeleteTableRow = this.onDeleteTableRow.bind(this);
+    this.onDuplicateViewDef = this.onDuplicateViewDef.bind(this);
+    this.onDeleteViewDef = this.onDeleteViewDef.bind(this);
   }
 
   componentWillMount() {
@@ -73,23 +75,28 @@ class ViewDefListContainer extends Component {
   }
 
   onSubmit() {
-    this.props.actions.saveViewDef(this.props.selectedView).then(function (updatedView) {
-      //console.log("updatedView");
-      //console.log(updatedView);
-      let views = store.getState().views.views;
-      let idx = _.findIndex(store.getState().views.views, {_id: updatedView._id});
-      //console.log("onSubmit - idx: " + idx);
-      if (idx >= 0) {
-        views[idx] = updatedView;
-      }
+    this.props.actions.saveViewDef(this.props.selectedView).then((id) => {
+      //this.props.actions.updateViewDefList(updatedView);
+      history.push("/views/" + id);
+      this.props.actions.loadViews(this.props.params.id, this.props.location.pathname);
     });
   }
 
   onDeleteTableRow(event) {
     event.preventDefault();
-    console.log("event: ");
-    console.log(event.currentTarget.name);
     this.props.actions.deleteTableRow(this.props.selectedView, event.currentTarget.name);
+  }
+
+  onDuplicateViewDef(event) {
+    this.props.actions.duplicateViewDef(this.props.selectedView);
+  }
+
+  onDeleteViewDef() {
+    this.props.actions.deleteViewDef(this.props.selectedView).then((id) => {
+      if (!this.props.selectedViewId) { // all records deleted
+        history.push("/views");
+      }
+    });
   }
 
   render() {
@@ -100,7 +107,9 @@ class ViewDefListContainer extends Component {
       <Split flex="right">
         <ViewDefList views={views} isFetchingViewList={isFetchingViewList} {...boundActionCreators}/>
         <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange}
-                       onSubmit={this.onSubmit} onDeleteTableRow={this.onDeleteTableRow} {...boundActionCreators}/>
+                       onSubmit={this.onSubmit} onDeleteTableRow={this.onDeleteTableRow}
+                       onDuplicateViewDef={this.onDuplicateViewDef}
+                       onDeleteViewDef={this.onDeleteViewDef} {...boundActionCreators}/>
       </Split>
     );
   }

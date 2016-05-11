@@ -1,4 +1,5 @@
 import request from 'superagent-bluebird-promise';
+import _ from 'lodash';
 import * as types from '../constants/ActionTypes';
 import {HOST_NAME, VIEW_DEF_URL/*, getFormData*/} from '../util/Config';
 //import history from '../RouteHistory';
@@ -167,13 +168,18 @@ export function saveViewDef(selectedView) {
       .send(JSON.stringify(selectedView))
       .then(function (res) {
         console.log("save successfully.");
+        let _id = res.text;
         dispatch({
           type: types.SAVE_VIEW_DEF,
-          selectedViewId: selectedView._id,
+          selectedViewId: _id,
           selectedView: selectedView,
           editing: false
         });
-        return selectedView;
+        //dispatch({
+        //  type: types.UPDATE_VIEW_DEF_LIST,
+        //  selectedView: selectedView
+        //});
+        return _id;
       }, function (err) {
         console.log("cannot save: " + err);
         return null;
@@ -218,6 +224,56 @@ export function deleteTableRow(selectedView, path) {
       selectedView: selectedView,
       path: path
     });
+  };
+}
+
+export function duplicateViewDef(selectedView) {
+  return dispatch => {
+    let clonedView = _.cloneDeep(selectedView);
+    delete clonedView._id;
+    dispatch({
+      type: types.DUPLICATE_VIEW_DEF,
+      selectedView: clonedView
+    });
+  };
+}
+
+export function deleteViewDef(selectedView) {
+  return function (dispatch) {
+    let formData = {};
+    var AM_FORM_DATA = "amFormData";
+    if (localStorage && localStorage[AM_FORM_DATA]) {
+      var form = JSON.parse(localStorage.getItem(AM_FORM_DATA));
+      if (form.user) formData.user = form.user;
+      if (form.password) formData.password = form.password;
+    }
+    //let  headers = { 'Accept': 'application/json' };
+    //Rest.setHeaders(headers);
+    let auth = 'Basic ' + new Buffer(formData.user + ':' + formData.password).toString('base64');
+    return request.del(HOST_NAME + VIEW_DEF_URL + "/" + selectedView._id)
+      .set("Authorization", auth)
+      .then(function (res) {
+        console.log("delete successfully - " + selectedView._id);
+        dispatch({
+          type: types.DELETE_VIEW_DEF,
+          deletedViewId: selectedView._id
+        });
+        //dispatch({
+        //  type: types.UPDATE_VIEW_DEF_LIST,
+        //  selectedView: selectedView
+        //});
+        return selectedView._id;
+      }, function (err) {
+        console.log("cannot delete: " + err);
+        return null;
+      });
+  };
+}
+
+export function updateViewDefList(selectedView) {
+  return {
+    type: types.UPDATE_VIEW_DEF_LIST,
+    selectedView: selectedView
   };
 }
 

@@ -2,7 +2,8 @@
 import objectPath from 'object-path';
 import { REQUEST_VIEWS, RECEIVE_VIEWS_SUCCESS, RECEIVE_VIEWS_FAILURE, SET_SELECTED_VIEW,
   REQUEST_TEMPLATE_TABLE, RECEIVE_TEMPLATE_TABLE_SUCCESS, RECEIVE_TEMPLATE_TABLE_FAILURE,
-  NEW_SELECTED_VIEW, UPDATE_SELECTED_VIEW, SYNC_SELECTED_VIEW, SAVE_VIEW_DEF, DELETE_TABLE_ROW}
+  NEW_SELECTED_VIEW, UPDATE_SELECTED_VIEW, SYNC_SELECTED_VIEW, SAVE_VIEW_DEF, DELETE_TABLE_ROW,
+  DUPLICATE_VIEW_DEF, DELETE_VIEW_DEF, UPDATE_VIEW_DEF_LIST}
   from '../constants/ActionTypes';
 import _ from 'lodash';
 import emptyViewDef from './EmptyViewDef.json';
@@ -123,6 +124,18 @@ const handlers = {
       views: action.views
     };
   },
+  [UPDATE_VIEW_DEF_LIST]: (state, action) => {
+    let views = state.views;
+    let idx = _.findIndex(state.views, {_id: action.selectedView._id});
+    if (idx >= 0) {
+      views[idx] = action.selectedView;
+    } else {
+      views.push(action.selectedView);
+    }
+    return {
+      views: [...views]
+    };
+  },
   [RECEIVE_VIEWS_FAILURE]: (state, action) => {
     return {
       isFetchingViewList: false,
@@ -162,14 +175,11 @@ const handlers = {
   [UPDATE_SELECTED_VIEW]: (state, action) => {
     //console.log("reducer - action.selectedView:");
     //console.log(action.selectedView);
-    console.log(state);
-    console.log(action);
     let editing = state.views.editing;
     let clonedView = action.selectedView;
     if (!editing) {
       clonedView = _.cloneDeep(action.selectedView);
     }
-    //setValueByJsonPath(action.path, action.newValue, clonedView);
     objectPath.set(clonedView, action.path, action.newValue);
     return {
       selectedView: clonedView,
@@ -182,10 +192,15 @@ const handlers = {
     if (!editing) {
       clonedView = _.cloneDeep(action.selectedView);
     }
-    //spliceArrayByJsonPath(clonedView, action.path);
     objectPath.del(clonedView, action.path);
     return {
       selectedView: clonedView,
+      editing: true
+    };
+  },
+  [DUPLICATE_VIEW_DEF]: (state, action) => {
+    return {
+      selectedView: action.selectedView,
       editing: true
     };
   },
@@ -233,6 +248,25 @@ const handlers = {
       selectedViewId: action.selectedViewId,
       selectedView: action.selectedView,
       editing: action.editing
+    };
+  },
+  [DELETE_VIEW_DEF]: (state, action) => {
+    let views = state.views;
+    let idx = _.findIndex(views, {_id: action.deletedViewId});
+    let selectedViewId, selectedView;
+    if (views.length > 1) { // find which record to display after deleting current one
+      if (idx == views.length - 1) {
+        selectedView = views[idx - 1];
+      } else {
+        selectedView = views[idx + 1];
+      }
+      selectedViewId = selectedView._id;
+    }
+    let updatedViews = [...views.slice(0, idx), ...views.slice(idx + 1)];
+    return {
+      selectedViewId: selectedViewId,
+      selectedView: selectedView,
+      views: updatedViews
     };
   }
 };

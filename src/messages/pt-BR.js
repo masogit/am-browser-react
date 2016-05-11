@@ -27,5 +27,7 @@ module.exports = {
   'caret-next': 'caret-next',
   notes: 'notes',
   'link-next': 'link-next',
-  'Close  Layer': 'Close  Layer'
+  'Close  Layer': 'Close  Layer',
+  checkmark: 'checkmark',
+  duplicate: 'duplicate'
 };

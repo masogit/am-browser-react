@@ -117,7 +117,7 @@ exports.upsert = function (req, res) {
   db.collection(collectionName).update({_id: obj._id}, obj, {upsert: true}, function (err, result) {
     if (err)
       console.log(err);
-    res.json(obj._id);
+    res.send(obj._id);
     db.close();
   });
 };
@@ -130,7 +130,7 @@ exports.delete = function (req, res) {
   db.collection(collectionName).remove([{_id: id}], function (err, result) {
     if (err)
       console.log(err);
-    res.json(id);
+    res.send(id);
     db.close();
   });
 };
