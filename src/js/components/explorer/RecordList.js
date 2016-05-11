@@ -48,7 +48,9 @@ export default class RecordList extends Component {
     this._getRecords();
     var groups_select = this.props.body.fields.map((field, index) => {
       return !field.PK &&
-        <option key={index} value={JSON.stringify(field)}>{this._getDisplayLabel(field)}</option>;
+        <option key={index} value={JSON.stringify(field)} selected={(field.groupby) ? true : false}>
+          {this._getDisplayLabel(field)}
+        </option>;
     });
     this.setState({
       group_select: groups_select
