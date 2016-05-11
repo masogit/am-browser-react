@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-// import * as c from '../../actions/explorer';
+import * as ExplorerAction from '../../actions/explorer';
 import {
   Tiles,
   Tile,
@@ -11,55 +11,55 @@ export default class RecordSearch extends Component {
 
   constructor() {
     super();
+    this.state = {
+      results: []
+    };
   }
 
   componentDidMount() {
-    console.log("RecordSearch");
+    this._search();
   }
 
   componentWillReceiveProps(nextProps) {
-
+    // this._search();
   }
 
+  _search() {
+    if (this.props.keyword)
+      ExplorerAction.loadViews((views) => {
+        if (views instanceof Array) {
+          views.forEach((view) => {
+            ExplorerAction.loadRecordsByKeyword(view.body, this.props.keyword, (data) => {
+              if (data) {
+                var results = this.state.results;
+                results.push({view: view, records: data.entities});
+                console.log("results");
+                console.log(results);
+                this.setState({
+                  results: results
+                });
+              }
+            });
+          });
+        }
+      });
+  }
 
   render() {
+    var tileComponent = this.state.results.map((result, index) => {
+      return <Tile key={index}>
+        <Header>{result.view.name}</Header>
+        {
+          result.records.map((record) => {
+            return <p><Anchor href="#" label={record.self} primary={true}/></p>;
+          })
+        }
 
+      </Tile>;
+    });
     return (
       <Tiles fill={true} flush={true}>
-        <Tile>
-          <Header>{this.props.keyword}</Header>
-          <Anchor href="#" label={this.props.keyword} primary={true} />
-          <Anchor href="#" label={this.props.keyword} primary={true} />
-          <Anchor href="#" label={this.props.keyword} primary={true} />
-          <Anchor href="#" label={this.props.keyword+'111111111111kkkkkkkkkkkkkkk'} primary={true} />
-          <Anchor href="#" label={this.props.keyword} primary={true} />
-          <Anchor href="#" label={this.props.keyword} primary={true} />
-          <Anchor href="#" label={this.props.keyword} primary={true} />
-        </Tile>
-        <Tile>
-          <Header>{this.props.keyword}</Header>
-          <Anchor href="#" label={this.props.keyword} primary={true} />
-          <Anchor href="#" label={this.props.keyword} primary={true} />
-          <Anchor href="#" label={this.props.keyword} primary={true} />
-          <Anchor href="#" label={this.props.keyword} primary={true} />
-          <Anchor href="#" label={this.props.keyword} primary={true} />
-          <Anchor href="#" label={this.props.keyword} primary={true} />
-          <Anchor href="#" label={this.props.keyword} primary={true} />
-        </Tile>
-        <Tile>
-          <Header>{this.props.keyword}</Header>
-          <Anchor href="#" label={this.props.keyword} primary={true} />
-          <Anchor href="#" label={this.props.keyword} primary={true} />
-          <Anchor href="#" label={this.props.keyword} primary={true} />
-          <Anchor href="#" label={this.props.keyword} primary={true} />
-        </Tile>
-        <Tile>
-          <Header>{this.props.keyword}</Header>
-          <Anchor href="#" label={this.props.keyword} primary={true} />
-          <Anchor href="#" label={this.props.keyword} primary={true} />
-          <Anchor href="#" label={this.props.keyword} primary={true} />
-          <Anchor href="#" label={this.props.keyword} primary={true} />
-        </Tile>
+        {tileComponent}
       </Tiles>
     );
   }

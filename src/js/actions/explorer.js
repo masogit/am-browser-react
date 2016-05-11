@@ -16,6 +16,15 @@ function param2aql(param) {
   return encodeURI(aql);
 }
 
+export function loadViews(callback) {
+  Rest.get(HOST_NAME + '/coll/view/').end(function (err, res) {
+    if (err) {
+      console.log(err);
+    } else
+      callback(res.body);
+  });
+}
+
 export function loadView(id, callback) {
   Rest.get(HOST_NAME + '/coll/view/' + id).end(function (err, res) {
     if (err) {
@@ -29,6 +38,19 @@ export function exportRecordsByBody(body, callback) {
   loadRecordsByBody(body, callback);
 }
 
+export function loadRecordsByKeyword(body, keyword, callback) {
+  var aql = body.fields.filter((field) => {
+    return field.search;
+  }).map((field) => {
+    return field.sqlname + " like '%" + keyword + "%'";
+  }).join(' OR ');
+
+  if (aql) {
+    body.filter = (body.filter) ? body.filter + ' AND (' + aql + ')' : aql;
+  }
+  
+  loadRecordsByBody(body, callback);
+}
 export function loadRecordsByBody(body, callback) {
 
   var fields = [];
@@ -65,7 +87,7 @@ export function loadRecordsByBody(body, callback) {
     if (err) {
       console.log(err);
       callback({count: 0, entities: []});
-    }  else if (res.body.count && res.body.entities)
+    } else if (res.body.count && res.body.entities)
       callback(res.body);
     else
       callback({count: 0, entities: []});
