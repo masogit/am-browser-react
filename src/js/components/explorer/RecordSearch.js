@@ -1,9 +1,6 @@
 import React, {Component} from 'react';
 import * as ExplorerAction from '../../actions/explorer';
 import {
-  Tiles,
-  Tile,
-  Header,
   Anchor
 } from 'grommet';
 
@@ -17,26 +14,28 @@ export default class RecordSearch extends Component {
   }
 
   componentDidMount() {
-    this._search();
+
   }
 
   componentWillReceiveProps(nextProps) {
-    // this._search();
+    if (nextProps.keyword !== this.props.keyword)
+      this._search(nextProps.keyword);
   }
 
-  _search() {
-    if (this.props.keyword)
+  _search(keyword) {
+    this.setState({
+      results: []
+    });
+    if (keyword)
       ExplorerAction.loadViews((views) => {
         if (views instanceof Array) {
           views.forEach((view) => {
-            ExplorerAction.loadRecordsByKeyword(view.body, this.props.keyword, (data) => {
-              if (data) {
+            ExplorerAction.loadRecordsByKeyword(view.body, keyword, (data) => {
+              if (data && data.entities.length > 0) {
                 var results = this.state.results;
                 results.push({view: view, records: data.entities});
-                console.log("results");
-                console.log(results);
                 this.setState({
-                  results: results
+                  results: [...results]
                 });
               }
             });
@@ -45,22 +44,21 @@ export default class RecordSearch extends Component {
       });
   }
 
-  render() {
-    var tileComponent = this.state.results.map((result, index) => {
-      return <Tile key={index}>
-        <Header>{result.view.name}</Header>
-        {
-          result.records.map((record) => {
-            return <p><Anchor href="#" label={record.self} primary={true}/></p>;
-          })
-        }
 
-      </Tile>;
+  render() {
+    var records = this.state.results.map((result, i) => {
+      return result.records.map((record, j) => {
+        // var id = record['ref-link'].split('/')[2];
+        return (<Anchor key={`${i}.${j}`} href="#" primary={true}>
+          {`${result.view.name}: ${record.self}`}
+        </Anchor> );
+      });
     });
+
     return (
-      <Tiles fill={true} flush={true}>
-        {tileComponent}
-      </Tiles>
+      <div>
+        {records}
+      </div>
     );
   }
 }

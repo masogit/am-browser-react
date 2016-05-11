@@ -59,10 +59,7 @@ export default class Widget extends Component {
           <input type="search" inline={true} className="flex" placeholder="Global View and Record search..."
                  onKeyDown={this._onEnter} onChange={this._onSearch}/>
         </Box>
-        {
-          this.state.keyword &&
-          <RecordSearch keyword={this.state.keyword}/>
-        }
+        <RecordSearch keyword={this.state.keyword}/>
         <Tiles flush={false} colorIndex="light-2" full="horizontal">
           {widgets}
         </Tiles>
