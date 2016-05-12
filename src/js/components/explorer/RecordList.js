@@ -5,7 +5,6 @@ import TableRow from 'grommet/components/TableRow';
 import Box from 'grommet/components/Box';
 import Anchor from 'grommet/components/Anchor';
 import Header from 'grommet/components/Header';
-import Button from 'grommet/components/Button';
 import Close from 'grommet/components/icons/base/Close';
 import Distribution from 'grommet/components/Distribution';
 import DocumentCsv from 'grommet/components/icons/base/DocumentCsv';
@@ -30,16 +29,6 @@ export default class RecordList extends Component {
         filters: []
       }
     };
-    this._onClick.bind(this);
-    this._onGroupBy.bind(this);
-    this._getFieldStrVal.bind(this);
-    this._getRecords.bind(this);
-    this._onOrderBy.bind(this);
-    this._onMore.bind(this);
-    this._onFilterClear.bind(this);
-    this._onClose.bind(this);
-    this._onDownload.bind(this);
-    this._getOrderByIcon.bind(this);
   }
 
   componentDidMount() {
@@ -160,6 +149,14 @@ export default class RecordList extends Component {
     }, this._getRecords);
   }
 
+  _onFilterBack(filter) {
+    var search = this.refs.search.value.trim();
+    if (search && search !== filter)
+      this.refs.search.value += ' AND ' + filter;
+    else
+      this.refs.search.value = filter;
+  }
+
   _onGroupBy() {
     if (this.refs.select_group.value) {
       var field = JSON.parse(this.refs.select_group.value);
@@ -235,14 +232,18 @@ export default class RecordList extends Component {
     });
 
     var filters = this.state.param.filters.map((filter, index) => {
-      return (<Button key={index} label={filter} plain={true} icon={<Close />}
-                      onClick={this._onFilterClear.bind(this, index)}/>);
+      return (
+        <span>
+          <Anchor href="#" icon={<Close />} onClick={this._onFilterClear.bind(this, index)}/>
+          <Anchor href="#" onClick={this._onFilterBack.bind(this, filter)} label={filter}/>
+        </span>
+      );
     });
 
     return (
       <div>
         <Header justify="between">
-          <input type="text" inline={true} className="flex" placeholder="Filter Records"
+          <input type="text" inline={true} className="flex" placeholder="Filter Records" ref="search"
                  onKeyDown={this._onFilter.bind(this)} onChange={this._onFilter.bind(this)}/>
           {(this.state.filtered) ? this.state.filtered.length : this.state.records.length}/{this.state.numTotal}
           ({this.state.time}ms)
@@ -274,7 +275,7 @@ export default class RecordList extends Component {
         </Table>
         {
           this.state.record &&
-          <RecordDetail body={this.props.body} record={this.state.record} onClose={this._onClose.bind(this)} />
+          <RecordDetail body={this.props.body} record={this.state.record} onClose={this._onClose.bind(this)}/>
         }
       </div>
     );
