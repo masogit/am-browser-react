@@ -47,9 +47,8 @@ export function loadRecordsByKeyword(body, keyword, callback) {
 
   if (aql) {
     body.filter = (body.filter) ? body.filter + ' AND (' + aql + ')' : aql;
+    loadRecordsByBody(body, callback);
   }
-
-  loadRecordsByBody(body, callback);
 }
 export function loadRecordsByBody(body, callback) {
 
