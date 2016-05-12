@@ -47,7 +47,7 @@ export function queryViewAQL(body, callback) {
   if (groupby.length > 0) {
     // get first groupby field, but it should only one field
     var field = groupby[0];
-    var aggregate = (field.groupby.toLowerCase() === 'sum') ? 'sum(*)' : 'count(*)';
+    var aggregate = (field.groupby.toLowerCase() === 'sum') ? field.groupby : 'count(*)';
     var aql = 'SELECT ' + field.sqlname + ', ' + aggregate + ' FROM ' + body.sqlname;
 
     if (body.filter)
