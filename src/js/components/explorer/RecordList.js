@@ -1,15 +1,13 @@
 import React, {Component} from 'react';
+import RecordDetail from './RecordDetail';
 import Table from 'grommet/components/Table';
 import TableRow from 'grommet/components/TableRow';
-import Tabs from 'grommet/components/Tabs';
-import Tab from 'grommet/components/Tab';
 import Box from 'grommet/components/Box';
 import Anchor from 'grommet/components/Anchor';
 import Header from 'grommet/components/Header';
 import Button from 'grommet/components/Button';
 import Close from 'grommet/components/icons/base/Close';
 import Distribution from 'grommet/components/Distribution';
-import Layer from 'grommet/components/Layer';
 import DocumentCsv from 'grommet/components/icons/base/DocumentCsv';
 import Ascend from 'grommet/components/icons/base/Ascend';
 import Descend from 'grommet/components/icons/base/Descend';
@@ -118,13 +116,6 @@ export default class RecordList extends Component {
         record: record
       });
     }
-  }
-
-  _getLinkBody(link, record) {
-    var body = {...link.body};
-    let AQL = link.reverse + '.PK=' + record[link.reversefield];
-    body.filter = body.filter ? body.filter + ' AND ' + AQL : AQL;
-    return body;
   }
 
   _getFieldStrVal(record, field) {
@@ -242,24 +233,7 @@ export default class RecordList extends Component {
         }
       </TableRow>);
     });
-    var fields;
-    var linkTabs;
-    if (this.state.record && this.props) {
-      fields = this.props.body.fields.map((field, index) => {
-        return !field.PK &&
-          <TableRow key={index}>
-            <td>{this._getDisplayLabel(field)}</td>
-            <td>{this._getFieldStrVal(this.state.record, field)}</td>
-          </TableRow>;
-      });
-      if (this.props.body.links && this.props.body.links.length > 0) {
-        linkTabs = this.props.body.links.map((link, index) => {
-          return (<Tab title={link.label} key={index}>
-            <RecordList body={this._getLinkBody(link, this.state.record)}/>
-          </Tab>);
-        });
-      }
-    }
+
     var filters = this.state.param.filters.map((filter, index) => {
       return (<Button key={index} label={filter} plain={true} icon={<Close />}
                       onClick={this._onFilterClear.bind(this, index)}/>);
@@ -298,27 +272,9 @@ export default class RecordList extends Component {
           {recordComponents}
           </tbody>
         </Table>
-
         {
           this.state.record &&
-          <Layer closer={true} align="right" onClose={this._onClose.bind(this)}>
-            <Tabs justify="start" initialIndex={0}>
-              <Tab title={this.props.body.label}>
-                <Table>
-                  <thead>
-                  <tr>
-                    <th>Field</th>
-                    <th>Value</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  {fields}
-                  </tbody>
-                </Table>
-              </Tab>
-              {linkTabs}
-            </Tabs>
-          </Layer>
+          <RecordDetail body={this.props.body} record={this.state.record} onClose={this._onClose.bind(this)} />
         }
       </div>
     );

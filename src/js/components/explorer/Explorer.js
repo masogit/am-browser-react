@@ -19,9 +19,6 @@ export default class Explorer extends Component {
     });
   }
 
-  componentWillMount() {
-  }
-
   render() {
     return (
       this.state.view &&
