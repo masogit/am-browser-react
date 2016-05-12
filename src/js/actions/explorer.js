@@ -40,7 +40,7 @@ export function exportRecordsByBody(body, callback) {
 
 export function loadRecordsByKeyword(body, keyword, callback) {
   var aql = body.fields.filter((field) => {
-    return field.search;
+    return field.searchable;
   }).map((field) => {
     return field.sqlname + " like '%" + keyword + "%'";
   }).join(' OR ');
@@ -48,7 +48,7 @@ export function loadRecordsByKeyword(body, keyword, callback) {
   if (aql) {
     body.filter = (body.filter) ? body.filter + ' AND (' + aql + ')' : aql;
   }
-  
+
   loadRecordsByBody(body, callback);
 }
 export function loadRecordsByBody(body, callback) {
