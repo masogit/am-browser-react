@@ -84,26 +84,72 @@ export default class AQL extends Component {
     });
   }
 
+  _assignObjectProp(from, to, propName) {
+    if(from[propName]) {
+      to[propName] = from[propName];
+    }
+  }
+
   _genChart(form, type) {
     if (type == 'chart') {
-      if (form.series_col) {
+      if (form.series_col.size > 0) {
         // gen series
-        var header = this.state.data.header.filter((h) => {
-          return h.Index == form.series_col;
-        })[0];
-        var s = {label: header.Name, values: []};
+        const series = [...form.series_col].map(col => ({
+          label: this.state.data.header[col].Name,
+          values: [],
+          index: col
+        }));
+
+        form.xAxis.data = [];
         this.state.data.rows.map((row, i) => {
           // gen series
-          s.values.push([i, row[form.series_col]]);
+          series.forEach(item => {
+            const value = row[item.index];
+            item.values.push([i, value/1.0]);
+          });
+
           // gen xAxis
-          if (form.xAxis_col && form.xAxis.placement)
-            form.xAxis.data.push({"label": row[form.xAxis_col], "value": i});
+          if (form.xAxis.placement) {
+            const xAxisLabel = form.xAxis_col ? row[form.xAxis_col] : i;
+            form.xAxis.data.push({"label": '' + xAxisLabel, "value": i});
+          }
         });
-        form.series.push(s);
-        this.setState({chartForm: form});
+
+        const chart = {
+          a11yTitleId: 'lineChartTitle',
+          a11yDescId: 'lineChartDesc',
+          important: form.important,
+          threshold: form.threshold,
+          type: form.type,
+          series: series,
+          size: form.size,
+          points: form.points,
+          segmented: form.segmented,
+          smooth: form.smooth,
+          sparkline: form.sparkline,
+          units: form.units
+        };
+
+        this._assignObjectProp(form, chart, 'max');
+        this._assignObjectProp(form, chart, 'min');
+
+        // gen legend
+        if(form.legend.position || form.legend.total) {
+          chart.legend = {
+            position: form.legend.position,
+            total: form.legend.total
+          };
+        }
+
+        // gen xAxis
+        if(form.xAxis.placement && form.xAxis.data.length > 0) {
+          chart.xAxis = form.xAxis;
+        }
+        this.setState({chart: chart});
+      } else {
+        this.setState({chart: null});
       }
     }
-
   }
 
   render() {
@@ -124,13 +170,10 @@ export default class AQL extends Component {
           }
         </TableRow>);
       });
-
     }
 
     // var chartTab = <Tab title="Chart"> <AChart data={this.state.data}/> </Tab>;
-
     return (
-
       <Split flex="right">
         <Sidebar primary={true} pad="small" size="small">
           <SearchInput suggestions={['123', '2344']}/>
@@ -141,7 +184,11 @@ export default class AQL extends Component {
                   this.state.reports.entities &&
                   this.state.reports.entities.map((report) => {
                     return (
-                      <ListItem key={report['ref-link']}>{report.Name}</ListItem>
+                      <ListItem key={report['ref-link']} onClick={
+                        () => {
+                          this.setState({aql: report.AQL});
+                        }
+                      }>{report.Name}</ListItem>
                     );
                   })
                 }
@@ -175,10 +222,8 @@ export default class AQL extends Component {
           <Split flex="left" fixed={false}>
             <Box>
               {
-                this.state.chartForm &&
-                <Chart a11yTitleId="lineChartTitle" a11yDescId="lineChartDesc" series={this.state.chartForm.series}
-                       xAxis={this.state.chartForm.xAxis} type={this.state.chartForm.type}
-                       legend={this.state.chartForm.legend} size={this.state.chartForm.size}/>
+                this.state.chart &&
+                <Chart {...this.state.chart} />
               }
               <Table>
                 <thead>
@@ -193,12 +238,12 @@ export default class AQL extends Component {
               this.state.data &&
               <Tabs initialIndex={0} justify="start">
                 <Tab title="Chart">
-                  <ChartForm header={this.state.data.header} genChart={this._genChart.bind(this)}/>
+                  <ChartForm header={this.state.data.header} genChart={this._genChart.bind(this)} chart={this.state.chart}/>
                 </Tab>
-                <Tab title="Meter"></Tab>
-                <Tab title="Distribution"></Tab>
-                <Tab title="Value"></Tab>
-                <Tab title="WorldMap"></Tab>
+                <Tab title="Meter"/>
+                <Tab title="Distribution"/>
+                <Tab title="Value"/>
+                <Tab title="WorldMap"/>
               </Tabs>
             }
           </Split>
