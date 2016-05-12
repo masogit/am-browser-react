@@ -40,22 +40,22 @@ export default class Widget extends Component {
     var templatesState = this.state && this.state.filtered ? this.state.filtered : templates;
     let widgets = templatesState.map((template, key) => {
       return (
-        <Tile key={key} selected={true} align="start" separator="top" colorIndex="light-1">
+        <Tile key={key} align="start" separator="top" colorIndex="light-1">
           <Header tag="h4" size="small" pad={{horizontal: 'small'}}>
-            <strong>Description:{template.description}</strong>
+            <Link to={`/explorer/${template._id}`}>{template.name}</Link>
           </Header>
           <Box pad="small">
-            <p><Link to={`/explorer/${template._id}`}>{template.name}</Link></p>
+            <p>{template.desc}&nbsp;</p>
           </Box>
           <Footer justify="between">
-            <span>Group:{template.category}</span>
+            Group: {template.category}
           </Footer>
         </Tile>
       );
     });
     return (
       <Box appCentered={true} align="center" full="vertical" justify="center">
-        <Box direction="row">
+        <Box direction="row" pad={{vertical: 'medium'}}>
           <input type="search" inline={true} className="flex" placeholder="Global View and Record search..."
                  onKeyDown={this._onEnter} onChange={this._onSearch} size="100"/>
         </Box>

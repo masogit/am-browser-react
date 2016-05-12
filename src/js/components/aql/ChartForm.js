@@ -29,7 +29,7 @@ export default class ChartForm extends Component {
   }
 
   componentWillMount() {
-    if(this.props.chart) {
+    if (this.props.chart) {
       const chart = Object.assign({}, this.state.chart, this.props.chart);
       //const chart = {...this.state.chart, ...nextProps.chart};
       this.setState({chart: chart});
@@ -40,7 +40,7 @@ export default class ChartForm extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if(nextProps.chart) {
+    if (nextProps.chart) {
       const chart = Object.assign({}, this.state.chart, nextProps.chart);
       //const chart = {...this.state.chart, ...nextProps.chart};
       this.setState({chart: chart});
@@ -65,9 +65,9 @@ export default class ChartForm extends Component {
 
   _setFormValues(event) {
     let val;
-    if(event.target.type === 'checkbox') {
+    if (event.target.type === 'checkbox') {
       val = event.target.checked;
-    } else if(event.target.type === 'number') {
+    } else if (event.target.type === 'number') {
       val = event.target.value / 1;
     } else {
       val = event.target.value;
@@ -75,8 +75,8 @@ export default class ChartForm extends Component {
 
     const path = event.target.name;
     const obj = this.state.chart;
-    if(path === 'series_col') {
-      if(event.target.checked === true) {
+    if (path === 'series_col') {
+      if (event.target.checked === true) {
         this.state.chart.series_col.add(event.target.id);
       } else {
         this.state.chart.series_col.delete(event.target.id);
@@ -129,21 +129,23 @@ export default class ChartForm extends Component {
                   <option value="large">large</option>
                 </select>
               </FormField>
-                <FormField label="X Axis placement">
-                  <select value={this.state.chart.xAxis && this.state.chart.xAxis.placement} name="xAxis.placement" onChange={this._setFormValues.bind(this)}>
-                    <option value=""></option>
-                    <option value="top">top</option>
-                    <option value="bottom">bottom</option>
-                  </select>
-                </FormField>
-                <FormField label="X Axis label">
-                  <select name="xAxis_col" value={this.state.chart.xAxis_col} onChange={this._setFormValues.bind(this)}>
-                    <option value=""></option>
-                    {xAxis_col_options}
-                  </select>
-                </FormField>
+              <FormField label="X Axis placement">
+                <select value={this.state.chart.xAxis && this.state.chart.xAxis.placement} name="xAxis.placement"
+                        onChange={this._setFormValues.bind(this)}>
+                  <option value=""></option>
+                  <option value="top">top</option>
+                  <option value="bottom">bottom</option>
+                </select>
+              </FormField>
+              <FormField label="X Axis label">
+                <select name="xAxis_col" value={this.state.chart.xAxis_col} onChange={this._setFormValues.bind(this)}>
+                  <option value=""></option>
+                  {xAxis_col_options}
+                </select>
+              </FormField>
               <FormField label="Legend position">
-                <select value={this.state.chart.legend && this.state.chart.legend.position} name="legend.position" onChange={this._setFormValues.bind(this)}>
+                <select value={this.state.chart.legend && this.state.chart.legend.position} name="legend.position"
+                        onChange={this._setFormValues.bind(this)}>
                   <option value=""></option>
                   <option value="overlay">overlay</option>
                   <option value="after">after</option>
@@ -151,10 +153,12 @@ export default class ChartForm extends Component {
                 </select>
               </FormField>
               <FormField label="Legend units">
-                <input type="text" name="units" value={this.state.chart.units} onChange={this._setFormValues.bind(this)}/>
+                <input type="text" name="units" value={this.state.chart.units}
+                       onChange={this._setFormValues.bind(this)}/>
               </FormField>
               <FormField label="Show legend total">
-                <CheckBox checked={this.state.chart.legend && this.state.chart.legend.total} id="legend.total" name="legend.total" toggle={true}
+                <CheckBox checked={this.state.chart.legend && this.state.chart.legend.total} id="legend.total"
+                          name="legend.total" toggle={true}
                           onChange={this._setFormValues.bind(this)}/>
               </FormField>
             </FormFields>
@@ -178,7 +182,8 @@ export default class ChartForm extends Component {
                 <NumberInput name="min" value={this.state.chart.min} onChange={this._setFormValues.bind(this)}/>
               </FormField>
               <FormField label="points">
-                <CheckBox id="points" name="points" checked={this.state.chart.points} toggle={true} onChange={this._setFormValues.bind(this)}/>
+                <CheckBox id="points" name="points" checked={this.state.chart.points} toggle={true}
+                          onChange={this._setFormValues.bind(this)}/>
               </FormField>
               {this.state.chart.type === 'bar' &&
               <FormField label="segmented">
@@ -186,14 +191,16 @@ export default class ChartForm extends Component {
                           onChange={this._setFormValues.bind(this)}/>
               </FormField>
               }
-              {(this.state.chart.type === 'line' || this.state.chart.type === 'area')&& (
-              <FormField label="smooth">
-                <CheckBox id="smooth" name="smooth" toggle={true} checked={this.state.chart.smooth} onChange={this._setFormValues.bind(this)}/>
-              </FormField>
+              {(this.state.chart.type === 'line' || this.state.chart.type === 'area') && (
+                <FormField label="smooth">
+                  <CheckBox id="smooth" name="smooth" toggle={true} checked={this.state.chart.smooth}
+                            onChange={this._setFormValues.bind(this)}/>
+                </FormField>
               )}
 
               <FormField label="sparkline">
-                <CheckBox id="sparkline" name="sparkline" toggle={true} checked={this.state.chart.sparkline} onChange={this._setFormValues.bind(this)}/>
+                <CheckBox id="sparkline" name="sparkline" toggle={true} checked={this.state.chart.sparkline}
+                          onChange={this._setFormValues.bind(this)}/>
               </FormField>
             </FormFields>
           </Form>

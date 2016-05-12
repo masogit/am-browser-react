@@ -85,7 +85,7 @@ export default class AQL extends Component {
   }
 
   _assignObjectProp(from, to, propName) {
-    if(from[propName]) {
+    if (from[propName]) {
       to[propName] = from[propName];
     }
   }
@@ -105,7 +105,7 @@ export default class AQL extends Component {
           // gen series
           series.forEach(item => {
             const value = row[item.index];
-            item.values.push([i, value/1.0]);
+            item.values.push([i, value / 1.0]);
           });
 
           // gen xAxis
@@ -134,7 +134,7 @@ export default class AQL extends Component {
         this._assignObjectProp(form, chart, 'min');
 
         // gen legend
-        if(form.legend.position || form.legend.total) {
+        if (form.legend.position || form.legend.total) {
           chart.legend = {
             position: form.legend.position,
             total: form.legend.total
@@ -142,7 +142,7 @@ export default class AQL extends Component {
         }
 
         // gen xAxis
-        if(form.xAxis.placement && form.xAxis.data.length > 0) {
+        if (form.xAxis.placement && form.xAxis.data.length > 0) {
           chart.xAxis = form.xAxis;
         }
         this.setState({chart: chart});
@@ -238,7 +238,8 @@ export default class AQL extends Component {
               this.state.data &&
               <Tabs initialIndex={0} justify="start">
                 <Tab title="Chart">
-                  <ChartForm header={this.state.data.header} genChart={this._genChart.bind(this)} chart={this.state.chart}/>
+                  <ChartForm header={this.state.data.header} genChart={this._genChart.bind(this)}
+                             chart={this.state.chart}/>
                 </Tab>
                 <Tab title="Meter"/>
                 <Tab title="Distribution"/>
