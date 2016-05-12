@@ -73,13 +73,12 @@ export default class RecordSearch extends Component {
         return (
           <Tile key={`${i}.${j}`} align="start" separator="top" colorIndex="light-1">
             <Header tag="h4" size="small" pad={{horizontal: 'small'}}>
-              <strong>{result.view.name}</strong>
+              {result.view.name}
             </Header>
-            <Anchor href="#" primary={true} onClick={this._onClick.bind(this, result.view, record)}>
-              {record.self}
-            </Anchor>
             <Box pad="small">
-              <p>{result.view.body.desc}</p>
+              <Anchor href="#" primary={true} onClick={this._onClick.bind(this, result.view, record)}>
+                {record.self}
+              </Anchor>
             </Box>
             <Footer justify="between">
               Table: {result.view.body.sqlname}
@@ -94,7 +93,7 @@ export default class RecordSearch extends Component {
           this.state.results.length > 0 &&
           <Box full="horizontal" pad="medium">
             <h4>Search Result:</h4>
-            <Tiles flush={false} justify="center" colorIndex="light-2" full="horizontal" size="large">
+            <Tiles flush={false} justify="center" colorIndex="light-2" full="horizontal">
               {records}
             </Tiles>
           </Box>
