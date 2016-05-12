@@ -1,6 +1,6 @@
 var db = require('./db.js');
 
-module.exports = function (app, am, redis) {
+module.exports = function (app, am) {
 
     var Metadata = require('./metadata.js');
     var metadata = new Metadata();
@@ -8,12 +8,9 @@ module.exports = function (app, am, redis) {
     var REST = require('./rest.js');
     var rest = new REST();
 
-    var Cache = require('./cache.js');
-    var cache = new Cache(db, redis);
-	
     var PropertiesReader = require('properties-reader');
     var properties = PropertiesReader('am-browser-config.properties');
-    var base = properties.get('rest.base'); 
+    var base = properties.get('rest.base');
     console.log("base: " + base);
     var httpProxy = require('http-proxy');
     var apiProxy = httpProxy.createProxyServer();
@@ -22,15 +19,6 @@ module.exports = function (app, am, redis) {
     apiProxy.on('proxyReq', function(proxyReq, req, res, options) {
       console.log("set request header: " + auth);
       proxyReq.setHeader('Authorization', auth);
-    });
-
-    // Redis Server Info
-    app.get('/redis', function (req, res) {
-        res.json(redis);
-    });
-
-    app.post('/redis', function (req, res) {
-        redis = req.body
     });
 
     // CRUD Tingodb
@@ -227,26 +215,5 @@ module.exports = function (app, am, redis) {
         console.log('http://' + am.server + base + '/v1/schema');
         apiProxy.web(req, res, {target: 'http://' + am.server + base + '/v1/schema'});
     });
-
-    // redis cache search --------------------------------------------------
-    app.post('/cache/search', cache.search);
-
-
-
-    //app.get('/browser', function (req, res) {
-    //    res.sendfile('./public/browser/index.html');
-    //});
-
-    app.get('/m', function (req, res) {
-        res.sendfile('./public/mobile/index.html');
-    });
-
-    //app.get('/login', function (req, res) {
-    //    res.sendfile('./public/login.html');
-    //});
-    //
-    //app.get('/', function (req, res) {
-    //    res.redirect("/login");
-    //});
 
 };

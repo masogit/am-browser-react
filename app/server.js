@@ -9,13 +9,6 @@ var morgan = require('morgan');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var dbFile = {folder: './db', json: '/template.json'};
-var redis = {
-  host: process.env.REDIS_HOST || "127.0.0.1",
-  port: process.env.REDIS_PORT || "6379",
-  auth_pass: process.env.REDIS_PASS || "",
-  enabled: process.env.REDIS_ENABLED || false,
-  ttl: process.env.REDIS_TTL || 600
-};
 
 // initial AM REST server
 var PropertiesReader = require('properties-reader');
@@ -70,7 +63,7 @@ app.use(methodOverride('X-HTTP-Method-Override')); // override with the X-HTTP-M
 
 
 // routes ======================================================================
-require('./routes.js')(app, am, redis);
+require('./routes.js')(app, am);
 
 // listen (start app with node server.js) ======================================
 app.listen(port, server);
@@ -93,13 +86,3 @@ try {
 catch (e) {
   console.warn("HTTPS is not set correctly");
 }
-
-
-// sub process to cache view data in Redis
-// if (am) {
-//     var cp = require('child_process');
-//     var child = cp.fork('app/worker.js');
-//
-//     // Send child process some work
-//     child.send(JSON.stringify({ am: am, db: dbFile, redis: redis }));
-// }
