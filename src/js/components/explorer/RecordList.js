@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import Converter from 'json-2-csv';
 import RecordDetail from './RecordDetail';
 import Table from 'grommet/components/Table';
 import TableRow from 'grommet/components/TableRow';
@@ -18,9 +19,13 @@ export default class RecordList extends Component {
     this.state = {
       numColumn: 4, // default column number, not include Self
       numTotal: 0,
-      time: 0,
+      timeQuery: 0,
+      timeDownloadStart: 0,
+      timeDownloadEnd: 0,
       records: [],
       filtered: null,
+      downloaded: [],
+      numDownload: null,
       record: null,
       param: {
         orderby: "",
@@ -59,25 +64,89 @@ export default class RecordList extends Component {
     }
   }
 
+  _getAllRecord(downloadRecords, callback) {
+    if (this.state.numTotal > downloadRecords.length) {
+      var param = {...this.state.param};
+      param.offset = downloadRecords.length;
+      if (this.state.numTotal >= 10000)
+        param.limit = 1000;
+      else if (this.state.numTotal < 10000 && this.state.numTotal >= 1000)
+        param.limit = parseInt(this.state.numTotal / 10);
+      else
+        param.limit = 100;
+      var body = {...this.props.body, param};
+      ExplorerActions.loadRecordsByBody(body, (data) => {
+        if (data.entities.length == 0) {
+          this.setState({
+            numTotal: downloadRecords.length
+          });
+          callback(downloadRecords);
+        } else {
+          downloadRecords = downloadRecords.concat(data.entities);
+          this.setState({
+            numDownload: downloadRecords.length,
+            timeDownloadEnd: Date.now()
+          });
+          this._getAllRecord(downloadRecords, callback);
+        }
+      });
+    } else {
+      callback(downloadRecords);
+    }
+  }
+
   _getRecords(param) {
     var body = {...this.props.body, param: (param) ? param : this.state.param}; // if sync pass param to query, then records append
     var timeStart = Date.now();
     ExplorerActions.loadRecordsByBody(body, (data) => {
       var records = this.state.records;
-      this.setState({
-        time: Date.now() - timeStart,
-        numTotal: data.count,
-        records: (param) ? records.concat(data.entities) : data.entities, // if sync pass param to query, then records append
-        filtered: null
-      }, this._onGroupBy);
+      if (data.entities.length > 0)
+        this.setState({
+          timeQuery: Date.now() - timeStart,
+          numTotal: data.count,
+          records: (param) ? records.concat(data.entities) : data.entities, // if sync pass param to query, then records append
+          filtered: null
+        }, this._onGroupBy);
+      else if (data.entities.length === 0)
+        this.setState({
+          numTotal: this.state.records.length
+        });
     });
   }
 
+  _json2csv(json) {
+    Converter.json2csv(json, (err, csv) => {
+      if (err)
+        console.log(err);
+      else {
+        var csvContent = "data:text/csv;charset=utf-8,";
+        var encodedUri = encodeURI(csvContent + csv);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", this.props.body.label + ".csv");
+        link.click();
+        // console.log(csv);
+      }
+    }, {prependHeader: false});
+  }
+
   _onDownload() {
-    var body = {...this.props.body, param: this.state.param};
-    ExplorerActions.exportRecordsByBody(body, (data) => {
-      this.setState({});
-    });
+    if (this.state.downloaded.length < this.state.numTotal) {
+      var downloadRecord = [...this.state.records];
+      this.setState({
+        numDownload: this.state.records.length,
+        timeDownloadStart: Date.now(),
+        timeDownloadEnd: Date.now()
+      });
+      this._getAllRecord(downloadRecord, (records) => {
+        this.setState({
+          downloaded: records
+        });
+        this._json2csv(records);
+      });
+    } else {
+      this._json2csv(this.state.downloaded);
+    }
   }
 
   _onOrderBy(sqlname) {
@@ -206,6 +275,11 @@ export default class RecordList extends Component {
     this.setState({record: null});
   }
 
+  _getDownloadProgress() {
+    return parseInt(this.state.numDownload / this.state.numTotal * 100) + '% '
+      + (this.state.timeDownloadEnd - this.state.timeDownloadStart) + 'ms';
+  }
+
   render() {
     var body = this.props.body;
     var records = (this.state.filtered) ? this.state.filtered : this.state.records;
@@ -246,8 +320,10 @@ export default class RecordList extends Component {
           <input type="text" inline={true} className="flex" placeholder="Filter Records" ref="search"
                  onKeyDown={this._onFilter.bind(this)} onChange={this._onFilter.bind(this)}/>
           {(this.state.filtered) ? this.state.filtered.length : this.state.records.length}/{this.state.numTotal}
-          ({this.state.time}ms)
-          <Anchor href="#" label="CSV" icon={<DocumentCsv />}/>
+          ({this.state.timeQuery}ms)
+          <Anchor href="#"
+                  label={this.state.numDownload?this._getDownloadProgress(this):'CSV'}
+                  icon={<DocumentCsv />} onClick={this._onDownload.bind(this)}/>
           <select onChange={this._onGroupBy.bind(this)} ref="select_group">
             <option value="">Group By</option>
             {this.state.group_select}
