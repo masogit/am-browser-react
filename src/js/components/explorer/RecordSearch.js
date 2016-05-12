@@ -2,7 +2,12 @@ import React, {Component} from 'react';
 import * as ExplorerAction from '../../actions/explorer';
 import RecordDetail from './RecordDetail';
 import {
-  Anchor
+  Anchor,
+  Box,
+  Header,
+  Footer,
+  Tiles,
+  Tile
 } from 'grommet';
 
 export default class RecordSearch extends Component {
@@ -65,18 +70,38 @@ export default class RecordSearch extends Component {
     var records = this.state.results.map((result, i) => {
       return result.records.map((record, j) => {
         // var id = record['ref-link'].split('/')[2];
-        return (<Anchor key={`${i}.${j}`} href="#" primary={true} onClick={this._onClick.bind(this, result.view, record)}>
-          {`${result.view.name}: ${record.self}`}
-        </Anchor> );
+        return (
+          <Tile key={`${i}.${j}`} align="start" separator="top" colorIndex="light-1">
+            <Header tag="h4" size="small" pad={{horizontal: 'small'}}>
+              <strong>{result.view.name}</strong>
+            </Header>
+            <Anchor href="#" primary={true} onClick={this._onClick.bind(this, result.view, record)}>
+              {record.self}
+            </Anchor>
+            <Box pad="small">
+              <p>{result.view.body.desc}</p>
+            </Box>
+            <Footer justify="between">
+              Table: {result.view.body.sqlname}
+            </Footer>
+          </Tile>);
       });
     });
 
     return (
       <div>
-        {records}
+        {
+          this.state.results.length > 0 &&
+          <Box full="horizontal" pad="medium">
+            <h4>Search Result:</h4>
+            <Tiles flush={false} justify="center" colorIndex="light-2" full="horizontal" size="large">
+              {records}
+            </Tiles>
+          </Box>
+        }
         {
           this.state.record &&
-          <RecordDetail body={this.state.view.body} record={this.state.record} onClose={this._onClose.bind(this)} />
+          <RecordDetail body={this.state.view.body} record={this.state.record} onClose={this._onClose.bind(this)}/>
         }
       </div>
     );
