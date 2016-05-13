@@ -1,10 +1,6 @@
 var db = require('./db.js');
 
 module.exports = function (app, am) {
-
-    var Metadata = require('./metadata.js');
-    var metadata = new Metadata();
-
     var REST = require('./rest.js');
     var rest = new REST();
 
@@ -192,8 +188,6 @@ module.exports = function (app, am) {
       apiProxy.web(req, res, {target: 'http://' + am.server + '/AssetManagerWebService/rs/integration/ucmdbAdapter/points'});
     });
 
-    // AM Metadata ---------------------------------------------------------
-    app.post('/am/metadata', metadata.get);
     app.post('/am/rest', rest.db);
 
     // Proxy the backend rest service /rs/db -> /am/db

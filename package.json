@@ -1,11 +1,7 @@
 {
-  "name": "grommet-ferret",
-  "version": "0.2.0",
-  "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/grommet/grommet-ferret.git"
-  },
+  "name": "am-browser",
+  "version": "0.1.0",
+  "description": "Asset Manager Browser project",
   "dependencies": {
     "bluebird": "^3.3.5",
     "body-parser": "^1.10.0",
