@@ -119,6 +119,7 @@ export default class RecordList extends Component {
       if (err)
         console.log(err);
       else {
+        console.log("save csv: " + this.props.body.label);
         var csvContent = "data:text/csv;charset=utf-8,";
         var encodedUri = encodeURI(csvContent + csv);
         var link = document.createElement("a");
@@ -277,7 +278,7 @@ export default class RecordList extends Component {
 
   _getDownloadProgress() {
     return parseInt(this.state.numDownload / this.state.numTotal * 100) + '% '
-      + (this.state.timeDownloadEnd - this.state.timeDownloadStart) + 'ms';
+      + parseInt((this.state.timeDownloadEnd - this.state.timeDownloadStart)/1000) + 's';
   }
 
   render() {
