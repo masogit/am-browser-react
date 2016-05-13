@@ -52,25 +52,6 @@ export default class RecordDetail extends Component {
 
   render() {
 
-    var fields;
-    var linkTabs;
-    if (this.props.record && this.props.body) {
-      fields = this.props.body.fields.map((field, index) => {
-        return !field.PK &&
-          <TableRow key={index}>
-            <td>{this._getDisplayLabel(field)}</td>
-            <td>{this._getFieldStrVal(this.props.record, field)}</td>
-          </TableRow>;
-      });
-      if (this.props.body.links && this.props.body.links.length > 0) {
-        linkTabs = this.props.body.links.map((link, index) => {
-          return (<Tab title={link.label} key={index}>
-            <RecordList body={this._getLinkBody(link, this.props.record)}/>
-          </Tab>);
-        });
-      }
-    }
-
     return (
       <Layer closer={true} align="right" onClose={this.props.onClose}>
         <Tabs justify="start" initialIndex={0}>
@@ -83,11 +64,29 @@ export default class RecordDetail extends Component {
               </tr>
               </thead>
               <tbody>
-              {fields}
+              <TableRow>
+                <td>Self</td>
+                <td>{this.props.record.self}</td>
+              </TableRow>
+              {
+                this.props.body.fields.map((field, index) => {
+                  return !field.PK &&
+                    <TableRow key={index}>
+                      <td>{this._getDisplayLabel(field)}</td>
+                      <td>{this._getFieldStrVal(this.props.record, field)}</td>
+                    </TableRow>;
+                })
+              }
               </tbody>
             </Table>
           </Tab>
-          {linkTabs}
+          {
+            this.props.body.links.map((link, index) => {
+              return (<Tab title={link.label} key={index}>
+                <RecordList body={this._getLinkBody(link, this.props.record)}/>
+              </Tab>);
+            })
+          }
         </Tabs>
       </Layer>
     );
