@@ -140,14 +140,12 @@ export default class ViewDefDetail extends Component {
                 <h3>{link.sqlname}</h3>
               </Header>
               <table key={"table_" + link.sqlname}>
-                <thead>
+                <tbody>
                 <tr>
                   <th>Field</th>
                   <th>Alias</th>
                   <th></th>
                 </tr>
-                </thead>
-                <tbody>
                 {link.body && link.body.fields && this.renderTemplateTable(link, false, currentPath)}
                 </tbody>
               </table>
@@ -208,14 +206,12 @@ export default class ViewDefDetail extends Component {
     const { selectedView } = this.props;
     let p = "input";
     let tableHeader = (
-      <thead>
       <tr>
         <th>Field</th>
         <th>Alias</th>
         <th>Search</th>
         <th></th>
       </tr>
-      </thead>
     );
 
     return (
@@ -290,8 +286,8 @@ export default class ViewDefDetail extends Component {
         <Box>
           {selectedView.body && selectedView.body.fields && this.renderMasterHeader(selectedView)}
           <Table>
-            {tableHeader}
             <tbody>
+            {tableHeader}
             {selectedView.body && selectedView.body.fields && this.renderTemplateTable(selectedView, true)}
             </tbody>
           </Table>
