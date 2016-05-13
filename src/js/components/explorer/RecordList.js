@@ -64,6 +64,18 @@ export default class RecordList extends Component {
     }
   }
 
+  _getFormattedRecords(body, rawRecords) {
+    var records = [];
+    rawRecords.forEach((rawRecord) => {
+      var record = {Self: rawRecord.self};
+      body.fields.forEach((field) => {
+        record[this._getDisplayLabel(field)] = this._getFieldStrVal(rawRecord, field);
+      });
+      records.push(record);
+    });
+    return records;
+  };
+
   _getAllRecord(downloadRecords, callback) {
     if (this.state.numTotal > downloadRecords.length) {
       var param = {...this.state.param};
@@ -82,7 +94,7 @@ export default class RecordList extends Component {
           });
           callback(downloadRecords);
         } else {
-          downloadRecords = downloadRecords.concat(data.entities);
+          downloadRecords = downloadRecords.concat(this._getFormattedRecords(body, data.entities));
           this.setState({
             numDownload: downloadRecords.length,
             timeDownloadEnd: Date.now()
@@ -115,11 +127,17 @@ export default class RecordList extends Component {
   }
 
   _json2csv(json) {
+    console.log("save file for: " + this.props.body.label);
     Converter.json2csv(json, (err, csv) => {
-      if (err)
+      if (err) {
         console.log(err);
-      else {
-        console.log("save csv: " + this.props.body.label);
+        var csvContent = "data:text/json;charset=utf-8,";
+        var encodedUri = encodeURI(csvContent + JSON.stringify(json));
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", this.props.body.label + ".json");
+        link.click();
+      } else {
         var csvContent = "data:text/csv;charset=utf-8,";
         var encodedUri = encodeURI(csvContent + csv);
         var link = document.createElement("a");
@@ -128,18 +146,17 @@ export default class RecordList extends Component {
         link.click();
         // console.log(csv);
       }
-    }, {prependHeader: false});
+    }, {prependHeader: true});
   }
 
   _onDownload() {
     if (this.state.downloaded.length < this.state.numTotal) {
-      var downloadRecord = [...this.state.records];
       this.setState({
-        numDownload: this.state.records.length,
+        numDownload: 0,
         timeDownloadStart: Date.now(),
         timeDownloadEnd: Date.now()
       });
-      this._getAllRecord(downloadRecord, (records) => {
+      this._getAllRecord([], (records) => {
         this.setState({
           downloaded: records
         });
@@ -278,7 +295,7 @@ export default class RecordList extends Component {
 
   _getDownloadProgress() {
     return parseInt(this.state.numDownload / this.state.numTotal * 100) + '% '
-      + parseInt((this.state.timeDownloadEnd - this.state.timeDownloadStart)/1000) + 's';
+      + parseInt((this.state.timeDownloadEnd - this.state.timeDownloadStart) / 1000) + 's';
   }
 
   render() {
