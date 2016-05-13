@@ -69,7 +69,8 @@ export default class RecordList extends Component {
     rawRecords.forEach((rawRecord) => {
       var record = {Self: rawRecord.self};
       body.fields.forEach((field) => {
-        record[this._getDisplayLabel(field)] = this._getFieldStrVal(rawRecord, field);
+        if (!field.PK)
+          record[this._getDisplayLabel(field)] = this._getFieldStrVal(rawRecord, field);
       });
       records.push(record);
     });
