@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 // import AChart from './AChart';
 import ChartForm from './ChartForm';
+import AlertForm from './AlertForm';
 import * as AQLActions from '../../actions/aql';
 import {
   Anchor,
@@ -9,14 +10,12 @@ import {
   // Distribution,
   Sidebar,
   Split,
-  // Form,
-  // FormFields,
+  Form,
   FormField,
   SearchInput,
   List,
   ListItem,
   Header,
-  // Footer,
   Tabs,
   Tab,
   Table,
@@ -28,30 +27,46 @@ import {
 import Play from 'grommet/components/icons/base/Play';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
 import Close from 'grommet/components/icons/base/Close';
+import Add from 'grommet/components/icons/base/Add';
 
 export default class AQL extends Component {
+
   constructor() {
     super();
     this.state = {
       reports: {},
       aqls: [],
-      data: null,
-      aql: "",
-      chartForm: null,
-      meterForm: null,
-      distributionForm: null,
-      valueForm: null,
-      worldmapForm: null
+      aql: {}
     };
-    // this._onQuery.bind(this);
   }
 
   componentDidMount() {
-    AQLActions.loadAQLs((data) => {
-      // this.setState({
-      //   aqls: data
-      // });
+    this._initAQL();
+    this._loadAQLs(this);
+    this._loadInToolReport(this);
+  }
+
+  _initAQL() {
+    this.setState({
+      aql: {
+        str: '',
+        name: '',
+        category: '',
+        type: '',
+        form: null
+      }
     });
+  }
+
+  _loadAQLs() {
+    AQLActions.loadAQLs((data) => {
+      this.setState({
+        aqls: data
+      });
+    });
+  }
+
+  _loadInToolReport() {
     AQLActions.loadReports((data) => {
       console.log(data);
       this.setState({
@@ -60,28 +75,128 @@ export default class AQL extends Component {
     });
   }
 
-  componentWillReceiveProps(newProps) {
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    return true;
-  }
-
-  _onQuery(e) {
-    e.preventDefault();
-    AQLActions.queryAQL(this.refs.aql.value, (data) => {
-      console.log(data);
+  _onQuery() {
+    AQLActions.queryAQL(this.state.aql.str, (data) => {
+      var aql = this.state.aql;
+      aql.data = data;
       this.setState({
-        data: data,
-        aql: this.refs.aql.value
+        aql: aql
       });
     });
   }
 
-  _setAQL() {
-    this.setState({
-      aql: this.refs.aql.value
+  _onSaveAQL() {
+    AQLActions.saveAQL(this.state.aql, (id) => {
+      console.log("Save AQL: " + id);
+      this._loadAQLs(this);
+      var aql = this.state.aql;
+      aql._id = id;
+      this.setState({aql: aql});
+      this.setState({
+        createdAlert: <AlertForm onClose={()=>{
+          this.setState({
+            createdAlert: null});}}
+          title={'AQL: ' + aql.name + ' saved!'}
+          desc={'AQL string: ' + aql.str}
+          onConfirm={()=>{
+            this.setState({
+              createdAlert: null});}}/>
+      });
     });
+  }
+
+  _onSave() {
+    if (this.state.aql.str.trim() === '' || this.state.aql.name.trim() === '' || this.state.aql.category.trim() === '') {
+      this.setState({
+        validationAlert: <AlertForm onClose={()=>{
+          this.setState({
+            validationAlert: null});}}
+          title={'Save AQL failed!'}
+          desc={'AQL string or Name or Category empty'}
+          onConfirm={()=>{
+            this.setState({
+              validationAlert: null});}}/>
+      });
+    } else {
+      this._onSaveAQL();
+    }
+  }
+
+  _onNew() {
+    if (this.state.aql.str.trim() !== '') {
+      this.setState({
+        newAlert: <AlertForm onClose={()=>{
+          this.setState({
+            newAlert: null});}}
+          title={'Create a new AQL?'}
+          desc={'You have not saved AQL string: ' + this.state.aql.str}
+          onConfirm={this._initAQL.bind(this)}/>
+      });
+    } else {
+      this._initAQL();
+    }
+  }
+
+  _onDelete() {
+    this.setState({
+      deletionAlert: <AlertForm onClose={()=>{
+        this.setState({
+          deletionAlert: null});}}
+        title={'Delete AQL: ' + this.state.aql.name}
+        desc={this.state.aql.str} onConfirm={this._removeAQL.bind(this)}/>
+    });
+  }
+
+  _removeAQL() {
+    AQLActions.removeAQL(this.state.aql._id, (id) => {
+      console.log("Remove AQL: " + id);
+      this._loadAQLs(this);
+      this._initAQL();
+    });
+  }
+
+  _loadAQLStr(str) {
+    var aql = this.state.aql;
+    aql.str = str;
+    this.setState({aql: aql});
+  }
+
+  _onLoadAQL(aql) {
+    this.setState({
+      aql: aql
+    });
+  }
+
+  _setFormValues(event) {
+    let val;
+    if (event.target.type === 'checkbox') {
+      val = event.target.checked;
+    } else if (event.target.type === 'number') {
+      val = event.target.value / 1;
+    } else {
+      val = event.target.value;
+    }
+
+    const path = event.target.name;
+    const obj = this.state.aql;
+    this.setValueByJsonPath(path, val, obj);
+    this.setState({aql: obj});
+  }
+
+  setValueByJsonPath(path, val, obj) {
+    var fields = path.split('.');
+    var result = obj;
+    for (var i = 0, n = fields.length; i < n && result !== undefined; i++) {
+      var field = fields[i];
+      if (i === n - 1) {
+        result[field] = val;
+      } else {
+        if (typeof result[field] === 'undefined' || !_.isObject(result[field])) {
+          result[field] = {};
+        }
+        result = result[field];
+      }
+    }
   }
 
   _assignObjectProp(from, to, propName) {
@@ -91,17 +206,21 @@ export default class AQL extends Component {
   }
 
   _genChart(form, type) {
+    var aql = this.state.aql;
+    aql.type = type;
+    aql.form = form;
+
     if (type == 'chart') {
       if (form.series_col.size > 0) {
         // gen series
         const series = [...form.series_col].map(col => ({
-          label: this.state.data.header[col].Name,
+          label: this.state.aql.data.header[col].Name,
           values: [],
           index: col
         }));
 
         form.xAxis.data = [];
-        this.state.data.rows.map((row, i) => {
+        this.state.aql.data.rows.map((row, i) => {
           // gen series
           series.forEach(item => {
             const value = row[item.index];
@@ -145,10 +264,13 @@ export default class AQL extends Component {
         if (form.xAxis.placement && form.xAxis.data.length > 0) {
           chart.xAxis = form.xAxis;
         }
-        this.setState({chart: chart});
+
+        aql.chart = chart;
       } else {
-        this.setState({chart: null});
+        aql.chart = null;
       }
+
+      this.setState({aql: aql});
     }
   }
 
@@ -156,12 +278,12 @@ export default class AQL extends Component {
     var header;
     var rows;
     // console.log(this.state);
-    if (this.state.data) {
-      header = this.state.data.header.map((col) => {
+    if (this.state.aql.data) {
+      header = this.state.aql.data.header.map((col) => {
         return (<th key={col.Index}>{col.Name}</th>);
       });
 
-      rows = this.state.data.rows.map((row, index) => {
+      rows = this.state.aql.data.rows.map((row, index) => {
         return (<TableRow key={index}>
           {
             row.map((col, i) => {
@@ -172,34 +294,30 @@ export default class AQL extends Component {
       });
     }
 
-    // var chartTab = <Tab title="Chart"> <AChart data={this.state.data}/> </Tab>;
     return (
       <Split flex="right">
-        <Sidebar primary={true} pad="small" size="small">
-          <SearchInput suggestions={['123', '2344']}/>
+        <Sidebar pad="small" size="small">
+          <SearchInput/>
           <Tabs initialIndex={0} justify="start">
-            <Tab title="Reports">
-              <List selectable={true}>
+            <Tab title="Saved AQLs">
+              <List selectable={true} selectable={true}>
                 {
-                  this.state.reports.entities &&
-                  this.state.reports.entities.map((report) => {
+                  this.state.aqls.map((aql) => {
                     return (
-                      <ListItem key={report['ref-link']} onClick={
-                        () => {
-                          this.setState({aql: report.AQL});
-                        }
-                      }>{report.Name}</ListItem>
+                      <ListItem key={aql._id} onClick={this._onLoadAQL.bind(this, aql)}>{aql.name}</ListItem>
                     );
                   })
                 }
               </List>
             </Tab>
-            <Tab title="Saved AQLs">
+            <Tab title="Repository">
               <List selectable={true}>
                 {
-                  this.state.aqls.map((aql) => {
+                  this.state.reports.entities &&
+                  this.state.reports.entities.map((report) => {
                     return (
-                      <ListItem key={aql._id}>{aql.name}</ListItem>
+                      <ListItem key={report['ref-link']}
+                                onClick={this._loadAQLStr.bind(this, report.AQL)}>{report.Name}</ListItem>
                     );
                   })
                 }
@@ -208,22 +326,40 @@ export default class AQL extends Component {
           </Tabs>
         </Sidebar>
         <div>
+          {this.state.newAlert}
+          {this.state.createdAlert}
+          {this.state.deletionAlert}
+          {this.state.validationAlert}
           <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
             <Title>AM Insight</Title>
             <Menu direction="row" align="center" responsive={false}>
               <Anchor link="#" icon={<Play />} onClick={this._onQuery.bind(this)}>Query</Anchor>
-              <Anchor link="#" icon={<Checkmark />} onClick={this._onQuery.bind(this)}>Save</Anchor>
-              <Anchor link="#" icon={<Close />} onClick={this._onQuery.bind(this)}>Delete</Anchor>
+              <Anchor link="#" icon={<Add />} onClick={this._onNew.bind(this)}>New</Anchor>
+              <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)}>Save</Anchor>
+              <Anchor link="#" icon={<Close />} onClick={this._onDelete.bind(this)}>Delete</Anchor>
             </Menu>
           </Header>
-          <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_Box">
-            <textarea id="AQL_Box" ref="aql" onChange={this._setAQL.bind(this)} value={this.state.aql}></textarea>
-          </FormField>
+          <Box justify="between" direction="row" pad={{between:'medium'}} size="small">
+            <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_Box">
+              <textarea id="AQL_Box" name="str" value={this.state.aql.str} rows="3"
+                        onChange={this._setFormValues.bind(this)}/>
+            </FormField>
+            <Form pad="none" compact={true}>
+              <FormField label="AQL Name" htmlFor="AQL_Box">
+                <input id="AQL_Name" type="text" name="name" value={this.state.aql.name}
+                       onChange={this._setFormValues.bind(this)}/>
+              </FormField>
+              <FormField label="Category" htmlFor="AQL_Category">
+                <input id="AQL_Category" type="text" name="category" value={this.state.aql.category}
+                       onChange={this._setFormValues.bind(this)}/>
+              </FormField>
+            </Form>
+          </Box>
           <Split flex="left" fixed={false}>
             <Box>
               {
-                this.state.chart &&
-                <Chart {...this.state.chart} />
+                this.state.aql.chart &&
+                <Chart {...this.state.aql.chart} />
               }
               <Table>
                 <thead>
@@ -235,11 +371,11 @@ export default class AQL extends Component {
               </Table>
             </Box>
             {
-              this.state.data &&
+              this.state.aql.data &&
               <Tabs initialIndex={0} justify="start">
                 <Tab title="Chart">
-                  <ChartForm header={this.state.data.header} genChart={this._genChart.bind(this)}
-                             chart={this.state.chart}/>
+                  <ChartForm header={this.state.aql.data.header} genChart={this._genChart.bind(this)}
+                             chart={this.state.aql.chart}/>
                 </Tab>
                 <Tab title="Meter"/>
                 <Tab title="Distribution"/>
