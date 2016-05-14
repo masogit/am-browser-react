@@ -17,7 +17,7 @@ export function saveAQL(aql, callback) {
     if (err) {
       console.log(err);
     } else
-      callback(res.body);
+      callback(res.text);
   });
 }
 
@@ -26,7 +26,7 @@ export function removeAQL(id, callback) {
     if (err) {
       console.log(err);
     } else
-      callback(res.body);
+      callback(res.text);
   });
 }
 
