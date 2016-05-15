@@ -69,11 +69,11 @@ class NavHeader extends Component {
           <Layer onClose={this._onClose.bind(this)} closer={true} align="left">
             <Box full="vertical" justify="center">
               <SearchInput placeHolder="Search views..." onChange={this._onSearch.bind(this)}/>
-              <GroupList selectable={true} pad={{vertical: 'small'}}>
+              <GroupList pad={{vertical: 'small'}}>
                 {
                   listViews.map((view) => {
                     return (
-                      <GroupListItem key={view._id} groupby={view.category} pad={{horizontal: 'medium'}}>
+                      <GroupListItem key={view._id} groupby={view.category} pad={{horizontal: 'medium', vertical: 'small'}}>
                         <Anchor href={`/explorer/${view._id}`}>{view.name}</Anchor>
                       </GroupListItem>
                     );
@@ -88,6 +88,9 @@ class NavHeader extends Component {
           <Menu direction="row" align="center" responsive={false}>
             <Link key="0" to="/home" activeClassName="active link-disabled">
               Search
+            </Link>
+            <Link key="4" to="/wall" activeClassName="active link-disabled">
+              Insight
             </Link>
             <Link key="1" to="/views" activeClassName="active link-disabled">
               Views
