@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 // import AChart from './AChart';
 import ChartForm from './ChartForm';
 import AlertForm from './AlertForm';
+import GroupList from './GroupList';
+import GroupListItem from './GroupListItem';
 import * as AQLActions from '../../actions/aql';
 import {
   Anchor,
@@ -38,6 +40,7 @@ export default class AQL extends Component {
       aqls: [],
       aql: {}
     };
+    this._onSearch.bind(this);
   }
 
   componentDidMount() {
@@ -66,6 +69,12 @@ export default class AQL extends Component {
     });
   }
 
+  _loadAQL(aql) {
+    this.setState({
+      aql: {...aql}
+    });
+  }
+
   _loadInToolReport() {
     AQLActions.loadReports((data) => {
       console.log(data);
@@ -73,6 +82,21 @@ export default class AQL extends Component {
         reports: data
       });
     });
+  }
+
+  _onSearch(keyword) {
+    var keyword = keyword.toLowerCase().trim();
+    if (keyword) {
+      var filteredAqls = this.state.aqls.filter((aql) => {
+        return aql.name.toLowerCase().indexOf(keyword) > -1 || aql.category.toLowerCase().indexOf(keyword) > -1;
+      });
+      this.setState({
+        filteredAqls: filteredAqls
+      });
+    } else
+      this.setState({
+        filteredAqls: null
+      });
   }
 
   _onQuery() {
@@ -96,11 +120,11 @@ export default class AQL extends Component {
         createdAlert: <AlertForm onClose={()=>{
           this.setState({
             createdAlert: null});}}
-          title={'AQL: ' + aql.name + ' saved!'}
-          desc={'AQL string: ' + aql.str}
-          onConfirm={()=>{
-            this.setState({
-              createdAlert: null});}}/>
+                                 title={'AQL: ' + aql.name + ' saved!'}
+                                 desc={'AQL string: ' + aql.str}
+                                 onConfirm={()=>{
+                                   this.setState({
+                                     createdAlert: null});}}/>
       });
     });
   }
@@ -111,11 +135,11 @@ export default class AQL extends Component {
         validationAlert: <AlertForm onClose={()=>{
           this.setState({
             validationAlert: null});}}
-          title={'Save AQL failed!'}
-          desc={'AQL string or Name or Category empty'}
-          onConfirm={()=>{
-            this.setState({
-              validationAlert: null});}}/>
+                                    title={'Save AQL failed!'}
+                                    desc={'AQL string or Name or Category empty'}
+                                    onConfirm={()=>{
+                                      this.setState({
+                                        validationAlert: null});}}/>
       });
     } else {
       this._onSaveAQL();
@@ -128,9 +152,9 @@ export default class AQL extends Component {
         newAlert: <AlertForm onClose={()=>{
           this.setState({
             newAlert: null});}}
-          title={'Create a new AQL?'}
-          desc={'You have not saved AQL string: ' + this.state.aql.str}
-          onConfirm={this._initAQL.bind(this)}/>
+                             title={'Create a new AQL?'}
+                             desc={'You have not saved AQL string: ' + this.state.aql.str}
+                             onConfirm={this._initAQL.bind(this)}/>
       });
     } else {
       this._initAQL();
@@ -142,8 +166,8 @@ export default class AQL extends Component {
       deletionAlert: <AlertForm onClose={()=>{
         this.setState({
           deletionAlert: null});}}
-        title={'Delete AQL: ' + this.state.aql.name}
-        desc={this.state.aql.str} onConfirm={this._removeAQL.bind(this)}/>
+                                title={'Delete AQL: ' + this.state.aql.name}
+                                desc={'AQL string: ' + this.state.aql.str} onConfirm={this._removeAQL.bind(this)}/>
     });
   }
 
@@ -159,12 +183,6 @@ export default class AQL extends Component {
     var aql = this.state.aql;
     aql.str = str;
     this.setState({aql: aql});
-  }
-
-  _onLoadAQL(aql) {
-    this.setState({
-      aql: aql
-    });
   }
 
   _setFormValues(event) {
@@ -294,21 +312,25 @@ export default class AQL extends Component {
       });
     }
 
+    var aqls = this.state.filteredAqls || this.state.aqls;
+
     return (
       <Split flex="right">
         <Sidebar pad="small" size="small">
-          <SearchInput/>
+          <SearchInput onChange={this._onSearch.bind(this)}/>
           <Tabs initialIndex={0} justify="start">
             <Tab title="Saved AQLs">
-              <List selectable={true} selectable={true}>
+              <GroupList selectable={true}>
                 {
-                  this.state.aqls.map((aql) => {
+                  aqls.map((aql) => {
                     return (
-                      <ListItem key={aql._id} onClick={this._onLoadAQL.bind(this, aql)}>{aql.name}</ListItem>
+                      <GroupListItem key={aql._id} groupby={aql.category} onClick={this._loadAQL.bind(this, aql)}>
+                        {aql.name}
+                      </GroupListItem>
                     );
                   })
                 }
-              </List>
+              </GroupList>
             </Tab>
             <Tab title="Repository">
               <List selectable={true}>
