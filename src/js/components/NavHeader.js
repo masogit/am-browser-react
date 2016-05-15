@@ -73,7 +73,7 @@ class NavHeader extends Component {
                 {
                   listViews.map((view) => {
                     return (
-                      <GroupListItem key={view._id} groupby={view.category} pad={{horizontal: 'small'}}>
+                      <GroupListItem key={view._id} groupby={view.category} pad={{horizontal: 'medium'}}>
                         <Anchor href={`/explorer/${view._id}`}>{view.name}</Anchor>
                       </GroupListItem>
                     );
