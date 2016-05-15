@@ -27,6 +27,7 @@ export default class RecordList extends Component {
       downloaded: [],
       numDownload: null,
       record: null,
+      groupby: "",
       param: {
         orderby: "",
         offset: 0,
@@ -39,13 +40,18 @@ export default class RecordList extends Component {
   componentDidMount() {
     this._getRecords();
     var groups_select = this.props.body.fields.map((field, index) => {
+      if (field.groupby) {
+        this.setState({
+          groupby: JSON.stringify(field)
+        });
+      }
       return !field.PK &&
-        <option key={index} value={JSON.stringify(field)} selected={(field.groupby) ? true : false}>
+        <option key={index} value={JSON.stringify(field)}>
           {this._getDisplayLabel(field)}
         </option>;
     });
     this.setState({
-      group_select: groups_select
+      group_selects: groups_select
     });
   }
 
@@ -278,7 +284,8 @@ export default class RecordList extends Component {
       });
 
       this.setState({
-        groups_dist: groups
+        groups_dist: groups,
+        groupby: this.refs.select_group.value
       });
     } else {
       this.setState({
@@ -343,9 +350,9 @@ export default class RecordList extends Component {
           <Anchor href="#"
                   label={this.state.numDownload?this._getDownloadProgress(this):'CSV'}
                   icon={<DocumentCsv />} onClick={this._onDownload.bind(this)}/>
-          <select onChange={this._onGroupBy.bind(this)} ref="select_group">
+          <select onChange={this._onGroupBy.bind(this)} ref="select_group" value={this.state.groupby}>
             <option value="">Group By</option>
-            {this.state.group_select}
+            {this.state.group_selects}
           </select>
         </Header>
         {filters}
