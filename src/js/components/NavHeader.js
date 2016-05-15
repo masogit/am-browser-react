@@ -87,7 +87,7 @@ class NavHeader extends Component {
           <Title onClick={this._onClick.bind(this)}><Logo /> AM Browser</Title>
           <Menu direction="row" align="center" responsive={false}>
             <Link key="0" to="/home" activeClassName="active link-disabled">
-              Home
+              Search
             </Link>
             <Link key="1" to="/views" activeClassName="active link-disabled">
               Views

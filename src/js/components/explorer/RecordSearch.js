@@ -92,27 +92,29 @@ export default class RecordSearch extends Component {
       <div>
         {
           this.props.keyword &&
-          <Box full="horizontal" pad="medium">
-            <h4>Search Result:</h4>
+          <Box full="horizontal">
             <Split flex="right">
-              <Table>
-                <thead>
-                <th>View</th>
-                <th>Time (ms)</th>
-                <th>Count</th>
-                </thead>
-                <tbody>
-                {
-                  Object.keys(this.state.messages).map((key) => {
-                    return <TableRow justify="between">
-                      <td>{key}</td>
-                      <td>{(this.state.messages[key].timeEnd) ? (this.state.messages[key].timeEnd - this.state.messages[key].timeStart) : ''}</td>
-                      <td>{this.state.messages[key].num}</td>
-                    </TableRow>;
-                  })
-                }
-                </tbody>
-              </Table>
+              <Box pad={{horizontal: 'small'}}>
+                <h4>Search Result:</h4>
+                <Table>
+                  <thead>
+                  <th>View</th>
+                  <th>Time (ms)</th>
+                  <th>Count</th>
+                  </thead>
+                  <tbody>
+                  {
+                    Object.keys(this.state.messages).map((key) => {
+                      return <TableRow justify="between">
+                        <td>{key}</td>
+                        <td>{(this.state.messages[key].timeEnd) ? (this.state.messages[key].timeEnd - this.state.messages[key].timeStart) : ''}</td>
+                        <td>{this.state.messages[key].num}</td>
+                      </TableRow>;
+                    })
+                  }
+                  </tbody>
+                </Table>
+              </Box>
               <Tiles flush={false} justify="center" colorIndex="light-2" full="horizontal">
                 {
                   this.state.results.map((result, i) => {
