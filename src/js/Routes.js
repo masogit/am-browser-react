@@ -3,6 +3,7 @@
 import Ferret from './components/Ferret';
 import Login from './components/Login';
 import Home from './components/Home';
+import Wall from './components/aql/Wall';
 import Explorer from './components/explorer/Explorer';
 import ViewDefListContainer from './components/builder/ViewDefListContainer';
 //import ViewDefDetail from './components/builder/ViewDefDetail';
@@ -33,6 +34,7 @@ module.exports = {
       childRoutes: [
         {path: 'login', component: Login},
         {path: 'home', component: Home},
+        {path: 'wall', component: Wall},
         {path: 'explorer', component: Explorer},
         {path: 'aql', component: AQL},
         {
