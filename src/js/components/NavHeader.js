@@ -13,8 +13,8 @@ import Logo from './Logo'; // './HPELogo';
 import Anchor from 'grommet/components/Anchor';
 import Menu from 'grommet/components/Menu';
 import SessionMenu from './SessionMenu';
-import GroupList from './aql/GroupList';
-import GroupListItem from './aql/GroupListItem';
+import GroupList from './commons/GroupList';
+import GroupListItem from './commons/GroupListItem';
 
 class NavHeader extends Component {
 

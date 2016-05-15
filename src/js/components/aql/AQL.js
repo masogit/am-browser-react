@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 // import AChart from './AChart';
 import ChartForm from './ChartForm';
-import AlertForm from './AlertForm';
-import GroupList from './GroupList';
-import GroupListItem from './GroupListItem';
+import AlertForm from './../commons/AlertForm';
+import GroupList from './../commons/GroupList';
+import GroupListItem from './../commons/GroupListItem';
 import * as AQLActions from '../../actions/aql';
 import {
   Anchor,

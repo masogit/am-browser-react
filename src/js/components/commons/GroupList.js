@@ -4,8 +4,8 @@ import {
   Box,
   List
 } from 'grommet';
-import Next from 'grommet/components/icons/base/Next';
-import Down from 'grommet/components/icons/base/Down';
+import Next from '../../../../node_modules/grommet/components/icons/base/Next';
+import Down from '../../../../node_modules/grommet/components/icons/base/Down';
 
 export default class GroupList extends Component {
 
