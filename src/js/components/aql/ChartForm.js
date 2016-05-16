@@ -92,6 +92,10 @@ export default class ChartForm extends Component {
     const col_options = [];
     const xAxis_col_options = [];
     if (this.props.header) {
+      let series_col = this.state.chart.series_col;
+      if(series_col.size === 0 && this.props.chart) {
+        series_col = new Set(this.props.chart.series.map((item) => item.index));
+      }
       this.props.header.map((header, index) => {
         xAxis_col_options.push(<option key={index} value={header.Index}>{header.Type}: {header.Name}</option>);
         if (['Long', 'Short', 'Int', 'Double', 'Byte'].includes(header.Type)) {
@@ -101,7 +105,7 @@ export default class ChartForm extends Component {
               id={header.Index}
               name='series_col'
               label={`${header.Type} : ${header.Name}`}
-              checked={this.state.chart.series_col.has(header.Index)}
+              checked={series_col.has(header.Index)}
               onChange={this._setFormValues.bind(this)}/>
           );
         }
