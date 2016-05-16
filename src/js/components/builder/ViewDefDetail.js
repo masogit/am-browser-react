@@ -151,6 +151,7 @@ export default class ViewDefDetail extends Component {
           <td style={{width: "35%"}}>
             <input id={"v." + currentPath + "body.fields." + index + ".alias"}
                    name={`v.${currentPath}body.fields.${index}.alias`}
+                   type="text"
                    placeholder="Add alias here..."
                    value={field.alias}
                    onChange={this._onChange}
@@ -170,6 +171,7 @@ export default class ViewDefDetail extends Component {
           <td>{!field.PK &&
           <CheckBox id={`v.${currentPath}body.fields.${index}.searchable`}
                     name={`v.${currentPath}body.fields.${index}.searchable`} checked={field.searchable}
+                    disabled={ (selfView.body.fields.filter(field => field.searchable == true).length >= 2) && !field.searchable }
                     onChange={this._onChange}/>}</td>}
           <td><a name={`${currentPath}body.fields.${index}`} className="tbBtnIcon"
                  onClick={this.props.onDeleteTableRow}><Close /></a></td>
