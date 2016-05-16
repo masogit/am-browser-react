@@ -26,5 +26,9 @@ export const statusAdapter = {
   "UNKNOWN" : {
     status: "unknown",
     text: 'Unknown'
+  },
+  "PREPARING_TO_RUN" : {
+    status: "unknown",
+    text: 'Preparing to run'
   }
 };
