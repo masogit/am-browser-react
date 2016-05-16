@@ -7,9 +7,7 @@ import Header from 'grommet/components/Header';
 import Box from 'grommet/components/Box';
 import Title from 'grommet/components/Title';
 import Layer from 'grommet/components/Layer';
-import SearchInput from 'grommet/components/SearchInput';
 import Logo from './Logo'; // './HPELogo';
-//import UserSettingsIcon from 'grommet/components/icons/base/UserSettings';
 import Anchor from 'grommet/components/Anchor';
 import Menu from 'grommet/components/Menu';
 import SessionMenu from './SessionMenu';
@@ -44,21 +42,6 @@ class NavHeader extends Component {
     });
   }
 
-  _onSearch(keyword) {
-    var keyword = keyword.toLowerCase().trim();
-    if (keyword) {
-      var filteredViews = this.state.views.filter((view) => {
-        return view.name.toLowerCase().indexOf(keyword) > -1 || view.category.toLowerCase().indexOf(keyword) > -1;
-      });
-      this.setState({
-        filteredViews: filteredViews
-      });
-    } else
-      this.setState({
-        filteredViews: null
-      });
-  }
-
   render() {
     var listViews = this.state.filteredViews || this.state.views;
     return (
@@ -68,8 +51,7 @@ class NavHeader extends Component {
           this.state.layer &&
           <Layer onClose={this._onClose.bind(this)} closer={true} align="left">
             <Box full="vertical" justify="center">
-              <SearchInput placeHolder="Search views..." onChange={this._onSearch.bind(this)}/>
-              <GroupList pad={{vertical: 'small'}}>
+              <GroupList pad={{vertical: 'small'}} searchable={true}>
                 {
                   listViews.map((view) => {
                     return (

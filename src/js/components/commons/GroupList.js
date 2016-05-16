@@ -1,8 +1,9 @@
-import React, {Component} from 'react';
+import React, {Component, PropTypes} from 'react';
 import {
   Anchor,
   Box,
-  List
+  List,
+  SearchInput
 } from 'grommet';
 import Next from '../../../../node_modules/grommet/components/icons/base/Next';
 import Down from '../../../../node_modules/grommet/components/icons/base/Down';
@@ -42,13 +43,33 @@ export default class GroupList extends Component {
       });
   }
 
+  _onSearch(keyword) {
+    var keyword = keyword.toLowerCase().trim();
+    if (keyword) {
+      var filtered = this.props.children.filter((child) => {
+        return child.props.groupby.toLowerCase().indexOf(keyword) > -1 ||
+          child.props.children.props.children.toLowerCase().indexOf(keyword) > -1;
+      });
+      this.setState({
+        filtered: filtered
+      });
+    } else
+      this.setState({
+        filtered: null
+      });
+  }
+
   render() {
-    var children = this.props.children;
+    var children = this.state.filtered || this.props.children;
     var grouped = this._getGroupedChildren(children);
 
     return (
 
       <Box direction="column">
+        {
+          this.props.searchable &&
+          <SearchInput placeHolder="Search..." onChange={this._onSearch.bind(this)}/>
+        }
         {
           Object.keys(grouped).map((key, i) => {
             return (<Box key={i} direction="column">
@@ -73,4 +94,8 @@ export default class GroupList extends Component {
     );
   }
 }
+
+GroupList.propTypes = {
+  searchable: PropTypes.bool
+};
 

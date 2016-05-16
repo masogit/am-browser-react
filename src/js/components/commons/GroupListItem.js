@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
+import React, {Component, PropTypes} from 'react';
 import {
   ListItem
 } from 'grommet';
 
-export default class GroupList extends Component {
+export default class GroupListItem extends Component {
 
   constructor() {
     super();
@@ -23,3 +23,6 @@ export default class GroupList extends Component {
   }
 }
 
+GroupListItem.propTypes = {
+  groupby: PropTypes.string.isRequired
+};

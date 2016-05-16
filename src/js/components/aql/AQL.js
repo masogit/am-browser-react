@@ -14,7 +14,6 @@ import {
   Split,
   Form,
   FormField,
-  SearchInput,
   List,
   ListItem,
   Header,
@@ -82,21 +81,6 @@ export default class AQL extends Component {
         reports: data
       });
     });
-  }
-
-  _onSearch(keyword) {
-    var keyword = keyword.toLowerCase().trim();
-    if (keyword) {
-      var filteredAqls = this.state.aqls.filter((aql) => {
-        return aql.name.toLowerCase().indexOf(keyword) > -1 || aql.category.toLowerCase().indexOf(keyword) > -1;
-      });
-      this.setState({
-        filteredAqls: filteredAqls
-      });
-    } else
-      this.setState({
-        filteredAqls: null
-      });
   }
 
   _onQuery() {
@@ -317,10 +301,9 @@ export default class AQL extends Component {
     return (
       <Split flex="right">
         <Sidebar pad="small" size="small">
-          <SearchInput onChange={this._onSearch.bind(this)}/>
           <Tabs initialIndex={0} justify="start">
             <Tab title="Saved AQLs">
-              <GroupList selectable={true}>
+              <GroupList selectable={true} searchable={true}>
                 {
                   aqls.map((aql) => {
                     return (

@@ -93,7 +93,7 @@ export default class ChartForm extends Component {
     const xAxis_col_options = [];
     if (this.props.header) {
       let series_col = this.state.chart.series_col;
-      if(series_col.size === 0 && this.props.chart) {
+      if (series_col.size === 0 && this.props.chart) {
         series_col = new Set(this.props.chart.series.map((item) => item.index));
       }
       this.props.header.map((header, index) => {
