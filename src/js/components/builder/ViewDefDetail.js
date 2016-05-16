@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 //import { connect } from 'react-redux';
 //import PureRenderMixin from 'react-addons-pure-render-mixin';
 //import Sidebar from 'grommet/components/Sidebar';
-import { Split, Box, Form, FormFields, FormField, Header, Footer, CheckBox, Menu, RadioButton, Table, Anchor, Title, Columns } from 'grommet';
+import { Split, Box, Form, FormFields, FormField, Header, Footer, CheckBox, Menu, RadioButton, Table, Anchor } from 'grommet';
 //import Button from 'grommet/components/Button';
 //import Add from 'grommet/components/icons/base/Add';
 import Close from 'grommet/components/icons/base/Close';
