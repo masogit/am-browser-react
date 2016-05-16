@@ -18,7 +18,7 @@ export default class IntegrationJobContainer extends Component {
   componentWillReceiveProps(nextProps) {
     if ( nextProps.tabName && (this.props.pointName !== nextProps.pointName || this.props.tabName !== nextProps.tabName)) {
       this.props.getIntegrationJob(nextProps);
-    } else if(nextProps.params.tabName && nextProps.params.tabName != nextProps.tabName) {
+    } else if (nextProps.params.tabName && nextProps.params.tabName != nextProps.tabName) {
       // if use change url manually
       this.onTabClick(nextProps.params.tabName, nextProps.pointName);
     }

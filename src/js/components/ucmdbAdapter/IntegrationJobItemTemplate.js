@@ -12,7 +12,7 @@ export const IntegrationJobItemTemplate = ({
   integrationJobItemData,
   tabName
   }) => {
-  if(integrationJobItemDataError) {
+  if (integrationJobItemDataError) {
     return (
       <div className="integrationJobItemTable">
         {integrationJobItemDataError}
@@ -20,7 +20,7 @@ export const IntegrationJobItemTemplate = ({
     );
   }
 
-  if(integrationJobItemData.length === 0) {
+  if (integrationJobItemData.length === 0) {
     return (
       <div className="integrationJobItemTable">
         <h2>No data to display!</h2>

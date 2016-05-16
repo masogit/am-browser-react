@@ -17,16 +17,16 @@ const IntegrationJobTable = ({
   integrationJobName,
   onIntegrationJobSelect
   }) => {
-  if(integrationJobDataError) {
+  if (integrationJobDataError) {
     return (<div>{integrationJobDataError}</div>);
   }
 
-  if(integrationJobData.length === 0) {
+  if (integrationJobData.length === 0) {
     return <h2>No data to display!</h2>;
   }
 
   let tableHeader, tableBody;
-  if(tabName === 'populationJobs') {
+  if (tabName === 'populationJobs') {
     tableHeader = (
       <thead>
       <tr>
@@ -56,7 +56,7 @@ const IntegrationJobTable = ({
       }
       </tbody>
     );
-  } else if(tabName === 'pushJobs') {
+  } else if (tabName === 'pushJobs') {
     tableHeader = (
       <thead>
       <tr>

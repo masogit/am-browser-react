@@ -45,8 +45,8 @@ export const getIntegrationJob = (pointName, jobType) =>
       const error = err && (err.rawResponse || err.message);
 
       const points = data.map((point)=> {
-        if(point.startTime !== undefined) point.startTime = dateFormatter(point.startTime);
-        if(point.stopTime !== undefined) point.stopTime =dateFormatter(point.stopTime);
+        if (point.startTime !== undefined) point.startTime = dateFormatter(point.startTime);
+        if (point.stopTime !== undefined) point.stopTime =dateFormatter(point.stopTime);
         return point;
       });
 
@@ -67,8 +67,8 @@ export const getIntegrationJobItem = (pointName, jobType, jobName) =>
       const data = res && res.ok && res.body && res.body.jobStatuses || [];
       const error = err && (err.rawResponse || err.message);
       const jobStatuses = data.map((jobStatus)=> {
-        if(jobStatus.startTime !== undefined) jobStatus.startTime = dateFormatter(jobStatus.startTime);
-        if(jobStatus.stopTime !== undefined) jobStatus.stopTime =dateFormatter(jobStatus.stopTime);
+        if (jobStatus.startTime !== undefined) jobStatus.startTime = dateFormatter(jobStatus.startTime);
+        if (jobStatus.stopTime !== undefined) jobStatus.stopTime =dateFormatter(jobStatus.stopTime);
         return jobStatus;
       });
 

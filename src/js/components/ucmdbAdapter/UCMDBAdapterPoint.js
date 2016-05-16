@@ -24,17 +24,17 @@ class UCMDBAdapterContainer extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if(!nextProps.params.pointName && !nextProps.params.tabName) {
+    if (!nextProps.params.pointName && !nextProps.params.tabName) {
       firstStart = true;
     }
-    if(firstStart && nextProps.data.length > 0) {
+    if (firstStart && nextProps.data.length > 0) {
       // find the point name from:  url > props > data
       let { pointName, tabName } = nextProps.params;
       pointName = pointName ? pointName : nextProps.pointName;
       pointName = pointName ? pointName : nextProps.data[0].name;
       const point = this.getRecentPoint(nextProps.data, pointName);
 
-      if(point) {
+      if (point) {
         // find the tab name from:  url >  point supported tab type
         tabName = tabName ? tabName : nextProps.tabName;
 
@@ -54,7 +54,7 @@ class UCMDBAdapterContainer extends Component {
       this.props.onMenuClick(pointName, tabName);
       //this.props.onTabClick(tabName, pointName);
       firstStart = false;
-    } else if(nextProps.params.pointName && nextProps.params.pointName != nextProps.pointName) {
+    } else if (nextProps.params.pointName && nextProps.params.pointName != nextProps.pointName) {
       this.props.onMenuClick(nextProps.params.pointName, nextProps.tabName);
     }
   }
@@ -67,14 +67,14 @@ class UCMDBAdapterContainer extends Component {
   onMenuClick(pointName, tabName) {
     /*const point = this.getRecentPoint(this.props.data, pointName);
     const supportedJobs = [];
-    if(point.populationSupported) {
+    if (point.populationSupported) {
       supportedJobs.push('populationJobs');
     }
-    if(point.pushSupported) {
+    if (point.pushSupported) {
       supportedJobs.push('pushJobs');
     }
 
-    if(!supportedJobs.includes(tabName)) {
+    if (!supportedJobs.includes(tabName)) {
       tabName = supportedJobs[0];
     }*/
 
@@ -93,13 +93,13 @@ class UCMDBAdapterContainer extends Component {
 
   render () {
     let jobList, jobItemList, pointListContainer, point;
-    if(this.props.pointName) {
+    if (this.props.pointName) {
       pointListContainer = <PointListContainer {...this.props} onMenuClick={this.onMenuClick}/>;
 
       point = this.getRecentPoint(this.props.data, this.props.pointName);
     }
 
-    if(point && this.props.tabName) {
+    if (point && this.props.tabName) {
       jobList = (
         <IntegrationJobContainer {...this.props}
           pushSupported={point.pushSupported}
@@ -107,7 +107,7 @@ class UCMDBAdapterContainer extends Component {
       );
     }
 
-    if(jobList && this.props.integrationJobName) {
+    if (jobList && this.props.integrationJobName) {
       jobItemList = <IntegrationJobItemContainer {...this.props}/>;
     }
 
