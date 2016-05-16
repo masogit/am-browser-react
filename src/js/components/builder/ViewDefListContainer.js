@@ -19,6 +19,7 @@ import Split from 'grommet/components/Split';
 //import {loadViews/*, loadTemplateTable, setSelectedView*/} from '../../actions/views';
 import ViewDefDetail from './ViewDefDetail';
 import ViewDefList from './ViewDefList';
+import ViewDefPreview from './ViewDefPreview';
 import * as ViewDefActions from '../../actions/views';
 import store from '../../store';
 import history from '../../RouteHistory';
@@ -32,6 +33,7 @@ class ViewDefListContainer extends Component {
     this.onDeleteTableRow = this.onDeleteTableRow.bind(this);
     this.onDuplicateViewDef = this.onDuplicateViewDef.bind(this);
     this.onDeleteViewDef = this.onDeleteViewDef.bind(this);
+    this.onClosePreview = this.onClosePreview.bind(this);
   }
 
   componentWillMount() {
@@ -99,18 +101,25 @@ class ViewDefListContainer extends Component {
     });
   }
 
+  onClosePreview() {
+
+  }
+
   render() {
-    const { views, isFetchingViewList, selectedView } = this.props;
+    const { views, isFetchingViewList, selectedView, preview } = this.props;
     let { dispatch } = store;
     let boundActionCreators = bindActionCreators(ViewDefActions, dispatch);
     return (
-      <Split flex="right">
-        <ViewDefList views={views} isFetchingViewList={isFetchingViewList} {...boundActionCreators}/>
-        <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange}
-                       onSubmit={this.onSubmit} onDeleteTableRow={this.onDeleteTableRow}
-                       onDuplicateViewDef={this.onDuplicateViewDef}
-                       onDeleteViewDef={this.onDeleteViewDef} {...boundActionCreators}/>
-      </Split>
+      <div>
+        <Split flex="right">
+          <ViewDefList views={views} isFetchingViewList={isFetchingViewList} {...boundActionCreators}/>
+          <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange}
+                         onSubmit={this.onSubmit} onDeleteTableRow={this.onDeleteTableRow}
+                         onDuplicateViewDef={this.onDuplicateViewDef}
+                         onDeleteViewDef={this.onDeleteViewDef} {...boundActionCreators}/>
+        </Split>
+        <ViewDefPreview active={preview} selectedView={selectedView} {...boundActionCreators}/>
+      </div>
     );
   }
 }
@@ -120,7 +129,8 @@ let mapStateToProps = (state) => {
     views: state.views.views,  // see store-dev.js or store-prod.js
     selectedView: state.views.selectedView,
     selectedViewId: state.views.selectedViewId,
-    templateTable: state.views.templateTable
+    templateTable: state.views.templateTable,
+    preview: state.views.preview
   };
 };
 

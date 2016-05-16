@@ -29,5 +29,6 @@ module.exports = {
   'link-next': 'link-next',
   'Close  Layer': 'Close  Layer',
   checkmark: 'checkmark',
-  duplicate: 'duplicate'
+  duplicate: 'duplicate',
+  'document-csv': 'document-csv'
 };

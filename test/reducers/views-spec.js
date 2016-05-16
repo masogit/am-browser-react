@@ -16,7 +16,8 @@ describe('views - reducers/views-spec.js', () => {
         selectedViewId: '',
         templateTable: {},
         err: '',
-        editing: false
+        editing: false,
+        preview: false
       }
     )
   })

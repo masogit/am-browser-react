@@ -11,7 +11,7 @@ import Checkmark from 'grommet/components/icons/base/Checkmark';
 import Duplicate from 'grommet/components/icons/base/Duplicate';
 //import MDSave from 'react-icons/lib/md/save';
 import _ from 'lodash';
-import InlineEdit from 'react-inline-edit';
+//import InlineEdit from 'react-inline-edit';
 //import store from '../../store';
 //import { setSelectedView, loadTemplateTable } from '../../actions/views';
 //import GrommetTableTest from '../GrommetTable';
@@ -146,14 +146,23 @@ export default class ViewDefDetail extends Component {
     let selfView = selectedView;
     let fields = selfView.body.fields.map((field, index) => {
       return (
-        <tr key={selfView.body.sqlname + "_" + field.sqlname + "_" + index}>
+        <tr key={currentPath + "_" + selfView.body.sqlname + "_" + field.sqlname + "_" + index}>
           <td style={{width: "35%"}}>{field.sqlname}</td>
           <td style={{width: "35%"}}>
-            <InlineEdit id={`v.${currentPath}body.fields.${index}.alias`}
-                        name={`v.${currentPath}body.fields.${index}.alias`}
-                        placeholder="Add alias here..."
-                        value={field.alias}
-                        onChange={this._onChange}
+            <input id={"v." + currentPath + "body.fields." + index + ".alias"}
+                   name={`v.${currentPath}body.fields.${index}.alias`}
+                   placeholder="Add alias here..."
+                   value={field.alias}
+                   onChange={this._onChange}
+                   style={{
+                     minWidth: 150,
+                     display: 'inline-block',
+                     margin: 0,
+                     padding: 0,
+                     outline: 0,
+                     borderWidth: 1,
+                     borderStyle: 'hidden'
+                   }}
               />
           </td>
 
@@ -279,7 +288,7 @@ export default class ViewDefDetail extends Component {
                 <Anchor link="#" icon={<Checkmark />} onClick={this.props.onSubmit}>Save</Anchor>
                 <Anchor link="#" icon={<Duplicate />} onClick={this.props.onDuplicateViewDef}>Duplicate</Anchor>
                 <Anchor link="#" icon={<Close />} onClick={this.props.onDeleteViewDef}>Delete</Anchor>
-                <Anchor link="#" icon={<Play />}>Query</Anchor>
+                <Anchor link="#" icon={<Play />} onClick={this.props.openPreview}>Query</Anchor>
               </Menu>
             </Footer>
           </Form>

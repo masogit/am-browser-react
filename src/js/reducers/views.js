@@ -3,7 +3,7 @@ import objectPath from 'object-path';
 import { REQUEST_VIEWS, RECEIVE_VIEWS_SUCCESS, RECEIVE_VIEWS_FAILURE, SET_SELECTED_VIEW,
   REQUEST_TEMPLATE_TABLE, RECEIVE_TEMPLATE_TABLE_SUCCESS, RECEIVE_TEMPLATE_TABLE_FAILURE,
   NEW_SELECTED_VIEW, UPDATE_SELECTED_VIEW, SYNC_SELECTED_VIEW, SAVE_VIEW_DEF, DELETE_TABLE_ROW,
-  DUPLICATE_VIEW_DEF, DELETE_VIEW_DEF, UPDATE_VIEW_DEF_LIST}
+  DUPLICATE_VIEW_DEF, DELETE_VIEW_DEF, UPDATE_VIEW_DEF_LIST, OPEN_PREVIEW, CLOSE_PREVIEW}
   from '../constants/ActionTypes';
 import _ from 'lodash';
 import emptyViewDef from './EmptyViewDef.json';
@@ -16,7 +16,8 @@ const initialState = {
   selectedViewId: '',
   templateTable: {},
   err: '',
-  editing: false
+  editing: false,
+  preview: false
 };
 
 const createReverse = (reverse) => {
@@ -267,6 +268,16 @@ const handlers = {
       selectedViewId: selectedViewId,
       selectedView: selectedView,
       views: updatedViews
+    };
+  },
+  [OPEN_PREVIEW]: (state, action) => {
+    return {
+      preview: action.preview
+    };
+  },
+  [CLOSE_PREVIEW]: (state, action) => {
+    return {
+      preview: action.preview
     };
   }
 };

@@ -287,6 +287,24 @@ export function syncSelectedView(elements, row) {
   };
 }
 
+export function openPreview() {
+  return dispatch => {
+    dispatch({
+      type: types.OPEN_PREVIEW,
+      preview: true
+    });
+  };
+}
+
+export function closePreview() {
+  return dispatch => {
+    dispatch({
+      type: types.CLOSE_PREVIEW,
+      preview: false
+    });
+  };
+}
+
 export function loadTemplateTable(selectedViewId, selectedView) {
   return dispatch => {
     console.log("action - loadTemplateTable - selectedViewId: " + selectedViewId);
