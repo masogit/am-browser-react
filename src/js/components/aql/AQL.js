@@ -39,7 +39,6 @@ export default class AQL extends Component {
       aqls: [],
       aql: {}
     };
-    this._onSearch.bind(this);
   }
 
   componentDidMount() {
