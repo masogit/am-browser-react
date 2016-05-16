@@ -3,6 +3,25 @@
 import {HOST_NAME} from '../util/Config';
 import Rest from 'grommet/utils/Rest';
 
+
+export function saveWall(wall, callback) {
+  Rest.post(HOST_NAME + '/coll/wall', wall).end((err, res) => {
+    if (err) {
+      console.log(err);
+    } else
+      callback(res.text);
+  });
+}
+
+export function loadWall(callback) {
+  Rest.get(HOST_NAME + '/coll/wall').end((err, res) => {
+    if (err) {
+      console.log(err);
+    } else
+      callback(res.body[0]);
+  });
+}
+
 export function loadAQLs(callback) {
   Rest.get(HOST_NAME + '/coll/aql').end((err, res) => {
     if (err) {
