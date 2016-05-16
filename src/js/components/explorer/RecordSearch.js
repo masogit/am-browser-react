@@ -105,11 +105,11 @@ export default class RecordSearch extends Component {
                   <tbody>
                   {
                     Object.keys(this.state.messages).map((key) => {
-                      return <TableRow justify="between">
+                      return (<TableRow justify="between">
                         <td>{key}</td>
                         <td>{(this.state.messages[key].timeEnd) ? (this.state.messages[key].timeEnd - this.state.messages[key].timeStart) : ''}</td>
                         <td>{this.state.messages[key].num}</td>
-                      </TableRow>;
+                      </TableRow>);
                     })
                   }
                   </tbody>

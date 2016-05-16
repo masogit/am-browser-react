@@ -51,7 +51,7 @@ export default class GroupList extends Component {
       <Box direction="column">
         {
           Object.keys(grouped).map((key, i) => {
-            return <Box key={i} direction="column">
+            return (<Box key={i} direction="column">
               <Box justify="between" direction="row" {...this.props}>
                 <Anchor href="#" label={key} icon={(this.state.expand===key)?<Down />:<Next />}
                         onClick={this._expandToggle.bind(this, key)}/>{grouped[key].length}
@@ -66,7 +66,7 @@ export default class GroupList extends Component {
                   }
                 </List>
               }
-            </Box>;
+            </Box>);
           })
         }
       </Box>
