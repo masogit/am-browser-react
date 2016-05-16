@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, PropTypes} from 'react';
 import {
   Box,
   Button,
@@ -8,7 +8,7 @@ import {
   Header
 } from 'grommet';
 
-export default class AQL extends Component {
+export default class AlertForm extends Component {
 
   constructor() {
     super();
@@ -26,8 +26,8 @@ export default class AQL extends Component {
 
     return (
 
-      <Layer onClose={this.props.onClose} closer={true} align="right">
-        <Box full="vertical" justify="center">
+      <Layer onClose={this.props.onClose} closer={true} {...this.props}>
+        <Box full={this.props.full} justify="center">
           <Form pad={{vertical: 'large'}}>
             <Header>
               <h2>
@@ -49,4 +49,13 @@ export default class AQL extends Component {
     );
   }
 }
+
+AlertForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  onConfirm: PropTypes.func.isOperational,
+  title: PropTypes.string,
+  desc: PropTypes.string,
+  full: PropTypes.oneOf([true, 'horizontal', 'vertical', false]),
+  align: PropTypes.oneOf(['center', 'top', 'bottom', 'left', 'right'])
+};
 
