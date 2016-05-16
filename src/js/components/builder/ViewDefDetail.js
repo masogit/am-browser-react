@@ -2,25 +2,7 @@ import React, { Component, PropTypes } from 'react';
 //import { connect } from 'react-redux';
 //import PureRenderMixin from 'react-addons-pure-render-mixin';
 //import Sidebar from 'grommet/components/Sidebar';
-import Split from 'grommet/components/Split';
-import Box from 'grommet/components/Box';
-import Form from 'grommet/components/Form';
-import FormFields from 'grommet/components/FormFields';
-import FormField from 'grommet/components/FormField';
-//import Button from 'grommet/components/Button';
-import Header from 'grommet/components/Header';
-import Footer from 'grommet/components/Footer';
-//import CheckBox from 'grommet/components/CheckBox';
-import RadioButton from 'grommet/components/RadioButton';
-//import SearchInput from 'grommet/components/SearchInput';
-//import Calendar from 'grommet/components/Calendar';
-//import NumberInput from 'grommet/components/NumberInput';
-//import Section from 'grommet/components/Section';
-import CheckBox from 'grommet/components/CheckBox';
-import Menu from 'grommet/components/Menu';
-import Table from 'grommet/components/Table';
-//import TableRow from 'grommet/components/TableRow';
-import Anchor from 'grommet/components/Anchor';
+import { Split, Box, Form, FormFields, FormField, Header, Footer, CheckBox, Menu, RadioButton, Table, Anchor, Title, Columns } from 'grommet';
 //import Button from 'grommet/components/Button';
 //import Add from 'grommet/components/icons/base/Add';
 import Close from 'grommet/components/icons/base/Close';
@@ -29,6 +11,7 @@ import Checkmark from 'grommet/components/icons/base/Checkmark';
 import Duplicate from 'grommet/components/icons/base/Duplicate';
 //import MDSave from 'react-icons/lib/md/save';
 import _ from 'lodash';
+import InlineEdit from 'react-inline-edit';
 //import store from '../../store';
 //import { setSelectedView, loadTemplateTable } from '../../actions/views';
 //import GrommetTableTest from '../GrommetTable';
@@ -164,11 +147,20 @@ export default class ViewDefDetail extends Component {
     let fields = selfView.body.fields.map((field, index) => {
       return (
         <tr key={selfView.body.sqlname + "_" + field.sqlname + "_" + index}>
-          <td>{field.sqlname}</td>
-          <td>{field.label}</td>
+          <td style={{width: "35%"}}>{field.sqlname}</td>
+          <td style={{width: "35%"}}>
+            <InlineEdit id={`v.${currentPath}body.fields.${index}.alias`}
+                        name={`v.${currentPath}body.fields.${index}.alias`}
+                        placeholder="Add alias here..."
+                        value={field.alias}
+                        onChange={this._onChange}
+              />
+          </td>
+
           {root &&
           <td>{!field.PK &&
-          <CheckBox id="v.search" name={`v.${currentPath}body.fields.${index}.searchable`} checked={field.searchable}
+          <CheckBox id={`v.${currentPath}body.fields.${index}.searchable`}
+                    name={`v.${currentPath}body.fields.${index}.searchable`} checked={field.searchable}
                     onChange={this._onChange}/>}</td>}
           <td><a name={`${currentPath}body.fields.${index}`} className="tbBtnIcon"
                  onClick={this.props.onDeleteTableRow}><Close /></a></td>
@@ -215,7 +207,19 @@ export default class ViewDefDetail extends Component {
     );
 
     return (
-      <Split flex="right">
+      <Split flex="left">
+        {selectedView && !_.isEmpty(selectedView) &&
+        <Box>
+          {selectedView.body && selectedView.body.fields && this.renderMasterHeader(selectedView)}
+          <Table>
+            <tbody>
+            {tableHeader}
+            {selectedView.body && selectedView.body.fields && this.renderTemplateTable(selectedView, true)}
+            </tbody>
+          </Table>
+        </Box>
+        }
+
         {selectedView && !_.isEmpty(selectedView) &&
         <Box pad="small">
           <Form onSubmit={this.props.onSubmit} compact={this.props.compact}>
@@ -282,17 +286,6 @@ export default class ViewDefDetail extends Component {
         </Box>
         }
 
-        {selectedView && !_.isEmpty(selectedView) &&
-        <Box>
-          {selectedView.body && selectedView.body.fields && this.renderMasterHeader(selectedView)}
-          <Table>
-            <tbody>
-            {tableHeader}
-            {selectedView.body && selectedView.body.fields && this.renderTemplateTable(selectedView, true)}
-            </tbody>
-          </Table>
-        </Box>
-        }
       </Split>
     );
   }
