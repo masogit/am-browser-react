@@ -1,215 +1,208 @@
-import React, {Component} from 'react';
-import {
-  CheckBox,
-  // Split,
-  Form,
-  FormFields,
-  FormField,
-  NumberInput,
-  Tabs,
-  Tab
-} from 'grommet';
+import GraphForm, {assignObjectProp} from './FormGenerator';
 
-export default class ChartForm extends Component {
+export default class ChartForm extends GraphForm {
 
   constructor() {
     super();
+    this.init = {
+      series_col: new Set(),
+      xAxis: {
+        placement: '',
+        data: [],
+        label: ''},
+      xAxis_col: '',
+      type: 'bar',
+      size: 'medium',
+      legend: {
+        position: '',
+        units: '',
+        total: false
+      },
+      important: 0,
+      threshold: 0,
+      max: 0,
+      min: 0,
+      points: false,
+      segmented: false,
+      sparkline: false
+    };
+
     this.state = {
-      chart: {
-        important: 0,
-        threshold: 0,
-        type: 'bar',
-        xAxis: {placement: '', data: []},
-        series_col: new Set(),
-        xAxis_col: '',
-        legend: {},
-        size: 'medium'
-      }
+      type: 'chart',
+      chart: Object.assign({}, this.init)
     };
   }
 
-  componentWillMount() {
-    if (this.props.chart) {
-      const chart = Object.assign({}, this.state.chart, this.props.chart);
-      //const chart = {...this.state.chart, ...nextProps.chart};
-      this.setState({chart: chart});
-    }
-  }
+  _genGraph(form) {
+    const chart = {
+      important: form.important,
+      threshold: form.threshold,
+      type: form.type,
+      size: form.size,
+      points: form.points,
+      segmented: form.segmented,
+      smooth: form.smooth,
+      sparkline: form.sparkline,
+      units: form.units,
+      xAxis_col: form.xAxis_col,
+      series_col: form.series_col,
+      series: []
+    };
 
-  componentDidMount() {
-  }
+    if (form.series_col.size > 0 || form.series.length > 0) {
+      form.xAxis.data = [];
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.chart) {
-      const chart = Object.assign({}, this.state.chart, nextProps.chart);
-      //const chart = {...this.state.chart, ...nextProps.chart};
-      this.setState({chart: chart});
-    }
-  }
+      // gen series
+      const series = [...form.series_col].map(col => ({
+        label: this.props.data.header[col].Name,
+        values: [],
+        index: col
+      }));
 
-  setValueByJsonPath(path, val, obj) {
-    var fields = path.split('.');
-    var result = obj;
-    for (var i = 0, n = fields.length; i < n && result !== undefined; i++) {
-      var field = fields[i];
-      if (i === n - 1) {
-        result[field] = val;
-      } else {
-        if (typeof result[field] === 'undefined' || !_.isObject(result[field])) {
-          result[field] = {};
-        }
-        result = result[field];
+      this.props.data.rows.map((row, i) => {
+        // gen series
+        series.forEach(item => {
+          const value = row[item.index];
+          item.values.push([i, value / 1.0]);
+        });
+
+        // gen xAxis
+        const xAxisLabel = form.xAxis_col ? row[form.xAxis_col] : i;
+        form.xAxis.data.push({"label": '' + xAxisLabel, "value": i});
+      });
+      chart.series = series;
+
+      assignObjectProp(form, chart, 'max');
+      assignObjectProp(form, chart, 'min');
+
+      // gen legend
+      if (form.legend.position) {
+        chart.legend = {
+          position: form.legend.position,
+          total: form.legend.total
+        };
+      }
+
+      if (form.xAxis.placement) {
+        chart.xAxis = form.xAxis;
       }
     }
-  }
 
-  _setFormValues(event) {
-    let val;
-    if (event.target.type === 'checkbox') {
-      val = event.target.checked;
-    } else if (event.target.type === 'number') {
-      val = event.target.value / 1;
-    } else {
-      val = event.target.value;
-    }
-
-    const path = event.target.name;
-    const obj = this.state.chart;
-    if (path === 'series_col') {
-      if (event.target.checked === true) {
-        this.state.chart.series_col.add(event.target.id);
-      } else {
-        this.state.chart.series_col.delete(event.target.id);
-      }
-      val = this.state.chart.series_col;
-    }
-
-    this.setValueByJsonPath(path, val, obj);
-    this.setState({chart: obj}, this.props.genChart(obj, 'chart'));
+    return chart;
   }
 
   render() {
     const col_options = [];
     const xAxis_col_options = [];
-    if (this.props.header) {
+    if (this.props.data.header) {
       let series_col = this.state.chart.series_col;
-      if (series_col.size === 0 && this.props.chart) {
+      if (this.props.chart) {
         series_col = new Set(this.props.chart.series.map((item) => item.index));
       }
-      this.props.header.map((header, index) => {
-        xAxis_col_options.push(<option key={index} value={header.Index}>{header.Type}: {header.Name}</option>);
+      this.props.data.header.map((header, index) => {
+        xAxis_col_options.push({value:header.Index, text:`${header.Type}: ${header.Name}`});
         if (['Long', 'Short', 'Int', 'Double', 'Byte'].includes(header.Type)) {
-          col_options.push(
-            <CheckBox
-              key={index}
-              id={header.Index}
-              name='series_col'
-              label={`${header.Type} : ${header.Name}`}
-              checked={series_col.has(header.Index)}
-              onChange={this._setFormValues.bind(this)}/>
-          );
+          col_options.push({
+            id: header.Index,
+            name: 'series_col',
+            label: `${header.Type} : ${header.Name}`,
+            checked: series_col.has(header.Index),
+            onChange: this._setFormValues.bind(this)
+          });
         }
       });
     }
-    return (
-      <Tabs initialIndex={0} justify="end">
-        <Tab title="Basic">
-          <Form pad="none" compact={true}>
-            <FormFields>
-              <FormField label="Column">
-                {col_options}
-              </FormField>
-              <FormField label="Type">
-                <select name="type" value={this.state.chart.type} onChange={this._setFormValues.bind(this)}>
-                  <option value="bar">bar</option>
-                  <option value="area">area</option>
-                  <option value="line">line</option>
-                </select>
-              </FormField>
-              <FormField label="Size">
-                <select value={this.state.chart.size} name="size" onChange={this._setFormValues.bind(this)}>
-                  <option value="small">small</option>
-                  <option value="medium">medium</option>
-                  <option value="large">large</option>
-                </select>
-              </FormField>
-              <FormField label="X Axis placement">
-                <select value={this.state.chart.xAxis && this.state.chart.xAxis.placement} name="xAxis.placement"
-                        onChange={this._setFormValues.bind(this)}>
-                  <option value=""></option>
-                  <option value="top">top</option>
-                  <option value="bottom">bottom</option>
-                </select>
-              </FormField>
-              <FormField label="X Axis label">
-                <select name="xAxis_col" value={this.state.chart.xAxis_col} onChange={this._setFormValues.bind(this)}>
-                  <option value=""></option>
-                  {xAxis_col_options}
-                </select>
-              </FormField>
-              <FormField label="Legend position">
-                <select value={this.state.chart.legend && this.state.chart.legend.position} name="legend.position"
-                        onChange={this._setFormValues.bind(this)}>
-                  <option value=""></option>
-                  <option value="overlay">overlay</option>
-                  <option value="after">after</option>
-                  {this.state.chart.type === 'line' && <option value="inline">inline</option>}
-                </select>
-              </FormField>
-              <FormField label="Legend units">
-                <input type="text" name="units" value={this.state.chart.units}
-                       onChange={this._setFormValues.bind(this)}/>
-              </FormField>
-              <FormField label="Show legend total">
-                <CheckBox checked={this.state.chart.legend && this.state.chart.legend.total} id="legend.total"
-                          name="legend.total" toggle={true}
-                          onChange={this._setFormValues.bind(this)}/>
-              </FormField>
-            </FormFields>
-          </Form>
-        </Tab>
-        <Tab title="Advance">
-          <Form pad="none" compact={true}>
-            <FormFields>
-              <FormField label="important">
-                <NumberInput name="important" value={this.state.chart.important}
-                             onChange={this._setFormValues.bind(this)}/>
-              </FormField>
-              <FormField label="threshold">
-                <NumberInput name="threshold" value={this.state.chart.threshold}
-                             onChange={this._setFormValues.bind(this)}/>
-              </FormField>
-              <FormField label="max">
-                <NumberInput name="max" value={this.state.chart.max} onChange={this._setFormValues.bind(this)}/>
-              </FormField>
-              <FormField label="min">
-                <NumberInput name="min" value={this.state.chart.min} onChange={this._setFormValues.bind(this)}/>
-              </FormField>
-              <FormField label="points">
-                <CheckBox id="points" name="points" checked={this.state.chart.points} toggle={true}
-                          onChange={this._setFormValues.bind(this)}/>
-              </FormField>
-              {this.state.chart.type === 'bar' &&
-              <FormField label="segmented">
-                <CheckBox id="segmented" name="segmented" toggle={true} checked={this.state.chart.segmented}
-                          onChange={this._setFormValues.bind(this)}/>
-              </FormField>
-              }
-              {(this.state.chart.type === 'line' || this.state.chart.type === 'area') && (
-                <FormField label="smooth">
-                  <CheckBox id="smooth" name="smooth" toggle={true} checked={this.state.chart.smooth}
-                            onChange={this._setFormValues.bind(this)}/>
-                </FormField>
-              )}
 
-              <FormField label="sparkline">
-                <CheckBox id="sparkline" name="sparkline" toggle={true} checked={this.state.chart.sparkline}
-                          onChange={this._setFormValues.bind(this)}/>
-              </FormField>
-            </FormFields>
-          </Form>
-        </Tab>
-      </Tabs>
-    );
+    const selections = {
+      series_col: col_options,
+      type: [
+        {value: 'bar', text: 'bar'},
+        {value: 'area', text: 'area'},
+        {value: 'line', text: 'line'}
+      ],
+      size: [
+        {value: 'small', text: 'small'},
+        {value: 'medium', text: 'medium'},
+        {value: 'large', text: 'large'}
+      ],
+      legend_position: [
+        {value: '', text: ''},
+        {value: 'overlay', text: 'overlay'},
+        {value: 'after', text: 'after'}
+      ],
+      xAxis_placement: [
+        {value: '', text: ''},
+        {value: 'top', text: 'top'},
+        {value: 'bottom', text: 'bottom'}
+      ]
+    };
+
+    if(this.state.chart.type === 'line') {
+      selections.xAxis_placement.push({value: 'inline', text: 'inline'});
+    }
+
+    const basicOptions = [{
+      label: 'Column',
+      name: 'series_col',
+      type: 'MultiCheckField'
+    }, {
+      name: 'type',
+      type: 'SelectField'
+    }, {
+      name: 'size',
+      type: 'SelectField'
+    }, {
+      label: 'X Axis placement',
+      name: 'xAxis.placement',
+      type: 'SelectField'
+    }, {
+      label: 'X Axis label',
+      name: 'xAxis_col',
+      options: xAxis_col_options,
+      type: 'SelectField'
+    }, {
+      name: 'legend.position',
+      type: 'SelectField'
+    }, {
+      label: 'Legend units',
+      name: 'units',
+      type: 'InputField'
+    }, {
+      label: 'Show legend total',
+      name: 'legend.total',
+      type: 'SwitchField'
+    }];
+
+    const advanceOptions = [{
+      name: 'important',
+      type: 'NumberField'
+    }, {
+      name: 'threshold',
+      type: 'NumberField'
+    }, {
+      name: 'max',
+      type: 'NumberField'
+    }, {
+      name: 'min',
+      type: 'NumberField'
+    }, {
+      name: 'points',
+      type: 'SwitchField'
+    }, {
+      name: 'segmented',
+      type: 'SwitchField'
+    }, {
+      name: 'sparkline',
+      type: 'SwitchField'
+    }];
+
+    if (this.state.chart.type === 'line' || this.state.chart.type === 'area') {
+      advanceOptions.push({
+        name: 'smooth',
+        type: 'SwitchField'
+      });
+    }
+
+    return super.render(basicOptions, advanceOptions, selections);
   }
 }

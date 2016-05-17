@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 // import AChart from './AChart';
 import ChartForm from './ChartForm';
+import MeterForm from './MeterForm.js';
+import DistributionForm from './DistributionForm.js';
 import AlertForm from './../commons/AlertForm';
 import GroupList from './../commons/GroupList';
 import GroupListItem from './../commons/GroupListItem';
@@ -22,8 +24,9 @@ import {
   Table,
   TableRow,
   Title,
-  Menu
-  // Meter
+  Menu,
+  Meter,
+  Distribution
 } from 'grommet';
 import Play from 'grommet/components/icons/base/Play';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
@@ -200,79 +203,15 @@ export default class AQL extends Component {
     }
   }
 
-  _assignObjectProp(from, to, propName) {
-    if (from[propName]) {
-      to[propName] = from[propName];
-    }
-  }
-
-  _genChart(form, type) {
+  _genGraph(form, type) {
     var aql = this.state.aql;
     aql.type = type;
     aql.form = form;
+    aql[type] = form;
+    this.setState({aql: aql});
 
-    if (type == 'chart') {
-      if (form.series_col.size > 0) {
-        // gen series
-        const series = [...form.series_col].map(col => ({
-          label: this.state.aql.data.header[col].Name,
-          values: [],
-          index: col
-        }));
-
-        form.xAxis.data = [];
-        this.state.aql.data.rows.map((row, i) => {
-          // gen series
-          series.forEach(item => {
-            const value = row[item.index];
-            item.values.push([i, value / 1.0]);
-          });
-
-          // gen xAxis
-          if (form.xAxis.placement) {
-            const xAxisLabel = form.xAxis_col ? row[form.xAxis_col] : i;
-            form.xAxis.data.push({"label": '' + xAxisLabel, "value": i});
-          }
-        });
-
-        const chart = {
-          a11yTitleId: 'lineChartTitle',
-          a11yDescId: 'lineChartDesc',
-          important: form.important,
-          threshold: form.threshold,
-          type: form.type,
-          series: series,
-          size: form.size,
-          points: form.points,
-          segmented: form.segmented,
-          smooth: form.smooth,
-          sparkline: form.sparkline,
-          units: form.units
-        };
-
-        this._assignObjectProp(form, chart, 'max');
-        this._assignObjectProp(form, chart, 'min');
-
-        // gen legend
-        if (form.legend.position || form.legend.total) {
-          chart.legend = {
-            position: form.legend.position,
-            total: form.legend.total
-          };
-        }
-
-        // gen xAxis
-        if (form.xAxis.placement && form.xAxis.data.length > 0) {
-          chart.xAxis = form.xAxis;
-        }
-
-        aql.chart = chart;
-      } else {
-        aql.chart = null;
-      }
-
-      this.setState({aql: aql});
-    }
+    //TODO: meter: data less than 7/4
+    //TODO: distribution: data must be all positive
   }
 
   render() {
@@ -296,7 +235,24 @@ export default class AQL extends Component {
     }
 
     var aqls = this.state.filteredAqls || this.state.aqls;
+    const getGraph = () => {
+      if (this.state.aql.form) {
+        const activeIndex = (this.refs.graphForms && this.refs.graphForms.state.activeIndex) || 0;
+        if (activeIndex === 0) {
+          return <Chart {...this.state.aql.chart} />;
+        }
 
+        if (activeIndex === 1) {
+          return <Meter {...this.state.aql.meter} />;
+        }
+
+        if (activeIndex === 2) {
+          return <Distribution {...this.state.aql.distribution} />;
+        }
+      }
+    };
+
+    //TODO: switch tab will re-generate Graph
     return (
       <Split flex="right">
         <Sidebar pad="small" size="small">
@@ -361,10 +317,7 @@ export default class AQL extends Component {
           </Box>
           <Split flex="left" fixed={false}>
             <Box>
-              {
-                this.state.aql.chart &&
-                <Chart {...this.state.aql.chart} />
-              }
+              {getGraph()}
               <Table>
                 <thead>
                 <tr>{header}</tr>
@@ -376,13 +329,16 @@ export default class AQL extends Component {
             </Box>
             {
               this.state.aql.data &&
-              <Tabs initialIndex={0} justify="start">
+              <Tabs initialIndex={0} justify="start" ref='graphForms'>
                 <Tab title="Chart">
-                  <ChartForm header={this.state.aql.data.header} genChart={this._genChart.bind(this)}
-                             chart={this.state.aql.chart}/>
+                  <ChartForm {...this.state.aql} genGraph={this._genGraph.bind(this)} />
                 </Tab>
-                <Tab title="Meter"/>
-                <Tab title="Distribution"/>
+                <Tab title="Meter">
+                  <MeterForm {...this.state.aql}  genGraph={this._genGraph.bind(this)} />
+                </Tab>
+                <Tab title="Distribution">
+                  <DistributionForm {...this.state.aql} genGraph={this._genGraph.bind(this)} />
+                </Tab>
                 <Tab title="Value"/>
                 <Tab title="WorldMap"/>
               </Tabs>
