@@ -11,8 +11,10 @@ import {
   Box,
   Chart,
   CheckBox,
+  Distribution,
   Header,
-  Layer
+  Layer,
+  Meter
 } from 'grommet';
 import GroupList from '../commons/GroupList';
 import GroupListItem from '../commons/GroupListItem';
@@ -167,7 +169,18 @@ export default class Wall extends Component {
         box.child && box.child.name &&
         <Box justify="center" {...box} direction="column" pad="medium">
           <Header>{box.child.name}</Header>
-          <Chart {...box.child.chart} />
+          {
+            box.child.chart &&
+            <Chart {...box.child.chart} />
+          }
+          {
+            box.child.meter &&
+            <Meter {...box.child.meter} />
+          }
+          {
+            box.child.distribution &&
+            <Distribution {...box.child.distribution} />
+          }
         </Box>
       }
       {
