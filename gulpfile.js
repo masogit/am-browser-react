@@ -7,6 +7,10 @@ var git = require('gulp-git');
 var del = require('del');
 var mkdirp = require('mkdirp');
 var spawn = require('child_process').spawn;
+var zip = require('gulp-zip');
+var unzip = require('gulp-unzip');
+var clean = require('gulp-clean');
+var merge = require('merge-stream');
 
 var opts = {
   base: '.',
@@ -148,5 +152,33 @@ process.on('exit', function() {
 });
 
 gulp.task('amdev',['copy-demo','start-node','dev']);
+
+gulp.task('clean-gen', function () {
+  console.log('Clean gen folder');
+  // clean gen folder
+  return gulp.src('./gen').pipe(clean({force: true}));
+});
+
+gulp.task('copy-temp', ['copy-demo', 'dist', 'clean-gen'], function () {
+  console.log('Copy all neccessary files into the gen temp folder');
+  // copy node installation folder and cmd to gen temp
+  var unzip_node = gulp.src('./build/node-v4.4.4-x64.zip', {base : '.'})
+      .pipe(unzip())
+      .pipe(gulp.dest('./gen/temp'));
+  var copy_cmd = gulp.src('./build/startup.cmd')
+      .pipe(gulp.dest('./gen/temp'));
+  // copy files to gen temp
+  var copy_file = gulp.src(['./app/**', './db/**', './dist/**', './node_modules/**', './ssl/**', './am-browser-config.properties'], {base : '.'})
+      .pipe(gulp.dest('./gen/temp'));
+  return merge(unzip_node, copy_cmd, copy_file);
+});
+
+gulp.task('gen', ['copy-temp'], function () {
+  console.log('Generate am-browser.zip from temp folder');
+  // generate am-browser.zip from temp folder
+  return gulp.src('./gen/temp/**')
+      .pipe(zip('am-browser.zip'))
+      .pipe(gulp.dest('./gen'));
+});
 
 gulpTasks(gulp, opts);
