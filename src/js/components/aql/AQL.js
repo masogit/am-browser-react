@@ -114,14 +114,10 @@ export default class AQL extends Component {
       aql._id = id;
       this.setState({aql: aql});
       this.setState({
-        createdAlert: <AlertForm onClose={()=>{
-          this.setState({
-            createdAlert: null});}}
-                                 title={'AQL: ' + aql.name + ' saved!'}
-                                 desc={'AQL string: ' + aql.str}
-                                 onConfirm={()=>{
-                                   this.setState({
-                                     createdAlert: null});}}/>
+        alertLayer: <AlertForm onClose={this._removeAlertLayer.bind(this)}
+                               title={'AQL: ' + aql.name + ' saved!'}
+                               desc={'AQL string: ' + aql.str}
+                               onConfirm={this._removeAlertLayer.bind(this)}/>
       });
     });
   }
@@ -129,14 +125,10 @@ export default class AQL extends Component {
   _onSave() {
     if (this.state.aql.str.trim() === '' || this.state.aql.name.trim() === '' || this.state.aql.category.trim() === '') {
       this.setState({
-        validationAlert: <AlertForm onClose={()=>{
-          this.setState({
-            validationAlert: null});}}
-                                    title={'Save AQL failed!'}
-                                    desc={'AQL string or Name or Category empty'}
-                                    onConfirm={()=>{
-                                      this.setState({
-                                        validationAlert: null});}}/>
+        alertLayer: <AlertForm onClose={this._removeAlertLayer.bind(this)}
+                               title={'Save AQL failed!'}
+                               desc={'AQL string or Name or Category empty'}
+                               onConfirm={this._removeAlertLayer.bind(this)}/>
       });
     } else {
       this._onSaveAQL();
@@ -146,12 +138,10 @@ export default class AQL extends Component {
   _onNew() {
     if (this.state.aql.str.trim() !== '') {
       this.setState({
-        newAlert: <AlertForm onClose={()=>{
-          this.setState({
-            newAlert: null});}}
-                             title={'Create a new AQL?'}
-                             desc={'You have not saved AQL string: ' + this.state.aql.str}
-                             onConfirm={this._initAQL.bind(this)}/>
+        alertLayer: <AlertForm onClose={this._removeAlertLayer.bind(this)}
+                               title={'Create a new AQL?'}
+                               desc={'You have not saved AQL string: ' + this.state.aql.str}
+                               onConfirm={this._initAQL.bind(this)}/>
       });
     } else {
       this._initAQL();
@@ -160,11 +150,15 @@ export default class AQL extends Component {
 
   _onDelete() {
     this.setState({
-      deletionAlert: <AlertForm onClose={()=>{
-        this.setState({
-          deletionAlert: null});}}
-                                title={'Delete AQL: ' + this.state.aql.name}
-                                desc={'AQL string: ' + this.state.aql.str} onConfirm={this._removeAQL.bind(this)}/>
+      alertLayer: <AlertForm onClose={this._removeAlertLayer.bind(this)}
+                             title={'Delete AQL: ' + this.state.aql.name}
+                             desc={'AQL string: ' + this.state.aql.str} onConfirm={this._removeAQL.bind(this)}/>
+    });
+  }
+
+  _removeAlertLayer() {
+    this.setState({
+      alertLayer: null
     });
   }
 
@@ -337,10 +331,7 @@ export default class AQL extends Component {
           </Tabs>
         </Sidebar>
         <div>
-          {this.state.newAlert}
-          {this.state.createdAlert}
-          {this.state.deletionAlert}
-          {this.state.validationAlert}
+          {this.state.alertLayer}
           <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
             <Title>AM Insight</Title>
             <Menu direction="row" align="center" responsive={false}>
