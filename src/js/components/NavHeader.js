@@ -51,11 +51,13 @@ class NavHeader extends Component {
           this.state.layer &&
           <Layer onClose={this._onClose.bind(this)} closer={true} align="left">
             <Box full="vertical" justify="center">
+              <Box pad={{vertical: 'medium'}}><Title>Views Navigation ({this.state.views.length})</Title></Box>
               <GroupList pad={{vertical: 'small'}} searchable={true}>
                 {
                   listViews.map((view) => {
                     return (
-                      <GroupListItem key={view._id} groupby={view.category} pad={{horizontal: 'medium', vertical: 'small'}}>
+                      <GroupListItem key={view._id} groupby={view.category}
+                                     pad={{horizontal: 'medium', vertical: 'small'}} search={view.name}>
                         <Anchor href={`/explorer/${view._id}`}>{view.name}</Anchor>
                       </GroupListItem>
                     );

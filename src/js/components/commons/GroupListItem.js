@@ -24,5 +24,6 @@ export default class GroupListItem extends Component {
 }
 
 GroupListItem.propTypes = {
-  groupby: PropTypes.string.isRequired
+  groupby: PropTypes.string.isRequired,
+  search: PropTypes.string
 };

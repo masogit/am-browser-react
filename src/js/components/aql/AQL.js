@@ -301,12 +301,13 @@ export default class AQL extends Component {
       <Split flex="right">
         <Sidebar pad="small" size="small">
           <Tabs initialIndex={0} justify="start">
-            <Tab title="Saved AQLs">
+            <Tab title={'AQLs ('+aqls.length+')'}>
               <GroupList selectable={true} searchable={true}>
                 {
                   aqls.map((aql) => {
                     return (
-                      <GroupListItem key={aql._id} groupby={aql.category} onClick={this._loadAQL.bind(this, aql)}>
+                      <GroupListItem key={aql._id} groupby={aql.category} onClick={this._loadAQL.bind(this, aql)}
+                                     search={aql.name}>
                         {aql.name}
                       </GroupListItem>
                     );

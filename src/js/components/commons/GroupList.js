@@ -48,7 +48,7 @@ export default class GroupList extends Component {
     if (keyword) {
       var filtered = this.props.children.filter((child) => {
         return child.props.groupby.toLowerCase().indexOf(keyword) > -1 ||
-          child.props.children.props.children.toLowerCase().indexOf(keyword) > -1;
+          child.props.search.toLowerCase().indexOf(keyword) > -1;
       });
       this.setState({
         filtered: filtered

@@ -129,7 +129,7 @@ export default class Wall extends Component {
             {
               this.state.aqls.map((aql) => {
                 return (
-                  <GroupListItem key={aql._id} groupby={aql.category}
+                  <GroupListItem key={aql._id} groupby={aql.category} search={aql.name}
                                  pad={{horizontal: 'medium', vertical: 'small'}}>
                     <Anchor href="#" onClick={this._attachAQL.bind(this, aql, box, parent)}>{aql.name}</Anchor>
                   </GroupListItem>
