@@ -30,8 +30,8 @@ export const FormContainer = ({basicOptions, advanceOptions, form, selections}) 
 );
 
 export const SelectField = ({label, name, value, onChange, options}) => {
-  const optionsComp = options.map( option=>
-      <option key={option.value} value={option.value}>{option.text}</option>);
+  const optionsComp = options.map(option=>
+    <option key={option.value} value={option.value}>{option.text}</option>);
   return (
     <FormField label={label} key={label}>
       <select name={name} value={value} onChange={onChange}>
@@ -57,7 +57,7 @@ export const MultiCheckField = ({label, options}) => {
   const optionsComp = options.map(option=>
     (
       <CheckBox key={option.id} id={option.id} name={option.name}
-        label={option.label} checked={option.checked} onChange={option.onChange}/>
+                label={option.label} checked={option.checked} onChange={option.onChange}/>
     ));
   return (
     <FormField label={label}>
@@ -109,7 +109,8 @@ const genOptions = (optionsArray, form, fromType, selections) => {
 
     if (type === 'SelectField') {
       return (
-        <SelectField key={name} label={label} name={name} value={value} options={options} onChange={form._setFormValues.bind(form)}/>
+        <SelectField key={name} label={label} name={name} value={value} options={options}
+                     onChange={form._setFormValues.bind(form)}/>
       );
     } else if (type === 'InputField') {
       return (
@@ -125,7 +126,7 @@ const genOptions = (optionsArray, form, fromType, selections) => {
       );
     } else if (type === 'MultiCheckField') {
       return (
-        <MultiCheckField label={label} options={options} />
+        <MultiCheckField label={label} options={options}/>
       );
     }
   });
@@ -149,13 +150,13 @@ export default class GraphForm extends Component {
       newState[type] = Object.assign({}, this.state[type], nextProps[type]);
 
       // series_col of chart form must be a 'set'
-      if(type === 'chart' && (nextProps[type].series_col && typeof nextProps[type].series_col.has !== 'function')) {
+      if (type === 'chart' && (nextProps[type].series_col && typeof nextProps[type].series_col.has !== 'function')) {
         newState[type].series_col = new Set();
       }
 
       //newState[type] = {...this.state[type], ...nextProps[type]};
       this.setState(newState);
-    }  else {
+    } else {
       this.state[type] = this.init;
     }
   }
@@ -191,7 +192,8 @@ export default class GraphForm extends Component {
   }
 
   render(basicOptions, advanceOptions, selections) {
-    return <FormContainer basicOptions={basicOptions} advanceOptions={advanceOptions} form={this} selections={selections} />;
+    return <FormContainer basicOptions={basicOptions} advanceOptions={advanceOptions} form={this}
+                          selections={selections}/>;
   }
 }
 

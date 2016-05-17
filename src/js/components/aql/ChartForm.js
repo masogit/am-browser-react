@@ -9,7 +9,8 @@ export default class ChartForm extends GraphForm {
       xAxis: {
         placement: '',
         data: [],
-        label: ''},
+        label: ''
+      },
       xAxis_col: '',
       type: 'bar',
       size: 'medium',
@@ -100,7 +101,7 @@ export default class ChartForm extends GraphForm {
         series_col = new Set(this.props.chart.series.map((item) => item.index));
       }
       this.props.data.header.map((header, index) => {
-        xAxis_col_options.push({value:header.Index, text:`${header.Type}: ${header.Name}`});
+        xAxis_col_options.push({value: header.Index, text: `${header.Type}: ${header.Name}`});
         if (['Long', 'Short', 'Int', 'Double', 'Byte'].includes(header.Type)) {
           col_options.push({
             id: header.Index,
@@ -137,7 +138,7 @@ export default class ChartForm extends GraphForm {
       ]
     };
 
-    if(this.state.chart.type === 'line') {
+    if (this.state.chart.type === 'line') {
       selections.xAxis_placement.push({value: 'inline', text: 'inline'});
     }
 
