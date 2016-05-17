@@ -165,7 +165,7 @@ export default class Wall extends Component {
       }
       {
         box.child && box.child.name &&
-        <Box justify="center" {...box} direction="column">
+        <Box justify="center" {...box} direction="column" pad="medium">
           <Header>{box.child.name}</Header>
           <Chart {...box.child.chart} />
         </Box>
