@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import * as AQLActions from '../../actions/aql';
+import AlertForm from '../commons/AlertForm';
 import Add from 'grommet/components/icons/base/Add';
 import Close from 'grommet/components/icons/base/Close';
 import Attachment from 'grommet/components/icons/base/Attachment';
@@ -10,6 +11,7 @@ import {
   Box,
   Chart,
   CheckBox,
+  Header,
   Layer
 } from 'grommet';
 import GroupList from '../commons/GroupList';
@@ -78,12 +80,15 @@ export default class Wall extends Component {
   _addBox(box, parent) {
     if (!box.child)
       box.child = [{
+        direction: 'row',
         child: null
       }, {
+        direction: 'row',
         child: null
       }];
     else if (box.child instanceof Array)
       box.child.push({
+        direction: 'row',
         child: null
       });
     this.setState({
@@ -138,14 +143,14 @@ export default class Wall extends Component {
   }
 
   _attachAQL(aql, box, parent) {
-    box.child = aql.chart;
+    box.child = aql;
     this.setState({
       box: parent
     }, this._onClose(this));
   }
 
   _buildBox(box, parent) {
-    return (<Box key={box.key} direction="column">
+    return (<Box key={box.key} direction="column" separator={this.state.edit?'all':'none'}>
       {
         this._buildActions(box, parent)}
       {
@@ -159,9 +164,10 @@ export default class Wall extends Component {
         }</Box>
       }
       {
-        box.child && box.child.series &&
-        <Box justify="center" {...box}>
-          <Chart {...box.child} />
+        box.child && box.child.name &&
+        <Box justify="center" {...box} direction="column">
+          <Header>{box.child.name}</Header>
+          <Chart {...box.child.chart} />
         </Box>
       }
       {
@@ -177,7 +183,7 @@ export default class Wall extends Component {
     var id = (Math.random() + 1).toString(36).substring(7);
     if (this.state.edit)
       return (<Box direction="row" justify="center" separator="bottom" pad="small">
-        <CheckBox id={id} label={box.direction==='row'?'Column':'Row'} checked={box.direction==='column'}
+        <CheckBox id={id} label={box.direction==='row'?'Column':'Row'} checked={box.direction!=='column'}
                   onChange={this._toggleDirection.bind(this, box, parent)} toggle={true}/>
         <Anchor href="#" icon={<Add />} label="Add" onClick={this._addBox.bind(this, box, parent)}/>
         <Anchor href="#" icon={<Close />} label="Delete" onClick={this._deleteBox.bind(this, box, parent)}/>
@@ -188,6 +194,16 @@ export default class Wall extends Component {
     AQLActions.saveWall(this.state.box, (data) => {
       if (data)
         this._loadWall();
+
+      this.setState({
+        savedAlert: <AlertForm onClose={()=>{
+          this.setState({
+            savedAlert: null});}}
+                                 title={'AM Insight layout saved!'}
+                                 onConfirm={()=>{
+                                   this.setState({
+                                     savedAlert: null});}}/>
+      });
     });
   }
 
@@ -209,6 +225,7 @@ export default class Wall extends Component {
             <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)}>Save</Anchor>
           </Box>
         }
+        {this.state.savedAlert}
       </Box>
     );
   }
