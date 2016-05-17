@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-// import AChart from './AChart';
 import ChartForm from './ChartForm';
 import MeterForm from './MeterForm.js';
 import DistributionForm from './DistributionForm.js';
@@ -7,6 +6,7 @@ import AlertForm from './../commons/AlertForm';
 import GroupList from './../commons/GroupList';
 import GroupListItem from './../commons/GroupListItem';
 import * as AQLActions from '../../actions/aql';
+import * as ExplorerActions from '../../actions/explorer';
 import {
   Anchor,
   Box,
@@ -16,6 +16,7 @@ import {
   Split,
   Form,
   FormField,
+  Layer,
   List,
   ListItem,
   Header,
@@ -32,6 +33,7 @@ import Play from 'grommet/components/icons/base/Play';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
 import Close from 'grommet/components/icons/base/Close';
 import Add from 'grommet/components/icons/base/Add';
+import Attachment from 'grommet/components/icons/base/Attachment';
 
 export default class AQL extends Component {
 
@@ -46,8 +48,9 @@ export default class AQL extends Component {
 
   componentDidMount() {
     this._initAQL();
-    this._loadAQLs(this);
-    this._loadInToolReport(this);
+    this._loadViews();
+    this._loadAQLs();
+    this._loadInToolReport();
   }
 
   _initAQL() {
@@ -59,6 +62,14 @@ export default class AQL extends Component {
         type: '',
         form: null
       }
+    });
+  }
+
+  _loadViews() {
+    ExplorerActions.loadViews((data) => {
+      this.setState({
+        views: data
+      });
     });
   }
 
@@ -214,6 +225,45 @@ export default class AQL extends Component {
     //TODO: distribution: data must be all positive
   }
 
+  _attachView(view) {
+    var aql = this.state.aql;
+    aql.view = view;
+    this.setState({
+      aql: aql,
+      viewsLayer: null
+    });
+  }
+
+  _selectView() {
+    var viewsLayer = (
+      <Layer onClose={this._onClose.bind(this)} closer={true} align="left">
+        <Box full="vertical" justify="center">
+          <GroupList pad={{vertical: 'small'}} searchable={true}>
+            {
+              this.state.views.map((view) => {
+                return (
+                  <GroupListItem key={view._id} groupby={view.category} search={view.name}
+                                 pad={{horizontal: 'medium', vertical: 'small'}}>
+                    <Anchor href="#" onClick={this._attachView.bind(this, view)}>{view.name}</Anchor>
+                  </GroupListItem>
+                );
+              })
+            }
+          </GroupList>
+        </Box>
+      </Layer>
+    );
+    this.setState({
+      viewsLayer: viewsLayer
+    });
+  }
+
+  _onClose() {
+    this.setState({
+      viewsLayer: null
+    });
+  }
+
   render() {
     var header;
     var rows;
@@ -298,6 +348,9 @@ export default class AQL extends Component {
               <Anchor link="#" icon={<Add />} onClick={this._onNew.bind(this)}>New</Anchor>
               <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)}>Save</Anchor>
               <Anchor link="#" icon={<Close />} onClick={this._onDelete.bind(this)}>Delete</Anchor>
+              <Anchor link="#" icon={<Attachment />} onClick={this._selectView.bind(this)}>
+                {this.state.aql.view ? 'Attached view: ' + this.state.aql.view.name : 'Attach View'}
+              </Anchor>
             </Menu>
           </Header>
           <Box justify="between" direction="row" pad={{between:'medium'}} size="small">
@@ -332,19 +385,20 @@ export default class AQL extends Component {
               this.state.aql.data &&
               <Tabs initialIndex={0} justify="start" ref='graphForms'>
                 <Tab title="Chart">
-                  <ChartForm {...this.state.aql} genGraph={this._genGraph.bind(this)} />
+                  <ChartForm {...this.state.aql} genGraph={this._genGraph.bind(this)}/>
                 </Tab>
                 <Tab title="Meter">
-                  <MeterForm {...this.state.aql}  genGraph={this._genGraph.bind(this)} />
+                  <MeterForm {...this.state.aql} genGraph={this._genGraph.bind(this)}/>
                 </Tab>
                 <Tab title="Distribution">
-                  <DistributionForm {...this.state.aql} genGraph={this._genGraph.bind(this)} />
+                  <DistributionForm {...this.state.aql} genGraph={this._genGraph.bind(this)}/>
                 </Tab>
                 <Tab title="Value"/>
                 <Tab title="WorldMap"/>
               </Tabs>
             }
           </Split>
+          {this.state.viewsLayer}
         </div>
       </Split>
     );
