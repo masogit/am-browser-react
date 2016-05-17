@@ -212,19 +212,20 @@ export default class Wall extends Component {
     return (
       <Box direction="column" pad="medium" full="horizontal">
         <Box justify="between" direction="row">
-          <Anchor href="#" icon={<Camera />} label="Picture"/>
+          {
+            this.state.edit &&
+            <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>
+          }
+          {
+            !this.state.edit &&
+            <Anchor href="#" icon={<Camera />} label="Picture"/>
+          }
           <CheckBox id="edit" label="Edit" checked={this.state.edit} onChange={this._toggleEdit.bind(this)}
                     toggle={true}/>
 
         </Box>
         {this._buildBox(box, box)}
         {this.state.layer}
-        {
-          this.state.edit &&
-          <Box justify="end" direction="row">
-            <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)}>Save</Anchor>
-          </Box>
-        }
         {this.state.savedAlert}
       </Box>
     );
