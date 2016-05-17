@@ -3,6 +3,7 @@ var db = require('./db.js');
 module.exports = function (app, am) {
     var REST = require('./rest.js');
     var rest = new REST();
+    var util = require('util')
 
     var PropertiesReader = require('properties-reader');
     var properties = PropertiesReader('am-browser-config.properties');
@@ -16,6 +17,10 @@ module.exports = function (app, am) {
       console.log("set request header: " + auth);
       proxyReq.setHeader('Authorization', auth);
     });
+
+    apiProxy.on('error', function(e){
+        console.log(util.inspect(e));
+    })
 
     // CRUD Tingodb
     app.get('/coll/:collection', db.find);
