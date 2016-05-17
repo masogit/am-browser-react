@@ -165,7 +165,11 @@ gulp.task('copy-temp', ['copy-demo', 'dist', 'clean-gen'], function () {
   var unzip_node = gulp.src('./build/node-v4.4.4-x64.zip', {base : '.'})
       .pipe(unzip())
       .pipe(gulp.dest('./gen/temp'));
-  var copy_cmd = gulp.src('./build/startup.cmd')
+  // copy nssm for register service
+  var unzip_node = gulp.src('./build/nssm-2.24.zip', {base : '.'})
+      .pipe(unzip())
+      .pipe(gulp.dest('./gen/temp'));
+  var copy_cmd = gulp.src(['./build/*.cmd'])
       .pipe(gulp.dest('./gen/temp'));
   // copy files to gen temp
   var copy_file = gulp.src(['./app/**', './db/**', './dist/**', './node_modules/**', './ssl/**', './am-browser-config.properties'], {base : '.'})
