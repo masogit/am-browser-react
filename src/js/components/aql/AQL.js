@@ -278,7 +278,6 @@ export default class AQL extends Component {
       });
     }
 
-    var aqls = this.state.filteredAqls || this.state.aqls;
     const getGraph = () => {
       if (this.state.aql.form) {
         const activeIndex = (this.refs.graphForms && this.refs.graphForms.state.activeIndex) || 0;
@@ -301,10 +300,10 @@ export default class AQL extends Component {
       <Split flex="right">
         <Sidebar pad="small" size="small">
           <Tabs initialIndex={0} justify="start">
-            <Tab title={'AQLs ('+aqls.length+')'}>
+            <Tab title={'AQLs ('+this.state.aqls.length+')'}>
               <GroupList selectable={true} searchable={true}>
                 {
-                  aqls.map((aql) => {
+                  this.state.aqls.map((aql) => {
                     return (
                       <GroupListItem key={aql._id} groupby={aql.category} onClick={this._loadAQL.bind(this, aql)}
                                      search={aql.name}>
