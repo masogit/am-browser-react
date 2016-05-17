@@ -22,7 +22,7 @@ export default class Explorer extends Component {
   render() {
     return (
       this.state.view &&
-      <RecordList body={this.state.view.body}/>
+      <RecordList body={this.state.view.body} title={this.state.view.name} />
     );
   }
 }

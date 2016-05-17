@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, PropTypes} from 'react';
 import RecordList from './RecordList';
 import {
   Layer,
@@ -92,3 +92,9 @@ export default class RecordDetail extends Component {
     );
   }
 }
+
+RecordDetail.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  body: PropTypes.object.isRequired,
+  record: PropTypes.object.isRequired
+};

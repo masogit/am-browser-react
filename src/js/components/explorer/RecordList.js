@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, PropTypes} from 'react';
 import Converter from 'json-2-csv';
 import RecordDetail from './RecordDetail';
 import Table from 'grommet/components/Table';
@@ -343,6 +343,7 @@ export default class RecordList extends Component {
     return (
       <div>
         <Header justify="between">
+          {this.props.title}
           <input type="text" inline={true} className="flex" placeholder="Filter Records" ref="search"
                  onKeyDown={this._onFilter.bind(this)} onChange={this._onFilter.bind(this)}/>
           {(this.state.filtered) ? this.state.filtered.length : this.state.records.length}/{this.state.numTotal}
@@ -383,3 +384,8 @@ export default class RecordList extends Component {
     );
   }
 }
+
+RecordList.propTypes = {
+  title: PropTypes.string,
+  body: PropTypes.object.isRequired
+};
