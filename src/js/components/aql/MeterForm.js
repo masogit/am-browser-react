@@ -124,10 +124,10 @@ export default class ChartForm extends GraphForm {
     const advanceOptions = [{
       name: 'important',
       type: 'NumberField'
-    }, {
+    }/*, {
       name: 'value',
       type: 'NumberField'
-    }, {
+    }*/, {
       name: 'threshold',
       type: 'NumberField'
     }, {

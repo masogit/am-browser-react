@@ -94,6 +94,16 @@ export const assignObjectProp = (from, to, propName) => {
   }
 };
 
+// each object in optionsArray has label, name, type, options, value
+// name and type is required,  label, options, value is optional
+// -- options
+// only needed for SelectField
+// if selections name is same as options, options can be ignored
+// if name has '.', use '_' in the selections
+// -- label
+// if ignored it will be capitalized name
+// -- value
+// if ignored it will be this.state.distribute.name
 const genOptions = (optionsArray, form, fromType, selections) => {
   return optionsArray.map(({label, name, value, options, type}) => {
     if (name.includes('.')) {
@@ -192,8 +202,8 @@ export default class GraphForm extends Component {
   }
 
   render(basicOptions, advanceOptions, selections) {
-    return <FormContainer basicOptions={basicOptions} advanceOptions={advanceOptions} form={this}
-                          selections={selections}/>;
+    return (<FormContainer basicOptions={basicOptions} advanceOptions={advanceOptions}
+                          form={this} selections={selections}/>);
   }
 }
 

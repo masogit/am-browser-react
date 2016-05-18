@@ -29,8 +29,8 @@ export default class ChartForm extends GraphForm {
     };
 
     if (form.series_col) {
-      distribution.series = this.props.data.rows.map((row, i) => ({
-        label: '' + i,
+      distribution.series = this.props.data.rows.map((row, i) => ( {
+        label: '' + (form.label ? row[form.label] : i),
         value: row[form.series_col] / 1.0,
         index: i
       }));
@@ -43,8 +43,11 @@ export default class ChartForm extends GraphForm {
 
   render() {
     const col_options = [{value: '', text: ''}];
+    const label_options = [{value: '', text: ''}];
     if (this.props.data.header) {
       this.props.data.header.map((header, index) => {
+        label_options.push({value:header.Index, text:`${header.Type}: ${header.Name}`});
+
         if (['Long', 'Short', 'Int', 'Double', 'Byte'].includes(header.Type)) {
           col_options.push({value: header.Index, text: `${header.Type}: ${header.Name}`});
         }
@@ -57,6 +60,7 @@ export default class ChartForm extends GraphForm {
 
     const selections = {
       series_col: col_options,
+      label: label_options,
       size: [
         {value: 'small', text: 'small'},
         {value: 'medium', text: 'medium'},
@@ -70,7 +74,11 @@ export default class ChartForm extends GraphForm {
     };
 
     const basicOptions = [{
+      label: 'Column',
       name: 'series_col',
+      type: 'SelectField'
+    }, {
+      name: 'label',
       type: 'SelectField'
     }, {
       name: 'size',
