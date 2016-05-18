@@ -10,7 +10,7 @@ import {
   Tab
 } from 'grommet';
 
-export const FormContainer = ({basicOptions, advanceOptions, form, selections}) => (
+const FormContainer = ({basicOptions, advanceOptions, form, selections}) => (
   <Tabs initialIndex={0} justify="end">
     <Tab title="Basic">
       <Form pad="none" compact={true}>
@@ -29,7 +29,7 @@ export const FormContainer = ({basicOptions, advanceOptions, form, selections}) 
   </Tabs>
 );
 
-export const SelectField = ({label, name, value, onChange, options}) => {
+const SelectField = ({label, name, value, onChange, options}) => {
   const optionsComp = options.map(option=>
     <option key={option.value} value={option.value}>{option.text}</option>);
   return (
@@ -41,19 +41,19 @@ export const SelectField = ({label, name, value, onChange, options}) => {
   );
 };
 
-export const InputField = ({label, name, value, onChange}) => (
+const InputField = ({label, name, value, onChange}) => (
   <FormField label={label} key={name}>
     <input type="text" name={name} value={value} onChange={onChange}/>
   </FormField>
 );
 
-export const SwitchField = ({label, checked, name, onChange}) => (
+const SwitchField = ({label, checked, name, onChange}) => (
   <FormField label={label} key={name}>
     <CheckBox checked={checked} id={name} name={name} toggle={true} onChange={onChange}/>
   </FormField>
 );
 
-export const MultiCheckField = ({label, options}) => {
+const MultiCheckField = ({label, options}) => {
   const optionsComp = options.map(option=>
     (
       <CheckBox key={option.id} id={option.id} name={option.name}
@@ -66,7 +66,7 @@ export const MultiCheckField = ({label, options}) => {
   );
 };
 
-export const NumberField = ({label, name, value, onChange}) => (
+const NumberField = ({label, name, value, onChange}) => (
   <FormField label={label} key={name}>
     <NumberInput name={name} value={value} onChange={onChange}/>
   </FormField>
@@ -206,4 +206,3 @@ export default class GraphForm extends Component {
                           form={this} selections={selections}/>);
   }
 }
-

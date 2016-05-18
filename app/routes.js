@@ -23,6 +23,7 @@ module.exports = function (app, am) {
 
     // CRUD Tingodb
     app.get('/coll/:collection', db.find);
+    app.patch('/coll/:collection', db.update);
     app.get('/coll/:collection/:id', db.find);
     app.post('/coll/:collection', db.upsert);
     app.delete('/coll/:collection/:id', db.delete);
@@ -30,6 +31,16 @@ module.exports = function (app, am) {
     // get ucmdb point data
     app.use('/am/ucmdbPoint/', function (req, res) {
       apiProxy.web(req, res, {target: 'http://' + am.server + '/AssetManagerWebService/rs/integration/ucmdbAdapter/points'});
+    });
+
+    // AM Server Conf
+    app.get('/am/conf', function(req, res) {
+      if (am) {
+        var am_rest = Object.assign({}, am);
+        am_rest['password'] = "";
+        res.json(am_rest);
+      } else
+        res.json(am);
     });
 
     // Proxy the backend rest service /rs/db -> /am/db
