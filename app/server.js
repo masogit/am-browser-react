@@ -61,13 +61,14 @@ app.use(bodyParser.json()); // parse application/json
 app.use(bodyParser.json({type: 'application/vnd.api+json'})); // parse application/vnd.api+json as json
 app.use(methodOverride('X-HTTP-Method-Override')); // override with the X-HTTP-Method-Override header in the request
 
+var logger = require('./logger.js');
 
 // routes ======================================================================
 require('./routes.js')(app, am);
 
 // listen (start app with node server.js) ======================================
 app.listen(port, server);
-console.log("App listening HTTP on port " + port);
+logger.info("App listening HTTP on port " + port);
 
 // TODO: 1. Enable this in production. 2. There are some hardcoded HTTP requests in front-end JS, which causes mixed content issues
 const KEY = 'ssl/server-key.pem';
@@ -81,8 +82,8 @@ try {
     ca: fs.readFileSync(CERT) //Optional for dev machine, but for production it's necessary!!!
   };
   https.createServer(server_options, app).listen(https_port);
-  console.log("App listening HTTPS on port " + https_port);
+  logger.info("App listening HTTPS on port " + https_port);
 }
 catch (e) {
-  console.warn("HTTPS is not set correctly");
+  logger.warn("HTTPS is not set correctly");
 }

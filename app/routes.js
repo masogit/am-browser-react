@@ -1,4 +1,5 @@
 var db = require('./db.js');
+var logger = require('./logger.js');
 
 module.exports = function (app, am) {
     var REST = require('./rest.js');
@@ -8,18 +9,18 @@ module.exports = function (app, am) {
     var PropertiesReader = require('properties-reader');
     var properties = PropertiesReader('am-browser-config.properties');
     var base = properties.get('rest.base');
-    console.log("base: " + base);
+    logger.info("base: " + base);
     var httpProxy = require('http-proxy');
     var apiProxy = httpProxy.createProxyServer();
     var auth = 'Basic ' + new Buffer(am.user + ':' + am.password).toString('base64');
-    console.log("auth: " + auth);
+    logger.info("auth: " + auth);
     apiProxy.on('proxyReq', function(proxyReq, req, res, options) {
-      console.log("set request header: " + auth);
+      logger.info("set request header: " + auth);
       proxyReq.setHeader('Authorization', auth);
     });
 
     apiProxy.on('error', function(e){
-        console.log(util.inspect(e));
+      logger.error(util.inspect(e));
     })
 
     // CRUD Tingodb
@@ -196,22 +197,22 @@ module.exports = function (app, am) {
     app.post('/am/rest', rest.db);
 
     // Proxy the backend rest service /rs/db -> /am/db
-    console.log(am);
+    logger.info(am);
     app.use('/am/db', function(req, res){
         // TODO: need to take care of https
-        console.log('http://' + am.server + base + '/db');
+        logger.info('http://' + am.server + base + '/db');
         apiProxy.web(req,res,{target: 'http://' + am.server + base + '/db'});
     });
 
     app.use('/am/aql', function(req, res){
       // TODO: need to take care of https
-      console.log('http://' + am.server + base + '/aql');
+      logger.info('http://' + am.server + base + '/aql');
       apiProxy.web(req,res,{target: 'http://' + am.server + base + '/aql'});
     });
 
     app.use('/am/v1/schema', function (req, res) {
         // TODO: need to take care of https
-        console.log('http://' + am.server + base + '/v1/schema');
+        logger.info('http://' + am.server + base + '/v1/schema');
         apiProxy.web(req, res, {target: 'http://' + am.server + base + '/v1/schema'});
     });
 

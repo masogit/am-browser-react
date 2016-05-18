@@ -3,6 +3,7 @@ var Client = require('node-rest-client').Client;
 var client = new Client();
 var converter = require('json-2-csv');
 var fs = require('fs');
+var logger = require('./logger.js');
 
 // var cp = require('child_process');
 // var child = cp.fork('./app/subworker.js');
@@ -36,7 +37,7 @@ process.on('message', function (m) {
         });
 
         rds_client.on("error", function (err) {
-            console.log("Redis Error " + err);
+            logger.error("Redis Error " + err);
             rds_client.end();
         });
 
@@ -57,7 +58,7 @@ process.on('message', function (m) {
 function cache(db, am) {
 
     // cache view data
-    console.log("start to load views: ");
+    logger.info("start to load views: ");
     db.getColl("template", function (data) {
         data.forEach(function (view) {
             getViewData(view, am, db, 0);
@@ -65,7 +66,7 @@ function cache(db, am) {
     });
 
     intervalObject = setInterval(function () {
-        console.log("start to load views: ");
+        logger.info("start to load views: ");
         db.getColl("template", function (data) {
             data.forEach(function (view) {
                 getViewData(view, am, db, 0);
@@ -92,7 +93,7 @@ function getViewData(view, am, db, offset) {
         }
     };
 
-    // console.log("restParam: " + JSON.stringify(restParam));
+    // logger.info("restParam: " + JSON.stringify(restParam));
 
     var url = "http://${server}${context}${ref-link}${collection}";
     var auth = 'Basic ' + new Buffer(restParam.user + ':' + restParam.password).toString('base64');
@@ -122,20 +123,20 @@ function getViewData(view, am, db, offset) {
             // Save in CSV
             var json2csvCallback = function (err, csv) {
                 if (err)
-                    console.log(err);
+                    logger.error(err);
 //                throw err;
-//                console.log(csv);
+//                logger.info(csv);
                 // delete file
                 if (offset == 0)
                     fs.unlink("csv/"+view.name+".csv", function (err) {
                         if (err)
 //                            throw err;
-                            console.log(err);
+                            logger.error(err);
                     });
                 // append file
                 fs.appendFile("csv/"+view.name+".csv", csv, function (err) {
                     if (err)
-                        console.log(err);
+                        logger.error(err);
 //                    throw err;
                 });
             };
@@ -156,10 +157,10 @@ function getViewData(view, am, db, offset) {
 
 
     }).on('error', function (err) {
-        console.log(err);
+        logger.error(err);
     });
 
-    console.log("request.options: " + JSON.stringify(request.options));
+    logger.info("request.options: " + JSON.stringify(request.options));
 }
 
 

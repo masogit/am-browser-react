@@ -1,6 +1,7 @@
 var Client = require('node-rest-client').Client;
 var client = new Client();
 var parseString = require('xml2js').parseString;
+var logger = require('./logger.js');
 
 module.exports = function (am) {
 
@@ -36,9 +37,9 @@ module.exports = function (am) {
             }).on('error', function (err) {
                     res.status(500).send(err.toString());
                 });
-            console.log("request.options: " + JSON.stringify(request.options));
+            logger.info("request.options: " + JSON.stringify(request.options));
             request.on('error', function (err) {
-                console.log('request error: ' + err);
+                logger.error('request error: ' + err);
             });
         } else if (req.body.method == "post") {
             request = client.post(url, args, function (data, response) {
@@ -76,10 +77,11 @@ this.query = function (req, callback) {
         var request = client.get(url, args, function (data, response) {
           callback(data);
         }).on('error', function (err) {
+          logger.error(err.toString());
           callback(err.toString());
         });
 
-        console.log("request.options: " + JSON.stringify(request.options));
+        logger.info("request.options: " + JSON.stringify(request.options));
 
     };
 };

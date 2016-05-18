@@ -3,6 +3,7 @@ var loki = require('lokijs');
 var db;
 var tingodbFolder;
 const fs = require('fs');
+var logger = require('./logger.js');
 
 // check db folder and files
 exports.init = function (dbFolder, json) {
@@ -10,14 +11,14 @@ exports.init = function (dbFolder, json) {
   db = new loki(dbFolder + json);
   fs.exists(dbFolder, function (db) {
     if (!db) {
-      console.log("not found db folder");
+      logger.info("not found db folder");
 
       fs.mkdir(dbFolder, function (err) {
         if (err) {
-          return console.log(err);
+          return logger.error(err);
         }
 
-        console.log("The db folder was created!");
+        logger.info("The db folder was created!");
       })
 
     }
@@ -26,10 +27,10 @@ exports.init = function (dbFolder, json) {
       if (!template)
         fs.writeFile(dbFolder + json, "", function (err) {
           if (err) {
-            return console.log(err);
+            return logger.error(err);
           }
 
-          console.log("The template file was created!");
+          logger.info("The template file was created!");
         });
     });
 
@@ -38,14 +39,14 @@ exports.init = function (dbFolder, json) {
   // init create public/csv folder
   fs.exists("csv", function (db) {
     if (!db) {
-      console.log("not found csv folder");
+      logger.info("not found csv folder");
 
       fs.mkdir("csv", function (err) {
         if (err) {
-          return console.log(err);
+          return logger.error(err);
         }
 
-        console.log("The csv folder was created!");
+        logger.info("The csv folder was created!");
       })
 
     }
@@ -72,7 +73,7 @@ exports.find = function (req, res) {
   if (id)
     db.collection(collectionName).findOne({_id: id}, function (err, documents) {
       if (err)
-        console.log(err);
+        logger.error(err);
       else if (download)
         JSONDownloader(res, documents, id + '.json');
       else
@@ -82,7 +83,7 @@ exports.find = function (req, res) {
   else
     db.collection(collectionName).find().toArray(function (err, documents) {
       if (err)
-        console.log(err);
+        logger.error(err);
       else if (download)
         JSONDownloader(res, documents, collectionName + '.json');
       else
@@ -96,7 +97,7 @@ exports.findOne = function (collectionName, id, callback) {
 
   db.collection(collectionName).findOne({_id: id}, function (err, documents) {
     if (err)
-      console.log(err);
+      logger.error(err);
     if (typeof callback == 'function')
       callback(documents);
     db.close();
@@ -116,7 +117,7 @@ exports.upsert = function (req, res) {
 
   db.collection(collectionName).update({_id: obj._id}, obj, {upsert: true}, function (err, result) {
     if (err)
-      console.log(err);
+      logger.error(err);
     res.send(obj._id);
     db.close();
   });
@@ -129,7 +130,7 @@ exports.delete = function (req, res) {
   var id = req.params.id;
   db.collection(collectionName).remove([{_id: id}], function (err, result) {
     if (err)
-      console.log(err);
+      logger.error(err);
     res.send(id);
     db.close();
   });
@@ -142,7 +143,7 @@ exports.get = function (req, res) {
     if (!coll) {
       res.json([]);
     } else {
-      // console.log(temp.data);
+      // logger.info(temp.data);
       res.json(coll.data);
     }
   });
@@ -194,7 +195,7 @@ exports.del = function (req, res) {
   var collectionName = req.params.collection;
   var id = req.params.id;
   var coll = db.getCollection(collectionName);
-  console.log("Delete collection: " + collectionName + " id: " + id);
+  logger.info("Delete collection: " + collectionName + " id: " + id);
   var data = coll.remove({$loki: id});
   res.json(data);
 
