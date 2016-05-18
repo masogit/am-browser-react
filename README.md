@@ -66,7 +66,7 @@ If you failed to run the test/coverage, try to:
   # am browser contents of properties file
   [node]
   protocol = http
-  server = 15.107.5.19
+  server = The ip of current node server, etc.15.107.5.19
   port = 8080
   https_port = 8443
 
