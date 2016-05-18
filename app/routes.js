@@ -2,9 +2,7 @@ var db = require('./db.js');
 var logger = require('./logger.js');
 
 module.exports = function (app, am) {
-    var REST = require('./rest.js');
-    var rest = new REST();
-    var util = require('util')
+    var util = require('util');
 
     var PropertiesReader = require('properties-reader');
     var properties = PropertiesReader('am-browser-config.properties');
@@ -21,7 +19,7 @@ module.exports = function (app, am) {
 
     apiProxy.on('error', function(e){
       logger.error(util.inspect(e));
-    })
+    });
 
     // CRUD Tingodb
     app.get('/coll/:collection', db.find);
@@ -29,172 +27,10 @@ module.exports = function (app, am) {
     app.post('/coll/:collection', db.upsert);
     app.delete('/coll/:collection/:id', db.delete);
 
-    function view (req, res, db){
-        if (am) {
-          req.body.method = "get";
-          req.body.server = am.server;
-          req.body.user = am.user;
-          req.body.password = am.password;
-
-            var collectionName = req.params.collection;
-            var id = req.params.id;
-            var ref = req.params.ref;
-
-            db.findOne(collectionName, id, function(view){
-
-
-              if (view.body) {
-                var record = {};
-                var promiseArray = [];
-
-                // body(req, res, view.body, record, promiseArray);
-                list(req, view.body, function (data) {
-                  res.send(data);
-                });
-
-              }
-            });
-        }
-    }
-
-    function list (req, body, callback){
-                var fields = [];
-                body.fields.forEach(function(field){
-                  fields.push(field.sqlname);
-                });
-                req.body.context = "/AssetManagerWebService/rs/";
-                req.body.collection = "";
-                req.body.param = {
-                  limit: (req.query.limit) ? req.query.limit:"100",
-                  offset: (req.query.offset) ? req.query.offset:"0",
-                  filter: body.filter,
-                  orderby: body.orderby,
-                  fields: fields.join()
-                }
-
-                var id = req.params.ref;
-                var linkName = req.params.link;
-
-                if (id)
-                    req.body['ref-link'] = 'db/'+body.sqlname+'/'+id;
-                else
-                    req.body['ref-link'] = 'db/'+body.sqlname;
-
-                rest.query(req, function (data) {
-                  if (req.params.ref) {
-                      if (body.links && body.links.length > 0) {
-                        if (linkName) {
-                            var link = body.links.filter(function (link) {
-                              return link.sqlname == linkName;
-                            })[0];
-
-                            if (link) {
-                              if (req.params.linkid) {
-                                req.params.ref = req.params.linkid;
-                                req.params.linkid = undefined;
-                              } else
-                                req.params.ref = undefined;
-
-                              req.params.link = (req.params.link2) ? req.params.link2 : req.params.link;
-
-                              var reverseField = link.reversefield;
-                              var reverse = link.reverse;
-                              var AQL = reverse+'.PK='+ data[reverseField];
-                              link.body.filter += (link.body.filter)?' AND ':'' + AQL;
-
-                              list (req, link.body, function (link_data) {
-                                callback(link_data);
-                              });
-                            } else {
-                                data.links = [];
-                                body.links.forEach(function (link) {
-                                  var body = link.body;
-                                  delete link.body;
-                                  data.links.push(link);
-                                });
-
-                              callback(data);
-                            }
-
-                        } else {
-                            data.links = [];
-                            body.links.forEach(function (link) {
-                              var body = link.body;
-                              delete link.body;
-                              data.links.push(link);
-                            });
-
-                          callback(data);
-                        }
-
-                      } else
-                        callback(data);
-
-                  } else {
-                    if (req.params.linkid) {
-                      data.links = [];
-                      body.links.forEach(function (link) {
-                        var body = link.body;
-                        delete link.body;
-                        data.links.push(link);
-                      });
-                    }
-
-                    callback(data);
-                  }
-
-
-                });
-
-    }
-
-    app.get('/coll/:collection/:id/list', function(req, res){
-      view(req, res, db);
-    });
-
-    app.get('/coll/:collection/:id/list/:ref', function(req, res){
-      view(req, res, db);
-    });
-
-    app.get('/coll/:collection/:id/list/:ref/:link', function(req, res){
-      view(req, res, db);
-    });
-
-    app.get('/coll/:collection/:id/list/:ref/:link/:linkid', function(req, res){
-      view(req, res, db);
-    });
-
-    app.get('/coll/:collection/:id/list/:ref/:link/:linkid/:link2', function(req, res){
-      view(req, res, db);
-    });
-
-    // CRUD local loki file json db
-    app.get('/json/:collection', db.get);
-    app.post('/json/:collection', db.set);
-    app.delete('/json/:collection/:id', db.del);
-
-    // AM Server Conf
-    app.get('/am/conf', function(req, res) {
-        if (am) {
-            var am_rest = Object.assign({}, am);
-            am_rest['password'] = "";
-            res.json(am_rest);
-        } else
-            res.json(am);
-    });
-
-    app.post('/am/conf', function (req, res) {
-        am.server = req.body.server;
-        am.user = req.body.user;
-        am.password = req.body.password;
-    });
-
     // get ucmdb point data
     app.use('/am/ucmdbPoint/', function (req, res) {
       apiProxy.web(req, res, {target: 'http://' + am.server + '/AssetManagerWebService/rs/integration/ucmdbAdapter/points'});
     });
-
-    app.post('/am/rest', rest.db);
 
     // Proxy the backend rest service /rs/db -> /am/db
     logger.info(am);
