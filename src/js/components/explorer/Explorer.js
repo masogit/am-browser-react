@@ -16,6 +16,9 @@ export default class Explorer extends Component {
       this.setState({
         view: view
       });
+
+      // save time count and visit
+      ExplorerActions.updateViewLast(view);
     });
   }
 

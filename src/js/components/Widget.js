@@ -3,7 +3,7 @@ import {Link} from 'react-router';
 import Anchor from 'grommet/components/Anchor';
 import Header from 'grommet/components/Header';
 import Box from 'grommet/components/Box';
-// import Footer from 'grommet/components/Footer';
+import Footer from 'grommet/components/Footer';
 import Tiles from 'grommet/components/Tiles';
 import Tile from 'grommet/components/Tile';
 import Headline from 'grommet/components/Headline';
@@ -51,10 +51,15 @@ export default class Widget extends Component {
             <Link to={`/explorer/${template._id}`}>
               <Anchor href="#" primary={true}>{template.name}</Anchor>
             </Link>
+
           </Header>
           <Box pad="small">
             {template.desc}
           </Box>
+          <Footer justify="between">
+            {template.body.sqlname}
+            {template.last?template.last.count:''}
+          </Footer>
         </Tile>
       );
     });
@@ -73,7 +78,7 @@ export default class Widget extends Component {
         <RecordSearch keyword={this.state.keyword}/>
         {
           widgets.length > 0 &&
-          <Tiles flush={false} colorIndex="light-2" full="horizontal" justify="center">
+          <Tiles flush={false} colorIndex="light-2" full="horizontal" justify="center" size="large">
             {widgets}
           </Tiles>
         }

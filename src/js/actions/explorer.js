@@ -34,8 +34,30 @@ export function loadView(id, callback) {
   });
 }
 
-export function exportRecordsByBody(body, callback) {
-  loadRecordsByBody(body, callback);
+export function updateViewLast(view) {
+  Rest.get(HOST_NAME + '/am/db/' + view.body.sqlname + '/?fields=PK').end(function (err, res) {
+    if (err)
+      console.log(err);
+    else {
+      if (view.last) {
+        view.last.time = Date.now();
+        view.last.count = res.body.count;
+        view.last.visit += 1;
+      } else {
+        view.last = {
+          time: Date.now(),
+          count: res.body.count,
+          visit: 1
+        };
+      }
+
+      //save view
+      Rest.post(HOST_NAME + '/coll/view/', view).end(function (err, res) {
+        if (err)
+          console.log(err);
+      });
+    }
+  });
 }
 
 export function loadRecordsByKeyword(body, keyword, callback) {
