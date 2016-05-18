@@ -36,32 +36,35 @@ export default class Widget extends Component {
       this.setState({
         keyword: ''
       });
-    this.setState({
-      filtered: this.props.templates.filter((obj) => obj.name.toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1)
-    });
+    // this.setState({
+    //   filtered: this.props.templates.filter((obj) => obj.name.toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1)
+    // });
   }
 
   render() {
     const {templates} = this.props;
+    templates.sort((a, b)=> {
+      return b.last.time - a.last.time;
+    });
     var templatesState = this.state && this.state.filtered ? this.state.filtered : templates;
     let widgets = templatesState.map((template, key) => {
-      return (
-        <Tile key={key} align="start" separator="top" colorIndex="light-1">
-          <Header size="small" pad={{horizontal: 'small'}}>
-            <Link to={`/explorer/${template._id}`}>
-              <Anchor href="#" primary={true}>{template.name}</Anchor>
-            </Link>
+      return key < 4 && (
+          <Tile key={key} align="start" separator="top" colorIndex="light-1">
+            <Header size="small" pad={{horizontal: 'small'}}>
+              <Link to={`/explorer/${template._id}`}>
+                <Anchor href="#" primary={true}>{template.name}</Anchor>
+              </Link>
 
-          </Header>
-          <Box pad="small">
-            {template.desc}
-          </Box>
-          <Footer justify="between">
-            {template.body.sqlname}
-            {template.last?template.last.count:''}
-          </Footer>
-        </Tile>
-      );
+            </Header>
+            <Box pad="small">
+              {template.desc}
+            </Box>
+            <Footer justify="between">
+              {template.body.sqlname}
+              {template.last ? template.last.count : ''}
+            </Footer>
+          </Tile>
+        );
     });
     return (
       <Box appCentered={true} align="center" full="vertical" justify="center">
@@ -77,10 +80,13 @@ export default class Widget extends Component {
         </Box>
         <RecordSearch keyword={this.state.keyword}/>
         {
-          widgets.length > 0 &&
-          <Tiles flush={false} colorIndex="light-2" full="horizontal" justify="center" size="large">
-            {widgets}
-          </Tiles>
+          widgets.length > 0 && !this.state.keyword &&
+          <Box full="horizontal" direction="column">
+            <h4>Total views: {widgets.length}, recently visited 4 views:</h4>
+            <Tiles flush={false} colorIndex="light-2" justify="center">
+              {widgets}
+            </Tiles>
+          </Box>
         }
       </Box>
     );
