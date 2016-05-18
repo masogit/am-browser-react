@@ -23,7 +23,7 @@ module.exports = function (app, am) {
 
     // CRUD Tingodb
     app.get('/coll/:collection', db.find);
-    app.patch('/coll/:collection', db.update);
+    app.patch('/coll/:collection', db.upsert);
     app.get('/coll/:collection/:id', db.find);
     app.post('/coll/:collection', db.upsert);
     app.delete('/coll/:collection/:id', db.delete);
