@@ -54,15 +54,17 @@ export default class AQL extends Component {
   }
 
   _initAQL() {
+    var aql = {
+      str: '',
+      name: '',
+      category: '',
+      type: '',
+      form: null
+    };
     this.setState({
-      aql: {
-        str: '',
-        name: '',
-        category: '',
-        type: '',
-        form: null
-      }
+      aql: aql
     });
+    return aql;
   }
 
   _loadViews() {
@@ -170,10 +172,12 @@ export default class AQL extends Component {
     });
   }
 
-  _loadAQLStr(str) {
-    var aql = this.state.aql;
-    aql.str = str;
-    this.setState({aql: aql});
+  _loadOOBAQL(report) {
+    var aql = this._initAQL();
+    aql.str = report.AQL;
+    aql.name = report.name;
+    aql.category = 'OOB';
+    this.setState({aql: aql}, this._onQuery());
   }
 
   _setFormValues(event) {
@@ -314,14 +318,14 @@ export default class AQL extends Component {
                 }
               </GroupList>
             </Tab>
-            <Tab title="Repository">
+            <Tab title={this.state.reports.count?`Repository (${this.state.reports.count})`:'Repository'}>
               <List selectable={true}>
                 {
                   this.state.reports.entities &&
                   this.state.reports.entities.map((report) => {
                     return (
                       <ListItem key={report['ref-link']}
-                                onClick={this._loadAQLStr.bind(this, report.AQL)}>{report.Name}</ListItem>
+                                onClick={this._loadOOBAQL.bind(this, report)}>{report.Name}</ListItem>
                     );
                   })
                 }
