@@ -1,17 +1,18 @@
 import React, {Component} from 'react';
 import ChartForm from './ChartForm';
-import MeterForm from './MeterForm.js';
-import DistributionForm from './DistributionForm.js';
+import MeterForm from './MeterForm';
+import DistributionForm from './DistributionForm';
+import Graph from './Graph';
 import AlertForm from './../commons/AlertForm';
 import GroupList from './../commons/GroupList';
 import GroupListItem from './../commons/GroupListItem';
 import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
+import ActionTab from '../commons/ActionTab';
+
 import {
   Anchor,
   Box,
-  Chart,
-  // Distribution,
   Sidebar,
   Split,
   Form,
@@ -25,9 +26,7 @@ import {
   Table,
   TableRow,
   Title,
-  Menu,
-  Meter,
-  Distribution
+  Menu
 } from 'grommet';
 import Play from 'grommet/components/icons/base/Play';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
@@ -54,17 +53,15 @@ export default class AQL extends Component {
   }
 
   _initAQL() {
-    var aql = {
-      str: '',
-      name: '',
-      category: '',
-      type: '',
-      form: null
-    };
     this.setState({
-      aql: aql
+      aql: {
+        str: '',
+        name: '',
+        category: '',
+        type: '',
+        form: null
+      }
     });
-    return aql;
   }
 
   _loadViews() {
@@ -84,6 +81,10 @@ export default class AQL extends Component {
   }
 
   _loadAQL(aql) {
+    if (this.refs && this.refs[aql.type]) {
+      this.refs[aql.type]._onClickTab(event);
+    }
+
     this.setState({
       aql: {...aql}
     });
@@ -263,8 +264,7 @@ export default class AQL extends Component {
   }
 
   render() {
-    var header;
-    var rows;
+    let header, rows;
     // console.log(this.state);
     if (this.state.aql.data) {
       header = this.state.aql.data.header.map((col) => {
@@ -281,58 +281,49 @@ export default class AQL extends Component {
         </TableRow>);
       });
     }
-
-    const getGraph = () => {
-      if (this.state.aql.form) {
-        const activeIndex = (this.refs.graphForms && this.refs.graphForms.state.activeIndex) || 0;
-        if (activeIndex === 0) {
-          return <Chart {...this.state.aql.chart} />;
-        }
-
-        if (activeIndex === 1) {
-          return <Meter {...this.state.aql.meter} />;
-        }
-
-        if (activeIndex === 2) {
-          return <Distribution {...this.state.aql.distribution} />;
-        }
-      }
+    const getIndex = (type) => {
+      if (type === 'chart') return 0;
+      if (type === 'meter') return 1;
+      if (type === 'distribution') return 2;
     };
 
-    //TODO: switch tab will re-generate Graph
+    const sideBar = (
+      <Sidebar primary={true} pad="small" fixed={false} full={false} separator="right">
+        <Tabs initialIndex={0} justify="start">
+          <Tab title={'AQLs ('+this.state.aqls.length+')'}>
+            <GroupList pad={{vertical: 'small'}} selectable={true} searchable={true}>
+              {
+                this.state.aqls.map((aql) => {
+                  return (
+                    <GroupListItem key={aql._id} groupby={aql.category} onClick={this._loadAQL.bind(this, aql)}
+                                   search={aql.name} pad="small">
+                      {aql.name}
+                    </GroupListItem>
+                  );
+                })
+              }
+            </GroupList>
+          </Tab>
+          <Tab title={this.state.reports.count?`Repository (${this.state.reports.count})`:'Repository'}>
+            <List selectable={true}>
+              {
+                this.state.reports.entities &&
+                this.state.reports.entities.map((report) => {
+                  return (
+                    <ListItem key={report['ref-link']}
+                              onClick={this._loadOOBAQL.bind(this, report)}>{report.Name}</ListItem>
+                  );
+                })
+              }
+            </List>
+          </Tab>
+        </Tabs>
+      </Sidebar>
+    );
+
     return (
       <Split flex="right">
-        <Sidebar primary={true} pad="small" fixed={false} full={false} separator="right">
-          <Tabs initialIndex={0} justify="start">
-            <Tab title={'AQLs ('+this.state.aqls.length+')'}>
-              <GroupList pad={{vertical: 'small'}} selectable={true} searchable={true}>
-                {
-                  this.state.aqls.map((aql) => {
-                    return (
-                      <GroupListItem key={aql._id} groupby={aql.category} onClick={this._loadAQL.bind(this, aql)}
-                                     search={aql.name} pad="small">
-                        {aql.name}
-                      </GroupListItem>
-                    );
-                  })
-                }
-              </GroupList>
-            </Tab>
-            <Tab title={this.state.reports.count?`Repository (${this.state.reports.count})`:'Repository'}>
-              <List selectable={true}>
-                {
-                  this.state.reports.entities &&
-                  this.state.reports.entities.map((report) => {
-                    return (
-                      <ListItem key={report['ref-link']}
-                                onClick={this._loadOOBAQL.bind(this, report)}>{report.Name}</ListItem>
-                    );
-                  })
-                }
-              </List>
-            </Tab>
-          </Tabs>
-        </Sidebar>
+        {sideBar}
         <Box pad={{horizontal: 'small'}}>
           <div>
             {this.state.alertLayer}
@@ -366,7 +357,7 @@ export default class AQL extends Component {
             </Box>
             <Split flex="left" fixed={false}>
               <Box>
-                {getGraph()}
+                {this.state.aql.form && <Graph {...this.state.aql} />}
                 <Table>
                   <thead>
                   <tr>{header}</tr>
@@ -378,22 +369,22 @@ export default class AQL extends Component {
               </Box>
               {
                 this.state.aql.data &&
-                <Tabs initialIndex={0} justify="start" ref='graphForms'>
-                  <Tab title="Chart">
+                <Tabs initialIndex={getIndex(this.state.aql.type)} justify="start">
+                  <ActionTab title="Chart" onClick={this._genGraph.bind(this, this.state.aql.chart, 'chart')} ref='chart'>
                     <ChartForm {...this.state.aql} genGraph={this._genGraph.bind(this)}/>
-                  </Tab>
-                  <Tab title="Meter">
+                  </ActionTab>
+                  <ActionTab title="Meter" onClick={this._genGraph.bind(this, this.state.aql.meter, 'meter')} ref='meter'>
                     <MeterForm {...this.state.aql} genGraph={this._genGraph.bind(this)}/>
-                  </Tab>
-                  <Tab title="Distribution">
+                  </ActionTab>
+                  <ActionTab title="Distribution" onClick={this._genGraph.bind(this, this.state.aql.distribution, 'distribution')} ref='distribution'>
                     <DistributionForm {...this.state.aql} genGraph={this._genGraph.bind(this)}/>
-                  </Tab>
+                  </ActionTab>
                   <Tab title="Value"/>
                   <Tab title="WorldMap"/>
                 </Tabs>
               }
+              {this.state.viewsLayer}
             </Split>
-            {this.state.viewsLayer}
           </div>
         </Box>
       </Split>

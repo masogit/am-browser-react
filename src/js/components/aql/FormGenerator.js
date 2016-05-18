@@ -11,7 +11,7 @@ import {
 } from 'grommet';
 
 const FormContainer = ({basicOptions, advanceOptions, form, selections}) => (
-  <Tabs initialIndex={0} justify="end">
+  <Tabs initialIndex={0} justify="end" key={form.state.type}>
     <Tab title="Basic">
       <Form pad="none" compact={true}>
         <FormFields>
@@ -85,12 +85,6 @@ const setValueByJsonPath = (path, val, obj) => {
       }
       result = result[field];
     }
-  }
-};
-
-export const assignObjectProp = (from, to, propName) => {
-  if (from[propName]) {
-    to[propName] = from[propName];
   }
 };
 
@@ -196,9 +190,9 @@ export default class GraphForm extends Component {
     }
 
     setValueByJsonPath(path, val, obj);
-    const graph = this._genGraph(obj);
-    newState[type] = graph;
-    this.setState(newState, this.props.genGraph(graph, type));
+    //const graph = this._genGraph(obj);
+    newState[type] = obj;
+    this.setState(newState, this.props.genGraph(obj, type));
   }
 
   render(basicOptions, advanceOptions, selections) {

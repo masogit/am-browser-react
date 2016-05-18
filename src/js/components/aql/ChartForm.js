@@ -1,4 +1,4 @@
-import GraphForm, {assignObjectProp} from './FormGenerator';
+import GraphForm from './FormGenerator';
 
 export default class ChartForm extends GraphForm {
 
@@ -34,70 +34,12 @@ export default class ChartForm extends GraphForm {
     };
   }
 
-  _genGraph(form) {
-    const chart = {
-      important: form.important,
-      threshold: form.threshold,
-      type: form.type,
-      size: form.size,
-      points: form.points,
-      segmented: form.segmented,
-      smooth: form.smooth,
-      sparkline: form.sparkline,
-      units: form.units,
-      xAxis_col: form.xAxis_col,
-      series_col: form.series_col,
-      series: []
-    };
-
-    if (form.series_col.size > 0 || form.series.length > 0) {
-      form.xAxis.data = [];
-
-      // gen series
-      const series = [...form.series_col].map(col => ({
-        label: this.props.data.header[col].Name,
-        values: [],
-        index: col
-      }));
-
-      this.props.data.rows.map((row, i) => {
-        // gen series
-        series.forEach(item => {
-          const value = row[item.index];
-          item.values.push([i, value / 1.0]);
-        });
-
-        // gen xAxis
-        const xAxisLabel = form.xAxis_col ? row[form.xAxis_col] : i;
-        form.xAxis.data.push({"label": '' + xAxisLabel, "value": i});
-      });
-      chart.series = series;
-
-      assignObjectProp(form, chart, 'max');
-      assignObjectProp(form, chart, 'min');
-
-      // gen legend
-      if (form.legend.position) {
-        chart.legend = {
-          position: form.legend.position,
-          total: form.legend.total
-        };
-      }
-
-      if (form.xAxis.placement) {
-        chart.xAxis = form.xAxis;
-      }
-    }
-
-    return chart;
-  }
-
   render() {
     const col_options = [];
-    const xAxis_col_options = [];
+    const xAxis_col_options = [{value: '', text: ''}];
     if (this.props.data.header) {
       let series_col = this.state.chart.series_col;
-      if (this.props.chart) {
+      if (this.props.chart && this.props.chart.series) {
         series_col = new Set(this.props.chart.series.map((item) => item.index));
       }
       this.props.data.header.map((header, index) => {

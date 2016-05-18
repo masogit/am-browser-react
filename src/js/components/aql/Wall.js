@@ -6,15 +6,13 @@ import Close from 'grommet/components/icons/base/Close';
 import Attachment from 'grommet/components/icons/base/Attachment';
 import Camera from 'grommet/components/icons/base/Camera';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
+import Graph from './Graph';
 import {
   Anchor,
   Box,
-  Chart,
   CheckBox,
-  Distribution,
   Header,
-  Layer,
-  Meter
+  Layer
 } from 'grommet';
 import GroupList from '../commons/GroupList';
 import GroupListItem from '../commons/GroupListItem';
@@ -179,18 +177,7 @@ export default class Wall extends Component {
         box.child && box.child.name &&
         <Box justify="center" {...box} direction="column" pad="medium">
           <Header>{box.child.name}</Header>
-          {
-            box.child.type === 'chart' &&
-            <Chart {...box.child.chart} />
-          }
-          {
-            box.child.type === 'meter' &&
-            <Meter {...box.child.meter} />
-          }
-          {
-            box.child.type === 'distribution' &&
-            <Distribution {...box.child.distribution} />
-          }
+          {<Graph {...box.child}/>}
         </Box>
       }
       {

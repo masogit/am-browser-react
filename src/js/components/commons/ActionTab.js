@@ -1,6 +1,7 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
-import Tab from 'grommet/components/Tab';
-class CustomTab extends Tab {
+import Tab from '../../../../node_modules/grommet/components/Tab';
+import {PropTypes} from 'react';
+export default class ActionTab extends Tab {
   constructor() {
     super();
   }
@@ -24,4 +25,8 @@ class CustomTab extends Tab {
     }
   }
 }
-export default CustomTab;
+
+ActionTab.propTypes = {
+  onClick: PropTypes.func,
+  disabled: PropTypes.bool
+};

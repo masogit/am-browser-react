@@ -18,7 +18,7 @@ import {IntlProvider} from 'react-intl';
 import store from './store';
 import history from './RouteHistory';
 import {init, routeChanged/*, loginSuccess*/} from './actions';
-
+import {AM_FORM_DATA} from './util/Config';
 import {ReduxRouter} from 'redux-router';
 
 // The port number needs to align with devServerProxy and websocketHost in gulpfile.js
@@ -26,8 +26,38 @@ import {ReduxRouter} from 'redux-router';
 
 //RestWatch.initialize('ws://' + hostName + '/rest/ws');
 
+
 Rest.setHeader('Accept', 'application/json');
 Rest.setHeader('X-API-Version', 200);
+
+if (!Rest.get('header').header.Authorization) {
+  const storage = window.localStorage && window.localStorage[AM_FORM_DATA];
+  if (storage) {
+    const form = JSON.parse(storage);
+    const auth = 'Basic ' + new Buffer(form.user + ':' + form.password).toString('base64');
+    Rest.setHeader("Authorization", auth);
+  }
+}
+
+// will be removed after we can get csrf token automatically
+const getCookie = (cname) => {
+  var name = cname + "=";
+  var ca = document.cookie.split(';');
+  for (var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+};
+
+if (!Rest.get('header').header.CSRFToken) {
+  Rest.setHeader("CSRFToken", getCookie('CSRFToken'));
+}
 
 // From a comment in https://github.com/rackt/redux/issues/637
 // this factory returns a history implementation which reads the current state
@@ -102,6 +132,8 @@ let postLoginPath = '/search';
 
 // check for session
 let sessionWatcher = () => {
+
+  console.log(Rest.get('header').header);
   const {route, session} = store.getState();
   Routes.routes[0].childRoutes = getRoutes();
 

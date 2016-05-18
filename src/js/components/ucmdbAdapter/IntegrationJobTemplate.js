@@ -6,7 +6,7 @@ import Table from 'grommet/components/Table';
 import {statusAdapter} from '../../constants/StatusAdapter.js';
 var Status = require('grommet/components/icons/Status');
 import Tabs from 'grommet/components/Tabs';
-import CustomTab from './CustomTab.js';
+import ActionTab from './../commons/ActionTab.js';
 import Split from 'grommet/components/Split';
 import React from 'react';
 
@@ -108,7 +108,7 @@ export const IntegrationJobTemplate = ({
   integrationJobData.sort((a,b) => a.name.localeCompare(b.name));
   return (
     <Tabs justify="start" initialIndex={tabName === 'populationJobs' ? 0: 1}>
-      <CustomTab title="Population" onClick={() => onTabClick('populationJobs')} disabled={!populationSupported}>
+      <ActionTab title="Population" onClick={() => onTabClick('populationJobs')} disabled={!populationSupported}>
         <Split flex="both" separator={true}>
           <div className="integrationJobTable">
             <IntegrationJobTable
@@ -119,8 +119,8 @@ export const IntegrationJobTemplate = ({
               onIntegrationJobSelect={(selected) => onIntegrationJobSelect(tabName, pointName, integrationJobData[selected].name)}/>
           </div>
         </Split>
-      </CustomTab>
-      <CustomTab title="Data Push" onClick={() => onTabClick('pushJobs')} disabled={!pushSupported}>
+      </ActionTab>
+      <ActionTab title="Data Push" onClick={() => onTabClick('pushJobs')} disabled={!pushSupported}>
         <Split flex="both" separator={true}>
           <div className="integrationJobTable">
             <IntegrationJobTable
@@ -131,7 +131,7 @@ export const IntegrationJobTemplate = ({
               onIntegrationJobSelect={(selected) => onIntegrationJobSelect(tabName, pointName, integrationJobData[selected].name)}/>
           </div>
         </Split>
-      </CustomTab>
+      </ActionTab>
     </Tabs>
   );
 };

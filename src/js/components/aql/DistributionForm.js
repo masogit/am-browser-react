@@ -18,29 +18,6 @@ export default class ChartForm extends GraphForm {
     };
   }
 
-  _genGraph(form) {
-    const distribution = {
-      size: form.size,
-      units: form.units,
-      legendTotal: form.legendTotal,
-      series_col: form.series_col,
-      full: false,
-      series: []
-    };
-
-    if (form.series_col) {
-      distribution.series = this.props.data.rows.map((row, i) => ( {
-        label: '' + (form.label ? row[form.label] : i),
-        value: row[form.series_col] / 1.0,
-        index: i
-      }));
-
-      distribution.legend = !!(form.units || form.legendTotal);
-    }
-
-    return distribution;
-  }
-
   render() {
     const col_options = [{value: '', text: ''}];
     const label_options = [{value: '', text: ''}];

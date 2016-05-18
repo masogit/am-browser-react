@@ -1,4 +1,4 @@
-import GraphForm, { assignObjectProp } from './FormGenerator';
+import GraphForm from './FormGenerator';
 
 export default class ChartForm extends GraphForm {
 
@@ -26,41 +26,6 @@ export default class ChartForm extends GraphForm {
       type: 'meter',
       meter: Object.assign({}, this.init)
     };
-  }
-
-  _genGraph(form) {
-    const meter = {
-      important: form.important,
-      threshold: form.threshold,
-      type: form.type,
-      series_col: form.series_col,
-      size: form.size,
-      vertical: form.vertical,
-      stacked: form.stacked,
-      units: form.units
-    };
-
-    if (form.series_col) {
-      meter.series = this.props.data.rows.map((row, i) => ({
-        label: '' + i,
-        value: row[form.series_col] / 1.0,
-        index: i
-      }));
-
-      assignObjectProp(form, meter, 'max');
-      assignObjectProp(form, meter, 'min');
-      assignObjectProp(form, meter, 'value');
-
-      // gen legend
-      if (form.legend.position) {
-        meter.legend = {
-          position: form.legend.position,
-          total: form.legend.total
-        };
-      }
-    }
-
-    return meter;
   }
 
   render() {
