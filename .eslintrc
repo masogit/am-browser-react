@@ -31,7 +31,6 @@ rules:
   indent: [2, 2, { SwitchCase: 1 }]
   brace-style: 2
   #space-after-keywords: 2
-  keyword-spacing: 2
   comma-dangle: 2
   no-unused-expressions: 2
   #block-scoped-var: 2
