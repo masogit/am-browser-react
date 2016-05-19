@@ -1,7 +1,6 @@
-import React, { Component, PropTypes } from 'react';
+import React, {Component, PropTypes} from 'react';
 import Anchor from 'grommet/components/Anchor';
-import Table from 'grommet/components/Table';
-import TableRow from 'grommet/components/TableRow';
+import Box from 'grommet/components/Box';
 
 export default class BreadCrumb extends Component {
 
@@ -25,25 +24,19 @@ export default class BreadCrumb extends Component {
   render() {
     let elements = this.props.elements;
     let Home = require('grommet/components/icons/base/Home');
-    let CaretNext = require('grommet/components/icons/base/CaretNext');
+    let Next = require('grommet/components/icons/base/Next');
     let breadcrumbs = elements.map((element, index) => {
       if (index == 0) {
-        return <td key={index}>&nbsp;&nbsp;<Home size="large" colorIndex="brand"/>&nbsp;&nbsp;<Anchor key={index} onClick={this._onClick.bind(this)}>{element.label}</Anchor></td>;
+        return <Anchor key={index} icon={<Home />} onClick={this._onClick.bind(this)} label={element.label}/>;
       } else if (index == elements.length - 1) {
-        return <td key={index}>&nbsp;&nbsp;<CaretNext size="large" colorIndex="brand"/>&nbsp;&nbsp;{element.label}</td>;
+        return <Anchor key={index} icon={<Next />} label={element.label}/>;
       } else {
-        return <td key={index}>&nbsp;&nbsp;<CaretNext size="large" colorIndex="brand"/>&nbsp;&nbsp;<Anchor key={index} onClick={this._onDetailClick.bind(this, element, index)}>{element.label}</Anchor></td>;
+        return <Anchor key={index} icon={<Next />} onClick={this._onDetailClick.bind(this, element, index)} label={element.label}/>;
       }
     });
 
     return (
-      <Table>
-        <tbody>
-          <TableRow>
-          {breadcrumbs}
-          </TableRow>
-        </tbody>
-      </Table>
+      <Box pad={{horizontal: 'small'}}>{breadcrumbs}</Box>
     );
   }
 }

@@ -7,7 +7,7 @@ import Rest from 'grommet/utils/Rest';
 export function saveWall(wall, callback) {
   Rest.post(HOST_NAME + '/coll/wall', wall).end((err, res) => {
     if (err) {
-      console.log(err);
+      console.log(err.response ? err.response.text : err);
     } else
       callback(res.text);
   });
@@ -25,7 +25,7 @@ export function loadWall(callback) {
 export function loadAQLs(callback) {
   Rest.get(HOST_NAME + '/coll/aql').end((err, res) => {
     if (err) {
-      console.log(err);
+      console.log(err.response ? err.response.text : err);
     } else
       callback(res.body);
   });
@@ -34,7 +34,7 @@ export function loadAQLs(callback) {
 export function saveAQL(aql, callback) {
   Rest.post(HOST_NAME + '/coll/aql', aql).end((err, res) => {
     if (err) {
-      console.log(err);
+      console.log(err.response ? err.response.text : err);
     } else
       callback(res.text);
   });
@@ -43,7 +43,7 @@ export function saveAQL(aql, callback) {
 export function removeAQL(id, callback) {
   Rest.del(HOST_NAME + '/coll/aql/' + id).end((err, res) => {
     if (err) {
-      console.log(err);
+      console.log(err.response ? err.response.text : err);
     } else
       callback(res.text);
   });
@@ -52,7 +52,7 @@ export function removeAQL(id, callback) {
 export function loadReports(callback) {
   Rest.get(HOST_NAME + '/am/db/amInToolReport').end(function (err, res) {
     if (err) {
-      console.log(err);
+      console.log(err.response ? err.response.text : err);
     } else
       callback(res.body);
   });

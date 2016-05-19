@@ -16,7 +16,30 @@ var rootPath = "/"; //"/ferret/";
 //  rootPath = "/"; // webpack-dev-server
 //}
 
-module.exports = {
+export const getRoutes = () => {
+  const routes = [
+    {path: 'login', component: Login},
+    {path: 'home', component: Home},
+    {path: 'wall', component: Wall},
+    {path: 'explorer', component: Explorer},
+    {path: 'explorer(/:id)', component: Explorer},
+    {path: 'tbd', component: TBD}
+  ];
+
+  const hasAdminPrivilege = (localStorage && localStorage.amFormData && JSON.parse(localStorage.amFormData).hasAdminPrivilege) || (sessionStorage && sessionStorage.amFormData && JSON.parse(sessionStorage.amFormData).hasAdminPrivilege);
+  if (hasAdminPrivilege) {
+    routes.push(...[
+      {path: 'ucmdbAdapter(/:pointName)(/:tabName)(/:integrationJobName)', component: UCMDBAdapterContainer},
+      {path: 'aql', component: AQL},
+      {path: 'views(/:id)', component: ViewDefListContainer}
+    ]);
+  }
+  return routes;
+};
+
+
+
+const Route = {
 
   prefix: rootPath.slice(0, -1),
 
@@ -25,38 +48,9 @@ module.exports = {
   routes: [
     {
       path: rootPath, component: Ferret,
-      // TODO: crashes react-router, wait for fix
-      //indexRoute: {
-      //  onEnter: function (nextState, replaceState) {
-      //    replaceState(null, '/explorer');
-      //  }
-      //},
-      childRoutes: [
-        {path: 'login', component: Login},
-        {path: 'home', component: Home},
-        {path: 'wall', component: Wall},
-        {path: 'explorer', component: Explorer},
-        {path: 'aql', component: AQL},
-        {
-          path: 'views(/:id)', component: ViewDefListContainer
-        },
-        {
-          path: 'explorer(/:id)', component: Explorer
-        },
-        //{
-        //  path: 'views', component: ViewDefList,
-        //  childRoutes: [
-        //    {
-        //      path: ':id', component: ViewDefDetail
-        //    }
-        //  ]
-        //},
-        {
-          path: 'ucmdbAdapter(/:pointName)(/:tabName)(/:integrationJobName)', component: UCMDBAdapterContainer
-        },
-        //{path: 'views/:id', component: Views},
-        {path: 'tbd', component: TBD}
-      ]
+      childRoutes: getRoutes()
     }
   ]
 };
+
+export default Route;

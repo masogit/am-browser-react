@@ -23,7 +23,6 @@ module.exports = function (app, am) {
 
     // CRUD Tingodb
     app.get('/coll/:collection', db.find);
-    app.patch('/coll/:collection', db.upsert);
     app.get('/coll/:collection/:id', db.find);
     app.post('/coll/:collection', db.upsert);
     app.delete('/coll/:collection/:id', db.delete);
@@ -33,11 +32,17 @@ module.exports = function (app, am) {
       apiProxy.web(req, res, {target: 'http://' + am.server + '/AssetManagerWebService/rs/integration/ucmdbAdapter/points'});
     });
 
+    //TODO: do the real check
+    const hasAdminPrivilege = (req) => {
+      return db.getUserName(req).toLowerCase() === 'admin';
+    };
+
     // AM Server Conf
     app.get('/am/conf', function(req, res) {
       if (am) {
         var am_rest = Object.assign({}, am);
         am_rest['password'] = "";
+        am_rest.hasAdminPrivilege = hasAdminPrivilege(req);
         res.json(am_rest);
       } else
         res.json(am);
