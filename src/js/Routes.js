@@ -3,6 +3,7 @@
 import Ferret from './components/Ferret';
 import Login from './components/Login';
 import Home from './components/Home';
+import Search from './components/explorer/Search';
 import Wall from './components/aql/Wall';
 import Explorer from './components/explorer/Explorer';
 import ViewDefListContainer from './components/builder/ViewDefListContainer';
@@ -20,6 +21,7 @@ export const getRoutes = () => {
   const routes = [
     {path: 'login', component: Login},
     {path: 'home', component: Home},
+    {path: 'search', component: Search},
     {path: 'wall', component: Wall},
     {path: 'explorer', component: Explorer},
     {path: 'explorer(/:id)', component: Explorer},

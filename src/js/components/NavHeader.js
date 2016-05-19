@@ -45,7 +45,8 @@ class NavHeader extends Component {
   render() {
     var listViews = this.state.filteredViews || this.state.views;
     let links = [
-      {to: '/home', text: 'Search'},
+      {to: '/home', text: 'Home'},
+      {to: '/search', text: 'Search(trial)'},
       {to: '/wall', text: 'Insight'}
     ];
 
