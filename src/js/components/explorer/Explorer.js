@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import * as ExplorerActions from '../../actions/explorer';
 import RecordList from './RecordList';
+import Box from 'grommet/components/Box';
 
 export default class Explorer extends Component {
 
@@ -25,7 +26,9 @@ export default class Explorer extends Component {
   render() {
     return (
       this.state.view &&
-      <RecordList body={this.state.view.body} title={this.state.view.name} />
+      <Box pad="small">
+        <RecordList body={this.state.view.body} title={this.state.view.name} />
+      </Box>
     );
   }
 }
