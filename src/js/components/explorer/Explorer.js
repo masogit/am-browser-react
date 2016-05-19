@@ -19,7 +19,7 @@ export default class Explorer extends Component {
       });
 
       // save time count and visit
-      ExplorerActions.updateViewLast(view);
+      // ExplorerActions.updateViewLast(view);
     });
   }
 
