@@ -26,7 +26,7 @@ export const getRoutes = () => {
     {path: 'tbd', component: TBD}
   ];
 
-  const hasAdminPrivilege = (localStorage && JSON.parse(localStorage.amFormData).hasAdminPrivilege) || (sessionStorage && JSON.parse(sessionStorage.amFormData).hasAdminPrivilege);
+  const hasAdminPrivilege = (localStorage && localStorage.amFormData && JSON.parse(localStorage.amFormData).hasAdminPrivilege) || (sessionStorage && sessionStorage.amFormData && JSON.parse(sessionStorage.amFormData).hasAdminPrivilege);
   if (hasAdminPrivilege) {
     routes.push(...[
       {path: 'ucmdbAdapter(/:pointName)(/:tabName)(/:integrationJobName)', component: UCMDBAdapterContainer},

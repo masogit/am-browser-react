@@ -49,7 +49,7 @@ class NavHeader extends Component {
       {to: '/wall', text: 'Insight'}
     ];
 
-    const hasAdminPrivilege = (localStorage && JSON.parse(localStorage.amFormData).hasAdminPrivilege) || (sessionStorage && JSON.parse(sessionStorage.amFormData).hasAdminPrivilege);
+    const hasAdminPrivilege = (localStorage && localStorage.amFormData && JSON.parse(localStorage.amFormData).hasAdminPrivilege) || (sessionStorage && sessionStorage.amFormData && JSON.parse(sessionStorage.amFormData).hasAdminPrivilege);
     if (hasAdminPrivilege) {
       links.push(...[
         {to: '/views', text: 'Views'},
