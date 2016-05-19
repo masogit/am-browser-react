@@ -93,6 +93,16 @@ export default class Wall extends Component {
         direction: 'row',
         child: null
       });
+    else {
+      var child = box.child;
+      box.child = [{
+        direction: 'row',
+        child: child
+      }, {
+        direction: 'row',
+        child: null
+      }];
+    }
     this.setState({
       box: parent
     });
@@ -152,7 +162,7 @@ export default class Wall extends Component {
   }
 
   _buildBox(box, parent) {
-    return (<Box key={box.key} direction="column" separator={this.state.edit?'all':'none'}>
+    return (<Box key={box.key} direction="column" separator={this.state.edit?'all':'none'} colorIndex="light-2">
       {
         this._buildActions(box, parent)}
       {
@@ -195,11 +205,14 @@ export default class Wall extends Component {
   _buildActions(box, parent) {
     var id = (Math.random() + 1).toString(36).substring(7);
     if (this.state.edit)
-      return (<Box direction="row" justify="center" separator="bottom" pad="small">
+      return (<Box direction="row" justify="center" pad="small">
         <CheckBox id={id} label={box.direction==='row'?'Column':'Row'} checked={box.direction!=='column'}
                   onChange={this._toggleDirection.bind(this, box, parent)} toggle={true}/>
-        <Anchor href="#" icon={<Add />} label="Add" onClick={this._addBox.bind(this, box, parent)}/>
-        <Anchor href="#" icon={<Close />} label="Delete" onClick={this._deleteBox.bind(this, box, parent)}/>
+        <Anchor href="#" icon={<Add />} label="Split" onClick={this._addBox.bind(this, box, parent)}/>
+        {
+          box.child &&
+          <Anchor href="#" icon={<Close />} label="Delete" onClick={this._deleteBox.bind(this, box, parent)}/>
+        }
       </Box>);
   }
 
@@ -207,16 +220,18 @@ export default class Wall extends Component {
     AQLActions.saveWall(this.state.box, (data) => {
       if (data)
         this._loadWall();
-
+      var alert = <AlertForm onClose={this._closeAlert.bind(this)}
+                             title={'AM Insight layout saved!'}
+                             onConfirm={this._closeAlert.bind(this)}/>;
       this.setState({
-        savedAlert: <AlertForm onClose={()=>{
-          this.setState({
-            savedAlert: null});}}
-                                 title={'AM Insight layout saved!'}
-                                 onConfirm={()=>{
-                                   this.setState({
-                                     savedAlert: null});}}/>
+        alert: alert
       });
+    });
+  }
+
+  _closeAlert() {
+    this.setState({
+      alert: null
     });
   }
 
@@ -224,7 +239,7 @@ export default class Wall extends Component {
     var box = this.state.box;
     return (
       <Box direction="column" pad="medium" full="horizontal">
-        <Box justify="between" direction="row">
+        <Box justify="between" direction="row" separator="none">
           {
             this.state.edit &&
             <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>
@@ -239,7 +254,7 @@ export default class Wall extends Component {
         </Box>
         {this._buildBox(box, box)}
         {this.state.layer}
-        {this.state.savedAlert}
+        {this.state.alert}
       </Box>
     );
   }
