@@ -302,15 +302,15 @@ export default class AQL extends Component {
     //TODO: switch tab will re-generate Graph
     return (
       <Split flex="right">
-        <Sidebar pad="small" size="small">
+        <Sidebar primary={true} pad="small" fixed={false} full={false} separator="right">
           <Tabs initialIndex={0} justify="start">
             <Tab title={'AQLs ('+this.state.aqls.length+')'}>
-              <GroupList selectable={true} searchable={true}>
+              <GroupList pad={{vertical: 'small'}} selectable={true} searchable={true}>
                 {
                   this.state.aqls.map((aql) => {
                     return (
                       <GroupListItem key={aql._id} groupby={aql.category} onClick={this._loadAQL.bind(this, aql)}
-                                     search={aql.name}>
+                                     search={aql.name} pad="small">
                         {aql.name}
                       </GroupListItem>
                     );

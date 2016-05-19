@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import Anchor from 'grommet/components/Anchor';
-// import Box from 'grommet/components/Box';
+import Box from 'grommet/components/Box';
 import Table from 'grommet/components/Table';
 import TableRow from 'grommet/components/TableRow';
 import SearchInput from 'grommet/components/SearchInput';
@@ -92,7 +92,7 @@ export default class MetaData extends Component {
       </TableRow>;
     });
     return (
-      <div>
+      <Box full="horizontal">
         <SearchInput id="metadataFilter" placeHolder="Search fields and links..." onDOMChange={this._onSearch}/>
         <Table>
           <tbody>
@@ -101,7 +101,7 @@ export default class MetaData extends Component {
           {fieldsComponents}
           </tbody>
         </Table>
-      </div>
+      </Box>
     );
   }
 }

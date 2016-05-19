@@ -43,9 +43,6 @@ export default class Widget extends Component {
 
   render() {
     const {templates} = this.props;
-    templates.sort((a, b)=> {
-      return b.last.time - a.last.time;
-    });
     var templatesState = this.state && this.state.filtered ? this.state.filtered : templates;
     let widgets = templatesState.map((template, key) => {
       return key < 4 && (
@@ -60,8 +57,7 @@ export default class Widget extends Component {
               {template.desc}
             </Box>
             <Footer justify="between">
-              {template.body.sqlname}
-              {template.last ? template.last.count : ''}
+              {template.body ? template.body.sqlname : ''}
             </Footer>
           </Tile>
         );

@@ -344,10 +344,10 @@ export default class RecordList extends Component {
       <div>
         <Header justify="between">
           {this.props.title}
+          {(this.state.filtered) ? this.state.filtered.length : this.state.records.length}/{this.state.numTotal}
           <input type="text" inline={true} className="flex" placeholder="Filter Records" ref="search"
                  onKeyDown={this._onFilter.bind(this)} onChange={this._onFilter.bind(this)}/>
-          {(this.state.filtered) ? this.state.filtered.length : this.state.records.length}/{this.state.numTotal}
-          ({this.state.timeQuery}ms)
+          {this.state.timeQuery}ms
           <Anchor href="#"
                   label={this.state.numDownload?this._getDownloadProgress(this):'CSV'}
                   icon={<DocumentCsv />} onClick={this._onDownload.bind(this)}/>
