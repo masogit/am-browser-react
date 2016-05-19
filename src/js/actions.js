@@ -192,7 +192,7 @@ export function metadataLoadDetail(obj, elements, index) {
 export function loadTemplates() {
   return function (dispatch) {
     Rest.get(HOST_NAME + '/coll/view').end(function (err, res) {
-      if(res && res.ok) {
+      if (res && res.ok) {
         dispatch(templatesLoadSuccess(res.body));
       }
     });
@@ -202,7 +202,7 @@ export function loadTemplates() {
 export function loadRecords(template) {
   return function (dispatch) {
     Rest.get(HOST_NAME + '/coll/view/' + template._id + '/list').end(function (err, res) {
-      if(res && res.ok && res.body) {
+      if (res && res.ok && res.body) {
         dispatch(recordsLoadSuccess(res.body.entities));
       }
     });
