@@ -1,24 +1,22 @@
-import React, { Component/*, PropTypes*/ } from 'react';
-//import PureRenderMixin from 'react-addons-pure-render-mixin';
-//import { connect } from 'react-redux';
-//import Split from 'grommet/components/Split';
-//import Footer from 'grommet/components/Footer';
-//import Title from 'grommet/components/Title';
-//import Menu from 'grommet/components/Menu';
-//import CloseIcon from 'grommet/components/icons/Clear';
-//import Search from 'grommet/components/Search';
-//import Gravatar from 'react-gravatar';
-//import Article from 'grommet/components/Article';
-//import Section from 'grommet/components/Section';
-//import {loadViews/*, loadTemplateTable, setSelectedView*/} from '../../actions/views';
-//import ViewDefDetail from './ViewDefDetail';
-//import store from '../../store';
-import Accordion from '../Accordion';
+import React, {Component/*, PropTypes*/} from 'react';
+import {Link} from 'react-router';
+import Anchor from 'grommet/components/Anchor';
+// import Box from 'grommet/components/Box';
+import GroupList from './../commons/GroupList';
+import GroupListItem from './../commons/GroupListItem';
+import Sidebar from 'grommet/components/Sidebar';
+import Builder from './Builder';
+import Edit from 'grommet/components/icons/base/Edit';
+import Add from 'grommet/components/icons/base/Add';
+import Close from 'grommet/components/icons/base/Close';
 
 export default class ViewsDefList extends Component {
 
   constructor(props) {
     super(props);
+    this.state = {
+      editView: null
+    };
   }
 
   componentDidMount() {
@@ -30,10 +28,59 @@ export default class ViewsDefList extends Component {
   componentWillUpdate(nextProps, nextState) {
   }
 
+  _editView(sqlname) {
+    var editView = (<Builder filterEntities={sqlname}/>);
+    this.setState({
+      editView: editView
+    });
+  }
+
+  _newView() {
+    var editView = (<Builder />);
+    this.setState({
+      editView: editView
+    });
+    this.props.newSelectedView();
+  }
+
+  _closeEdit() {
+    this.setState({
+      editView: null
+    });
+  }
+
   render() {
-    const { views, isFetchingViewList } = this.props;
+    const {views} = this.props;
     return (
-        <Accordion views={views} isFetching={isFetchingViewList} type="views" isEditable={true} newSelectedView={this.props.newSelectedView}/>
+      <Sidebar primary={true} pad="small" fixed={false} full={false}>
+        {
+          !this.state.editView &&
+          <Anchor href="#" icon={<Add />} label="New" onClick={this._newView.bind(this)} />
+        }
+        {
+          this.state.editView &&
+          <Anchor href="#" icon={<Close />} label="Close" onClick={this._closeEdit.bind(this)} />
+        }
+        {
+          !this.state.editView &&
+          <GroupList pad={{vertical: 'small'}} searchable={true} selectable={true}>
+            {
+              views.map((view, key) => {
+                return (
+                  <GroupListItem key={view._id} groupby={view.category} search={view.name}
+                                 pad={{horizontal: 'small', vertical: 'none'}} justify="between">
+                    <Link to={`/views/${view._id}`} key={key}>{view.name}</Link>
+                    <Anchor href="#" icon={<Edit size="small"/>}
+                            onClick={this._editView.bind(this, view.body.sqlname)}/>
+                  </GroupListItem>
+                );
+              })
+            }
+          </GroupList>
+        }
+        {this.state.editView}
+
+      </Sidebar>
     );
   }
 }
