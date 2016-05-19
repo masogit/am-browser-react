@@ -81,6 +81,15 @@ export function init(email, token) {
 //}
 
 let formData = getFormData();
+const getAuth = () => {
+  var AM_FORM_DATA = "amFormData";
+  if (localStorage && localStorage[AM_FORM_DATA]) {
+    var form = JSON.parse(localStorage.getItem(AM_FORM_DATA));
+    if (form.user) formData.user = form.user;
+    if (form.password) formData.password = form.password;
+  }
+  return 'Basic ' + new Buffer(formData.user + ':' + formData.password).toString('base64');
+};
 
 export function login(username, password) {
   return function (dispatch) {
@@ -88,76 +97,53 @@ export function login(username, password) {
     Rest.setHeader("Authorization", auth);
     Rest.get(HOST_NAME + '/am/conf').end((err, res) => {
       if (err) {
+        console.log("failed");
+        dispatch(loginFailure({message: 'LoginFailed'}));
         throw err;
       } else if (res.ok) {
-
         // set AM server address
         if (res.body.server)
           formData.server = res.body.server;
+
+        if (res.body.hasAdminPrivilege !== undefined)
+          formData.hasAdminPrivilege = res.body.hasAdminPrivilege;
 
         var AM_FORM_DATA = "amFormData";
         formData['ref-link'] = "db/amEmplDept";
         formData.param.filter = "UserLogin='" + username.trim() + "'";
         formData.user = username;
         formData.password = password;
-        Rest.post(HOST_NAME + '/am/rest', formData)
-          .end(function (err, res) {
-            //console.log(error);
-            console.log(res);
-            if (err || !res.ok) {
-              dispatch(loginFailure({message: 'LoginFailed'}));
-              console.log("error");
-            } else {
-              if (res.body instanceof Object) {
-                if (localStorage) {
-                  var form = {
-                    server: formData.server,
-                    user: formData.user,
-                    password: formData.password,
-                    pageSize: formData.pageSize,
-                    showLabel: formData.showLabel,
-                    //                showError: $scope.formData.showError,
-                    limit: formData.param.limit,
-                    offset: formData.param.offset,
-                    viewStyle: formData.viewStyle
-                  };
-                  localStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
-                }
+        if (localStorage) {
+          var form = {
+            server: formData.server,
+            user: formData.user,
+            password: formData.password,
+            hasAdminPrivilege: formData.hasAdminPrivilege
+          };
+          localStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
+        }
 
-                if (sessionStorage) {
-                  var form = {
-                    server: formData.server,
-                    user: formData.user
-                  };
-                  sessionStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
-                }
-                console.log("pass");
-                console.log('res.body: ' + res.body);
-                dispatch(loginSuccess(username, 'faketoken123456789'/*res.body.sessionID*/));
-              } else {
-                console.log("failed");
-                dispatch(loginFailure({message: 'LoginFailed'}));
-              }
-            }
-          });
+        if (sessionStorage) {
+          var form = {
+            server: formData.server,
+            user: formData.user,
+            hasAdminPrivilege: formData.hasAdminPrivilege
+          };
+          sessionStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
+        }
+        console.log("pass");
+        console.log('res.body: ' + res.body);
+        dispatch(loginSuccess(username, 'faketoken123456789'/*res.body.sessionID*/));
       }
     });
-
   };
 }
 
 export function metadataLoad() {
   return function (dispatch) {
-    var AM_FORM_DATA = "amFormData";
-    if (localStorage && localStorage[AM_FORM_DATA]) {
-      var form = JSON.parse(localStorage.getItem(AM_FORM_DATA));
-      if (form.user) formData.user = form.user;
-      if (form.password) formData.password = form.password;
-    }
-    let auth = 'Basic ' + new Buffer(formData.user + ':' + formData.password).toString('base64');
     let  headers = {
       "Content-Type": "text/xml",
-      "Authorization": auth
+      "Authorization": getAuth()
     };
     Rest.setHeaders(headers);
     Rest.get(HOST_NAME + '/am/v1/schema')
@@ -206,8 +192,9 @@ export function metadataLoadDetail(obj, elements, index) {
 export function loadTemplates() {
   return function (dispatch) {
     Rest.get(HOST_NAME + '/coll/view').end(function (err, res) {
-      var templates = res.body;
-      dispatch(templatesLoadSuccess(templates));
+      if(res && res.ok) {
+        dispatch(templatesLoadSuccess(res.body));
+      }
     });
   };
 };
@@ -215,8 +202,9 @@ export function loadTemplates() {
 export function loadRecords(template) {
   return function (dispatch) {
     Rest.get(HOST_NAME + '/coll/view/' + template._id + '/list').end(function (err, res) {
-      var records = res.body.entities;
-      dispatch(recordsLoadSuccess(records));
+      if(res && res.ok && res.body) {
+        dispatch(recordsLoadSuccess(res.body.entities));
+      }
     });
   };
 };

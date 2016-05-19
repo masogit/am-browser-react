@@ -10,7 +10,7 @@ import Rest from 'grommet/utils/Rest';
 import { getCurrentLocale, getLocaleData } from 'grommet/utils/Locale';
 import { addLocaleData } from 'react-intl';
 import en from 'react-intl/locale-data/en';
-import Routes from './Routes';
+import Routes, {getRoutes} from './Routes';
 import DevTools from './DevTools';
 import { Provider } from 'react-redux';
 import { IntlProvider } from 'react-intl';
@@ -105,6 +105,8 @@ let postLoginPath = '/home';
 // check for session
 let sessionWatcher = () => {
   const {route, session} = store.getState();
+  Routes.routes[0].childRoutes = getRoutes();
+
   if (route) {
     if (route.pathname === '/login' && session.token) {
       localStorage.email = session.email;

@@ -44,8 +44,21 @@ class NavHeader extends Component {
 
   render() {
     var listViews = this.state.filteredViews || this.state.views;
-    return (
+    let links = [
+      {to: '/home', text: 'Search'},
+      {to: '/wall', text: 'Insight'}
+    ];
 
+    const hasAdminPrivilege = (localStorage && JSON.parse(localStorage.amFormData).hasAdminPrivilege) || (sessionStorage && JSON.parse(sessionStorage.amFormData).hasAdminPrivilege);
+    if (hasAdminPrivilege) {
+      links.push(...[
+        {to: '/views', text: 'Views'},
+        {to: '/aql', text: 'AQL'},
+        {to: '/ucmdbAdapter', text: 'Adapter'}
+      ]);
+    }
+
+    return (
       <Header fixed={true} size="small">
         {
           this.state.layer &&
@@ -70,21 +83,9 @@ class NavHeader extends Component {
         <Box full="horizontal" direction="row" justify="between" colorIndex="neutral-1" pad={{vertical: 'small'}}>
           <Title onClick={this._onClick.bind(this)}><Logo /> AM Browser</Title>
           <Menu direction="row" align="center" responsive={false}>
-            <Link key="0" to="/home" activeClassName="active link-disabled">
-              Search
-            </Link>
-            <Link key="4" to="/wall" activeClassName="active link-disabled">
-              Insight
-            </Link>
-            <Link key="1" to="/views" activeClassName="active link-disabled">
-              Views
-            </Link>
-            <Link key="2" to="/aql" activeClassName="active link-disabled">
-              AQL
-            </Link>
-            <Link key="3" to="/ucmdbAdapter" activeClassName="active link-disabled">
-              Adapter
-            </Link>
+            {
+              links.map((link, index) => <Link key={index} to={link.to} activeClassName="active link-disabled">{link.text}</Link>)
+            }
             <SessionMenu />
           </Menu>
         </Box>
