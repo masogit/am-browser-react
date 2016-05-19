@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 // import {Link} from 'react-router';
 import * as ExplorerActions from '../../actions/explorer';
+import * as AQLActions from '../../actions/aql';
 import RecordSearch from './RecordSearch';
 import RecordList from './RecordList';
 import GroupList from './../commons/GroupList';
@@ -29,6 +30,16 @@ export default class Search extends Component {
   }
 
   componentDidMount() {
+    ExplorerActions.loadViews((views)=> {
+      this.setState({
+        viewSeries: this._getSeries(views, 'category')
+      });
+    });
+    AQLActions.loadAQLs((aqls)=> {
+      this.setState({
+        aqlSeries: this._getSeries(aqls, 'category')
+      });
+    });
   }
 
   _getViewNavigation(views) {
@@ -88,6 +99,25 @@ export default class Search extends Component {
     });
   }
 
+  _getSeries(children, groupby) {
+    var grouped = {};
+    children.forEach((child) => {
+      if (grouped[child[groupby]]) {
+        grouped[child[groupby]].push(child);
+      } else {
+        grouped[child[groupby]] = [child];
+      }
+    });
+    var series = Object.keys(grouped).map((key)=> {
+      return {
+        label: key,
+        value: grouped[key].length
+      };
+    });
+
+    return series;
+  }
+
   render() {
 
     return (
@@ -109,21 +139,21 @@ export default class Search extends Component {
             <Tiles flush={false} colorIndex="light-2" justify="center" size="large">
               <Tile align="center" separator="top" colorIndex="light-1" onClick={this._toggleViewNavigation.bind(this)}>
                 <Title>Browser Views</Title>
-                <Meter legend={{"total": true}} series={[
-                  {"label": "Gen 7", "value": 50, "colorIndex": "graph-1"},
-                  {"label": "Gen 8", "value": 200, "colorIndex": "graph-2"},
-                  {"label": "Gen 9", "value": 100, "colorIndex": "graph-3"},
-                  {"label": "Gen 10", "value": 300, "colorIndex": "graph-4"}
-                ]} vertical={true} a11yTitleId="meter-title-13" a11yDescId="meter-desc-13"/>
+                {
+                  this.state.viewSeries &&
+                  <Meter legend={{"total": true}} series={this.state.viewSeries} vertical={true}
+                         a11yTitleId="meter-title-13" a11yDescId="meter-desc-13"/>
+                }
+
               </Tile>
               <Tile align="center" separator="top" colorIndex="light-1">
                 <Title>AQL Graphs</Title>
-                <Meter legend={{"placement": "inline"}} series={[
-                  {"label": "Gen 7", "value": 50, "colorIndex": "graph-1"},
-                  {"label": "Gen 8", "value": 200, "colorIndex": "graph-2"},
-                  {"label": "Gen 9", "value": 100, "colorIndex": "graph-3"},
-                  {"label": "Gen 10", "value": 300, "colorIndex": "graph-4"}
-                ]} a11yTitleId="meter-title-12" a11yDescId="meter-desc-12" />
+                {
+                  this.state.aqlSeries &&
+                  <Meter legend={{"placement": "inline"}} series={this.state.aqlSeries} a11yTitleId="meter-title-12"
+                         a11yDescId="meter-desc-12"/>
+                }
+
               </Tile>
               <Tile align="center" separator="top" colorIndex="light-1">
                 <Title>UCMDB Adapter Jobs Status</Title>
