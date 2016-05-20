@@ -1,8 +1,8 @@
-import React, { Component /*, PropTypes*/ } from 'react';
+import React, {Component /*, PropTypes*/} from 'react';
 //import PureRenderMixin from 'react-addons-pure-render-mixin';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-//import Sidebar from 'grommet/components/Sidebar';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import Box from 'grommet/components/Box';
 //import Header from 'grommet/components/Header';
 import Split from 'grommet/components/Split';
 //import Footer from 'grommet/components/Footer';
@@ -54,7 +54,7 @@ class ViewDefListContainer extends Component {
     //console.log(nextProps);
     let currentId = this.props.params.id;
     let nextId = nextProps.params.id;
-    let { views } = nextProps;
+    let {views} = nextProps;
     if (views && views.length > 0) {
       if (!currentId && !nextId) { // Click navigation link, no id param.
         this.props.actions.setSelectedView(views[0]._id, views[0]);
@@ -106,17 +106,19 @@ class ViewDefListContainer extends Component {
   }
 
   render() {
-    const { views, isFetchingViewList, selectedView, preview } = this.props;
-    let { dispatch } = store;
+    const {views, isFetchingViewList, selectedView, preview} = this.props;
+    let {dispatch} = store;
     let boundActionCreators = bindActionCreators(ViewDefActions, dispatch);
     return (
       <div>
         <Split flex="right">
           <ViewDefList views={views} isFetchingViewList={isFetchingViewList} {...boundActionCreators}/>
-          <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange}
-                         onSubmit={this.onSubmit} onDeleteTableRow={this.onDeleteTableRow}
-                         onDuplicateViewDef={this.onDuplicateViewDef}
-                         onDeleteViewDef={this.onDeleteViewDef} {...boundActionCreators}/>
+          <Box pad={{horizontal: 'small'}}>
+            <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange}
+                           onSubmit={this.onSubmit} onDeleteTableRow={this.onDeleteTableRow}
+                           onDuplicateViewDef={this.onDuplicateViewDef}
+                           onDeleteViewDef={this.onDeleteViewDef} {...boundActionCreators}/>
+          </Box>
         </Split>
         <ViewDefPreview active={preview} selectedView={selectedView} {...boundActionCreators}/>
       </div>

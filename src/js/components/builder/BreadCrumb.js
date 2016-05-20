@@ -36,7 +36,7 @@ export default class BreadCrumb extends Component {
     });
 
     return (
-      <Box pad={{horizontal: 'small'}}>{breadcrumbs}</Box>
+      <Box pad="none">{breadcrumbs}</Box>
     );
   }
 }

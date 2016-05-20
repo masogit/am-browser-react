@@ -241,7 +241,7 @@ export default class AQL extends Component {
               this.state.views.map((view) => {
                 return (
                   <GroupListItem key={view._id} groupby={view.category} search={view.name}
-                                 pad={{horizontal: 'medium', vertical: 'small'}}>
+                                 pad="small">
                     <Anchor href="#" onClick={this._attachView.bind(this, view)}>{view.name}</Anchor>
                   </GroupListItem>
                 );
@@ -333,67 +333,69 @@ export default class AQL extends Component {
             </Tab>
           </Tabs>
         </Sidebar>
-        <div>
-          {this.state.alertLayer}
-          <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
-            <Title>AM Insight</Title>
-            <Menu direction="row" align="center" responsive={false}>
-              <Anchor link="#" icon={<Play />} onClick={this._onQuery.bind(this)}>Query</Anchor>
-              <Anchor link="#" icon={<Add />} onClick={this._onNew.bind(this)}>New</Anchor>
-              <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)}>Save</Anchor>
-              <Anchor link="#" icon={<Close />} onClick={this._onDelete.bind(this)}>Delete</Anchor>
-              <Anchor link="#" icon={<Attachment />} onClick={this._selectView.bind(this)}>
-                {this.state.aql.view ? 'Attached view: ' + this.state.aql.view.name : 'Attach View'}
-              </Anchor>
-            </Menu>
-          </Header>
-          <Box justify="between" direction="row" pad={{between:'medium'}} size="small">
-            <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_Box">
+        <Box pad={{horizontal: 'small'}}>
+          <div>
+            {this.state.alertLayer}
+            <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
+              <Title>AM Insight</Title>
+              <Menu direction="row" align="center" responsive={false}>
+                <Anchor link="#" icon={<Play />} onClick={this._onQuery.bind(this)}>Query</Anchor>
+                <Anchor link="#" icon={<Add />} onClick={this._onNew.bind(this)}>New</Anchor>
+                <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)}>Save</Anchor>
+                <Anchor link="#" icon={<Close />} onClick={this._onDelete.bind(this)}>Delete</Anchor>
+                <Anchor link="#" icon={<Attachment />} onClick={this._selectView.bind(this)}>
+                  {this.state.aql.view ? 'Attached view: ' + this.state.aql.view.name : 'Attach View'}
+                </Anchor>
+              </Menu>
+            </Header>
+            <Box justify="between" direction="row" pad={{between:'medium'}} size="small">
+              <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_Box">
               <textarea id="AQL_Box" name="str" value={this.state.aql.str} rows="3"
                         onChange={this._setFormValues.bind(this)}/>
-            </FormField>
-            <Form pad="none" compact={true}>
-              <FormField label="AQL Name" htmlFor="AQL_Box">
-                <input id="AQL_Name" type="text" name="name" value={this.state.aql.name}
-                       onChange={this._setFormValues.bind(this)}/>
               </FormField>
-              <FormField label="Category" htmlFor="AQL_Category">
-                <input id="AQL_Category" type="text" name="category" value={this.state.aql.category}
-                       onChange={this._setFormValues.bind(this)}/>
-              </FormField>
-            </Form>
-          </Box>
-          <Split flex="left" fixed={false}>
-            <Box>
-              {getGraph()}
-              <Table>
-                <thead>
-                <tr>{header}</tr>
-                </thead>
-                <tbody>
-                {rows}
-                </tbody>
-              </Table>
+              <Form pad="none" compact={true}>
+                <FormField label="AQL Name" htmlFor="AQL_Box">
+                  <input id="AQL_Name" type="text" name="name" value={this.state.aql.name}
+                         onChange={this._setFormValues.bind(this)}/>
+                </FormField>
+                <FormField label="Category" htmlFor="AQL_Category">
+                  <input id="AQL_Category" type="text" name="category" value={this.state.aql.category}
+                         onChange={this._setFormValues.bind(this)}/>
+                </FormField>
+              </Form>
             </Box>
-            {
-              this.state.aql.data &&
-              <Tabs initialIndex={0} justify="start" ref='graphForms'>
-                <Tab title="Chart">
-                  <ChartForm {...this.state.aql} genGraph={this._genGraph.bind(this)}/>
-                </Tab>
-                <Tab title="Meter">
-                  <MeterForm {...this.state.aql} genGraph={this._genGraph.bind(this)}/>
-                </Tab>
-                <Tab title="Distribution">
-                  <DistributionForm {...this.state.aql} genGraph={this._genGraph.bind(this)}/>
-                </Tab>
-                <Tab title="Value"/>
-                <Tab title="WorldMap"/>
-              </Tabs>
-            }
-          </Split>
-          {this.state.viewsLayer}
-        </div>
+            <Split flex="left" fixed={false}>
+              <Box>
+                {getGraph()}
+                <Table>
+                  <thead>
+                  <tr>{header}</tr>
+                  </thead>
+                  <tbody>
+                  {rows}
+                  </tbody>
+                </Table>
+              </Box>
+              {
+                this.state.aql.data &&
+                <Tabs initialIndex={0} justify="start" ref='graphForms'>
+                  <Tab title="Chart">
+                    <ChartForm {...this.state.aql} genGraph={this._genGraph.bind(this)}/>
+                  </Tab>
+                  <Tab title="Meter">
+                    <MeterForm {...this.state.aql} genGraph={this._genGraph.bind(this)}/>
+                  </Tab>
+                  <Tab title="Distribution">
+                    <DistributionForm {...this.state.aql} genGraph={this._genGraph.bind(this)}/>
+                  </Tab>
+                  <Tab title="Value"/>
+                  <Tab title="WorldMap"/>
+                </Tabs>
+              }
+            </Split>
+            {this.state.viewsLayer}
+          </div>
+        </Box>
       </Split>
     );
   }

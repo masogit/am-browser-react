@@ -1,8 +1,8 @@
 import React, {Component, PropTypes} from 'react';
 import Anchor from 'grommet/components/Anchor';
 import Box from 'grommet/components/Box';
-import Table from 'grommet/components/Table';
-import TableRow from 'grommet/components/TableRow';
+import List from 'grommet/components/List';
+import ListItem from 'grommet/components/ListItem';
 import SearchInput from 'grommet/components/SearchInput';
 
 export default class MetaData extends Component {
@@ -62,13 +62,10 @@ export default class MetaData extends Component {
     // let LinkNext = require('grommet/components/icons/base/LinkNext');
     let Notes = require('grommet/components/icons/base/Notes');
     let entitiesComponents = entities.sort(this._sortSqlName).map((row, index) => {
-      return (
-        <TableRow key={index}>
-          <td><Anchor href="#" key={index} primary={true} label={row.sqlname}
-                      onClick={this._onClick.bind(this, {label: row.label, sqlname: row.sqlname, url: row["ref-link"]})}/>
-          </td>
-        </TableRow>
-      );
+      return <ListItem separator="none" key={index}>
+        <Anchor href="#" key={index} primary={true} label={row.sqlname}
+                onClick={this._onClick.bind(this, {label: row.label, sqlname: row.sqlname, url: row["ref-link"]})}/>
+      </ListItem>;
     });
     let linksComponents = links.sort(this._sortSqlName).map((row, index) => {
       let newRow = {
@@ -79,34 +76,26 @@ export default class MetaData extends Component {
         reverse: row.reverse,
         reversefield: row.src_field.sqlname
       };
-      return (
-        <TableRow key={index}>
-          <td><Anchor href="#" key={index} primary={true} onClick={this._onClick.bind(this, newRow)} label={row.sqlname}/>
-          </td>
-        </TableRow>
-      );
+      return <ListItem separator="none" key={index}>
+        <Anchor href="#" key={index} primary={true} onClick={this._onClick.bind(this, newRow)} label={row.sqlname}/>
+      </ListItem>;
     });
     //let fieldsComponents = fields.sort().map((row, index) => {
     //  return <TableRow key={index}><td><CheckBox key={index} id={`checkbox_${row.sqlname}`} checked={row.checked} onChange={this._onChange.bind(this, row)}/><Notes/>{row.sqlname}</td></TableRow>;
     //});
     let fieldsComponents = fields.sort(this._sortSqlName).map((row, index) => {
-      return (
-        <TableRow key={index}>
-          <td><Anchor href="#" key={index} icon={<Notes />} onClick={this._onChange.bind(this, row)} label={row.sqlname}/>
-          </td>
-        </TableRow>
-      );
+      return <ListItem separator="none" key={index}>
+        <Anchor href="#" key={index} icon={<Notes />} onClick={this._onChange.bind(this, row)} label={row.sqlname}/>
+      </ListItem>;
     });
     return (
-      <Box full="horizontal">
+      <Box>
         <SearchInput id="metadataFilter" placeHolder="Search fields and links..." onDOMChange={this._onSearch}/>
-        <Table>
-          <tbody>
+        <List>
           {entitiesComponents}
           {linksComponents}
           {fieldsComponents}
-          </tbody>
-        </Table>
+        </List>
       </Box>
     );
   }

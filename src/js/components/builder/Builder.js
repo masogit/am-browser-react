@@ -29,13 +29,11 @@ export default class Builder extends Component {
     let boundActionCreators = bindActionCreators(BuilderActions, dispatch);
     let boundActionCreators_views = bindActionCreators(ViewDefActions, dispatch);
     return (
-      <Box>
-        <Header>
-          <BreadCrumb elements={elements} {...boundActionCreators} clearFilter={this._clearFilter}/>
-        </Header>
+      <div>
+        <BreadCrumb elements={elements} {...boundActionCreators} clearFilter={this._clearFilter}/>
         <MetaData elements={elements} rows={item} {...boundActionCreators} {...boundActionCreators_views}
                   clearFilter={this._clearFilter} filterEntities={this.props.filterEntities}/>
-      </Box>
+      </div>
     );
   }
 }

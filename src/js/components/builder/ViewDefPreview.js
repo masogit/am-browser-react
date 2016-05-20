@@ -1,5 +1,5 @@
-import React, { Component, PropTypes } from 'react';
-import { Layer, Box, Header } from 'grommet';
+import React, {Component, PropTypes} from 'react';
+import {Layer, Box} from 'grommet';
 import RecordList from '../explorer/RecordList';
 
 export default class ViewDefPreview extends Component {
@@ -13,10 +13,7 @@ export default class ViewDefPreview extends Component {
       (
         <Layer onClose={this.props.closePreview} closer={true} flush={true} align="center">
           <Box full={true} pad="large">
-            <Header size="small">
-              <h3>{this.props.selectedView.name}</h3>
-            </Header>
-            <RecordList body={this.props.selectedView.body}/>
+            <RecordList body={this.props.selectedView.body} title={this.props.selectedView.name}/>
           </Box>
         </Layer>
       )

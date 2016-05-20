@@ -78,6 +78,10 @@ export default class Search extends Component {
     history.push(`/explorer`);
   }
 
+  _goAQL() {
+    history.push(`/aql`);
+  }
+
   render() {
 
     return (
@@ -101,7 +105,7 @@ export default class Search extends Component {
                      a11yTitleId="meter-title-13" a11yDescId="meter-desc-13"/>
             }
           </Tile>
-          <Tile align="center" separator="top" colorIndex="light-1">
+          <Tile align="center" separator="top" colorIndex="light-1" onClick={this._goAQL}>
             <Title>AQL Graphs</Title>
             {
               this.state.aqlSeries &&
