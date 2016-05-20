@@ -52,7 +52,11 @@ export const PointListContainer = ({
 };
 
 
-export const UCMDBAdapterContainerTemplate = ({pointList, jobList, jobItemList}) => {
+export const UCMDBAdapterContainerTemplate = ({dataError, pointList, jobList, jobItemList}) => {
+  if (dataError) {
+    return (<div>{dataError}</div>);
+  }
+
   return (
     <Split flex="right" separator={true} priority="left" fixed={false}>
       <Sidebar colorIndex="light-2" className="adapterSideBar">

@@ -30,25 +30,27 @@ class UCMDBAdapterContainer extends Component {
     if (firstStart && nextProps.data.length > 0) {
       // find the point name from:  url > props > data
       let { pointName, tabName } = nextProps.params;
-      pointName = pointName ? pointName : nextProps.pointName;
-      pointName = pointName ? pointName : nextProps.data[0].name;
+      pointName = pointName || nextProps.pointName;
+      pointName = pointName || nextProps.data[0].name;
       const point = this.getRecentPoint(nextProps.data, pointName);
 
       if (point) {
         // find the tab name from:  url >  point supported tab type
-        tabName = tabName ? tabName : nextProps.tabName;
+        tabName = tabName || nextProps.tabName;
 
-        /*const supportedJobs = [];
-        if (point.populationSupported) {
-          supportedJobs.push('populationJobs');
-        }
-        if (point.pushSupported) {
-          supportedJobs.push('pushJobs');
-        }
+        if (!tabName) {
+          const supportedJobs = [];
+          if (point.populationSupported) {
+            supportedJobs.push('populationJobs');
+          }
+          if (point.pushSupported) {
+            supportedJobs.push('pushJobs');
+          }
 
-        if (!supportedJobs.includes(tabName)) {
-          tabName = supportedJobs[0];
-        }*/
+          if (!supportedJobs.includes(tabName)) {
+            tabName = supportedJobs[0];
+          }
+        }
       }
 
       this.props.onMenuClick(pointName, tabName);
@@ -116,6 +118,7 @@ class UCMDBAdapterContainer extends Component {
         pointList={pointListContainer}
         jobList={jobList}
         jobItemList={jobItemList}
+        dataError={this.props.dataError}
         />
     );
   }
