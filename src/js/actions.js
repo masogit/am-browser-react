@@ -81,20 +81,62 @@ export function init(email, token) {
 //}
 
 let formData = getFormData();
-const getAuth = () => {
-  var AM_FORM_DATA = "amFormData";
-  if (localStorage && localStorage[AM_FORM_DATA]) {
-    var form = JSON.parse(localStorage.getItem(AM_FORM_DATA));
-    if (form.user) formData.user = form.user;
-    if (form.password) formData.password = form.password;
+
+export const hasAdminPrivilege = () => {
+  if (localStorage && localStorage.amFormData && JSON.parse(localStorage.amFormData).hasAdminPrivilege) {
+    return true;
   }
-  return 'Basic ' + new Buffer(formData.user + ':' + formData.password).toString('base64');
+
+  if (sessionStorage && sessionStorage.amFormData && JSON.parse(sessionStorage.amFormData).hasAdminPrivilege) {
+    return true;
+  }
+
+  return false;
+};
+
+const setCookie = (cname, cvalue, exmins) => {
+  let expires = '';
+  if(exmins) {
+    const d = new Date();
+    d.setTime(d.getTime() + (exmins * 60 * 1000));
+    expires = "expires=" + d.toUTCString();
+  }
+  document.cookie = cname + "=" + cvalue + "; " + expires;
+};
+
+const getCookie = (cname) => {
+  var name = cname + "=";
+  var ca = document.cookie.split(';');
+  for(var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+};
+
+export const prepareRequest = (username, password) => {
+  const AM_FORM_DATA = "amFormData";
+  if (!username && localStorage && localStorage[AM_FORM_DATA]) {
+    const form = JSON.parse(localStorage.getItem(AM_FORM_DATA));
+    if (form.user) username = form.user;
+    if (form.password) password = form.password;
+  }
+  formData.user = username;
+  formData.password = password;
+
+  const auth = 'Basic ' + new Buffer(formData.user + ':' + formData.password).toString('base64');
+  Rest.setHeader("Authorization", auth);
+  Rest.setHeader("CSRFToken", getCookie('CSRFToken'));
 };
 
 export function login(username, password) {
   return function (dispatch) {
-    var auth = 'Basic ' + new Buffer(username + ':' + password).toString('base64');
-    Rest.setHeader("Authorization", auth);
+    prepareRequest(username, password);
     Rest.get(HOST_NAME + '/am/conf').end((err, res) => {
       if (err) {
         console.log("failed");
@@ -131,6 +173,10 @@ export function login(username, password) {
           };
           sessionStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
         }
+
+        // set CSRF token in cookie, expires in 20 mins;
+        setCookie('CSRFToken', 'fake_scrf_token1231231231', 20);
+
         console.log("pass");
         console.log('res.body: ' + res.body);
         dispatch(loginSuccess(username, 'faketoken123456789'/*res.body.sessionID*/));
@@ -141,11 +187,8 @@ export function login(username, password) {
 
 export function metadataLoad() {
   return function (dispatch) {
-    let  headers = {
-      "Content-Type": "text/xml",
-      "Authorization": getAuth()
-    };
-    Rest.setHeaders(headers);
+    prepareRequest();
+    Rest.setHeaders('Content-Type', 'text/xml');
     Rest.get(HOST_NAME + '/am/v1/schema')
       .end(function (err, res) {
         if (!err) {
@@ -158,20 +201,8 @@ export function metadataLoad() {
 
 export function metadataLoadDetail(obj, elements, index) {
   return function (dispatch) {
-    var AM_FORM_DATA = "amFormData";
-    if (localStorage && localStorage[AM_FORM_DATA]) {
-      var form = JSON.parse(localStorage.getItem(AM_FORM_DATA));
-      if (form.user) formData.user = form.user;
-      if (form.password) formData.password = form.password;
-    }
-    //let  headers = { 'Accept': 'application/json' };
-    //Rest.setHeaders(headers);
-    let auth = 'Basic ' + new Buffer(formData.user + ':' + formData.password).toString('base64');
-    let  headers = {
-      "Content-Type": "text/xml",
-      "Authorization": auth
-    };
-    Rest.setHeaders(headers);
+    prepareRequest();
+    Rest.setHeaders('Content-Type', 'text/xml');
     Rest.get(HOST_NAME + '/am/v1/' + obj.url)
       .end(function (err, res) {
         if (!err) {
@@ -191,6 +222,7 @@ export function metadataLoadDetail(obj, elements, index) {
 
 export function loadTemplates() {
   return function (dispatch) {
+    prepareRequest();
     Rest.get(HOST_NAME + '/coll/view').end(function (err, res) {
       if (res && res.ok) {
         dispatch(templatesLoadSuccess(res.body));
@@ -201,6 +233,7 @@ export function loadTemplates() {
 
 export function loadRecords(template) {
   return function (dispatch) {
+    prepareRequest();
     Rest.get(HOST_NAME + '/coll/view/' + template._id + '/list').end(function (err, res) {
       if (res && res.ok && res.body) {
         dispatch(recordsLoadSuccess(res.body.entities));
@@ -209,11 +242,12 @@ export function loadRecords(template) {
   };
 };
 
-export function loadDetailRecordLinks (viewid, recordid, linksArray, linksObj) {
+export function loadDetailRecordLinks(viewid, recordid, linksArray, linksObj) {
   return function (dispatch) {
     var link = linksArray.pop();
     if (link) {
       var linkname = link.sqlname;
+      prepareRequest();
       Rest.get(HOST_NAME + `/coll/view/${viewid}/list/${recordid}/${linkname}`).end(function (err, res) {
         if (res.body && res.body.entities) {
           linksObj[linkname] = res.body.entities;
@@ -239,7 +273,7 @@ export function loadDetailRecord(template, record) {
 
   return function (dispatch) {
 
-    var fields = template.body.fields.filter(function(field) {
+    var fields = template.body.fields.filter(function (field) {
       if (!field.PK) {
         field.value = record[field.sqlname];
         return field;
@@ -301,6 +335,8 @@ export function loginFailure(error) {
 }
 
 export function logout() {
+  // clear the CSRF token
+  setCookie('CSRFToken', '', 0);
   return {type: LOGOUT};
 }
 
@@ -381,6 +417,7 @@ export function dashboardSearch(text) {
         count: 5,
         query: text
       };
+      prepareRequest();
       Rest.get('/rest/index/search-suggestions', params).end((err, res) => {
         if (err) {
           throw err;

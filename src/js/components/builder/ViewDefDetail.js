@@ -168,13 +168,20 @@ export default class ViewDefDetail extends Component {
           </td>
 
           {root &&
-          <td>{!field.PK &&
-          <CheckBox id={`v.${currentPath}body.fields.${index}.searchable`}
-                    name={`v.${currentPath}body.fields.${index}.searchable`} checked={field.searchable}
-                    disabled={ (selfView.body.fields.filter(field => field.searchable == true).length >= 2) && !field.searchable }
-                    onChange={this._onChange}/>}</td>}
-          <td><a name={`${currentPath}body.fields.${index}`} className="tbBtnIcon"
-                 onClick={this.props.onDeleteTableRow}><Close /></a></td>
+            <td>{!field.PK && (
+              <CheckBox id={`v.${currentPath}body.fields.${index}.searchable`}
+                      name={`v.${currentPath}body.fields.${index}.searchable`} checked={field.searchable}
+                      disabled={(selfView.body.fields.filter(field => field.searchable == true).length >= 2) && !field.searchable}
+                      onChange={this._onChange}/>
+              )
+            }
+            </td>
+          }
+          <td>
+            <a name={`${currentPath}body.fields.${index}`} className="tbBtnIcon" onClick={this.props.onDeleteTableRow}>
+              <Close />
+            </a>
+          </td>
         </tr>
       );
     });

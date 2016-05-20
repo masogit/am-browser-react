@@ -2,9 +2,10 @@
 // import * as types from '../constants/ActionTypes';
 import {HOST_NAME} from '../util/Config';
 import Rest from 'grommet/utils/Rest';
-
+import {prepareRequest} from '../actions';
 
 export function saveWall(wall, callback) {
+  prepareRequest();
   Rest.post(HOST_NAME + '/coll/wall', wall).end((err, res) => {
     if (err) {
       console.log(err.response ? err.response.text : err);
@@ -14,6 +15,7 @@ export function saveWall(wall, callback) {
 }
 
 export function loadWall(callback) {
+  prepareRequest();
   Rest.get(HOST_NAME + '/coll/wall').end((err, res) => {
     if (err) {
       console.log(err);
@@ -23,6 +25,7 @@ export function loadWall(callback) {
 }
 
 export function loadAQLs(callback) {
+  prepareRequest();
   Rest.get(HOST_NAME + '/coll/aql').end((err, res) => {
     if (err) {
       console.log(err.response ? err.response.text : err);
@@ -32,6 +35,7 @@ export function loadAQLs(callback) {
 }
 
 export function saveAQL(aql, callback) {
+  prepareRequest();
   Rest.post(HOST_NAME + '/coll/aql', aql).end((err, res) => {
     if (err) {
       console.log(err.response ? err.response.text : err);
@@ -41,6 +45,7 @@ export function saveAQL(aql, callback) {
 }
 
 export function removeAQL(id, callback) {
+  prepareRequest();
   Rest.del(HOST_NAME + '/coll/aql/' + id).end((err, res) => {
     if (err) {
       console.log(err.response ? err.response.text : err);
@@ -50,6 +55,7 @@ export function removeAQL(id, callback) {
 }
 
 export function loadReports(callback) {
+  prepareRequest();
   Rest.get(HOST_NAME + '/am/db/amInToolReport').end(function (err, res) {
     if (err) {
       console.log(err.response ? err.response.text : err);
@@ -112,6 +118,7 @@ export function queryAQL(str, callback) {
     if (aql.where)
       query += " " + aql.where;
 
+    prepareRequest();
     Rest.get(HOST_NAME + query).end(function (err, res) {
       if (err) {
         console.log(err);

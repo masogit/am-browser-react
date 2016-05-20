@@ -220,9 +220,9 @@ export default class Wall extends Component {
     AQLActions.saveWall(this.state.box, (data) => {
       if (data)
         this._loadWall();
-      var alert = <AlertForm onClose={this._closeAlert.bind(this)}
+      var alert = (<AlertForm onClose={this._closeAlert.bind(this)}
                              title={'AM Insight layout saved!'}
-                             onConfirm={this._closeAlert.bind(this)}/>;
+                             onConfirm={this._closeAlert.bind(this)}/>);
       this.setState({
         alert: alert
       });

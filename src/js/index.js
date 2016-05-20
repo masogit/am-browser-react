@@ -108,17 +108,19 @@ let sessionWatcher = () => {
   Routes.routes[0].childRoutes = getRoutes();
 
   if (route) {
-    if (route.pathname === '/login' && session.token) {
-      localStorage.email = session.email;
-      localStorage.token = session.token;
-      history.pushState(null, Routes.path(postLoginPath));
-    } else if (route.pathname !== Routes.path('/login') && !session.token) {
+    if (session.token) {
+      if(route.pathname === '/login') {
+        localStorage.email = session.email;
+        localStorage.token = session.token;
+        history.pushState(null, Routes.path(postLoginPath));
+      }
+    } else {
       localStorage.removeItem('email');
       localStorage.removeItem('token');
-      postLoginPath = route.pathname;
-      history.pushState(null, Routes.path('/login'));
-    } else if (route.pathname === '/') {
-      history.replaceState(null, Routes.path('/search'));
+      if (route.pathname !== Routes.path('/login')) {
+        postLoginPath = route.pathname;
+        history.pushState(null, Routes.path('/login'));
+      }
     }
   }
 };

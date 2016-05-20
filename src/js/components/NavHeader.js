@@ -8,6 +8,7 @@ import Title from 'grommet/components/Title';
 import Logo from './Logo'; // './HPELogo';
 import Menu from 'grommet/components/Menu';
 import SessionMenu from './SessionMenu';
+import { hasAdminPrivilege } from '../actions';
 
 class NavHeader extends Component {
 
@@ -26,8 +27,7 @@ class NavHeader extends Component {
       {to: '/explorer', text: 'Records'}
     ];
 
-    const hasAdminPrivilege = (localStorage && localStorage.amFormData && JSON.parse(localStorage.amFormData).hasAdminPrivilege) || (sessionStorage && sessionStorage.amFormData && JSON.parse(sessionStorage.amFormData).hasAdminPrivilege);
-    if (hasAdminPrivilege) {
+    if (hasAdminPrivilege()) {
       links.push(...[
         {to: '/views', text: 'Builder'},
         {to: '/aql', text: 'Graph'},

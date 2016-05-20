@@ -11,7 +11,7 @@ import ViewDefListContainer from './components/builder/ViewDefListContainer';
 import AQL from './components/aql/AQL';
 import TBD from 'grommet/components/TBD';
 import UCMDBAdapterContainer from './components/ucmdbAdapter/UCMDBAdapterPoint';
-
+import { hasAdminPrivilege } from './actions';
 var rootPath = "/"; //"/ferret/";
 //if (NODE_ENV === 'development') {
 //  rootPath = "/"; // webpack-dev-server
@@ -28,27 +28,29 @@ export const getRoutes = () => {
     {path: 'tbd', component: TBD}
   ];
 
-  const hasAdminPrivilege = (localStorage && localStorage.amFormData && JSON.parse(localStorage.amFormData).hasAdminPrivilege) || (sessionStorage && sessionStorage.amFormData && JSON.parse(sessionStorage.amFormData).hasAdminPrivilege);
-  if (hasAdminPrivilege) {
+  if (hasAdminPrivilege()) {
     routes.push(...[
       {path: 'ucmdbAdapter(/:pointName)(/:tabName)(/:integrationJobName)', component: UCMDBAdapterContainer},
       {path: 'aql', component: AQL},
       {path: 'views(/:id)', component: ViewDefListContainer}
     ]);
   }
+  routes.push({
+    path: '*',
+    component: Search,
+    onEnter: (nextState, replaceState) => replaceState(null, '/home')
+  });
   return routes;
 };
-
-
 
 const Route = {
 
   prefix: rootPath.slice(0, -1),
 
   path: (path) => (rootPath + path.slice(1)),
-
   routes: [
     {
+      indexRoute: { component: Search },
       path: rootPath, component: Ferret,
       childRoutes: getRoutes()
     }
