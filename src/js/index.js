@@ -7,19 +7,19 @@ import ReactDOM from 'react-dom';
 //import Router from 'react-router';
 import Rest from 'grommet/utils/Rest';
 //import RestWatch from './RestWatch';
-import { getCurrentLocale, getLocaleData } from 'grommet/utils/Locale';
-import { addLocaleData } from 'react-intl';
+import {getCurrentLocale, getLocaleData} from 'grommet/utils/Locale';
+import {addLocaleData} from 'react-intl';
 import en from 'react-intl/locale-data/en';
 import Routes, {getRoutes} from './Routes';
 import DevTools from './DevTools';
-import { Provider } from 'react-redux';
-import { IntlProvider } from 'react-intl';
+import {Provider} from 'react-redux';
+import {IntlProvider} from 'react-intl';
 
 import store from './store';
 import history from './RouteHistory';
-import { init, routeChanged/*, loginSuccess*/ } from './actions';
+import {init, routeChanged/*, loginSuccess*/} from './actions';
 
-import { ReduxRouter } from 'redux-router';
+import {ReduxRouter} from 'redux-router';
 
 // The port number needs to align with devServerProxy and websocketHost in gulpfile.js
 //let hostName = NODE_ENV === 'development' ? 'localhost:8010' : window.location.host;
@@ -109,7 +109,7 @@ let sessionWatcher = () => {
 
   if (route) {
     if (session.token) {
-      if(route.pathname === '/login') {
+      if (route.pathname === '/login') {
         localStorage.email = session.email;
         localStorage.token = session.token;
         history.pushState(null, Routes.path(postLoginPath));

@@ -5,8 +5,6 @@ import * as BuilderActions from '../../actions';
 import * as ViewDefActions from '../../actions/views';
 import MetaData from './MetaData';
 import BreadCrumb from './BreadCrumb';
-import Box from 'grommet/components/Box';
-import Header from 'grommet/components/Header';
 
 export default class Builder extends Component {
 

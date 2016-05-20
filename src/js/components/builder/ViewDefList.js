@@ -1,5 +1,5 @@
 import React, {Component/*, PropTypes*/} from 'react';
-import {Link} from 'react-router';
+// import {Link} from 'react-router';
 import history from '../../RouteHistory';
 import Anchor from 'grommet/components/Anchor';
 import Box from 'grommet/components/Box';
