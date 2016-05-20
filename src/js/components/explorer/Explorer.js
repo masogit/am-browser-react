@@ -17,7 +17,6 @@ export default class Explorer extends Component {
   }
 
   componentDidMount() {
-    console.log(this.props.params.id);
     if (this.props.params.id)
       ExplorerActions.loadView(this.props.params.id, (view) => {
         this.setState({
@@ -26,7 +25,6 @@ export default class Explorer extends Component {
       });
     else
       ExplorerActions.loadViews((views) => {
-        console.log(views);
         this.setState({
           viewNavigation: this._getViewNavigation(views)
         });
