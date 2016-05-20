@@ -1,0 +1,1182 @@
+<?xml version='1.0'?>
+<project name="updateWebXml" default="help">
+  <description>
+    Replaces the customised env properties in a war's web.xml
+    using values specified in a property file, optionally creating
+    an ear (as also specified in the property file). Type "ant help"
+    for more help.
+
+    NOTE: this build file requires Ant 1.6.2 or higher.
+  </description>
+
+  <property file="${env.properties.file}" prefix="PRI" />
+
+  <!-- the following properties are only specified here as defaults.
+       They are typically overridden during the build, or ant.tasks.dir
+       is provided in the env.properties.file.
+
+       ant.tasks.dir is provided here so that help works (is displayed)
+       from within the deploy directory using the simple command "ant" -->
+  <property name="PRI.ant.tasks.dir" value="lib" />
+
+  <property name="3rdparty.ant.tasks.ant-contrib" value="${PRI.ant.tasks.dir}" />
+  <property name="3rdparty.ant.tasks.xmltask" value="${PRI.ant.tasks.dir}" />
+  <property name="3rdparty.ant.tasks.xalan" value="${PRI.ant.tasks.dir}" />
+  <property name="ant.tasks.amcrypt" value="${PRI.ant.tasks.dir}" />
+  <property name="commons.path" value="${PRI.ant.tasks.dir}" />
+
+  <property name="tmp" value="${java.io.tmpdir}" />
+  <taskdef resource="net/sf/antcontrib/antlib.xml" classpath="${3rdparty.ant.tasks.ant-contrib}/ant-contrib-1.0b3.jar"/>
+  <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask">
+    <classpath>
+      <pathelement path="${3rdparty.ant.tasks.xmltask}/xmltask.jar"/>
+      <pathelement path="${3rdparty.ant.tasks.xalan}/xalan.jar"/>
+    </classpath>
+  </taskdef>
+  <if>
+    <or>
+      <equals arg1="on" arg2="${dev.build}"/>
+      <equals arg1="off" arg2="${dev.build}"/>
+    </or>
+    <then>
+      <property name="TEMP.PBKDF2.Password.First.File" value="${acsrc}/install/secret-share/secret1.txt" />
+      <property name="TEMP.PBKDF2.Password.Second.File" value="${acsrc}/install/secret-share/secret2.txt" />
+    </then>
+    <else>
+      <property name="TEMP.PBKDF2.Password.First.File" value="${basedir}/secret-share/secret1.txt" />
+      <property name="TEMP.PBKDF2.Password.Second.File" value="${basedir}/secret-share/secret2.txt" />
+    </else>
+  </if>
+  <taskdef name="amcrypt" classname="com.peregrine.ac.password.ant.AMCrypt">
+    <classpath id="pwdClasspath">
+      <pathelement path="${ant.tasks.amcrypt}"/>
+      <fileset dir="${ant.tasks.amcrypt}">
+        <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${commons.path}">
+        <include name="commons-codec.jar"/>
+        <include name="commons-logging.jar"/>
+        <include name="secretshare-1.4.1.jar"/>
+      </fileset>
+    </classpath>
+  </taskdef>
+  <taskdef name="amsplitpassword" classname="com.peregrine.ac.password.ant.AMSplitPassword">
+    <classpath id="pwdClasspath">
+      <pathelement path="${ant.tasks.amcrypt}"/>
+      <fileset dir="${ant.tasks.amcrypt}">
+        <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${commons.path}">
+        <include name="commons-codec.jar"/>
+        <include name="commons-logging.jar"/>
+        <include name="secretshare-1.4.1.jar"/>
+      </fileset>
+    </classpath>
+  </taskdef>
+
+  <if>
+    <os family="windows"/>
+    <then>
+      <property name="Library.Extension" value="dll" />
+      <property name="Library.Prefix" value="" />
+    </then>
+    <else>
+      <property name="Library.Extension" value="so" />
+      <property name="Library.Prefix" value="lib" />
+    </else>
+  </if>
+
+  <target name="help" description="Get help on using this build file">
+    <echo>
+      === WAR transformation / EAR creation =========================
+
+      To transform the deployment parameters within a deployable
+      war, use the target "transform.deployment". Specify the war
+      file to transform and the properties file that contains the
+      updated values on the commandline using the parameters:
+
+      -Denv.properties.file=/path/to/package.properties
+      -Dwar=/path/to/xxxx.war
+
+      where xxxx is the name of the war to transform and
+      package.properties is the name of the properties
+      file containing the updated values.
+
+      Any or all of properties may also be specified in
+      the file which env.properties.file specifies (except, of
+      course, env.properties.file). If specified both on the
+      command line and in the properties file, the command line
+      values are used.
+    </echo>
+    <input message="press [Enter] for more... "/>
+    <echo>
+      --- Web Service parameters ------------------------------------
+
+      The path to the library used in the DB connection string
+      can be specified in one of two ways. If the library is
+      located in the install directory, you may specify:
+
+      -Darch=x64         OR   -Darch=x86
+      (accepted values are 64, x64, 32, x86)
+
+      If the path is elsewhere you need to specify the absolute
+      path:
+
+      -DDB.library.path=/path/to/aamapixx.xxx
+
+      To set the password used by the Web Service to connect
+      to Asset Manager, specify the following in the commandline:
+
+      -DAssetManager.UserPwd=xxxxxxxxxxx
+
+      where xxxxxxxxxx is the password. If you specify the
+      unencrypted value of this password, you must also specify:
+
+      -Dencrypt=true
+    </echo>
+    <input message="press [Enter] for more... "/>
+    <echo>
+      and you may specify a different passphrase
+      (AssetManager.PassPhrase) in either the properties
+      file or via the command line:
+
+      -DAssetManager.PassPhrase=yyyyyyyyyyy
+
+      A temporary directory should be specified using:
+
+      -Dtmp=/path/to/temp/dir
+
+    </echo>
+    <input message="press [Enter] for more... "/>
+    <echo>
+      === Generating web.xml without deploying a WAR/EAR ============
+
+      To use the generate.webxml target, the following properties
+      must be set:
+
+      env.properties.file =&gt; the .properties file that contains
+      the values to replace in the web.xml
+      ant.tasks.dir       =&gt; the path to the base ant task jar
+      extensions directory
+      input.web.xml       =&gt; the path to the original web.xml
+      that is going to be changed
+      output.web.xml      =&gt; the path to the web.xml to generate
+
+      The following properties may also be specified if the
+      ant-contrib and xmltask task jars or the needed apache
+      commons jars are to be found in a different location:
+
+      3rdparty.ant.tasks.ant-contrib
+      3rdparty.ant.tasks.xmltask
+      commons.path
+    </echo>
+  </target>
+
+  <target name="generate.ehcache" description="generate the webtier's ecache.xml">
+    <property file="${env.properties.file}" />
+    <available file="${tmp}/unwar/WEB-INF/classes/ehcache.xml" property="ehcache.exist" />
+    <if>
+      <equals arg1="${ehcache.exist}" arg2="true"/>
+      <then>
+        <xmltask source="${tmp}/unwar/WEB-INF/classes/ehcache.xml"  dest="${tmp}/unwar/WEB-INF/classes/ehcache.xml" preserveType="true">
+          <replace path="/ehcache/cache[@name='openItemizedList']/@timeToIdleSeconds" withText="${Cache.OpenedItemizedLists.timeToLiveSeconds}" />
+          <replace path="/ehcache/cache[@name='openItemizedList']/@timeToLiveSeconds" withText="${Cache.OpenedItemizedLists.timeToIdleSeconds}" />
+        </xmltask>
+      </then>
+    </if>
+  </target>
+
+  <target name="generate.webxml" description="Generate a web.xml from the package.properties file">
+    <property name="properties.file" value="${env.properties.file}" description="default, if not passed in as a param" />
+    <mkdir dir="${tmp}/working" />
+    <copy file="${input.web.xml}" tofile="${tmp}/working/web.xml" overwrite="true" flatten="true" />
+    <!-- take care of empty values specified in shorthand notation, which xmltask doesn't seem to like -->
+    <replace file="${tmp}/working/web.xml">
+      <replacetoken><![CDATA[<env-entry-value/>]]></replacetoken>
+      <replacevalue><![CDATA[<env-entry-value>@@blank@@</env-entry-value>]]></replacevalue>
+    </replace>
+    <replace file="${tmp}/working/web.xml">
+      <replacetoken><![CDATA[<env-entry-value></env-entry-value>]]></replacetoken>
+      <replacevalue><![CDATA[<env-entry-value>@@blank@@</env-entry-value>]]></replacevalue>
+    </replace>
+    <if>
+      <not>
+        <isset property="property.prefix" />
+      </not>
+      <then>
+        <property name="property.prefix" value="PRI." />
+      </then>
+    </if>
+    <xmltask source="${tmp}/working/web.xml" destbuffer="newwebxml" preservetype="true" expandEntityReferences="false" omitHeader="false"/>
+    <if>
+      <equals arg1="" arg2="${PRI.PBKDF2.Password.First.File}"/>
+      <then>
+        <echo message="Warning: 'PBKDF2.Password.First.File' property not set in properties file. Will default to ${TEMP.PBKDF2.Password.First.File}." level="error"/>
+        <propertycopy property="PRI.PBKDF2.Password.First.File" from="TEMP.PBKDF2.Password.First.File" override="true"/>
+      </then>
+    </if>
+    <if>
+      <equals arg1="" arg2="${PRI.PBKDF2.Password.Second.File}"/>
+      <then>
+        <echo message="Warning: 'PBKDF2.Password.Second.File' property not set in properties file. Will default to ${TEMP.PBKDF2.Password.Second.File}." level="error"/>
+        <propertycopy property="PRI.PBKDF2.Password.Second.File" from="TEMP.PBKDF2.Password.Second.File" override="true"/>
+      </then>
+    </if>
+    <if>
+      <and>
+        <not>
+          <available property="file1.exists" file="${TEMP.PBKDF2.Password.First.File}"/>
+        </not>
+        <not>
+          <available property="file2.exists" file="${TEMP.PBKDF2.Password.Second.File}"/>
+        </not>
+      </and>
+      <then>
+        <fail message="The following password files do not exist: ${TEMP.PBKDF2.Password.First.File}, ${TEMP.PBKDF2.Password.Second.File}. Please generate them first by running generate-password.bat (or generate-password.sh), or copy your existing password files to the 'secret-share' folder."/>
+      </then>
+      <else>
+        <if>
+          <or>
+            <not>
+              <available property="file1.exists" file="${TEMP.PBKDF2.Password.First.File}"/>
+            </not>
+            <not>
+              <available property="file2.exists" file="${TEMP.PBKDF2.Password.Second.File}"/>
+            </not>
+          </or>
+          <then>
+            <fail message="One of the following password files is missing: ${TEMP.PBKDF2.Password.First.File}, ${TEMP.PBKDF2.Password.Second.File}. Please re-generate them by running generate-password.bat (or generate-password.sh), or copy your existing password files to the 'secret-share' folder."/>
+          </then>
+        </if>
+      </else>
+
+
+    </if>
+    <xmltask source="${tmp}/working/web.xml">
+      <call path="/:web-app/:env-entry" inheritAll="true">
+        <param name="name" path="child::*[2]/text()" default="" />
+        <actions>
+          <if>
+            <isset property="@{name}"/>
+            <then>
+              <var name="WK.name" value="@{name}" />
+            </then>
+            <else>
+              <if>
+                <isset property="${property.prefix}@{name}"/>
+                <then>
+                  <var name="WK.name" value="${property.prefix}@{name}" />
+                </then>
+              </if>
+            </else>
+          </if>
+
+          <propertycopy property="WK.dbNameProperty" from="${property.prefix}dbNameProperty" override="true" silent="true" />
+          <if>
+            <or>
+              <isset property="@{name}"/>
+              <isset property="${property.prefix}@{name}"/>
+            </or>
+            <then>
+              <if>
+                <or>
+                  <contains substring=":@{name}:" string="${PRI.pwdEntries}"/>
+                  <contains substring=":@{name}:" string="${SEC.pwdEntries}"/>
+                </or>
+                <then>
+                  <antcallback target="-get.transform.password" return="WK.AM.Transformed.UserPwd" inheritAll="true">
+                    <param name="pwdEntry" value="@{name}" />
+                  </antcallback>
+                  <echo message="Setting @{name}=*****************" level="warning" />
+                  <xmltask sourcebuffer="newwebxml" destbuffer="newwebxml" preservetype="true" expandEntityReferences="false" omitHeader="false">
+                    <replace path="/:web-app/:env-entry/:env-entry-value[preceding-sibling::*[2]='@{name}']/text()" withText="${WK.AM.Transformed.UserPwd}" />
+                  </xmltask>
+                </then>
+                <else>
+                  <propertycopy property="tempValue" from="${WK.name}" override="true" />
+                  <antcallback target="-transform.value" return="WK.value" inheritAll="true">
+                    <param name="valueToTransform" value="${tempValue}" />
+                  </antcallback>
+                  <echo message="Setting @{name}=${WK.value}" level="warning" />
+                  <xmltask sourcebuffer="newwebxml" destbuffer="newwebxml" preservetype="true" expandEntityReferences="false" omitHeader="false">
+                    <replace path="/:web-app/:env-entry/:env-entry-value[preceding-sibling::*[2]='@{name}']/text()" withText="${WK.value}" />
+                  </xmltask>
+                </else>
+              </if>
+            </then>
+            <elseif>
+              <and>
+                <isset property="${property.prefix}dbNameProperty"/>
+                <equals arg1="@{name}" arg2="${WK.dbNameProperty}"/>
+              </and>
+              <then>
+                <antcallback target="-construct.db.name" return="WK.${WK.dbNameProperty},WK.reported.${WK.dbNameProperty}" inheritAll="true">
+                  <param name="dbNameProperty" value="${WK.dbNameProperty}" />
+                </antcallback>
+                <propertycopy property="WK.dbNameProperty.transformed" from="WK.${WK.dbNameProperty}" override="true" />
+                <propertycopy property="WK.dbNameProperty.reported" from="WK.reported.${WK.dbNameProperty}" override="true" />
+                <echo message="Setting ${WK.dbNameProperty}=${WK.dbNameProperty.reported}" level="warning" />
+                <xmltask sourcebuffer="newwebxml" destbuffer="newwebxml" preservetype="true" expandEntityReferences="false" omitHeader="false">
+                  <replace path="/:web-app/:env-entry/:env-entry-value[preceding-sibling::*[2]='@{name}']/text()" withText="${WK.dbNameProperty.transformed}" />
+                </xmltask>
+              </then>
+            </elseif>
+            <else>
+              <if>
+                <or>
+                  <contains substring=":@{name}:" string="${PRI.internalProperties}"/>
+                  <contains substring=":@{name}:" string="${SEC.internalProperties}"/>
+                </or>
+                <then>
+                  <echo message="Changing '@{name}'" level="verbose" />
+                </then>
+                <else>
+                  <echo message="Not changing '@{name}'" level="warning" />
+                </else>
+              </if>
+            </else>
+          </if>
+        </actions>
+      </call>
+    </xmltask>
+    <xmltask source="${tmp}/working/web.xml">
+      <call path="/:web-app/:session-config" inheritAll="true">
+        <param name="name" value="sessionTimeout"/>
+
+        <actions>
+          <if>
+            <isset property="@{name}"/>
+            <then>
+              <var name="WK.name" value="@{name}" />
+            </then>
+            <else>
+              <if>
+                <isset property="${property.prefix}@{name}"/>
+                <then>
+                  <var name="WK.name" value="${property.prefix}@{name}" />
+                </then>
+              </if>
+            </else>
+          </if>
+          <if>
+            <or>
+              <isset property="@{name}"/>
+              <isset property="${property.prefix}@{name}"/>
+            </or>
+            <then>
+              <propertycopy property="WK.value" from="${WK.name}" override="true" />
+              <echo message="Setting @{name}=${WK.value}" level="warning" />
+              <xmltask sourcebuffer="newwebxml" destbuffer="newwebxml" preservetype="true" expandEntityReferences="false" omitHeader="false">
+                <replace path="/:web-app/:session-config/:session-timeout/text()" withText="${WK.value}" />
+              </xmltask>
+            </then>
+          </if>
+        </actions>
+      </call>
+    </xmltask>
+
+    <xmltask source="${tmp}/working/web.xml">
+      <call path="/:web-app/:filter/:init-param/:param-name" inheritAll="true">
+        <param name="name" path="text()"/>
+
+        <actions>
+          <if>
+            <isset property="@{name}"/>
+            <then>
+              <var name="WK.name" value="@{name}" />
+            </then>
+            <else>
+              <if>
+                <isset property="${property.prefix}@{name}"/>
+                <then>
+                  <var name="WK.name" value="${property.prefix}@{name}" />
+                </then>
+              </if>
+            </else>
+          </if>
+          <if>
+            <or>
+              <isset property="@{name}"/>
+              <isset property="${property.prefix}@{name}"/>
+            </or>
+            <then>
+              <propertycopy property="WK.value" from="${WK.name}" override="true" />
+
+              <echo message="Setting @{name}=${WK.value}" level="warning" />
+              <xmltask sourcebuffer="newwebxml" destbuffer="newwebxml" preservetype="true" expandEntityReferences="false" omitHeader="false">
+                <replace path="/:web-app/:filter/:init-param/:param-value[preceding-sibling::*[1]='@{name}']/text()" withText="${WK.value}" />
+              </xmltask>
+            </then>
+          </if>
+        </actions>
+      </call>
+    </xmltask>
+
+    <xmltask sourcebuffer="newwebxml" dest="${output.web.xml}" preservetype="true"
+             expandEntityReferences="false" omitHeader="false"/>
+    <replace file="${output.web.xml}">
+      <replacetoken><![CDATA[<env-entry-value>@@blank@@</env-entry-value>]]></replacetoken>
+      <replacevalue><![CDATA[<env-entry-value/>]]></replacevalue>
+    </replace>
+  </target>
+
+  <target name="-transform.value" description="Update a property value if it contains a @{...}@ marker">
+    <propertyregex property="replacementValuePropertyName"
+                   override="true"
+                   input="${valueToTransform}"
+                   regexp=".*?\@\{([^\}]*)\}\@.*?"
+                   select="\1"
+                   defaultValue="" />
+    <if>
+      <and>
+        <isset property="replacementValuePropertyName" />
+        <not>
+          <equals arg1="" arg2="${replacementValuePropertyName}" />
+        </not>
+      </and>
+      <then>
+        <if>
+          <isset property="${replacementValuePropertyName}"/>
+          <then>
+            <propertycopy property="replacementValueList" from="${replacementValuePropertyName}" override="true" />
+          </then>
+          <else>
+            <if>
+              <isset property="${property.prefix}${replacementValuePropertyName}"/>
+              <then>
+                <propertycopy property="replacementValueList" from="${property.prefix}${replacementValuePropertyName}" override="true" />
+              </then>
+              <else>
+                <property name="replacementValueList" value=""/>
+              </else>
+            </if>
+          </else>
+        </if>
+        <for list="${replacementValueList}" param="possibility">
+          <sequential>
+            <propertyregex property="selection" override="true" input="@{possibility}" regexp="([^=]*)=([^:]*):(.*)" select="\1" />
+            <propertyregex property="comparison" override="true" input="@{possibility}" regexp="([^=]*)=([^:]*):(.*)" select="\2" />
+            <propertyregex property="value" override="true" input="@{possibility}" regexp="([^=]*)=([^:]*):(.*)" select="\3" />
+            <if>
+              <equals arg1="${selection}" arg2="${comparison}"/>
+              <then>
+                <property name="replacementValue" value="${value}" />
+              </then>
+            </if>
+          </sequential>
+        </for>
+        <if>
+          <isset property="replacementValuePropertyName" />
+          <then>
+            <property name="regex" value="\@\{(${replacementValuePropertyName})\}\@"/>
+            <propertyregex property="WK.value"
+                           override="true"
+                           defaultValue="${valueToTransform}"
+                           global="true"
+                           input="${valueToTransform}"
+                           regexp="${regex}"
+                           replace="${replacementValue}" />
+          </then>
+          <else>
+            <propertycopy property="WK.value" from="valueToTransform" override="true"/>
+          </else>
+        </if>
+      </then>
+      <else>
+        <propertycopy property="WK.value" from="valueToTransform" override="true"/>
+      </else>
+    </if>
+  </target>
+
+  <target name="-get.password">
+    <propertycopy property="WK.promptForPwd" from="${property.prefix}promptForPwd" override="true" />
+    <propertycopy property="WK.${pwdEntry}" from="${property.prefix}${pwdEntry}" override="true" />
+
+    <echo message="===========================================================${line.separator}" level="error" />
+
+    <if>
+      <or>
+        <and>
+          <isset property="${property.prefix}promptForPwd" />
+          <istrue value="${WK.promptForPwd}" />
+          <or>
+            <not>
+              <isset property="promptForPwd" />
+            </not>
+            <istrue value="${promptForPwd}" />
+          </or>
+        </and>
+        <and>
+          <isset property="promptForPwd" />
+          <istrue value="${promptForPwd}" />
+        </and>
+      </or>
+      <then>
+        <echo message="===========================================================" />
+        <input addproperty="password.db"
+               message="Enter the unencrypted value for ${pwdEntry}:" />
+      </then>
+      <else>
+        <if>
+          <isset property="${pwdEntry}" />
+          <then>
+            <propertycopy property="password.db" from="${pwdEntry}" />
+          </then>
+          <else>
+            <propertycopy property="password.db" from="WK.${pwdEntry}" />
+          </else>
+        </if>
+      </else>
+    </if>
+  </target>
+
+  <target name="-pwd.check.transform" depends="-get.password">
+    <echo message="Encrypting ${pwdEntry}..." level="warning" />
+    <amcrypt firstPbkdf2PasswordFile="${TEMP.PBKDF2.Password.First.File}" secondPbkdf2PasswordFile="${TEMP.PBKDF2.Password.Second.File}"
+             property="${property.prefix}AM.Transformed.UserPwd" password="${password.db}" />
+  </target>
+
+  <target name="-get.transform.password">
+    <antcallback target="-pwd.check.transform" return="${property.prefix}AM.Transformed.UserPwd" inheritAll="true">
+    </antcallback>
+    <propertycopy property="WK.AM.Transformed.UserPwd" from="${property.prefix}AM.Transformed.UserPwd" override="true" />
+  </target>
+
+  <target name="-construct.db.name">
+    <propertycopy property="WK.DB.engine" from="${property.prefix}DB.engine" override="true" silent="true" />
+    <propertycopy property="WK.DB.engine" from="DB.engine" override="true" silent="true" />
+    <!-- in case DB.engine isn't specified -->
+    <property name="WK.DB.engine" value="Generic" />
+    <if>
+      <or>
+        <and>
+          <isset property="DB.engine" />
+          <equals arg1="${DB.engine}" arg2="Generic" casesensitive="false" />
+        </and>
+        <or>
+          <not>
+            <isset property="${property.prefix}DB.engine" />
+          </not>
+          <equals arg1="${WK.DB.engine}" arg2="Generic" casesensitive="false" />
+        </or>
+      </or>
+      <then>
+        <!-- in case DB.datasource isn't specified -->
+        <property name="WK.${dbNameProperty}" value="" />
+        <property name="WK.reported.${dbNameProperty}" value="" />
+        <propertycopy name="WK.${dbNameProperty}" from="${property.prefix}DB.datasource" override="true" silent="true" />
+        <propertycopy name="WK.reported.${dbNameProperty}" from="${property.prefix}DB.datasource" override="true" silent="true" />
+        <!-- override from possible commandline specs -->
+        <propertycopy name="WK.${dbNameProperty}" from="DB.datasource" override="true" silent="true" />
+        <propertycopy name="WK.reported.${dbNameProperty}" from="DB.datasource" override="true" silent="true" />
+      </then>
+      <else>
+        <propertycopy property="WK.DB.datasource" from="${property.prefix}DB.datasource" override="true" />
+        <propertycopy property="WK.DB.login" from="${property.prefix}DB.login" override="true" />
+        <propertycopy property="WK.DB.library.path" from="${property.prefix}DB.library.path" override="true" />
+        <propertycopy property="WK.DB.cache.enabled" from="${property.prefix}DB.cache.enabled" override="true" />
+        <propertycopy property="WK.DB.cache.dir" from="${property.prefix}DB.cache.dir" override="true" />
+        <propertycopy property="WK.DB.cache.size" from="${property.prefix}DB.cache.size" override="true" />
+        <propertycopy property="WK.DB.owner" from="${property.prefix}DB.owner" override="true" />
+        <propertycopy property="WK.DB.ws.address" from="${property.prefix}DB.ws.address" override="true" />
+        <propertycopy property="WK.DB.passphrase" from="${property.prefix}DB.passphrase" override="true" />
+        <propertycopy property="WK.DB.auth.type" from="${property.prefix}DB.auth.type" override="true" />
+        <propertycopy property="WK.DB.expand.typedlinks" from="${property.prefix}DB.expand.typedlinks" override="true" />
+        <propertycopy property="WK.DB.FetchingArraySize" from="${property.prefix}DB.FetchingArraySize" override="true" />
+        <!-- override from possible commandline specs -->
+        <propertycopy property="WK.DB.datasource" from="DB.datasource" override="true" silent="true" />
+        <propertycopy property="WK.DB.login" from="DB.login" override="true" silent="true" />
+        <propertycopy property="WK.DB.library.path" from="DB.library.path" override="true" silent="true" />
+        <propertycopy property="WK.DB.cache.enabled" from="DB.cache.enabled" override="true" silent="true" />
+        <propertycopy property="WK.DB.cache.dir" from="DB.cache.dir" override="true" silent="true" />
+        <propertycopy property="WK.DB.cache.size" from="DB.cache.size" override="true" silent="true" />
+        <propertycopy property="WK.DB.owner" from="DB.owner" override="true" silent="true" />
+        <propertycopy property="WK.DB.ws.address" from="DB.ws.address" override="true"  silent="true" />
+        <propertycopy property="WK.DB.passphrase" from="DB.passphrase" override="true"  silent="true" />
+        <propertycopy property="WK.DB.auth.type" from="DB.auth.type" override="true"  silent="true" />
+        <propertycopy property="WK.DB.expand.typedlinks" from="DB.expand.typedlinks" override="true" silent="true" />
+        <propertycopy property="WK.DB.FetchingArraySize" from="DB.FetchingArraySize" override="true" silent="true" />
+
+        <antcallback target="-pwd.check.transform" return="${property.prefix}AM.Transformed.UserPwd" inheritAll="true">
+          <param name="pwdEntry" value="DB.password" />
+        </antcallback>
+        <propertycopy property="WK.encryptedPwd" from="${property.prefix}AM.Transformed.UserPwd" override="true" />
+        <condition property="WK.cache.enabled" value="1" else="0">
+          <or>
+            <not>
+              <isset property="${property.prefix}DB.cache.enabled" />
+            </not>
+            <istrue value="${WK.DB.cache.enabled}" />
+          </or>
+        </condition>
+
+        <!-- check for optional parameter -->
+        <propertycopy property="WK.optional.token" from="${property.prefix}dbConnectionPattern.optional.token" override="true" silent="true" />
+        <!-- value from properties file -->
+        <propertycopy property="WK.optional.token.value" from="${property.prefix}${WK.optional.token}" override="true" silent="true" />
+        <!-- override from possible commandline specs -->
+        <propertycopy property="WK.optional.token.value" from="${WK.optional.token}" override="true" silent="true" />
+        <if>
+          <and>
+            <isset property="${property.prefix}${WK.optional.token}" />
+            <not>
+              <equals arg1="${WK.optional.token.value}" arg2="" />
+            </not>
+          </and>
+          <then>
+            <!-- default values for optional token prefix and suffix -->
+            <property name="${property.prefix}dbConnectionPattern.optional.token.prefix" value="" />
+            <property name="${property.prefix}dbConnectionPattern.optional.token.suffix" value="" />
+            <!-- values from properties file -->
+            <propertycopy property="WK.optional.token.prefix" from="${property.prefix}dbConnectionPattern.optional.token.prefix" override="true" />
+            <propertycopy property="WK.optional.token.suffix" from="${property.prefix}dbConnectionPattern.optional.token.suffix" override="true" />
+            <!-- override from possible commandline specs -->
+            <propertycopy property="WK.optional.token.prefix" from="dbConnectionPattern.optional.token.prefix" override="true" silent="true" />
+            <propertycopy property="WK.optional.token.suffix" from="dbConnectionPattern.optional.token.suffix" override="true" silent="true" />
+            <!-- construct optional parameter replacement value -->
+            <property name="WK.optional.token.value.full" value="${WK.optional.token.prefix}${WK.optional.token.value}${WK.optional.token.suffix}" />
+          </then>
+          <else>
+            <property name="WK.optional.token.value.full" value="" />
+          </else>
+        </if>
+
+        <!-- load properties with tokens replaced for use as the real values -->
+        <loadproperties srcFile="${properties.file}">
+          <filterchain>
+            <linecontains>
+              <contains value="dbConnectionPattern=" />
+            </linecontains>
+            <prefixlines prefix="WK.resolved." />
+            <replacetokens>
+              <token key="${WK.optional.token}" value="${WK.optional.token.value.full}" />
+            </replacetokens>
+            <replacetokens>
+              <token key="DB.engine" value="${WK.DB.engine}" />
+              <token key="DB.datasource" value="${WK.DB.datasource}" />
+              <token key="DB.login" value="${WK.DB.login}" />
+              <token key="DB.password" value="${WK.encryptedPwd}" />
+              <token key="DB.cache.enabled" value="${WK.cache.enabled}" />
+              <token key="DB.cache.dir" value="${WK.DB.cache.dir}" />
+              <token key="DB.cache.size" value="${WK.DB.cache.size}" />
+              <token key="DB.owner" value="${WK.DB.owner}" />
+              <token key="DB.ws.address" value="${WK.DB.ws.address}" />
+              <token key="DB.passphrase" value="${WK.DB.passphrase}" />
+              <token key="DB.auth.type" value="${WK.DB.auth.type}" />
+              <token key="DB.library.path" value="${WK.DB.library.path}" />
+              <token key="DB.expand.typedlinks" value="${WK.DB.expand.typedlinks}" />
+              <token key="DB.FetchingArraySize" value="${WK.DB.FetchingArraySize}" />
+            </replacetokens>
+          </filterchain>
+        </loadproperties>
+        <!-- load properties with tokens replaced for use in display (to avoid displaying passwords) -->
+        <loadproperties srcFile="${properties.file}">
+          <filterchain>
+            <linecontains>
+              <contains value="dbConnectionPattern=" />
+            </linecontains>
+            <prefixlines prefix="WK.displayed." />
+            <replacetokens>
+              <token key="${WK.optional.token}" value="${WK.optional.token.value.full}" />
+            </replacetokens>
+            <replacetokens>
+              <token key="DB.engine" value="${WK.DB.engine}" />
+              <token key="DB.datasource" value="${WK.DB.datasource}" />
+              <token key="DB.login" value="${WK.DB.login}" />
+              <token key="DB.password" value="**********" />
+              <token key="DB.cache.enabled" value="${WK.cache.enabled}" />
+              <token key="DB.cache.dir" value="${WK.DB.cache.dir}" />
+              <token key="DB.cache.size" value="${WK.DB.cache.size}" />
+              <token key="DB.owner" value="${WK.DB.owner}" />
+              <token key="DB.ws.address" value="${WK.DB.ws.address}" />
+              <token key="DB.passphrase" value="${WK.DB.passphrase}" />
+              <token key="DB.auth.type" value="${WK.DB.auth.type}" />
+              <token key="DB.library.path" value="${WK.DB.library.path}" />
+              <token key="DB.expand.typedlinks" value="${WK.DB.expand.typedlinks}" />
+              <token key="DB.FetchingArraySize" value="${WK.DB.FetchingArraySize}" />
+            </replacetokens>
+          </filterchain>
+        </loadproperties>
+
+        <antcallback target="-transform.value" return="WK.value" inheritAll="true">
+          <param name="valueToTransform" value="${WK.resolved.dbConnectionPattern}" />
+        </antcallback>
+        <property name="WK.${dbNameProperty}" value="${WK.value}" />
+        <antcallback target="-transform.value" return="WK.value" inheritAll="true">
+          <param name="valueToTransform" value="${WK.displayed.dbConnectionPattern}" />
+        </antcallback>
+        <property name="WK.reported.${dbNameProperty}" value="${WK.value}" />
+      </else>
+    </if>
+  </target>
+
+  <target name="-get.db.params">
+    <if>
+      <available file="${properties.file}" />
+      <then>
+        <loadproperties srcFile="${properties.file}">
+          <filterchain>
+            <linecontains>
+              <contains value="dbConnectionPattern=" />
+            </linecontains>
+            <prefixlines prefix="${prefix}" />
+            <replacetokens>
+              <token key="${WK.optional.token}" value="${WK.optional.token.value.full}" />
+            </replacetokens>
+            <replacetokens>
+              <token key="DB.engine" value="${WK.DB.engine}" />
+              <token key="DB.datasource" value="${WK.DB.datasource}" />
+              <token key="DB.login" value="${WK.DB.login}" />
+              <token key="DB.password" value="${WK.encryptedPwd}" />
+              <token key="DB.cache.enabled" value="${WK.cache.enabled}" />
+              <token key="DB.cache.dir" value="${WK.DB.cache.dir}" />
+              <token key="DB.cache.size" value="${WK.DB.cache.size}" />
+              <token key="DB.owner" value="${WK.DB.owner}" />
+              <token key="DB.ws.address" value="${WK.DB.ws.address}" />
+              <token key="DB.passphrase" value="${WK.DB.passphrase}" />
+              <token key="DB.auth.type" value="${WK.DB.auth.type}" />
+              <token key="DB.library.path" value="${WK.DB.library.path}" />
+              <token key="DB.expand.typedlinks" value="${WK.DB.expand.typedlinks}" />
+              <token key="DB.FetchingArraySize" value="${WK.DB.FetchingArraySize}" />
+            </replacetokens>
+          </filterchain>
+        </loadproperties>
+      </then>
+    </if>
+  </target>
+
+  <target name="transform.deployment"
+          description="Update the web.xml(s) of the war(s) and/or create ear"
+          depends="-clearPasswordFlag,-war.deployment,-generate.ear">
+    <antcall target="-clean.deploy.temp.dirs" inheritall="true" />
+    <antcall target="-clearPasswordFlag" inheritall="true" />
+  </target>
+
+  <target name="-clearPasswordFlag">
+    <delete file="${tmp}/passwordflag.txt"/>
+  </target>
+
+  <target name="-check.cmdline.deployment">
+    <if>
+      <or>
+        <and>
+          <isset property="PRI.ear.deployment" />
+          <istrue value="${PRI.ear.deployment}" />
+          <or>
+            <not>
+              <isset property="ear.deployment" />
+            </not>
+            <istrue value="${ear.deployment}" />
+          </or>
+        </and>
+        <and>
+          <isset property="ear.deployment" />
+          <istrue value="${ear.deployment}" />
+        </and>
+      </or>
+      <then>
+        <property name="do.ear" value="true"/>
+      </then>
+    </if>
+    <if>
+      <or>
+        <and>
+          <isset property="PRI.war.deployment" />
+          <istrue value="${PRI.war.deployment}" />
+          <or>
+            <not>
+              <isset property="war.deployment" />
+            </not>
+            <istrue value="${war.deployment}" />
+          </or>
+        </and>
+        <and>
+          <isset property="war.deployment" />
+          <istrue value="${war.deployment}" />
+        </and>
+      </or>
+      <then>
+        <property name="do.war" value="true"/>
+      </then>
+    </if>
+  </target>
+
+  <target name="-war.deployment" depends="-check.cmdline.deployment" if="do.war">
+    <antcall target="-clean.deploy.temp.dirs" inheritall="true" />
+    <propertyregex property="PRI.war.name" input="${PRI.war}" regexp=".*[\/|\\]([^\.]*\.[^\.]*)$" select="\1" />
+    <antcall target="-transform.war" inheritall="true">
+      <param name="properties.file" value="${env.properties.file}" />
+      <param name="property.prefix" value="PRI."/>
+      <param name="war" value="${PRI.war}"/>
+      <param name="war.name" value="${PRI.war.name}"/>
+      <param name="war.included.in.ear" value="false"/>
+      <param name="war.tomcat6" value="${tomcat6}"/>
+      <param name="war.ws8" value="${ws8}"/>
+      <param name="war.wls12c" value="${wls12c}"/>
+    </antcall>
+    <if>
+      <and>
+        <isset property="war"/>
+      </and>
+      <then>
+        <dirname file="${war}" property="war.dir" />
+      </then>
+      <else>
+        <dirname file="${PRI.war}" property="war.dir" />
+      </else>
+    </if>
+    <property name="war.dir.report" value="${war.dir}${file.separator}${PRI.war.name}" />
+    <echo message="${line.separator}Done transforming ${war.dir.report}." level="warning" />
+    <antcall target="-war.warning" />
+  </target>
+
+  <target name="-get.war.dir">
+    <dirname file="${PRI.war}" property="war.dir" />
+  </target>
+
+  <target name="-generate.ear" depends="-check.cmdline.deployment" if="do.ear">
+    <antcall target="-clean.deploy.temp.dirs" inheritall="true" />
+    <mkdir dir="${tmp}/war1" />
+    <copy file="${PRI.war}" todir="${tmp}/war1/" flatten="true"/>
+    <propertyregex property="PRI.war.name" input="${PRI.war}" regexp=".*[\/|\\]([^\.]*\.[^\.]*)$" select="\1" />
+    <antcall target="-transform.war" inheritall="true">
+      <param name="properties.file" value="${env.properties.file}" />
+      <param name="tmp" value="${tmp}/war1"/>
+      <param name="property.prefix" value="PRI." />
+      <param name="war" value="${tmp}/war1/${PRI.war.name}"/>
+      <param name="war.name" value="${PRI.war.name}"/>
+      <param name="war.included.in.ear" value="true"/>
+      <param name="war.ws8" value="${ws8}"/>
+      <param name="war.wls12c" value="${wls12c}"/>
+    </antcall>
+    <mkdir dir="${tmp}/ear" />
+    <copy todir="${tmp}/ear" file="${tmp}/war1/${PRI.war.name}" flatten="true"/>
+    <antcall target="-copy.addl.files" inheritall="true">
+      <param name="property.prefix" value="PRI." />
+    </antcall>
+    <!-- save the first MANIFEST for use in the ear -->
+    <copy todir="${tmp}" file="${tmp}/unwar/META-INF/MANIFEST.MF" />
+    <if>
+      <and>
+        <isset property="PRI.combination.ear" />
+        <istrue value="${PRI.combination.ear}" />
+      </and>
+      <then>
+        <if>
+          <not>
+            <available file="${PRI.properties.file2}" />
+          </not>
+          <then>
+            <property name="secondary.file.expanded" location="${PRI.properties.file2}" />
+            <echo>${secondary.file.expanded} file not found! ("properties.file2=${PRI.properties.file2}")</echo>
+            <echo message="Cannot proceed with COMBINATION ear creation."/>
+            <echo message="Creating ear containing ${PRI.war.name} only:${line.separator}${line.separator}${line.separator}" />
+          </then>
+          <else>
+            <property name="SEC.properties.file.found" value="true"/>
+            <property file="${PRI.properties.file2}" prefix="SEC"/>
+            <mkdir dir="${tmp}/war2" />
+            <copy file="${SEC.war}" todir="${tmp}/war2/" flatten="true"/>
+            <propertyregex property="SEC.war.name" input="${SEC.war}" regexp=".*[\/|\\]([^\.]*\.[^\.]*)$" select="\1" />
+            <antcall target="-transform.war" inheritall="true">
+              <param name="properties.file" value="${PRI.properties.file2}" />
+              <param name="tmp" value="${tmp}/war2"/>
+              <param name="property.prefix" value="SEC." />
+              <param name="war" value="${tmp}/war2/${SEC.war.name}"/>
+              <param name="war.name" value="${SEC.war.name}"/>
+              <param name="war.included.in.ear" value="true"/>
+            </antcall>
+            <copy file="${tmp}/war2/${SEC.war.name}" todir="${tmp}/ear" />
+          </else>
+        </if>
+      </then>
+    </if>
+    <if>
+      <and>
+        <isset property="PRI.combination.ear" />
+        <istrue value="${PRI.combination.ear}" />
+        <isset property="SEC.properties.file.found" />
+        <istrue value="${SEC.properties.file.found}" />
+      </and>
+      <then>
+        <copy todir="${tmp}/ear" file="${tmp}/war2/${SEC.war.name}" flatten="true"/>
+        <antcall target="-copy.addl.files" inheritall="true">
+          <param name="property.prefix" value="SEC." />
+        </antcall>
+        <antcall target="-create.combo.application.xml" inheritall="true" />
+        <!-- set the classpath in the MANIFEST -->
+        <antcall target="-set.ear.both.classpath" inheritall="true">
+          <param name="manifest.file" value="${tmp}/MANIFEST.MF" />
+        </antcall>
+      </then>
+      <else>
+        <antcall target="-create.application.xml" inheritall="true" />
+        <!-- set the classpath in the MANIFEST -->
+        <antcall target="-set.ear.PRI.classpath" inheritall="true">
+          <param name="manifest.file" value="${tmp}/MANIFEST.MF" />
+        </antcall>
+      </else>
+    </if>
+    <propertyregex property="ear.name" input="${PRI.ear}" regexp=".*[\/|\\]([^\.]*\.[^\.]*)$" select="\1" />
+    <!-- ear the results -->
+    <echo message="Packaging ${ear.name}..." level="warning" />
+    <dirname file="${PRI.ear}" property="ear.dir" />
+    <mkdir dir="${ear.dir}" />
+    <ear destfile="${PRI.ear}" appxml="${tmp}/application.xml" update="false" manifest="${tmp}/MANIFEST.MF">
+      <fileset dir="${tmp}/ear" includes="**/*"/>
+    </ear>
+    <echo message="${line.separator}Done creating ${ear.dir}${file.separator}${ear.name}." level="warning" />
+    <antcall target="-ear.warning" />
+  </target>
+
+  <target name="-war.warning" if="PRI.war.message">
+    <echo message="${line.separator}${PRI.war.message}${line.separator}" level="error" />
+  </target>
+
+  <target name="-ear.warning" if="PRI.ear.message">
+    <echo message="${line.separator}${PRI.ear.message}${line.separator}" level="error" />
+  </target>
+
+  <target name="-transform.war">
+    <echo message="Transforming ${war.name}:" level="warning" />
+    <mkdir dir="${tmp}/unwar" />
+    <echo message="Retrieving web.xml from war..." level="warning" />
+    <unwar src="${war}" dest="${tmp}/unwar" overwrite="true">
+      <patternset>
+        <include name="WEB-INF/web.xml"/>
+        <include name="META-INF/MANIFEST.MF"/>
+        <include name="WEB-INF/classes/ehcache.xml"/>
+      </patternset>
+    </unwar>
+    <antcall target="generate.webxml" inheritAll="true">
+      <param name="input.web.xml" value="${tmp}/unwar/WEB-INF/web.xml"/>
+      <param name="output.web.xml" value="${tmp}/unwar/WEB-INF/web.xml"/>
+      <param name="property.prefix" value="${property.prefix}" />
+    </antcall>
+    <antcall target="generate.ehcache" inheritAll="true"/>
+    <!-- set the classpath in the war MANIFEST if this is an ear build -->
+    <propertycopy property="war.manifest.classpath" from="${property.prefix}manifest.classpath" override="true" silent="true" />
+    <if>
+      <and>
+        <istrue value="${war.included.in.ear}" />
+        <isset property="${property.prefix}manifest.classpath"/>
+        <not>
+          <equals arg1="${war.manifest.classpath}" arg2="" />
+        </not>
+      </and>
+      <then>
+        <antcall target="-set.war.classpath" inheritall="true">
+          <param name="manifest.file" value="${tmp}/unwar/META-INF/MANIFEST.MF" />
+          <param name="property.prefix" value="${property.prefix}" />
+        </antcall>
+        <echo message="Storing transformed web.xml and MANIFEST.MF..." level="warning" />
+      </then>
+      <else>
+        <echo message="Storing transformed web.xml..." level="warning" />
+      </else>
+    </if>
+
+    <if>
+      <and>
+        <istrue value="${war.tomcat6}" />
+        <equals arg1="${war.name}" arg2="AssetManager.war" />
+      </and>
+      <then>
+        <echo message="For tomcat 6: removing el-api.jar from AssetManager/WEB-INF/lib..." />
+        <delete file="${tmp}/unwar/WEB-INF/lib/el-api.jar"/>
+      </then>
+    </if>
+
+    <if>
+      <and>
+        <istrue value="${war.ws8}" />
+        <equals arg1="${war.name}" arg2="quicksearch.war" />
+      </and>
+      <then>
+        <echo message="For Websphere 8: removing listeners from /WEB-INF/web.xml..." />
+        <xmltask  source="${tmp}/unwar/WEB-INF/web.xml" dest="${tmp}/unwar/WEB-INF/web.xml">
+          <remove path="/:web-app/:listener[:listener-class/text()='com.sun.faces.config.ConfigureListener']"/>
+          <remove path="/:web-app/:listener[:listener-class/text()='com.hp.am.servlet.WeldPatchListener']"/>
+          <remove path="/:web-app/:listener[:listener-class/text()='org.jboss.weld.environment.servlet.Listener']"/>
+        </xmltask>
+      </then>
+    </if>
+
+    <if>
+      <and>
+        <istrue value="${war.wls12c}" />
+        <equals arg1="${war.name}" arg2="quicksearch.war" />
+      </and>
+      <then>
+        <echo message="For Weblogic 12c: removing listeners from /WEB-INF/web.xml..." />
+        <xmltask  source="${tmp}/unwar/WEB-INF/web.xml" dest="${tmp}/unwar/WEB-INF/web.xml">
+          <remove path="/:web-app/:listener[:listener-class/text()='com.hp.am.servlet.WeldPatchListener']"/>
+          <remove path="/:web-app/:listener[:listener-class/text()='org.jboss.weld.environment.servlet.Listener']"/>
+        </xmltask>
+      </then>
+    </if>
+
+    <war basedir="${tmp}/unwar" destfile="${war}"
+         keepcompression="true" update="true"
+         includes="**/ehcache.xml"
+         manifest="${tmp}/unwar/META-INF/MANIFEST.MF"
+         webxml="${tmp}/unwar/WEB-INF/web.xml"/>
+
+    <antcall target="-remove.files" inheritall="true">
+      <param name="property.prefix" value="PRI." />
+      <param name="tmp" value="${tmp}/war1"/>
+      <param name="war" value="${war}"/>
+      <param name="war.name" value="${PRI.war.name}"/>
+    </antcall>
+    <echo message="Done transforming ${war.name}.${line.separator}${line.separator}${line.separator}" level="warning" />
+  </target>
+
+  <target name="-create.application.xml">
+    <echo message="Creating application.xml for the ear..." level="warning" />
+    <echo file="${tmp}/application.xml" append="false">&lt;?xml version="1.0" encoding="UTF-8"?>
+      &lt;application xmlns="http://java.sun.com/xml/ns/j2ee"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
+      http://java.sun.com/xml/ns/j2ee/application_1_4.xsd"
+      version="1.4">
+      &lt;display-name>${PRI.display.name}&lt;/display-name>
+      &lt;module>
+      &lt;web>
+      &lt;web-uri>${PRI.war.name}&lt;/web-uri>
+      &lt;context-root>${PRI.context.root}&lt;/context-root>
+      &lt;/web>
+      &lt;/module>
+      &lt;/application>
+    </echo>
+  </target>
+
+  <target name="-create.combo.application.xml">
+    <echo message="Creating application.xml for the ear..." level="warning" />
+    <echo file="${tmp}/application.xml" append="false">&lt;?xml version="1.0" encoding="UTF-8"?>
+      &lt;application xmlns="http://java.sun.com/xml/ns/j2ee"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
+      http://java.sun.com/xml/ns/j2ee/application_1_4.xsd"
+      version="1.4">
+      &lt;display-name>${PRI.display.name}&lt;/display-name>
+      &lt;module>
+      &lt;web>
+      &lt;web-uri>${PRI.war.name}&lt;/web-uri>
+      &lt;context-root>${PRI.context.root}&lt;/context-root>
+      &lt;/web>
+      &lt;/module>
+      &lt;display-name>${SEC.display.name}&lt;/display-name>
+      &lt;module>
+      &lt;web>
+      &lt;web-uri>${SEC.war.name}&lt;/web-uri>
+      &lt;context-root>${SEC.context.root}&lt;/context-root>
+      &lt;/web>
+      &lt;/module>
+      &lt;/application>
+    </echo>
+  </target>
+
+  <target name="-copy.addl.files" if="${property.prefix}addl.files">
+    <propertycopy property="addl.files.tocopy" from="${property.prefix}addl.files" override="true" />
+    <propertycopy property="addl.files.tocopy.root" from="${property.prefix}addl.files.root" override="true" />
+    <if>
+      <not>
+        <equals arg1="${addl.files.tocopy}" arg2="" trim="true" />
+      </not>
+      <then>
+        <antcallback target="-transform.value" return="WK.value" inheritAll="true">
+          <param name="valueToTransform" value="${addl.files.tocopy}" />
+        </antcallback>
+        <echo message="Copying additional files for the ear... ${WK.value}" level="error" />
+        <copy todir="${tmp}/ear" flatten="true" failonerror="true" >
+          <fileset dir="${addl.files.tocopy.root}" includes="${WK.value}" defaultexcludes="no" />
+        </copy>
+      </then>
+    </if>
+  </target>
+
+  <target name="-remove.files" if="${remove.files}">
+    <echo message="Removing files: ${remove.war.files}"/>
+    <zip destfile="${tmp}/${war.name}">
+      <zipfileset src="${war}" excludes="${remove.war.files}" />
+    </zip>
+    <copy file="${tmp}/${war.name}" tofile="${war}" overwrite="true" force="true"/>
+  </target>
+
+  <target name="-set.war.classpath">
+    <propertycopy property="war.manifest.classpath" from="${property.prefix}manifest.classpath" override="true" silent="true" />
+    <if>
+      <and>
+        <isset property="${property.prefix}manifest.classpath"/>
+        <not>
+          <equals arg1="${war.manifest.classpath}" arg2="" />
+        </not>
+      </and>
+      <then>
+        <echo message="Setting classpath in war MANIFEST.MF..." level="warning" />
+        <manifest file="${manifest.file}" mode="update">
+          <!-- due to we signed the AssetManagerWebService.war, this will modify MANIFEST.MF then cause sign verify failed.
+		  and aslo am-jni.jar & am-constans.jar are in this war file, so remove this new line from deploy to ear packages.
+          <attribute name="Class-Path" value="${war.manifest.classpath}"/> -->
+        </manifest>
+      </then>
+    </if>
+  </target>
+
+  <target name="-set.ear.PRI.classpath" if="set.ear.manifest.classpath">
+    <echo message="Setting classpath in ear MANIFEST.MF..." level="warning" />
+    <manifest file="${manifest.file}" mode="update">
+      <attribute name="Class-Path" value="${PRI.manifest.classpath}"/>
+    </manifest>
+  </target>
+
+  <target name="-set.ear.both.classpath" if="set.ear.manifest.classpath">
+    <echo message="Setting classpath in ear MANIFEST.MF..." level="warning" />
+    <manifest file="${manifest.file}" mode="update">
+      <attribute name="Class-Path" value="${PRI.manifest.classpath} ${SEC.manifest.classpath}"/>
+    </manifest>
+  </target>
+
+  <target name="-clean.deploy.temp.dirs">
+    <delete dir="${tmp}/unwar" quiet="true" failonerror="false" />
+    <delete dir="${tmp}/war1" quiet="true" failonerror="false" />
+    <delete dir="${tmp}/war2" quiet="true" failonerror="false" />
+    <delete dir="${tmp}/ear" quiet="true" failonerror="false" />
+    <delete dir="${tmp}/working" quiet="true" failonerror="false" />
+    <delete file="${tmp}/application.xml"/>
+    <delete file="${tmp}/quicksearch.war"/>
+  </target>
+
+  <target name="generate.password.files">
+    <if>
+      <or>
+        <available property="file1.exists" file="${TEMP.PBKDF2.Password.First.File}"/>
+        <available property="file2.exists" file="${TEMP.PBKDF2.Password.Second.File}"/>
+      </or>
+      <then>
+        <input message="Warning: Password files will be overwritten. Do you want to continue (yes/no)?" validargs="yes,no" addproperty="do.delete"/>
+        <condition property="do.abort">
+          <equals arg1="no" arg2="${do.delete}"/>
+        </condition>
+        <if>
+          <istrue value="${do.abort}" />
+          <then>
+            <echo message="User aborted."/>
+          </then>
+          <else>
+            <antcall target="-generate.password.files"/>
+          </else>
+        </if>
+      </then>
+      <else>
+        <antcall target="-generate.password.files"/>
+      </else>
+    </if>
+  </target>
+
+  <target name="-generate.password.files">
+    <echo message="Generating password files in ${basedir}\secret-share."/>
+    <amsplitpassword firstPbkdf2PasswordFile="${basedir}/secret-share/secret1.txt" secondPbkdf2PasswordFile="${basedir}/secret-share/secret2.txt" />
+  </target>
+
+</project>

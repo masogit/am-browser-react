@@ -11,6 +11,9 @@ var zip = require('gulp-zip');
 var unzip = require('gulp-unzip');
 var clean = require('gulp-clean');
 var merge = require('merge-stream');
+var download = require("gulp-download");
+var xml2json = require('gulp-xml2json');
+var rename = require('gulp-rename');
 
 var opts = {
   base: '.',
@@ -169,7 +172,7 @@ gulp.task('copy-temp', ['copy-demo', 'dist', 'clean-gen'], function () {
   var unzip_node = gulp.src('./build/nssm-2.24.zip', {base : '.'})
       .pipe(unzip())
       .pipe(gulp.dest('./gen/temp'));
-  var copy_cmd = gulp.src(['./build/*.cmd'])
+  var copy_cmd = gulp.src('./build/*.cmd')
       .pipe(gulp.dest('./gen/temp'));
   // copy files to gen temp
   var copy_file = gulp.src(['./app/**', './db/**', './dist/**', './node_modules/**', './ssl/**', './am-browser-config.properties'], {base : '.'})
@@ -183,6 +186,62 @@ gulp.task('gen', ['copy-temp'], function () {
   return gulp.src('./gen/temp/**')
       .pipe(zip('am-browser.zip'))
       .pipe(gulp.dest('./gen'));
+});
+
+gulp.task('download-ws-metadata-xml', function () {
+  console.log('Download ws metadata xml');
+  // download ws metadata xml
+  return download('http://svs-spm-nexus.hpeswlab.net/nexus/content/repositories/local-assetmanager-snapshot/com/hp/am/java/ac.ws/MAIN-SNAPSHOT/maven-metadata.xml')
+	  .pipe(gulp.dest('./rest/downloads/'));
+});
+
+gulp.task('parse-ws-metadata-xml', ['download-ws-metadata-xml'], function () {
+  console.log('Parse ws metadata xml to json');
+  // parse ws metadata xml
+  return gulp.src('./rest/downloads/maven-metadata.xml')
+      .pipe(xml2json())
+	  .pipe(rename({extname: '.json'}))
+	  .pipe(gulp.dest('./rest/downloads/json'));
+});
+
+gulp.task('download-ws', ['parse-ws-metadata-xml'], function () {
+  console.log('Download ws');
+  var json = require('./rest/downloads/json/maven-metadata.json');
+  var url = 'http://svs-spm-nexus.hpeswlab.net/nexus/content/repositories/local-assetmanager-snapshot/com/hp/am/java/ac.ws/MAIN-SNAPSHOT/ac.ws-MAIN-'
+      + json.metadata.versioning[0].snapshot[0].timestamp + '-' + json.metadata.versioning[0].snapshot[0].buildNumber + '.war';
+  console.log('Ws url is : ' + url);
+  // download ws
+  return download(url)
+	  .pipe(gulp.dest('./rest/downloads/'));
+});
+
+gulp.task('clean-gen-ws', function () {
+  console.log('Clean gen ws folder');
+  // clean gen folder
+  return gulp.src('./rest/gen').pipe(clean({force: true}));
+});
+
+gulp.task('gen-ws-base', ['clean-gen-ws', 'download-ws'], function () {
+  console.log('Generate ws package');
+  // copy folder and files
+  var copy_deploy = gulp.src('./rest/install/**')
+      .pipe(gulp.dest('./rest/gen/deploy'));
+  var copy_file = gulp.src('./rest/package.properties')
+      .pipe(gulp.dest('./rest/gen/websvc'));
+  var rename_war = gulp.src('./rest/downloads/*.war')
+      .pipe(rename({basename: 'AssetManagerWebService'}))
+      .pipe(gulp.dest('./rest/gen/websvc'));
+  // unzip tomcat instance
+  var unzip_tomcat = gulp.src('./rest/apache-tomcat-8.0.18-windows-x64.zip', {base : '.'})
+      .pipe(unzip())
+      .pipe(gulp.dest('./rest/gen'));
+  return merge(copy_deploy, copy_file, rename_war, unzip_tomcat);
+});
+
+gulp.task('gen-ws', ['gen-ws-base'], function () {
+  console.log('Generate ws package');
+  // generate ws package
+  return gulp.src('./rest/conf/**').pipe(gulp.dest('./rest/gen/apache-tomcat-8.0.18/conf'));
 });
 
 gulpTasks(gulp, opts);
