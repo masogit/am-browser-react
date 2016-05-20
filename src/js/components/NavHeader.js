@@ -22,15 +22,15 @@ class NavHeader extends Component {
     let links = [
       // {to: '/home', text: 'Home'},
       {to: '/search', text: 'Search'},
-      {to: '/explorer', text: 'Explorer'},
-      {to: '/wall', text: 'Insight'}
+      {to: '/wall', text: 'Insight'},
+      {to: '/explorer', text: 'Records'}
     ];
 
     const hasAdminPrivilege = (localStorage && localStorage.amFormData && JSON.parse(localStorage.amFormData).hasAdminPrivilege) || (sessionStorage && sessionStorage.amFormData && JSON.parse(sessionStorage.amFormData).hasAdminPrivilege);
     if (hasAdminPrivilege) {
       links.push(...[
-        {to: '/views', text: 'Views'},
-        {to: '/aql', text: 'AQL'},
+        {to: '/views', text: 'Builder'},
+        {to: '/aql', text: 'Graph'},
         {to: '/ucmdbAdapter', text: 'Adapter'}
       ]);
     }
