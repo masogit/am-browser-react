@@ -100,7 +100,7 @@ store.dispatch(init(localStorage.email, localStorage.token));
 // simulate initial login
 //store.dispatch(loginSuccess('nobody@grommet.io', 'simulated'));
 
-let postLoginPath = '/home';
+let postLoginPath = '/search';
 
 // check for session
 let sessionWatcher = () => {
@@ -118,7 +118,7 @@ let sessionWatcher = () => {
       postLoginPath = route.pathname;
       history.pushState(null, Routes.path('/login'));
     } else if (route.pathname === '/') {
-      history.replaceState(null, Routes.path('/home'));
+      history.replaceState(null, Routes.path('/search'));
     }
   }
 };
