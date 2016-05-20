@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import RecordList from './RecordList';
+import * as ExplorerActions from '../../actions/explorer';
 import {
   Layer,
   Tabs,
@@ -14,20 +15,32 @@ export default class RecordDetail extends Component {
     super();
     this.state = {
       record: null,
-      body: null
+      body: null,
+      links: []
     };
   }
 
   componentDidMount() {
-
+    this.props.body.links.forEach((link) => {
+      var body = this._getLinkBody(link, this.props.record);
+      console.log(body);
+      ExplorerActions.getCount(body, (records) => {
+        link.count = records.count;
+        var links = this.state.links;
+        links.push(link);
+        this.setState({
+          links: links
+        });
+      });
+    });
   }
 
   componentWillReceiveProps(nextProps) {
-
   }
 
+
   _getLinkBody(link, record) {
-    var body = {...link.body};
+    var body = Object.assign({}, link.body);
     let AQL = link.reverse + '.PK=' + record[link.reversefield];
     body.filter = body.filter ? body.filter + ' AND ' + AQL : AQL;
     return body;
@@ -81,8 +94,8 @@ export default class RecordDetail extends Component {
             </Table>
           </Tab>
           {
-            this.props.body.links.map((link, index) => {
-              return (<Tab title={link.label} key={index}>
+            this.state.links.map((link, index) => {
+              return (<Tab title={`${link.label} (${link.count})`} key={index}>
                 <RecordList body={this._getLinkBody(link, this.props.record)}/>
               </Tab>);
             })

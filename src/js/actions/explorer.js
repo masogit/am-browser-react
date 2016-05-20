@@ -34,6 +34,18 @@ export function loadView(id, callback) {
   });
 }
 
+export function getCount(body, callback) {
+  body.orderby = '';
+  body.fields = [{
+    sqlname: 'PK'
+  }];
+  body.param = {
+    limit: 1,
+    offset: 0
+  };
+  loadRecordsByBody(body, callback);
+}
+
 export function updateViewLast(view) {
   Rest.get(HOST_NAME + '/am/db/' + view.body.sqlname + '/?fields=PK').end(function (err, res) {
     if (err)
@@ -96,7 +108,7 @@ export function loadRecordsByBody(body, callback) {
       param.limit = userParam.limit;
     if (userParam.offset)
       param.offset = userParam.offset;
-    if (userParam.filters.length > 0) {
+    if (userParam.filters && userParam.filters.length > 0) {
       var userFilters = userParam.filters.join(" AND ");
       param.filter = param.filter ? param.filter + ' AND ' + userFilters : userFilters;
     }
