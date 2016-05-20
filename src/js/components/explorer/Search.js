@@ -82,6 +82,10 @@ export default class Search extends Component {
     history.push(`/aql`);
   }
 
+  _goUCMDB() {
+    history.push(`/ucmdbAdapter`);
+  }
+
   render() {
 
     return (
@@ -113,7 +117,7 @@ export default class Search extends Component {
                      a11yDescId="meter-desc-12"/>
             }
           </Tile>
-          <Tile align="center" separator="top" colorIndex="light-1">
+          <Tile align="center" separator="top" colorIndex="light-1" onClick={this._goUCMDB}>
             <Title>UCMDB Adapter Jobs Status</Title>
             <Meter type="spiral" series={[
                   {"label": "OK", "value": 70, "colorIndex": "ok"},
