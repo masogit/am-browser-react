@@ -8,7 +8,7 @@ app.use(cors());
 var morgan = require('morgan');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
-var dbFile = {folder: './db', json: '/template.json'};
+var dbFolder = './db';
 
 // initial AM REST server
 var PropertiesReader = require('properties-reader');
@@ -34,7 +34,7 @@ var am = {
 
 // initial db folder and files =================================================
 var db = require('./db.js');
-db.init(dbFile.folder, dbFile.json);
+db.init(dbFolder);
 
 var path = require('path');
 

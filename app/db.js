@@ -1,6 +1,4 @@
 var Engine = require('tingodb')();
-var loki = require('lokijs');
-var db;
 var tingodbFolder;
 const fs = require('fs');
 var logger = require('./logger.js');
@@ -20,9 +18,8 @@ const checkRight = (req) => {
 };
 
 // check db folder and files
-exports.init = function (dbFolder, json) {
+exports.init = function (dbFolder) {
   tingodbFolder = dbFolder;
-  db = new loki(dbFolder + json);
   fs.exists(dbFolder, function (db) {
     if (!db) {
       logger.info("not found db folder");
@@ -33,34 +30,6 @@ exports.init = function (dbFolder, json) {
         }
 
         logger.info("The db folder was created!");
-      })
-
-    }
-
-    fs.exists(dbFolder + json, function (template) {
-      if (!template)
-        fs.writeFile(dbFolder + json, "", function (err) {
-          if (err) {
-            return logger.error(err);
-          }
-
-          logger.info("The template file was created!");
-        });
-    });
-
-  });
-
-  // init create public/csv folder
-  fs.exists("csv", function (db) {
-    if (!db) {
-      logger.info("not found csv folder");
-
-      fs.mkdir("csv", function (err) {
-        if (err) {
-          return logger.error(err);
-        }
-
-        logger.info("The csv folder was created!");
       })
 
     }
@@ -171,48 +140,4 @@ exports.getColl = function (collectionName, callback) {
     if (callback instanceof Function && coll && coll.data)
       callback(coll.data);
   });
-};
-
-exports.set = function (req, res) {
-  var collectionName = req.params.collection;
-  var coll = db.getCollection(collectionName);
-  if (!coll) {
-    coll = db.addCollection(collectionName);
-  }
-  var obj = req.body;
-
-  var data;
-  if (obj.$loki)
-    data = coll.update(obj);
-  else
-    data = coll.insert(obj);
-  res.json(data);
-
-  db.saveDatabase();
-};
-
-exports.setColl = function (collectionName, obj) {
-  var coll = db.getCollection(collectionName);
-  if (!coll) {
-    coll = db.addCollection(collectionName);
-  }
-
-  var data;
-  if (obj.$loki)
-    data = coll.update(obj);
-  else
-    data = coll.insert(obj);
-
-  db.saveDatabase();
-};
-
-exports.del = function (req, res) {
-  var collectionName = req.params.collection;
-  var id = req.params.id;
-  var coll = db.getCollection(collectionName);
-  logger.info("Delete collection: " + collectionName + " id: " + id);
-  var data = coll.remove({$loki: id});
-  res.json(data);
-
-  db.saveDatabase();
 };
