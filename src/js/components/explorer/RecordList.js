@@ -117,10 +117,14 @@ export default class RecordList extends Component {
   _getRecords(param) {
     var body = {...this.props.body, param: (param) ? param : this.state.param}; // if sync pass param to query, then records append
     var timeStart = Date.now();
+    this.setState({
+      loading: true
+    });
     ExplorerActions.loadRecordsByBody(body, (data) => {
       var records = this.state.records;
       if (data.entities.length > 0)
         this.setState({
+          loading: false,
           timeQuery: Date.now() - timeStart,
           numTotal: data.count,
           records: (param) ? records.concat(data.entities) : data.entities, // if sync pass param to query, then records append
@@ -128,6 +132,7 @@ export default class RecordList extends Component {
         }, this._onGroupBy);
       else if (data.entities.length === 0)
         this.setState({
+          loading: false,
           numTotal: this.state.records.length
         });
     });
@@ -340,6 +345,8 @@ export default class RecordList extends Component {
       );
     });
 
+    var Spinning = require('grommet/components/icons/Spinning');
+
     return (
       <div>
         <Header justify="between">
@@ -376,6 +383,10 @@ export default class RecordList extends Component {
           {recordComponents}
           </tbody>
         </Table>
+        {
+          records.length === 0 && this.state.loading &&
+          <Box align="center"><Spinning /></Box>
+        }
         {
           this.state.record &&
           <RecordDetail body={this.props.body} record={this.state.record} onClose={this._onClose.bind(this)}/>

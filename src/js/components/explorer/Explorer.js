@@ -33,7 +33,7 @@ export default class Explorer extends Component {
 
   _getViewNavigation(views) {
     return (
-      <Sidebar primary={true} pad="small" fixed={false} full={false} separator="right">
+      <Sidebar primary={true} pad="small" fixed={false} full={false} direction="column" separator="right">
         <Box pad={{vertical: 'medium'}}><Title>Views Navigation ({views.length})</Title></Box>
         <GroupList pad={{vertical: 'small'}} searchable={true} selectable={true}>
           {
