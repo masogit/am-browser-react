@@ -351,7 +351,15 @@ export default class RecordList extends Component {
       <div>
         <Header justify="between">
           {this.props.title}
-          {(this.state.filtered) ? this.state.filtered.length : this.state.records.length}/{this.state.numTotal}
+          {
+            this.state.loading &&
+            <Spinning />
+          }
+          {
+            !this.state.loading &&
+            <Box>{(this.state.filtered) ? this.state.filtered.length : this.state.records.length}</Box>
+          }
+          /{this.state.numTotal}
           <input type="text" inline={true} className="flex" placeholder="Filter Records" ref="search"
                  onKeyDown={this._onFilter.bind(this)} onChange={this._onFilter.bind(this)}/>
           {this.state.timeQuery}ms
@@ -383,10 +391,6 @@ export default class RecordList extends Component {
           {recordComponents}
           </tbody>
         </Table>
-        {
-          records.length === 0 && this.state.loading &&
-          <Box align="center"><Spinning /></Box>
-        }
         {
           this.state.record &&
           <RecordDetail body={this.props.body} record={this.state.record} onClose={this._onClose.bind(this)}/>
