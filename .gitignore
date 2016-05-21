@@ -1,7 +1,8 @@
 **bower_components**
 node_modules
-/db
-csv
+db
+log
+ssl
 **/dist*/**
 **/dist-bower*/**
 .DS_Store
