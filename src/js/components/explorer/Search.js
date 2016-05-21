@@ -3,7 +3,6 @@ import React, {Component} from 'react';
 import history from '../../RouteHistory';
 import * as ExplorerActions from '../../actions/explorer';
 import * as AQLActions from '../../actions/aql';
-import RecordSearch from './RecordSearch';
 // import Anchor from 'grommet/components/Anchor';
 import Title from 'grommet/components/Title';
 import Box from 'grommet/components/Box';
@@ -42,9 +41,7 @@ export default class Search extends Component {
 
   _onEnter(event) {
     if ((event.keyCode === 13))
-      this.setState({
-        keyword: event.target.value.trim()
-      });
+      this._goRecordSearch(event.target.value.trim());
   }
 
   _onSearch(event) {
@@ -86,16 +83,17 @@ export default class Search extends Component {
     history.push(`/ucmdbAdapter`);
   }
 
+  _goRecordSearch(keyword) {
+    history.push(`/search/${keyword}`);
+  }
+
   render() {
 
     return (
       <Box align="center" full={true} justify="center">
-        {
-          !this.state.keyword &&
-          <Headline size="large">
-            Asset Manager Browser
-          </Headline>
-        }
+        <Headline size="large">
+          Asset Manager Browser
+        </Headline>
         <Box direction="row" pad={{vertical: 'medium'}}>
           <input type="search" inline={true} className="flex" placeholder="Global Record search..."
                  onKeyDown={this._onEnter.bind(this)} onChange={this._onSearch.bind(this)} size="100"/>
@@ -126,7 +124,6 @@ export default class Search extends Component {
             ]} max={90} a11yTitleId="meter-title-17" a11yDescId="meter-desc-17"/>
           </Tile>
         </Tiles>
-        <RecordSearch keyword={this.state.keyword}/>
       </Box>
     );
   }

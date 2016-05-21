@@ -76,7 +76,7 @@ export default class Explorer extends Component {
 
   render() {
     return (
-      <Box direction="row" full="true">
+      <Box direction="row" full={true}>
         {this.state.viewNavigation}
         {
           this.state.view &&
