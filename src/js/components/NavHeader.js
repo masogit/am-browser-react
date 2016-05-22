@@ -8,7 +8,7 @@ import Title from 'grommet/components/Title';
 import Logo from './Logo'; // './HPELogo';
 import Menu from 'grommet/components/Menu';
 import SessionMenu from './SessionMenu';
-import { hasAdminPrivilege } from '../actions';
+import { getHeaderNavs } from '../actions';
 
 class NavHeader extends Component {
 
@@ -20,20 +20,24 @@ class NavHeader extends Component {
   }
 
   render() {
-    let links = [
+    const defaultLinks = [
       // {to: '/home', text: 'Home'},
       {to: '/search', text: 'Search'},
       {to: '/wall', text: 'Insight'},
-      {to: '/explorer', text: 'Records'}
+      {to: '/explorer', text: 'Records'},
+      {to: '/views', text: 'Builder'},
+      {to: '/aql', text: 'Graph'},
+      {to: '/ucmdbAdapter', text: 'Adapter'}
     ];
 
-    if (hasAdminPrivilege()) {
-      links.push(...[
-        {to: '/views', text: 'Builder'},
-        {to: '/aql', text: 'Graph'},
-        {to: '/ucmdbAdapter', text: 'Adapter'}
-      ]);
-    }
+    const links = [];
+    const headerNavs = getHeaderNavs();
+    defaultLinks.map(link => {
+      const basePath = link.to.split('/')[1];
+      if (!headerNavs || headerNavs[basePath]) {
+        links.push(link);
+      }
+    });
 
     return (
       <Header fixed={true} size="small">

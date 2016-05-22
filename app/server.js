@@ -28,8 +28,7 @@ var am = {
   //server: rest_protocol + "://" + rest_server + ":" + rest_port,
   server: rest_server + ":" + rest_port,
   user: rest_username,
-  password: rest_password,
-  hasAdminPrivilege: false
+  password: rest_password
 };
 
 // initial db folder and files =================================================

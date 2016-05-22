@@ -12,14 +12,16 @@ import ViewDefListContainer from './components/builder/ViewDefListContainer';
 import AQL from './components/aql/AQL';
 import TBD from 'grommet/components/TBD';
 import UCMDBAdapterContainer from './components/ucmdbAdapter/UCMDBAdapterPoint';
-import { hasAdminPrivilege } from './actions';
+import { getHeaderNavs } from './actions';
 var rootPath = "/"; //"/ferret/";
 //if (NODE_ENV === 'development') {
 //  rootPath = "/"; // webpack-dev-server
 //}
 
 export const getRoutes = () => {
-  const routes = [
+  const headerNavs = getHeaderNavs();
+
+  const allRoutes = [
     {path: 'login', component: Login},
     {path: 'home', component: Home},
     {path: 'search', component: Search},
@@ -27,21 +29,27 @@ export const getRoutes = () => {
     {path: 'wall', component: Wall},
     {path: 'explorer', component: Explorer},
     {path: 'explorer(/:id)', component: Explorer},
-    {path: 'tbd', component: TBD}
+    {path: 'tbd', component: TBD},
+    {path: 'ucmdbAdapter(/:pointName)(/:tabName)(/:integrationJobName)', component: UCMDBAdapterContainer},
+    {path: 'aql', component: AQL},
+    {path: 'views(/:id)', component: ViewDefListContainer}
   ];
 
-  if (hasAdminPrivilege()) {
-    routes.push(...[
-      {path: 'ucmdbAdapter(/:pointName)(/:tabName)(/:integrationJobName)', component: UCMDBAdapterContainer},
-      {path: 'aql', component: AQL},
-      {path: 'views(/:id)', component: ViewDefListContainer}
-    ]);
-  }
-  routes.push({
-    path: '*',
-    component: Search,
-    onEnter: (nextState, replaceState) => replaceState(null, '/home')
+  const routes = [];
+  allRoutes.map(route => {
+    const basePath = route.path.split('(')[0];
+    if (!headerNavs || headerNavs[basePath]) {
+      routes.push(route);
+    }
   });
+
+  if (routes.length > 0) {
+    routes.push({
+      path: '*',
+      component: Search,
+      onEnter: (nextState, replaceState) => replaceState(null, '/search')
+    });
+  }
   return routes;
 };
 

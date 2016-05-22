@@ -67,16 +67,16 @@ export function init(email, token) {
 }
 
 // TODO: change this to something not so obvious
-export const hasAdminPrivilege = () => {
-  if (localStorage && localStorage.amFormData && JSON.parse(localStorage.amFormData).hasAdminPrivilege) {
-    return true;
+export const getHeaderNavs = () => {
+  if (localStorage && localStorage.amFormData) {
+    return JSON.parse(localStorage.amFormData).headerNavs;
   }
 
-  if (sessionStorage && sessionStorage.amFormData && JSON.parse(sessionStorage.amFormData).hasAdminPrivilege) {
-    return true;
+  if (sessionStorage && sessionStorage.amFormData) {
+    return JSON.parse(sessionStorage.amFormData).headerNavs;
   }
 
-  return false;
+  return null;
 };
 
 
@@ -111,8 +111,6 @@ export function login(username, password) {
   return function (dispatch) {
     const auth = 'Basic ' + new Buffer(`${username}:${password}`).toString('base64');
     Rest.setHeader("Authorization", auth);
-    Rest.setHeader('Content-Type', 'text/xml');
-
     Rest.get(HOST_NAME + '/am/conf').end((err, res) => {
       if (err) {
         console.log("failed");
@@ -122,7 +120,7 @@ export function login(username, password) {
         let form = {
           server: res.body.server,  // set AM server address
           user: username,
-          hasAdminPrivilege: res.body.hasAdminPrivilege || false
+          headerNavs: res.body.headerNavs
         };
 
         if (sessionStorage) {
@@ -149,6 +147,7 @@ export function login(username, password) {
 export function metadataLoad() {
   return function (dispatch) {
     Rest.get(HOST_NAME + '/am/v1/schema')
+      .set('Content-Type', 'text/xml')
       .end(function (err, res) {
         if (!err) {
           let data = JSON.parse(res.text);
@@ -161,6 +160,7 @@ export function metadataLoad() {
 export function metadataLoadDetail(obj, elements, index) {
   return function (dispatch) {
     Rest.get(HOST_NAME + '/am/v1/' + obj.url)
+      .set('Content-Type', 'text/xml')
       .end(function (err, res) {
         if (!err) {
           let data = JSON.parse(res.text);

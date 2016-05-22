@@ -10,11 +10,6 @@ const getUserName = (req) => {
 };
 
 const checkRight = (req) => {
-  if(req && req.headers.authorization) {
-    const user = new Buffer(req.headers.authorization.split(' ')[1], 'base64').toString();
-    return user.split(':')[0];
-  }
-
   if(getUserName(req) != 'admin') {
     throw 'user has no permission';
   }
@@ -24,6 +19,18 @@ const checkRight = (req) => {
 const hasAdminPrivilege = (req) => {
   return getUserName(req).toLowerCase() === 'admin';
 };
+
+const getHeadNav = (isAdmin) => ({
+  login: true,
+  home: true,
+  search: true,
+  wall: true,
+  explorer: true,
+  tbd: true,
+  ucmdbAdapter: isAdmin,
+  aql: isAdmin,
+  views: isAdmin
+});
 
 module.exports = function (app, am) {
     var util = require('util');
@@ -68,7 +75,7 @@ module.exports = function (app, am) {
       if (am) {
         var am_rest = Object.assign({}, am);
         am_rest['password'] = "";
-        am_rest.hasAdminPrivilege = hasAdminPrivilege(req);
+        am_rest.headerNavs = getHeadNav(hasAdminPrivilege(req));
         res.json(am_rest);
       } else
         res.json(am);
