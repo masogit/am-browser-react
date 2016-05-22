@@ -153,9 +153,8 @@ export default class GraphForm extends Component {
 
       newState[type] = Object.assign({}, this.state[type], nextProps[type]);
 
-      // series_col of chart form must be a 'set'
-      if (type === 'chart' && (nextProps[type].series_col && typeof nextProps[type].series_col.has !== 'function')) {
-        newState[type].series_col = new Set();
+      if (type === 'chart' && !nextProps[type].series_col) {
+        newState[type].series_col = [];
       }
 
       //newState[type] = {...this.state[type], ...nextProps[type]};
@@ -182,9 +181,9 @@ export default class GraphForm extends Component {
 
     if (type === 'chart' && path === 'series_col') {
       if (event.target.checked === true) {
-        obj.series_col.add(event.target.id);
+        obj.series_col.push(event.target.id);
       } else {
-        obj.series_col.delete(event.target.id);
+        obj.series_col = obj.series_col.filter((item) => item != event.target.id);
       }
       val = obj.series_col;
     }

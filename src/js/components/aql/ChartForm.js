@@ -5,7 +5,7 @@ export default class ChartForm extends GraphForm {
   constructor() {
     super();
     this.init = {
-      series_col: new Set(),
+      series_col: [],
       xAxis: {
         placement: '',
         data: [],
@@ -40,7 +40,7 @@ export default class ChartForm extends GraphForm {
     if (this.props.data.header) {
       let series_col = this.state.chart.series_col;
       if (this.props.chart && this.props.chart.series) {
-        series_col = new Set(this.props.chart.series.map((item) => item.index));
+        series_col = this.props.chart.series.map((item) => item.index);
       }
       this.props.data.header.map((header, index) => {
         xAxis_col_options.push({value: header.Index, text: `${header.Type}: ${header.Name}`});
@@ -49,7 +49,7 @@ export default class ChartForm extends GraphForm {
             id: header.Index,
             name: 'series_col',
             label: `${header.Type} : ${header.Name}`,
-            checked: series_col.has(header.Index),
+            checked: series_col.includes(header.Index),
             onChange: this._setFormValues.bind(this)
           });
         }

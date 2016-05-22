@@ -35,13 +35,13 @@ export default class Graph extends Component {
       series: []
     };
 
-    if (form.series_col.size > 0 || (form.series && form.series.length > 0)) {
+    if (form.series_col.length > 0 || (form.series && form.series.length > 0)) {
       if (form.xAxis) {
         form.xAxis.data = [];
       }
 
       // gen series
-      const series = [...form.series_col].map(col => ({
+      const series = form.series_col.map(col => ({
         label: data.header[col].Name,
         values: [],
         index: col
