@@ -79,23 +79,6 @@ export const getHeaderNavs = () => {
   return null;
 };
 
-
-// will be removed after we can get csrf token automatically
-const getCookie = (cname) => {
-  var name = cname + "=";
-  var ca = document.cookie.split(';');
-  for (var i = 0; i < ca.length; i++) {
-    var c = ca[i];
-    while (c.charAt(0) == ' ') {
-      c = c.substring(1);
-    }
-    if (c.indexOf(name) == 0) {
-      return c.substring(name.length, c.length);
-    }
-  }
-  return "";
-};
-
 // will be removed after we can set csrf token automatically
 const setCookie = (cname, cvalue, exmins) => {
   let expires = '';
@@ -134,7 +117,6 @@ export function login(username, password) {
 
         // set CSRF token in cookie, expires in 20 mins;
         setCookie('CSRFToken', 'fake_scrf_token1231231231', 20);
-        Rest.setHeader('CSRFToken', getCookie('CSRFToken'));
 
         console.log("pass");
         console.log('res.body: ' + res.body);
