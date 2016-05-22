@@ -4,7 +4,7 @@ import Rest from 'grommet/utils/Rest';
 //import history from './RouteHistory';
 //import Query from 'grommet-index/utils/Query';
 import IndexApi from './Api';
-import {HOST_NAME, getFormData} from './util/Config';
+import {HOST_NAME, AM_FORM_DATA } from './util/Config';
 
 // session
 export const INIT = 'INIT';
@@ -66,22 +66,7 @@ export function init(email, token) {
   return {type: INIT, email: email, token: token};
 }
 
-//export function login(email, password) {
-//  return function (dispatch) {
-//    Rest.post('/rest/login-sessions',
-//      {email: email, password: password})
-//      .end(function(err, res) {
-//        if (err || !res.ok) {
-//          dispatch(loginFailure(res.body));
-//        } else {
-//          dispatch(loginSuccess(email, res.body.sessionID));
-//        }
-//      });
-//  };
-//}
-
-let formData = getFormData();
-
+// TODO: change this to something not so obvious
 export const hasAdminPrivilege = () => {
   if (localStorage && localStorage.amFormData && JSON.parse(localStorage.amFormData).hasAdminPrivilege) {
     return true;
@@ -94,16 +79,8 @@ export const hasAdminPrivilege = () => {
   return false;
 };
 
-const setCookie = (cname, cvalue, exmins) => {
-  let expires = '';
-  if (exmins) {
-    const d = new Date();
-    d.setTime(d.getTime() + (exmins * 60 * 1000));
-    expires = "expires=" + d.toUTCString();
-  }
-  document.cookie = cname + "=" + cvalue + "; " + expires;
-};
 
+// will be removed after we can get csrf token automatically
 const getCookie = (cname) => {
   var name = cname + "=";
   var ca = document.cookie.split(';');
@@ -119,63 +96,47 @@ const getCookie = (cname) => {
   return "";
 };
 
-export const prepareRequest = (username, password) => {
-  const AM_FORM_DATA = "amFormData";
-  if (!username && localStorage && localStorage[AM_FORM_DATA]) {
-    const form = JSON.parse(localStorage.getItem(AM_FORM_DATA));
-    if (form.user) username = form.user;
-    if (form.password) password = form.password;
+// will be removed after we can set csrf token automatically
+const setCookie = (cname, cvalue, exmins) => {
+  let expires = '';
+  if (exmins) {
+    const d = new Date();
+    d.setTime(d.getTime() + (exmins * 60 * 1000));
+    expires = "expires=" + d.toUTCString();
   }
-  formData.user = username;
-  formData.password = password;
-
-  const auth = 'Basic ' + new Buffer(formData.user + ':' + formData.password).toString('base64');
-  Rest.setHeader("Authorization", auth);
-  Rest.setHeader("CSRFToken", getCookie('CSRFToken'));
+  document.cookie = cname + "=" + cvalue + "; " + expires;
 };
 
 export function login(username, password) {
   return function (dispatch) {
-    prepareRequest(username, password);
+    const auth = 'Basic ' + new Buffer(`${username}:${password}`).toString('base64');
+    Rest.setHeader("Authorization", auth);
+    Rest.setHeader('Content-Type', 'text/xml');
+
     Rest.get(HOST_NAME + '/am/conf').end((err, res) => {
       if (err) {
         console.log("failed");
         dispatch(loginFailure({message: 'LoginFailed'}));
         throw err;
-      } else if (res.ok) {
-        // set AM server address
-        if (res.body.server)
-          formData.server = res.body.server;
-
-        if (res.body.hasAdminPrivilege !== undefined)
-          formData.hasAdminPrivilege = res.body.hasAdminPrivilege;
-
-        var AM_FORM_DATA = "amFormData";
-        formData['ref-link'] = "db/amEmplDept";
-        formData.param.filter = "UserLogin='" + username.trim() + "'";
-        formData.user = username;
-        formData.password = password;
-        if (localStorage) {
-          var form = {
-            server: formData.server,
-            user: formData.user,
-            password: formData.password,
-            hasAdminPrivilege: formData.hasAdminPrivilege
-          };
-          localStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
-        }
+      } else if (res.ok && res.body) {
+        let form = {
+          server: res.body.server,  // set AM server address
+          user: username,
+          hasAdminPrivilege: res.body.hasAdminPrivilege || false
+        };
 
         if (sessionStorage) {
-          var form = {
-            server: formData.server,
-            user: formData.user,
-            hasAdminPrivilege: formData.hasAdminPrivilege
-          };
           sessionStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
+        }
+
+        if (localStorage) {
+          form.password = password;
+          localStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
         }
 
         // set CSRF token in cookie, expires in 20 mins;
         setCookie('CSRFToken', 'fake_scrf_token1231231231', 20);
+        Rest.setHeader('CSRFToken', getCookie('CSRFToken'));
 
         console.log("pass");
         console.log('res.body: ' + res.body);
@@ -187,8 +148,6 @@ export function login(username, password) {
 
 export function metadataLoad() {
   return function (dispatch) {
-    prepareRequest();
-    Rest.setHeaders('Content-Type', 'text/xml');
     Rest.get(HOST_NAME + '/am/v1/schema')
       .end(function (err, res) {
         if (!err) {
@@ -201,8 +160,6 @@ export function metadataLoad() {
 
 export function metadataLoadDetail(obj, elements, index) {
   return function (dispatch) {
-    prepareRequest();
-    Rest.setHeaders('Content-Type', 'text/xml');
     Rest.get(HOST_NAME + '/am/v1/' + obj.url)
       .end(function (err, res) {
         if (!err) {
@@ -222,7 +179,6 @@ export function metadataLoadDetail(obj, elements, index) {
 
 export function loadTemplates() {
   return function (dispatch) {
-    prepareRequest();
     Rest.get(HOST_NAME + '/coll/view').end(function (err, res) {
       if (res && res.ok) {
         dispatch(templatesLoadSuccess(res.body));
@@ -233,7 +189,6 @@ export function loadTemplates() {
 
 export function loadRecords(template) {
   return function (dispatch) {
-    prepareRequest();
     Rest.get(HOST_NAME + '/coll/view/' + template._id + '/list').end(function (err, res) {
       if (res && res.ok && res.body) {
         dispatch(recordsLoadSuccess(res.body.entities));
@@ -247,7 +202,6 @@ export function loadDetailRecordLinks(viewid, recordid, linksArray, linksObj) {
     var link = linksArray.pop();
     if (link) {
       var linkname = link.sqlname;
-      prepareRequest();
       Rest.get(HOST_NAME + `/coll/view/${viewid}/list/${recordid}/${linkname}`).end(function (err, res) {
         if (res.body && res.body.entities) {
           linksObj[linkname] = res.body.entities;
@@ -417,7 +371,6 @@ export function dashboardSearch(text) {
         count: 5,
         query: text
       };
-      prepareRequest();
       Rest.get('/rest/index/search-suggestions', params).end((err, res) => {
         if (err) {
           throw err;

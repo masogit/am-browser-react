@@ -26,10 +26,8 @@ import {ReduxRouter} from 'redux-router';
 
 //RestWatch.initialize('ws://' + hostName + '/rest/ws');
 
-Rest.setHeaders({
-  'Accept': 'application/json',
-  'X-API-Version': 200
-});
+Rest.setHeader('Accept', 'application/json');
+Rest.setHeader('X-API-Version', 200);
 
 // From a comment in https://github.com/rackt/redux/issues/637
 // this factory returns a history implementation which reads the current state

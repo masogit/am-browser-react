@@ -1,6 +1,30 @@
 var db = require('./db.js');
 var logger = require('./logger.js');
 
+const getUserName = (req) => {
+  if(req && req.headers.authorization) {
+    const user = new Buffer(req.headers.authorization.split(' ')[1], 'base64').toString();
+    return user.split(':')[0];
+  }
+  return '';
+};
+
+const checkRight = (req) => {
+  if(req && req.headers.authorization) {
+    const user = new Buffer(req.headers.authorization.split(' ')[1], 'base64').toString();
+    return user.split(':')[0];
+  }
+
+  if(getUserName(req) != 'admin') {
+    throw 'user has no permission';
+  }
+};
+
+//TODO: do the real check
+const hasAdminPrivilege = (req) => {
+  return getUserName(req).toLowerCase() === 'admin';
+};
+
 module.exports = function (app, am) {
     var util = require('util');
 
@@ -24,18 +48,20 @@ module.exports = function (app, am) {
     // CRUD Tingodb
     app.get('/coll/:collection', db.find);
     app.get('/coll/:collection/:id', db.find);
-    app.post('/coll/:collection', db.upsert);
-    app.delete('/coll/:collection/:id', db.delete);
+    app.post('/coll/:collection', (req, res) => {
+      checkRight(req);
+      db.upsert(req, res);
+    });
+    app.delete('/coll/:collection/:id', (req, res) => {
+      checkRight(req);
+      db.delete(req, res);
+    });
 
     // get ucmdb point data
     app.use('/am/ucmdbPoint/', function (req, res) {
+      checkRight(req);
       apiProxy.web(req, res, {target: 'http://' + am.server + '/AssetManagerWebService/rs/integration/ucmdbAdapter/points'});
     });
-
-    //TODO: do the real check
-    const hasAdminPrivilege = (req) => {
-      return db.getUserName(req).toLowerCase() === 'admin';
-    };
 
     // AM Server Conf
     app.get('/am/conf', function(req, res) {

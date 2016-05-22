@@ -3,20 +3,6 @@ var tingodbFolder;
 const fs = require('fs');
 var logger = require('./logger.js');
 
-exports.getUserName = (req) => {
-  if(req && req.headers.authorization) {
-    const user = new Buffer(req.headers.authorization.split(' ')[1], 'base64').toString();
-    return user.split(':')[0];
-  }
-  return '';
-};
-
-const checkRight = (req) => {
-  if(this.getUserName(req) != 'admin') {
-    throw 'user has no permission';
-  }
-};
-
 // check db folder and files
 exports.init = function (dbFolder) {
   tingodbFolder = dbFolder;
@@ -89,7 +75,6 @@ exports.findOne = function (collectionName, id, callback) {
 
 // tingodb Insert or Update
 exports.upsert = function (req, res) {
-  checkRight(req);
   var db = new Engine.Db(tingodbFolder, {});
   var collectionName = req.params.collection;
   var obj = req.body;
@@ -108,7 +93,6 @@ exports.upsert = function (req, res) {
 
 // tingodb Delete
 exports.delete = function (req, res) {
-  checkRight(req);
   var db = new Engine.Db(tingodbFolder, {});
   var collectionName = req.params.collection;
   var id = req.params.id;

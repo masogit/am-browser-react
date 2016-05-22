@@ -41,11 +41,10 @@ class ViewDefListContainer extends Component {
 
   componentDidMount() {
     // Initialize list data, called only once.
-    this.props.actions.loadViews(this.props.params.id, this.props.location.pathname).then(function (urlOfFirstRecord) {
+    this.props.actions.loadViews(this.props.params.id, this.props.location.pathname, urlOfFirstRecord => {
       if (urlOfFirstRecord) {
-        history.push(urlOfFirstRecord); // display the first record
+        history.push(urlOfFirstRecord);  // display the first record
       }
-    }, function (err) {
     });
   }
 
@@ -77,7 +76,7 @@ class ViewDefListContainer extends Component {
   }
 
   onSubmit() {
-    this.props.actions.saveViewDef(this.props.selectedView).then((id) => {
+    this.props.actions.saveViewDef(this.props.selectedView, (id) => {
       //this.props.actions.updateViewDefList(updatedView);
       history.push("/views/" + id);
       this.props.actions.loadViews(this.props.params.id, this.props.location.pathname);
@@ -94,7 +93,7 @@ class ViewDefListContainer extends Component {
   }
 
   onDeleteViewDef() {
-    this.props.actions.deleteViewDef(this.props.selectedView).then((id) => {
+    this.props.actions.deleteViewDef(this.props.selectedView, (id) => {
       if (!this.props.selectedViewId) { // all records deleted
         history.push("/views");
       }

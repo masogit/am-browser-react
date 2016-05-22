@@ -1,8 +1,8 @@
-import request from 'superagent-bluebird-promise';
+//import request from 'superagent-bluebird-promise';
 import _ from 'lodash';
 import * as types from '../constants/ActionTypes';
-import {HOST_NAME, VIEW_DEF_URL/*, getFormData*/} from '../util/Config';
-//import history from '../RouteHistory';
+import {HOST_NAME, VIEW_DEF_URL} from '../util/Config';
+import Rest from 'grommet/utils/Rest';
 
 function requestViews() {
   return {
@@ -122,67 +122,63 @@ function receiveViewsFailure(err) {
 //  });
 //}
 
-export function loadViews(selectedViewId, currentPathName) {
+export function loadViews(selectedViewId, currentPathName, callback) {
   return dispatch => {
     dispatch(requestViews());
-    return request.get(HOST_NAME + VIEW_DEF_URL).then(function (res) {
-      dispatch(receiveViewsSuccess(res.body));
-      let views = res.body;
-      // Load first record of the list in detail.
-      if (views.length > 0) {
-        let selectedView = selectedViewId ? views.filter(view => view._id == selectedViewId)[0] : views[0];
-        //console.log("selectedView:");
-        //console.log(selectedView);
-        dispatch({
-          type: types.SET_SELECTED_VIEW,
-          selectedViewId: selectedView._id,
-          selectedView: selectedView
-        });
-        // return the url of the first record
-        // don't call 'history.push()' here, because unit test will fail ('history' can't be mocked).
-        return !selectedViewId ? currentPathName + "/" + selectedView._id : null;
+    Rest.get(HOST_NAME + VIEW_DEF_URL).end(function (err, res) {
+      if(err) {
+        dispatch(receiveViewsFailure(err));
+      } else {
+        dispatch(receiveViewsSuccess(res.body));
+        let views = res.body;
+        // Load first record of the list in detail.
+        if (views.length > 0) {
+          let selectedView = selectedViewId ? views.filter(view => view._id == selectedViewId)[0] : views[0];
+          selectedView = selectedView || views[0];
+          //console.log("selectedView:");
+          //console.log(selectedView);
+          dispatch({
+            type: types.SET_SELECTED_VIEW,
+            selectedViewId: selectedView._id,
+            selectedView: selectedView
+          });
+          // return the url of the first record
+          // don't call 'history.push()' here, because unit test will fail ('history' can't be mocked).
+          if (!selectedViewId && callback) {
+            callback(currentPathName + "/" + selectedView._id);
+          }
+        }
       }
-    }, function (error) {
-      dispatch(receiveViewsFailure(error));
-      return null;
     });
   };
 }
 
-export function saveViewDef(selectedView) {
+export function saveViewDef(selectedView, callback) {
   //console.log(selectedView);
   return function (dispatch) {
-    let formData = {};
-    var AM_FORM_DATA = "amFormData";
-    if (localStorage && localStorage[AM_FORM_DATA]) {
-      var form = JSON.parse(localStorage.getItem(AM_FORM_DATA));
-      if (form.user) formData.user = form.user;
-      if (form.password) formData.password = form.password;
-    }
-    //let  headers = { 'Accept': 'application/json' };
-    //Rest.setHeaders(headers);
-    let auth = 'Basic ' + new Buffer(formData.user + ':' + formData.password).toString('base64');
-    return request.post(HOST_NAME + VIEW_DEF_URL)
+    Rest.post(HOST_NAME + VIEW_DEF_URL)
       .set("Content-Type", "application/json")
-      .set("Authorization", auth)
       .send(JSON.stringify(selectedView))
-      .then(function (res) {
-        console.log("save successfully.");
-        let _id = res.text;
-        dispatch({
-          type: types.SAVE_VIEW_DEF,
-          selectedViewId: _id,
-          selectedView: selectedView,
-          editing: false
-        });
-        //dispatch({
-        //  type: types.UPDATE_VIEW_DEF_LIST,
-        //  selectedView: selectedView
-        //});
-        return _id;
-      }, function (err) {
-        console.log("cannot save: " + err);
-        return null;
+      .end(function (err, res) {
+        if (err) {
+          console.log("cannot save: " + err);
+        } else {
+          console.log("save successfully.");
+          let _id = res.text;
+          dispatch({
+            type: types.SAVE_VIEW_DEF,
+            selectedViewId: _id,
+            selectedView: selectedView,
+            editing: false
+          });
+          //dispatch({
+          //  type: types.UPDATE_VIEW_DEF_LIST,
+          //  selectedView: selectedView
+          //});
+          if (callback) {
+            callback(_id);
+          }
+        }
       });
   };
 }
@@ -238,34 +234,26 @@ export function duplicateViewDef(selectedView) {
   };
 }
 
-export function deleteViewDef(selectedView) {
+export function deleteViewDef(selectedView, callback) {
   return function (dispatch) {
-    let formData = {};
-    var AM_FORM_DATA = "amFormData";
-    if (localStorage && localStorage[AM_FORM_DATA]) {
-      var form = JSON.parse(localStorage.getItem(AM_FORM_DATA));
-      if (form.user) formData.user = form.user;
-      if (form.password) formData.password = form.password;
-    }
-    //let  headers = { 'Accept': 'application/json' };
-    //Rest.setHeaders(headers);
-    let auth = 'Basic ' + new Buffer(formData.user + ':' + formData.password).toString('base64');
-    return request.del(HOST_NAME + VIEW_DEF_URL + "/" + selectedView._id)
-      .set("Authorization", auth)
-      .then(function (res) {
-        console.log("delete successfully - " + selectedView._id);
-        dispatch({
-          type: types.DELETE_VIEW_DEF,
-          deletedViewId: selectedView._id
-        });
-        //dispatch({
-        //  type: types.UPDATE_VIEW_DEF_LIST,
-        //  selectedView: selectedView
-        //});
-        return selectedView._id;
-      }, function (err) {
-        console.log("cannot delete: " + err);
-        return null;
+    Rest.del(HOST_NAME + VIEW_DEF_URL + "/" + selectedView._id)
+      .end(function (err, res) {
+        if (err) {
+          console.log("cannot delete: " + err);
+        } else {
+          console.log("delete successfully - " + selectedView._id);
+          dispatch({
+            type: types.DELETE_VIEW_DEF,
+            deletedViewId: selectedView._id
+          });
+          //dispatch({
+          //  type: types.UPDATE_VIEW_DEF_LIST,
+          //  selectedView: selectedView
+          //});
+          if (callback) {
+            callback(selectedView._id);
+          }
+        }
       });
   };
 }

@@ -3,7 +3,6 @@
  */
 import {HOST_NAME} from '../util/Config';
 import Rest from 'grommet/utils/Rest';
-import {prepareRequest} from '../actions';
 
 function param2aql(param) {
 
@@ -18,7 +17,6 @@ function param2aql(param) {
 }
 
 export function loadViews(callback) {
-  prepareRequest();
   Rest.get(HOST_NAME + '/coll/view/').end(function (err, res) {
     if (err) {
       console.log(err);
@@ -28,7 +26,6 @@ export function loadViews(callback) {
 }
 
 export function loadView(id, callback) {
-  prepareRequest();
   Rest.get(HOST_NAME + '/coll/view/' + id).end(function (err, res) {
     if (err) {
       console.log(err);
@@ -50,7 +47,6 @@ export function getCount(body, callback) {
 }
 
 export function updateViewLast(view) {
-  prepareRequest();
   Rest.get(HOST_NAME + '/am/db/' + view.body.sqlname + '/?fields=PK').end(function (err, res) {
     if (err)
       console.log(err);
@@ -68,7 +64,6 @@ export function updateViewLast(view) {
       }
 
       //save view
-      prepareRequest();
       Rest.post(HOST_NAME + '/coll/view/', view).end(function (err, res) {
         if (err)
           console.log(err);
@@ -121,7 +116,6 @@ export function loadRecordsByBody(body, callback) {
 
   var aql = param2aql(param);
 
-  prepareRequest();
   Rest.get(HOST_NAME + '/am/db/' + query + aql).end(function (err, res) {
     if (err) {
       console.log(err);

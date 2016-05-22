@@ -4,7 +4,6 @@
 import Rest from 'grommet/utils/Rest';
 import {HOST_NAME} from '../util/Config';
 import history from '../RouteHistory';
-import {prepareRequest} from '../actions';
 
 export const ADAPTER_DATA_SUCCESS = 'ADAPTER_DATA_SUCCESS';
 export const INTEGRATION_JOB_DATA_SUCCESS = 'INTEGRATION_JOB_DATA_SUCCESS';
@@ -24,7 +23,6 @@ const adapterDataFetch = (data, error) => ({
 export const getIntegrationPoint = () =>
   (dispatch) =>{
     const url = `${HOST_NAME}/am/ucmdbPoint/`;
-    prepareRequest();
     Rest.get(url).end(function (err, res) {
       const data = res && res.ok && res.body || [];
       const error = err && (err.rawResponse || err.message);
@@ -41,7 +39,6 @@ const integrationJobDataSuccess = (integrationJobData, error) =>({
 export const getIntegrationJob = (pointName, jobType) =>
   (dispatch) => {
     const url = `${HOST_NAME}/am/ucmdbPoint/${pointName}/${jobType}`;
-    prepareRequest();
     Rest.get(url).end(function (err, res) {
       const data = res && res.ok && res.body || [];
       const error = err && (err.rawResponse || err.message);
@@ -65,7 +62,6 @@ const integrationJobItemDataSuccess = (integrationJobItemData, error) =>({
 export const getIntegrationJobItem = (pointName, jobType, jobName) =>
   (dispatch) => {
     const url = `${HOST_NAME}/am/ucmdbPoint/${pointName}/${jobType}/${jobName}`;
-    prepareRequest();
     Rest.get(url).end(function (err, res) {
       const data = res && res.ok && res.body && res.body.jobStatuses || [];
       const error = err && (err.rawResponse || err.message);

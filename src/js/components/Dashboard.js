@@ -19,7 +19,6 @@ import App from 'grommet/components/App';
 //import Status from 'grommet/components/icons/Status';
 import Rest from 'grommet/utils/Rest';
 import {HOST_NAME} from '../util/Config';
-import {prepareRequest} from '../actions';
 
 const links = [
   {label: 'Explorer', value: 'explorer'},
@@ -38,7 +37,6 @@ export default class Dashboard extends Component {
   _onSearch(value) {
     var self = this;
     console.log(value);
-    prepareRequest();
     Rest.post(HOST_NAME + '/cache/search', {keyword: value}).end(function (err, res) {
       if (err || !res.ok) {
         //dispatch(loginFailure(res.body));
