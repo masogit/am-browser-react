@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import RecordDetail from './RecordDetail';
+import Title from 'grommet/components/Title';
 import Table from 'grommet/components/Table';
 import TableRow from 'grommet/components/TableRow';
 import Box from 'grommet/components/Box';
@@ -259,7 +260,7 @@ export default class RecordList extends Component {
     return (
       <div>
         <Header justify="between">
-          {this.props.title}
+          <Title>{this.props.title}</Title>
           {
             this.state.loading &&
             <Spinning />

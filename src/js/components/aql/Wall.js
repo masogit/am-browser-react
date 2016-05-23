@@ -4,7 +4,7 @@ import AlertForm from '../commons/AlertForm';
 import Add from 'grommet/components/icons/base/Add';
 import Close from 'grommet/components/icons/base/Close';
 import Attachment from 'grommet/components/icons/base/Attachment';
-import Camera from 'grommet/components/icons/base/Camera';
+import DocumentPdf from 'grommet/components/icons/base/DocumentPdf';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
 import Graph from './Graph';
 import {
@@ -12,6 +12,8 @@ import {
   Box,
   CheckBox,
   Header,
+  Menu,
+  Title,
   Layer
 } from 'grommet';
 import GroupList from '../commons/GroupList';
@@ -226,19 +228,21 @@ export default class Wall extends Component {
     var box = this.state.box;
     return (
       <Box direction="column" pad="medium" full="horizontal">
-        <Box justify="between" direction="row" separator="none">
-          {
-            this.state.edit &&
-            <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>
-          }
-          {
-            !this.state.edit &&
-            <Anchor href="#" icon={<Camera />} label="Picture"/>
-          }
-          <CheckBox id="edit" label="Edit" checked={this.state.edit} onChange={this._toggleEdit.bind(this)}
-                    toggle={true}/>
-
-        </Box>
+        <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
+          <Title>AM Insight</Title>
+          <Menu direction="row" align="center" responsive={false}>
+            {
+              this.state.edit &&
+              <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>
+            }
+            {
+              !this.state.edit &&
+              <Anchor href="#" icon={<DocumentPdf />} label="Export"/>
+            }
+            <CheckBox id="edit" label="Edit" checked={this.state.edit} onChange={this._toggleEdit.bind(this)}
+                      toggle={true}/>
+          </Menu>
+        </Header>
         {this._buildBox(box, box)}
         {this.state.layer}
         {this.state.alert}
