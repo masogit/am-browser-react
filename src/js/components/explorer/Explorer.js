@@ -84,6 +84,12 @@ export default class Explorer extends Component {
             <RecordList body={this.state.view.body} title={this.state.view.name}/>
           </Box>
         }
+        {
+          !this.state.view &&
+          <Box align="center" full={true} justify="center">
+            <Box size="large" colorIndex="light-2" pad={{horizontal: 'large', vertical: 'medium'}}>Select an item to query.</Box>
+          </Box>
+        }
       </Box>
     );
   }
