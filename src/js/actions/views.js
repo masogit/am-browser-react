@@ -126,7 +126,7 @@ export function loadViews(selectedViewId, currentPathName, callback) {
   return dispatch => {
     dispatch(requestViews());
     Rest.get(HOST_NAME + VIEW_DEF_URL).end(function (err, res) {
-      if(err) {
+      if (err) {
         dispatch(receiveViewsFailure(err));
       } else {
         dispatch(receiveViewsSuccess(res.body));
