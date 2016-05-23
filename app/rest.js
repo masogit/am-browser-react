@@ -40,9 +40,7 @@ module.exports = function (am) {
         req.query.limit = 100;
 
       if (data.entities && data.entities.length > 0)
-        // Convertor.json2csv(getFormattedRecords(JSON.parse(req.query.rawFields), data.entities), (err, csv) => {
-        Convertor.json2csv(getRecords(data.entities), (err, csv) => {
-
+        Convertor.json2csv(getFormattedRecords(JSON.parse(req.body.body).fields, data.entities), (err, csv) => {
           res.write(csv, 'binary');
 
           if (data.count > data.entities.length + req.query.offset) {
@@ -102,14 +100,6 @@ function getFormattedRecords(fields, rawRecords) {
     records.push(record);
   });
   return records;
-}
-
-function getRecords(rawRecords) {
-  rawRecords.forEach((rawRecord) => {
-    if (rawRecord instanceof Object)
-      rawRecord = rawRecord[Object.keys(rawRecord)[0]];
-  });
-  return rawRecords;
 }
 
 function getFieldStrVal(record, field) {

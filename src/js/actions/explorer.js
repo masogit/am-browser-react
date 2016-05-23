@@ -115,6 +115,5 @@ export function getDownloadQuery(body) {
         type: field.type
       });
   });
-  console.log(JSON.stringify(rawFields));
-  return HOST_NAME + '/download/db/' + getQueryByBody(body) + '&rawFields=' + encodeURI(JSON.stringify(rawFields));
+  return HOST_NAME + '/download/db/' + getQueryByBody(body);
 }

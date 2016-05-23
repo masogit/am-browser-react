@@ -216,6 +216,10 @@ export default class RecordList extends Component {
     this.setState({record: null});
   }
 
+  _onSubmit() {
+    this.refs.downloadForm.submit();
+  }
+
   render() {
     var body = this.props.body;
     var records = (this.state.filtered) ? this.state.filtered : this.state.records;
@@ -268,11 +272,16 @@ export default class RecordList extends Component {
           <input type="text" inline={true} className="flex" placeholder="Filter Records" ref="search"
                  onKeyDown={this._onFilter.bind(this)} onChange={this._onFilter.bind(this)}/>
           {this.state.timeQuery}ms
-          <Anchor href={ExplorerActions.getDownloadQuery(this.props.body)} icon={<Download />} label="CSV"/>
+          <Anchor href="#" icon={<Download />} label="CSV" onClick={this._onSubmit.bind(this)}/>
           <select onChange={this._onGroupBy.bind(this)} ref="select_group" value={this.state.groupby}>
             <option value="">Group By</option>
             {this.state.group_selects}
           </select>
+          <form name="Download" ref="downloadForm"
+                action={ExplorerActions.getDownloadQuery({...this.props.body, param: this.state.param})}
+                method="post">
+            <input type="hidden" name="body" value={JSON.stringify(this.props.body)}/>
+          </form>
         </Header>
         {filters}
         {

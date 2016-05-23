@@ -61,7 +61,7 @@ module.exports = function (app, am) {
   });
 
   // Download CSV in server side
-  app.get('/download/*', rest.csv);
+  app.use('/download/*', rest.csv);
 
 
   // AM Server Conf
