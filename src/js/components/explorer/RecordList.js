@@ -11,6 +11,7 @@ import Distribution from 'grommet/components/Distribution';
 import DocumentCsv from 'grommet/components/icons/base/DocumentCsv';
 import Ascend from 'grommet/components/icons/base/Ascend';
 import Descend from 'grommet/components/icons/base/Descend';
+import Download from 'grommet/components/icons/base/Download';
 import * as ExplorerActions from '../../actions/explorer';
 export default class RecordList extends Component {
 
@@ -366,6 +367,7 @@ export default class RecordList extends Component {
           <Anchor href="#"
                   label={this.state.numDownload?this._getDownloadProgress(this):'CSV'}
                   icon={<DocumentCsv />} onClick={this._onDownload.bind(this)}/>
+          <Anchor href={ExplorerActions.getDownloadQuery(this.props.body)} icon={<Download />} label="Download"/>
           <select onChange={this._onGroupBy.bind(this)} ref="select_group" value={this.state.groupby}>
             <option value="">Group By</option>
             {this.state.group_selects}

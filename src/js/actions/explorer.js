@@ -46,32 +46,6 @@ export function getCount(body, callback) {
   loadRecordsByBody(body, callback);
 }
 
-export function updateViewLast(view) {
-  Rest.get(HOST_NAME + '/am/db/' + view.body.sqlname + '/?fields=PK').end(function (err, res) {
-    if (err)
-      console.log(err);
-    else {
-      if (view.last) {
-        view.last.time = Date.now();
-        view.last.count = res.body.count;
-        view.last.visit += 1;
-      } else {
-        view.last = {
-          time: Date.now(),
-          count: res.body.count,
-          visit: 1
-        };
-      }
-
-      //save view
-      Rest.post(HOST_NAME + '/coll/view/', view).end(function (err, res) {
-        if (err)
-          console.log(err);
-      });
-    }
-  });
-}
-
 export function loadRecordsByKeyword(body, keyword, callback) {
   var aql = body.fields.filter((field) => {
     return field.searchable;
@@ -85,6 +59,18 @@ export function loadRecordsByKeyword(body, keyword, callback) {
   }
 }
 export function loadRecordsByBody(body, callback) {
+  Rest.get(HOST_NAME + '/am/db/' + getQueryByBody(body)).end(function (err, res) {
+    if (err) {
+      console.log(err);
+      callback({count: 0, entities: []});
+    } else if (res.body.count && res.body.entities)
+      callback(res.body);
+    else
+      callback({count: 0, entities: []});
+  });
+}
+
+export function getQueryByBody(body) {
 
   var fields = [];
   body.fields.forEach(function (field) {
@@ -116,15 +102,19 @@ export function loadRecordsByBody(body, callback) {
 
   var aql = param2aql(param);
 
-  Rest.get(HOST_NAME + '/am/db/' + query + aql).end(function (err, res) {
-    if (err) {
-      console.log(err);
-      callback({count: 0, entities: []});
-    } else if (res.body.count && res.body.entities)
-      callback(res.body);
-    else
-      callback({count: 0, entities: []});
-  });
-
+  return query + aql;
 }
 
+export function getDownloadQuery(body) {
+  var rawFields = [];
+  body.fields.forEach((field)=> {
+    if (!field.PK)
+      rawFields.push({
+        sqlname: field.sqlname,
+        label: field.alias || field.label,
+        type: field.type
+      });
+  });
+  console.log(JSON.stringify(rawFields));
+  return HOST_NAME + '/download/db/' + getQueryByBody(body) + '&rawFields=' + encodeURI(JSON.stringify(rawFields));
+}
