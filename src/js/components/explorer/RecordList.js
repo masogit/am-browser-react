@@ -1,5 +1,4 @@
 import React, {Component, PropTypes} from 'react';
-import Converter from 'json-2-csv';
 import RecordDetail from './RecordDetail';
 import Table from 'grommet/components/Table';
 import TableRow from 'grommet/components/TableRow';
@@ -8,7 +7,6 @@ import Anchor from 'grommet/components/Anchor';
 import Header from 'grommet/components/Header';
 import Close from 'grommet/components/icons/base/Close';
 import Distribution from 'grommet/components/Distribution';
-import DocumentCsv from 'grommet/components/icons/base/DocumentCsv';
 import Ascend from 'grommet/components/icons/base/Ascend';
 import Descend from 'grommet/components/icons/base/Descend';
 import Download from 'grommet/components/icons/base/Download';
@@ -21,12 +19,8 @@ export default class RecordList extends Component {
       numColumn: 4, // default column number, not include Self
       numTotal: 0,
       timeQuery: 0,
-      timeDownloadStart: 0,
-      timeDownloadEnd: 0,
       records: [],
       filtered: null,
-      downloaded: [],
-      numDownload: null,
       record: null,
       groupby: "",
       param: {
@@ -71,50 +65,6 @@ export default class RecordList extends Component {
     }
   }
 
-  _getFormattedRecords(body, rawRecords) {
-    var records = [];
-    rawRecords.forEach((rawRecord) => {
-      var record = {Self: rawRecord.self};
-      body.fields.forEach((field) => {
-        if (!field.PK)
-          record[this._getDisplayLabel(field)] = this._getFieldStrVal(rawRecord, field);
-      });
-      records.push(record);
-    });
-    return records;
-  };
-
-  _getAllRecord(downloadRecords, callback) {
-    if (this.state.numTotal > downloadRecords.length) {
-      var param = {...this.state.param};
-      param.offset = downloadRecords.length;
-      if (this.state.numTotal >= 10000)
-        param.limit = 1000;
-      else if (this.state.numTotal < 10000 && this.state.numTotal >= 1000)
-        param.limit = parseInt(this.state.numTotal / 10);
-      else
-        param.limit = 100;
-      var body = {...this.props.body, param};
-      ExplorerActions.loadRecordsByBody(body, (data) => {
-        if (data.entities.length == 0) {
-          this.setState({
-            numTotal: downloadRecords.length
-          });
-          callback(downloadRecords);
-        } else {
-          downloadRecords = downloadRecords.concat(this._getFormattedRecords(body, data.entities));
-          this.setState({
-            numDownload: downloadRecords.length,
-            timeDownloadEnd: Date.now()
-          });
-          this._getAllRecord(downloadRecords, callback);
-        }
-      });
-    } else {
-      callback(downloadRecords);
-    }
-  }
-
   _getRecords(param) {
     var body = {...this.props.body, param: (param) ? param : this.state.param}; // if sync pass param to query, then records append
     var timeStart = Date.now();
@@ -137,47 +87,6 @@ export default class RecordList extends Component {
           numTotal: this.state.records.length
         });
     });
-  }
-
-  _json2csv(json) {
-    console.log("save file for: " + this.props.body.label);
-    Converter.json2csv(json, (err, csv) => {
-      if (err) {
-        console.log(err);
-        var csvContent = "data:text/json;charset=utf-8,";
-        var encodedUri = encodeURI(csvContent + JSON.stringify(json));
-        var link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", this.props.body.label + ".json");
-        link.click();
-      } else {
-        var csvContent = "data:text/csv;charset=utf-8,";
-        var encodedUri = encodeURI(csvContent + csv);
-        var link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", this.props.body.label + ".csv");
-        link.click();
-        // console.log(csv);
-      }
-    }, {prependHeader: true});
-  }
-
-  _onDownload() {
-    if (this.state.downloaded.length < this.state.numTotal) {
-      this.setState({
-        numDownload: 0,
-        timeDownloadStart: Date.now(),
-        timeDownloadEnd: Date.now()
-      });
-      this._getAllRecord([], (records) => {
-        this.setState({
-          downloaded: records
-        });
-        this._json2csv(records);
-      });
-    } else {
-      this._json2csv(this.state.downloaded);
-    }
   }
 
   _onOrderBy(sqlname) {
@@ -307,11 +216,6 @@ export default class RecordList extends Component {
     this.setState({record: null});
   }
 
-  _getDownloadProgress() {
-    return parseInt(this.state.numDownload / this.state.numTotal * 100) + '% '
-      + parseInt((this.state.timeDownloadEnd - this.state.timeDownloadStart) / 1000) + 's';
-  }
-
   render() {
     var body = this.props.body;
     var records = (this.state.filtered) ? this.state.filtered : this.state.records;
@@ -364,10 +268,7 @@ export default class RecordList extends Component {
           <input type="text" inline={true} className="flex" placeholder="Filter Records" ref="search"
                  onKeyDown={this._onFilter.bind(this)} onChange={this._onFilter.bind(this)}/>
           {this.state.timeQuery}ms
-          <Anchor href="#"
-                  label={this.state.numDownload?this._getDownloadProgress(this):'CSV'}
-                  icon={<DocumentCsv />} onClick={this._onDownload.bind(this)}/>
-          <Anchor href={ExplorerActions.getDownloadQuery(this.props.body)} icon={<Download />} label="Download"/>
+          <Anchor href={ExplorerActions.getDownloadQuery(this.props.body)} icon={<Download />} label="CSV"/>
           <select onChange={this._onGroupBy.bind(this)} ref="select_group" value={this.state.groupby}>
             <option value="">Group By</option>
             {this.state.group_selects}
