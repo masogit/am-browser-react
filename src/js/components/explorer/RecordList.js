@@ -309,7 +309,7 @@ export default class RecordList extends Component {
           <form name="Download" ref="downloadForm"
                 action={ExplorerActions.getDownloadQuery({...this.props.body, param: this.state.param})}
                 method="post">
-            <input type="hidden" name="body" value={JSON.stringify(this.props.body)}/>
+            <input type="hidden" name="fields" value={JSON.stringify(this.props.body.fields)}/>
           </form>
         </Header>
         {filters}

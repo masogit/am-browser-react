@@ -40,7 +40,7 @@ module.exports = function (am) {
         req.query.limit = 100;
 
       if (data.entities && data.entities.length > 0)
-        Convertor.json2csv(getFormattedRecords(JSON.parse(req.body.body).fields, data.entities), (err, csv) => {
+        Convertor.json2csv(getFormattedRecords(JSON.parse(req.body.fields), data.entities), (err, csv) => {
           res.write(csv, 'binary');
 
           if (data.count > data.entities.length + req.query.offset) {
