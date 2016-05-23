@@ -3,6 +3,7 @@ import {
   Anchor,
   Box,
   List,
+  ListItem,
   SearchInput
 } from 'grommet';
 import Next from '../../../../node_modules/grommet/components/icons/base/Next';
@@ -73,10 +74,13 @@ export default class GroupList extends Component {
         {
           Object.keys(grouped).map((key, i) => {
             return (<Box key={i} direction="column">
-              <Box justify="between" direction="row" {...this.props}>
-                <Anchor href="#" label={key} icon={(this.state.expand===key)?<Down />:<Next />}
-                        onClick={this._expandToggle.bind(this, key)}/>{grouped[key].length}
-              </Box>
+              <List>
+                <ListItem justify="between" direction="row" pad={{vertical: 'small'}} separator="none"
+                          onClick={this._expandToggle.bind(this, key)}>
+                  <Anchor href="#" label={key} icon={(this.state.expand===key)?<Down />:<Next />}/>
+                  {grouped[key].length}
+                </ListItem>
+              </List>
               {
                 this.state.expand === key &&
                 <List {...this.props}>
