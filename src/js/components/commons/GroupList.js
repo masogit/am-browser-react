@@ -75,7 +75,7 @@ export default class GroupList extends Component {
           Object.keys(grouped).map((key, i) => {
             return (<Box key={i} direction="column">
               <List>
-                <ListItem justify="between" direction="row" pad={{vertical: 'small'}} separator="none"
+                <ListItem {...this.props} justify="between" direction="row" separator="none"
                           onClick={this._expandToggle.bind(this, key)}>
                   <Anchor href="#" label={key} icon={(this.state.expand===key)?<Down />:<Next />}/>
                   {grouped[key].length}
