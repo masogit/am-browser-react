@@ -131,9 +131,7 @@ store.dispatch(init(localStorage.email, localStorage.token));
 let postLoginPath = '/search';
 
 // check for session
-let sessionWatcher = () => {
-
-  console.log(Rest.get('header').header);
+const sessionWatcher = () => {
   const {route, session} = store.getState();
   Routes.routes[0].childRoutes = getRoutes();
 

@@ -6,7 +6,7 @@ import Close from 'grommet/components/icons/base/Close';
 import Attachment from 'grommet/components/icons/base/Attachment';
 import DocumentPdf from 'grommet/components/icons/base/DocumentPdf';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
-import Graph from './Graph';
+import Graph from './../commons/Graph';
 import {
   Anchor,
   Box,
@@ -55,11 +55,11 @@ export default class Wall extends Component {
 
   _loadWall() {
     AQLActions.loadWall((data) => {
-      console.log(data);
-      if (data)
+      if (data) {
         this.setState({
           box: data
         });
+      }
     });
   }
 
@@ -179,7 +179,7 @@ export default class Wall extends Component {
         box.child && box.child.name &&
         <Box justify="center" {...box} direction="column" pad="medium">
           <Header>{box.child.name}</Header>
-          {<Graph {...box.child}/>}
+          {<Graph type={box.child.type} aqlStr={box.child.str} graphConfig={box.child.form}/>}
         </Box>
       }
       {

@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import ChartForm from './ChartForm';
 import MeterForm from './MeterForm';
 import DistributionForm from './DistributionForm';
-import Graph from './Graph';
+import Graph from './../commons/Graph';
 import AlertForm from './../commons/AlertForm';
 import GroupList from './../commons/GroupList';
 import GroupListItem from './../commons/GroupListItem';
@@ -41,7 +41,8 @@ export default class AQL extends Component {
     this.state = {
       reports: {},
       aqls: [],
-      aql: {}
+      aql: {},
+      data: null
     };
   }
 
@@ -60,7 +61,8 @@ export default class AQL extends Component {
         category: '',
         type: '',
         form: null
-      }
+      },
+      data: null
     }, callback);
   }
 
@@ -87,6 +89,11 @@ export default class AQL extends Component {
 
     this.setState({
       aql: {...aql}
+    }, () => {
+      if (this.refs && this.refs[aql.type]) {
+        this.refs[aql.type]._onClickTab(event);
+      }
+      this._onQuery();
     });
   }
 
@@ -101,10 +108,8 @@ export default class AQL extends Component {
 
   _onQuery() {
     AQLActions.queryAQL(this.state.aql.str, (data) => {
-      var aql = this.state.aql;
-      aql.data = data;
       this.setState({
-        aql: aql
+        data
       });
     });
   }
@@ -217,9 +222,13 @@ export default class AQL extends Component {
 
   _genGraph(form, type) {
     var aql = this.state.aql;
-    aql.type = type;
+    if (type) {
+      aql.type = type;
+    }
+    form = form || aql[type];
     aql.form = form;
     aql[type] = form;
+
     this.setState({aql: aql});
 
     //TODO: meter: data less than 7/4
@@ -268,12 +277,12 @@ export default class AQL extends Component {
   render() {
     let header, rows;
     // console.log(this.state);
-    if (this.state.aql.data) {
-      header = this.state.aql.data.header.map((col) => {
+    if (this.state.data) {
+      header = this.state.data.header.map((col) => {
         return (<th key={col.Index}>{col.Name}</th>);
       });
 
-      rows = this.state.aql.data.rows.map((row, index) => {
+      rows = this.state.data.rows.map((row, index) => {
         return (<TableRow key={index}>
           {
             row.map((col, i) => {
@@ -359,7 +368,8 @@ export default class AQL extends Component {
             </Box>
             <Split flex="left" fixed={false}>
               <Box>
-                {this.state.aql.form && <Graph {...this.state.aql} />}
+                {this.state.data && this.state.aql.form && this.state.aql.type &&
+                    <Graph type={this.state.aql.type} aqlStr={this.state.aql.str} graphConfig={this.state.aql.form} />}
                 <Table>
                   <thead>
                   <tr>{header}</tr>
@@ -370,20 +380,16 @@ export default class AQL extends Component {
                 </Table>
               </Box>
               {
-                this.state.aql.data &&
+                this.state.data &&
                 <Tabs initialIndex={getIndex(this.state.aql.type)} justify="start">
-                  <ActionTab title="Chart" onClick={this._genGraph.bind(this, this.state.aql.chart, 'chart')}
-                             ref='chart'>
-                    <ChartForm {...this.state.aql} genGraph={this._genGraph.bind(this)}/>
+                  <ActionTab title="Chart" onClick={this._genGraph.bind(this, null, 'chart')} ref='chart'>
+                    <ChartForm {...this.state.aql} genGraph={this._genGraph.bind(this)} data={this.state.data}/>
                   </ActionTab>
-                  <ActionTab title="Meter" onClick={this._genGraph.bind(this, this.state.aql.meter, 'meter')}
-                             ref='meter'>
-                    <MeterForm {...this.state.aql} genGraph={this._genGraph.bind(this)}/>
+                  <ActionTab title="Meter" onClick={this._genGraph.bind(this, null, 'meter')} ref='meter'>
+                    <MeterForm {...this.state.aql} genGraph={this._genGraph.bind(this)} data={this.state.data}/>
                   </ActionTab>
-                  <ActionTab title="Distribution"
-                             onClick={this._genGraph.bind(this, this.state.aql.distribution, 'distribution')}
-                             ref='distribution'>
-                    <DistributionForm {...this.state.aql} genGraph={this._genGraph.bind(this)}/>
+                  <ActionTab title="Distribution" onClick={this._genGraph.bind(this, null, 'distribution')} ref='distribution'>
+                    <DistributionForm {...this.state.aql} genGraph={this._genGraph.bind(this)} data={this.state.data}/>
                   </ActionTab>
                   <Tab title="Value"/>
                   <Tab title="WorldMap"/>

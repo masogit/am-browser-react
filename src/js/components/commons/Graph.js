@@ -1,7 +1,8 @@
 /**
  * Created by huling on 5/22/2016.
  */
-import React, {Component} from 'react';
+import {queryAQL} from '../../actions/aql';
+import React, {Component,PropTypes} from 'react';
 import {
   Chart,
   Meter,
@@ -15,11 +16,14 @@ const assignObjectProp = (from, to, propName) => {
 };
 
 export default class Graph extends Component {
-  constructor () {
+  constructor() {
     super();
+    this.state = {
+      data: null
+    }
   }
 
-  _genChart(form, data) {
+  _gen_chart(form, data) {
     const chart = {
       important: form.important,
       threshold: form.threshold,
@@ -41,16 +45,18 @@ export default class Graph extends Component {
       }
 
       // gen series
-      const series = form.series_col.map(col => ({
-        label: data.header[col].Name,
+      const series = form.series_col.map(index => ({
+        label: '' + data.header[index].Name,
         values: [],
-        index: col
+        index
       }));
 
       data.rows.map((row, i) => {
         series.forEach(item => {
-          const value = row[item.index];
-          item.values.push([i, value / 1.0]);
+          const value = row[item.index] / 1.0;
+          if (!value.isNaN) {
+            item.values.push([i, value]);
+          }
         });
 
         // gen xAxis
@@ -80,8 +86,7 @@ export default class Graph extends Component {
     return chart;
   }
 
-
-  _genDistribution(form, data) {
+  _gen_distribution(form, data) {
     const distribution = {
       size: form.size,
       units: form.units,
@@ -92,11 +97,16 @@ export default class Graph extends Component {
     };
 
     if (form.series_col) {
-      distribution.series = data.rows.map((row, i) => ( {
-        label: '' + (form.label ? row[form.label] : i),
-        value: row[form.series_col] / 1.0,
-        index: i
-      }));
+      distribution.series = data.rows.map((row, index) => {
+        const value = row[form.series_col] / 1.0;
+        if (!value.isNaN) {
+          return {
+            label: '' + (form.label ? row[form.label] : index),
+            value,
+            index
+          };
+        }
+      });
 
       distribution.legend = !!(form.units || form.legendTotal);
     }
@@ -104,14 +114,13 @@ export default class Graph extends Component {
     return distribution;
   }
 
-
-
-  _genMeter(form, data) {
+  _gen_meter(form, data) {
     const meter = {
       important: form.important,
       threshold: form.threshold,
       type: form.type,
       series_col: form.series_col,
+      series: [],
       size: form.size,
       vertical: form.vertical,
       stacked: form.stacked,
@@ -119,11 +128,16 @@ export default class Graph extends Component {
     };
 
     if (form.series_col) {
-      meter.series = data.rows.map((row, i) => ({
-        label: '' + i,
-        value: row[form.series_col] / 1.0,
-        index: i
-      }));
+      meter.series = data.rows.map((row, index) => {
+        const value = row[form.series_col] / 1.0;
+        if (!value.isNaN) {
+          return {
+            label: '' + index,
+            value,
+            index
+          };
+        }
+      });
 
       assignObjectProp(form, meter, 'max');
       assignObjectProp(form, meter, 'min');
@@ -141,18 +155,36 @@ export default class Graph extends Component {
     return meter;
   }
 
+  componentDidMount() {
+    queryAQL(this.props.aqlStr, (data) => {
+      if (data) {
+        this.setState({data});
+      }
+    });
+  }
+
   render() {
-    const {type, chart, meter, distribution, data} = this.props;
-    if (type === 'chart') {
-      return <Chart {...this._genChart(chart, data)} />;
-    }
+    const {type, graphConfig} = this.props;
 
-    if (type === 'meter') {
-      return <Meter {...this._genMeter(meter, data)} />;
+    if (this.state.data) {
+      const graph = this['_gen_' + type](graphConfig, this.state.data);
+      if (graph.series.length > 0) {
+        switch (type) {
+          case 'chart':
+            return <Chart {...graph} />;
+          case 'meter':
+            return <Meter {...graph} />;
+          case 'distribution':
+            return <Distribution {...graph} />;
+        }
+      }
     }
-
-    if (type === 'distribution') {
-      return <Distribution {...this._genDistribution(distribution, data)} />;
-    }
+    return <div></div>;
   }
 }
+
+Graph.propTypes = {
+  type: PropTypes.string.isRequired,
+  graphConfig: PropTypes.object.isRequired,
+  aqlStr: PropTypes.string.isRequired
+};

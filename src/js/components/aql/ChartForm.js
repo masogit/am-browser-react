@@ -4,42 +4,46 @@ export default class ChartForm extends GraphForm {
 
   constructor() {
     super();
-    this.init = {
-      series_col: [],
-      xAxis: {
-        placement: '',
-        data: [],
-        label: ''
-      },
-      xAxis_col: '',
-      type: 'bar',
-      size: 'medium',
-      legend: {
-        position: '',
-        units: '',
-        total: false
-      },
-      important: 0,
-      threshold: 0,
-      max: 0,
-      min: 0,
-      points: false,
-      segmented: false,
-      sparkline: false
-    };
+    this._init();
+  }
 
+  _init() {
     this.state = {
       type: 'chart',
-      chart: Object.assign({}, this.init)
+      chart: {
+        series_col: [],
+        series: [],
+        xAxis: {
+          placement: '',
+          data: [],
+          label: ''
+        },
+        xAxis_col: '',
+        type: 'bar',
+        size: 'medium',
+        legend: {
+          position: '',
+          units: '',
+          total: false
+        },
+        important: 0,
+        threshold: 0,
+        max: 0,
+        min: 0,
+        points: false,
+        segmented: false,
+        sparkline: false
+      }
     };
   }
 
   render() {
     const col_options = [];
     const xAxis_col_options = [{value: '', text: ''}];
+
     if (this.props.data.header) {
       let series_col = this.state.chart.series_col;
-      if (this.props.chart && this.props.chart.series) {
+      if (this.props.chart && this.props.chart.series && this.props.chart.series.length > 0) {
         series_col = this.props.chart.series.map((item) => item.index);
       }
       this.props.data.header.map((header, index) => {

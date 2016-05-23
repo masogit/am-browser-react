@@ -4,16 +4,19 @@ export default class ChartForm extends GraphForm {
 
   constructor() {
     super();
-    this.init = {
-      series_col: '',
-      size: 'medium', //small|medium|large
-      legendTotal: false,
-      full: true,
-      units: ''
-    };
+    this._init();
+  }
 
+  _init() {
     this.state = {
-      distribution: Object.assign({}, this.init),
+      distribution: {
+        series_col: '',
+        series: [],
+        size: 'medium', //small|medium|large
+        legendTotal: false,
+        full: true,
+        units: ''
+      },
       type: 'distribution'
     };
   }

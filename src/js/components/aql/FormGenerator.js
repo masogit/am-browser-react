@@ -11,7 +11,7 @@ import {
 } from 'grommet';
 
 const FormContainer = ({basicOptions, advanceOptions, form, selections}) => (
-  <Tabs initialIndex={0} justify="end" key={form.state.type}>
+  <Tabs initialIndex={0} justify="end">
     <Tab title="Basic">
       <Form pad="none" compact={true}>
         <FormFields>
@@ -118,19 +118,19 @@ const genOptions = (optionsArray, form, fromType, selections) => {
       );
     } else if (type === 'InputField') {
       return (
-        <InputField label={label} name={name} value={value} onChange={form._setFormValues.bind(form)}/>
+        <InputField key={name} label={label} name={name} value={value} onChange={form._setFormValues.bind(form)}/>
       );
     } else if (type === 'SwitchField') {
       return (
-        <SwitchField label={label} name={name} checked={value} onChange={form._setFormValues.bind(form)}/>
+        <SwitchField key={name} label={label} name={name} checked={value} onChange={form._setFormValues.bind(form)}/>
       );
     } else if (type === 'NumberField') {
       return (
-        <NumberField label={label} name={name} value={value} onChange={form._setFormValues.bind(form)}/>
+        <NumberField key={name} label={label} name={name} value={value} onChange={form._setFormValues.bind(form)}/>
       );
     } else if (type === 'MultiCheckField') {
       return (
-        <MultiCheckField label={label} options={options}/>
+        <MultiCheckField key={name} label={label} options={options}/>
       );
     }
   });
@@ -139,28 +139,25 @@ const genOptions = (optionsArray, form, fromType, selections) => {
 export default class GraphForm extends Component {
 
   componentWillMount() {
-    this._updateState(this.props);
+    const type = this.state.type;
+
+    let form;
+    if (this.props[type]) {
+      form = Object.assign({}, this.state[type], this.props[type]);
+    } else {
+      this._init();
+      form = this.state[type];
+    }
+    const newState = {};
+    newState[type] = form;
+    if (type === 'chart' ? form.series_col.length > 0 : form.series_col) {
+      this.setState(newState, this.props.genGraph(form, this.state.type));
+    }
   }
 
   componentWillReceiveProps(nextProps) {
-    this._updateState(nextProps);
-  }
-
-  _updateState(nextProps) {
-    const type = this.state.type;
-    if (nextProps[type]) {
-      const newState = {};
-
-      newState[type] = Object.assign({}, this.state[type], nextProps[type]);
-
-      if (type === 'chart' && !nextProps[type].series_col) {
-        newState[type].series_col = [];
-      }
-
-      //newState[type] = {...this.state[type], ...nextProps[type]};
-      this.setState(newState);
-    } else {
-      this.state[type] = this.init;
+    if (!nextProps[this.state.type]) {
+      this._init();
     }
   }
 
@@ -189,7 +186,7 @@ export default class GraphForm extends Component {
     }
 
     setValueByJsonPath(path, val, obj);
-    //const graph = this._genGraph(obj);
+
     newState[type] = obj;
     this.setState(newState, this.props.genGraph(obj, type));
   }

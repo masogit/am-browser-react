@@ -4,27 +4,30 @@ export default class ChartForm extends GraphForm {
 
   constructor() {
     super();
-    this.init = {
-      series_col: '',
-      type: 'bar', //bar|arc|circle|spiral
-      size: 'medium', //small|medium|large
-      legend: {
-        position: '', //right|bottom|inline
-        units: '',
-        total: false
-      },
-      important: 0,
-      threshold: 0,
-      max: 0,
-      min: 0,
-      vertical: false,
-      stacked: false,
-      value: 0
-    };
+    this._init();
+  }
 
+  _init() {
     this.state = {
       type: 'meter',
-      meter: Object.assign({}, this.init)
+      meter: {
+        series_col: '',
+        series: [],
+        type: 'bar', //bar|arc|circle|spiral
+        size: 'medium', //small|medium|large
+        legend: {
+          position: '', //right|bottom|inline
+          units: '',
+          total: false
+        },
+        important: 0,
+        threshold: 0,
+        max: 0,
+        min: 0,
+        vertical: false,
+        stacked: false,
+        value: 0
+      }
     };
   }
 
