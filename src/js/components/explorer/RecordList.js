@@ -6,11 +6,13 @@ import TableRow from 'grommet/components/TableRow';
 import Box from 'grommet/components/Box';
 import Anchor from 'grommet/components/Anchor';
 import Header from 'grommet/components/Header';
+import Menu from 'grommet/components/Menu';
 import Close from 'grommet/components/icons/base/Close';
 import Distribution from 'grommet/components/Distribution';
 import Ascend from 'grommet/components/icons/base/Ascend';
 import Descend from 'grommet/components/icons/base/Descend';
 import Download from 'grommet/components/icons/base/Download';
+import AdvancedSearch from 'grommet/components/icons/base/AdvancedSearch';
 import * as ExplorerActions from '../../actions/explorer';
 export default class RecordList extends Component {
 
@@ -135,20 +137,42 @@ export default class RecordList extends Component {
   }
 
   _onFilter(event) {
-    // console.log(event);
     if (event.keyCode === 13 && event.target.value.trim()) {
       var param = this.state.param;
-      if (param.filters.indexOf(event.target.value) == -1)
-        param.filters.push(event.target.value);
-      event.target.value = "";
-      this.setState({
-        param: param
-      }, this._getRecords);
+      if (param.filters.indexOf(event.target.value) == -1) {
+        var aql = this.props.body.fields.filter((field) => {
+          return field.searchable;
+        }).map((field) => {
+          return field.sqlname + " like '%" + event.target.value.trim() + "%'";
+        }).join(' OR ');
+
+        if (aql) {
+          param.filters.push(aql);
+          event.target.value = "";
+          this.setState({
+            param: param
+          }, this._getRecords);
+        }
+      }
     } else {
       this.setState({
         filtered: this.state.records.filter((obj) => JSON.stringify(obj).toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1)
       }, this._onGroupBy);
     }
+  }
+
+  _addAQLFilter() {
+    var searchValue = this.refs.search.value;
+    if (searchValue) {
+      var param = this.state.param;
+      if (param.filters.indexOf(searchValue) == -1)
+        param.filters.push(searchValue);
+      this.refs.search.value = "";
+      this.setState({
+        param: param
+      }, this._getRecords);
+    }
+
   }
 
   _onFilterClear(index) {
@@ -270,14 +294,18 @@ export default class RecordList extends Component {
             <Box>{(this.state.filtered) ? this.state.filtered.length : this.state.records.length}</Box>
           }
           /{this.state.numTotal}
-          <input type="text" inline={true} className="flex" placeholder="Filter Records" ref="search"
-                 onKeyDown={this._onFilter.bind(this)} onChange={this._onFilter.bind(this)}/>
           {this.state.timeQuery}ms
-          <Anchor href="#" icon={<Download />} label="CSV" onClick={this._onSubmit.bind(this)}/>
-          <select onChange={this._onGroupBy.bind(this)} ref="select_group" value={this.state.groupby}>
-            <option value="">Group By</option>
-            {this.state.group_selects}
-          </select>
+          <input type="text" inline={true} className="flex" ref="search"
+                 placeholder="Instant search, press Enter: global search, click AQL icon: advance search"
+                 onKeyDown={this._onFilter.bind(this)} onChange={this._onFilter.bind(this)}/>
+          <Menu direction="row" align="center" responsive={false}>
+            <Anchor href="#" icon={<AdvancedSearch />} label="AQL" onClick={this._addAQLFilter.bind(this)}/>
+            <Anchor href="#" icon={<Download />} label="CSV" onClick={this._onSubmit.bind(this)}/>
+            <select onChange={this._onGroupBy.bind(this)} ref="select_group" value={this.state.groupby}>
+              <option value="">Group By</option>
+              {this.state.group_selects}
+            </select>
+          </Menu>
           <form name="Download" ref="downloadForm"
                 action={ExplorerActions.getDownloadQuery({...this.props.body, param: this.state.param})}
                 method="post">
