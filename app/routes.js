@@ -100,4 +100,16 @@ module.exports = function (app, am) {
     checkRight(req);
     apiProxy.web(req, res, {target: 'http://' + am.server + base + '/integration/ucmdbAdapter/points'});
   });
+
+  /**
+   * Federate CI from UCMDB
+   * /ucmdb-browser/<global_id>
+   */
+  app.use('/ucmdb-browser', function (req, res) {
+    var server = properties.get('ucmdb.server');
+    var port = properties.get('ucmdb.port');
+    var param = properties.get('ucmdb.param');
+    checkRight(req);
+    apiProxy.web(req, res, {target: `http://${server}:${port}${param}`});
+  });
 };
