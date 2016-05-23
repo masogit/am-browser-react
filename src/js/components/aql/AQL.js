@@ -52,7 +52,7 @@ export default class AQL extends Component {
     this._loadInToolReport();
   }
 
-  _initAQL() {
+  _initAQL(callback) {
     this.setState({
       aql: {
         str: '',
@@ -61,7 +61,7 @@ export default class AQL extends Component {
         type: '',
         form: null
       }
-    });
+    }, callback);
   }
 
   _loadViews() {
@@ -174,11 +174,13 @@ export default class AQL extends Component {
   }
 
   _loadOOBAQL(report) {
-    var aql = this._initAQL();
-    aql.str = report.AQL;
-    aql.name = report.name;
-    aql.category = 'OOB';
-    this.setState({aql: aql}, this._onQuery());
+    this._initAQL(()=> {
+      var aql = this.state.aql;
+      aql.str = report.AQL;
+      aql.name = report.Name;
+      aql.category = 'OOB';
+      this.setState({aql: aql}, this._onQuery());
+    });
   }
 
   _setFormValues(event) {
@@ -370,13 +372,17 @@ export default class AQL extends Component {
               {
                 this.state.aql.data &&
                 <Tabs initialIndex={getIndex(this.state.aql.type)} justify="start">
-                  <ActionTab title="Chart" onClick={this._genGraph.bind(this, this.state.aql.chart, 'chart')} ref='chart'>
+                  <ActionTab title="Chart" onClick={this._genGraph.bind(this, this.state.aql.chart, 'chart')}
+                             ref='chart'>
                     <ChartForm {...this.state.aql} genGraph={this._genGraph.bind(this)}/>
                   </ActionTab>
-                  <ActionTab title="Meter" onClick={this._genGraph.bind(this, this.state.aql.meter, 'meter')} ref='meter'>
+                  <ActionTab title="Meter" onClick={this._genGraph.bind(this, this.state.aql.meter, 'meter')}
+                             ref='meter'>
                     <MeterForm {...this.state.aql} genGraph={this._genGraph.bind(this)}/>
                   </ActionTab>
-                  <ActionTab title="Distribution" onClick={this._genGraph.bind(this, this.state.aql.distribution, 'distribution')} ref='distribution'>
+                  <ActionTab title="Distribution"
+                             onClick={this._genGraph.bind(this, this.state.aql.distribution, 'distribution')}
+                             ref='distribution'>
                     <DistributionForm {...this.state.aql} genGraph={this._genGraph.bind(this)}/>
                   </ActionTab>
                   <Tab title="Value"/>
