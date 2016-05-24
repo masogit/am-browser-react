@@ -243,7 +243,10 @@ export default class AQL extends Component {
 
   _attachView(view) {
     var aql = this.state.aql;
-    aql.view = view;
+    aql.view = {
+      _id: view._id,
+      name: view.name
+    };
     this.setState({
       aql: aql,
       viewsLayer: null
@@ -284,7 +287,7 @@ export default class AQL extends Component {
   render() {
     const header = this.state.data.header.map((col) => <th key={col.Index}>{col.Name}</th>);
 
-    const  rows = this.state.data.rows.map((row, index) => (
+    const rows = this.state.data.rows.map((row, index) => (
       <TableRow key={index}> {
         row.map((col, i) => {
           return (<td key={i}>{col}</td>);
@@ -370,7 +373,8 @@ export default class AQL extends Component {
             <Split flex="left" fixed={false}>
               <Box>
                 {this.state.data.rows.length > 0 && this.state.aql.form && this.state.aql.type &&
-                    <Graph type={this.state.aql.type} data={this.state.data} config={this.state.aql.form} onClick={(filter) => console.log(filter.key + '=' + filter.value)} />}
+                <Graph type={this.state.aql.type} data={this.state.data} config={this.state.aql.form}
+                       onClick={(filter) => console.log(filter.key + '=' + filter.value)}/>}
                 <Table>
                   <thead>
                   <tr>{header}</tr>
@@ -389,7 +393,8 @@ export default class AQL extends Component {
                   <ActionTab title="Meter" onClick={this._genGraph.bind(this, null, 'meter')} ref='meter'>
                     <MeterForm {...this.state.aql} genGraph={this._genGraph.bind(this)} data={this.state.data}/>
                   </ActionTab>
-                  <ActionTab title="Distribution" onClick={this._genGraph.bind(this, null, 'distribution')} ref='distribution'>
+                  <ActionTab title="Distribution" onClick={this._genGraph.bind(this, null, 'distribution')}
+                             ref='distribution'>
                     <DistributionForm {...this.state.aql} genGraph={this._genGraph.bind(this)} data={this.state.data}/>
                   </ActionTab>
                   <Tab title="Value"/>

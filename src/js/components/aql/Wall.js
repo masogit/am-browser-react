@@ -185,7 +185,7 @@ export default class Wall extends Component {
   }
 
   _attachAQL(aql, box, parent) {
-    box.child = aql;
+    box.child = {_id: aql._id};
     this.setState({
       box: parent
     }, this._onClose(this));
