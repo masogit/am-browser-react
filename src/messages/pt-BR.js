@@ -30,5 +30,7 @@ module.exports = {
   'Close  Layer': 'Close  Layer',
   checkmark: 'checkmark',
   duplicate: 'duplicate',
-  'document-csv': 'document-csv'
+  'document-csv': 'document-csv',
+  Spiral: 'Spiral',
+  next: 'next'
 };

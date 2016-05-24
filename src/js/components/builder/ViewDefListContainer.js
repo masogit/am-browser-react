@@ -110,15 +110,17 @@ class ViewDefListContainer extends Component {
     let boundActionCreators = bindActionCreators(ViewDefActions, dispatch);
     return (
       <div>
-        <Split flex="right">
+        <div style={{display: "flex"}}>
           <ViewDefList views={views} isFetchingViewList={isFetchingViewList} {...boundActionCreators}/>
-          <Box pad={{horizontal: 'small'}}>
-            <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange}
-                           onSubmit={this.onSubmit} onDeleteTableRow={this.onDeleteTableRow}
-                           onDuplicateViewDef={this.onDuplicateViewDef}
-                           onDeleteViewDef={this.onDeleteViewDef} {...boundActionCreators}/>
-          </Box>
-        </Split>
+          <div style={{width: "90%"}}>
+            <Box pad={{horizontal: 'small'}}>
+              <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange}
+                             onSubmit={this.onSubmit} onDeleteTableRow={this.onDeleteTableRow}
+                             onDuplicateViewDef={this.onDuplicateViewDef}
+                             onDeleteViewDef={this.onDeleteViewDef} {...boundActionCreators}/>
+            </Box>
+          </div>
+        </div>
         <ViewDefPreview active={preview} selectedView={selectedView} {...boundActionCreators}/>
       </div>
     );
