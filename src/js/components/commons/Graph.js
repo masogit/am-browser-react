@@ -3,6 +3,7 @@
  */
 import {queryAQL} from '../../actions/aql';
 import React, {Component,PropTypes} from 'react';
+import Spinning from 'grommet/components/icons/Spinning';
 import {
   Chart,
   Meter,
@@ -31,7 +32,7 @@ export default class Graph extends Component {
     });
   }
 
-  _gen_chart(form, data) {
+  _gen_chart(form, data, onClick) {
     const chart = {
       important: form.important,
       threshold: form.threshold,
@@ -63,6 +64,14 @@ export default class Graph extends Component {
         series.forEach(item => {
           const value = row[item.index] / 1.0;
           if (!value.isNaN) {
+            /*let seriesItem = {
+              x: i,
+              y: value
+            };
+            if (form.type === 'bar') {
+              seriesItem.onClick = onClick;
+            }
+            item.values.push(seriesItem);*/
             item.values.push([i, value]);
           }
         });
@@ -94,7 +103,13 @@ export default class Graph extends Component {
     return chart;
   }
 
-  _gen_distribution(form, data) {
+  _gen_filter(row, header) {
+    return row.map((value, index) => {
+      return `${header[index].Name}=${value}`;
+    });
+  }
+
+  _gen_distribution(form, data, onClick) {
     const distribution = {
       size: form.size,
       units: form.units,
@@ -108,10 +123,13 @@ export default class Graph extends Component {
       distribution.series = data.rows.map((row, index) => {
         const value = row[form.series_col] / 1.0;
         if (!value.isNaN) {
+          const label = form.label ? '' + row[form.label] : '';
+          const filter = this._gen_filter(row, data.header);
           return {
-            label: '' + (form.label ? row[form.label] : index),
+            label,
             value,
-            index
+            index,
+            onClick: onClick && onClick.bind(this, filter)
           };
         }
       });
@@ -122,13 +140,14 @@ export default class Graph extends Component {
     return distribution;
   }
 
-  _gen_meter(form, data) {
+  _gen_meter(form, data, onClick) {
     const meter = {
       important: form.important,
       threshold: form.threshold,
       type: form.type,
       series_col: form.series_col,
       series: [],
+      col_unit: form.col_unit,
       size: form.size,
       vertical: form.vertical,
       stacked: form.stacked,
@@ -139,10 +158,13 @@ export default class Graph extends Component {
       meter.series = data.rows.map((row, index) => {
         const value = row[form.series_col] / 1.0;
         if (!value.isNaN) {
+          const label = form.col_unit ? '' + row[form.col_unit] : '';
+          const filter = this._gen_filter(row, data.header);
           return {
-            label: '' + index,
+            label,
             value,
-            index
+            index,
+            onClick: onClick && onClick.bind(this, filter)
           };
         }
       });
@@ -165,10 +187,15 @@ export default class Graph extends Component {
 
 
   render() {
-    const {type, graphConfig} = this.props;
-
+    const {type, graphConfig, view} = this.props;
+    let onClick;
+    if (view) {
+      onClick = (filter) => {
+        view.body.filter = filter.join('&');
+      }
+    }
     if (this.state.data) {
-      const graph = this['_gen_' + type](graphConfig, this.state.data);
+      const graph = this['_gen_' + type](graphConfig, this.state.data, onClick);
       if (graph.series.length > 0) {
         switch (type) {
           case 'chart':
@@ -180,12 +207,13 @@ export default class Graph extends Component {
         }
       }
     }
-    return <div></div>;
+    return <Spinning />;
   }
 }
 
 Graph.propTypes = {
   type: PropTypes.string.isRequired,
   graphConfig: PropTypes.object.isRequired,
-  aqlStr: PropTypes.string.isRequired
+  aqlStr: PropTypes.string.isRequired,
+  view: PropTypes.object
 };

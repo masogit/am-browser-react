@@ -33,11 +33,14 @@ export default class ChartForm extends GraphForm {
 
   render() {
     const col_options = [{value: '', text: ''}];
+    const col_unit_options = [{value: '', text: ''}];
     if (this.props.data.header) {
       this.props.data.header.map((header, index) => {
+        const option = {value: header.Index, text: `${header.Type}: ${header.Name}`};
         if (['Long', 'Short', 'Int', 'Double', 'Byte'].includes(header.Type)) {
-          col_options.push({value: header.Index, text: `${header.Type}: ${header.Name}`});
+          col_options.push(option);
         }
+        col_unit_options.push(option);
       });
     }
 
@@ -47,6 +50,7 @@ export default class ChartForm extends GraphForm {
 
     const selections = {
       series_col: col_options,
+      col_unit: col_unit_options,
       type: [
         {value: 'bar', text: 'bar'},
         {value: 'arc', text: 'arc'},
@@ -69,6 +73,10 @@ export default class ChartForm extends GraphForm {
     const basicOptions = [{
       label: 'Column',
       name: 'series_col',
+      type: 'SelectField'
+    }, {
+      label: 'Column units',
+      name: 'col_unit',
       type: 'SelectField'
     }, {
       name: 'type',

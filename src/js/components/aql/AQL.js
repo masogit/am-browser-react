@@ -369,7 +369,7 @@ export default class AQL extends Component {
             <Split flex="left" fixed={false}>
               <Box>
                 {this.state.data && this.state.aql.form && this.state.aql.type &&
-                    <Graph type={this.state.aql.type} aqlStr={this.state.aql.str} graphConfig={this.state.aql.form} />}
+                    <Graph type={this.state.aql.type} aqlStr={this.state.aql.str} graphConfig={this.state.aql.form} view={this.state.aql.view} />}
                 <Table>
                   <thead>
                   <tr>{header}</tr>
