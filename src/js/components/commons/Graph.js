@@ -192,7 +192,7 @@ export default class Graph extends Component {
     if (view) {
       onClick = (filter) => {
         view.body.filter = filter.join('&');
-      }
+      };
     }
     if (this.state.data) {
       const graph = this['_gen_' + type](graphConfig, this.state.data, onClick);
