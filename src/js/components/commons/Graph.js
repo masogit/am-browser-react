@@ -20,7 +20,15 @@ export default class Graph extends Component {
     super();
     this.state = {
       data: null
-    }
+    };
+  }
+
+  componentDidMount() {
+    queryAQL(this.props.aqlStr, (data) => {
+      if (data) {
+        this.setState({data});
+      }
+    });
   }
 
   _gen_chart(form, data) {
@@ -155,13 +163,6 @@ export default class Graph extends Component {
     return meter;
   }
 
-  componentDidMount() {
-    queryAQL(this.props.aqlStr, (data) => {
-      if (data) {
-        this.setState({data});
-      }
-    });
-  }
 
   render() {
     const {type, graphConfig} = this.props;
