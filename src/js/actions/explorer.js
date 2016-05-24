@@ -95,13 +95,14 @@ export function getQueryByBody(body) {
     if (userParam.offset)
       param.offset = userParam.offset;
     if (userParam.filters && userParam.filters.length > 0) {
-      var userFilters = userParam.filters.join(" AND ");
-      param.filter = param.filter ? param.filter + ' AND ' + userFilters : userFilters;
+      var userFilters = userParam.filters.map((filter) => {
+        return '(' + filter + ')';
+      }).join(" AND ");
+      param.filter = param.filter ? param.filter + ' AND (' + userFilters + ')' : userFilters;
     }
   }
 
   var aql = param2aql(param);
-
   return query + aql;
 }
 
