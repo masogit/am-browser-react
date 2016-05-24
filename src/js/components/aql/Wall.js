@@ -29,7 +29,8 @@ export default class Wall extends Component {
       box: {
         direction: 'row',
         child: null
-      }
+      },
+      data: {}
     };
     this._buildBox.bind(this);
     this._buildActions.bind(this);
@@ -40,7 +41,7 @@ export default class Wall extends Component {
     this._selectAQL.bind(this);
   }
 
-  componentDidMount() {
+  componentWillMount() {
     this._loadAQLs();
     this._loadWall();
   }
@@ -49,6 +50,21 @@ export default class Wall extends Component {
     AQLActions.loadAQLs((data) => {
       this.setState({
         aqls: data
+      }, this._queryData(data));
+    });
+  }
+
+  _queryData(aqls) {
+    const data = this.state.data;
+    aqls.map((aql) => {
+      AQLActions.queryAQL(aql.str, (result) => {
+        if (result) {
+          data[aql._id] = {
+            aql: aql,
+            data: result
+          };
+          this.setState({data});
+        }
       });
     });
   }
@@ -162,47 +178,55 @@ export default class Wall extends Component {
   }
 
   _buildBox(box, parent) {
-    return (<Box key={box.key} direction="column" separator={this.state.edit?'all':'none'} colorIndex="light-2">
-      {
-        this._buildActions(box, parent)}
-      {
-        box.child && box.child instanceof Array &&
-        <Box justify="center" {...box}>{
-          box.child.map((child, i) => {
-            child.key = i;
-            if (child)
+    let child;
+    if (box.child) {
+      if (box.child instanceof Array) {
+        child = (
+          <Box justify="center" {...box}>{
+            box.child.map((child, i) => {
+              child.key = i;
               return this._buildBox(child, parent);
-          })
-        }</Box>
+            })
+          }</Box>
+        );
+      } else if (box.child._id && this.state.data[box.child._id]) {
+        const dataMap = this.state.data[box.child._id];
+        child = (
+          <Box justify="center" {...box} direction="column" pad="medium">
+            <Header>{dataMap.aql.name}</Header>
+            {<Graph type={dataMap.aql.type} data={dataMap.data}
+                    config={dataMap.aql.form} onClick={(filter) => console.log(filter.key + '=' + filter.value)}/>}
+          </Box>
+        );
       }
-      {
-        box.child && box.child.name &&
-        <Box justify="center" {...box} direction="column" pad="medium">
-          <Header>{box.child.name}</Header>
-          {<Graph type={box.child.type} aqlStr={box.child.str} graphConfig={box.child.form} onClick={(filter) => console.log(filter.key + '=' + filter.value)}/>}
-        </Box>
-      }
-      {
-        !box.child && this.state.edit &&
+    } else if (this.state.edit) {
+      child = (
         <Box direction="row" justify="center" pad="large">
           <Anchor href="#" icon={<Attachment />} label="Attach AQL" onClick={this._selectAQL.bind(this, box, parent)}/>
         </Box>
-      }
+      );
+    }
+
+    return (<Box key={box.key} direction="column" separator={this.state.edit?'all':'none'} colorIndex="light-2">
+      {this._buildActions(box, parent)}
+      {child}
     </Box>);
   }
 
   _buildActions(box, parent) {
     var id = (Math.random() + 1).toString(36).substring(7);
     if (this.state.edit)
-      return (<Box direction="row" justify="center" pad="small">
-        <CheckBox id={id} label={box.direction==='row'?'Column':'Row'} checked={box.direction!=='column'}
-                  onChange={this._toggleDirection.bind(this, box, parent)} toggle={true}/>
-        <Anchor href="#" icon={<Add />} label="Split" onClick={this._addBox.bind(this, box, parent)}/>
-        {
-          box.child &&
-          <Anchor href="#" icon={<Close />} label="Delete" onClick={this._deleteBox.bind(this, box, parent)}/>
-        }
-      </Box>);
+      return (
+        <Box direction="row" justify="center" pad="small">
+          <CheckBox id={id} label={box.direction==='row'?'Column':'Row'} checked={box.direction!=='column'}
+                    onChange={this._toggleDirection.bind(this, box, parent)} toggle={true}/>
+          <Anchor href="#" icon={<Add />} label="Split" onClick={this._addBox.bind(this, box, parent)}/>
+          {
+            box.child &&
+            <Anchor href="#" icon={<Close />} label="Delete" onClick={this._deleteBox.bind(this, box, parent)}/>
+          }
+        </Box>
+      );
   }
 
   _onSave() {

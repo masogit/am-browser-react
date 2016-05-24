@@ -369,7 +369,7 @@ export default class AQL extends Component {
             <Split flex="left" fixed={false}>
               <Box>
                 {this.state.data.rows.length > 0 && this.state.aql.form && this.state.aql.type &&
-                    <Graph type={this.state.aql.type} aqlStr={this.state.aql.str} graphConfig={this.state.aql.form} onClick={(filter) => console.log(filter.key + '=' + filter.value)} />}
+                    <Graph type={this.state.aql.type} data={this.state.data} config={this.state.aql.form} onClick={(filter) => console.log(filter.key + '=' + filter.value)} />}
                 <Table>
                   <thead>
                   <tr>{header}</tr>
@@ -380,6 +380,7 @@ export default class AQL extends Component {
                 </Table>
               </Box>
               {
+                this.state.data && this.state.aql.form &&
                 <Tabs initialIndex={getIndex(this.state.aql.type)} justify="start">
                   <ActionTab title="Chart" onClick={this._genGraph.bind(this, null, 'chart')} ref='chart'>
                     <ChartForm {...this.state.aql} genGraph={this._genGraph.bind(this)} data={this.state.data}/>

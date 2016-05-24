@@ -1,7 +1,6 @@
 /**
  * Created by huling on 5/22/2016.
  */
-import {queryAQL} from '../../actions/aql';
 import React, {Component,PropTypes} from 'react';
 import Spinning from 'grommet/components/icons/Spinning';
 import {
@@ -19,20 +18,6 @@ const assignObjectProp = (from, to, propName) => {
 export default class Graph extends Component {
   constructor() {
     super();
-    this.state = {
-      data: {
-        header: [],
-        rows: []
-      }
-    };
-  }
-
-  componentDidMount() {
-    queryAQL(this.props.aqlStr, (data) => {
-      if (data) {
-        this.setState({data});
-      }
-    });
   }
 
   _gen_chart(form, data, onClick) {
@@ -195,10 +180,10 @@ export default class Graph extends Component {
 
 
   render() {
-    const {type, graphConfig, onClick} = this.props;
+    const {type, config, onClick, data} = this.props;
 
-    if (this.state.data.rows.length > 0) {
-      const graph = this['_gen_' + type](graphConfig, this.state.data, onClick);
+    if (data && data.rows.length > 0) {
+      const graph = this['_gen_' + type](config, data, onClick);
       if (graph.series.length > 0) {
         switch (type) {
           case 'chart':
@@ -218,7 +203,10 @@ export default class Graph extends Component {
 
 Graph.propTypes = {
   type: PropTypes.string.isRequired,
-  graphConfig: PropTypes.object.isRequired,
-  aqlStr: PropTypes.string.isRequired,
+  config: PropTypes.object.isRequired,
+  data: PropTypes.shape({
+    header: PropTypes.array,
+    rows: PropTypes.array
+  }),
   onClick: PropTypes.func
 };
