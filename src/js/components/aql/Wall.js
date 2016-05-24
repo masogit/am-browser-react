@@ -14,7 +14,8 @@ import {
   Header,
   Menu,
   Title,
-  Layer
+  Layer,
+  Carousel
 } from 'grommet';
 import GroupList from '../commons/GroupList';
 import GroupListItem from '../commons/GroupListItem';
@@ -25,6 +26,7 @@ export default class Wall extends Component {
     super();
     this.state = {
       edit: false,
+      carousel: true,
       aqls: [],
       box: {
         direction: 'row',
@@ -95,6 +97,12 @@ export default class Wall extends Component {
   _toggleEdit() {
     this.setState({
       edit: !this.state.edit
+    });
+  }
+
+  _toggleCarousel() {
+    this.setState({
+      carousel: !this.state.carousel
     });
   }
 
@@ -243,6 +251,26 @@ export default class Wall extends Component {
       );
   }
 
+  _buildCarousel(data) {
+    return (
+      <Carousel>
+        {
+          Object.keys(data).map((key)=> {
+            const dataMap = data[key];
+            return (
+              <Box align="center" pad="large">
+                <Header>{dataMap.aql.name}</Header>
+                {<Graph type={dataMap.aql.type} data={dataMap.data}
+                        config={dataMap.aql.form}
+                        onClick={(filter) => console.log(filter.key + '=' + filter.value)}/>}
+              </Box>
+            );
+          })
+        }
+      </Carousel>
+    );
+  }
+
   _onSave() {
     AQLActions.saveWall(this.state.box, (data) => {
       if (data)
@@ -264,11 +292,16 @@ export default class Wall extends Component {
 
   render() {
     var box = this.state.box;
+    var data = this.state.data;
     return (
       <Box direction="column" pad="medium" full="horizontal">
         <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
           <Title>AM Insight</Title>
           <Menu direction="row" align="center" responsive={false}>
+            <CheckBox id="carousel" label="Carousel" checked={this.state.carousel}
+                      onChange={this._toggleCarousel.bind(this)}/>
+            <CheckBox id="dashboard" label="Dashboard" checked={!this.state.carousel}
+                      onChange={this._toggleCarousel.bind(this)}/>
             {
               this.state.edit &&
               <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>
@@ -281,7 +314,13 @@ export default class Wall extends Component {
                       toggle={true}/>
           </Menu>
         </Header>
-        {this._buildBox(box, box)}
+        {
+          this.state.carousel && !this.state.edit &&
+          this._buildCarousel(data)}
+        {
+          (!this.state.carousel || this.state.edit) &&
+          this._buildBox(box, box)
+        }
         {this.state.layer}
         {this.state.alert}
       </Box>
