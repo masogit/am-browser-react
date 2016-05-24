@@ -258,7 +258,7 @@ export default class Wall extends Component {
           Object.keys(data).map((key)=> {
             const dataMap = data[key];
             return (
-              <Box align="center" pad="large">
+              <Box align="center" pad="large" colorIndex="light-2">
                 <Header>{dataMap.aql.name}</Header>
                 {<Graph type={dataMap.aql.type} data={dataMap.data}
                         config={dataMap.aql.form}
