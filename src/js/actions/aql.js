@@ -150,7 +150,6 @@ function simpleAQLResult(Query) {
       } else {
         if (row.Column.content)
           cols.push(row.Column.content);
-
       }
       if (cols.length > 0)
         data.rows.push(cols);
@@ -158,11 +157,10 @@ function simpleAQLResult(Query) {
 
   } else {
     var cols = [];
-    if (Query.Result.Row.Column.content)
+    if (Query.Result.Row && Query.Result.Row.Column.content)
       cols.push(Query.Result.Row.Column.content);
     if (cols.length > 0)
       data.rows.push(cols);
-
   }
 
   return data;
