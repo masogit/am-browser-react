@@ -58,7 +58,7 @@ export default class RecordList extends Component {
     this._getRecords();
   }
 
-  _onMore() {
+  _getMoreRecords() {
     if (this.state.numTotal > this.state.records.length) {
       var param = {...this.state.param};
       param.offset = this.state.records.length;
@@ -84,7 +84,7 @@ export default class RecordList extends Component {
           numTotal: data.count,
           records: (param) ? records.concat(data.entities) : data.entities, // if sync pass param to query, then records append
           filtered: null
-        }, this._onGroupBy);
+        }, this._groupBy);
       else if (data.entities.length === 0)
         this.setState({
           loading: false,
@@ -93,7 +93,7 @@ export default class RecordList extends Component {
     });
   }
 
-  _onOrderBy(sqlname) {
+  _orderBy(sqlname) {
     var param = {...this.state.param};
     if (param.orderby == (sqlname + ' desc'))
       param.orderby = "";
@@ -106,13 +106,13 @@ export default class RecordList extends Component {
     }, this._getRecords);
   }
 
-  _getOrderByIcon(sqlname) {
+  _showOrderByIcon(sqlname) {
     var orderby = this.state.param.orderby;
     var icon = (orderby.indexOf(sqlname) > -1) ? ((orderby.indexOf('desc') > -1) ? <Descend /> : <Ascend />) : null;
     return icon;
   }
 
-  _onClick(record) {
+  _viewDetailShow(record) {
     if (this.props.body.links && this.props.body.links.length > 0) {
       this.setState({
         record: record
@@ -137,7 +137,7 @@ export default class RecordList extends Component {
     return field.alias ? field.alias : (field.label ? field.label : field.sqlname);
   }
 
-  _onFilter(event) {
+  _filterAdd(event) {
     if (event.keyCode === 13 && event.target.value.trim()) {
       if (this.state.aqlInput) {
         this._addAQLFilter();
@@ -163,7 +163,7 @@ export default class RecordList extends Component {
       if (!this.state.aqlInput)
         this.setState({
           filtered: this.state.records.filter((obj) => JSON.stringify(obj).toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1)
-        }, this._onGroupBy);
+        }, this._groupBy);
     }
   }
 
@@ -181,7 +181,7 @@ export default class RecordList extends Component {
 
   }
 
-  _onFilterClear(index) {
+  _filterClear(index) {
     var param = this.state.param;
     param.filters.splice(index, 1);
     this.setState({
@@ -189,7 +189,7 @@ export default class RecordList extends Component {
     }, this._getRecords);
   }
 
-  _onFilterBack(filter) {
+  _filterReuse(filter) {
     var search = this.refs.search.value.trim();
     if (search && search !== filter)
       this.refs.search.value += ' AND ' + filter;
@@ -197,7 +197,7 @@ export default class RecordList extends Component {
       this.refs.search.value = filter;
   }
 
-  _onGroupBy() {
+  _groupBy() {
     if (this.refs.select_group.value) {
       var field = JSON.parse(this.refs.select_group.value);
 
@@ -240,14 +240,14 @@ export default class RecordList extends Component {
     }
   }
 
-  _onClose(event) {
+  _viewDetailClose(event) {
     if (event) {
       event.preventDefault();
     }
     this.setState({record: null});
   }
 
-  _onSubmit() {
+  _download() {
     this.refs.downloadForm.submit();
   }
 
@@ -263,13 +263,13 @@ export default class RecordList extends Component {
     var header = body.fields.map((field, index) => {
       return !field.PK && index <= this.state.numColumn &&
         <th key={index}>
-          <Anchor href="#" reverse={true} icon={this._getOrderByIcon(field.sqlname)}
+          <Anchor href="#" reverse={true} icon={this._showOrderByIcon(field.sqlname)}
                   label={this._getDisplayLabel(field)}
-                  onClick={this._onOrderBy.bind(this, field.sqlname)}/>
+                  onClick={this._orderBy.bind(this, field.sqlname)}/>
         </th>;
     });
     var recordComponents = records.map((record, index) => {
-      return (<TableRow key={index} onClick={this._onClick.bind(this, record)}>
+      return (<TableRow key={index} onClick={this._viewDetailShow.bind(this, record)}>
         <td>{record.self}</td>
         {
           body.fields.map((field, tdindex) => {
@@ -285,8 +285,8 @@ export default class RecordList extends Component {
     var filters = this.state.param.filters.map((filter, index) => {
       return (
         <span>
-          <Anchor href="#" icon={<Close />} onClick={this._onFilterClear.bind(this, index)}/>
-          <Anchor href="#" onClick={this._onFilterBack.bind(this, filter)} label={filter}/>
+          <Anchor href="#" icon={<Close />} onClick={this._filterClear.bind(this, index)}/>
+          <Anchor href="#" onClick={this._filterReuse.bind(this, filter)} label={filter}/>
         </span>
       );
     });
@@ -309,12 +309,12 @@ export default class RecordList extends Component {
           {this.state.timeQuery}ms
           <input type="text" inline={true} className="flex" ref="search"
                  placeholder={this.state.aqlInput?'Input AQL...':'Quick search'}
-                 onKeyDown={this._onFilter.bind(this)} onChange={this._onFilter.bind(this)}/>
+                 onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
           <Menu direction="row" align="center" responsive={false}>
             <CheckBox label="AQL" checked={this.state.aqlInput} onChange={this._toggleAQLInput.bind(this)}
                       toggle={true}/>
-            <Anchor href="#" icon={<Download />} label="CSV" onClick={this._onSubmit.bind(this)}/>
-            <select onChange={this._onGroupBy.bind(this)} ref="select_group" value={this.state.groupby}>
+            <Anchor href="#" icon={<Download />} label="CSV" onClick={this._download.bind(this)}/>
+            <select onChange={this._groupBy.bind(this)} ref="select_group" value={this.state.groupby}>
               <option value="">Group By</option>
               {this.state.group_selects}
             </select>
@@ -333,11 +333,11 @@ export default class RecordList extends Component {
           </Box>
         }
         <Table selectable={true}
-               onMore={(this.state.numTotal > this.state.records.length && !this.state.filtered)?this._onMore.bind(this):null}>
+               onMore={(this.state.numTotal > this.state.records.length && !this.state.filtered)?this._getMoreRecords.bind(this):null}>
           <thead>
           <tr>
-            <th><Anchor href="#" reverse={true} icon={this._getOrderByIcon('self')} label="Self"
-                        onClick={this._onOrderBy.bind(this, 'self')}/></th>
+            <th><Anchor href="#" reverse={true} icon={this._showOrderByIcon('self')} label="Self"
+                        onClick={this._orderBy.bind(this, 'self')}/></th>
             {header}
           </tr>
           </thead>
@@ -347,7 +347,7 @@ export default class RecordList extends Component {
         </Table>
         {
           this.state.record &&
-          <RecordDetail body={this.props.body} record={this.state.record} onClose={this._onClose.bind(this)}/>
+          <RecordDetail body={this.props.body} record={this.state.record} onClose={this._viewDetailClose.bind(this)}/>
         }
       </div>
     );
