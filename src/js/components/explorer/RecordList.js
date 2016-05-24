@@ -4,6 +4,7 @@ import Title from 'grommet/components/Title';
 import Table from 'grommet/components/Table';
 import TableRow from 'grommet/components/TableRow';
 import Box from 'grommet/components/Box';
+import CheckBox from 'grommet/components/CheckBox';
 import Anchor from 'grommet/components/Anchor';
 import Header from 'grommet/components/Header';
 import Menu from 'grommet/components/Menu';
@@ -12,7 +13,6 @@ import Distribution from 'grommet/components/Distribution';
 import Ascend from 'grommet/components/icons/base/Ascend';
 import Descend from 'grommet/components/icons/base/Descend';
 import Download from 'grommet/components/icons/base/Download';
-import AdvancedSearch from 'grommet/components/icons/base/AdvancedSearch';
 import * as ExplorerActions from '../../actions/explorer';
 export default class RecordList extends Component {
 
@@ -31,7 +31,8 @@ export default class RecordList extends Component {
         offset: 0,
         limit: 30,
         filters: []
-      }
+      },
+      aqlInput: false
     };
   }
 
@@ -138,26 +139,31 @@ export default class RecordList extends Component {
 
   _onFilter(event) {
     if (event.keyCode === 13 && event.target.value.trim()) {
-      var param = this.state.param;
-      if (param.filters.indexOf(event.target.value) == -1) {
-        var aql = this.props.body.fields.filter((field) => {
-          return field.searchable;
-        }).map((field) => {
-          return field.sqlname + " like '%" + event.target.value.trim() + "%'";
-        }).join(' OR ');
+      if (this.state.aqlInput) {
+        this._addAQLFilter();
+      } else {
+        var param = this.state.param;
+        if (param.filters.indexOf(event.target.value) == -1) {
+          var aql = this.props.body.fields.filter((field) => {
+            return field.searchable;
+          }).map((field) => {
+            return field.sqlname + " like '%" + event.target.value.trim() + "%'";
+          }).join(' OR ');
 
-        if (aql) {
-          param.filters.push(aql);
-          event.target.value = "";
-          this.setState({
-            param: param
-          }, this._getRecords);
+          if (aql) {
+            param.filters.push(aql);
+            event.target.value = "";
+            this.setState({
+              param: param
+            }, this._getRecords);
+          }
         }
       }
     } else {
-      this.setState({
-        filtered: this.state.records.filter((obj) => JSON.stringify(obj).toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1)
-      }, this._onGroupBy);
+      if (!this.state.aqlInput)
+        this.setState({
+          filtered: this.state.records.filter((obj) => JSON.stringify(obj).toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1)
+        }, this._onGroupBy);
     }
   }
 
@@ -245,6 +251,12 @@ export default class RecordList extends Component {
     this.refs.downloadForm.submit();
   }
 
+  _toggleAQLInput() {
+    this.setState({
+      aqlInput: !this.state.aqlInput
+    });
+  }
+
   render() {
     var body = this.props.body;
     var records = (this.state.filtered) ? this.state.filtered : this.state.records;
@@ -296,10 +308,11 @@ export default class RecordList extends Component {
           /{this.state.numTotal}
           {this.state.timeQuery}ms
           <input type="text" inline={true} className="flex" ref="search"
-                 placeholder="Instant search, press Enter: global search, click AQL icon: advance search"
+                 placeholder={this.state.aqlInput?'Input AQL...':'Quick search'}
                  onKeyDown={this._onFilter.bind(this)} onChange={this._onFilter.bind(this)}/>
           <Menu direction="row" align="center" responsive={false}>
-            <Anchor href="#" icon={<AdvancedSearch />} label="AQL" onClick={this._addAQLFilter.bind(this)}/>
+            <CheckBox label="AQL" checked={this.state.aqlInput} onChange={this._toggleAQLInput.bind(this)}
+                      toggle={true}/>
             <Anchor href="#" icon={<Download />} label="CSV" onClick={this._onSubmit.bind(this)}/>
             <select onChange={this._onGroupBy.bind(this)} ref="select_group" value={this.state.groupby}>
               <option value="">Group By</option>
