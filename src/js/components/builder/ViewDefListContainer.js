@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import Box from 'grommet/components/Box';
 //import Header from 'grommet/components/Header';
-import Split from 'grommet/components/Split';
+//import Split from 'grommet/components/Split';
 //import Footer from 'grommet/components/Footer';
 //import Title from 'grommet/components/Title';
 //import Menu from 'grommet/components/Menu';
