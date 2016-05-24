@@ -83,12 +83,9 @@ export default class AQL extends Component {
   }
 
   _loadAQL(aql) {
-    if (this.refs && this.refs[aql.type]) {
-      this.refs[aql.type]._onClickTab(event);
-    }
-
     this.setState({
-      aql: {...aql}
+      aql: {...aql},
+      data: null
     }, () => {
       if (this.refs && this.refs[aql.type]) {
         this.refs[aql.type]._onClickTab(event);
@@ -296,6 +293,7 @@ export default class AQL extends Component {
       if (type === 'chart') return 0;
       if (type === 'meter') return 1;
       if (type === 'distribution') return 2;
+      return 0;
     };
 
     const sideBar = (
@@ -369,7 +367,7 @@ export default class AQL extends Component {
             <Split flex="left" fixed={false}>
               <Box>
                 {this.state.data && this.state.aql.form && this.state.aql.type &&
-                    <Graph type={this.state.aql.type} aqlStr={this.state.aql.str} graphConfig={this.state.aql.form} view={this.state.aql.view} />}
+                    <Graph type={this.state.aql.type} aqlStr={this.state.aql.str} graphConfig={this.state.aql.form} onClick={(filter) => console.log(filter.key + '=' + filter.value)} />}
                 <Table>
                   <thead>
                   <tr>{header}</tr>

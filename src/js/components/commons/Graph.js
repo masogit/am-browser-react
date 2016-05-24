@@ -63,7 +63,7 @@ export default class Graph extends Component {
       data.rows.map((row, i) => {
         series.forEach(item => {
           const value = row[item.index] / 1.0;
-          if (!value.isNaN) {
+          if (!isNaN(value)) {
             /*let seriesItem = {
               x: i,
               y: value
@@ -103,10 +103,11 @@ export default class Graph extends Component {
     return chart;
   }
 
-  _gen_filter(row, header) {
-    return row.map((value, index) => {
-      return `${header[index].Name}=${value}`;
-    });
+  _getFullCol(row, header) {
+    return row.map((value, index) => ({
+      key: header[index].Name,
+      value
+    }));
   }
 
   _gen_distribution(form, data, onClick) {
@@ -120,17 +121,19 @@ export default class Graph extends Component {
     };
 
     if (form.series_col) {
-      distribution.series = data.rows.map((row, index) => {
+      data.rows.map((row, index) => {
         const value = row[form.series_col] / 1.0;
-        if (!value.isNaN) {
+        if (!isNaN(value)) {
           const label = form.label ? '' + row[form.label] : '';
-          const filter = this._gen_filter(row, data.header);
-          return {
+          const filter = this._getFullCol(row, data.header);
+          const mainFilterKey = form.label || form.series_col;
+          const mainFilterValue = form.label ? label : value;
+          distribution.series.push({
             label,
             value,
             index,
-            onClick: onClick && onClick.bind(this, filter)
-          };
+            onClick: onClick && onClick.bind(this, {key: data.header[mainFilterKey].Name, value: mainFilterValue},filter)
+          });
         }
       });
 
@@ -155,17 +158,19 @@ export default class Graph extends Component {
     };
 
     if (form.series_col) {
-      meter.series = data.rows.map((row, index) => {
+      data.rows.filter((row, index) => {
         const value = row[form.series_col] / 1.0;
-        if (!value.isNaN) {
+        if (!isNaN(value)) {
           const label = form.col_unit ? '' + row[form.col_unit] : '';
-          const filter = this._gen_filter(row, data.header);
-          return {
+          const filter = this._getFullCol(row, data.header);
+          const mainFilterKey = form.col_unit || form.series_col;
+          const mainFilterValue = form.col_unit ? label : value;
+          meter.series.push({
             label,
             value,
             index,
-            onClick: onClick && onClick.bind(this, filter)
-          };
+            onClick: onClick && onClick.bind(this, {key: data.header[mainFilterKey].Name, value: mainFilterValue}, filter)
+          });
         }
       });
 
@@ -187,13 +192,8 @@ export default class Graph extends Component {
 
 
   render() {
-    const {type, graphConfig, view} = this.props;
-    let onClick;
-    if (view) {
-      onClick = (filter) => {
-        view.body.filter = filter.join('&');
-      };
-    }
+    const {type, graphConfig, onClick} = this.props;
+
     if (this.state.data) {
       const graph = this['_gen_' + type](graphConfig, this.state.data, onClick);
       if (graph.series.length > 0) {
@@ -215,5 +215,5 @@ Graph.propTypes = {
   type: PropTypes.string.isRequired,
   graphConfig: PropTypes.object.isRequired,
   aqlStr: PropTypes.string.isRequired,
-  view: PropTypes.object
+  onClick: PropTypes.func
 };

@@ -123,7 +123,6 @@ export function queryAQL(str, callback) {
 }
 
 function simpleAQLResult(Query) {
-  console.log(Query);
   var data = {
     table: "",
     header: [],

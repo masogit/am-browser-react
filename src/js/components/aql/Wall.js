@@ -179,7 +179,7 @@ export default class Wall extends Component {
         box.child && box.child.name &&
         <Box justify="center" {...box} direction="column" pad="medium">
           <Header>{box.child.name}</Header>
-          {<Graph type={box.child.type} aqlStr={box.child.str} graphConfig={box.child.form} view={box.child.view}/>}
+          {<Graph type={box.child.type} aqlStr={box.child.str} graphConfig={box.child.form} onClick={(filter) => console.log(filter.key + '=' + filter.value)}/>}
         </Box>
       }
       {
