@@ -254,6 +254,7 @@ export default class AQL extends Component {
     var viewsLayer = (
       <Layer onClose={this._onClose.bind(this)} closer={true} align="left">
         <Box full="vertical" justify="center">
+          <Box pad={{vertical: 'medium'}}><Title>Views Selector ({this.state.views.length})</Title></Box>
           <GroupList pad={{vertical: 'small'}} searchable={true}>
             {
               this.state.views.map((view) => {

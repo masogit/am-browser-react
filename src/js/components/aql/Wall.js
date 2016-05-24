@@ -46,26 +46,39 @@ export default class Wall extends Component {
     this._loadWall();
   }
 
+  _findAqls(box) {
+    console.log(box);
+    if (box.child && box.child._id) {
+      AQLActions.loadAQL(box.child._id, (aql)=> {
+        this._queryData(aql);
+        console.log("aql: " + aql.name);
+      });
+    } else if (box.child && box.child instanceof Array) {
+      box.child.forEach((child)=> {
+        this._findAqls(child);
+      });
+    }
+  }
+
   _loadAQLs() {
     AQLActions.loadAQLs((data) => {
       this.setState({
         aqls: data
-      }, this._queryData(data));
+      });
     });
   }
 
-  _queryData(aqls) {
+  _queryData(aql) {
     const data = this.state.data;
-    aqls.map((aql) => {
-      AQLActions.queryAQL(aql.str, (result) => {
-        if (result) {
-          data[aql._id] = {
-            aql: aql,
-            data: result
-          };
-          this.setState({data});
-        }
-      });
+    AQLActions.queryAQL(aql.str, (result) => {
+      console.log(result);
+      if (result) {
+        data[aql._id] = {
+          aql: aql,
+          data: result
+        };
+        this.setState({data});
+      }
     });
   }
 
@@ -74,7 +87,7 @@ export default class Wall extends Component {
       if (data) {
         this.setState({
           box: data
-        });
+        }, this._findAqls(data));
       }
     });
   }
@@ -153,6 +166,7 @@ export default class Wall extends Component {
     return (
       <Layer onClose={this._onClose.bind(this)} closer={true} align="left">
         <Box full="vertical" justify="center">
+          <Box pad={{vertical: 'medium'}}><Title>Graph Selector ({this.state.aqls.length})</Title></Box>
           <GroupList pad={{vertical: 'small'}} searchable={true}>
             {
               this.state.aqls.map((aql) => {
@@ -234,8 +248,8 @@ export default class Wall extends Component {
       if (data)
         this._loadWall();
       var alert = (<AlertForm onClose={this._closeAlert.bind(this)}
-                             title={'AM Insight layout saved!'}
-                             onConfirm={this._closeAlert.bind(this)}/>);
+                              title={'AM Insight layout saved!'}
+                              onConfirm={this._closeAlert.bind(this)}/>);
       this.setState({
         alert: alert
       });

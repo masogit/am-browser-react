@@ -21,6 +21,15 @@ export function loadWall(callback) {
   });
 }
 
+export function loadAQL(id, callback) {
+  Rest.get(HOST_NAME + '/coll/aql/' + id).end((err, res) => {
+    if (err) {
+      console.log(err.response ? err.response.text : err);
+    } else
+      callback(res.body);
+  });
+}
+
 export function loadAQLs(callback) {
   Rest.get(HOST_NAME + '/coll/aql').end((err, res) => {
     if (err) {
