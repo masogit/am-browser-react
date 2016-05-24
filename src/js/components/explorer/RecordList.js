@@ -140,7 +140,7 @@ export default class RecordList extends Component {
   _filterAdd(event) {
     if (event.keyCode === 13 && event.target.value.trim()) {
       if (this.state.aqlInput) {
-        this._addAQLFilter();
+        this._aqlFilterAdd();
       } else {
         var param = this.state.param;
         if (param.filters.indexOf(event.target.value) == -1) {
@@ -167,7 +167,7 @@ export default class RecordList extends Component {
     }
   }
 
-  _addAQLFilter() {
+  _aqlFilterAdd() {
     var searchValue = this.refs.search.value;
     if (searchValue) {
       var param = this.state.param;
