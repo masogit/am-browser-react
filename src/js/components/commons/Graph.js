@@ -20,7 +20,10 @@ export default class Graph extends Component {
   constructor() {
     super();
     this.state = {
-      data: null
+      data: {
+        header: [],
+        rows: []
+      }
     };
   }
 
@@ -194,7 +197,7 @@ export default class Graph extends Component {
   render() {
     const {type, graphConfig, onClick} = this.props;
 
-    if (this.state.data) {
+    if (this.state.data.rows.length > 0) {
       const graph = this['_gen_' + type](graphConfig, this.state.data, onClick);
       if (graph.series.length > 0) {
         switch (type) {
@@ -205,6 +208,8 @@ export default class Graph extends Component {
           case 'distribution':
             return <Distribution {...graph} />;
         }
+      } else {
+        return <div></div>;
       }
     }
     return <Spinning />;

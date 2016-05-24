@@ -42,7 +42,10 @@ export default class AQL extends Component {
       reports: {},
       aqls: [],
       aql: {},
-      data: null
+      data: {
+        header: [],
+        rows: []
+      }
     };
   }
 
@@ -62,7 +65,10 @@ export default class AQL extends Component {
         type: '',
         form: null
       },
-      data: null
+      data: {
+        header: [],
+        rows: []
+      }
     }, callback);
   }
 
@@ -85,7 +91,10 @@ export default class AQL extends Component {
   _loadAQL(aql) {
     this.setState({
       aql: {...aql},
-      data: null
+      data: {
+        header: [],
+        rows: []
+      }
     }, () => {
       if (this.refs && this.refs[aql.type]) {
         this.refs[aql.type]._onClickTab(event);
@@ -272,23 +281,16 @@ export default class AQL extends Component {
   }
 
   render() {
-    let header, rows;
-    // console.log(this.state);
-    if (this.state.data) {
-      header = this.state.data.header.map((col) => {
-        return (<th key={col.Index}>{col.Name}</th>);
-      });
+    const header = this.state.data.header.map((col) => <th key={col.Index}>{col.Name}</th>);
 
-      rows = this.state.data.rows.map((row, index) => {
-        return (<TableRow key={index}>
-          {
-            row.map((col, i) => {
-              return (<td key={i}>{col}</td>);
-            })
-          }
-        </TableRow>);
-      });
-    }
+    const  rows = this.state.data.rows.map((row, index) => (
+      <TableRow key={index}> {
+        row.map((col, i) => {
+          return (<td key={i}>{col}</td>);
+        })
+      }</TableRow>
+    ));
+
     const getIndex = (type) => {
       if (type === 'chart') return 0;
       if (type === 'meter') return 1;
@@ -366,7 +368,7 @@ export default class AQL extends Component {
             </Box>
             <Split flex="left" fixed={false}>
               <Box>
-                {this.state.data && this.state.aql.form && this.state.aql.type &&
+                {this.state.data.rows.length > 0 && this.state.aql.form && this.state.aql.type &&
                     <Graph type={this.state.aql.type} aqlStr={this.state.aql.str} graphConfig={this.state.aql.form} onClick={(filter) => console.log(filter.key + '=' + filter.value)} />}
                 <Table>
                   <thead>
@@ -378,7 +380,6 @@ export default class AQL extends Component {
                 </Table>
               </Box>
               {
-                this.state.data &&
                 <Tabs initialIndex={getIndex(this.state.aql.type)} justify="start">
                   <ActionTab title="Chart" onClick={this._genGraph.bind(this, null, 'chart')} ref='chart'>
                     <ChartForm {...this.state.aql} genGraph={this._genGraph.bind(this)} data={this.state.data}/>
