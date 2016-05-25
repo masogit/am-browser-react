@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import * as AQLActions from '../../actions/aql';
+import * as ExplorerActions from '../../actions/explorer';
+import RecordList from '../explorer/RecordList';
 import AlertForm from '../commons/AlertForm';
 import Add from 'grommet/components/icons/base/Add';
 import Close from 'grommet/components/icons/base/Close';
@@ -216,8 +218,8 @@ export default class Wall extends Component {
         child = (
           <Box justify="center" {...box} direction="column" pad="medium">
             <Header>{dataMap.aql.name}</Header>
-            {<Graph type={dataMap.aql.type} data={dataMap.data}
-                    config={dataMap.aql.form} onClick={(filter) => console.log(filter.key + '=' + filter.value)}/>}
+            {<Graph type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
+                    onClick={(filter) => this._showViewRecords(filter, dataMap.aql.view)}/>}
           </Box>
         );
       }
@@ -263,9 +265,8 @@ export default class Wall extends Component {
                 {
                   <Box key={dataMap.aql._id} pad="large" align={(dataMap.aql.type=='meter')?'center':''}
                        full="horizontal">
-                    <Graph type={dataMap.aql.type} data={dataMap.data}
-                           config={dataMap.aql.form}
-                           onClick={(filter) => console.log(filter.key + '=' + filter.value)}/>
+                    <Graph type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
+                           onClick={(filter) => this._showViewRecords(filter, dataMap.aql.view)}/>
                   </Box>
                 }
               </Box>
@@ -274,6 +275,25 @@ export default class Wall extends Component {
         }
       </Carousel>
     );
+  }
+
+  _showViewRecords(filter, viewInAQL) {
+    if (viewInAQL && viewInAQL._id)
+      ExplorerActions.loadView(viewInAQL._id, (view) => {
+        var body = view.body;
+        body.filter = (body.filter) ? `(${body.filter} AND ${filter.key}='${filter.value}')` : `${filter.key}='${filter.value}'`;
+        var layer = (
+          <Layer onClose={this._onClose.bind(this)} closer={true} flush={true} align="center">
+            <Box full={true} pad="large">
+              <RecordList body={body} title={view.name}/>
+            </Box>
+          </Layer>
+        );
+
+        this.setState({
+          layer: layer
+        });
+      });
   }
 
   _onSave() {

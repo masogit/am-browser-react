@@ -306,21 +306,22 @@ export default class AQL extends Component {
   }
 
   _showViewRecords(filter, viewInAQL) {
-    ExplorerActions.loadView(viewInAQL._id, (view) => {
-      var body = view.body;
-      body.filter = (body.filter) ? `(${body.filter} AND ${filter.key}='${filter.value}')` : `${filter.key}='${filter.value}'`;
-      var popupLayer = (
-        <Layer onClose={this._onClose.bind(this)} closer={true} flush={true} align="center">
-          <Box full={true} pad="large">
-            <RecordList body={body} title={view.name}/>
-          </Box>
-        </Layer>
-      );
+    if (viewInAQL && viewInAQL._id)
+      ExplorerActions.loadView(viewInAQL._id, (view) => {
+        var body = view.body;
+        body.filter = (body.filter) ? `(${body.filter} AND ${filter.key}='${filter.value}')` : `${filter.key}='${filter.value}'`;
+        var popupLayer = (
+          <Layer onClose={this._onClose.bind(this)} closer={true} flush={true} align="center">
+            <Box full={true} pad="large">
+              <RecordList body={body} title={view.name}/>
+            </Box>
+          </Layer>
+        );
 
-      this.setState({
-        popupLayer: popupLayer
+        this.setState({
+          popupLayer: popupLayer
+        });
       });
-    });
   }
 
   _getFieldStrVal(val) {
