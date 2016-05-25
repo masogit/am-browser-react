@@ -8,6 +8,7 @@ import GroupList from './../commons/GroupList';
 import GroupListItem from './../commons/GroupListItem';
 import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
+import RecordList from '../explorer/RecordList';
 import ActionTab from '../commons/ActionTab';
 
 import {
@@ -247,12 +248,12 @@ export default class AQL extends Component {
     };
     this.setState({
       aql: aql,
-      viewsLayer: null
+      popupLayer: null
     });
   }
 
   _selectView() {
-    var viewsLayer = (
+    var popupLayer = (
       <Layer onClose={this._onClose.bind(this)} closer={true} align="left">
         <Box full="vertical" justify="center">
           <Box pad={{vertical: 'medium'}}>
@@ -274,12 +275,12 @@ export default class AQL extends Component {
       </Layer>
     );
     this.setState({
-      viewsLayer: viewsLayer
+      popupLayer: popupLayer
     });
   }
 
   _selectReports() {
-    var viewsLayer = (
+    var popupLayer = (
       <Layer onClose={this._onClose.bind(this)} closer={true} align="left">
         <Box full="vertical" justify="center">
           <Box pad={{vertical: 'medium'}}><Title>AQL Selector ({this.state.views.length})</Title></Box>
@@ -300,7 +301,25 @@ export default class AQL extends Component {
       </Layer>
     );
     this.setState({
-      viewsLayer: viewsLayer
+      popupLayer: popupLayer
+    });
+  }
+
+  _showViewRecords(filter, viewInAQL) {
+    ExplorerActions.loadView(viewInAQL._id, (view) => {
+      var body = view.body;
+      body.filter = (body.filter) ? `(${body.filter} AND ${filter.key}='${filter.value}')` : `${filter.key}='${filter.value}'`;
+      var popupLayer = (
+        <Layer onClose={this._onClose.bind(this)} closer={true} flush={true} align="center">
+          <Box full={true} pad="large">
+            <RecordList body={body} title={view.name}/>
+          </Box>
+        </Layer>
+      );
+
+      this.setState({
+        popupLayer: popupLayer
+      });
     });
   }
 
@@ -312,7 +331,7 @@ export default class AQL extends Component {
 
   _onClose() {
     this.setState({
-      viewsLayer: null
+      popupLayer: null
     });
   }
 
@@ -395,7 +414,7 @@ export default class AQL extends Component {
               <Box>
                 {this.state.data.rows.length > 0 && this.state.aql.form && this.state.aql.type &&
                 <Graph type={this.state.aql.type} data={this.state.data} config={this.state.aql.form}
-                       onClick={(filter) => console.log(filter.key + '=' + filter.value)}/>}
+                       onClick={(filter) => this._showViewRecords(filter, this.state.aql.view)}/>}
                 <Table>
                   <thead>
                   <tr>{header}</tr>
@@ -422,7 +441,7 @@ export default class AQL extends Component {
                   <Tab title="WorldMap"/>
                 </Tabs>
               }
-              {this.state.viewsLayer}
+              {this.state.popupLayer}
             </Split>
           </div>
         </Box>
