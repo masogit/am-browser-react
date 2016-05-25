@@ -1,6 +1,6 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-var Rest = require('grommet/utils/Rest');
+var Rest = require('./util/grommet-rest-promise');
 
 var RECONNECT_TIMEOUT = 5000; // 5s
 var POLL_TIMEOUT = 10000; // 10s

@@ -17,7 +17,7 @@ import Menu from 'grommet/components/Menu';
 //import Box from 'grommet/components/Box';
 import App from 'grommet/components/App';
 //import Status from 'grommet/components/icons/Status';
-import Rest from 'grommet/utils/Rest';
+import Rest from '../util/grommet-rest-promise';
 import {HOST_NAME} from '../util/Config';
 
 const links = [

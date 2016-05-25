@@ -1,7 +1,7 @@
 // import request from 'superagent-bluebird-promise';
 // import * as types from '../constants/ActionTypes';
 import {HOST_NAME} from '../util/Config';
-import Rest from 'grommet/utils/Rest';
+import Rest from '../util/grommet-rest-promise';
 
 export function saveWall(wall, callback) {
   Rest.post(HOST_NAME + '/coll/wall', wall).end((err, res) => {

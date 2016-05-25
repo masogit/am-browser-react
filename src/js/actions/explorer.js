@@ -2,7 +2,7 @@
  * Created by mansh on 4/25/2016.
  */
 import {HOST_NAME} from '../util/Config';
-import Rest from 'grommet/utils/Rest';
+import Rest from '../util/grommet-rest-promise';
 
 function param2aql(param) {
 

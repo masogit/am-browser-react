@@ -5,7 +5,7 @@ import 'index.scss';
 import React from 'react';
 import ReactDOM from 'react-dom';
 //import Router from 'react-router';
-import Rest from 'grommet/utils/Rest';
+import Rest from './util/grommet-rest-promise';
 //import RestWatch from './RestWatch';
 import {getCurrentLocale, getLocaleData} from 'grommet/utils/Locale';
 import {addLocaleData} from 'react-intl';

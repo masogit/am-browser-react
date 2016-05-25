@@ -52,7 +52,7 @@ export default class AlertForm extends Component {
 
 AlertForm.propTypes = {
   onClose: PropTypes.func.isRequired,
-  onConfirm: PropTypes.func.isOperational,
+  onConfirm: PropTypes.func.isRequired,
   title: PropTypes.string,
   desc: PropTypes.string,
   full: PropTypes.oneOf([true, 'horizontal', 'vertical', false]),

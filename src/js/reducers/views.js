@@ -3,7 +3,8 @@ import objectPath from 'object-path';
 import { REQUEST_VIEWS, RECEIVE_VIEWS_SUCCESS, RECEIVE_VIEWS_FAILURE, SET_SELECTED_VIEW,
   REQUEST_TEMPLATE_TABLE, RECEIVE_TEMPLATE_TABLE_SUCCESS, RECEIVE_TEMPLATE_TABLE_FAILURE,
   NEW_SELECTED_VIEW, UPDATE_SELECTED_VIEW, SYNC_SELECTED_VIEW, SAVE_VIEW_DEF, DELETE_TABLE_ROW,
-  DUPLICATE_VIEW_DEF, DELETE_VIEW_DEF, UPDATE_VIEW_DEF_LIST, OPEN_PREVIEW, CLOSE_PREVIEW}
+  DUPLICATE_VIEW_DEF, DELETE_VIEW_DEF, UPDATE_VIEW_DEF_LIST, OPEN_PREVIEW, CLOSE_PREVIEW,
+  ALERT_FORM}
   from '../constants/ActionTypes';
 import _ from 'lodash';
 import emptyViewDef from './EmptyViewDef.json';
@@ -17,7 +18,8 @@ const initialState = {
   templateTable: {},
   err: '',
   editing: false,
-  preview: false
+  preview: false,
+  alertForm: null
 };
 
 const createReverse = (reverse) => {
@@ -202,7 +204,8 @@ const handlers = {
   [DUPLICATE_VIEW_DEF]: (state, action) => {
     return {
       selectedView: action.selectedView,
-      editing: true
+      editing: true,
+      alertForm: action.alertForm
     };
   },
   [SYNC_SELECTED_VIEW]: (state, action) => {
@@ -248,7 +251,8 @@ const handlers = {
     return {
       selectedViewId: action.selectedViewId,
       selectedView: action.selectedView,
-      editing: action.editing
+      editing: action.editing,
+      alertForm: action.alertForm
     };
   },
   [DELETE_VIEW_DEF]: (state, action) => {
@@ -279,7 +283,13 @@ const handlers = {
     return {
       preview: action.preview
     };
+  },
+  [ALERT_FORM]: (state, action) => {
+    return {
+      alertForm: action.alertForm
+    };
   }
+
 };
 
 export default function viewsReducer(state = initialState, action) {

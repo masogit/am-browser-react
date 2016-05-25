@@ -1,6 +1,6 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import Rest from 'grommet/utils/Rest';
+import Rest from './util/grommet-rest-promise';
 //import history from './RouteHistory';
 //import Query from 'grommet-index/utils/Query';
 import IndexApi from './Api';

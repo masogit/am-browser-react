@@ -1,7 +1,7 @@
 /**
  * Created by huling on 5/4/2016.
  */
-import Rest from 'grommet/utils/Rest';
+import Rest from '../util/grommet-rest-promise';
 import {HOST_NAME} from '../util/Config';
 import history from '../RouteHistory';
 

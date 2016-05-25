@@ -30,6 +30,7 @@ class ViewDefListContainer extends Component {
     super(props);
     this.onValueChange = this.onValueChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+    this.onSaveSuccess = this.onSaveSuccess.bind(this);
     this.onDeleteTableRow = this.onDeleteTableRow.bind(this);
     this.onDuplicateViewDef = this.onDuplicateViewDef.bind(this);
     this.onDeleteViewDef = this.onDeleteViewDef.bind(this);
@@ -41,7 +42,7 @@ class ViewDefListContainer extends Component {
 
   componentDidMount() {
     // Initialize list data, called only once.
-    this.props.actions.loadViews(this.props.params.id, this.props.location.pathname, urlOfFirstRecord => {
+    this.props.actions.loadViews(this.props.params.id, this.props.location.pathname).then(urlOfFirstRecord => {
       if (urlOfFirstRecord) {
         history.push(urlOfFirstRecord);  // display the first record
       }
@@ -76,11 +77,23 @@ class ViewDefListContainer extends Component {
   }
 
   onSubmit() {
-    this.props.actions.saveViewDef(this.props.selectedView, (id) => {
+    this.props.actions.saveViewDef(this.props.selectedView).then((id) => {
       //this.props.actions.updateViewDefList(updatedView);
-      history.push("/views/" + id);
-      this.props.actions.loadViews(this.props.params.id, this.props.location.pathname);
-    });
+      //history.push("/views/" + id);
+      //this.props.actions.loadViews(id, this.props.location.pathname);
+    }, (err) => console.log("onSubmit - err: " + err));
+  }
+
+  onSaveSuccess() {
+    let {selectedViewId} = this.props;
+    if (selectedViewId) {
+      //history.push("/views/" + selectedViewId);
+      this.props.actions.loadViews(selectedViewId, this.props.location.pathname).then((res) => {
+        history.push("/views/" + selectedViewId);
+      }, (err) => {
+        console.log("onSaveSuccess - err: " + err);
+      });
+    }
   }
 
   onDeleteTableRow(event) {
@@ -93,7 +106,7 @@ class ViewDefListContainer extends Component {
   }
 
   onDeleteViewDef() {
-    this.props.actions.deleteViewDef(this.props.selectedView, (id) => {
+    this.props.actions.confirmDeleteViewDef(this.props.selectedView, (id) => {
       if (!this.props.selectedViewId) { // all records deleted
         history.push("/views");
       }
@@ -112,12 +125,15 @@ class ViewDefListContainer extends Component {
       <div>
         <div style={{display: "flex"}}>
           <ViewDefList views={views} isFetchingViewList={isFetchingViewList} {...boundActionCreators}/>
+
           <div style={{width: "90%"}}>
             <Box pad={{horizontal: 'small'}}>
               <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange}
-                             onSubmit={this.onSubmit} onDeleteTableRow={this.onDeleteTableRow}
+                             onSubmit={this.onSubmit} onSaveSuccess={this.onSaveSuccess}
+                             onDeleteTableRow={this.onDeleteTableRow}
                              onDuplicateViewDef={this.onDuplicateViewDef}
-                             onDeleteViewDef={this.onDeleteViewDef} {...boundActionCreators}/>
+                             onDeleteViewDef={this.onDeleteViewDef}
+                             alertForm={this.props.alertForm} {...boundActionCreators}/>
             </Box>
           </div>
         </div>
@@ -133,7 +149,8 @@ let mapStateToProps = (state) => {
     selectedView: state.views.selectedView,
     selectedViewId: state.views.selectedViewId,
     templateTable: state.views.templateTable,
-    preview: state.views.preview
+    preview: state.views.preview,
+    alertForm: state.views.alertForm
   };
 };
 

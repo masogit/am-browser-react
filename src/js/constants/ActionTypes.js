@@ -16,3 +16,4 @@ export const DUPLICATE_VIEW_DEF = 'DUPLICATE_VIEW_DEF';
 export const DELETE_VIEW_DEF = 'DELETE_VIEW_DEF';
 export const OPEN_PREVIEW = 'OPEN_PREVIEW';
 export const CLOSE_PREVIEW = 'CLOSE_PREVIEW';
+export const ALERT_FORM = 'ALERT_FORM';

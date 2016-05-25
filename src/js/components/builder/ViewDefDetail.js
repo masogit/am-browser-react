@@ -15,6 +15,7 @@ import _ from 'lodash';
 //import store from '../../store';
 //import { setSelectedView, loadTemplateTable } from '../../actions/views';
 //import GrommetTableTest from '../GrommetTable';
+import AlertForm from '../../components/commons/AlertForm';
 
 export default class ViewDefDetail extends Component {
 
@@ -208,7 +209,24 @@ export default class ViewDefDetail extends Component {
   }
 
   render() {
-    const { selectedView } = this.props;
+    let { selectedView, closeAlertForm, onDeleteViewDef, onSaveSuccess } = this.props;
+    let alertForms = selectedView ? {
+      save: <AlertForm onClose={closeAlertForm}
+                       title={"Save view definition"}
+                       desc={"'" + selectedView.name + "' saved successfully."}
+                       onConfirm={onSaveSuccess}/>,
+      duplicate: <AlertForm onClose={closeAlertForm}
+                            title={"Duplicate view definition"}
+                            desc={"View definition duplicated as '" + selectedView.name + "'."}
+                            onConfirm={closeAlertForm}/>,
+      delete: <AlertForm onClose={closeAlertForm}
+                         title={'Delete view definition'}
+                         desc={"You're about to delete '" + selectedView.name + "', continue?"}
+                         onConfirm={onDeleteViewDef}/>
+    } : {};
+
+    //console.log("alertForms[this.props.alertForm]:");
+    //console.log(this.props.alertForm);
     let p = "input";
     let tableHeader = (
       <tr>
@@ -226,7 +244,7 @@ export default class ViewDefDetail extends Component {
           <Menu direction="row" align="center" responsive={false}>
             <Anchor link="#" icon={<Checkmark />} onClick={this.props.onSubmit}>Save</Anchor>
             <Anchor link="#" icon={<Duplicate />} onClick={this.props.onDuplicateViewDef}>Duplicate</Anchor>
-            <Anchor link="#" icon={<Close />} onClick={this.props.onDeleteViewDef}>Delete</Anchor>
+            <Anchor link="#" icon={<Close />} onClick={this.props.deleteViewDef}>Delete</Anchor>
             <Anchor link="#" icon={<Play />} onClick={this.props.openPreview}>Query</Anchor>
           </Menu>
         </Header>
@@ -271,7 +289,7 @@ export default class ViewDefDetail extends Component {
             </Box>
           </div>
           }
-
+          {alertForms[this.props.alertForm]}
         </div>
       </Box>
     );
