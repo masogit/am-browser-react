@@ -18,8 +18,6 @@ import {
   Form,
   FormField,
   Layer,
-  List,
-  ListItem,
   Header,
   Tabs,
   Tab,
@@ -257,14 +255,16 @@ export default class AQL extends Component {
     var viewsLayer = (
       <Layer onClose={this._onClose.bind(this)} closer={true} align="left">
         <Box full="vertical" justify="center">
-          <Box pad={{vertical: 'medium'}}><Title>Views Selector ({this.state.views.length})</Title></Box>
+          <Box pad={{vertical: 'medium'}}>
+            <Title>Views Selector ({this.state.views.length})</Title>
+          </Box>
           <GroupList pad={{vertical: 'small'}} searchable={true}>
             {
               this.state.views.map((view) => {
                 return (
                   <GroupListItem key={view._id} groupby={view.category} search={view.name}
-                                 pad="small">
-                    <Anchor href="#" onClick={this._attachView.bind(this, view)}>{view.name}</Anchor>
+                                 pad="small" onClick={this._attachView.bind(this, view)}>
+                    {view.name}
                   </GroupListItem>
                 );
               })
@@ -276,6 +276,38 @@ export default class AQL extends Component {
     this.setState({
       viewsLayer: viewsLayer
     });
+  }
+
+  _selectReports() {
+    var viewsLayer = (
+      <Layer onClose={this._onClose.bind(this)} closer={true} align="left">
+        <Box full="vertical" justify="center">
+          <Box pad={{vertical: 'medium'}}><Title>AQL Selector ({this.state.views.length})</Title></Box>
+          <GroupList pad={{vertical: 'small'}} searchable={true}>
+            {
+              this.state.reports.entities &&
+              this.state.reports.entities.map((report) => {
+                return (
+                  <GroupListItem key={report['ref-link']} groupby={this._getFieldStrVal(report.seType)}
+                                 search={report.Name} pad="small" onClick={this._loadOOBAQL.bind(this, report)}>
+                    {report.Name}
+                  </GroupListItem>
+                );
+              })
+            }
+          </GroupList>
+        </Box>
+      </Layer>
+    );
+    this.setState({
+      viewsLayer: viewsLayer
+    });
+  }
+
+  _getFieldStrVal(val) {
+    if (val instanceof Object)
+      val = val[Object.keys(val)[0]];
+    return val;
   }
 
   _onClose() {
@@ -303,36 +335,25 @@ export default class AQL extends Component {
     };
 
     const sideBar = (
-      <Sidebar primary={true} pad="small" fixed={false} full={false} separator="right">
-        <Tabs initialIndex={0} justify="start">
-          <Tab title={'AQLs ('+this.state.aqls.length+')'}>
-            <GroupList pad={{vertical: 'small'}} selectable={true} searchable={true}>
-              {
-                this.state.aqls.map((aql) => {
-                  return (
-                    <GroupListItem key={aql._id} groupby={aql.category} onClick={this._loadAQL.bind(this, aql)}
-                                   search={aql.name} pad="small">
-                      {aql.name}
-                    </GroupListItem>
-                  );
-                })
-              }
-            </GroupList>
-          </Tab>
-          <Tab title={this.state.reports.count?`Repository (${this.state.reports.count})`:'Repository'}>
-            <List selectable={true}>
-              {
-                this.state.reports.entities &&
-                this.state.reports.entities.map((report) => {
-                  return (
-                    <ListItem key={report['ref-link']}
-                              onClick={this._loadOOBAQL.bind(this, report)}>{report.Name}</ListItem>
-                  );
-                })
-              }
-            </List>
-          </Tab>
-        </Tabs>
+      <Sidebar primary={true} pad="small" fixed={false} full={false} direction="column" separator="right">
+        <Header justify="between">
+          <Title>Graphs ({this.state.aqls.length})</Title>
+          <Menu direction="row" align="center" responsive={false}>
+            <Anchor href="#" icon={<Add />} label="InToolReport" onClick={this._selectReports.bind(this)}/>
+          </Menu>
+        </Header>
+        <GroupList pad={{vertical: 'small'}} selectable={true} searchable={true}>
+          {
+            this.state.aqls.map((aql) => {
+              return (
+                <GroupListItem key={aql._id} groupby={aql.category} onClick={this._loadAQL.bind(this, aql)}
+                               search={aql.name} pad="small">
+                  {aql.name}
+                </GroupListItem>
+              );
+            })
+          }
+        </GroupList>
       </Sidebar>
     );
 
@@ -343,7 +364,7 @@ export default class AQL extends Component {
           <div>
             {this.state.alertLayer}
             <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
-              <Title>AM Insight</Title>
+              <Title>AQL and Graph</Title>
               <Menu direction="row" align="center" responsive={false}>
                 <Anchor link="#" icon={<Play />} onClick={this._onQuery.bind(this)}>Query</Anchor>
                 <Anchor link="#" icon={<Add />} onClick={this._onNew.bind(this)}>New</Anchor>
