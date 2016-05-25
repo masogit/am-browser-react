@@ -1,6 +1,5 @@
 @echo off
 set SCRIPTPATH=%~dp0
-set JAVA_HOME=C:\SEL\Software\Java\jdk1.7.0_79
 set JAVA_LIB_PATH=%SCRIPTPATH%\x64
 set CATALINA_HOME=%SCRIPTPATH%\apache-tomcat-8.0.18
 set CATALINA_BASE=%SCRIPTPATH%\apache-tomcat-8.0.18
