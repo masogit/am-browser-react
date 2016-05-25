@@ -10,21 +10,20 @@ import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
 import RecordList from '../explorer/RecordList';
 import ActionTab from '../commons/ActionTab';
+import Sidebar from '../commons/Sidebar';
 
 import {
   Anchor,
   Box,
-  Sidebar,
   Split,
   Form,
   FormField,
   Layer,
-  Header,
   Tabs,
   Tab,
   Table,
   TableRow,
-  Title,
+  Title, Header,
   Menu
 } from 'grommet';
 import Play from 'grommet/components/icons/base/Play';
@@ -354,32 +353,25 @@ export default class AQL extends Component {
       return 0;
     };
 
-    const sideBar = (
-      <Sidebar primary={true} pad="small" fixed={false} full={false} direction="column" separator="right">
-        <Header justify="between">
-          <Title>Graphs ({this.state.aqls.length})</Title>
-          <Menu direction="row" align="center" responsive={false}>
-            <Anchor href="#" icon={<Add />} label="InToolReport" onClick={this._selectReports.bind(this)}/>
-          </Menu>
-        </Header>
-        <GroupList pad={{vertical: 'small'}} selectable={true} searchable={true}>
-          {
-            this.state.aqls.map((aql) => {
-              return (
-                <GroupListItem key={aql._id} groupby={aql.category} onClick={this._loadAQL.bind(this, aql)}
-                               search={aql.name} pad="small">
-                  {aql.name}
-                </GroupListItem>
-              );
-            })
-          }
-        </GroupList>
-      </Sidebar>
+    const menu = <Anchor href="#" icon={<Add />} label="InToolReport" onClick={this._selectReports.bind(this)}/>;
+    const contents = (
+      <GroupList pad={{vertical: 'small'}} selectable={true} searchable={true}>
+        {
+          this.state.aqls.map((aql) => {
+            return (
+              <GroupListItem key={aql._id} groupby={aql.category} onClick={this._loadAQL.bind(this, aql)}
+                             search={aql.name} pad="small">
+                {aql.name}
+              </GroupListItem>
+            );
+          })
+        }
+      </GroupList>
     );
 
     return (
       <Split flex="right">
-        {sideBar}
+        <Sidebar title={`Graphs (${this.state.aqls.length})`} menu={menu} contents={contents}/>
         <Box pad={{horizontal: 'small'}}>
           <div>
             {this.state.alertLayer}

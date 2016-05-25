@@ -65,7 +65,6 @@ export default class GroupList extends Component {
     var grouped = this._getGroupedChildren(children);
 
     return (
-
       <Box direction="column">
         {
           this.props.searchable &&
@@ -73,25 +72,27 @@ export default class GroupList extends Component {
         }
         {
           Object.keys(grouped).map((key, i) => {
-            return (<Box key={i} direction="column">
-              <List>
+            return (
+              <Box key={i} direction="column">
                 <ListItem {...this.props} justify="between" direction="row" separator="none"
-                          onClick={this._expandToggle.bind(this, key)}>
+                                          onClick={this._expandToggle.bind(this, key)}>
                   <Anchor href="#" label={key} icon={(this.state.expand===key)?<Down />:<Next />}/>
                   {grouped[key].length}
                 </ListItem>
-              </List>
-              {
-                this.state.expand === key &&
-                <List {...this.props}>
-                  {
-                    grouped[key].map((child) => {
-                      return child;
-                    })
-                  }
-                </List>
-              }
-            </Box>);
+                {
+                  this.state.expand === key &&
+                  <Box pad={{horizontal: 'medium'}}>
+                    <List {...this.props} className='test'>
+                      {
+                        grouped[key].map((child) => {
+                          return child;
+                        })
+                      }
+                    </List>
+                  </Box>
+                }
+              </Box>
+            );
           })
         }
       </Box>
