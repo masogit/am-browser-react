@@ -394,7 +394,7 @@ export default class AQL extends Component {
                 </Anchor>
               </Menu>
             </Header>
-            <Box justify="between" direction="row" pad={{between:'medium'}} size="small">
+            <Box justify="between" direction="row" pad={{between:'medium'}} size="small" pad='small'>
               <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_Box">
               <textarea id="AQL_Box" name="str" value={this.state.aql.str} rows="3"
                         onChange={this._setFormValues.bind(this)}/>
@@ -411,8 +411,8 @@ export default class AQL extends Component {
               </Form>
             </Box>
             <Split flex="left" fixed={false}>
-              <Box>
-                {this.state.data.rows.length > 0 && this.state.aql.form && this.state.aql.type &&
+              <Box pad='small'>
+                {this.state.data && this.state.aql.form && this.state.aql.type &&
                 <Graph type={this.state.aql.type} data={this.state.data} config={this.state.aql.form}
                        onClick={(filter) => this._showViewRecords(filter, this.state.aql.view)}/>}
                 <Table>
@@ -425,21 +425,24 @@ export default class AQL extends Component {
                 </Table>
               </Box>
               {
-                this.state.data && this.state.aql.form &&
-                <Tabs initialIndex={getIndex(this.state.aql.type)} justify="start">
-                  <ActionTab title="Chart" onClick={this._genGraph.bind(this, null, 'chart')} ref='chart'>
-                    <ChartForm {...this.state.aql} genGraph={this._genGraph.bind(this)} data={this.state.data}/>
-                  </ActionTab>
-                  <ActionTab title="Meter" onClick={this._genGraph.bind(this, null, 'meter')} ref='meter'>
-                    <MeterForm {...this.state.aql} genGraph={this._genGraph.bind(this)} data={this.state.data}/>
-                  </ActionTab>
-                  <ActionTab title="Distribution" onClick={this._genGraph.bind(this, null, 'distribution')}
-                             ref='distribution'>
-                    <DistributionForm {...this.state.aql} genGraph={this._genGraph.bind(this)} data={this.state.data}/>
-                  </ActionTab>
-                  <Tab title="Value"/>
-                  <Tab title="WorldMap"/>
-                </Tabs>
+                this.state.data && this.state.aql.type &&
+                <Box pad='small'>
+                  <Tabs initialIndex={getIndex(this.state.aql.type)} justify="end">
+                    <ActionTab title="Chart" onClick={this._genGraph.bind(this, null, 'chart')} ref='chart'>
+                      <ChartForm {...this.state.aql} genGraph={this._genGraph.bind(this)} data={this.state.data}/>
+                    </ActionTab>
+                    <ActionTab title="Meter" onClick={this._genGraph.bind(this, null, 'meter')} ref='meter'>
+                      <MeterForm {...this.state.aql} genGraph={this._genGraph.bind(this)} data={this.state.data}/>
+                    </ActionTab>
+                    <ActionTab title="Distribution" onClick={this._genGraph.bind(this, null, 'distribution')}
+                               ref='distribution'>
+                      <DistributionForm {...this.state.aql} genGraph={this._genGraph.bind(this)}
+                                                            data={this.state.data}/>
+                    </ActionTab>
+                    <Tab title="Value"/>
+                    <Tab title="WorldMap"/>
+                  </Tabs>
+                </Box>
               }
               {this.state.popupLayer}
             </Split>

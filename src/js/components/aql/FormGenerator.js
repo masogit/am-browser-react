@@ -1,4 +1,6 @@
 import React, {Component} from 'react';
+const Next = require('grommet/components/icons/base/Next');
+const Previous = require('grommet/components/icons/base/Previous');
 import {
   CheckBox,
   // Split,
@@ -6,28 +8,43 @@ import {
   FormFields,
   FormField,
   NumberInput,
-  Tabs,
-  Tab
+  Box,
+  Footer,
+  Anchor
 } from 'grommet';
 
-const FormContainer = ({basicOptions, advanceOptions, form, selections}) => (
-  <Tabs initialIndex={0} justify="end">
-    <Tab title="Basic">
-      <Form pad="none" compact={true}>
+const FormContainer = ({basicOptions, advanceOptions, form, selections}) => {
+  const showAdvance = form.state.showAdvance;
+  let label, icon, formFields;
+  const advance = genOptions(advanceOptions, form, form.state.type, selections);
+  const basic = genOptions(basicOptions, form, form.state.type, selections);
+  formFields = basic;
+  if (!showAdvance) {
+    label = 'advance';
+    icon = <Next />;
+    formFields = basic;
+  } else {
+    label = 'basic';
+    icon = <Previous />;
+    formFields = advance;
+  }
+
+  return (
+    <Box>
+      <Form>
         <FormFields>
-          {genOptions(basicOptions, form, form.state.type, selections)}
+          {formFields}
         </FormFields>
       </Form>
-    </Tab>
-    <Tab title="Advance">
-      <Form pad="none" compact={true}>
-        <FormFields>
-          {genOptions(advanceOptions, form, form.state.type, selections)}
-        </FormFields>
-      </Form>
-    </Tab>
-  </Tabs>
-);
+      { advance.length > 0 &&
+      <Footer justify="end">
+        <Anchor icon={icon} label={label} reverse={!showAdvance}
+                onClick={() => form.setState({showAdvance: !showAdvance})}/>
+      </Footer>
+      }
+    </Box>
+  );
+};
 
 const SelectField = ({label, name, value, onChange, options}) => {
   const optionsComp = options.map(option=>
@@ -48,14 +65,13 @@ const InputField = ({label, name, value, onChange}) => (
 );
 
 const SwitchField = ({label, checked, name, onChange}) => (
-  <FormField label={label} key={name}>
-    <CheckBox checked={checked} id={name} name={name} toggle={true} onChange={onChange}/>
+  <FormField key={name}>
+    <CheckBox checked={checked} label={label} toggle={true} id={name} name={name} onChange={onChange}/>
   </FormField>
 );
 
 const MultiCheckField = ({label, options}) => {
-  const optionsComp = options.map(option=>
-    (
+  const optionsComp = options.map(option=> (
       <CheckBox key={option.id} id={option.id} name={option.name}
                 label={option.label} checked={option.checked} onChange={option.onChange}/>
     ));
@@ -68,7 +84,8 @@ const MultiCheckField = ({label, options}) => {
 
 const NumberField = ({label, name, value, onChange}) => (
   <FormField label={label} key={name}>
-    <NumberInput name={name} value={value} onChange={onChange}/>
+    {/*<input type='range' name={name} value={value} onChange={onChange}/>*/}
+    <NumberInput name={name} value={value / 1.0} onChange={onChange}/>
   </FormField>
 );
 

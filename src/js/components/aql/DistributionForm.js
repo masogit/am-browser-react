@@ -1,6 +1,6 @@
 import GraphForm from './FormGenerator';
 
-export default class ChartForm extends GraphForm {
+export default class DistributionForm extends GraphForm {
 
   constructor() {
     super();

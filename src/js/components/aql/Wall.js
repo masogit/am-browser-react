@@ -261,7 +261,8 @@ export default class Wall extends Component {
               <Box pad="large" colorIndex="light-2">
                 <Header>{dataMap.aql.name}</Header>
                 {
-                  <Box pad="large" align={(dataMap.aql.type=='meter')?'center':''} full="horizontal">
+                  <Box key={dataMap.aql._id} pad="large" align={(dataMap.aql.type=='meter')?'center':''}
+                       full="horizontal">
                     <Graph type={dataMap.aql.type} data={dataMap.data}
                            config={dataMap.aql.form}
                            onClick={(filter) => console.log(filter.key + '=' + filter.value)}/>
