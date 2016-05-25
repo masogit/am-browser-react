@@ -1,4 +1,5 @@
 {
+  "Nexus": "http://svs-spm-nexus.hpeswlab.net/nexus/content/repositories/local-assetmanager-snapshot/",
   "DSN": "AMBrowser",
   "Description": "AMBrowser",
   "SERVER": "(local)",

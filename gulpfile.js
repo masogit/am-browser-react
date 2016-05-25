@@ -192,7 +192,7 @@ gulp.task('gen', ['copy-temp'], function () {
 gulp.task('download-ws-metadata-xml', function () {
   console.log('Download ws metadata xml');
   // download ws metadata xml
-  return download('http://svs-spm-nexus.hpeswlab.net/nexus/content/repositories/local-assetmanager-snapshot/com/hp/am/java/ac.ws/MAIN-SNAPSHOT/maven-metadata.xml')
+  return download(config.Nexus + 'com/hp/am/java/ac.ws/MAIN-SNAPSHOT/maven-metadata.xml')
 	  .pipe(gulp.dest('./rest/downloads/'));
 });
 
@@ -208,7 +208,7 @@ gulp.task('parse-ws-metadata-xml', ['download-ws-metadata-xml'], function () {
 gulp.task('download-ws', ['parse-ws-metadata-xml'], function () {
   console.log('Download ws');
   var json = require('./rest/downloads/json/maven-metadata.json');
-  var url = 'http://svs-spm-nexus.hpeswlab.net/nexus/content/repositories/local-assetmanager-snapshot/com/hp/am/java/ac.ws/MAIN-SNAPSHOT/ac.ws-MAIN-'
+  var url = config.Nexus + 'com/hp/am/java/ac.ws/MAIN-SNAPSHOT/ac.ws-MAIN-'
       + json.metadata.versioning[0].snapshot[0].timestamp + '-' + json.metadata.versioning[0].snapshot[0].buildNumber + '.war';
   console.log('Ws url is : ' + url);
   // download ws
@@ -226,30 +226,38 @@ gulp.task('gen-ws-base', ['clean-gen-ws', 'download-ws'], function () {
   console.log('Generate ws package');
   // copy folder and files
   var copy_properties= gulp.src('./rest/package.properties')
-      .pipe(gulp.dest('./rest/gen/websvc'));
+      .pipe(gulp.dest('./rest/gen/temp/websvc'));
   var copy_bat = gulp.src('./rest/*.bat')
-      .pipe(gulp.dest('./rest/gen'));
+      .pipe(gulp.dest('./rest/gen/temp'));
   // copy x64 folder
   var copy_x64 = gulp.src('./rest/x64/**')
-      .pipe(gulp.dest('./rest/gen/x64'));
+      .pipe(gulp.dest('./rest/gen/temp/x64'));
   var rename_war = gulp.src('./rest/downloads/*.war')
       .pipe(rename({basename: 'AssetManagerWebService'}))
-      .pipe(gulp.dest('./rest/gen/websvc'));
+      .pipe(gulp.dest('./rest/gen/temp/websvc'));
   // unzip tomcat instance
   var unzip_tomcat = gulp.src('./rest/apache-tomcat-8.0.18-windows-x64.zip', {base : '.'})
       .pipe(unzip())
-      .pipe(gulp.dest('./rest/gen'));
+      .pipe(gulp.dest('./rest/gen/temp'));
   // unzip deploy
-  var unzip_deploy = gulp.src('./rest/deploy.zip', {base : '.'})
+  var unzip_deploy = gulp.src('./rest/*.zip', {base : '.'})
       .pipe(unzip())
-      .pipe(gulp.dest('./rest/gen'));
+      .pipe(gulp.dest('./rest/gen/temp'));
   return merge(copy_properties, copy_bat, copy_x64, rename_war, unzip_tomcat, unzip_deploy);
 });
 
-gulp.task('gen-ws', ['gen-ws-base'], function () {
-  console.log('Generate ws package');
+gulp.task('gen-ws-conf', ['gen-ws-base'], function () {
+  console.log('Copy ws conf');
   // generate ws package
-  return gulp.src('./rest/conf/**').pipe(gulp.dest('./rest/gen/apache-tomcat-8.0.18/conf'));
+  return gulp.src('./rest/conf/**').pipe(gulp.dest('./rest/gen/temp/apache-tomcat-8.0.18/conf'));
+});
+
+gulp.task('gen-ws', ['gen-ws-conf'], function () {
+  console.log('Generate am-browser-rest.zip from temp folder');
+  // generate am-browser-rest.zip from temp folder
+  return gulp.src('./rest/gen/temp/**')
+      .pipe(zip('am-browser-rest.zip'))
+      .pipe(gulp.dest('./rest/gen'));
 });
 
 gulp.task('register-odbc', function () {
