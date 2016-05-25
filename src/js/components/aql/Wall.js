@@ -258,11 +258,15 @@ export default class Wall extends Component {
           Object.keys(data).map((key)=> {
             const dataMap = data[key];
             return (
-              <Box align="center" pad="large" colorIndex="light-2">
+              <Box pad="large" colorIndex="light-2">
                 <Header>{dataMap.aql.name}</Header>
-                {<Graph type={dataMap.aql.type} data={dataMap.data}
-                        config={dataMap.aql.form}
-                        onClick={(filter) => console.log(filter.key + '=' + filter.value)}/>}
+                {
+                  <Box pad="large" align={(dataMap.aql.type=='meter')?'center':''} full="horizontal">
+                    <Graph type={dataMap.aql.type} data={dataMap.data}
+                           config={dataMap.aql.form}
+                           onClick={(filter) => console.log(filter.key + '=' + filter.value)}/>
+                  </Box>
+                }
               </Box>
             );
           })
