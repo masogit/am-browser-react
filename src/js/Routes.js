@@ -2,7 +2,6 @@
 
 import Ferret from './components/Ferret';
 import Login from './components/Login';
-import Home from './components/Home';
 import Search from './components/explorer/Search';
 import RecordSearch from './components/explorer/RecordSearch';
 import Wall from './components/aql/Wall';
@@ -23,7 +22,6 @@ export const getRoutes = () => {
 
   const allRoutes = [
     {path: 'login', component: Login},
-    {path: 'home', component: Home},
     {path: 'search', component: Search},
     {path: 'search(/:keyword)', component: RecordSearch},
     {path: 'wall', component: Wall},
