@@ -36,7 +36,7 @@ const FormContainer = ({basicOptions, advanceOptions, form, selections}) => {
           {formFields}
         </FormFields>
       </Form>
-      { advance.length > 0 &&
+      {advance.length > 0 &&
       <Footer justify="end">
         <Anchor icon={icon} label={label} reverse={!showAdvance}
                 onClick={() => form.setState({showAdvance: !showAdvance})}/>

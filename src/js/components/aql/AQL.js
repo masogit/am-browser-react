@@ -395,7 +395,7 @@ export default class AQL extends Component {
                 </Anchor>
               </Menu>
             </Header>
-            <Box justify="between" direction="row" pad={{between:'medium'}} size="small" pad='small'>
+            <Box justify="between" direction="row" size="small" pad='small'>
               <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_Box">
               <textarea id="AQL_Box" name="str" value={this.state.aql.str} rows="3"
                         onChange={this._setFormValues.bind(this)}/>
