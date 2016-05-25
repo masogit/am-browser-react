@@ -14,6 +14,7 @@ var merge = require('merge-stream');
 var download = require("gulp-download");
 var xml2json = require('gulp-xml2json');
 var rename = require('gulp-rename');
+var config = require('./rest/config.json');
 
 var opts = {
   base: '.',
@@ -224,10 +225,13 @@ gulp.task('clean-gen-ws', function () {
 gulp.task('gen-ws-base', ['clean-gen-ws', 'download-ws'], function () {
   console.log('Generate ws package');
   // copy folder and files
-  var copy_deploy = gulp.src('./rest/install/**')
-      .pipe(gulp.dest('./rest/gen/deploy'));
-  var copy_file = gulp.src('./rest/package.properties')
+  var copy_properties= gulp.src('./rest/package.properties')
       .pipe(gulp.dest('./rest/gen/websvc'));
+  var copy_bat = gulp.src('./rest/*.bat')
+      .pipe(gulp.dest('./rest/gen'));
+  // copy x64 folder
+  var copy_x64 = gulp.src('./rest/x64/**')
+      .pipe(gulp.dest('./rest/gen/x64'));
   var rename_war = gulp.src('./rest/downloads/*.war')
       .pipe(rename({basename: 'AssetManagerWebService'}))
       .pipe(gulp.dest('./rest/gen/websvc'));
@@ -235,13 +239,22 @@ gulp.task('gen-ws-base', ['clean-gen-ws', 'download-ws'], function () {
   var unzip_tomcat = gulp.src('./rest/apache-tomcat-8.0.18-windows-x64.zip', {base : '.'})
       .pipe(unzip())
       .pipe(gulp.dest('./rest/gen'));
-  return merge(copy_deploy, copy_file, rename_war, unzip_tomcat);
+  // unzip deploy
+  var unzip_deploy = gulp.src('./rest/deploy.zip', {base : '.'})
+      .pipe(unzip())
+      .pipe(gulp.dest('./rest/gen'));
+  return merge(copy_properties, copy_bat, copy_x64, rename_war, unzip_tomcat, unzip_deploy);
 });
 
 gulp.task('gen-ws', ['gen-ws-base'], function () {
   console.log('Generate ws package');
   // generate ws package
   return gulp.src('./rest/conf/**').pipe(gulp.dest('./rest/gen/apache-tomcat-8.0.18/conf'));
+});
+
+gulp.task('register-odbc', function () {
+  console.log('Register am browser odbc');
+  return spawn('C:/Windows/System32/odbcconf.exe', ['CONFIGSYSDSN', 'SQL Server', 'DSN=' + config.DSN + '|Description=' + config.Description + '|SERVER=' + config.SERVER + '|Trusted_Connection=no|Database=' + config.Database], {stdio: 'inherit'});
 });
 
 gulpTasks(gulp, opts);
