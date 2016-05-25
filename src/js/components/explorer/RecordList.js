@@ -14,6 +14,7 @@ import Ascend from 'grommet/components/icons/base/Ascend';
 import Descend from 'grommet/components/icons/base/Descend';
 import Download from 'grommet/components/icons/base/Download';
 import * as ExplorerActions from '../../actions/explorer';
+import * as Format from '../../constants/RecordFormat';
 export default class RecordList extends Component {
 
   constructor() {
@@ -46,7 +47,7 @@ export default class RecordList extends Component {
       }
       return !field.PK &&
         <option key={index} value={JSON.stringify(field)}>
-          {this._getDisplayLabel(field)}
+          {Format.getDisplayLabel(field)}
         </option>;
     });
     this.setState({
@@ -120,23 +121,6 @@ export default class RecordList extends Component {
     }
   }
 
-  _getFieldStrVal(record, field) {
-    var val = record[field.sqlname];
-    if (field.user_type && field.user_type == 'System Itemized List')
-      val = val[Object.keys(val)[0]];
-    else if (field.type && field.type.indexOf('Date') > -1) {
-      var d = new Date(val * 1000);
-      val = d.toLocaleString();
-    } else if (val instanceof Object)
-      val = val[Object.keys(val)[0]];
-
-    return val;
-  }
-
-  _getDisplayLabel(field) {
-    return field.alias ? field.alias : (field.label ? field.label : field.sqlname);
-  }
-
   _filterAdd(event) {
     if (event.keyCode === 13 && event.target.value.trim()) {
       if (this.state.aqlInput) {
@@ -206,7 +190,7 @@ export default class RecordList extends Component {
 
       records.forEach((record) => {
         var val = record[field.sqlname];
-        val = this._getFieldStrVal(record, field);
+        val = Format.getFieldStrVal(record, field);
 
         var group = groups.filter(function (group) {
           return group.label == val; //_getFieldStrVal(record, field);
@@ -264,7 +248,7 @@ export default class RecordList extends Component {
       return !field.PK && index <= this.state.numColumn &&
         <th key={index}>
           <Anchor href="#" reverse={true} icon={this._showOrderByIcon(field.sqlname)}
-                  label={this._getDisplayLabel(field)}
+                  label={Format.getDisplayLabel(field)}
                   onClick={this._orderBy.bind(this, field.sqlname)}/>
         </th>;
     });
@@ -275,7 +259,7 @@ export default class RecordList extends Component {
           body.fields.map((field, tdindex) => {
             return !field.PK && tdindex <= this.state.numColumn &&
               <td key={tdindex}>
-                {this._getFieldStrVal(record, field)}
+                {Format.getFieldStrVal(record, field)}
               </td>;
           })
         }

@@ -19,7 +19,6 @@ module.exports = function (am) {
       headers: (auth) ? {
         "Content-Type": "application/json",
         "Authorization": auth
-        // "CSRFToken": getCookie('CSRFToken')
       } : undefined
     };
 
@@ -69,30 +68,10 @@ module.exports = function (am) {
 
 };
 
-
-String.prototype.isEmpty = function () {
-  return (this.length === 0 || !this.trim());
-};
-
-const getCookie = (cname) => {
-  var name = cname + "=";
-  var ca = document.cookie.split(';');
-  for (var i = 0; i < ca.length; i++) {
-    var c = ca[i];
-    while (c.charAt(0) == ' ') {
-      c = c.substring(1);
-    }
-    if (c.indexOf(name) == 0) {
-      return c.substring(name.length, c.length);
-    }
-  }
-  return "";
-};
-
 function getFormattedRecords(fields, rawRecords) {
   var records = [];
   rawRecords.forEach((rawRecord) => {
-    var record = {Self: rawRecord.self};
+    var record = {Self: escapeStr(rawRecord.self)};
     fields.forEach((field) => {
       if (!field.PK)
         record[getDisplayLabel(field)] = getFieldStrVal(rawRecord, field);
@@ -107,14 +86,21 @@ function getFieldStrVal(record, field) {
   if (field.user_type && field.user_type == 'System Itemized List')
     val = val[Object.keys(val)[0]];
   else if (field.type && field.type.indexOf('Date') > -1) {
-    var d = new Date(val);
+    var d = new Date(val * 1000);
     val = d.toLocaleString();
   } else if (val instanceof Object)
     val = val[Object.keys(val)[0]];
 
-  return val;
+  return escapeStr(val);
 }
 
+function escapeStr(val) {
+  if (typeof val == 'string') {
+    val = val.replace(/"/g, '""');
+    return '"' + val + '"';
+  } else
+    return val;
+}
 
 function getDisplayLabel(field) {
   return field.alias ? field.alias : (field.label ? field.label : field.sqlname);
