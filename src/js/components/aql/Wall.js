@@ -26,7 +26,7 @@ export default class Wall extends Component {
     super();
     this.state = {
       edit: false,
-      carousel: true,
+      carousel: false,
       aqls: [],
       box: {
         direction: 'row',
