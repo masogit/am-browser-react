@@ -106,7 +106,7 @@ function getFieldStrVal(record, field) {
   var val = record[field.sqlname];
   if (field.user_type && field.user_type == 'System Itemized List')
     val = val[Object.keys(val)[0]];
-  else if (field.type && field.type == 'Date+Time') {
+  else if (field.type && field.type.indexOf('Date') > -1) {
     var d = new Date(val);
     val = d.toLocaleString();
   } else if (val instanceof Object)
