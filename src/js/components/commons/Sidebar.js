@@ -7,8 +7,7 @@ import { Title, Header, Sidebar, Menu } from 'grommet';
 
 export default ({title, menu, contents}) => {
   return (
-    <Sidebar primary={true} pad={{horizontal: 'medium'}} fixed={false} full={false} direction="column"
-             separator="right">
+    <Sidebar primary={true} pad={{horizontal: 'medium'}} fixed={false} separator="right">
       <Header justify="between">
         <Title>{title}</Title>
         {menu &&

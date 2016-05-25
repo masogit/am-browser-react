@@ -5,7 +5,6 @@ import Box from 'grommet/components/Box';
 import GroupList from './../commons/GroupList';
 import GroupListItem from './../commons/GroupListItem';
 import Sidebar from '../commons/Sidebar';
-import Title from 'grommet/components/Title';
 
 export default class Explorer extends Component {
 
