@@ -282,7 +282,7 @@ export default class AQL extends Component {
     var popupLayer = (
       <Layer onClose={this._onClose.bind(this)} closer={true} align="left">
         <Box full="vertical" justify="center">
-          <Box pad={{vertical: 'medium'}}><Title>AQL Selector ({this.state.views.length})</Title></Box>
+          <Box pad={{vertical: 'medium'}}><Title>AQL Selector ({this.state.reports.entities.length})</Title></Box>
           <GroupList pad={{vertical: 'small'}} searchable={true}>
             {
               this.state.reports.entities &&
