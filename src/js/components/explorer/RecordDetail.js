@@ -1,10 +1,10 @@
 import React, {Component, PropTypes} from 'react';
 import RecordList from './RecordList';
+import ActionTab from '../commons/ActionTab';
 import * as ExplorerActions from '../../actions/explorer';
 import {
   Layer,
   Tabs,
-  Tab,
   Table,
   TableRow
 } from 'grommet';
@@ -53,7 +53,7 @@ export default class RecordDetail extends Component {
     return (
       <Layer closer={true} align="right" onClose={this.props.onClose}>
         <Tabs justify="start" initialIndex={0}>
-          <Tab title={this.props.body.label}>
+          <ActionTab title={this.props.body.label}>
             <Table>
               <thead>
               <tr>
@@ -77,12 +77,12 @@ export default class RecordDetail extends Component {
               }
               </tbody>
             </Table>
-          </Tab>
+          </ActionTab>
           {
             this.state.links.map((link, index) => {
-              return (<Tab title={`${link.label} (${link.count})`} key={index}>
+              return (<ActionTab title={`${link.label} (${link.count})`} key={index}>
                 <RecordList body={this._getLinkBody(link, this.props.record)}/>
-              </Tab>);
+              </ActionTab>);
             })
           }
         </Tabs>
