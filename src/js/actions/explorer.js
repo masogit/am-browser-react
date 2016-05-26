@@ -77,6 +77,17 @@ export function getQueryByBody(body) {
     fields.push(field.sqlname);
   });
 
+  // add reverse fields before query
+  if (body.links && body.links.length > 0) {
+    var reversefields = body.links.map((link) => {
+      return link.reversefield;
+    });
+    reversefields.filter((elem, pos, arr) => {
+      return arr.indexOf(elem) == pos;
+    });
+    fields = fields.concat(reversefields);
+  }
+
   var query = body.sqlname;
   var param = {
     limit: 100,
