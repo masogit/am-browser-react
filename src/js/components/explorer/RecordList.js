@@ -295,7 +295,7 @@ export default class RecordList extends Component {
                  placeholder={this.state.aqlInput?'Input AQL...':'Quick search'}
                  onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
           <Menu direction="row" align="center" responsive={false}>
-            <CheckBox label="AQL" checked={this.state.aqlInput} onChange={this._toggleAQLInput.bind(this)}
+            <CheckBox id="checkbox_aql" label="AQL" checked={this.state.aqlInput} onChange={this._toggleAQLInput.bind(this)}
                       toggle={true}/>
             <Anchor href="#" icon={<Download />} label="CSV" onClick={this._download.bind(this)}/>
             <select onChange={this._groupBy.bind(this)} ref="select_group" value={this.state.groupby}>
