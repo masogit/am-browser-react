@@ -13,10 +13,8 @@ export default class GroupListItem extends Component {
   }
 
   render() {
-    var props = Object.assign({pad: {horizontal: 'medium'}, separator: "none"}, this.props);
-
     return (
-      <ListItem {...props}>
+      <ListItem {...this.props} pad={{vertical: 'small'}} separator='none'>
         {this.props.children}
       </ListItem>
     );

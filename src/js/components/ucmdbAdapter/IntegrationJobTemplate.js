@@ -2,12 +2,10 @@
  * Created by huling on 5/9/2016.
  */
 
-import Table from 'grommet/components/Table';
 import {statusAdapter} from '../../constants/StatusAdapter.js';
 var Status = require('grommet/components/icons/Status');
-import Tabs from 'grommet/components/Tabs';
+import {Tabs, Table} from 'grommet';
 import ActionTab from './../commons/ActionTab.js';
-import Split from 'grommet/components/Split';
 import React from 'react';
 
 const IntegrationJobTable = ({
@@ -109,28 +107,20 @@ export const IntegrationJobTemplate = ({
   return (
     <Tabs justify="start" initialIndex={tabName === 'populationJobs' ? 0: 1}>
       <ActionTab title="Population" onClick={() => onTabClick('populationJobs')} disabled={!populationSupported}>
-        <Split flex="both" separator={true}>
-          <div className="integrationJobTable">
-            <IntegrationJobTable
-              tabName={tabName}
-              integrationJobData={integrationJobData}
-              integrationJobDataError={integrationJobDataError}
-              integrationJobName={integrationJobName}
-              onIntegrationJobSelect={(selected) => onIntegrationJobSelect(tabName, pointName, integrationJobData[selected].name)}/>
-          </div>
-        </Split>
+        <IntegrationJobTable
+          tabName={tabName}
+          integrationJobData={integrationJobData}
+          integrationJobDataError={integrationJobDataError}
+          integrationJobName={integrationJobName}
+          onIntegrationJobSelect={(selected) => onIntegrationJobSelect(tabName, pointName, integrationJobData[selected].name)}/>
       </ActionTab>
       <ActionTab title="Data Push" onClick={() => onTabClick('pushJobs')} disabled={!pushSupported}>
-        <Split flex="both" separator={true}>
-          <div className="integrationJobTable">
-            <IntegrationJobTable
-              tabName={tabName}
-              integrationJobData={integrationJobData}
-              integrationJobDataError={integrationJobDataError}
-              integrationJobName={integrationJobName}
-              onIntegrationJobSelect={(selected) => onIntegrationJobSelect(tabName, pointName, integrationJobData[selected].name)}/>
-          </div>
-        </Split>
+        <IntegrationJobTable
+          tabName={tabName}
+          integrationJobData={integrationJobData}
+          integrationJobDataError={integrationJobDataError}
+          integrationJobName={integrationJobName}
+          onIntegrationJobSelect={(selected) => onIntegrationJobSelect(tabName, pointName, integrationJobData[selected].name)}/>
       </ActionTab>
     </Tabs>
   );
