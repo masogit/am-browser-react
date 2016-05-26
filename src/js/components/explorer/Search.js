@@ -114,7 +114,7 @@ export default class Search extends Component {
         </Headline>
         <Box direction="row" pad={{vertical: 'medium'}}>
           <input type="search" inline={true} className="flex" placeholder="Global Record search..."
-                 onKeyDown={this._onEnter.bind(this)} onChange={this._onSearch.bind(this)} size="163"
+                 onKeyDown={this._onEnter.bind(this)} onChange={this._onSearch.bind(this)} size="120"
                  responsive={true}/>
         </Box>
         <Tiles flush={false} justify="center" size="large">
