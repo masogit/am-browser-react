@@ -221,7 +221,7 @@ export default class Wall extends Component {
           <Box justify="center" {...box} direction="column" pad="medium">
             <Header>{dataMap.aql.name}</Header>
             {<Graph type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
-                    onClick={(filter) => this._showViewRecords(Format.getFilterFromField(dataMap.aql.view.body.fields, filter), dataMap.aql.view)}/>}
+                    onClick={(filter) => this._showViewRecords(filter, dataMap.aql.view)}/>}
           </Box>
         );
       }
