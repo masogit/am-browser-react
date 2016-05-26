@@ -114,11 +114,9 @@ export default class RecordList extends Component {
   }
 
   _viewDetailShow(record) {
-    if (this.props.body.links && this.props.body.links.length > 0) {
-      this.setState({
-        record: record
-      });
-    }
+    this.setState({
+      record: record
+    });
   }
 
   _filterAdd(event) {
@@ -278,7 +276,7 @@ export default class RecordList extends Component {
     var Spinning = require('grommet/components/icons/Spinning');
 
     return (
-      <div>
+      <Box>
         <Header justify="between">
           <Title>{this.props.title}</Title>
           {
@@ -295,7 +293,8 @@ export default class RecordList extends Component {
                  placeholder={this.state.aqlInput?'Input AQL...':'Quick search'}
                  onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
           <Menu direction="row" align="center" responsive={false}>
-            <CheckBox id="checkbox_aql" label="AQL" checked={this.state.aqlInput} onChange={this._toggleAQLInput.bind(this)}
+            <CheckBox id="checkbox_aql" label="AQL" checked={this.state.aqlInput}
+                      onChange={this._toggleAQLInput.bind(this)}
                       toggle={true}/>
             <Anchor href="#" icon={<Download />} label="CSV" onClick={this._download.bind(this)}/>
             <select onChange={this._groupBy.bind(this)} ref="select_group" value={this.state.groupby}>
@@ -308,8 +307,8 @@ export default class RecordList extends Component {
                 method="post">
             <input type="hidden" name="fields" value={JSON.stringify(this.props.body.fields)}/>
           </form>
+          {filters}
         </Header>
-        {filters}
         {
           this.state.groups_dist && this.state.groups_dist.length > 0 &&
           <Box dirction="row">
@@ -333,7 +332,7 @@ export default class RecordList extends Component {
           this.state.record &&
           <RecordDetail body={this.props.body} record={this.state.record} onClose={this._viewDetailClose.bind(this)}/>
         }
-      </div>
+      </Box>
     );
   }
 }

@@ -22,18 +22,19 @@ export default class RecordDetail extends Component {
   }
 
   componentDidMount() {
-    this.props.body.links.forEach((link) => {
-      var body = this._getLinkBody(link, this.props.record);
-      console.log(body);
-      ExplorerActions.getCount(body, (records) => {
-        link.count = records.count;
-        var links = this.state.links;
-        links.push(link);
-        this.setState({
-          links: links
+    if (this.props.body.links)
+      this.props.body.links.forEach((link) => {
+        var body = this._getLinkBody(link, this.props.record);
+        console.log(body);
+        ExplorerActions.getCount(body, (records) => {
+          link.count = records.count;
+          var links = this.state.links;
+          links.push(link);
+          this.setState({
+            links: links
+          });
         });
       });
-    });
   }
 
   componentWillReceiveProps(nextProps) {
