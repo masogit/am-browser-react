@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
+import * as Format from '../../constants/RecordFormat';
 import RecordList from '../explorer/RecordList';
 import AlertForm from '../commons/AlertForm';
 import Add from 'grommet/components/icons/base/Add';
@@ -182,8 +183,9 @@ export default class Wall extends Component {
               this.state.aqls.map((aql) => {
                 return (
                   <GroupListItem key={aql._id} groupby={aql.category} search={aql.name}
-                                 pad={{horizontal: 'medium', vertical: 'small'}}>
-                    <Anchor href="#" onClick={this._attachAQL.bind(this, aql, box, parent)}>{aql.name}</Anchor>
+                                 pad={{horizontal: 'medium', vertical: 'small'}}
+                                 onClick={this._attachAQL.bind(this, aql, box, parent)}>
+                    {aql.name}
                   </GroupListItem>
                 );
               })
@@ -219,7 +221,7 @@ export default class Wall extends Component {
           <Box justify="center" {...box} direction="column" pad="medium">
             <Header>{dataMap.aql.name}</Header>
             {<Graph type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
-                    onClick={(filter) => this._showViewRecords(filter, dataMap.aql.view)}/>}
+                    onClick={(filter) => this._showViewRecords(Format.getFilterFromField(dataMap.aql.view.body.fields, filter), dataMap.aql.view)}/>}
           </Box>
         );
       }
@@ -281,7 +283,8 @@ export default class Wall extends Component {
     if (viewInAQL && viewInAQL._id)
       ExplorerActions.loadView(viewInAQL._id, (view) => {
         var body = view.body;
-        body.filter = (body.filter) ? `(${body.filter} AND ${filter.key}='${filter.value}')` : `${filter.key}='${filter.value}'`;
+        var newFitler = Format.getFilterFromField(view.body.fields, filter);
+        body.filter = (body.filter) ? `(${body.filter} AND ${newFitler})` : newFitler;
         var layer = (
           <Layer onClose={this._onClose.bind(this)} closer={true} flush={true} align="center">
             <Box full={true} pad="large">

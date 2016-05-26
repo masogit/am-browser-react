@@ -9,11 +9,12 @@ import Anchor from 'grommet/components/Anchor';
 import Header from 'grommet/components/Header';
 import Menu from 'grommet/components/Menu';
 import Close from 'grommet/components/icons/base/Close';
-import Distribution from 'grommet/components/Distribution';
 import Ascend from 'grommet/components/icons/base/Ascend';
 import Descend from 'grommet/components/icons/base/Descend';
 import Download from 'grommet/components/icons/base/Download';
 import * as ExplorerActions from '../../actions/explorer';
+import * as AQLActions from '../../actions/aql';
+import Graph from '../commons/Graph';
 import * as Format from '../../constants/RecordFormat';
 export default class RecordList extends Component {
 
@@ -39,20 +40,26 @@ export default class RecordList extends Component {
 
   componentDidMount() {
     this._getRecords();
-    var groups_select = this.props.body.fields.map((field, index) => {
-      if (field.groupby) {
+    if (this.props.body.groupby)
+      AQLActions.queryAQL(ExplorerActions.getGroupByAql(this.props.body), (data)=> {
+        var distributionConfig = {
+          series_col: "1",
+          label: "0",
+          size: "small",
+          legendTotal: false,
+          full: true,
+          units: ""
+        };
+        var distributionGraph = (
+          <Box>
+            <Graph type='distribution' data={data} config={distributionConfig}
+                   onClick={(filter) => this._aqlFilterAdd(Format.getFilterFromField(this.props.body.fields, filter))}/>
+          </Box>
+        );
         this.setState({
-          groupby: JSON.stringify(field)
+          distributionGraph: distributionGraph
         });
-      }
-      return !field.PK &&
-        <option key={index} value={JSON.stringify(field)}>
-          {Format.getDisplayLabel(field)}
-        </option>;
-    });
-    this.setState({
-      group_selects: groups_select
-    });
+      });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -85,11 +92,12 @@ export default class RecordList extends Component {
           numTotal: data.count,
           records: (param) ? records.concat(data.entities) : data.entities, // if sync pass param to query, then records append
           filtered: null
-        }, this._groupBy);
+        });
       else if (data.entities.length === 0)
         this.setState({
           loading: false,
-          numTotal: this.state.records.length
+          numTotal: this.state.records.length,
+          records: []
         });
     });
   }
@@ -145,12 +153,12 @@ export default class RecordList extends Component {
       if (!this.state.aqlInput)
         this.setState({
           filtered: this.state.records.filter((obj) => JSON.stringify(obj).toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1)
-        }, this._groupBy);
+        });
     }
   }
 
-  _aqlFilterAdd() {
-    var searchValue = this.refs.search.value;
+  _aqlFilterAdd(filter) {
+    var searchValue = filter || this.refs.search.value;
     if (searchValue) {
       var param = this.state.param;
       if (param.filters.indexOf(searchValue) == -1)
@@ -177,49 +185,6 @@ export default class RecordList extends Component {
       this.refs.search.value += ' AND ' + filter;
     else
       this.refs.search.value = filter;
-  }
-
-  _groupBy() {
-    if (this.refs.select_group.value) {
-      var field = JSON.parse(this.refs.select_group.value);
-
-      let groups = [];
-      let records = (this.state.filtered) ? this.state.filtered : this.state.records;
-
-      records.forEach((record) => {
-        var val = record[field.sqlname];
-        val = Format.getFieldStrVal(record, field);
-
-        var group = groups.filter(function (group) {
-          return group.label == val; //_getFieldStrVal(record, field);
-        })[0];
-
-        if (group) {
-          group.value += 1;
-          group.records.push(record);
-        } else {
-          let g = {
-            label: val, value: 1, records: [record], onClick: (event) => {
-              var group = this.state.groups_dist.filter((group) => group.label == val)[0];
-              this.setState({
-                filtered: group.records
-              });
-            }
-          };
-          groups.push(g);
-        }
-
-      });
-
-      this.setState({
-        groups_dist: groups,
-        groupby: this.refs.select_group.value
-      });
-    } else {
-      this.setState({
-        groups_dist: null
-      });
-    }
   }
 
   _viewDetailClose(event) {
@@ -276,7 +241,7 @@ export default class RecordList extends Component {
     var Spinning = require('grommet/components/icons/Spinning');
 
     return (
-      <Box>
+      <div>
         <Header justify="between">
           <Title>{this.props.title}</Title>
           {
@@ -297,24 +262,15 @@ export default class RecordList extends Component {
                       onChange={this._toggleAQLInput.bind(this)}
                       toggle={true}/>
             <Anchor href="#" icon={<Download />} label="CSV" onClick={this._download.bind(this)}/>
-            <select onChange={this._groupBy.bind(this)} ref="select_group" value={this.state.groupby}>
-              <option value="">Group By</option>
-              {this.state.group_selects}
-            </select>
           </Menu>
           <form name="Download" ref="downloadForm"
                 action={ExplorerActions.getDownloadQuery({...this.props.body, param: this.state.param})}
                 method="post">
             <input type="hidden" name="fields" value={JSON.stringify(this.props.body.fields)}/>
           </form>
-          {filters}
         </Header>
-        {
-          this.state.groups_dist && this.state.groups_dist.length > 0 &&
-          <Box dirction="row">
-            <Distribution size="small" series={this.state.groups_dist} legend={false}/>
-          </Box>
-        }
+        {filters}
+        {this.state.distributionGraph}
         <Table selectable={true}
                onMore={(this.state.numTotal > this.state.records.length && !this.state.filtered)?this._getMoreRecords.bind(this):null}>
           <thead>
@@ -332,7 +288,7 @@ export default class RecordList extends Component {
           this.state.record &&
           <RecordDetail body={this.props.body} record={this.state.record} onClose={this._viewDetailClose.bind(this)}/>
         }
-      </Box>
+      </div>
     );
   }
 }

@@ -5,11 +5,13 @@ import DistributionForm from './DistributionForm';
 import Graph from './../commons/Graph';
 import AlertForm from './../commons/AlertForm';
 import GroupList from './../commons/GroupList';
+import GroupListItem from './../commons/GroupListItem';
 import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
 import RecordList from '../explorer/RecordList';
 import ActionTab from '../commons/ActionTab';
 import Sidebar from '../commons/Sidebar';
+import * as Format from '../../constants/RecordFormat';
 
 import {
   Anchor,
@@ -259,13 +261,15 @@ export default class AQL extends Component {
           </Box>
           <GroupList pad={{vertical: 'small'}} searchable={true}>
             {
-              this.state.views.map((view) => ({
-                key: view._id,
-                groupby: view.category,
-                onClick: this._attachView.bind(this, view),
-                search: view.name,
-                child: view.name
-              }))
+              this.state.views.map((view) => {
+                return (
+                  <GroupListItem key={view._id} groupby={view.category} search={view.name}
+                                 pad={{horizontal: 'medium', vertical: 'small'}}
+                                 onClick={this._attachView.bind(this, view)}>
+                    {view.name}
+                  </GroupListItem>
+                );
+              })
             }
           </GroupList>
         </Box>
@@ -284,13 +288,14 @@ export default class AQL extends Component {
           <GroupList pad={{vertical: 'small'}} searchable={true}>
             {
               this.state.reports.entities &&
-              this.state.reports.entities.map((report) => ({
-                key: report['ref-link'],
-                groupby: this._getFieldStrVal(report.seType),
-                onClick: this._loadOOBAQL.bind(this, report),
-                search: report.name,
-                child: report.Name
-              }))
+              this.state.reports.entities.map((report) => {
+                return (
+                  <GroupListItem key={report['ref-link']} groupby={this._getFieldStrVal(report.seType)}
+                                 search={report.Name} pad="small" onClick={this._loadOOBAQL.bind(this, report)}>
+                    {report.Name}
+                  </GroupListItem>
+                );
+              })
             }
           </GroupList>
         </Box>
@@ -305,7 +310,8 @@ export default class AQL extends Component {
     if (viewInAQL && viewInAQL._id)
       ExplorerActions.loadView(viewInAQL._id, (view) => {
         var body = view.body;
-        body.filter = (body.filter) ? `(${body.filter} AND ${filter.key}='${filter.value}')` : `${filter.key}='${filter.value}'`;
+        var newFilter = Format.getFilterFromField(view.body.fields, filter);
+        body.filter = (body.filter) ? `(${body.filter} AND ${newFilter})` : newFilter;
         var popupLayer = (
           <Layer onClose={this._onClose.bind(this)} closer={true} flush={true} align="center">
             <Box full={true} pad="large">

@@ -117,6 +117,24 @@ export function getQueryByBody(body) {
   return query + aql;
 }
 
+export function getGroupByAql(body) {
+  if (body.groupby) {
+    var aggregate = (body.sum) ? `sum(${body.sum})` : 'count(*)';
+    var aql = `select ${body.groupby}, ${aggregate} from ${body.sqlname}`;
+    if (body.filter)
+      aql += ` where ${body.filter}`;
+    if (body.groupby)
+      aql += ` group by ${body.groupby}`;
+    if (body.orderby && body.orderby.indexOf(body.groupby) > -1)
+      aql += ` order by ${body.orderby}`;
+
+    console.log(aql);
+    return aql;
+  } else {
+    return '';
+  }
+}
+
 export function getDownloadQuery(body) {
   var rawFields = [];
   body.fields.forEach((field)=> {
