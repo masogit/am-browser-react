@@ -2,8 +2,6 @@
   "name": "",
   "desc": "",
   "category": "",
-  "search": [
-  ],
   "body": {
     "orderby": "",
     "filter": "",
@@ -13,10 +11,5 @@
     ],
     "links": [
     ]
-  },
-  "chart": {
-    "groupby": "",
-    "aggregate": "count",
-    "type": "line"
   }
 }

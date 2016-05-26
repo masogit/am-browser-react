@@ -3,7 +3,6 @@
 import Rest from './util/grommet-rest-promise';
 //import history from './RouteHistory';
 //import Query from 'grommet-index/utils/Query';
-import IndexApi from './Api';
 import {HOST_NAME, AM_FORM_DATA } from './util/Config';
 
 // session
@@ -20,13 +19,6 @@ export const ROUTE_CHANGED = 'ROUTE_CHANGED';
 export const NAV_PEEK = 'NAV_PEEK';
 export const NAV_ACTIVATE = 'NAV_ACTIVATE';
 export const NAV_RESPONSIVE = 'NAV_RESPONSIVE';
-
-// dashboard
-export const DASHBOARD_LAYOUT = 'DASHBOARD_LAYOUT';
-export const DASHBOARD_LOAD = 'DASHBOARD_LOAD';
-export const DASHBOARD_UNLOAD = 'DASHBOARD_UNLOAD';
-export const DASHBOARD_SEARCH = 'DASHBOARD_SEARCH';
-export const DASHBOARD_SEARCH_SUCCESS = 'DASHBOARD_SEARCH_SUCCESS';
 
 // index page
 export const INDEX_NAV = 'INDEX_NAV';
@@ -290,76 +282,4 @@ export function navActivate(active) {
 
 export function navResponsive(responsive) {
   return {type: NAV_RESPONSIVE, responsive: responsive};
-}
-
-export function dashboardLayout(graphicSize, count, legendPlacement, tiles) {
-  return function (dispatch) {
-    dispatch({
-      type: DASHBOARD_LAYOUT,
-      graphicSize: graphicSize,
-      count: count,
-      legendPlacement: legendPlacement
-    });
-    // reset what we're watching for
-    tiles.filter((tile) => (tile.history)).forEach((tile) => {
-      IndexApi.stopWatching(tile.watcher);
-      let params = {
-        category: tile.category,
-        query: tile.query,
-        attribute: tile.attribute,
-        interval: tile.interval,
-        count: count
-      };
-      let watcher = IndexApi.watchAggregate(params, (result) => {
-        dispatch(indexAggregateSuccess(watcher, tile.name, result));
-      });
-    });
-  };
-}
-
-export function dashboardLoad(tiles) {
-  return function (dispatch) {
-    dispatch({type: DASHBOARD_LOAD});
-    tiles.forEach((tile) => {
-      let params = {
-        category: tile.category,
-        query: tile.query,
-        attribute: tile.attribute,
-        interval: tile.interval,
-        count: tile.count
-      };
-      let watcher = IndexApi.watchAggregate(params, (result) => {
-        dispatch(indexAggregateSuccess(watcher, tile.name, result));
-      });
-    });
-  };
-}
-
-export function dashboardUnload(tiles) {
-  return function (dispatch) {
-    dispatch({type: DASHBOARD_UNLOAD});
-    tiles.forEach((tile) => {
-      IndexApi.stopWatching(tile.watcher);
-    });
-  };
-}
-
-export function dashboardSearch(text) {
-  return function (dispatch) {
-    dispatch({type: DASHBOARD_SEARCH, text: text});
-    if (text && text.length > 0) {
-      let params = {
-        start: 0,
-        count: 5,
-        query: text
-      };
-      Rest.get('/rest/index/search-suggestions', params).end((err, res) => {
-        if (err) {
-          throw err;
-        } else if (res.ok) {
-          dispatch({type: DASHBOARD_SEARCH_SUCCESS, result: res.body});
-        }
-      });
-    }
-  };
 }
