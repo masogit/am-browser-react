@@ -2,8 +2,6 @@ import React, {Component} from 'react';
 import * as ExplorerActions from '../../actions/explorer';
 import RecordList from './RecordList';
 import Box from 'grommet/components/Box';
-import GroupList from './../commons/GroupList';
-import GroupListItem from './../commons/GroupListItem';
 import Sidebar from '../commons/Sidebar';
 
 export default class Explorer extends Component {
@@ -31,20 +29,13 @@ export default class Explorer extends Component {
   }
 
   _getViewNavigation(views) {
-    const contents = (
-      <GroupList pad={{vertical: 'small'}} searchable={true} selectable={true}>
-        {
-          views.map((view, key) => {
-            return (
-              <GroupListItem key={view._id} groupby={view.category} search={view.name} pad="small"
-                             onClick={this._queryView.bind(this, view)}>
-                {view.name}
-              </GroupListItem>
-            );
-          })
-        }
-      </GroupList>
-    );
+    const contents = views.map((view, key) => ({
+      key: view._id,
+      groupby: view.category,
+      onClick: this._queryView.bind(this, view),
+      search: view.name,
+      child: view.name
+    }));
 
     return <Sidebar title={`Views Navigation (${views.length})`} contents={contents}/>;
   }

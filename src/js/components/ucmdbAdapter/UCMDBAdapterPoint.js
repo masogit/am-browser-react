@@ -4,9 +4,13 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {getIntegrationPoint, getIntegrationJob, getIntegrationJobItem,
   adapterSideBarClick, integrationJobSelect, integrationJobTabSwitch} from '../../actions/ucmdbAdapter';
-import {UCMDBAdapterContainerTemplate, PointListContainer} from './PointTemplates.js';
 import IntegrationJobContainer from './IntegrationJob.js';
 import IntegrationJobItemContainer from './IntegrationJobItem.js';
+
+import {statusAdapter} from '../../constants/StatusAdapter.js';
+var Status = require('grommet/components/icons/Status');
+import {Split, Box} from 'grommet';
+import Sidebar from '../commons/Sidebar';
 
 let firstStart = true;
 class UCMDBAdapterContainer extends Component {
@@ -94,11 +98,27 @@ class UCMDBAdapterContainer extends Component {
   }
 
   render () {
-    let jobList, jobItemList, pointListContainer, point;
+    if (this.props.dataError) {
+      return (<div>{this.props.dataError}</div>);
+    }
+
+    let jobList, jobItemList, point, pointList, focus;
     if (this.props.pointName) {
-      pointListContainer = <PointListContainer {...this.props} onMenuClick={this.onMenuClick}/>;
+      if (this.props.dataError) {
+        pointList = <div>{dataError}</div>;
+      } else {
+        pointList = this.props.data.map(adapter => ({
+          key: adapter.name,
+          groupby: adapter.adapterType,
+          onClick: this.onMenuClick.bind(this, adapter.name, this.props.tabName),
+          search: adapter.name,
+          child: adapter.name,
+          icon: <Status value={statusAdapter[adapter.status].status}/>
+        }));
+      }
 
       point = this.getRecentPoint(this.props.data, this.props.pointName);
+      focus = {expand: point.adapterType, selected: this.props.pointName};
     }
 
     if (point && this.props.tabName) {
@@ -114,12 +134,13 @@ class UCMDBAdapterContainer extends Component {
     }
 
     return (
-      <UCMDBAdapterContainerTemplate
-        pointList={pointListContainer}
-        jobList={jobList}
-        jobItemList={jobItemList}
-        dataError={this.props.dataError}
-        />
+      <Split flex="right" priority="left" fixed={false}>
+        <Sidebar title='Integration Point' contents={pointList} focus={focus}/>
+        <Box pad='small' justify="between">
+          {jobList}
+          {jobItemList}
+        </Box>
+      </Split>
     );
   }
 }

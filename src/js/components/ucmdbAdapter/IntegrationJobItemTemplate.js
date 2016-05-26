@@ -5,7 +5,7 @@
 import {statusAdapter} from '../../constants/StatusAdapter.js';
 import React from 'react';
 var Status = require('grommet/components/icons/Status');
-import Table from 'grommet/components/Table';
+import {Table} from 'grommet';
 
 export const IntegrationJobItemTemplate = ({
   integrationJobItemDataError,
@@ -95,11 +95,9 @@ export const IntegrationJobItemTemplate = ({
   );
 
   return (
-    <div className="integrationJobItemTable">
-      <Table selectable={false}>
-        {tableHeader}
-        {tableBody}
-      </Table>
-    </div>
+    <Table selectable={false}>
+      {tableHeader}
+      {tableBody}
+    </Table>
   );
 };

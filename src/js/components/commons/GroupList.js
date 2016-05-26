@@ -18,7 +18,12 @@ export default class GroupList extends Component {
     };
   }
 
-  componentDidMount() {
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.focus) {
+      this.setState({
+        expand: nextProps.focus.expand
+      });
+    }
   }
 
   _getGroupedChildren(children) {
@@ -63,7 +68,7 @@ export default class GroupList extends Component {
   render() {
     var children = this.state.filtered || this.props.children;
     var grouped = this._getGroupedChildren(children);
-
+    const expand = this.state.expand;
     return (
       <Box direction="column">
         {
@@ -72,26 +77,25 @@ export default class GroupList extends Component {
         }
         {
           Object.keys(grouped).map((key, i) => {
+            const selected = this.props.focus && grouped[key].findIndex(item => this.props.focus.selected == item.key);
             return (
               <Box key={i} direction="column">
                 <List>
                   <ListItem {...this.props} justify="between" direction="row" separator="none"
                                             onClick={this._expandToggle.bind(this, key)}>
-                    <Anchor href="#" label={key} icon={(this.state.expand===key)?<Down />:<Next />}/>
+                    <Anchor href="#" label={key} icon={(expand===key)?<Down />:<Next />}/>
                     {grouped[key].length}
                   </ListItem>
                 </List>
                 {
-                  this.state.expand === key &&
-                  <Box pad={{horizontal: 'medium'}}>
-                    <List {...this.props}>
-                      {
-                        grouped[key].map((child) => {
-                          return child;
-                        })
-                      }
-                    </List>
-                  </Box>
+                  expand === key &&
+                  <List {...this.props} selected={selected}>
+                    {
+                      grouped[key].map((child) => {
+                        return child;
+                      })
+                    }
+                  </List>
                 }
               </Box>
             );

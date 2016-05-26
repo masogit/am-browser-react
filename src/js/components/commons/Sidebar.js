@@ -3,16 +3,37 @@
  */
 
 import React from 'react';
-import { Title, Header, Sidebar, Menu } from 'grommet';
+import { Title, Header, Sidebar, Menu, Box } from 'grommet';
+import GroupList from './GroupList';
+import GroupListItem from './GroupListItem';
+import EmptyIcon from './EmptyIcon';
 
-export default ({title, menu, contents}) => {
+export default ({title, toolbar, contents, focus}) => {
+  if (contents instanceof Array) {
+    contents = (
+      <GroupList pad={{vertical: 'small'}} selectable={true} searchable={true} focus={focus}>
+        {
+          contents.map((listItem, index) => (
+            <GroupListItem key={listItem.key || index} {...listItem}>
+              <EmptyIcon />
+              <Box justify='between' direction="row" full='horizontal' pad='none'>
+                {listItem.child}
+                {listItem.icon}
+              </Box>
+            </GroupListItem>
+          ))
+        }
+      </GroupList>
+    );
+  }
+
   return (
     <Sidebar primary={true} pad={{horizontal: 'medium'}} fixed={false} separator="right">
       <Header justify="between">
         <Title>{title}</Title>
-        {menu &&
+        {toolbar &&
         <Menu direction="row" align="center" responsive={false}>
-          {menu}
+          {toolbar}
         </Menu>
         }
       </Header>
