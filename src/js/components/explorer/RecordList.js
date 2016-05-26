@@ -42,23 +42,25 @@ export default class RecordList extends Component {
     this._getRecords();
     if (this.props.body.groupby)
       AQLActions.queryAQL(ExplorerActions.getGroupByAql(this.props.body), (data)=> {
-        var distributionConfig = {
-          series_col: "1",
-          label: "0",
-          size: "small",
-          legendTotal: false,
-          full: true,
-          units: ""
-        };
-        var distributionGraph = (
-          <Box>
-            <Graph type='distribution' data={data} config={distributionConfig}
-                   onClick={(filter) => this._aqlFilterAdd(Format.getFilterFromField(this.props.body.fields, filter))}/>
-          </Box>
-        );
-        this.setState({
-          distributionGraph: distributionGraph
-        });
+        if (data.rows.length > 0) {
+          var distributionConfig = {
+            series_col: "1",
+            label: "0",
+            size: "small",
+            legendTotal: false,
+            full: true,
+            units: ""
+          };
+          var distributionGraph = (
+            <Box>
+              <Graph type='distribution' data={data} config={distributionConfig}
+                     onClick={(filter) => this._aqlFilterAdd(Format.getFilterFromField(this.props.body.fields, filter))}/>
+            </Box>
+          );
+          this.setState({
+            distributionGraph: distributionGraph
+          });
+        }
       });
   }
 
