@@ -56,7 +56,16 @@ const generateFieldsLinks = (body, elements, row) => {
       if (isLinkNotExisted) {
         // create a new link with body
         var reverse = element;
+        // set reverse sqlname
         reverse.sqlname = sqlname;
+        // set reversefield
+        var position = sqlname.lastIndexOf(".");
+        var prefix = "";
+        if (position != -1) {
+          prefix = sqlname.substring(0, position);
+        }
+        reverse.reversefield = ((prefix.length > 0) ? prefix + "." : prefix) + element.reversefield;
+        // create a reverse link
         link = createReverse(reverse);
       } else {
         // get first match
@@ -74,28 +83,6 @@ const generateFieldsLinks = (body, elements, row) => {
       // push new link to links
       if (isLinkNotExisted) {
         body.links.push(link);
-      }
-      if (!body.fields) {
-        body.fields = [];
-      }
-      // find prefix for PK
-      var position = sqlname.lastIndexOf(".");
-      var prefix = "";
-      if (position == -1) {
-        prefix = sqlname;
-      } else {
-        prefix = sqlname.substring(0, position);
-      }
-      // push PK to fields
-      var PK = {
-        sqlname: ((prefix.length > 0) ? prefix + "." : prefix) + link.reversefield,
-        PK: true
-      };
-      var filterPK = body.fields.filter(field => field.sqlname == PK.sqlname);
-      if (filterPK && filterPK.length == 0) {
-        body.fields.push(PK);
-      } else {
-        console.log("Current link PK exists on table:" + body.sqlname);
       }
       // one2many links will break the loop
       break;
