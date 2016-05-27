@@ -69,6 +69,7 @@ export default class RecordList extends Component {
   }
 
   _getMoreRecords() {
+    console.log('get more record');
     if (this.state.numTotal > this.state.records.length) {
       var param = {...this.state.param};
       param.offset = this.state.records.length;
@@ -87,20 +88,13 @@ export default class RecordList extends Component {
     });
     ExplorerActions.loadRecordsByBody(body, (data) => {
       var records = this.state.records;
-      if (data.entities.length > 0)
-        this.setState({
-          loading: false,
-          timeQuery: Date.now() - timeStart,
-          numTotal: data.count,
-          records: (param) ? records.concat(data.entities) : data.entities, // if sync pass param to query, then records append
-          filtered: null
-        });
-      else if (data.entities.length === 0)
-        this.setState({
-          loading: false,
-          numTotal: this.state.records.length,
-          records: []
-        });
+      this.setState({
+        loading: false,
+        timeQuery: Date.now() - timeStart,
+        numTotal: data.count,
+        records: (param) ? records.concat(data.entities) : data.entities, // if sync pass param to query, then records append
+        filtered: null
+      });
     });
   }
 
@@ -256,6 +250,10 @@ export default class RecordList extends Component {
           }
           /{this.state.numTotal}
           {this.state.timeQuery}ms
+          {
+            this.state.numTotal > this.state.records.length &&
+            <Anchor href="#" label="More..." onClick={this._getMoreRecords.bind(this)}/>
+          }
           <input type="text" inline={true} className="flex" ref="search"
                  placeholder={this.state.aqlInput?'Input AQL...':'Quick search'}
                  onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
