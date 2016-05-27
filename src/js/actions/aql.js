@@ -4,65 +4,58 @@ import {HOST_NAME} from '../util/Config';
 import Rest from '../util/grommet-rest-promise';
 
 export function saveWall(wall, callback) {
-  Rest.post(HOST_NAME + '/coll/wall', wall).end((err, res) => {
-    if (err) {
-      console.log(err.response ? err.response.text : err);
-    } else
-      callback(res.text);
+  Rest.post(HOST_NAME + '/coll/wall', wall).then((res) => {
+    callback(res.text);
+  }, (err) => {
+    console.log(err.response ? err.response.text : err);
   });
 }
 
 export function loadWall(callback) {
-  Rest.get(HOST_NAME + '/coll/wall').end((err, res) => {
-    if (err) {
-      console.log(err);
-    } else
-      callback(res.body[0]);
+  Rest.get(HOST_NAME + '/coll/wall').then((res) => {
+    callback(res.body[0]);
+  }, (err) => {
+    console.log(err.response ? err.response.text : err);
   });
 }
 
 export function loadAQL(id, callback) {
-  Rest.get(HOST_NAME + '/coll/aql/' + id).end((err, res) => {
-    if (err) {
-      console.log(err.response ? err.response.text : err);
-    } else
-      callback(res.body);
+  Rest.get(HOST_NAME + '/coll/aql/' + id).then((res) => {
+    callback(res.body);
+  }, (err) => {
+    console.log(err.response ? err.response.text : err);
   });
 }
 
 export function loadAQLs(callback) {
-  Rest.get(HOST_NAME + '/coll/aql').end((err, res) => {
-    if (err) {
-      console.log(err.response ? err.response.text : err);
-    } else
-      callback(res.body);
+  Rest.get(HOST_NAME + '/coll/aql').then((res) => {
+    callback(res.body);
+  }, (err) => {
+    console.log(err.response ? err.response.text : err);
   });
 }
 
 export function saveAQL(aql, callback) {
-  Rest.post(HOST_NAME + '/coll/aql', aql).end((err, res) => {
-    if (err) {
-      console.log(err.response ? err.response.text : err);
-    } else
-      callback(res.text);
+  Rest.post(HOST_NAME + '/coll/aql', aql).then((res) => {
+    callback(res.text);
+  }, (err) => {
+    console.log(err.response ? err.response.text : err);
   });
 }
 
 export function removeAQL(id, callback) {
-  Rest.del(HOST_NAME + '/coll/aql/' + id).end((err, res) => {
-    if (err) {
-      console.log(err.response ? err.response.text : err);
-    } else
-      callback(res.text);
+  Rest.del(HOST_NAME + '/coll/aql/' + id).then((res) => {
+    callback(res.text);
+  }, (err) => {
+    console.log(err.response ? err.response.text : err);
   });
 }
 
 export function loadReports(callback) {
-  Rest.get(HOST_NAME + '/am/db/amInToolReport').end(function (err, res) {
-    if (err) {
-      console.log(err.response ? err.response.text : err);
-    } else
-      callback(res.body);
+  Rest.get(HOST_NAME + '/am/db/amInToolReport').then((res) => {
+    callback(res.body);
+  }, (err) => {
+    console.log(err.response ? err.response.text : err);
   });
 }
 
@@ -121,12 +114,10 @@ export function queryAQL(str, callback) {
       query += " " + aql.where;
     }
 
-    Rest.get(HOST_NAME + query).end(function (err, res) {
-      if (err) {
-        console.log(err);
-      } else {
-        callback(simpleAQLResult(res.body.Query));
-      }
+    Rest.get(HOST_NAME + query).then((res) => {
+      callback(simpleAQLResult(res.body.Query));
+    }, (err) => {
+      console.log(err.response ? err.response.text : err);
     });
   }
 }

@@ -17,20 +17,18 @@ function param2aql(param) {
 }
 
 export function loadViews(callback) {
-  Rest.get(HOST_NAME + '/coll/view/').end(function (err, res) {
-    if (err) {
-      console.log(err);
-    } else
-      callback(res.body);
+  Rest.get(HOST_NAME + '/coll/view/').then((res) => {
+    callback(res.body);
+  }, (err) => {
+    console.log(err.response ? err.response.text : err);
   });
 }
 
 export function loadView(id, callback) {
-  Rest.get(HOST_NAME + '/coll/view/' + id).end(function (err, res) {
-    if (err) {
-      console.log(err);
-    } else
-      callback(res.body);
+  Rest.get(HOST_NAME + '/coll/view/' + id).then((res) => {
+    callback(res.body);
+  }, (err) => {
+    console.log(err.response ? err.response.text : err);
   });
 }
 
@@ -59,14 +57,14 @@ export function loadRecordsByKeyword(body, keyword, callback) {
   }
 }
 export function loadRecordsByBody(body, callback) {
-  Rest.get(HOST_NAME + '/am/db/' + getQueryByBody(body)).end(function (err, res) {
-    if (err) {
-      console.log(err);
-      callback({count: 0, entities: []});
-    } else if (res.body.count && res.body.entities)
+  Rest.get(HOST_NAME + '/am/db/' + getQueryByBody(body)).then((res) => {
+    if (res.body.count && res.body.entities)
       callback(res.body);
     else
       callback({count: 0, entities: []});
+  }, (err) => {
+    console.log(err.response ? err.response.text : err);
+    callback({count: 0, entities: []});
   });
 }
 

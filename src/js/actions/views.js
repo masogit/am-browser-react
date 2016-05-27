@@ -146,23 +146,22 @@ export function deleteViewDef(selectedView, callback) {
 export function confirmDeleteViewDef(selectedView, callback) {
   return function (dispatch) {
     Rest.del(HOST_NAME + VIEW_DEF_URL + "/" + selectedView._id)
-      .end(function (err, res) {
-        if (err) {
-          console.log("cannot delete: " + err);
-        } else {
-          console.log("delete successfully - " + selectedView._id);
-          dispatch({
-            type: types.DELETE_VIEW_DEF,
-            deletedViewId: selectedView._id
-          });
-          //dispatch({
-          //  type: types.UPDATE_VIEW_DEF_LIST,
-          //  selectedView: selectedView
-          //});
-          if (callback) {
-            callback(selectedView._id);
-          }
+      .then((res) => {
+        console.log("delete successfully - " + selectedView._id);
+        dispatch({
+          type: types.DELETE_VIEW_DEF,
+          deletedViewId: selectedView._id
+        });
+        //dispatch({
+        //  type: types.UPDATE_VIEW_DEF_LIST,
+        //  selectedView: selectedView
+        //});
+        if (callback) {
+          callback(selectedView._id);
         }
+      }, (err) => {
+        console.log("cannot delete - ");
+        console.log(err.response ? err.response.text : err);
       });
   };
 }

@@ -86,34 +86,32 @@ export function login(username, password) {
   return function (dispatch) {
     const auth = 'Basic ' + new Buffer(`${username}:${password}`).toString('base64');
     Rest.setHeader("Authorization", auth);
-    Rest.get(HOST_NAME + '/am/conf').end((err, res) => {
-      if (err) {
-        console.log("failed");
-        dispatch(loginFailure({message: 'LoginFailed'}));
-        throw err;
-      } else if (res.ok && res.body) {
-        let form = {
-          server: res.body.server,  // set AM server address
-          user: username,
-          headerNavs: res.body.headerNavs
-        };
+    Rest.get(HOST_NAME + '/am/conf').then((res) => {
+      let form = {
+        server: res.body.server,  // set AM server address
+        user: username,
+        headerNavs: res.body.headerNavs
+      };
 
-        if (sessionStorage) {
-          sessionStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
-        }
-
-        if (localStorage) {
-          form.password = password;
-          localStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
-        }
-
-        // set CSRF token in cookie, expires in 20 mins;
-        setCookie('CSRFToken', 'fake_scrf_token1231231231', 20);
-
-        console.log("pass");
-        console.log('res.body: ' + res.body);
-        dispatch(loginSuccess(username, 'faketoken123456789'/*res.body.sessionID*/));
+      if (sessionStorage) {
+        sessionStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
       }
+
+      if (localStorage) {
+        form.password = password;
+        localStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
+      }
+
+      // set CSRF token in cookie, expires in 20 mins;
+      setCookie('CSRFToken', 'fake_scrf_token1231231231', 20);
+
+      console.log("pass");
+      console.log('res.body: ' + res.body);
+      dispatch(loginSuccess(username, 'faketoken123456789'/*res.body.sessionID*/));
+    }, (err) => {
+      console.log("login failed - ");
+      console.log(err.response ? err.response.text : err);
+      dispatch(loginFailure({message: 'LoginFailed'}));
     });
   };
 }
@@ -122,11 +120,12 @@ export function metadataLoad() {
   return function (dispatch) {
     Rest.get(HOST_NAME + '/am/v1/schema')
       .set('Content-Type', 'text/xml')
-      .end(function (err, res) {
-        if (!err) {
-          let data = JSON.parse(res.text);
-          dispatch(metadataSuccess(data, []));
-        }
+      .then((res) => {
+        let data = JSON.parse(res.text);
+        dispatch(metadataSuccess(data, []));
+      }, (err) => {
+        console.log("cannot load metadata - ");
+        console.log(err.response ? err.response.text : err);
       });
   };
 }
@@ -135,38 +134,41 @@ export function metadataLoadDetail(obj, elements, index) {
   return function (dispatch) {
     Rest.get(HOST_NAME + '/am/v1/' + obj.url)
       .set('Content-Type', 'text/xml')
-      .end(function (err, res) {
-        if (!err) {
-          let data = JSON.parse(res.text);
-          if (!index) {
-            obj.body_label = data.label;
-            obj.body_sqlname = data.sqlname;
-            elements.push(obj);
-          } else {
-            elements = elements.slice(0, index + 1);
-          }
-          dispatch(metadataDetailSuccess(data, elements));
+      .then((res) => {
+        let data = JSON.parse(res.text);
+        if (!index) {
+          obj.body_label = data.label;
+          obj.body_sqlname = data.sqlname;
+          elements.push(obj);
+        } else {
+          elements = elements.slice(0, index + 1);
         }
+        dispatch(metadataDetailSuccess(data, elements));
+      }, (err) => {
+        console.log("cannot load metadata detail - ");
+        console.log(err.response ? err.response.text : err);
       });
   };
 }
 
 export function loadTemplates() {
   return function (dispatch) {
-    Rest.get(HOST_NAME + '/coll/view').end(function (err, res) {
-      if (res && res.ok) {
-        dispatch(templatesLoadSuccess(res.body));
-      }
+    Rest.get(HOST_NAME + '/coll/view').then((res) => {
+      dispatch(templatesLoadSuccess(res.body));
+    }, (err) => {
+      console.log("cannot load templates - ");
+      console.log(err.response ? err.response.text : err);
     });
   };
 };
 
 export function loadRecords(template) {
   return function (dispatch) {
-    Rest.get(HOST_NAME + '/coll/view/' + template._id + '/list').end(function (err, res) {
-      if (res && res.ok && res.body) {
-        dispatch(recordsLoadSuccess(res.body.entities));
-      }
+    Rest.get(HOST_NAME + '/coll/view/' + template._id + '/list').then((res) => {
+      dispatch(recordsLoadSuccess(res.body.entities));
+    }, (err) => {
+      console.log("cannot load records - ");
+      console.log(err.response ? err.response.text : err);
     });
   };
 };
@@ -176,14 +178,16 @@ export function loadDetailRecordLinks(viewid, recordid, linksArray, linksObj) {
     var link = linksArray.pop();
     if (link) {
       var linkname = link.sqlname;
-      Rest.get(HOST_NAME + `/coll/view/${viewid}/list/${recordid}/${linkname}`).end(function (err, res) {
+      Rest.get(HOST_NAME + `/coll/view/${viewid}/list/${recordid}/${linkname}`).then((res) => {
         if (res.body && res.body.entities) {
           linksObj[linkname] = res.body.entities;
           dispatch(loadDetailRecordLinks(viewid, recordid, linksArray, linksObj));
         }
+      }, (err) => {
+        console.log("cannot load detail record links - ");
+        console.log(err.response ? err.response.text : err);
       });
     } else {
-
       dispatch(loadDetailLinkSuccess(linksObj));
     }
 

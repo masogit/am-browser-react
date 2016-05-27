@@ -21,12 +21,14 @@ const adapterDataFetch = (data, error) => ({
 });
 
 export const getIntegrationPoint = () =>
-  (dispatch) =>{
+  (dispatch) => {
     const url = `${HOST_NAME}/am/ucmdbPoint/`;
-    Rest.get(url).end(function (err, res) {
+    Rest.get(url).then((res) => {
       const data = res && res.ok && res.body || [];
-      const error = err && (err.rawResponse || err.message);
-      dispatch(adapterDataFetch(data, error));
+      dispatch(adapterDataFetch(data, null));
+    }, (err) => {
+      const error = err.rawResponse || err.message;
+      dispatch(adapterDataFetch([], error));
     });
   };
 
@@ -39,17 +41,17 @@ const integrationJobDataSuccess = (integrationJobData, error) =>({
 export const getIntegrationJob = (pointName, jobType) =>
   (dispatch) => {
     const url = `${HOST_NAME}/am/ucmdbPoint/${pointName}/${jobType}`;
-    Rest.get(url).end(function (err, res) {
+    Rest.get(url).then((res) => {
       const data = res && res.ok && res.body || [];
-      const error = err && (err.rawResponse || err.message);
-
       const points = data.map((point)=> {
         if (point.startTime !== undefined) point.startTime = dateFormatter(point.startTime);
-        if (point.stopTime !== undefined) point.stopTime =dateFormatter(point.stopTime);
+        if (point.stopTime !== undefined) point.stopTime = dateFormatter(point.stopTime);
         return point;
       });
-
-      dispatch(integrationJobDataSuccess(points, error));
+      dispatch(integrationJobDataSuccess(points, null));
+    }, (err) => {
+      const error = err && (err.rawResponse || err.message);
+      dispatch(integrationJobDataSuccess([], error));
     });
   };
 
@@ -62,16 +64,17 @@ const integrationJobItemDataSuccess = (integrationJobItemData, error) =>({
 export const getIntegrationJobItem = (pointName, jobType, jobName) =>
   (dispatch) => {
     const url = `${HOST_NAME}/am/ucmdbPoint/${pointName}/${jobType}/${jobName}`;
-    Rest.get(url).end(function (err, res) {
+    Rest.get(url).then((res) => {
       const data = res && res.ok && res.body && res.body.jobStatuses || [];
-      const error = err && (err.rawResponse || err.message);
       const jobStatuses = data.map((jobStatus)=> {
         if (jobStatus.startTime !== undefined) jobStatus.startTime = dateFormatter(jobStatus.startTime);
-        if (jobStatus.stopTime !== undefined) jobStatus.stopTime =dateFormatter(jobStatus.stopTime);
+        if (jobStatus.stopTime !== undefined) jobStatus.stopTime = dateFormatter(jobStatus.stopTime);
         return jobStatus;
       });
-
-      dispatch(integrationJobItemDataSuccess(jobStatuses, error));
+      dispatch(integrationJobItemDataSuccess(jobStatuses, null));
+    }, (err) => {
+      const error = err && (err.rawResponse || err.message);
+      dispatch(integrationJobItemDataSuccess([], error));
     });
   };
 
@@ -81,7 +84,7 @@ export const adapterSideBarClick = (pointName, tabName) => {
 };
 
 export const integrationJobSelect = (tabName, pointName, integrationJobName) => {
-  return { type: JOB_SELECT_SUCCESS, integrationJobName };
+  return {type: JOB_SELECT_SUCCESS, integrationJobName};
 };
 
 export const integrationJobTabSwitch = (tabName, pointName) => {
