@@ -40,13 +40,13 @@ exports.find = function (req, res) {
   var id = req.params.id;
   var download = req.query.download;
   if (id)
-    db.collection(collectionName).findOne({_id: id}, function (err, documents) {
+    db.collection(collectionName).findOne({_id: id}, function (err, document) {
       if (err)
         logger.error(err);
       else if (download)
-        JSONDownloader(res, documents, id + '.json');
+        JSONDownloader(res, document, (document.name || id) + '.json');
       else
-        res.json(documents);
+        res.json(document);
       db.close();
     });
   else
