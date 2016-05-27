@@ -13,39 +13,6 @@ import {
   Anchor
 } from 'grommet';
 
-const FormContainer = ({basicOptions, advanceOptions, form, selections}) => {
-  const showAdvance = form.state.showAdvance;
-  let label, icon, formFields;
-  const advance = genOptions(advanceOptions, form, form.state.type, selections);
-  const basic = genOptions(basicOptions, form, form.state.type, selections);
-  formFields = basic;
-  if (!showAdvance) {
-    label = 'advance';
-    icon = <Next />;
-    formFields = basic;
-  } else {
-    label = 'basic';
-    icon = <Previous />;
-    formFields = advance;
-  }
-
-  return (
-    <Box>
-      <Form>
-        <FormFields>
-          {formFields}
-        </FormFields>
-      </Form>
-      {advance.length > 0 &&
-      <Footer justify="end">
-        <Anchor icon={icon} label={label} reverse={!showAdvance}
-                onClick={() => form.setState({showAdvance: !showAdvance})}/>
-      </Footer>
-      }
-    </Box>
-  );
-};
-
 const SelectField = ({label, name, value, onChange, options}) => {
   const optionsComp = options.map(option=>
     <option key={option.value} value={option.value}>{option.text}</option>);
@@ -209,7 +176,35 @@ export default class GraphForm extends Component {
   }
 
   render(basicOptions, advanceOptions, selections) {
-    return (<FormContainer basicOptions={basicOptions} advanceOptions={advanceOptions}
-                          form={this} selections={selections}/>);
+    const showAdvance = this.state.showAdvance;
+    let label, icon, formFields;
+    const advance = genOptions(advanceOptions, this, this.state.type, selections);
+    const basic = genOptions(basicOptions, this, this.state.type, selections);
+    formFields = basic;
+    if (!showAdvance) {
+      label = 'advance';
+      icon = <Next />;
+      formFields = basic;
+    } else {
+      label = 'basic';
+      icon = <Previous />;
+      formFields = advance;
+    }
+
+    return (
+      <Box>
+        <Form className='short-form'>
+          <FormFields>
+            {formFields}
+          </FormFields>
+        </Form>
+        {advance.length > 0 &&
+        <Footer justify="end">
+          <Anchor icon={icon} label={label} reverse={!showAdvance}
+                  onClick={() => form.setState({showAdvance: !showAdvance})}/>
+        </Footer>
+        }
+      </Box>
+    );
   }
 }

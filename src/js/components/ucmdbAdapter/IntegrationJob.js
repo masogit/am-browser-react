@@ -34,6 +34,6 @@ export default class IntegrationJobContainer extends Component {
   }
 
   render () {
-    return <IntegrationJobTemplate {...this.props} onTabClick={this.onTabClick.bind(this)}/>;
+    return <IntegrationJobTemplate {...this.props} onTabClick={this.onTabClick.bind(this)} className='ssdf'/>;
   }
 }

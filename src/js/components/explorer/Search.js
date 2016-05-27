@@ -1,19 +1,13 @@
 import React, {Component} from 'react';
-// import {Link} from 'react-router';
 import history from '../../RouteHistory';
 import * as ExplorerActions from '../../actions/explorer';
 import * as AQLActions from '../../actions/aql';
-// import Anchor from 'grommet/components/Anchor';
 import Title from 'grommet/components/Title';
 import Box from 'grommet/components/Box';
-// import Footer from 'grommet/components/Footer';
 import Tiles from 'grommet/components/Tiles';
 import Tile from 'grommet/components/Tile';
 import Headline from 'grommet/components/Headline';
-// import Header from 'grommet/components/Header';
 import Meter from 'grommet/components/Meter';
-// import SelectLeft from 'grommet/components/icons/base/SelectLeft';
-// import Close from 'grommet/components/icons/base/Close';
 
 
 export default class Search extends Component {
@@ -28,14 +22,18 @@ export default class Search extends Component {
   componentDidMount() {
     ExplorerActions.loadViews((views)=> {
       this.setState({
-        viewSeries: this._getSeries(views, 'category')
+        viewSeries: this._filterFirst7(this._getSeries(views, 'category'))
       });
     });
     AQLActions.loadAQLs((aqls)=> {
       this.setState({
-        aqlSeries: this._getSeries(aqls, 'category')
+        aqlSeries: this._filterFirst7(this._getSeries(aqls, 'category'))
       });
     });
+  }
+
+  _filterFirst7(objs) {
+    return objs.length > 7 ? objs.filter((item, index) => index < 7) : objs;
   }
 
   _onEnter(event) {

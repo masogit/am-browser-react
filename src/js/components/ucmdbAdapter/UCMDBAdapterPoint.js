@@ -9,8 +9,8 @@ import IntegrationJobItemContainer from './IntegrationJobItem.js';
 
 import {statusAdapter} from '../../constants/StatusAdapter.js';
 var Status = require('grommet/components/icons/Status');
-import {Split, Box} from 'grommet';
 import Sidebar from '../commons/Sidebar';
+import {Container, Content} from '../commons/Split';
 
 let firstStart = true;
 class UCMDBAdapterContainer extends Component {
@@ -134,13 +134,13 @@ class UCMDBAdapterContainer extends Component {
     }
 
     return (
-      <Split flex="right" priority="left" fixed={false}>
+      <Container>
         <Sidebar title='Integration Point' contents={pointList} focus={focus}/>
-        <Box pad='small' justify="between">
+        <Content justify='between'>
           {jobList}
           {jobItemList}
-        </Box>
-      </Split>
+        </Content>
+      </Container>
     );
   }
 }

@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { navResponsive } from '../actions';
-import App from 'grommet/components/App';
+import { App } from 'grommet';
 //import Split from 'grommet/components/Split';
 //import NavSidebar from './NavSidebar';
 import NavHeader from './NavHeader';
@@ -27,8 +27,12 @@ class Indexer extends Component {
 
     return (
       <App centered={false}>
-          {pane1}
-          {pane2}
+        {pane1}
+        <div className='main-body-container'>
+          <div className='main-body'>
+            {pane2}
+          </div>
+        </div>
       </App>
     );
   }

@@ -12,16 +12,16 @@ import RecordList from '../explorer/RecordList';
 import ActionTab from '../commons/ActionTab';
 import Sidebar from '../commons/Sidebar';
 import * as Format from '../../constants/RecordFormat';
+import {Container, Content} from '../commons/Split';
 
 import {
   Anchor,
   Box,
   Split,
   Form,
-  FormField,
+  FormField, FormFields,
   Layer,
   Tabs,
-  Tab,
   Table,
   TableRow,
   Title, Header,
@@ -366,10 +366,9 @@ export default class AQL extends Component {
     }));
 
     return (
-      <Split flex="right">
+      <Container>
         <Sidebar title={`Graphs (${this.state.aqls.length})`} toolbar={toolbar} contents={contents}/>
-        <Box pad={{horizontal: 'small'}}>
-          <div>
+        <Content>
             {this.state.alertLayer}
             <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
               <Title>AQL and Graph</Title>
@@ -383,12 +382,13 @@ export default class AQL extends Component {
                 </Anchor>
               </Menu>
             </Header>
-            <Box justify="between" direction="row" size="small" pad='small'>
+          <Box justify="between" direction="row" className='header'>
               <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_Box">
-              <textarea id="AQL_Box" name="str" value={this.state.aql.str} rows="3"
+                <textarea id="AQL_Box" name="str" value={this.state.aql.str} rows="3"
                         onChange={this._setFormValues.bind(this)}/>
               </FormField>
-              <Form pad="none" compact={true}>
+            <Form pad={{horizontal: 'small'}}>
+              <FormFields className='short-form'>
                 <FormField label="AQL Name" htmlFor="AQL_Box">
                   <input id="AQL_Name" type="text" name="name" value={this.state.aql.name}
                          onChange={this._setFormValues.bind(this)}/>
@@ -397,10 +397,11 @@ export default class AQL extends Component {
                   <input id="AQL_Category" type="text" name="category" value={this.state.aql.category}
                          onChange={this._setFormValues.bind(this)}/>
                 </FormField>
+              </FormFields>
               </Form>
             </Box>
             <Split flex="left" fixed={false}>
-              <Box pad='small'>
+              <Box pad={{vertical: 'small'}}>
                 {this.state.data && this.state.aql.form && this.state.aql.type &&
                 <Graph type={this.state.aql.type} data={this.state.data} config={this.state.aql.form}
                        onClick={(filter) => this._showViewRecords(filter, this.state.aql.view)}/>}
@@ -415,8 +416,8 @@ export default class AQL extends Component {
               </Box>
               {
                 this.state.data && this.state.aql.type &&
-                <Box pad='small'>
-                  <Tabs initialIndex={getIndex(this.state.aql.type)} justify="end">
+                <Box pad={{horizontal: 'small'}}>
+                  <Tabs initialIndex={getIndex(this.state.aql.type)} justify='end'>
                     <ActionTab title="Chart" onClick={this._genGraph.bind(this, null, 'chart')} ref='chart'>
                       <ChartForm {...this.state.aql} genGraph={this._genGraph.bind(this)} data={this.state.data}/>
                     </ActionTab>
@@ -428,16 +429,17 @@ export default class AQL extends Component {
                       <DistributionForm {...this.state.aql} genGraph={this._genGraph.bind(this)}
                                                             data={this.state.data}/>
                     </ActionTab>
-                    <Tab title="Value"/>
-                    <Tab title="WorldMap"/>
+                    {
+                      /*<Tab title="Value"/>
+                       <Tab title="WorldMap"/>*/
+                    }
                   </Tabs>
                 </Box>
               }
               {this.state.popupLayer}
             </Split>
-          </div>
-        </Box>
-      </Split>
+        </Content>
+      </Container>
     );
   }
 }

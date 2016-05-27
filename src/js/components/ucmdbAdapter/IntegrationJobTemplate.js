@@ -4,7 +4,7 @@
 
 import {statusAdapter} from '../../constants/StatusAdapter.js';
 var Status = require('grommet/components/icons/Status');
-import {Tabs, Table} from 'grommet';
+import {Tabs, Table, Box} from 'grommet';
 import ActionTab from './../commons/ActionTab.js';
 import React from 'react';
 
@@ -16,11 +16,11 @@ const IntegrationJobTable = ({
   onIntegrationJobSelect
   }) => {
   if (integrationJobDataError) {
-    return (<div>{integrationJobDataError}</div>);
+    return (<Box>{integrationJobDataError}</Box>);
   }
 
   if (integrationJobData.length === 0) {
-    return <h2>No data to display!</h2>;
+    return (<Box><h2>No data to display!</h2></Box>);
   }
 
   let tableHeader, tableBody;

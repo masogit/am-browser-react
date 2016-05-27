@@ -2,27 +2,13 @@ import React, {Component /*, PropTypes*/} from 'react';
 //import PureRenderMixin from 'react-addons-pure-render-mixin';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import Box from 'grommet/components/Box';
-//import Header from 'grommet/components/Header';
-//import Split from 'grommet/components/Split';
-//import Footer from 'grommet/components/Footer';
-//import Title from 'grommet/components/Title';
-//import Menu from 'grommet/components/Menu';
-//import CloseIcon from 'grommet/components/icons/Clear';
-//import Search from 'grommet/components/Search';
-//import Gravatar from 'react-gravatar';
-//import Article from 'grommet/components/Article';
-//import Section from 'grommet/components/Section';
-//import { Link } from 'react-router';
-//import Tabs from 'grommet/components/Tabs';
-//import Tab from 'grommet/components/Tab';
-//import {loadViews/*, loadTemplateTable, setSelectedView*/} from '../../actions/views';
 import ViewDefDetail from './ViewDefDetail';
 import ViewDefList from './ViewDefList';
 import ViewDefPreview from './ViewDefPreview';
 import * as ViewDefActions from '../../actions/views';
 import store from '../../store';
 import history from '../../RouteHistory';
+import {Container, Content} from '../commons/Split';
 
 class ViewDefListContainer extends Component {
 
@@ -122,23 +108,18 @@ class ViewDefListContainer extends Component {
     let {dispatch} = store;
     let boundActionCreators = bindActionCreators(ViewDefActions, dispatch);
     return (
-      <div>
-        <div style={{display: "flex"}}>
-          <ViewDefList views={views} isFetchingViewList={isFetchingViewList} {...boundActionCreators}/>
-
-          <div style={{width: "90%"}}>
-            <Box pad={{horizontal: 'small'}}>
-              <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange}
-                             onSubmit={this.onSubmit} onSaveSuccess={this.onSaveSuccess}
-                             onDeleteTableRow={this.onDeleteTableRow}
-                             onDuplicateViewDef={this.onDuplicateViewDef}
-                             onDeleteViewDef={this.onDeleteViewDef}
-                             alertForm={this.props.alertForm} {...boundActionCreators}/>
-            </Box>
-          </div>
-        </div>
+      <Container>
+        <ViewDefList views={views} isFetchingViewList={isFetchingViewList} {...boundActionCreators}/>
+        <Content>
+          <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange}
+                         onSubmit={this.onSubmit} onSaveSuccess={this.onSaveSuccess}
+                         onDeleteTableRow={this.onDeleteTableRow}
+                         onDuplicateViewDef={this.onDuplicateViewDef}
+                         onDeleteViewDef={this.onDeleteViewDef}
+                         alertForm={this.props.alertForm} {...boundActionCreators}/>
+        </Content>
         <ViewDefPreview active={preview} selectedView={selectedView} {...boundActionCreators}/>
-      </div>
+      </Container>
     );
   }
 }
