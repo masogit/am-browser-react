@@ -114,7 +114,7 @@ class ViewDefListContainer extends Component {
         <Content>
           <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange}
                          onSubmit={this.onSubmit} onSaveSuccess={this.onSaveSuccess}
-                         onDeleteTableRow={this.onDeleteTableRow}
+                         onDeleteTableRow={this.onDeleteTableRow} compact={true}
                          onDuplicateViewDef={this.onDuplicateViewDef}
                          onDeleteViewDef={this.onDeleteViewDef}
                          alertForm={this.props.alertForm} {...boundActionCreators}/>

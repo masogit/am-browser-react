@@ -1,14 +1,15 @@
-import React, { Component, PropTypes } from 'react';
+import React, {Component, PropTypes} from 'react';
 //import { connect } from 'react-redux';
 //import PureRenderMixin from 'react-addons-pure-render-mixin';
 //import Sidebar from 'grommet/components/Sidebar';
-import { Box, Form, FormFields, FormField, Header, CheckBox, Menu, Table, Anchor, Title } from 'grommet';
+import {Box, Form, FormFields, FormField, Header, CheckBox, Menu, Table, Anchor, Title} from 'grommet';
 //import Button from 'grommet/components/Button';
 //import Add from 'grommet/components/icons/base/Add';
 import Close from 'grommet/components/icons/base/Close';
 import Play from 'grommet/components/icons/base/Play';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
 import Duplicate from 'grommet/components/icons/base/Duplicate';
+import Download from 'grommet/components/icons/base/Download';
 //import MDSave from 'react-icons/lib/md/save';
 import _ from 'lodash';
 //import InlineEdit from 'react-inline-edit';
@@ -53,6 +54,15 @@ export default class ViewDefDetail extends Component {
     } else {
       this.props.onValueChange(path.substring(2), event.target.value);
     }
+  }
+
+  _onDownload(obj) {
+    var content = "data:application/json;charset=utf-8,";
+    var encodedUri = encodeURI(content + JSON.stringify(obj));
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", (obj.name || obj.body.sqlname || 'view') + ".json");
+    link.click();
   }
 
   hasLinks(links) {
@@ -148,7 +158,7 @@ export default class ViewDefDetail extends Component {
                      value={field.alias}
                      onChange={this._onChange}
                      style={{display: 'inline-block',margin: 0,padding: 0,outline: 0,borderWidth: 1,borderStyle: 'hidden'}}
-                />
+              />
             </td>
 
             {root &&
@@ -209,7 +219,7 @@ export default class ViewDefDetail extends Component {
   }
 
   render() {
-    let { selectedView, closeAlertForm, onDeleteViewDef, onSaveSuccess } = this.props;
+    let {selectedView, closeAlertForm, onDeleteViewDef, onSaveSuccess} = this.props;
     let alertForms = selectedView ? {
       save: <AlertForm onClose={closeAlertForm}
                        title={"Save view definition"}
@@ -240,12 +250,13 @@ export default class ViewDefDetail extends Component {
     return (
       <Box>
         <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
-          <Title>Builder</Title>
+          <Title>View Builder</Title>
           <Menu direction="row" align="center" responsive={false}>
             <Anchor link="#" icon={<Checkmark />} onClick={this.props.onSubmit}>Save</Anchor>
             <Anchor link="#" icon={<Duplicate />} onClick={this.props.onDuplicateViewDef}>Duplicate</Anchor>
             <Anchor link="#" icon={<Close />} onClick={this.props.deleteViewDef}>Delete</Anchor>
             <Anchor link="#" icon={<Play />} onClick={this.props.openPreview}>Query</Anchor>
+            <Anchor link="#" icon={<Download />} onClick={this._onDownload.bind(this, selectedView)}>Download</Anchor>
           </Menu>
         </Header>
 
@@ -269,22 +280,18 @@ export default class ViewDefDetail extends Component {
           <div>
             <Box pad="small">
               <Form onSubmit={this.props.onSubmit} compact={this.props.compact}>
-                <FormFields>
-                  <fieldset>
-                    <FormField label="Name" htmlFor={p + "item1"}>
-                      <input id="v.name" name="v.name" type="text" onChange={this._onChange}
-                             value={selectedView.name}/>
-                    </FormField>
-                    <FormField label="Description" htmlFor={p + "item2"}>
+                <FormField label="Name" htmlFor={p + "item1"}>
+                  <input id="v.name" name="v.name" type="text" onChange={this._onChange}
+                         value={selectedView.name}/>
+                </FormField>
+                <FormField label="Description" htmlFor={p + "item2"}>
                     <textarea id="v.desc" name="v.desc" value={selectedView.desc}
                               onChange={this._onChange}></textarea>
-                    </FormField>
-                    <FormField label="Category" htmlFor={p + "item3"}>
-                      <input id="v.category" name="v.category" type="text" onChange={this._onChange}
-                             value={selectedView.category}/>
-                    </FormField>
-                  </fieldset>
-                </FormFields>
+                </FormField>
+                <FormField label="Category" htmlFor={p + "item3"}>
+                  <input id="v.category" name="v.category" type="text" onChange={this._onChange}
+                         value={selectedView.category}/>
+                </FormField>
               </Form>
             </Box>
           </div>
