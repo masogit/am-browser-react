@@ -21,18 +21,24 @@ class Indexer extends Component {
 
   render() {
     //const { active: navActive } = this.props;
-
-    var pane1 = localStorage.token ? <NavHeader /> : null; //navActive ? <NavSidebar /> : null;
-    var pane2 = this.props.children;
+    let children, header;
+    if (localStorage.token) {
+      header = <NavHeader />;
+      children = (
+        <div className='main-body-container'>
+          <div className='main-body'>
+            {this.props.children}
+          </div>
+        </div>
+      );
+    } else {
+      children = this.props.children;
+    }
 
     return (
       <App centered={false}>
-        {pane1}
-        <div className='main-body-container'>
-          <div className='main-body'>
-            {pane2}
-          </div>
-        </div>
+        {header}
+        {children}
       </App>
     );
   }

@@ -361,9 +361,11 @@ export default class AQL extends Component {
       child: aql.name
     }));
 
+    const focus = this.state.aql && {expand: this.state.aql.category, selected: this.state.aql._id};
+
     return (
       <Container>
-        <Sidebar title={`Graphs (${this.state.aqls.length})`} toolbar={toolbar} contents={contents}/>
+        <Sidebar title={`Graphs (${this.state.aqls.length})`} toolbar={toolbar} contents={contents} focus={focus}/>
         <Content>
             {this.state.alertLayer}
             <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
