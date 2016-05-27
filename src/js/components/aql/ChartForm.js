@@ -43,9 +43,13 @@ export default class ChartForm extends GraphForm {
 
     if (this.props.data.header) {
       let series_col = this.state.chart.series_col;
-      if (this.props.chart && this.props.chart.series && this.props.chart.series.length > 0) {
-        series_col = this.props.chart.series.map((item) => item.index);
+      if (this.props.chart) {
+        series_col = this.props.chart.series_col;
+        if (this.props.chart.series && this.props.chart.series.length > 0) {
+          series_col = this.props.chart.series.map((item) => item.index);
+        }
       }
+
       this.props.data.header.map((header, index) => {
         xAxis_col_options.push({value: header.Index, text: `${header.Type}: ${header.Name}`});
         if (['Long', 'Short', 'Int', 'Double', 'Byte'].includes(header.Type)) {

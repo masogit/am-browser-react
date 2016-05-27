@@ -201,7 +201,7 @@ export default class GraphForm extends Component {
         {advance.length > 0 &&
         <Footer justify="end">
           <Anchor icon={icon} label={label} reverse={!showAdvance}
-                  onClick={() => form.setState({showAdvance: !showAdvance})}/>
+                  onClick={() => this.setState({showAdvance: !showAdvance})}/>
         </Footer>
         }
       </Box>

@@ -61,7 +61,7 @@ export default class AQL extends Component {
         str: '',
         name: '',
         category: '',
-        type: '',
+        type: 'chart',
         form: null
       },
       data: {
