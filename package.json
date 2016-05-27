@@ -28,7 +28,7 @@
     "superagent-bluebird-promise": "^3.0.0",
     "tingodb": "^0.4.2",
     "winston": "^2.2.0",
-    "winston-daily-rotate-file": "^1.0.1",
+    "winston-daily-rotate-file": "^1.0.1"
   },
   "devDependencies": {
     "babel-core": "^6.7.4",
