@@ -175,7 +175,7 @@ export default class ViewDefDetail extends Component {
   renderMasterHeader(selectedView) {
     return (
       <Header size="small">
-        <h3>{selectedView.body.label} ({selectedView.body.sqlname})</h3>
+        {selectedView.body.label && <h3>{`${selectedView.body.label} (${selectedView.body.sqlname})`}</h3>}
       </Header>
     );
   }

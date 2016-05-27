@@ -261,15 +261,13 @@ export default class AQL extends Component {
           </Box>
           <GroupList pad={{vertical: 'small'}} searchable={true}>
             {
-              this.state.views.map((view) => {
-                return (
-                  <GroupListItem key={view._id} groupby={view.category} search={view.name}
-                                 pad={{horizontal: 'medium', vertical: 'small'}}
-                                 onClick={this._attachView.bind(this, view)}>
-                    {view.name}
-                  </GroupListItem>
-                );
-              })
+              this.state.views.map((view) => (
+                <GroupListItem key={view._id} groupby={view.category} search={view.name}
+                               pad={{horizontal: 'medium', vertical: 'small'}}
+                               onClick={this._attachView.bind(this, view)}>
+                  {view.name}
+                </GroupListItem>
+              ))
             }
           </GroupList>
         </Box>
@@ -288,14 +286,12 @@ export default class AQL extends Component {
           <GroupList pad={{vertical: 'small'}} searchable={true}>
             {
               this.state.reports.entities &&
-              this.state.reports.entities.map((report) => {
-                return (
-                  <GroupListItem key={report['ref-link']} groupby={this._getFieldStrVal(report.seType)}
-                                 search={report.Name} pad="small" onClick={this._loadOOBAQL.bind(this, report)}>
-                    {report.Name}
-                  </GroupListItem>
-                );
-              })
+              this.state.reports.entities.map((report) => (
+                <GroupListItem key={report['ref-link']} groupby={this._getFieldStrVal(report.seType)}
+                               search={report.Name} pad="small" onClick={this._loadOOBAQL.bind(this, report)}>
+                  {report.Name}
+                </GroupListItem>
+              ))
             }
           </GroupList>
         </Box>

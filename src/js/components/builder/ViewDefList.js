@@ -52,13 +52,14 @@ export default class ViewsDefList extends Component {
   }
 
   render() {
-    const {views} = this.props;
-    let toolbar, contents;
+    const {views, selectedView} = this.props;
+    let toolbar, contents, focus;
+
     if (this.state.editView) {
       toolbar = <Anchor href="#" icon={<Close />} label="Close" onClick={this._closeEdit.bind(this)}/>;
       contents = this.state.editView;
     } else {
-      toolbar = <Anchor href="#" icon={<Add />} label="New" onClick={this._newView.bind(this)}/>;
+      toolbar = <Anchor href="#" icon={<Add />} label="" onClick={this._newView.bind(this)}/>;
       contents = views.map((view, key) => ({
         key: view._id,
         groupby: view.category,
@@ -71,10 +72,11 @@ export default class ViewsDefList extends Component {
           </span>
         )
       }));
+      focus = {expand: selectedView.category, selected: selectedView._id};
     }
 
     return (
-      <Sidebar title={`Views Builder (${views.length})`} toolbar={toolbar} contents={contents}/>
+      <Sidebar title={`Views Builder (${views.length})`} toolbar={toolbar} contents={contents} focus={focus}/>
     );
   }
 }

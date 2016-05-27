@@ -109,7 +109,8 @@ class ViewDefListContainer extends Component {
     let boundActionCreators = bindActionCreators(ViewDefActions, dispatch);
     return (
       <Container>
-        <ViewDefList views={views} isFetchingViewList={isFetchingViewList} {...boundActionCreators}/>
+        <ViewDefList views={views} isFetchingViewList={isFetchingViewList}
+                     selectedView={selectedView} {...boundActionCreators}/>
         <Content>
           <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange}
                          onSubmit={this.onSubmit} onSaveSuccess={this.onSaveSuccess}
