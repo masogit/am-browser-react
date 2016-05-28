@@ -81,32 +81,7 @@ export default class ViewDefDetail extends Component {
               <Header size="small">
                 {link.sqlname}
               </Header>
-              {/*
-               <Header size="small">
-               <Box direction="row">
-               <FormField label="Filter" htmlFor={`v.${currentPath}.body.filter`}>
-               <input id={`v.${currentPath}.body.filter`} name={`v.${currentPath}.body.filter`} type="text"
-               onChange={this._onChange}
-               value={link.body.filter} placeholder="Filter" className="header-form-field"/>
-               </FormField>
-               <FormField label="Order by" htmlFor={`v.${currentPath}.body.orderby`}>
-               <input id={`v.${currentPath}.body.orderby`} name={`v.${currentPath}.body.orderby`} type="text"
-               onChange={this._onChange}
-               value={link.body.orderby} placeholder="Order by" className="header-form-field"/>
-               </FormField>
-               <FormField label="Group by" htmlFor={`v.${currentPath}.body.count`}>
-               <input id={`v.${currentPath}.body.groupby`} name={`v.${currentPath}.body.groupby`} type="text"
-               onChange={this._onChange}
-               value={link.body.groupby} placeholder="Group by" className="header-form-field"/>
-               </FormField>
-               <FormField label="Sum" htmlFor={`v.${currentPath}.body.sum`}>
-               <input id={`v.${currentPath}.body.sum`} name={`v.${currentPath}.body.sum`} type="text"
-               onChange={this._onChange}
-               value={link.body.sum} placeholder="Sum" className="header-form-field"/>
-               </FormField>
-               </Box>
-               </Header>
-               */}
+
               <table key={"table_" + link.sqlname}>
                 <tbody>
                 <tr>
@@ -201,7 +176,6 @@ export default class ViewDefDetail extends Component {
     }).filter(field => field != null);
     let links = [];
     if (selfView.body.links && selfView.body.links.length > 0) {
-      //console.log("selfView.body.links.length" + selfView.body.links.length);
       links = this.renderLinks(links, selfView, currentPath + "body.links");
     }
     return fields.concat(links);
@@ -214,7 +188,7 @@ export default class ViewDefDetail extends Component {
       </Header>
     );
   }
-  
+
   render() {
     let {selectedView, closeAlertForm, onDeleteViewDef, onSaveSuccess} = this.props;
     let alertForms = selectedView ? {
@@ -232,8 +206,6 @@ export default class ViewDefDetail extends Component {
                          onConfirm={onDeleteViewDef}/>
     } : {};
 
-    //console.log("alertForms[this.props.alertForm]:");
-    //console.log(this.props.alertForm);
     let p = "input";
     let tableHeader = (
       <tr>
@@ -268,7 +240,6 @@ export default class ViewDefDetail extends Component {
               selectedView && !_.isEmpty(selectedView) &&
               <Box>
                 {selectedView.body && selectedView.body.fields && this.renderMasterHeader(selectedView)}
-                {/*selectedView.body && selectedView.body.fields && this.renderMasterHeaderConditions(selectedView)*/}
                 <Table>
                   <tbody>
                   {tableHeader}
