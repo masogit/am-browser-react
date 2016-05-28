@@ -2,8 +2,7 @@
 
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import {getIntegrationPoint, getIntegrationJob, getIntegrationJobItem,
-  adapterSideBarClick, integrationJobSelect, integrationJobTabSwitch} from '../../actions/ucmdbAdapter';
+import * as UCMDBAdapterActions from '../../actions/ucmdbAdapter';
 import IntegrationJobContainer from './IntegrationJob.js';
 import IntegrationJobItemContainer from './IntegrationJobItem.js';
 
@@ -21,9 +20,9 @@ class UCMDBAdapterContainer extends Component {
   }
 
   componentDidMount() {
-    this.props.getIntegrationPoint();
+    this._getPoints();
     this.integrationPointInterval = setInterval(() => {
-      this.props.getIntegrationPoint();
+      this._getPoints();
     },60*1000);
   }
 
@@ -70,6 +69,20 @@ class UCMDBAdapterContainer extends Component {
     firstStart = true;
   }
 
+  _getPoints() {
+    UCMDBAdapterActions.getIntegrationPoint(this.props.getIntegrationPoint);
+  }
+
+  _getJob() {
+    const {pointName, tabName, getIntegrationJob} = this.props;
+    UCMDBAdapterActions.getIntegrationJob(pointName, tabName, getIntegrationJob);
+  }
+
+  _getJobItem() {
+    const {pointName, tabName, integrationJobName, getIntegrationJobItem} = this.props;
+    UCMDBAdapterActions.getIntegrationJobItem(pointName, tabName, integrationJobName, getIntegrationJobItem);
+  }
+
   onMenuClick(pointName, tabName) {
     /*const point = this.getRecentPoint(this.props.data, pointName);
     const supportedJobs = [];
@@ -105,7 +118,7 @@ class UCMDBAdapterContainer extends Component {
     let jobList, jobItemList, point, pointList, focus;
     if (this.props.pointName) {
       if (this.props.dataError) {
-        pointList = <div>{dataError}</div>;
+        pointList = <div>{this.props.dataError}</div>;
       } else {
         pointList = this.props.data.map(adapter => ({
           key: adapter.name,
@@ -125,12 +138,13 @@ class UCMDBAdapterContainer extends Component {
       jobList = (
         <IntegrationJobContainer {...this.props}
           pushSupported={point.pushSupported}
-          populationSupported={point.populationSupported}/>
+          populationSupported={point.populationSupported}
+          getJob={this._getJob.bind(this)}/>
       );
     }
 
     if (jobList && this.props.integrationJobName) {
-      jobItemList = <IntegrationJobItemContainer {...this.props}/>;
+      jobItemList = <IntegrationJobItemContainer {...this.props} getJobItem={this._getJobItem.bind(this)}/>;
     }
 
     return (
@@ -161,18 +175,12 @@ const select = (state) => {
 
 const menuAction = (dispatch, ownProps) => {
   return {
-    onMenuClick: (pointName, tabName) => dispatch(adapterSideBarClick(pointName, tabName)),
-    getIntegrationPoint: () => dispatch(getIntegrationPoint()),
-    onTabClick: (tabName, pointName) => dispatch(integrationJobTabSwitch(tabName, pointName)),
-    onIntegrationJobSelect: (tabName, pointName, jobName) => dispatch(integrationJobSelect(tabName, pointName, jobName)),
-    getIntegrationJob: (props) => {
-      const {pointName, tabName} = props;
-      dispatch(getIntegrationJob(pointName, tabName));
-    },
-    getIntegrationJobItem: (props) => {
-      const {pointName, tabName, integrationJobName} = props;
-      dispatch(getIntegrationJobItem(pointName, tabName, integrationJobName));
-    }
+    onMenuClick: (pointName, tabName) => dispatch(UCMDBAdapterActions.adapterSideBarClick(pointName, tabName)),
+    getIntegrationPoint: (data, error) => dispatch(UCMDBAdapterActions.adapterDataFetch(data, error)),
+    onTabClick: (tabName, pointName) => dispatch(UCMDBAdapterActions.integrationJobTabSwitch(tabName, pointName)),
+    onIntegrationJobSelect: (tabName, pointName, jobName) => dispatch(UCMDBAdapterActions.integrationJobSelect(tabName, pointName, jobName)),
+    getIntegrationJob: (points, error) => dispatch(UCMDBAdapterActions.integrationJobDataSuccess(points, error)),
+    getIntegrationJobItem: (jobStatuses, error) => dispatch(UCMDBAdapterActions.integrationJobItemDataSuccess(jobStatuses, error))
   };
 };
 

@@ -22,17 +22,17 @@ export default class Graph extends Component {
 
   _gen_chart(form, data, onClick) {
     const chart = {
-      important: form.important,
-      threshold: form.threshold,
-      type: form.type,
-      size: form.size,
-      points: form.points,
-      segmented: form.segmented,
-      smooth: form.smooth,
-      sparkline: form.sparkline,
-      units: form.units,
-      xAxis_col: form.xAxis_col,
-      series_col: form.series_col,
+      important: form.important || 0,
+      threshold: form.threshold || 0,
+      type: form.type || 'bar',
+      size: form.size || 'medium',
+      points: form.points || false,
+      segmented: form.segmented || false,
+      smooth: form.smooth || false,
+      sparkline: form.sparkline || false,
+      units: form.units || '',
+      xAxis_col: form.xAxis_col || '',
+      series_col: form.series_col || [],
       series: []
     };
 
@@ -133,8 +133,8 @@ export default class Graph extends Component {
 
   _gen_meter(form, data, onClick) {
     const meter = {
-      important: form.important,
-      threshold: form.threshold,
+      important: form.important || 0,
+      threshold: form.threshold || 0,
       type: form.type,
       series_col: form.series_col,
       series: [],
