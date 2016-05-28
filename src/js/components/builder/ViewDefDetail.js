@@ -214,76 +214,7 @@ export default class ViewDefDetail extends Component {
       </Header>
     );
   }
-
-  renderBody(body) {
-    return (
-      <Table>
-        <tbody>
-        <Header size="small">
-          {body.label && `${body.label} (${body.sqlname})`}
-        </Header>
-        <tr>
-          <td colSpan={8}>
-            <textarea id="v.body.filter" name="v.body.filter" defaultValue={body.filter}
-                      placeholder="Input AQL as filter" onChange={this._onChange}
-                      style={{width: '100%', margin: 0,outline: 0,borderWidth: 1,borderStyle: 'hidden'}}/>
-          </td>
-        </tr>
-        <tr>
-          {
-            body.fields.map((field, index) => {
-              return (
-                !field.PK ?
-                  <tr id={`${currentPath}_${selfView.body.sqlname}_${field.sqlname}_${index}_row`}
-                      key={`${currentPath}_${selfView.body.sqlname}_${field.sqlname}_${index}_row`}>
-                    <td>{field.sqlname}</td>
-                    <td>
-                      <input id={"v." + currentPath + "body.fields." + index + ".alias"}
-                             name={`v.${currentPath}body.fields.${index}.alias`}
-                             type="text"
-                             placeholder="Add alias here..."
-                             value={field.alias}
-                             onChange={this._onChange}
-                             style={{display: 'inline-block',margin: 0,padding: 0,outline: 0,borderWidth: 0,borderStyle: 'hidden'}}
-                      />
-                    </td>
-                    <td>
-                      <CheckBox id={`v.${currentPath}body.fields.${index}.searchable`}
-                                name={`v.${currentPath}body.fields.${index}.searchable`} checked={field.searchable}
-                                disabled={ (selfView.body.fields.filter(field => field.searchable == true).length >= 2) && !field.searchable }
-                                onChange={this._onChange}/>
-                    </td>
-                    <td><CheckBox id={`v.${currentPath}body.groupby`} name={`v.${currentPath}body.groupby`}
-                                  value={field.sqlname} checked={selfView.body.groupby==field.sqlname?true:false}
-                                  disabled={(selfView.body.groupby&&selfView.body.groupby!=field.sqlname)?true:false}
-                                  onChange={this._onChange}/>
-                    </td>
-                    <td>
-                      <CheckBox id={`v.${currentPath}body.fields.${index}.searchable`}
-                                name={`v.${currentPath}body.fields.${index}.searchable`} checked={field.searchable}
-                                disabled={ (selfView.body.fields.filter(field => field.searchable == true).length >= 2) && !field.searchable }
-                                onChange={this._onChange}/>
-                    </td>
-                    <td>
-                      <CheckBox id={`v.${currentPath}body.fields.${index}.searchable`}
-                                name={`v.${currentPath}body.fields.${index}.searchable`} checked={field.searchable}
-                                disabled={ (selfView.body.fields.filter(field => field.searchable == true).length >= 2) && !field.searchable }
-                                onChange={this._onChange}/></td>
-                    <td>
-                      <a id={`${currentPath}body.fields.${index}.del`} name={`${currentPath}body.fields.${index}`}
-                         onClick={this.props.onDeleteTableRow}><Close /></a>
-                    </td>
-                  </tr>
-                  : null
-              );
-            })
-          }
-        </tr>
-        </tbody>
-      </Table>
-    );
-  }
-
+  
   render() {
     let {selectedView, closeAlertForm, onDeleteViewDef, onSaveSuccess} = this.props;
     let alertForms = selectedView ? {
