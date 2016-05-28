@@ -59,7 +59,7 @@ export default class ViewsDefList extends Component {
       toolbar = <Anchor href="#" icon={<Close />} label="Close" onClick={this._closeEdit.bind(this)}/>;
       contents = this.state.editView;
     } else {
-      toolbar = <Anchor href="#" icon={<Add />} label="" onClick={this._newView.bind(this)}/>;
+      toolbar = <Anchor href="#" icon={<Add />} label="New" onClick={this._newView.bind(this)}/>;
       contents = views.map((view, key) => ({
         key: view._id,
         groupby: view.category,
