@@ -18,8 +18,17 @@ export default class GroupList extends Component {
     };
   }
 
+  componentWillMount() {
+    if (this.props.focus) {
+      this.setState({
+        expand: this.props.focus.expand
+      });
+    }
+  }
+
+
   componentWillReceiveProps(nextProps) {
-    if (nextProps.focus) {
+    if (nextProps.focus && nextProps.focus.expand !== this.props.focus.expand) {
       this.setState({
         expand: nextProps.focus.expand
       });
@@ -83,7 +92,9 @@ export default class GroupList extends Component {
                 <List>
                   <ListItem {...this.props} justify="between" direction="row" separator="none"
                                             onClick={this._expandToggle.bind(this, key)}>
-                    <Anchor href="#" label={key} icon={(expand===key)?<Down />:<Next />}/>
+                    <Box full='horizontal'>
+                      <Anchor href="#" label={key} icon={(expand===key)?<Down />:<Next />}/>
+                    </Box>
                     {grouped[key].length}
                   </ListItem>
                 </List>
