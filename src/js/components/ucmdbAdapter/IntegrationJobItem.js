@@ -9,15 +9,15 @@ export default class IntegrationJobItemContainer extends Component {
   }
 
   componentDidMount() {
-    this.props.getIntegrationJobItem(this.props);
+    this.props.getJobItem();
     this.integrationJobItemInterval = setInterval(() => {
-      this.props.getIntegrationJobItem(this.props);
+      this.props.getJobItem();
     }, 60 * 1000);
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.pointName !== this.props.pointName || nextProps.tabName !== this.props.tabName || this.props.integrationJobName !== nextProps.integrationJobName) {
-      this.props.getIntegrationJobItem(nextProps);
+      this.props.getJobItem();
     }
   }
 

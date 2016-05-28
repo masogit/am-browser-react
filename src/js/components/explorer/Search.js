@@ -2,12 +2,9 @@ import React, {Component} from 'react';
 import history from '../../RouteHistory';
 import * as ExplorerActions from '../../actions/explorer';
 import * as AQLActions from '../../actions/aql';
-import Title from 'grommet/components/Title';
-import Box from 'grommet/components/Box';
-import Tiles from 'grommet/components/Tiles';
-import Tile from 'grommet/components/Tile';
-import Headline from 'grommet/components/Headline';
-import Meter from 'grommet/components/Meter';
+import * as UCMDBAdapterActions from '../../actions/ucmdbAdapter';
+import {Title, Box, Tiles, Headline, Meter, Tile} from 'grommet';
+import Graph from '../commons/Graph';
 
 
 export default class Search extends Component {
@@ -15,7 +12,12 @@ export default class Search extends Component {
   constructor() {
     super();
     this.state = {
-      viewNavigation: null
+      viewNavigation: null,
+      ucmdbAdapter: {
+        ready: false,
+        popJobs: [],
+        pushJobs: []
+      }
     };
   }
 
@@ -30,6 +32,47 @@ export default class Search extends Component {
         aqlSeries: this._filterFirst7(this._getSeries(aqls, 'category'))
       });
     });
+    UCMDBAdapterActions.getIntegrationPoint((points) => {
+      if (points.length > 0) {
+        let count = 1;
+        points.map((point) => {
+          if (point.populationSupported) {
+            UCMDBAdapterActions.getIntegrationJob(point.name, 'populationJobs', (popJobs) => {
+              if (point.pushSupported) {
+                UCMDBAdapterActions.getIntegrationJob(point.name, 'pushJobs', (pushJobs) => {
+                  this.setState({
+                    ucmdbAdapter: {
+                      ready: count++ === points.length,
+                      pushJobs: this.state.ucmdbAdapter.pushJobs.concat(pushJobs),
+                      popJobs: this.state.ucmdbAdapter.popJobs.concat(popJobs)
+                    }
+                  });
+                });
+              } else {
+                this.setState({
+                  ucmdbAdapter: {
+                    ready: count++ === points.length,
+                    pushJobs: this.state.ucmdbAdapter.pushJobs,
+                    popJobs: this.state.ucmdbAdapter.popJobs.concat(popJobs)
+                  }
+                });
+              }
+            });
+          } else if (point.pushSupported) {
+            UCMDBAdapterActions.getIntegrationJob(point.name, 'pushJobs', (pushJobs) => {
+              this.setState({
+                ucmdbAdapter: {
+                  ready: count++ === points.length,
+                  pushJobs: this.state.ucmdbAdapter.pushJobs.concat(pushJobs),
+                  popJobs: this.state.ucmdbAdapter.popJobs
+                }
+              });
+            });
+          }
+        });
+      }
+    });
+
   }
 
   _filterFirst7(objs) {
@@ -49,7 +92,7 @@ export default class Search extends Component {
   }
 
   _getSeries(children, groupby) {
-    var grouped = {};
+    const grouped = {};
     children.forEach((child) => {
       if (grouped[child[groupby]]) {
         grouped[child[groupby]].push(child);
@@ -57,14 +100,73 @@ export default class Search extends Component {
         grouped[child[groupby]] = [child];
       }
     });
-    var series = Object.keys(grouped).map((key)=> {
-      return {
-        label: key,
-        value: grouped[key].length
-      };
+    return Object.keys(grouped).map((key)=> ({
+      label: key,
+      value: grouped[key].length
+    }));
+  }
+
+  _getChartValues(children, groupby) {
+    const grouped = {};
+    children.forEach((child) => {
+      if (grouped[child[groupby]]) {
+        grouped[child[groupby]].push(child);
+      } else {
+        grouped[child[groupby]] = [child];
+      }
     });
 
-    return series;
+    return Object.keys(grouped).map((key, index)=> {
+      return {key, value: grouped[key].length};
+    });
+  }
+
+  _fillData(rows, ...children) {
+    children.map((child, index) => {
+      child.map(data => {
+        let exists = false;
+        rows.map(row => {
+          if (row[0] === data.key) {
+            exists = true;
+            row[index + 1] = data.value;
+          }
+        });
+        if (exists === false) {
+          const row = [data.key];
+          row[index + 1] = data.value;
+          rows.push(row);
+        }
+      });
+    });
+
+    rows.map((row) => {
+      for (let i = 1; i <= children.length; i++) {
+        if (!row[i]) {
+          row[i] = 0;
+        }
+      }
+    });
+  }
+
+  _getUcmdbGraph() {
+    let pushJobs, popJobs, rows;
+    popJobs = this._getChartValues(this.state.ucmdbAdapter.popJobs, 'status');
+    pushJobs = this._getChartValues(this.state.ucmdbAdapter.pushJobs, 'status');
+    rows = [];
+    this._fillData(rows, pushJobs, popJobs);
+
+    const data = {
+      header: [{Name: 'status'}, {Name: 'pushJobs'}, {Name: 'popJobs'}],
+      rows: rows
+    };
+    const config = {
+      xAxis: {placement: 'bottom'},
+      xAxis_col: '0',
+      series_col: ['1', '2'],
+      series: [pushJobs, popJobs],
+      legend: {position: 'after'}
+    };
+    return <Graph type="chart" data={data} config={config}/>;
   }
 
   _goExplorer() {
@@ -96,12 +198,10 @@ export default class Search extends Component {
     }, {
       title: 'UCMDB Adapter Jobs Status',
       onClick: this._goUCMDB,
-      graph: (
-        <Meter type="spiral" series={[
-          {"label": "OK", "value": 70, "colorIndex": "ok"},
-          {"label": "Warning", "value": 15, "colorIndex": "warning"},
-          {"label": "Error", "value": 5, "colorIndex": "error"}
-        ]} max={90} a11yTitle="meter-title-17"/>
+      graph: this.state.ucmdbAdapter.ready && (
+        <Meter
+          series={this._getSeries(this.state.ucmdbAdapter.popJobs.concat(this.state.ucmdbAdapter.pushJobs), 'status')}
+          max={8} legend={{"placement": "inline"}}/>
       )
     }];
 

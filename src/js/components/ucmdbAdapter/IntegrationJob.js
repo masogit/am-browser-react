@@ -9,15 +9,15 @@ export default class IntegrationJobContainer extends Component {
   }
 
   componentDidMount() {
-    this.props.getIntegrationJob(this.props);
+    this.props.getJob();
     this.integrationJobInterval = setInterval(() => {
-      this.props.getIntegrationJob(this.props);
+      this.props.getJob();
     },60*1000);
   }
 
   componentWillReceiveProps(nextProps) {
     if ( nextProps.tabName && (this.props.pointName !== nextProps.pointName || this.props.tabName !== nextProps.tabName)) {
-      this.props.getIntegrationJob(nextProps);
+      this.props.getJob(nextProps);
     } else if (nextProps.params.tabName && nextProps.params.tabName != nextProps.tabName) {
       // if use change url manually
       this.onTabClick(nextProps.params.tabName, nextProps.pointName);
