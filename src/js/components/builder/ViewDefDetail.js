@@ -1,21 +1,12 @@
 import React, {Component, PropTypes} from 'react';
-//import { connect } from 'react-redux';
-//import PureRenderMixin from 'react-addons-pure-render-mixin';
-//import Sidebar from 'grommet/components/Sidebar';
-import {Box, Form, FormFields, FormField, Header, CheckBox, Menu, Table, Anchor, Title} from 'grommet';
-//import Button from 'grommet/components/Button';
-//import Add from 'grommet/components/icons/base/Add';
+import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Title, Split} from 'grommet';
 import Close from 'grommet/components/icons/base/Close';
 import Play from 'grommet/components/icons/base/Play';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
 import Duplicate from 'grommet/components/icons/base/Duplicate';
 import Download from 'grommet/components/icons/base/Download';
-//import MDSave from 'react-icons/lib/md/save';
+import Mail from 'grommet/components/icons/base/Mail';
 import _ from 'lodash';
-//import InlineEdit from 'react-inline-edit';
-//import store from '../../store';
-//import { setSelectedView, loadTemplateTable } from '../../actions/views';
-//import GrommetTableTest from '../GrommetTable';
 import AlertForm from '../../components/commons/AlertForm';
 
 export default class ViewDefDetail extends Component {
@@ -32,7 +23,6 @@ export default class ViewDefDetail extends Component {
   }
 
   componentDidMount() {
-    //console.log("ViewDefDetail - componentDidMount()");
   }
 
   componentWillReceiveProps(nextProps) {
@@ -47,10 +37,10 @@ export default class ViewDefDetail extends Component {
   componentWillUnmount() {
   }
 
-  _onChange(event) {
+  _onChange(event, value) {
     let path = event.target.name; // why not 'event.target.id'? because of radio button.
     if (event.target.type == "checkbox") {
-      this.props.onValueChange(path.substring(2), event.target.checked ? true : false);
+      this.props.onValueChange(path.substring(2), event.target.checked ? (value ? value : true) : (value ? "" : false));
     } else {
       this.props.onValueChange(path.substring(2), event.target.value);
     }
@@ -79,6 +69,7 @@ export default class ViewDefDetail extends Component {
     return false;
   }
 
+
   renderLinks(links, table, path) {
     let selfTable = table;
     links = selfTable.body.links.map((link, index) => {
@@ -86,41 +77,54 @@ export default class ViewDefDetail extends Component {
         let currentPath = path + "." + index;
         return (
           <tr key={"link_" + link.sqlname + "_" + index}>
-            <td colSpan={4}>
+            <td colSpan={8}>
               <Header size="small">
-                <h3>{link.sqlname}</h3>
+                {link.sqlname}
               </Header>
-
-              <Header size="small">
-                <Box direction="row">
-                  <FormField label="Filter" htmlFor={`v.${currentPath}.body.filter`}>
-                    <input id={`v.${currentPath}.body.filter`} name={`v.${currentPath}.body.filter`} type="text"
-                           onChange={this._onChange}
-                           value={link.body.filter} placeholder="Filter" className="header-form-field"/>
-                  </FormField>
-                  <FormField label="Order by" htmlFor={`v.${currentPath}.body.orderby`}>
-                    <input id={`v.${currentPath}.body.orderby`} name={`v.${currentPath}.body.orderby`} type="text"
-                           onChange={this._onChange}
-                           value={link.body.orderby} placeholder="Order by" className="header-form-field"/>
-                  </FormField>
-                  <FormField label="Group by" htmlFor={`v.${currentPath}.body.count`}>
-                    <input id={`v.${currentPath}.body.groupby`} name={`v.${currentPath}.body.groupby`} type="text"
-                           onChange={this._onChange}
-                           value={link.body.groupby} placeholder="Group by" className="header-form-field"/>
-                  </FormField>
-                  <FormField label="Sum" htmlFor={`v.${currentPath}.body.sum`}>
-                    <input id={`v.${currentPath}.body.sum`} name={`v.${currentPath}.body.sum`} type="text"
-                           onChange={this._onChange}
-                           value={link.body.sum} placeholder="Sum" className="header-form-field"/>
-                  </FormField>
-                </Box>
-              </Header>
+              {/*
+               <Header size="small">
+               <Box direction="row">
+               <FormField label="Filter" htmlFor={`v.${currentPath}.body.filter`}>
+               <input id={`v.${currentPath}.body.filter`} name={`v.${currentPath}.body.filter`} type="text"
+               onChange={this._onChange}
+               value={link.body.filter} placeholder="Filter" className="header-form-field"/>
+               </FormField>
+               <FormField label="Order by" htmlFor={`v.${currentPath}.body.orderby`}>
+               <input id={`v.${currentPath}.body.orderby`} name={`v.${currentPath}.body.orderby`} type="text"
+               onChange={this._onChange}
+               value={link.body.orderby} placeholder="Order by" className="header-form-field"/>
+               </FormField>
+               <FormField label="Group by" htmlFor={`v.${currentPath}.body.count`}>
+               <input id={`v.${currentPath}.body.groupby`} name={`v.${currentPath}.body.groupby`} type="text"
+               onChange={this._onChange}
+               value={link.body.groupby} placeholder="Group by" className="header-form-field"/>
+               </FormField>
+               <FormField label="Sum" htmlFor={`v.${currentPath}.body.sum`}>
+               <input id={`v.${currentPath}.body.sum`} name={`v.${currentPath}.body.sum`} type="text"
+               onChange={this._onChange}
+               value={link.body.sum} placeholder="Sum" className="header-form-field"/>
+               </FormField>
+               </Box>
+               </Header>
+               */}
               <table key={"table_" + link.sqlname}>
                 <tbody>
                 <tr>
                   <th>Field</th>
                   <th>Alias</th>
-                  <th></th>
+                  <th>Search</th>
+                  <th>Group</th>
+                  <th>Sum</th>
+                  <th>Order</th>
+                  <th>Del</th>
+                </tr>
+                <tr>
+                  <td colSpan={8}>
+                    <textarea type="text" placeholder="Input AQL as filter" id={`v.${currentPath}.body.filter`}
+                              name={`v.${currentPath}.body.filter`} onChange={this._onChange}
+                              value={link.body.filter}
+                              style={{width: '100%', margin: 0,outline: 0,borderWidth: 1,borderStyle: 'hidden'}}/>
+                  </td>
                 </tr>
                 {link.body && link.body.fields && this.renderTemplateTable(link, false, currentPath)}
                 </tbody>
@@ -142,34 +146,55 @@ export default class ViewDefDetail extends Component {
       return (
         !field.PK ?
           <tr id={`${currentPath}_${selfView.body.sqlname}_${field.sqlname}_${index}_row`}
-              key={`${currentPath}_${selfView.body.sqlname}_${field.sqlname}_${index}_row`}
-              onMouseOver={() => {
-                document.getElementById(`${currentPath}body.fields.${index}.del`).style.display = "inline-block";
-              }}
-              onMouseOut={() => {
-                document.getElementById(`${currentPath}body.fields.${index}.del`).style.display = "none";
-              }}>
-            <td style={{width: "35%"}}>{field.sqlname}</td>
-            <td style={{width: "35%"}}>
-              <input id={"v." + currentPath + "body.fields." + index + ".alias"}
+              key={`${currentPath}_${selfView.body.sqlname}_${field.sqlname}_${index}_row`}>
+            <td>{field.sqlname}</td>
+            <td>
+              <input id={`v.${currentPath}body.fields.${index}.alias`}
                      name={`v.${currentPath}body.fields.${index}.alias`}
                      type="text"
                      placeholder="Add alias here..."
                      value={field.alias}
                      onChange={this._onChange}
-                     style={{display: 'inline-block',margin: 0,padding: 0,outline: 0,borderWidth: 1,borderStyle: 'hidden'}}
+                     style={{display: 'inline-block',margin: 0,padding: 0,outline: 0,borderWidth: 0,borderStyle: 'hidden'}}
               />
             </td>
-
-            {root &&
             <td>
               <CheckBox id={`v.${currentPath}body.fields.${index}.searchable`}
                         name={`v.${currentPath}body.fields.${index}.searchable`} checked={field.searchable}
-                        disabled={ (selfView.body.fields.filter(field => field.searchable == true).length >= 2) && !field.searchable }
-                        onChange={this._onChange}/></td>}
-            <td><a id={`${currentPath}body.fields.${index}.del`} name={`${currentPath}body.fields.${index}`}
-                   style={{display: "none"}}
-                   onClick={this.props.onDeleteTableRow}><Close /></a></td>
+                        disabled={(selfView.body.fields.filter(field => field.searchable == true).length >= 2) && !field.searchable}
+                        onChange={this._onChange}/>
+            </td>
+            <td>
+              <CheckBox id={`v.${currentPath}body.groupby`} name={`v.${currentPath}body.groupby`}
+                        value={field.sqlname} checked={selfView.body.groupby==field.sqlname?true:false}
+                        disabled={(selfView.body.groupby&&selfView.body.groupby!=field.sqlname)?true:false}
+                        onChange={
+                          (event) => {
+                            this._onChange(event, field.sqlname);
+                          }}/>
+            </td>
+            <td>
+              <CheckBox id={`v.${currentPath}body.sum`} name={`v.${currentPath}body.sum`}
+                        value={field.sqlname} checked={selfView.body.sum==field.sqlname?true:false}
+                        disabled={(selfView.body.sum&&selfView.body.sum!=field.sqlname)?true:false}
+                        onChange={
+                          (event) => {
+                            this._onChange(event, field.sqlname);
+                          }}/>
+            </td>
+            <td>
+              <CheckBox id={`v.${currentPath}body.orderby`} name={`v.${currentPath}body.orderby`}
+                        value={field.sqlname} checked={selfView.body.orderby==field.sqlname?true:false}
+                        disabled={(selfView.body.orderby&&selfView.body.orderby!=field.sqlname)?true:false}
+                        onChange={
+                          (event) => {
+                            this._onChange(event, field.sqlname);
+                          }}/>
+            </td>
+            <td>
+              <a id={`${currentPath}body.fields.${index}.del`} name={`${currentPath}body.fields.${index}`}
+                 onClick={this.props.onDeleteTableRow}><Close /></a>
+            </td>
           </tr>
           : null
       );
@@ -185,36 +210,77 @@ export default class ViewDefDetail extends Component {
   renderMasterHeader(selectedView) {
     return (
       <Header size="small">
-        {selectedView.body.label && <h3>{`${selectedView.body.label} (${selectedView.body.sqlname})`}</h3>}
+        {selectedView.body.label && `${selectedView.body.label} (${selectedView.body.sqlname})`}
       </Header>
     );
   }
 
-  renderMasterHeaderConditions(selectedView) {
-    //let conditionsPath = "v.body.conditions".replace(/\./g, "_");
+  renderBody(body) {
     return (
-      <Header size="small">
-        <Box direction="row">
-          <FormField label="Filter" htmlFor="v.body.filter">
-            <input id="v.body.filter" name="v.body.filter" type="text" onChange={this._onChange}
-                   value={selectedView.body.filter} placeholder="Add filter here..." className="header-form-field"/>
-          </FormField>
-          <FormField label="Order by" htmlFor="v.body.orderby">
-            <input id="v.body.orderby" name="v.body.orderby" type="text" onChange={this._onChange}
-                   value={selectedView.body.orderby} placeholder="Add filter here..." className="header-form-field"/>
-          </FormField>
-          <FormField label="Group by" htmlFor="v.body.groupby">
-            <input id={`v.body.groupby`} name={`v.body.groupby`} type="text"
-                   onChange={this._onChange}
-                   value={selectedView.body.groupby} placeholder="Group by" className="header-form-field"/>
-          </FormField>
-          <FormField label="Sum" htmlFor="v.body.sum">
-            <input id={`v.body.sum`} name={`v.body.sum`} type="text"
-                   onChange={this._onChange}
-                   value={selectedView.body.sum} placeholder="Sum" className="header-form-field"/>
-          </FormField>
-        </Box>
-      </Header>
+      <Table>
+        <tbody>
+        <Header size="small">
+          {body.label && `${body.label} (${body.sqlname})`}
+        </Header>
+        <tr>
+          <td colSpan={8}>
+            <textarea id="v.body.filter" name="v.body.filter" defaultValue={body.filter}
+                      placeholder="Input AQL as filter" onChange={this._onChange}
+                      style={{width: '100%', margin: 0,outline: 0,borderWidth: 1,borderStyle: 'hidden'}}/>
+          </td>
+        </tr>
+        <tr>
+          {
+            body.fields.map((field, index) => {
+              return (
+                !field.PK ?
+                  <tr id={`${currentPath}_${selfView.body.sqlname}_${field.sqlname}_${index}_row`}
+                      key={`${currentPath}_${selfView.body.sqlname}_${field.sqlname}_${index}_row`}>
+                    <td>{field.sqlname}</td>
+                    <td>
+                      <input id={"v." + currentPath + "body.fields." + index + ".alias"}
+                             name={`v.${currentPath}body.fields.${index}.alias`}
+                             type="text"
+                             placeholder="Add alias here..."
+                             value={field.alias}
+                             onChange={this._onChange}
+                             style={{display: 'inline-block',margin: 0,padding: 0,outline: 0,borderWidth: 0,borderStyle: 'hidden'}}
+                      />
+                    </td>
+                    <td>
+                      <CheckBox id={`v.${currentPath}body.fields.${index}.searchable`}
+                                name={`v.${currentPath}body.fields.${index}.searchable`} checked={field.searchable}
+                                disabled={ (selfView.body.fields.filter(field => field.searchable == true).length >= 2) && !field.searchable }
+                                onChange={this._onChange}/>
+                    </td>
+                    <td><CheckBox id={`v.${currentPath}body.groupby`} name={`v.${currentPath}body.groupby`}
+                                  value={field.sqlname} checked={selfView.body.groupby==field.sqlname?true:false}
+                                  disabled={(selfView.body.groupby&&selfView.body.groupby!=field.sqlname)?true:false}
+                                  onChange={this._onChange}/>
+                    </td>
+                    <td>
+                      <CheckBox id={`v.${currentPath}body.fields.${index}.searchable`}
+                                name={`v.${currentPath}body.fields.${index}.searchable`} checked={field.searchable}
+                                disabled={ (selfView.body.fields.filter(field => field.searchable == true).length >= 2) && !field.searchable }
+                                onChange={this._onChange}/>
+                    </td>
+                    <td>
+                      <CheckBox id={`v.${currentPath}body.fields.${index}.searchable`}
+                                name={`v.${currentPath}body.fields.${index}.searchable`} checked={field.searchable}
+                                disabled={ (selfView.body.fields.filter(field => field.searchable == true).length >= 2) && !field.searchable }
+                                onChange={this._onChange}/></td>
+                    <td>
+                      <a id={`${currentPath}body.fields.${index}.del`} name={`${currentPath}body.fields.${index}`}
+                         onClick={this.props.onDeleteTableRow}><Close /></a>
+                    </td>
+                  </tr>
+                  : null
+              );
+            })
+          }
+        </tr>
+        </tbody>
+      </Table>
     );
   }
 
@@ -243,7 +309,10 @@ export default class ViewDefDetail extends Component {
         <th>Field</th>
         <th>Alias</th>
         <th>Search</th>
-        <th></th>
+        <th>Group</th>
+        <th>Sum</th>
+        <th>Order</th>
+        <th>Del</th>
       </tr>
     );
 
@@ -256,48 +325,61 @@ export default class ViewDefDetail extends Component {
             <Anchor link="#" icon={<Duplicate />} onClick={this.props.onDuplicateViewDef}>Duplicate</Anchor>
             <Anchor link="#" icon={<Close />} onClick={this.props.deleteViewDef}>Delete</Anchor>
             <Anchor link="#" icon={<Play />} onClick={this.props.openPreview}>Query</Anchor>
+            <Anchor link="#" icon={<Mail />} onClick={this.props.openPreview}>Mail</Anchor>
             <Anchor link="#" icon={<Download />} onClick={this._onDownload.bind(this, selectedView)}>Download</Anchor>
           </Menu>
         </Header>
 
-        <div style={{display: "flex"}}>
-          {selectedView && !_.isEmpty(selectedView) &&
-          <div style={{width: "75%"}}>
-            <Box>
-              {selectedView.body && selectedView.body.fields && this.renderMasterHeader(selectedView)}
-              {selectedView.body && selectedView.body.fields && this.renderMasterHeaderConditions(selectedView)}
-              <Table>
-                <tbody>
-                {tableHeader}
-                {selectedView.body && selectedView.body.fields && this.renderTemplateTable(selectedView, true)}
-                </tbody>
-              </Table>
-            </Box>
-          </div>
-          }
+        <Box>
+          <Split flex="left">
 
-          {selectedView && !_.isEmpty(selectedView) &&
-          <div>
-            <Box pad="small">
-              <Form onSubmit={this.props.onSubmit} compact={this.props.compact}>
-                <FormField label="Name" htmlFor={p + "item1"}>
-                  <input id="v.name" name="v.name" type="text" onChange={this._onChange}
-                         value={selectedView.name}/>
-                </FormField>
-                <FormField label="Description" htmlFor={p + "item2"}>
-                    <textarea id="v.desc" name="v.desc" value={selectedView.desc}
-                              onChange={this._onChange}></textarea>
-                </FormField>
-                <FormField label="Category" htmlFor={p + "item3"}>
-                  <input id="v.category" name="v.category" type="text" onChange={this._onChange}
-                         value={selectedView.category}/>
-                </FormField>
-              </Form>
-            </Box>
-          </div>
-          }
-          {alertForms[this.props.alertForm]}
-        </div>
+            {
+              selectedView && !_.isEmpty(selectedView) &&
+              <Box>
+                {selectedView.body && selectedView.body.fields && this.renderMasterHeader(selectedView)}
+                {/*selectedView.body && selectedView.body.fields && this.renderMasterHeaderConditions(selectedView)*/}
+                <Table>
+                  <tbody>
+                  {tableHeader}
+                  <tr>
+                    <td colSpan={8}>
+                      <textarea id="v.body.filter" name="v.body.filter" value={selectedView.body.filter}
+                                placeholder="Input AQL as filter" onChange={this._onChange}
+                                style={{width: '100%', margin: 0,outline: 0,borderWidth: 1,borderStyle: 'hidden'}}>
+                      </textarea>
+                    </td>
+                  </tr>
+                  {selectedView.body && selectedView.body.fields && this.renderTemplateTable(selectedView, true)}
+                  </tbody>
+                </Table>
+              </Box>
+            }
+
+
+            {
+              selectedView && !_.isEmpty(selectedView) &&
+              <Box pad="small">
+                <Header>Attributes</Header>
+                <Form onSubmit={this.props.onSubmit} compact={this.props.compact}>
+                  <FormField label="Name" htmlFor={p + "item1"}>
+                    <input id="v.name" name="v.name" type="text" onChange={this._onChange}
+                           value={selectedView.name}/>
+                  </FormField>
+                  <FormField label="Description" htmlFor={p + "item2"}>
+                    <textarea id="v.desc" name="v.desc" value={selectedView.desc} onChange={this._onChange}></textarea>
+                  </FormField>
+                  <FormField label="Category" htmlFor={p + "item3"}>
+                    <input id="v.category" name="v.category" type="text" onChange={this._onChange}
+                           value={selectedView.category}/>
+                  </FormField>
+                </Form>
+              </Box>
+            }
+
+            {alertForms[this.props.alertForm]}
+
+          </Split>
+        </Box>
       </Box>
     );
   }
