@@ -232,10 +232,10 @@ export default class ViewDefDetail extends Component {
         <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
           <Title>View Builder</Title>
           <Menu direction="row" align="center" responsive={false}>
-            <Anchor link="#" icon={<Checkmark />} onClick={this.props.onSubmit}>Save</Anchor>
-            <Anchor link="#" icon={<Duplicate />} onClick={this.props.onDuplicateViewDef}>Duplicate</Anchor>
-            <Anchor link="#" icon={<Close />} onClick={this.props.deleteViewDef}>Delete</Anchor>
             <Anchor link="#" icon={<Play />} onClick={this.props.openPreview}>Query</Anchor>
+            <Anchor link="#" icon={<Checkmark />} onClick={this.props.onSubmit}>Save</Anchor>
+            <Anchor link="#" icon={<Close />} onClick={this.props.deleteViewDef}>Delete</Anchor>
+            <Anchor link="#" icon={<Duplicate />} onClick={this.props.onDuplicateViewDef}>Duplicate</Anchor>
             {
               selectedView._id &&
               <Anchor link="#" icon={<Mail />} onClick={this._onMail.bind(this, selectedView)}>Mail</Anchor>
