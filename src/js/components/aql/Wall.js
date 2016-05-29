@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
 import * as Format from '../../constants/RecordFormat';
+import history from '../../RouteHistory';
 import RecordList from '../explorer/RecordList';
 import AlertForm from '../commons/AlertForm';
 import Add from 'grommet/components/icons/base/Add';
@@ -17,6 +18,8 @@ import {
   Header,
   Menu,
   Title,
+  Table,
+  TableRow,
   Layer,
   Carousel
 } from 'grommet';
@@ -46,17 +49,21 @@ export default class Wall extends Component {
     this._selectAQL.bind(this);
   }
 
-  componentWillMount() {
-    this._loadAQLs();
-    this._loadWall();
+  componentDidMount() {
+    if (this.props.params.id) {
+      AQLActions.loadAQL(this.props.params.id, (aql)=> {
+        this._queryData(aql);
+      });
+    } else {
+      this._loadAQLs();
+      this._loadWall();
+    }
   }
 
   _findAqls(box) {
-    console.log(box);
     if (box.child && box.child._id) {
       AQLActions.loadAQL(box.child._id, (aql)=> {
         this._queryData(aql);
-        console.log("aql: " + aql.name);
       });
     } else if (box.child && box.child instanceof Array) {
       box.child.forEach((child)=> {
@@ -76,7 +83,6 @@ export default class Wall extends Component {
   _queryData(aql) {
     const data = this.state.data;
     AQLActions.queryAQL(aql.str, (result) => {
-      console.log(result);
       if (result) {
         data[aql._id] = {
           aql: aql,
@@ -173,6 +179,10 @@ export default class Wall extends Component {
     });
   }
 
+  _onPrint() {
+    window.print();
+  }
+
   _getLayer(box, parent) {
     return (
       <Layer onClose={this._onClose.bind(this)} closer={true} align="left">
@@ -219,7 +229,9 @@ export default class Wall extends Component {
         const dataMap = this.state.data[box.child._id];
         child = (
           <Box justify="center" {...box} direction="column" pad="medium">
-            <Header>{dataMap.aql.name}</Header>
+            <Header>
+              <Anchor label={dataMap.aql.name} onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
+            </Header>
             {<Graph type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
                     onClick={(filter) => this._showViewRecords(filter, dataMap.aql.view)}/>}
           </Box>
@@ -259,11 +271,13 @@ export default class Wall extends Component {
     return (
       <Carousel>
         {
-          Object.keys(data).map((key)=> {
+          Object.keys(data).map((key, index)=> {
             const dataMap = data[key];
             return (
-              <Box pad="large" colorIndex="light-2">
-                <Header>{dataMap.aql.name}</Header>
+              <Box pad="large" colorIndex="light-2" key={index}>
+                <Header>
+                  <Anchor label={dataMap.aql.name} onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
+                </Header>
                 {
                   <Box key={dataMap.aql._id} pad="large" align={(dataMap.aql.type=='meter')?'center':''}
                        full="horizontal">
@@ -299,6 +313,42 @@ export default class Wall extends Component {
       });
   }
 
+  _showAQLDetail(id) {
+    history.push(`/wall/${id}`);
+  }
+
+  _renderSingleAQL(graph) {
+    const {aql, data} = graph;
+    const header = data.header.map((col) => <th key={col.Index}>{col.Name}</th>);
+    const rows = data.rows.map((row, index) => (
+      <TableRow key={index}> {
+        row.map((col, i) => {
+          return (<td key={i}>{col}</td>);
+        })
+      }</TableRow>
+    ));
+    return (
+      <Box pad="large" colorIndex="light-2">
+        <Header>{aql.name}</Header>
+        {
+          <Box key={aql._id} pad="large" align={(aql.type=='meter')?'center':''} full="horizontal">
+            <Graph type={aql.type} data={data} config={aql.form}
+                   onClick={(filter) => this._showViewRecords(filter, aql.view)}/>
+          </Box>
+        }
+        <Table>
+          <thead>
+          <tr>{header}</tr>
+          </thead>
+          <tbody>
+          {rows}
+          </tbody>
+        </Table>
+      </Box>
+    );
+  }
+
+
   _onSave() {
     AQLActions.saveWall(this.state.box, (data) => {
       if (data)
@@ -322,33 +372,44 @@ export default class Wall extends Component {
     var box = this.state.box;
     var data = this.state.data;
     return (
-      <Box direction="column" pad="medium" full="horizontal">
-        <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
-          <Title>AM Insight</Title>
-          <Menu direction="row" align="center" responsive={false}>
-            <CheckBox id="carousel" label="Carousel" checked={this.state.carousel}
-                      onChange={this._toggleCarousel.bind(this)}/>
-            <CheckBox id="dashboard" label="Dashboard" checked={!this.state.carousel}
-                      onChange={this._toggleCarousel.bind(this)}/>
-            {
-              this.state.edit &&
-              <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>
-            }
-            {
-              !this.state.edit &&
-              <Anchor href="#" icon={<DocumentPdf />} label="Export"/>
-            }
-            <CheckBox id="edit" label="Edit" checked={this.state.edit} onChange={this._toggleEdit.bind(this)}
-                      toggle={true}/>
-          </Menu>
-        </Header>
+      <Box pad="medium" full="horizontal">
         {
-          this.state.carousel && !this.state.edit &&
-          this._buildCarousel(data)}
-        {
-          (!this.state.carousel || this.state.edit) &&
-          this._buildBox(box, box)
+          !this.props.params.id &&
+          <Box>
+            <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
+              <Title>AM Insight</Title>
+              <Menu direction="row" align="center" responsive={false}>
+                <CheckBox id="carousel" label="Carousel" checked={this.state.carousel}
+                          onChange={this._toggleCarousel.bind(this)}/>
+                <CheckBox id="dashboard" label="Dashboard" checked={!this.state.carousel}
+                          onChange={this._toggleCarousel.bind(this)}/>
+                {
+                  this.state.edit &&
+                  <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>
+                }
+                {
+                  !this.state.edit &&
+                  <Anchor href="#" icon={<DocumentPdf />} label="Print" onClick={this._onPrint.bind(this)}/>
+                }
+                <CheckBox id="edit" label="Edit" checked={this.state.edit} onChange={this._toggleEdit.bind(this)}
+                          toggle={true}/>
+              </Menu>
+            </Header>
+            {
+              this.state.carousel && !this.state.edit &&
+              this._buildCarousel(data)}
+            {
+              (!this.state.carousel || this.state.edit) &&
+              this._buildBox(box, box)
+            }
+          </Box>
         }
+
+        {
+          this.props.params.id && this.state.data && this.state.data[this.props.params.id] &&
+          this._renderSingleAQL(this.state.data[this.props.params.id])
+        }
+
         {this.state.layer}
         {this.state.alert}
       </Box>

@@ -14,6 +14,7 @@ import Sidebar from '../commons/Sidebar';
 import * as Format from '../../constants/RecordFormat';
 import {Container, Content} from '../commons/Split';
 import Download from 'grommet/components/icons/base/Download';
+import Mail from 'grommet/components/icons/base/Mail';
 
 import {
   Anchor,
@@ -177,6 +178,14 @@ export default class AQL extends Component {
                              title={'Delete AQL: ' + this.state.aql.name}
                              desc={'AQL string: ' + this.state.aql.str} onConfirm={this._removeAQL.bind(this)}/>
     });
+  }
+
+  _onMail(aql) {
+    // let br = "%0D%0A";
+    let subject = `AM Browser Graph: ${aql.name}`;
+    let url = window.location.origin + '/wall/' + aql._id;
+    let content = `URL: ${url}`;
+    window.open(`mailto:test@example.com?subject=${subject}&body=${content}`, '_self');
   }
 
   _removeAlertLayer() {
@@ -385,6 +394,10 @@ export default class AQL extends Component {
               <Anchor link="#" icon={<Add />} onClick={this._onNew.bind(this)}>New</Anchor>
               <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)}>Save</Anchor>
               <Anchor link="#" icon={<Close />} onClick={this._onDelete.bind(this)}>Delete</Anchor>
+              {
+                this.state.aql._id &&
+                <Anchor link="#" icon={<Mail />} onClick={this._onMail.bind(this, this.state.aql)}>Mail</Anchor>
+              }
               <Anchor link="#" icon={<Download />}
                       onClick={this._onDownload.bind(this, this.state.aql)}>Download</Anchor>
               <Anchor link="#" icon={<Attachment />} onClick={this._selectView.bind(this)}>

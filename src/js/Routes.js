@@ -25,6 +25,7 @@ export const getRoutes = () => {
     {path: 'search', component: Search},
     {path: 'search(/:keyword)', component: RecordSearch},
     {path: 'wall', component: Wall},
+    {path: 'wall(/:id)', component: Wall},
     {path: 'explorer', component: Explorer},
     {path: 'explorer(/:id)', component: Explorer},
     {path: 'tbd', component: TBD},
