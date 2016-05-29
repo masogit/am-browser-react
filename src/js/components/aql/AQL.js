@@ -13,6 +13,7 @@ import ActionTab from '../commons/ActionTab';
 import Sidebar from '../commons/Sidebar';
 import * as Format from '../../constants/RecordFormat';
 import {Container, Content} from '../commons/Split';
+import Download from 'grommet/components/icons/base/Download';
 
 import {
   Anchor,
@@ -53,6 +54,15 @@ export default class AQL extends Component {
     this._loadViews();
     this._loadAQLs();
     this._loadInToolReport();
+  }
+
+  _onDownload(obj) {
+    var content = "data:application/json;charset=utf-8,";
+    var encodedUri = encodeURI(content + JSON.stringify(obj));
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", (obj.name || 'graph') + ".json");
+    link.click();
   }
 
   _initAQL(callback) {
@@ -367,24 +377,26 @@ export default class AQL extends Component {
       <Container>
         <Sidebar title={`Graphs (${this.state.aqls.length})`} toolbar={toolbar} contents={contents} focus={focus}/>
         <Content>
-            {this.state.alertLayer}
-            <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
-              <Title>AQL and Graph</Title>
-              <Menu direction="row" align="center" responsive={false}>
-                <Anchor link="#" icon={<Play />} onClick={this._onQuery.bind(this)}>Query</Anchor>
-                <Anchor link="#" icon={<Add />} onClick={this._onNew.bind(this)}>New</Anchor>
-                <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)}>Save</Anchor>
-                <Anchor link="#" icon={<Close />} onClick={this._onDelete.bind(this)}>Delete</Anchor>
-                <Anchor link="#" icon={<Attachment />} onClick={this._selectView.bind(this)}>
-                  {this.state.aql.view ? 'Attached view: ' + this.state.aql.view.name : 'Attach View'}
-                </Anchor>
-              </Menu>
-            </Header>
+          {this.state.alertLayer}
+          <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
+            <Title>AQL and Graph</Title>
+            <Menu direction="row" align="center" responsive={false}>
+              <Anchor link="#" icon={<Play />} onClick={this._onQuery.bind(this)}>Query</Anchor>
+              <Anchor link="#" icon={<Add />} onClick={this._onNew.bind(this)}>New</Anchor>
+              <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)}>Save</Anchor>
+              <Anchor link="#" icon={<Close />} onClick={this._onDelete.bind(this)}>Delete</Anchor>
+              <Anchor link="#" icon={<Download />}
+                      onClick={this._onDownload.bind(this, this.state.aql)}>Download</Anchor>
+              <Anchor link="#" icon={<Attachment />} onClick={this._selectView.bind(this)}>
+                {this.state.aql.view ? 'Attached view: ' + this.state.aql.view.name : 'Attach View'}
+              </Anchor>
+            </Menu>
+          </Header>
           <Box justify="between" direction="row" className='header'>
-              <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_Box">
+            <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_Box">
                 <textarea id="AQL_Box" name="str" value={this.state.aql.str} rows="3"
-                        onChange={this._setFormValues.bind(this)}/>
-              </FormField>
+                          onChange={this._setFormValues.bind(this)}/>
+            </FormField>
             <Form pad={{horizontal: 'small'}}>
               <FormFields className='short-form'>
                 <FormField label="AQL Name" htmlFor="AQL_Box">
@@ -396,46 +408,46 @@ export default class AQL extends Component {
                          onChange={this._setFormValues.bind(this)}/>
                 </FormField>
               </FormFields>
-              </Form>
+            </Form>
+          </Box>
+          <Split flex="left" fixed={false}>
+            <Box pad={{vertical: 'small'}}>
+              {this.state.data && this.state.aql.form && this.state.aql.type &&
+              <Graph type={this.state.aql.type} data={this.state.data} config={this.state.aql.form}
+                     onClick={(filter) => this._showViewRecords(filter, this.state.aql.view)}/>}
+              <Table>
+                <thead>
+                <tr>{header}</tr>
+                </thead>
+                <tbody>
+                {rows}
+                </tbody>
+              </Table>
             </Box>
-            <Split flex="left" fixed={false}>
-              <Box pad={{vertical: 'small'}}>
-                {this.state.data && this.state.aql.form && this.state.aql.type &&
-                <Graph type={this.state.aql.type} data={this.state.data} config={this.state.aql.form}
-                       onClick={(filter) => this._showViewRecords(filter, this.state.aql.view)}/>}
-                <Table>
-                  <thead>
-                  <tr>{header}</tr>
-                  </thead>
-                  <tbody>
-                  {rows}
-                  </tbody>
-                </Table>
+            {
+              this.state.data && this.state.aql.type &&
+              <Box pad={{horizontal: 'small'}}>
+                <Tabs initialIndex={getIndex(this.state.aql.type)} justify='end'>
+                  <ActionTab title="Chart" onClick={this._genGraph.bind(this, null, 'chart')} ref='chart'>
+                    <ChartForm {...this.state.aql} genGraph={this._genGraph.bind(this)} data={this.state.data}/>
+                  </ActionTab>
+                  <ActionTab title="Meter" onClick={this._genGraph.bind(this, null, 'meter')} ref='meter'>
+                    <MeterForm {...this.state.aql} genGraph={this._genGraph.bind(this)} data={this.state.data}/>
+                  </ActionTab>
+                  <ActionTab title="Distribution" onClick={this._genGraph.bind(this, null, 'distribution')}
+                             ref='distribution'>
+                    <DistributionForm {...this.state.aql} genGraph={this._genGraph.bind(this)}
+                                                          data={this.state.data}/>
+                  </ActionTab>
+                  {
+                    /*<Tab title="Value"/>
+                     <Tab title="WorldMap"/>*/
+                  }
+                </Tabs>
               </Box>
-              {
-                this.state.data && this.state.aql.type &&
-                <Box pad={{horizontal: 'small'}}>
-                  <Tabs initialIndex={getIndex(this.state.aql.type)} justify='end'>
-                    <ActionTab title="Chart" onClick={this._genGraph.bind(this, null, 'chart')} ref='chart'>
-                      <ChartForm {...this.state.aql} genGraph={this._genGraph.bind(this)} data={this.state.data}/>
-                    </ActionTab>
-                    <ActionTab title="Meter" onClick={this._genGraph.bind(this, null, 'meter')} ref='meter'>
-                      <MeterForm {...this.state.aql} genGraph={this._genGraph.bind(this)} data={this.state.data}/>
-                    </ActionTab>
-                    <ActionTab title="Distribution" onClick={this._genGraph.bind(this, null, 'distribution')}
-                               ref='distribution'>
-                      <DistributionForm {...this.state.aql} genGraph={this._genGraph.bind(this)}
-                                                            data={this.state.data}/>
-                    </ActionTab>
-                    {
-                      /*<Tab title="Value"/>
-                       <Tab title="WorldMap"/>*/
-                    }
-                  </Tabs>
-                </Box>
-              }
-              {this.state.popupLayer}
-            </Split>
+            }
+            {this.state.popupLayer}
+          </Split>
         </Content>
       </Container>
     );
