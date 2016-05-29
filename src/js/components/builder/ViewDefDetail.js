@@ -55,6 +55,14 @@ export default class ViewDefDetail extends Component {
     link.click();
   }
 
+  _onMail(view) {
+    let br = "%0D%0A";
+    let subject = `AM Browser View: ${view.name}`;
+    let url = window.location.origin + '/explorer/' + view._id;
+    let content = `URL: ${url}${br}Description: ${view.desc}`;
+    window.open(`mailto:test@example.com?subject=${subject}&body=${content}`, '_self');
+  }
+
   hasLinks(links) {
     if (links) {
       for (let i = 0; i < links.length; i++) {
@@ -228,7 +236,10 @@ export default class ViewDefDetail extends Component {
             <Anchor link="#" icon={<Duplicate />} onClick={this.props.onDuplicateViewDef}>Duplicate</Anchor>
             <Anchor link="#" icon={<Close />} onClick={this.props.deleteViewDef}>Delete</Anchor>
             <Anchor link="#" icon={<Play />} onClick={this.props.openPreview}>Query</Anchor>
-            <Anchor link="#" icon={<Mail />} onClick={this.props.openPreview}>Mail</Anchor>
+            {
+              selectedView._id &&
+              <Anchor link="#" icon={<Mail />} onClick={this._onMail.bind(this, selectedView)}>Mail</Anchor>
+            }
             <Anchor link="#" icon={<Download />} onClick={this._onDownload.bind(this, selectedView)}>Download</Anchor>
           </Menu>
         </Header>
