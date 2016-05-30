@@ -314,7 +314,7 @@ export default class Wall extends Component {
   }
 
   _showAQLDetail(id) {
-    history.push(`/wall/${id}`);
+    history.push(`/insight/${id}`);
   }
 
   _renderSingleAQL(graph) {

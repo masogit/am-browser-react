@@ -23,7 +23,7 @@ class NavHeader extends Component {
     const defaultLinks = [
       // {to: '/home', text: 'Home'},
       {to: '/search', text: 'Search'},
-      {to: '/wall', text: 'Insight'},
+      {to: '/insight', text: 'Insight'},
       {to: '/explorer', text: 'Records'},
       {to: '/views', text: 'Builder'},
       {to: '/aql', text: 'Graph'},

@@ -24,7 +24,7 @@ const getHeadNav = (isAdmin) => ({
   login: true,
   home: true,
   search: true,
-  wall: true,
+  insight: true,
   explorer: true,
   tbd: true,
   ucmdbAdapter: isAdmin,
