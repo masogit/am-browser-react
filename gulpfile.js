@@ -57,7 +57,8 @@ var opts = {
     'grommet/scss': path.resolve(__dirname, '../grommet/src/scss'),
     'grommet': path.resolve(__dirname, '../grommet/src/js')
   },
-  devPreprocess: ['set-webpack-alias']
+  devPreprocess: ['set-webpack-alias'],
+  distPreprocess: ['copy-demo']
 };
 
 gulp.task('set-webpack-alias', function () {
@@ -163,7 +164,7 @@ gulp.task('clean-gen', function () {
   return gulp.src('./gen').pipe(clean({force: true}));
 });
 
-gulp.task('copy-temp', ['copy-demo', 'dist', 'clean-gen'], function () {
+gulp.task('copy-temp', ['dist', 'clean-gen'], function () {
   console.log('Copy all neccessary files into the gen temp folder');
   // copy node installation folder and cmd to gen temp
   var unzip_node = gulp.src('./build/node-v4.4.4-x64.zip', {base : '.'})
