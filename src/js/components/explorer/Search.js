@@ -19,18 +19,24 @@ export default class Search extends Component {
         pushJobs: []
       }
     };
+    this._isUnmount = false;
   }
 
   componentDidMount() {
+    this._isUnmount = false;
     ExplorerActions.loadViews((views)=> {
-      this.setState({
-        viewSeries: this._filterFirst7(this._getSeries(views, 'category'))
-      });
+      if (!this._isUnmount) {
+        this.setState({
+          viewSeries: this._filterFirst7(this._getSeries(views, 'category'))
+        });
+      }
     });
     AQLActions.loadAQLs((aqls)=> {
-      this.setState({
-        aqlSeries: this._filterFirst7(this._getSeries(aqls, 'category'))
-      });
+      if (!this._isUnmount) {
+        this.setState({
+          aqlSeries: this._filterFirst7(this._getSeries(aqls, 'category'))
+        });
+      }
     });
     UCMDBAdapterActions.getIntegrationPoint((points) => {
       if (points.length > 0) {
@@ -40,39 +46,49 @@ export default class Search extends Component {
             UCMDBAdapterActions.getIntegrationJob(point.name, 'populationJobs', (popJobs) => {
               if (point.pushSupported) {
                 UCMDBAdapterActions.getIntegrationJob(point.name, 'pushJobs', (pushJobs) => {
+                  if (!this._isUnmount) {
+                    this.setState({
+                      ucmdbAdapter: {
+                        ready: count++ === points.length,
+                        pushJobs: this.state.ucmdbAdapter.pushJobs.concat(pushJobs),
+                        popJobs: this.state.ucmdbAdapter.popJobs.concat(popJobs)
+                      }
+                    });
+                  }
+                });
+              } else {
+                if (!this._isUnmount) {
                   this.setState({
                     ucmdbAdapter: {
                       ready: count++ === points.length,
-                      pushJobs: this.state.ucmdbAdapter.pushJobs.concat(pushJobs),
+                      pushJobs: this.state.ucmdbAdapter.pushJobs,
                       popJobs: this.state.ucmdbAdapter.popJobs.concat(popJobs)
                     }
                   });
-                });
-              } else {
-                this.setState({
-                  ucmdbAdapter: {
-                    ready: count++ === points.length,
-                    pushJobs: this.state.ucmdbAdapter.pushJobs,
-                    popJobs: this.state.ucmdbAdapter.popJobs.concat(popJobs)
-                  }
-                });
+                }
               }
             });
           } else if (point.pushSupported) {
             UCMDBAdapterActions.getIntegrationJob(point.name, 'pushJobs', (pushJobs) => {
-              this.setState({
-                ucmdbAdapter: {
-                  ready: count++ === points.length,
-                  pushJobs: this.state.ucmdbAdapter.pushJobs.concat(pushJobs),
-                  popJobs: this.state.ucmdbAdapter.popJobs
-                }
-              });
+              if (!this._isUnmount) {
+                this.setState({
+                  ucmdbAdapter: {
+                    ready: count++ === points.length,
+                    pushJobs: this.state.ucmdbAdapter.pushJobs.concat(pushJobs),
+                    popJobs: this.state.ucmdbAdapter.popJobs
+                  }
+                });
+              }
             });
           }
         });
       }
     });
+  }
 
+  componentWillUnmount() {
+    // should replace this by promise
+    this._isUnmount = true;
   }
 
   _filterFirst7(objs) {
