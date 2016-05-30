@@ -26,6 +26,9 @@ class SessionMenu extends Component {
     return (
       <Menu icon={icon} dropAlign={dropAlign} a11yTitle="Session">
         <Anchor href="#" className="active">Settings</Anchor>
+        <Anchor href="#">Error Log</Anchor>
+        <Anchor href="#">Help</Anchor>
+        <Anchor href="#">About</Anchor>
         <Anchor href="#" onClick={this._onLogout}>Logout</Anchor>
       </Menu>
     );
