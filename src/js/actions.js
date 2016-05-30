@@ -275,7 +275,6 @@ export function loginFailure(error) {
 
 export function logout() {
   // clear the CSRF token
-  setCookie('CSRFToken', '', 0);
   return {type: LOGOUT};
 }
 
