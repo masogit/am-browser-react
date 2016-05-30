@@ -11,6 +11,7 @@ import Attachment from 'grommet/components/icons/base/Attachment';
 import DocumentPdf from 'grommet/components/icons/base/DocumentPdf';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
 import Graph from './../commons/Graph';
+import {AM_FORM_DATA} from '../../util/Config';
 import {
   Anchor,
   Box,
@@ -31,6 +32,7 @@ export default class Wall extends Component {
   constructor() {
     super();
     this.state = {
+      wall: {},
       edit: false,
       carousel: false,
       aqls: [],
@@ -50,14 +52,20 @@ export default class Wall extends Component {
   }
 
   componentDidMount() {
-    if (this.props.params.id) {
-      AQLActions.loadAQL(this.props.params.id, (aql)=> {
-        this._queryData(aql);
-      });
-    } else {
-      this._loadAQLs();
-      this._loadWall();
+    // get user name from localstorage
+    const storage = window.localStorage && window.localStorage[AM_FORM_DATA];
+    if (storage) {
+      const form = JSON.parse(storage);
+      if (this.props.params.id) {
+        AQLActions.loadAQL(this.props.params.id, (aql)=> {
+          this._queryData(aql);
+        });
+      } else {
+        this._loadAQLs();
+        this._loadWall(form.user);
+      }
     }
+
   }
 
   _findAqls(box) {
@@ -93,13 +101,24 @@ export default class Wall extends Component {
     });
   }
 
-  _loadWall() {
-    AQLActions.loadWall((data) => {
-      if (data) {
+  _loadWall(user) {
+    AQLActions.loadWalls((walls) => {
+      var walls = walls.filter((wall)=> {
+        return wall.user == user;
+      });
+
+      if (walls[0])
         this.setState({
-          box: data
-        }, this._findAqls(data));
-      }
+          wall: walls[0],
+          box: walls[0].box
+        }, this._findAqls(walls[0].box));
+      else
+        this.setState({
+          wall: {
+            user: user,
+            box: this.state.box
+          }
+        });
     });
   }
 
@@ -350,7 +369,9 @@ export default class Wall extends Component {
 
 
   _onSave() {
-    AQLActions.saveWall(this.state.box, (data) => {
+    var wall = this.state.wall;
+    wall.box = this.state.box;
+    AQLActions.saveWall(wall, (data) => {
       if (data)
         this._loadWall();
       var alert = (<AlertForm onClose={this._closeAlert.bind(this)}

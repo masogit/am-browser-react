@@ -11,9 +11,9 @@ export function saveWall(wall, callback) {
   });
 }
 
-export function loadWall(callback) {
+export function loadWalls(callback) {
   Rest.get(HOST_NAME + '/coll/wall').then((res) => {
-    callback(res.body[0]);
+    callback(res.body);
   }, (err) => {
     console.log(err.response ? err.response.text : err);
   });
