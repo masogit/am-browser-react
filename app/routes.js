@@ -48,6 +48,23 @@ module.exports = function (app, am) {
     logger.error(util.inspect(e));
   });
 
+  app.get("/*", function(req, res, next) {
+    var session = req.session;
+    if (req.url != '/am/login' && req.url != '/am/logout' && (!session || !session.user)) {
+      session.destroy();
+      res.clearCookie('connect.sid');
+      res.clearCookie('csrf-token');
+      res.clearCookie('user');
+      res.redirect(401, '/am/login');
+    } else {
+      //TODO: do the real check
+      res.locals._user = session.user;
+      res.locals._headerNavs = getHeadNav(session.user == 'admin');
+      next(); // Call the next middleware
+    }
+  });
+
+
   // CRUD Tingodb
   app.get('/coll/:collection', db.find);
   app.get('/coll/:collection/:id', db.find);
@@ -64,12 +81,32 @@ module.exports = function (app, am) {
   app.use('/download/*', rest.csv);
 
 
-  // AM Server Conf
-  app.get('/am/conf', function (req, res) {
+  // AM Server Login
+  app.get('/am/login', function (req, res) {
     if (am) {
+      var username = getUserName(req);
+
+      // TODO login
       var am_rest = Object.assign({}, am);
+      res.cookie('user', username);
+      res.cookie('csrf-token', req.sessionID);
+      req.session.user = username;
+      am_rest['_csrf'] = req.session ? req.sessionID : ''; // CSRF
       am_rest['password'] = "";
       am_rest.headerNavs = getHeadNav(hasAdminPrivilege(req));
+      res.json(am_rest);
+    } else
+      res.json(am);
+  });
+
+  app.get('/am/logout', function (req, res) {
+    if (am) {
+      // TODO logout
+      var am_rest = Object.assign({}, am);
+      req.session.destroy();
+      res.clearCookie('connect.sid');
+      res.clearCookie('csrf-token');
+      res.clearCookie('user');
       res.json(am_rest);
     } else
       res.json(am);

@@ -107,31 +107,31 @@ exports.default = {
     return op;
   },
   get: function get(uri, params) {
-    var op = _superagent2.default.get(uri).query(buildQueryParams(params));
+    var op = _superagent2.default.get(uri).withCredentials().query(buildQueryParams(params));
     op.timeout(_timeout);
     op.set(_headers);
     return op;
   },
   patch: function patch(uri, data) {
-    var op = _superagent2.default.patch(uri).send(data);
+    var op = _superagent2.default.patch(uri).withCredentials().send(data);
     op.timeout(_timeout);
     op.set(_headers);
     return op;
   },
   post: function post(uri, data) {
-    var op = _superagent2.default.post(uri).send(data);
+    var op = _superagent2.default.post(uri).withCredentials().send(data);
     op.timeout(_timeout);
     op.set(_headers);
     return op;
   },
   put: function put(uri, data) {
-    var op = _superagent2.default.put(uri).send(data);
+    var op = _superagent2.default.put(uri).withCredentials().send(data);
     op.timeout(_timeout);
     op.set(_headers);
     return op;
   },
   del: function del(uri) {
-    var op = _superagent2.default.del(uri);
+    var op = _superagent2.default.del(uri).withCredentials();
     op.timeout(_timeout);
     op.set(_headers);
     return op;

@@ -4,6 +4,7 @@ import Rest from './util/grommet-rest-promise';
 //import history from './RouteHistory';
 //import Query from 'grommet-index/utils/Query';
 import {HOST_NAME, AM_FORM_DATA } from './util/Config';
+import cookies from 'js-cookie';
 
 // session
 export const INIT = 'INIT';
@@ -19,6 +20,13 @@ export const ROUTE_CHANGED = 'ROUTE_CHANGED';
 export const NAV_PEEK = 'NAV_PEEK';
 export const NAV_ACTIVATE = 'NAV_ACTIVATE';
 export const NAV_RESPONSIVE = 'NAV_RESPONSIVE';
+
+// dashboard
+export const DASHBOARD_LAYOUT = 'DASHBOARD_LAYOUT';
+export const DASHBOARD_LOAD = 'DASHBOARD_LOAD';
+export const DASHBOARD_UNLOAD = 'DASHBOARD_UNLOAD';
+export const DASHBOARD_SEARCH = 'DASHBOARD_SEARCH';
+export const DASHBOARD_SEARCH_SUCCESS = 'DASHBOARD_SEARCH_SUCCESS';
 
 // index page
 export const INDEX_NAV = 'INDEX_NAV';
@@ -71,47 +79,52 @@ export const getHeaderNavs = () => {
   return null;
 };
 
-// will be removed after we can set csrf token automatically
-const setCookie = (cname, cvalue, exmins) => {
-  let expires = '';
-  if (exmins) {
-    const d = new Date();
-    d.setTime(d.getTime() + (exmins * 60 * 1000));
-    expires = "expires=" + d.toUTCString();
-  }
-  document.cookie = cname + "=" + cvalue + "; " + expires;
-};
-
 export function login(username, password) {
   return function (dispatch) {
     const auth = 'Basic ' + new Buffer(`${username}:${password}`).toString('base64');
     Rest.setHeader("Authorization", auth);
-    Rest.get(HOST_NAME + '/am/conf').then((res) => {
-      let form = {
-        server: res.body.server,  // set AM server address
-        user: username,
-        headerNavs: res.body.headerNavs
-      };
+    Rest.get(HOST_NAME + '/am/login').end((err, res) => {
+      if (err) {
+        console.log("failed");
+        dispatch(loginFailure({message: 'LoginFailed'}));
+        throw err;
+      } else if (res.ok && res.body) {
+        let form = {
+          server: res.body.server,  // set AM server address
+          user: username,
+          headerNavs: res.body.headerNavs
+        };
 
-      if (sessionStorage) {
-        sessionStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
+        if (sessionStorage) {
+          sessionStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
+        }
+
+        if (localStorage) {
+          form.password = password;
+          localStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
+        }
+
+        console.log("pass");
+        console.log('res.body: ' + res.body);
+        dispatch(loginSuccess(username, res.body._csrf));
       }
+    });
+  };
+}
 
-      if (localStorage) {
-        form.password = password;
-        localStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
+export function logout() {
+  return function (dispatch) {
+    Rest.get(HOST_NAME + '/am/logout').end((err, res) => {
+      if (err) {
+        console.log("failed");
+        dispatch({message: 'LogoutFailed'});
+        throw err;
+      } else if (res.ok && res.body) {
+        console.log('Logout: ' + res.body.user);
+        cookies.remove('connect.sid');
+        cookies.remove('csrf-token');
+        dispatch({type: LOGOUT});
       }
-
-      // set CSRF token in cookie, expires in 20 mins;
-      setCookie('CSRFToken', 'fake_scrf_token1231231231', 20);
-
-      console.log("pass");
-      console.log('res.body: ' + res.body);
-      dispatch(loginSuccess(username, 'faketoken123456789'/*res.body.sessionID*/));
-    }, (err) => {
-      console.log("login failed - ");
-      console.log(err.response ? err.response.text : err);
-      dispatch(loginFailure({message: 'LoginFailed'}));
     });
   };
 }
@@ -120,12 +133,11 @@ export function metadataLoad() {
   return function (dispatch) {
     Rest.get(HOST_NAME + '/am/v1/schema')
       .set('Content-Type', 'text/xml')
-      .then((res) => {
-        let data = JSON.parse(res.text);
-        dispatch(metadataSuccess(data, []));
-      }, (err) => {
-        console.log("cannot load metadata - ");
-        console.log(err.response ? err.response.text : err);
+      .end(function (err, res) {
+        if (!err) {
+          let data = JSON.parse(res.text);
+          dispatch(metadataSuccess(data, []));
+        }
       });
   };
 }
@@ -134,41 +146,38 @@ export function metadataLoadDetail(obj, elements, index) {
   return function (dispatch) {
     Rest.get(HOST_NAME + '/am/v1/' + obj.url)
       .set('Content-Type', 'text/xml')
-      .then((res) => {
-        let data = JSON.parse(res.text);
-        if (!index) {
-          obj.body_label = data.label;
-          obj.body_sqlname = data.sqlname;
-          elements.push(obj);
-        } else {
-          elements = elements.slice(0, index + 1);
+      .end(function (err, res) {
+        if (!err) {
+          let data = JSON.parse(res.text);
+          if (!index) {
+            obj.body_label = data.label;
+            obj.body_sqlname = data.sqlname;
+            elements.push(obj);
+          } else {
+            elements = elements.slice(0, index + 1);
+          }
+          dispatch(metadataDetailSuccess(data, elements));
         }
-        dispatch(metadataDetailSuccess(data, elements));
-      }, (err) => {
-        console.log("cannot load metadata detail - ");
-        console.log(err.response ? err.response.text : err);
       });
   };
 }
 
 export function loadTemplates() {
   return function (dispatch) {
-    Rest.get(HOST_NAME + '/coll/view').then((res) => {
-      dispatch(templatesLoadSuccess(res.body));
-    }, (err) => {
-      console.log("cannot load templates - ");
-      console.log(err.response ? err.response.text : err);
+    Rest.get(HOST_NAME + '/coll/view').end(function (err, res) {
+      if (res && res.ok) {
+        dispatch(templatesLoadSuccess(res.body));
+      }
     });
   };
 };
 
 export function loadRecords(template) {
   return function (dispatch) {
-    Rest.get(HOST_NAME + '/coll/view/' + template._id + '/list').then((res) => {
-      dispatch(recordsLoadSuccess(res.body.entities));
-    }, (err) => {
-      console.log("cannot load records - ");
-      console.log(err.response ? err.response.text : err);
+    Rest.get(HOST_NAME + '/coll/view/' + template._id + '/list').end(function (err, res) {
+      if (res && res.ok && res.body) {
+        dispatch(recordsLoadSuccess(res.body.entities));
+      }
     });
   };
 };
@@ -178,16 +187,14 @@ export function loadDetailRecordLinks(viewid, recordid, linksArray, linksObj) {
     var link = linksArray.pop();
     if (link) {
       var linkname = link.sqlname;
-      Rest.get(HOST_NAME + `/coll/view/${viewid}/list/${recordid}/${linkname}`).then((res) => {
+      Rest.get(HOST_NAME + `/coll/view/${viewid}/list/${recordid}/${linkname}`).end(function (err, res) {
         if (res.body && res.body.entities) {
           linksObj[linkname] = res.body.entities;
           dispatch(loadDetailRecordLinks(viewid, recordid, linksArray, linksObj));
         }
-      }, (err) => {
-        console.log("cannot load detail record links - ");
-        console.log(err.response ? err.response.text : err);
       });
     } else {
+
       dispatch(loadDetailLinkSuccess(linksObj));
     }
 
@@ -286,4 +293,76 @@ export function navActivate(active) {
 
 export function navResponsive(responsive) {
   return {type: NAV_RESPONSIVE, responsive: responsive};
+}
+
+export function dashboardLayout(graphicSize, count, legendPlacement, tiles) {
+  return function (dispatch) {
+    dispatch({
+      type: DASHBOARD_LAYOUT,
+      graphicSize: graphicSize,
+      count: count,
+      legendPlacement: legendPlacement
+    });
+    // reset what we're watching for
+    tiles.filter((tile) => (tile.history)).forEach((tile) => {
+      IndexApi.stopWatching(tile.watcher);
+      let params = {
+        category: tile.category,
+        query: tile.query,
+        attribute: tile.attribute,
+        interval: tile.interval,
+        count: count
+      };
+      let watcher = IndexApi.watchAggregate(params, (result) => {
+        dispatch(indexAggregateSuccess(watcher, tile.name, result));
+      });
+    });
+  };
+}
+
+export function dashboardLoad(tiles) {
+  return function (dispatch) {
+    dispatch({type: DASHBOARD_LOAD});
+    tiles.forEach((tile) => {
+      let params = {
+        category: tile.category,
+        query: tile.query,
+        attribute: tile.attribute,
+        interval: tile.interval,
+        count: tile.count
+      };
+      let watcher = IndexApi.watchAggregate(params, (result) => {
+        dispatch(indexAggregateSuccess(watcher, tile.name, result));
+      });
+    });
+  };
+}
+
+export function dashboardUnload(tiles) {
+  return function (dispatch) {
+    dispatch({type: DASHBOARD_UNLOAD});
+    tiles.forEach((tile) => {
+      IndexApi.stopWatching(tile.watcher);
+    });
+  };
+}
+
+export function dashboardSearch(text) {
+  return function (dispatch) {
+    dispatch({type: DASHBOARD_SEARCH, text: text});
+    if (text && text.length > 0) {
+      let params = {
+        start: 0,
+        count: 5,
+        query: text
+      };
+      Rest.get('/rest/index/search-suggestions', params).end((err, res) => {
+        if (err) {
+          throw err;
+        } else if (res.ok) {
+          dispatch({type: DASHBOARD_SEARCH_SUCCESS, result: res.body});
+        }
+      });
+    }
+  };
 }

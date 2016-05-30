@@ -7,6 +7,7 @@ import { App } from 'grommet';
 //import Split from 'grommet/components/Split';
 //import NavSidebar from './NavSidebar';
 import NavHeader from './NavHeader';
+import cookies from 'js-cookie';
 
 class Indexer extends Component {
 
@@ -22,7 +23,7 @@ class Indexer extends Component {
   render() {
     //const { active: navActive } = this.props;
     let children, header;
-    if (localStorage.token) {
+    if (cookies.get('csrf-token')) {
       header = <NavHeader />;
       children = (
         <div className='main-body-container'>

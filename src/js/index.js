@@ -39,26 +39,6 @@ if (!Rest.get('header').header.Authorization) {
   }
 }
 
-// will be removed after we can get csrf token automatically
-const getCookie = (cname) => {
-  var name = cname + "=";
-  var ca = document.cookie.split(';');
-  for (var i = 0; i < ca.length; i++) {
-    var c = ca[i];
-    while (c.charAt(0) == ' ') {
-      c = c.substring(1);
-    }
-    if (c.indexOf(name) == 0) {
-      return c.substring(name.length, c.length);
-    }
-  }
-  return "";
-};
-
-if (!Rest.get('header').header.CSRFToken) {
-  Rest.setHeader("CSRFToken", getCookie('CSRFToken'));
-}
-
 // From a comment in https://github.com/rackt/redux/issues/637
 // this factory returns a history implementation which reads the current state
 // from the redux store and delegates push state to a different history.
@@ -122,9 +102,9 @@ if (process.env.NODE_ENV === 'production') {
 
 document.body.classList.remove('loading');
 
-let localStorage = window.localStorage;
-// init from localStorage
-store.dispatch(init(localStorage.email, localStorage.token));
+import cookies from 'js-cookie';
+
+store.dispatch(init(cookies.get('user'), cookies.get('csrf-token')));
 // simulate initial login
 //store.dispatch(loginSuccess('nobody@grommet.io', 'simulated'));
 
@@ -138,13 +118,9 @@ const sessionWatcher = () => {
   if (route) {
     if (session.token) {
       if (route.pathname === '/login') {
-        localStorage.email = session.email;
-        localStorage.token = session.token;
         history.pushState(null, Routes.path(postLoginPath));
       }
     } else {
-      localStorage.removeItem('email');
-      localStorage.removeItem('token');
       if (route.pathname !== Routes.path('/login')) {
         postLoginPath = route.pathname;
         history.pushState(null, Routes.path('/login'));

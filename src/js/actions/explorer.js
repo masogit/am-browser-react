@@ -4,6 +4,10 @@
 import {HOST_NAME} from '../util/Config';
 import Rest from '../util/grommet-rest-promise';
 
+// TODO Change the session, if session changed, the view will be refresh(index.js)
+import store from '../store';
+import {init} from '../actions';
+
 function param2aql(param) {
 
   let aql = '';
@@ -21,6 +25,8 @@ export function loadViews(callback) {
     callback(res.body);
   }, (err) => {
     console.log(err.response ? err.response.text : err);
+    // TODO Change the session, if session changed, the view will be refresh(index.js)
+    store.dispatch(init('', ''));
   });
 }
 
