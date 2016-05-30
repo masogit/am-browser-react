@@ -273,11 +273,6 @@ export function loginFailure(error) {
   return {type: LOGIN_FAILURE, error: error};
 }
 
-export function logout() {
-  // clear the CSRF token
-  return {type: LOGOUT};
-}
-
 export function routeChanged(route, prefix) {
   return {type: ROUTE_CHANGED, route: route, prefix: prefix};
 }
