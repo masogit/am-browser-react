@@ -1,87 +1,66 @@
+var util = require('util');
 var db = require('./db.js');
 var logger = require('./logger.js');
+var REST = require('./rest.js');
 
-const getUserName = (req) => {
-  if (req && req.headers.authorization) {
-    const user = new Buffer(req.headers.authorization.split(' ')[1], 'base64').toString();
-    return user.split(':')[0];
-  }
-  return '';
-};
-
-const checkRight = (req) => {
-  if (getUserName(req) != 'admin') {
-    throw 'user has no permission';
-  }
-};
-
-//TODO: do the real check
-const hasAdminPrivilege = (name) => {
-  return name.toLowerCase() === 'admin';
-};
-
-const getHeadNav = (isAdmin) => ({
-  login: true,
-  home: true,
-  search: true,
-  insight: true,
-  explorer: true,
-  tbd: true,
-  ucmdbAdapter: isAdmin,
-  aql: isAdmin,
-  views: isAdmin
-});
-
-module.exports = function (app, am) {
-  var util = require('util');
-  var REST = require('./rest.js');
-  var rest = new REST(am);
-
+module.exports = function (app) {
+  // init variables from properties
   var PropertiesReader = require('properties-reader');
   var properties = PropertiesReader('am-browser-config.properties');
+  var rest_protocol = process.env.AMB_REST_PROTOCOL || properties.get('rest.protocol');
+  var rest_server = process.env.AMB_REST_SERVER || properties.get('rest.server');
+  var rest_port = process.env.AMB_REST_PORT || properties.get('rest.port');
+  var rest_username = process.env.AMB_REST_USERNAME || properties.get('rest.username');
+  var rest_password = process.env.AMB_REST_PASSWORD || properties.getRaw('rest.password');
   var base = properties.get('rest.base');
-  logger.info("base: " + base);
+  var db_folder = properties.get('db.folder');
+  db.init(db_folder);
+
   var httpProxy = require('http-proxy');
   var apiProxy = httpProxy.createProxyServer();
+
+  // TODO replace Authorization by session id
+  var auth = 'Basic ' + new Buffer(rest_username + ':' + rest_password).toString('base64');
+  apiProxy.on('proxyReq', function (proxyReq, req, res, options) {
+    logger.info("set request header: " + auth);
+    proxyReq.setHeader('Authorization', auth);
+  });
+
+  var rest = new REST({
+    user: rest_username,
+    password: rest_password,
+    server: rest_server + ":" + rest_port
+  });
 
   apiProxy.on('error', function (e) {
     logger.error(util.inspect(e));
   });
 
-
   // AM Server Login
   app.get('/am/login', function (req, res) {
-    if (am) {
-      var username = getUserName(req);
-
-      // TODO login
-      var am_rest = Object.assign({}, am);
-      res.cookie('user', username);
-      res.cookie('csrf-token', req.sessionID);
-      req.session.user = username;
-      am_rest['_csrf'] = req.session ? req.sessionID : ''; // CSRF
-      am_rest['password'] = "";
-      am_rest.server = am.server;
-      am_rest.headerNavs = getHeadNav(hasAdminPrivilege(username));
-      res.json(am_rest);
-    } else
-      res.json(am);
+    var username = getUserName(req);
+    // TODO login
+    var am_rest = {};
+    res.cookie('user', username);
+    res.cookie('csrf-token', req.sessionID);
+    req.session.user = username;
+    am_rest['_csrf'] = req.session ? req.sessionID : ''; // CSRF
+    am_rest.headerNavs = getHeadNav(hasAdminPrivilege(username));
+    am_rest.server = rest_server + ":" + rest_port;
+    res.json(am_rest);
   });
 
   app.get('/am/logout', function (req, res) {
-    if (am) {
-      // TODO logout
-      var am_rest = Object.assign({}, am);
-      req.session.destroy();
-      res.clearCookie('connect.sid');
-      res.clearCookie('csrf-token');
-      res.clearCookie('user');
-      res.json(am_rest);
-    } else
-      res.json(am);
+    // TODO logout
+    var am_rest = {};
+    req.session.destroy();
+    res.clearCookie('connect.sid');
+    res.clearCookie('csrf-token');
+    res.clearCookie('user');
+    res.json(am_rest);
   });
 
-  app.get("/*", function(req, res, next) {
+  app.get("/*", function (req, res, next) {
     var session = req.session;
     if (!session || !session.user) {
       session.destroy();
@@ -118,29 +97,28 @@ module.exports = function (app, am) {
   app.use('/download/*', rest.csv);
 
   // Proxy the backend rest service /rs/db -> /am/db
-  logger.info(am);
   app.use('/am/db', function (req, res) {
     // TODO: need to take care of https
-    logger.info('http://' + am.server + base + '/db');
-    apiProxy.web(req, res, {target: 'http://' + am.server + base + '/db'});
+    logger.info(`${rest_protocol}://${rest_server}:${rest_port}${base}/db`);
+    apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${base}/db`});
   });
 
   app.use('/am/aql', function (req, res) {
     // TODO: need to take care of https
-    logger.info('http://' + am.server + base + '/aql');
-    apiProxy.web(req, res, {target: 'http://' + am.server + base + '/aql'});
+    logger.info(`${rest_protocol}://${rest_server}:${rest_port}${base}/aql`);
+    apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${base}/aql`});
   });
 
   app.use('/am/v1/schema', function (req, res) {
     // TODO: need to take care of https
-    logger.info('http://' + am.server + base + '/v1/schema');
-    apiProxy.web(req, res, {target: 'http://' + am.server + base + '/v1/schema'});
+    logger.info(`${rest_protocol}://${rest_server}:${rest_port}${base}/v1/schema`);
+    apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${base}/v1/schema`});
   });
 
   // get ucmdb point data
   app.use('/am/ucmdbPoint/', function (req, res) {
     checkRight(req);
-    apiProxy.web(req, res, {target: 'http://' + am.server + base + '/integration/ucmdbAdapter/points'});
+    apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${base}/integration/ucmdbAdapter/points`});
   });
 
   /**
@@ -155,3 +133,35 @@ module.exports = function (app, am) {
     apiProxy.web(req, res, {target: `http://${server}:${port}${param}`});
   });
 };
+
+const getUserName = (req) => {
+  if (req && req.headers.authorization) {
+    const user = new Buffer(req.headers.authorization.split(' ')[1], 'base64').toString();
+    return user.split(':')[0];
+  }
+  return '';
+};
+
+const checkRight = (req) => {
+  if (getUserName(req) != 'admin') {
+    throw 'user has no permission';
+  }
+};
+
+//TODO: do the real check
+const hasAdminPrivilege = (name) => {
+  return name.toLowerCase() === 'admin';
+};
+
+const getHeadNav = (isAdmin) => ({
+  login: true,
+  home: true,
+  search: true,
+  insight: true,
+  explorer: true,
+  tbd: true,
+  ucmdbAdapter: isAdmin,
+  aql: isAdmin,
+  views: isAdmin
+});
+
