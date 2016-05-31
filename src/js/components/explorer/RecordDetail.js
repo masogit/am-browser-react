@@ -81,7 +81,7 @@ export default class RecordDetail extends Component {
           {
             this.state.links.map((link, index) => {
               return (<ActionTab title={`${link.label} (${link.count})`} key={index}>
-                <RecordList body={this._getLinkBody(link, this.props.record)}/>
+                <RecordList key={link.sqlname} body={this._getLinkBody(link, this.props.record)}/>
               </ActionTab>);
             })
           }
