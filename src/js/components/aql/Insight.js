@@ -226,6 +226,7 @@ export default class Insight extends Component {
 
   _attachAQL(aql, box, parent) {
     box.child = {_id: aql._id};
+    this._findAqls(box);
     this.setState({
       box: parent
     }, this._onClose(this));
@@ -258,7 +259,7 @@ export default class Insight extends Component {
     } else if (this.state.edit) {
       child = (
         <Box direction="row" justify="center" pad="large">
-          <Anchor href="#" icon={<Attachment />} label="Attach AQL" onClick={this._selectAQL.bind(this, box, parent)}/>
+          <Anchor href="#" icon={<Attachment />} label="Attach a Graph" onClick={this._selectAQL.bind(this, box, parent)}/>
         </Box>
       );
     }
