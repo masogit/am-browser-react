@@ -72,6 +72,10 @@ module.exports = function (app, am) {
     checkRight(req);
     db.upsert(req, res);
   });
+  app.post('/coll/:collection/:id', (req, res) => {
+    checkRight(req);
+    db.upsert(req, res);
+  });
   app.delete('/coll/:collection/:id', (req, res) => {
     checkRight(req);
     db.delete(req, res);

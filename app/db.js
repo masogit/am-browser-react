@@ -77,11 +77,14 @@ exports.findOne = function (collectionName, id, callback) {
 exports.upsert = function (req, res) {
   var db = new Engine.Db(tingodbFolder, {});
   var collectionName = req.params.collection;
+  var id = req.params.id;
   var obj = req.body;
+
+  if (id)
+    obj._id = id;
 
   if (!obj._id)
     obj._id = (Math.random() + 1).toString(36).substring(7);
-  // obj._id = new Engine.ObjectID().toString();
 
   db.collection(collectionName).update({_id: obj._id}, obj, {upsert: true}, function (err, result) {
     if (err)
