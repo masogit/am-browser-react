@@ -235,6 +235,11 @@ export default class RecordList extends Component {
     });
 
     var Spinning = require('grommet/components/icons/Spinning');
+    const aqlStyle = {
+      'font-weight': 'bold',
+      'color':  '#767676',
+      'border-color': '#614767'
+    };
 
     return (
       <div>
@@ -254,7 +259,7 @@ export default class RecordList extends Component {
             this.state.numTotal > this.state.records.length &&
             <Anchor href="#" label="More..." onClick={this._getMoreRecords.bind(this)}/>
           }
-          <input type="text" inline={true} className="flex" ref="search"
+          <input type="text" inline={true} className="flex" ref="search" style={this.state.aqlInput?aqlStyle:{}}
                  placeholder={this.state.aqlInput?'Input AQL...':'Quick search'}
                  onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
           <Menu direction="row" align="center" responsive={false}>
