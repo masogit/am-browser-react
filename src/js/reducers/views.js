@@ -55,7 +55,7 @@ const generateFieldsLinks = (body, elements, row) => {
       // check loop one2many link if exists in current links array
       if (isLinkNotExisted) {
         // create a new link with body
-        var reverse = element;
+        var reverse = _.cloneDeep(element);
         // set reverse sqlname
         reverse.sqlname = sqlname;
         // set reversefield
