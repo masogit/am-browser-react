@@ -4,7 +4,7 @@ import Ferret from './components/Ferret';
 import Login from './components/Login';
 import Search from './components/explorer/Search';
 import RecordSearch from './components/explorer/RecordSearch';
-import Wall from './components/aql/Wall';
+import Insight from './components/aql/Insight';
 import Explorer from './components/explorer/Explorer';
 import ViewDefListContainer from './components/builder/ViewDefListContainer';
 //import ViewDefDetail from './components/builder/ViewDefDetail';
@@ -24,8 +24,8 @@ export const getRoutes = () => {
     {path: 'login', component: Login},
     {path: 'search', component: Search},
     {path: 'search(/:keyword)', component: RecordSearch},
-    {path: 'insight', component: Wall},
-    {path: 'insight(/:id)', component: Wall},
+    {path: 'insight', component: Insight},
+    {path: 'insight(/:id)', component: Insight},
     {path: 'explorer', component: Explorer},
     {path: 'explorer(/:id)', component: Explorer},
     {path: 'tbd', component: TBD},

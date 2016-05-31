@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import cookies from 'js-cookie';
 import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
 import * as Format from '../../constants/RecordFormat';
@@ -11,7 +12,6 @@ import Attachment from 'grommet/components/icons/base/Attachment';
 import DocumentPdf from 'grommet/components/icons/base/DocumentPdf';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
 import Graph from './../commons/Graph';
-import {AM_FORM_DATA} from '../../util/Config';
 import {
   Anchor,
   Box,
@@ -27,7 +27,7 @@ import {
 import GroupList from '../commons/GroupList';
 import GroupListItem from '../commons/GroupListItem';
 
-export default class Wall extends Component {
+export default class Insight extends Component {
 
   constructor() {
     super();
@@ -53,16 +53,15 @@ export default class Wall extends Component {
 
   componentDidMount() {
     // get user name from localstorage
-    const storage = window.localStorage && window.localStorage[AM_FORM_DATA];
-    if (storage) {
-      const form = JSON.parse(storage);
+    var user = cookies.get('user').toLowerCase();
+    if (user) {
       if (this.props.params.id) {
         AQLActions.loadAQL(this.props.params.id, (aql)=> {
           this._queryData(aql);
         });
       } else {
         this._loadAQLs();
-        this._loadWall(form.user);
+        this._loadWall(user);
       }
     }
 
