@@ -143,6 +143,7 @@ const getUserName = (req) => {
 };
 
 const checkRight = (req) => {
+  return true; // expect login, others request header no authentication
   if (getUserName(req) != 'admin') {
     throw 'user has no permission';
   }
