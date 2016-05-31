@@ -17,8 +17,7 @@ import {IntlProvider} from 'react-intl';
 
 import store from './store';
 import history from './RouteHistory';
-import {init, routeChanged/*, loginSuccess*/} from './actions';
-import {AM_FORM_DATA} from './util/Config';
+import {init, routeChanged, getConfig, getConfigSuccess} from './actions';
 import {ReduxRouter} from 'redux-router';
 
 // The port number needs to align with devServerProxy and websocketHost in gulpfile.js
@@ -29,15 +28,6 @@ import {ReduxRouter} from 'redux-router';
 
 Rest.setHeader('Accept', 'application/json');
 Rest.setHeader('X-API-Version', 200);
-
-if (!Rest.get('header').header.Authorization) {
-  const storage = window.localStorage && window.localStorage[AM_FORM_DATA];
-  if (storage) {
-    const form = JSON.parse(storage);
-    const auth = 'Basic ' + new Buffer(form.user + ':' + form.password).toString('base64');
-    Rest.setHeader("Authorization", auth);
-  }
-}
 
 // From a comment in https://github.com/rackt/redux/issues/637
 // this factory returns a history implementation which reads the current state
@@ -75,36 +65,51 @@ try {
 }
 var localeData = getLocaleData(messages, locale);
 
-if (process.env.NODE_ENV === 'production') {
-  ReactDOM.render((
-    <div>
-      <Provider store={store}>
-        <IntlProvider locale={localeData.locale} messages={localeData.messages}>
-          <ReduxRouter routes={Routes.routes}/>
-        </IntlProvider>
-      </Provider>
-    </div>
-  ), element);
-} else {
-  ReactDOM.render((
-    <div>
-      <Provider store={store}>
-        <IntlProvider locale={localeData.locale} messages={localeData.messages}>
-          <div>
-            <ReduxRouter routes={Routes.routes}/>
-            <DevTools store={store}/>
-          </div>
-        </IntlProvider>
-      </Provider>
-    </div>
-  ), element);
-}
 
 document.body.classList.remove('loading');
 
 import cookies from 'js-cookie';
 
 store.dispatch(init(cookies.get('user'), cookies.get('csrf-token')));
+
+const renderPage = () => {
+  if (process.env.NODE_ENV === 'production') {
+    ReactDOM.render((
+      <div>
+        <Provider store={store}>
+          <IntlProvider locale={localeData.locale} messages={localeData.messages}>
+            <ReduxRouter routes={Routes.routes}/>
+          </IntlProvider>
+        </Provider>
+      </div>
+    ), element);
+  } else {
+    ReactDOM.render((
+      <div>
+        <Provider store={store}>
+          <IntlProvider locale={localeData.locale} messages={localeData.messages}>
+            <div>
+              <ReduxRouter routes={Routes.routes}/>
+              <DevTools store={store}/>
+            </div>
+          </IntlProvider>
+        </Provider>
+      </div>
+    ), element);
+  }
+};
+
+if (!cookies.get('csrf-token')) {
+  renderPage();
+}
+
+getConfig().then(
+  (headerNavs) => {
+    Routes.routes[0].childRoutes = getRoutes(headerNavs);
+    store.dispatch(getConfigSuccess(headerNavs));
+    renderPage();
+  }
+);
 // simulate initial login
 //store.dispatch(loginSuccess('nobody@grommet.io', 'simulated'));
 
@@ -113,14 +118,17 @@ let postLoginPath = '/search';
 // check for session
 const sessionWatcher = () => {
   const {route, session} = store.getState();
-  Routes.routes[0].childRoutes = getRoutes();
 
   if (route) {
     if (session.token) {
-      if (route.pathname === '/login') {
-        history.pushState(null, Routes.path(postLoginPath));
+      if (session.headerNavs) {
+        Routes.routes[0].childRoutes = getRoutes(session.headerNavs);
+        if (route.pathname === '/login') {
+          history.pushState(null, Routes.path(postLoginPath));
+        }
       }
     } else {
+      Routes.routes[0].childRoutes = getRoutes(null);
       if (route.pathname !== Routes.path('/login')) {
         postLoginPath = route.pathname;
         history.pushState(null, Routes.path('/login'));

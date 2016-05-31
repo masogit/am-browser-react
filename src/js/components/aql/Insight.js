@@ -53,7 +53,7 @@ export default class Insight extends Component {
 
   componentDidMount() {
     // get user name from localstorage
-    var user = cookies.get('user').toLowerCase();
+    var user = cookies.get('user') && cookies.get('user').toLowerCase();
     if (user) {
       if (this.props.params.id) {
         AQLActions.loadAQL(this.props.params.id, (aql)=> {

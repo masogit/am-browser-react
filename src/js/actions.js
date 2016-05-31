@@ -3,7 +3,7 @@
 import Rest from './util/grommet-rest-promise';
 //import history from './RouteHistory';
 //import Query from 'grommet-index/utils/Query';
-import {HOST_NAME, AM_FORM_DATA } from './util/Config';
+import {HOST_NAME } from './util/Config';
 import cookies from 'js-cookie';
 
 // session
@@ -12,6 +12,7 @@ export const LOGIN = 'LOGIN';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAILURE = 'LOGIN_FAILURE';
 export const LOGOUT = 'LOGOUT';
+export const GET_SETTINGS_SUCCESS = 'GET_SETTINGS_SUCCESS';
 
 // route
 export const ROUTE_CHANGED = 'ROUTE_CHANGED';
@@ -63,52 +64,23 @@ export const RECORD_LOAD_SUCCESS = 'RECORD_LOAD_SUCCESS';
 export const DETAIL_RECORD_LOAD_SUCCESS = 'DETAIL_RECORD_LOAD_SUCCESS';
 
 export function init(email, token) {
-  return {type: INIT, email: email, token: token};
+  return {type: INIT, email, token};
 }
-
-// TODO: change this to something not so obvious
-export const getHeaderNavs = () => {
-  if (localStorage && localStorage.amFormData) {
-    return JSON.parse(localStorage.amFormData).headerNavs;
-  }
-
-  if (sessionStorage && sessionStorage.amFormData) {
-    return JSON.parse(sessionStorage.amFormData).headerNavs;
-  }
-
-  return null;
-};
 
 export function login(username, password) {
   return function (dispatch) {
     const auth = 'Basic ' + new Buffer(`${username}:${password}`).toString('base64');
-    Rest.setHeader("Authorization", auth);
-    Rest.get(HOST_NAME + '/am/login').end((err, res) => {
-      if (err) {
-        console.log("failed");
-        dispatch(loginFailure({message: 'LoginFailed'}));
-        throw err;
-      } else if (res.ok && res.body) {
-        let form = {
-          server: res.body.server,  // set AM server address
-          user: username,
-          headerNavs: res.body.headerNavs
-        };
-
-        if (sessionStorage) {
-          sessionStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
+    Rest.get(HOST_NAME + '/am/login')
+      .set("Authorization", auth)
+      .end((err, res) => {
+        if (err) {
+          dispatch(loginFailure({message: 'LoginFailed'}));
+          throw err;
+        } else if (res.ok && res.body) {
+          console.log('res.body: ' + res.body);
+          dispatch(loginSuccess(username, res.body._csrf, res.body.headerNavs, res.body.server));
         }
-
-        if (localStorage) {
-          form.password = password;
-          localStorage.setItem(AM_FORM_DATA, JSON.stringify(form));
-        }
-
-        console.log("pass");
-        console.log('res.body: ' + res.body);
-        dispatch(loginSuccess(username, res.body._csrf));
-      }
-    });
+      });
   };
 }
 
@@ -116,17 +88,34 @@ export function logout() {
   return function (dispatch) {
     Rest.get(HOST_NAME + '/am/logout').end((err, res) => {
       if (err) {
-        console.log("failed");
         dispatch({message: 'LogoutFailed'});
         throw err;
       } else if (res.ok && res.body) {
-        console.log('Logout: ' + res.body.user);
         cookies.remove('connect.sid');
         cookies.remove('csrf-token');
         dispatch({type: LOGOUT});
       }
     });
   };
+}
+
+export function getConfig() {
+  return Rest.get(HOST_NAME + '/am/config').then((res) => {
+    if (res.ok && res.body) {
+      //dispatch({type: GET_SETTINGS_SUCCESS, headerNavs: res.body});
+      return res.body;
+    }
+    return null;
+  }, (err) => {
+    if (err) {
+      console.log('get setting failed');
+      throw err;
+    }
+  });
+};
+
+export function getConfigSuccess(headerNavs) {
+  return {type: GET_SETTINGS_SUCCESS, headerNavs};
 }
 
 export function metadataLoad() {
@@ -265,8 +254,8 @@ export function detailRecordLoadSuccess(result) {
   };
 }
 
-export function loginSuccess(email, token) {
-  return {type: LOGIN_SUCCESS, email: email, token: token};
+export function loginSuccess(email, token, headerNavs, server) {
+  return {type: LOGIN_SUCCESS, email, token, headerNavs, server};
 }
 
 export function loginFailure(error) {

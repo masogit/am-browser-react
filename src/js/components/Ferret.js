@@ -24,7 +24,7 @@ class Indexer extends Component {
     //const { active: navActive } = this.props;
     let children, header;
     if (cookies.get('csrf-token')) {
-      header = <NavHeader />;
+      header = <NavHeader headerNavs={this.props.headerNavs}/>;
       children = (
         <div className='main-body-container'>
           <div className='main-body'>
@@ -45,6 +45,10 @@ class Indexer extends Component {
   }
 }
 
-let select = (state) => state.nav;
+let select = (state) => {
+  return Object.assign({}, state.nav, {
+    headerNavs: state.session.headerNavs
+  });
+};
 
 export default connect(select)(Indexer);

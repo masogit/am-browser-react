@@ -16,8 +16,8 @@ const checkRight = (req) => {
 };
 
 //TODO: do the real check
-const hasAdminPrivilege = (req) => {
-  return getUserName(req).toLowerCase() === 'admin';
+const hasAdminPrivilege = (name) => {
+  return name.toLowerCase() === 'admin';
 };
 
 const getHeadNav = (isAdmin) => ({
@@ -48,9 +48,42 @@ module.exports = function (app, am) {
     logger.error(util.inspect(e));
   });
 
+
+  // AM Server Login
+  app.get('/am/login', function (req, res) {
+    if (am) {
+      var username = getUserName(req);
+
+      // TODO login
+      var am_rest = Object.assign({}, am);
+      res.cookie('user', username);
+      res.cookie('csrf-token', req.sessionID);
+      req.session.user = username;
+      am_rest['_csrf'] = req.session ? req.sessionID : ''; // CSRF
+      am_rest['password'] = "";
+      am_rest.server = am.server;
+      am_rest.headerNavs = getHeadNav(hasAdminPrivilege(username));
+      res.json(am_rest);
+    } else
+      res.json(am);
+  });
+
+  app.get('/am/logout', function (req, res) {
+    if (am) {
+      // TODO logout
+      var am_rest = Object.assign({}, am);
+      req.session.destroy();
+      res.clearCookie('connect.sid');
+      res.clearCookie('csrf-token');
+      res.clearCookie('user');
+      res.json(am_rest);
+    } else
+      res.json(am);
+  });
+
   app.get("/*", function(req, res, next) {
     var session = req.session;
-    if (req.url != '/am/login' && req.url != '/am/logout' && (!session || !session.user)) {
+    if (!session || !session.user) {
       session.destroy();
       res.clearCookie('connect.sid');
       res.clearCookie('csrf-token');
@@ -83,38 +116,6 @@ module.exports = function (app, am) {
 
   // Download CSV in server side
   app.use('/download/*', rest.csv);
-
-
-  // AM Server Login
-  app.get('/am/login', function (req, res) {
-    if (am) {
-      var username = getUserName(req);
-
-      // TODO login
-      var am_rest = Object.assign({}, am);
-      res.cookie('user', username);
-      res.cookie('csrf-token', req.sessionID);
-      req.session.user = username;
-      am_rest['_csrf'] = req.session ? req.sessionID : ''; // CSRF
-      am_rest['password'] = "";
-      am_rest.headerNavs = getHeadNav(hasAdminPrivilege(req));
-      res.json(am_rest);
-    } else
-      res.json(am);
-  });
-
-  app.get('/am/logout', function (req, res) {
-    if (am) {
-      // TODO logout
-      var am_rest = Object.assign({}, am);
-      req.session.destroy();
-      res.clearCookie('connect.sid');
-      res.clearCookie('csrf-token');
-      res.clearCookie('user');
-      res.json(am_rest);
-    } else
-      res.json(am);
-  });
 
   // Proxy the backend rest service /rs/db -> /am/db
   logger.info(am);

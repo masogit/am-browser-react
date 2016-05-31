@@ -8,7 +8,6 @@ import Title from 'grommet/components/Title';
 import Logo from './Logo'; // './HPELogo';
 import Menu from 'grommet/components/Menu';
 import SessionMenu from './SessionMenu';
-import { getHeaderNavs } from '../actions';
 
 class NavHeader extends Component {
 
@@ -31,13 +30,14 @@ class NavHeader extends Component {
     ];
 
     const links = [];
-    const headerNavs = getHeaderNavs();
-    defaultLinks.map(link => {
-      const basePath = link.to.split('/')[1];
-      if (!headerNavs || headerNavs[basePath]) {
-        links.push(link);
-      }
-    });
+    if (this.props.headerNavs) {
+      defaultLinks.map(link => {
+        const basePath = link.to.split('/')[1];
+        if (this.props.headerNavs[basePath]) {
+          links.push(link);
+        }
+      });
+    }
 
     return (
       <Header fixed={true} size="small">

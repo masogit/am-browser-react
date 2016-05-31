@@ -1,19 +1,28 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import { INIT, LOGIN, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT } from '../actions';
+import { INIT, LOGIN, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT, GET_SETTINGS_SUCCESS } from '../actions';
 
 const initialState = {
   email: null,
   token: null,
-  error: null
+  error: null,
+  headerNavs: null,
+  server: ''
 };
 
 const handlers = {
-  [INIT]: (_, action) => ({email: action.email, token: action.token}),
+  [INIT]: (_, action) => ({email: action.email, token: action.token, headerNavs: action.headerNavs}),
   [LOGIN]: (_, action) => ({email: action.email, error: null}),
-  [LOGIN_SUCCESS]: (_, action) => ({email: action.email, token: action.token, error: null}),
+  [LOGIN_SUCCESS]: (_, action) => ({
+    email: action.email,
+    token: action.token,
+    error: null,
+    headerNavs: action.headerNavs,
+    server: action.server
+  }),
   [LOGIN_FAILURE]: (_, action) => ({error: action.error}),
-  [LOGOUT]: () => ({token: null})
+  [LOGOUT]: () => initialState,
+  [GET_SETTINGS_SUCCESS]: (_, action) => ({headerNavs: action.headerNavs})
 };
 
 export default function sessionReducer (state = initialState, action) {
