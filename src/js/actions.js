@@ -152,7 +152,7 @@ export function metadataLoadDetail(obj, elements, index) {
       .end(function (err, res) {
         if (!err) {
           let data = JSON.parse(res.text);
-          if (!index) {
+          if (typeof index === 'undefined') {
             obj.body_label = data.label;
             obj.body_sqlname = data.sqlname;
             elements.push(obj);

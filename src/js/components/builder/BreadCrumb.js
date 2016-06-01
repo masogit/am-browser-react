@@ -11,11 +11,6 @@ export default class BreadCrumb extends Component {
   componentDidMount() {
   }
 
-  _onClick() {
-    this.props.clearFilter();
-    this.props.metadataLoad();
-  }
-
   _onDetailClick(obj, index) {
     this.props.clearFilter();
     this.props.metadataLoadDetail(obj, this.props.elements, index);
@@ -27,7 +22,7 @@ export default class BreadCrumb extends Component {
     let Next = require('grommet/components/icons/base/Next');
     let breadcrumbs = elements.map((element, index) => {
       if (index == 0) {
-        return <Anchor key={index} icon={<Home />} onClick={this._onClick.bind(this)} label={element.label}/>;
+        return <Anchor key={index} icon={<Home />} onClick={this._onDetailClick.bind(this, element, index)} label={element.label}/>;
       } else if (index == elements.length - 1) {
         return <Anchor key={index} icon={<Next />} label={element.label}/>;
       } else {
