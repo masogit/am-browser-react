@@ -22,6 +22,14 @@ export default class Search extends Component {
     this._isUnmount = false;
   }
 
+  _isUCMDBAdpaterSupported() {
+    if (this.state.ucmdbAdapter.supported === undefined) {
+      const route = this.props.routes[1].childRoutes.filter((item)=> item.path.indexOf('ucmdbAdapter') > -1);
+      this.state.ucmdbAdapter.supported = route.length > 0;
+    }
+    return this.state.ucmdbAdapter.supported;
+  }
+
   componentDidMount() {
     this._isUnmount = false;
     ExplorerActions.loadViews((views)=> {
@@ -38,52 +46,55 @@ export default class Search extends Component {
         });
       }
     });
-    UCMDBAdapterActions.getIntegrationPoint((points) => {
-      if (points.length > 0) {
-        let count = 1;
-        points.map((point) => {
-          if (point.populationSupported) {
-            UCMDBAdapterActions.getIntegrationJob(point.name, 'populationJobs', (popJobs) => {
-              if (point.pushSupported) {
-                UCMDBAdapterActions.getIntegrationJob(point.name, 'pushJobs', (pushJobs) => {
+
+    if (this._isUCMDBAdpaterSupported()) {
+      UCMDBAdapterActions.getIntegrationPoint((points) => {
+        if (points.length > 0) {
+          let count = 1;
+          points.map((point) => {
+            if (point.populationSupported) {
+              UCMDBAdapterActions.getIntegrationJob(point.name, 'populationJobs', (popJobs) => {
+                if (point.pushSupported) {
+                  UCMDBAdapterActions.getIntegrationJob(point.name, 'pushJobs', (pushJobs) => {
+                    if (!this._isUnmount) {
+                      this.setState({
+                        ucmdbAdapter: {
+                          ready: count++ === points.length,
+                          pushJobs: this.state.ucmdbAdapter.pushJobs.concat(pushJobs),
+                          popJobs: this.state.ucmdbAdapter.popJobs.concat(popJobs)
+                        }
+                      });
+                    }
+                  });
+                } else {
                   if (!this._isUnmount) {
                     this.setState({
                       ucmdbAdapter: {
                         ready: count++ === points.length,
-                        pushJobs: this.state.ucmdbAdapter.pushJobs.concat(pushJobs),
+                        pushJobs: this.state.ucmdbAdapter.pushJobs,
                         popJobs: this.state.ucmdbAdapter.popJobs.concat(popJobs)
                       }
                     });
                   }
-                });
-              } else {
+                }
+              });
+            } else if (point.pushSupported) {
+              UCMDBAdapterActions.getIntegrationJob(point.name, 'pushJobs', (pushJobs) => {
                 if (!this._isUnmount) {
                   this.setState({
                     ucmdbAdapter: {
                       ready: count++ === points.length,
-                      pushJobs: this.state.ucmdbAdapter.pushJobs,
-                      popJobs: this.state.ucmdbAdapter.popJobs.concat(popJobs)
+                      pushJobs: this.state.ucmdbAdapter.pushJobs.concat(pushJobs),
+                      popJobs: this.state.ucmdbAdapter.popJobs
                     }
                   });
                 }
-              }
-            });
-          } else if (point.pushSupported) {
-            UCMDBAdapterActions.getIntegrationJob(point.name, 'pushJobs', (pushJobs) => {
-              if (!this._isUnmount) {
-                this.setState({
-                  ucmdbAdapter: {
-                    ready: count++ === points.length,
-                    pushJobs: this.state.ucmdbAdapter.pushJobs.concat(pushJobs),
-                    popJobs: this.state.ucmdbAdapter.popJobs
-                  }
-                });
-              }
-            });
-          }
-        });
-      }
-    });
+              });
+            }
+          });
+        }
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -211,15 +222,19 @@ export default class Search extends Component {
       onClick: this._goAQL,
       graph: this.state.aqlSeries &&
       <Meter legend={{"placement": "inline"}} series={this.state.aqlSeries} a11yTitle="meter-title-12"/>
-    }, {
-      title: 'UCMDB Adapter Jobs Status',
-      onClick: this._goUCMDB,
-      graph: this.state.ucmdbAdapter.ready && (
-        <Meter
-          series={this._getSeries(this.state.ucmdbAdapter.popJobs.concat(this.state.ucmdbAdapter.pushJobs), 'status')}
-          max={8} legend={{"placement": "inline"}}/>
-      )
     }];
+
+    if (this._isUCMDBAdpaterSupported()) {
+      tiles.push({
+        title: 'UCMDB Adapter Jobs Status',
+        onClick: this._goUCMDB,
+        graph: this.state.ucmdbAdapter.ready && (
+          <Meter
+            series={this._getSeries(this.state.ucmdbAdapter.popJobs.concat(this.state.ucmdbAdapter.pushJobs), 'status')}
+            max={8} legend={{"placement": "inline"}}/>
+        )
+      });
+    }
 
     return (
       <Box align="center" full={true} justify="center">
