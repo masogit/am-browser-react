@@ -1,4 +1,5 @@
-// set up ======================================================================
+// set up =======
+var compression = require('compression');
 var express = require('express');
 var path = require('path');
 var app = express(); 								// create our app w/ express
@@ -20,7 +21,7 @@ var server = process.env.AMB_NODE_SERVER || properties.get('node.server');
 var port = process.env.AMB_NODE_PORT || properties.get('node.port'); 				// set the port
 var https_port = process.env.AMB_REST_HTTPS_PORT || properties.get('node.https_port');     // set the https port
 
-
+app.use(compression());
 app.use(express.static(__dirname + '/public')); 		// set the static files location /public/img will be /img for users
 app.use(morgan('dev')); // log every request to the console
 app.use(bodyParser.urlencoded({'extended': 'true'})); // parse application/x-www-form-urlencoded
