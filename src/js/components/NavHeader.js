@@ -23,7 +23,7 @@ class NavHeader extends Component {
       // {to: '/home', text: 'Home'},
       {to: '/search', text: 'Search'},
       {to: '/insight', text: 'Insight'},
-      {to: '/explorer', text: 'Records'},
+      {to: '/explorer', text: 'Viewer'},
       {to: '/views', text: 'Builder'},
       {to: '/aql', text: 'Graph'},
       {to: '/ucmdbAdapter', text: 'Adapter'}

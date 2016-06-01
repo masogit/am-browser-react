@@ -209,7 +209,7 @@ export default class AQL extends Component {
       aql.name = report.Name;
       aql.category = 'OOB';
       this.setState({aql: aql}, this._onQuery());
-    });
+    }, this._onClose());
   }
 
   _setFormValues(event) {
@@ -371,7 +371,7 @@ export default class AQL extends Component {
       return 0;
     };
 
-    const toolbar = <Anchor href="#" icon={<Add />} label="InToolReport" onClick={this._selectReports.bind(this)}/>;
+    const toolbar = <Anchor href="#" icon={<Add />} label="Widgets" onClick={this._selectReports.bind(this)}/>;
     const contents = this.state.aqls.map((aql) => ({
       key: aql._id,
       groupby: aql.category,
