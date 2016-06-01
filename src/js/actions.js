@@ -76,19 +76,22 @@ export function login(username, password) {
         if (err) {
           dispatch(loginFailure({message: 'LoginFailed'}));
           throw err;
-        } else if (res.ok && res.body) {
-          Rest.get(HOST_NAME + '/am/csrf')
-            .set("Authorization", auth)
-            .end((err, res) => {
-              if (err) {
-                dispatch(loginFailure({message: 'LoginFailed'}));
-                throw err;
-              } else if (res.ok && res.body) {
-                console.log('res.body: ' + res.body);
-                Rest.setHeader('csrf-token', res.body._csrf);
-                dispatch(loginSuccess(username, res.body._csrf, res.body.headerNavs));
-              }
-            });
+        } else if (res.ok) {
+          if (res.body) {
+            Rest.get(HOST_NAME + '/am/csrf')
+              .set("Authorization", auth)
+              .end((err, res) => {
+                if (err) {
+                  dispatch(loginFailure({message: 'LoginFailed'}));
+                  throw err;
+                } else if (res.ok && res.body) {
+                  Rest.setHeader('csrf-token', res.body._csrf);
+                  dispatch(loginSuccess(username, res.body._csrf, res.body.headerNavs));
+                }
+              });
+          } else {
+            dispatch(loginFailure({message: res.text}));
+          }
         }
       });
   };

@@ -23,7 +23,6 @@ module.exports = function (am) {
     };
 
     request = client.get(url, args, (data, response) => {
-
       var isOffset = !req.query['offset'] || req.query['offset'] === 0 || req.query['offset'] === "0";
       if (isOffset) {
         req.query['offset'] = 0;
@@ -66,6 +65,49 @@ module.exports = function (am) {
 
   };
 
+  this.login = function (req, res) {
+    var url = "http://${server}${context}${ref-link}", request;
+
+    const user = new Buffer(req.headers.authorization.split(' ')[1], 'base64').toString();
+    const username = user.split(':')[0];
+    const password = user.split(':')[1];
+    var args = {
+      path: {
+        server: am.server,
+        context: '/AssetManagerWebService/rs/',
+        "ref-link": `db/amEmplDept`
+      },
+      parameters: {
+        filter: `UserLogin='${username.trim()}'`
+      },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": req.headers.authorization
+      }
+    };
+
+    request = client.get(url, args, (data, response) => {
+      if (!data.entities || data.count === 0) {
+        res.send('user name or password is wrong');
+      } else {
+        var am_rest = {};
+        res.cookie('user', username);
+        res.cookie('csrf-token', req.sessionID);
+        req.session.user = username;
+        req.session.password = password;
+        req.session.isAdmin = data.entities[0].bAdminRight[1];
+        am_rest._csrf = req.session ? req.sessionID : ''; // CSRF
+        am_rest.headerNavs = getHeadNav(req.session.isAdmin);
+        res.json(am_rest);
+      }
+
+      res.end();
+    }).on('error', function (err) {
+      res.status(500).send(err.toString());
+    });
+  };
+
+  this.getHeadNav = getHeadNav;
 };
 
 function getFormattedRecords(fields, rawRecords) {
@@ -105,3 +147,17 @@ function escapeStr(val) {
 function getDisplayLabel(field) {
   return field.alias ? field.alias : (field.label ? field.label : field.sqlname);
 }
+
+function getHeadNav(isAdmin) {
+  return {
+    login: true,
+    home: true,
+    search: true,
+    insight: true,
+    explorer: true,
+    tbd: true,
+    ucmdbAdapter: isAdmin,
+    aql: isAdmin,
+    views: isAdmin
+  };
+};

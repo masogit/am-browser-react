@@ -35,6 +35,9 @@ module.exports = function (app) {
     logger.error(util.inspect(e));
   });
 
+  // AM Server Login
+  app.get('/am/login', rest.login);
+
   app.get("/*", function (req, res, next) {
     var session = req.session;
     if (!session || !session.user) {
@@ -45,7 +48,6 @@ module.exports = function (app) {
     } else {
       //TODO: do the real check
       res.locals._user = session.user;
-      res.locals._headerNavs = getHeadNav(session.user == 'admin');
       next(); // Call the next middleware
     }
   });
@@ -72,8 +74,9 @@ module.exports = function (app) {
     res.json(am_rest);
   });
 
+
   app.get('/am/config', function (req, res) {
-    const headerNavs = getHeadNav(hasAdminPrivilege(req.session.user));
+    const headerNavs = rest.getHeadNav(req.session.isAdmin);
     res.json(headerNavs);
   });
 
@@ -81,15 +84,15 @@ module.exports = function (app) {
   app.get('/coll/:collection', db.find);
   app.get('/coll/:collection/:id', db.find);
   app.post('/coll/:collection', (req, res) => {
-    checkRight(req.session.user);
+    checkRight(req);
     db.upsert(req, res);
   });
   app.post('/coll/:collection/:id', (req, res) => {
-    checkRight(req.session.user);
+    checkRight(req);
     db.upsert(req, res);
   });
   app.delete('/coll/:collection/:id', (req, res) => {
-    checkRight(req.session.user);
+    checkRight(req);
     db.delete(req, res);
   });
 
@@ -117,7 +120,7 @@ module.exports = function (app) {
 
   // get ucmdb point data
   app.use('/am/ucmdbPoint/', function (req, res) {
-    checkRight(req.session.user);
+    checkRight(req);
     apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${base}/integration/ucmdbAdapter/points`});
   });
 
@@ -129,32 +132,14 @@ module.exports = function (app) {
     var server = properties.get('ucmdb.server');
     var port = properties.get('ucmdb.port');
     var param = properties.get('ucmdb.param');
-    checkRight(req.session.user);
+    checkRight(req);
     apiProxy.web(req, res, {target: `http://${server}:${port}${param}`});
   });
 };
 
-const checkRight = (name) => {
-  return true; // expect login, others request header no authentication
-  if (name != 'admin') {
+const checkRight = (req) => {
+  if (!req.session.isAdmin) {
     throw 'user has no permission';
   }
 };
-
-//TODO: do the real check
-const hasAdminPrivilege = (name) => {
-  return name && name.toLowerCase() === 'admin';
-};
-
-const getHeadNav = (isAdmin) => ({
-  login: true,
-  home: true,
-  search: true,
-  insight: true,
-  explorer: true,
-  tbd: true,
-  ucmdbAdapter: isAdmin,
-  aql: isAdmin,
-  views: isAdmin
-});
 
