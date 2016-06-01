@@ -2,7 +2,7 @@
 
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { login } from '../actions';
+import { initLogin, login } from '../actions';
 import Split from 'grommet/components/Split';
 import Section from 'grommet/components/Section';
 import Sidebar from 'grommet/components/Sidebar';
@@ -24,6 +24,10 @@ class IndexerLogin extends Component {
 
   _onResponsive(responsive) {
     this.setState({responsive: responsive});
+  }
+
+  componentDidMount() {
+    this.props.dispatch(initLogin());
   }
 
   render() {
