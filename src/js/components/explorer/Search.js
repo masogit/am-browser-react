@@ -22,14 +22,6 @@ export default class Search extends Component {
     this._isUnmount = false;
   }
 
-  _isUCMDBAdpaterSupported() {
-    if (this.state.ucmdbAdapter.supported === undefined) {
-      const route = this.props.routes[1].childRoutes.filter((item)=> item.path.indexOf('ucmdbAdapter') > -1);
-      this.state.ucmdbAdapter.supported = route.length > 0;
-    }
-    return this.state.ucmdbAdapter.supported;
-  }
-
   componentDidMount() {
     this._isUnmount = false;
     ExplorerActions.loadViews((views)=> {
@@ -100,6 +92,14 @@ export default class Search extends Component {
   componentWillUnmount() {
     // should replace this by promise
     this._isUnmount = true;
+  }
+
+  _isUCMDBAdpaterSupported() {
+    if (this.state.ucmdbAdapter.supported === undefined) {
+      const route = this.props.routes[1].childRoutes.filter((item)=> item.path.indexOf('ucmdbAdapter') > -1);
+      this.state.ucmdbAdapter.supported = route.length > 0;
+    }
+    return this.state.ucmdbAdapter.supported;
   }
 
   _filterFirst7(objs) {
