@@ -70,6 +70,25 @@ Request.prototype.then = function () {
   return promise.then.apply(promise, arguments);
 };
 
+
+// TODO Change the session, if session changed, the view will be refresh(index.js)
+const store = require('../store');
+const {init} = require('../actions');
+
+const end = Request.prototype.end;
+Request.prototype.end = function (callback) {
+  return end.call(this, (error, response) => {
+    if (error) {
+      console.log(error.response ? error.response.text : error);
+      if (error.status == 401) {
+        store.default.dispatch(init('', ''));
+      }
+    }
+
+    callback(error, response);
+  });
+};
+
 // convert params to string, to deal with array values
 function buildQueryParams(params) {
   var result = [];

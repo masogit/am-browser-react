@@ -70,15 +70,25 @@ export function init(email, token) {
 export function login(username, password) {
   return function (dispatch) {
     const auth = 'Basic ' + new Buffer(`${username}:${password}`).toString('base64');
-    Rest.get(HOST_NAME + '/am/login')
+    Rest.post(HOST_NAME + '/am/login')
       .set("Authorization", auth)
       .end((err, res) => {
         if (err) {
           dispatch(loginFailure({message: 'LoginFailed'}));
           throw err;
         } else if (res.ok && res.body) {
-          console.log('res.body: ' + res.body);
-          dispatch(loginSuccess(username, res.body._csrf, res.body.headerNavs));
+          Rest.get(HOST_NAME + '/am/csrf')
+            .set("Authorization", auth)
+            .end((err, res) => {
+              if (err) {
+                dispatch(loginFailure({message: 'LoginFailed'}));
+                throw err;
+              } else if (res.ok && res.body) {
+                console.log('res.body: ' + res.body);
+                Rest.setHeader('csrf-token', res.body._csrf);
+                dispatch(loginSuccess(username, res.body._csrf, res.body.headerNavs));
+              }
+            });
         }
       });
   };

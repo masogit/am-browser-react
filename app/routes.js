@@ -35,18 +35,29 @@ module.exports = function (app) {
     logger.error(util.inspect(e));
   });
 
-  // AM Server Login
-  app.get('/am/login', function (req, res) {
+  app.get("/*", function (req, res, next) {
+    var session = req.session;
+    if (!session || !session.user) {
+      res.clearCookie('connect.sid');
+      res.clearCookie('csrf-token');
+      res.clearCookie('user');
+      res.redirect(401, '/am/login');
+    } else {
+      //TODO: do the real check
+      res.locals._user = session.user;
+      res.locals._headerNavs = getHeadNav(session.user == 'admin');
+      next(); // Call the next middleware
+    }
+  });
+
+  app.get('/am/csrf', function (req, res) {
     const user = new Buffer(req.headers.authorization.split(' ')[1], 'base64').toString();
     const username = user.split(':')[0];
     const password = user.split(':')[1];
     // TODO login
     var am_rest = {};
-    res.cookie('user', username);
-    res.cookie('csrf-token', req.sessionID);
-    req.session.user = username;
-    req.session.password = password;
-    am_rest['_csrf'] = req.session ? req.sessionID : ''; // CSRF
+    res.cookie('csrf-token', req.csrfToken());
+    am_rest['_csrf'] = req.session ? req.csrfToken() : ''; // CSRF
     am_rest.headerNavs = getHeadNav(hasAdminPrivilege(username));
     res.json(am_rest);
   });
@@ -60,23 +71,6 @@ module.exports = function (app) {
     res.clearCookie('user');
     res.json(am_rest);
   });
-
-  app.get("/*", function (req, res, next) {
-    var session = req.session;
-    if (!session || !session.user) {
-      session.destroy();
-      res.clearCookie('connect.sid');
-      res.clearCookie('csrf-token');
-      res.clearCookie('user');
-      res.redirect(401, '/am/login');
-    } else {
-      //TODO: do the real check
-      res.locals._user = session.user;
-      res.locals._headerNavs = getHeadNav(session.user == 'admin');
-      next(); // Call the next middleware
-    }
-  });
-
 
   app.get('/am/config', function (req, res) {
     const headerNavs = getHeadNav(hasAdminPrivilege(req.session.user));
