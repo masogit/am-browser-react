@@ -135,10 +135,10 @@ export function getConfigSuccess(headerNavs) {
 export function metadataLoad() {
   return function (dispatch) {
     Rest.get(HOST_NAME + '/am/v1/schema')
-      .set('Content-Type', 'text/xml')
+      .set('Content-Type', 'Application/json')
       .end(function (err, res) {
         if (!err) {
-          let data = JSON.parse(res.text);
+          let data = res.body;
           dispatch(metadataSuccess(data, []));
         }
       });
@@ -148,10 +148,10 @@ export function metadataLoad() {
 export function metadataLoadDetail(obj, elements, index) {
   return function (dispatch) {
     Rest.get(HOST_NAME + '/am/v1/' + obj.url)
-      .set('Content-Type', 'text/xml')
+      .set('Content-Type', 'Application/json')
       .end(function (err, res) {
         if (!err) {
-          let data = JSON.parse(res.text);
+          let data = res.body;
           if (typeof index === 'undefined') {
             obj.body_label = data.label;
             obj.body_sqlname = data.sqlname;
