@@ -116,7 +116,18 @@ export default class RecordSearch extends Component {
 
 
   render() {
+    var messages = Object.keys(this.state.messages).map((key) => {
+      return {
+        view: key,
+        timeEnd: this.state.messages[key].timeEnd,
+        timeStart: this.state.messages[key].timeStart,
+        num: this.state.messages[key].num
+      };
+    }).sort((a, b)=> {
+      return b.num - a.num;
+    });
 
+    console.log(messages);
     return (
       <Box full="horizontal" pad={{horizontal: 'small'}}>
         <Box direction="row" pad={{vertical: 'medium'}}>
@@ -134,11 +145,11 @@ export default class RecordSearch extends Component {
               </thead>
               <tbody>
               {
-                Object.keys(this.state.messages).map((key) => {
+                messages.map((msg) => {
                   return (<TableRow justify="between">
-                    <td>{key}</td>
-                    <td>{(this.state.messages[key].timeEnd) ? (this.state.messages[key].timeEnd - this.state.messages[key].timeStart) : ''}</td>
-                    <td>{this.state.messages[key].num}</td>
+                    <td>{msg.view}</td>
+                    <td>{msg.timeEnd ? (msg.timeEnd - msg.timeStart) : ''}</td>
+                    <td>{msg.num}</td>
                   </TableRow>);
                 })
               }
