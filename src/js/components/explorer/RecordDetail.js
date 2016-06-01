@@ -43,7 +43,15 @@ export default class RecordDetail extends Component {
 
   _getLinkBody(link, record) {
     var body = Object.assign({}, link.body);
-    let AQL = link.reverse + '.PK=' + record[link.reversefield];
+
+    let AQL = "";
+    if (link.src_field) {
+      var relative_path = link.src_field.relative_path;
+      var src_field = relative_path ? relative_path + '.' + link.src_field.sqlname : link.src_field.sqlname;
+      AQL = link.dest_field.sqlname + '=' + record[src_field];
+    } else
+      AQL = link.reverse + '.PK=' + record[link.reversefield]; // TODO remove reversefield
+
     body.filter = body.filter ? '(' + body.filter + ') AND ' + AQL : AQL;
     return body;
   }

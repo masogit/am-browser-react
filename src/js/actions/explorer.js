@@ -44,7 +44,7 @@ export function getCount(body, callback) {
   loadRecordsByBody(body, callback);
 }
 
-export function loadRecordsByKeyword(body, keyword, callback) {
+export function getBodyByKeyword(body, keyword) {
   var aql = body.fields.filter((field) => {
     return field.searchable;
   }).map((field) => {
@@ -53,9 +53,10 @@ export function loadRecordsByKeyword(body, keyword, callback) {
 
   if (aql) {
     body.filter = (body.filter) ? body.filter + ' AND (' + aql + ')' : aql;
-    loadRecordsByBody(body, callback);
   }
+  return body;
 }
+
 export function loadRecordsByBody(body, callback) {
   Rest.get(HOST_NAME + '/am/db/' + getQueryByBody(body)).then((res) => {
     if (res.body.count && res.body.entities)
@@ -75,15 +76,25 @@ export function getQueryByBody(body) {
     fields.push(field.sqlname);
   });
 
-  // add reverse fields before query
+  // add src_fields before query
   if (body.links && body.links.length > 0) {
-    var reversefields = body.links.map((link) => {
-      return link.reversefield;
+    var src_fields = body.links.map((link) => {
+      if (link.src_field) {
+        var relative_path = link.src_field.relative_path;
+        return relative_path ? relative_path + '.' + link.src_field.sqlname : link.src_field.sqlname;
+      }
+
+      // TODO remove this part reversefield was replaced by src_field
+      if (link.reversefield)
+        return link.reversefield;
     });
-    reversefields.filter((elem, pos, arr) => {
+
+    // remove same fields
+    src_fields.filter((elem, pos, arr) => {
       return arr.indexOf(elem) == pos;
     });
-    fields = fields.concat(reversefields);
+
+    fields = fields.concat(src_fields);
   }
 
   var query = body.sqlname;
