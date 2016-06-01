@@ -65,14 +65,12 @@ try {
 }
 var localeData = getLocaleData(messages, locale);
 
-
-document.body.classList.remove('loading');
-
 import cookies from 'js-cookie';
 
 store.dispatch(init(cookies.get('user'), cookies.get('csrf-token')));
 
 const renderPage = () => {
+  document.body.classList.remove('loading');
   if (process.env.NODE_ENV === 'production') {
     ReactDOM.render((
       <div>

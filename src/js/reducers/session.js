@@ -6,8 +6,7 @@ const initialState = {
   email: null,
   token: null,
   error: null,
-  headerNavs: null,
-  server: ''
+  headerNavs: null
 };
 
 const handlers = {
@@ -17,8 +16,7 @@ const handlers = {
     email: action.email,
     token: action.token,
     error: null,
-    headerNavs: action.headerNavs,
-    server: action.server
+    headerNavs: action.headerNavs
   }),
   [LOGIN_FAILURE]: (_, action) => ({error: action.error}),
   [LOGOUT]: () => initialState,

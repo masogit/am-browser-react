@@ -78,7 +78,7 @@ export function login(username, password) {
           throw err;
         } else if (res.ok && res.body) {
           console.log('res.body: ' + res.body);
-          dispatch(loginSuccess(username, res.body._csrf, res.body.headerNavs, res.body.server));
+          dispatch(loginSuccess(username, res.body._csrf, res.body.headerNavs));
         }
       });
   };
@@ -254,8 +254,8 @@ export function detailRecordLoadSuccess(result) {
   };
 }
 
-export function loginSuccess(email, token, headerNavs, server) {
-  return {type: LOGIN_SUCCESS, email, token, headerNavs, server};
+export function loginSuccess(email, token, headerNavs) {
+  return {type: LOGIN_SUCCESS, email, token, headerNavs};
 }
 
 export function loginFailure(error) {

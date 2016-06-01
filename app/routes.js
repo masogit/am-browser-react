@@ -19,9 +19,8 @@ module.exports = function (app) {
   var httpProxy = require('http-proxy');
   var apiProxy = httpProxy.createProxyServer();
 
-  // TODO replace Authorization by session id
-  var auth = 'Basic ' + new Buffer(rest_username + ':' + rest_password).toString('base64');
   apiProxy.on('proxyReq', function (proxyReq, req, res, options) {
+    const auth = 'Basic ' + new Buffer(req.session.user + ':' + req.session.password).toString('base64');
     logger.info("set request header: " + auth);
     proxyReq.setHeader('Authorization', auth);
   });
@@ -38,15 +37,17 @@ module.exports = function (app) {
 
   // AM Server Login
   app.get('/am/login', function (req, res) {
-    var username = getUserName(req);
+    const user = new Buffer(req.headers.authorization.split(' ')[1], 'base64').toString();
+    const username = user.split(':')[0];
+    const password = user.split(':')[1];
     // TODO login
     var am_rest = {};
     res.cookie('user', username);
     res.cookie('csrf-token', req.sessionID);
     req.session.user = username;
+    req.session.password = password;
     am_rest['_csrf'] = req.session ? req.sessionID : ''; // CSRF
     am_rest.headerNavs = getHeadNav(hasAdminPrivilege(username));
-    am_rest.server = rest_server + ":" + rest_port;
     res.json(am_rest);
   });
 
@@ -77,19 +78,24 @@ module.exports = function (app) {
   });
 
 
+  app.get('/am/config', function (req, res) {
+    const headerNavs = getHeadNav(hasAdminPrivilege(req.session.user));
+    res.json(headerNavs);
+  });
+
   // CRUD Tingodb
   app.get('/coll/:collection', db.find);
   app.get('/coll/:collection/:id', db.find);
   app.post('/coll/:collection', (req, res) => {
-    checkRight(req);
+    checkRight(req.session.user);
     db.upsert(req, res);
   });
   app.post('/coll/:collection/:id', (req, res) => {
-    checkRight(req);
+    checkRight(req.session.user);
     db.upsert(req, res);
   });
   app.delete('/coll/:collection/:id', (req, res) => {
-    checkRight(req);
+    checkRight(req.session.user);
     db.delete(req, res);
   });
 
@@ -117,7 +123,7 @@ module.exports = function (app) {
 
   // get ucmdb point data
   app.use('/am/ucmdbPoint/', function (req, res) {
-    checkRight(req);
+    checkRight(req.session.user);
     apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${base}/integration/ucmdbAdapter/points`});
   });
 
@@ -129,29 +135,21 @@ module.exports = function (app) {
     var server = properties.get('ucmdb.server');
     var port = properties.get('ucmdb.port');
     var param = properties.get('ucmdb.param');
-    checkRight(req);
+    checkRight(req.session.user);
     apiProxy.web(req, res, {target: `http://${server}:${port}${param}`});
   });
 };
 
-const getUserName = (req) => {
-  if (req && req.headers.authorization) {
-    const user = new Buffer(req.headers.authorization.split(' ')[1], 'base64').toString();
-    return user.split(':')[0];
-  }
-  return '';
-};
-
-const checkRight = (req) => {
+const checkRight = (name) => {
   return true; // expect login, others request header no authentication
-  if (getUserName(req) != 'admin') {
+  if (name != 'admin') {
     throw 'user has no permission';
   }
 };
 
 //TODO: do the real check
 const hasAdminPrivilege = (name) => {
-  return name.toLowerCase() === 'admin';
+  return name && name.toLowerCase() === 'admin';
 };
 
 const getHeadNav = (isAdmin) => ({
