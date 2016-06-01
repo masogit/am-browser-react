@@ -1,11 +1,13 @@
 import React, {Component} from 'react';
 import * as ExplorerAction from '../../actions/explorer';
 import RecordDetail from './RecordDetail';
+import RecordList from './RecordList';
 import {
   Anchor,
   Box,
   Header,
   Footer,
+  Layer,
   Split,
   Table,
   TableRow,
@@ -33,13 +35,13 @@ export default class RecordSearch extends Component {
   componentWillReceiveProps(nextProps) {
   }
 
-  _setMessage(name, time, num) {
+  _setMessage(view, time, num) {
     var messages = this.state.messages;
-    if (messages[name]) {
-      messages[name].timeEnd = time;
-      messages[name].num = num;
+    if (messages[view._id]) {
+      messages[view._id].timeEnd = time;
+      messages[view._id].num = num;
     } else {
-      messages[name] = {timeStart: time, num: num};
+      messages[view._id] = {view: view, timeStart: time, num: num};
     }
     this.setState({
       messages: messages
@@ -56,17 +58,24 @@ export default class RecordSearch extends Component {
         ExplorerAction.loadViews((views) => {
           if (views instanceof Array) {
             views.forEach((view) => {
-              this._setMessage(view.name, Date.now(), 0);
-              ExplorerAction.loadRecordsByKeyword(view.body, keyword, (data) => {
-                this._setMessage(view.name, Date.now(), data.count);
-                if (data && data.entities.length > 0) {
-                  var results = this.state.results;
-                  results.push({view: view, records: data.entities});
-                  this.setState({
-                    results: [...results]
-                  });
-                }
+              // check searchable
+              var aql = view.body.fields.filter((field) => {
+                return field.searchable;
               });
+              if (aql.length > 0) {
+                ExplorerAction.getBodyByKeyword(view.body, keyword);
+                this._setMessage(view, Date.now(), 0);
+                ExplorerAction.loadRecordsByBody(view.body, (data) => {
+                  this._setMessage(view, Date.now(), data.count);
+                  if (data && data.entities.length > 0) {
+                    var results = this.state.results;
+                    results.push({view: view, records: data.entities});
+                    this.setState({
+                      results: [...results]
+                    });
+                  }
+                });
+              }
             });
           }
         });
@@ -95,7 +104,7 @@ export default class RecordSearch extends Component {
     if (event) {
       event.preventDefault();
     }
-    this.setState({record: null});
+    this.setState({record: null, layer: null});
   }
 
   _onClick(view, record) {
@@ -114,11 +123,25 @@ export default class RecordSearch extends Component {
     }
   }
 
+  _showViewRecords(view) {
+    var layer = (
+      <Layer onClose={this._onClose.bind(this)} closer={true} flush={true} align="center">
+        <Box full={true} pad="large">
+          <RecordList body={view.body} title={view.name}/>
+        </Box>
+      </Layer>
+    );
+
+    this.setState({
+      layer: layer
+    });
+  }
 
   render() {
     var messages = Object.keys(this.state.messages).map((key) => {
       return {
-        view: key,
+        _id: key,
+        view: this.state.messages[key].view,
         timeEnd: this.state.messages[key].timeEnd,
         timeStart: this.state.messages[key].timeStart,
         num: this.state.messages[key].num
@@ -127,7 +150,6 @@ export default class RecordSearch extends Component {
       return b.num - a.num;
     });
 
-    console.log(messages);
     return (
       <Box full="horizontal" pad={{horizontal: 'small'}}>
         <Box direction="row" pad={{vertical: 'medium'}}>
@@ -146,10 +168,15 @@ export default class RecordSearch extends Component {
               <tbody>
               {
                 messages.map((msg) => {
-                  return (<TableRow justify="between">
-                    <td>{msg.view}</td>
+                  return (<TableRow key={msg._id} justify="between">
+                    <td>{msg.view.name}</td>
                     <td>{msg.timeEnd ? (msg.timeEnd - msg.timeStart) : ''}</td>
-                    <td>{msg.num}</td>
+                    <td>
+                      {
+                        msg.num > 0 ?
+                          <Anchor onClick={this._showViewRecords.bind(this, msg.view)} label={msg.num}/> : msg.num
+                      }
+                    </td>
                   </TableRow>);
                 })
               }
@@ -187,6 +214,7 @@ export default class RecordSearch extends Component {
           this.state.record &&
           <RecordDetail body={this.state.view.body} record={this.state.record} onClose={this._onClose.bind(this)}/>
         }
+        {this.state.layer}
       </Box>
     );
   }
