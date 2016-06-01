@@ -22,13 +22,6 @@ export const NAV_PEEK = 'NAV_PEEK';
 export const NAV_ACTIVATE = 'NAV_ACTIVATE';
 export const NAV_RESPONSIVE = 'NAV_RESPONSIVE';
 
-// dashboard
-export const DASHBOARD_LAYOUT = 'DASHBOARD_LAYOUT';
-export const DASHBOARD_LOAD = 'DASHBOARD_LOAD';
-export const DASHBOARD_UNLOAD = 'DASHBOARD_UNLOAD';
-export const DASHBOARD_SEARCH = 'DASHBOARD_SEARCH';
-export const DASHBOARD_SEARCH_SUCCESS = 'DASHBOARD_SEARCH_SUCCESS';
-
 // index page
 export const INDEX_NAV = 'INDEX_NAV';
 export const INDEX_LOAD = 'INDEX_LOAD';
@@ -126,7 +119,7 @@ export function getConfig() {
       throw err;
     }
   });
-};
+}
 
 export function getConfigSuccess(headerNavs) {
   return {type: GET_SETTINGS_SUCCESS, headerNavs};
@@ -165,72 +158,6 @@ export function metadataLoadDetail(obj, elements, index) {
   };
 }
 
-export function loadTemplates() {
-  return function (dispatch) {
-    Rest.get(HOST_NAME + '/coll/view').end(function (err, res) {
-      if (res && res.ok) {
-        dispatch(templatesLoadSuccess(res.body));
-      }
-    });
-  };
-};
-
-export function loadRecords(template) {
-  return function (dispatch) {
-    Rest.get(HOST_NAME + '/coll/view/' + template._id + '/list').end(function (err, res) {
-      if (res && res.ok && res.body) {
-        dispatch(recordsLoadSuccess(res.body.entities));
-      }
-    });
-  };
-};
-
-export function loadDetailRecordLinks(viewid, recordid, linksArray, linksObj) {
-  return function (dispatch) {
-    var link = linksArray.pop();
-    if (link) {
-      var linkname = link.sqlname;
-      Rest.get(HOST_NAME + `/coll/view/${viewid}/list/${recordid}/${linkname}`).end(function (err, res) {
-        if (res.body && res.body.entities) {
-          linksObj[linkname] = res.body.entities;
-          dispatch(loadDetailRecordLinks(viewid, recordid, linksArray, linksObj));
-        }
-      });
-    } else {
-
-      dispatch(loadDetailLinkSuccess(linksObj));
-    }
-
-  };
-};
-
-export function loadDetailLinkSuccess(links) {
-  return {
-    type: "LOAD_DETAIL_LINK_SUCCESS",
-    links: links
-  };
-}
-
-export function loadDetailRecord(template, record) {
-
-  return function (dispatch) {
-
-    var fields = template.body.fields.filter(function (field) {
-      if (!field.PK) {
-        field.value = record[field.sqlname];
-        return field;
-      }
-    });
-
-    var links = {};
-    var linksArray = Object.assign([], template.body.links);
-
-    dispatch(loadDetailRecordLinks(template._id, record['ref-link'].split('/')[2], linksArray, links));
-
-    dispatch(detailRecordLoadSuccess(fields));
-  };
-};
-
 export function metadataSuccess(result, elements) {
   return {
     type: METADATA_SUCCESS,
@@ -244,27 +171,6 @@ export function metadataDetailSuccess(result, elements) {
     type: METADATA_DETAIL_SUCCESS,
     rows: result,
     elements: elements
-  };
-}
-
-export function templatesLoadSuccess(result) {
-  return {
-    type: TEMPLATE_LOAD_SUCCESS,
-    templates: result
-  };
-}
-
-export function recordsLoadSuccess(result) {
-  return {
-    type: RECORD_LOAD_SUCCESS,
-    records: result
-  };
-}
-
-export function detailRecordLoadSuccess(result) {
-  return {
-    type: DETAIL_RECORD_LOAD_SUCCESS,
-    record: result
   };
 }
 
@@ -292,74 +198,4 @@ export function navResponsive(responsive) {
   return {type: NAV_RESPONSIVE, responsive: responsive};
 }
 
-export function dashboardLayout(graphicSize, count, legendPlacement, tiles) {
-  return function (dispatch) {
-    dispatch({
-      type: DASHBOARD_LAYOUT,
-      graphicSize: graphicSize,
-      count: count,
-      legendPlacement: legendPlacement
-    });
-    // reset what we're watching for
-    tiles.filter((tile) => (tile.history)).forEach((tile) => {
-      IndexApi.stopWatching(tile.watcher);
-      let params = {
-        category: tile.category,
-        query: tile.query,
-        attribute: tile.attribute,
-        interval: tile.interval,
-        count: count
-      };
-      let watcher = IndexApi.watchAggregate(params, (result) => {
-        dispatch(indexAggregateSuccess(watcher, tile.name, result));
-      });
-    });
-  };
-}
 
-export function dashboardLoad(tiles) {
-  return function (dispatch) {
-    dispatch({type: DASHBOARD_LOAD});
-    tiles.forEach((tile) => {
-      let params = {
-        category: tile.category,
-        query: tile.query,
-        attribute: tile.attribute,
-        interval: tile.interval,
-        count: tile.count
-      };
-      let watcher = IndexApi.watchAggregate(params, (result) => {
-        dispatch(indexAggregateSuccess(watcher, tile.name, result));
-      });
-    });
-  };
-}
-
-export function dashboardUnload(tiles) {
-  return function (dispatch) {
-    dispatch({type: DASHBOARD_UNLOAD});
-    tiles.forEach((tile) => {
-      IndexApi.stopWatching(tile.watcher);
-    });
-  };
-}
-
-export function dashboardSearch(text) {
-  return function (dispatch) {
-    dispatch({type: DASHBOARD_SEARCH, text: text});
-    if (text && text.length > 0) {
-      let params = {
-        start: 0,
-        count: 5,
-        query: text
-      };
-      Rest.get('/rest/index/search-suggestions', params).end((err, res) => {
-        if (err) {
-          throw err;
-        } else if (res.ok) {
-          dispatch({type: DASHBOARD_SEARCH_SUCCESS, result: res.body});
-        }
-      });
-    }
-  };
-}
