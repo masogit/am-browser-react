@@ -70,7 +70,7 @@ export default class ViewDefDetail extends Component {
           return true;
         }
         if (links[i].body.links) {
-          return hasLinks(links[i].body.links);
+          return this.hasLinks(links[i].body.links);
         }
       }
     }

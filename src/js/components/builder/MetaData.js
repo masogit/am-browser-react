@@ -75,8 +75,8 @@ export default class MetaData extends Component {
         sqlname: row.sqlname,
         url: row.dest_table["ref-link"],
         card11: row.card11,
-        reverse: row.reverse,
-        reversefield: row.src_field.sqlname
+        src_field: row.src_field,
+        dest_field: row.dest_field
       };
       return (
         <ListItem separator="none" key={index}>

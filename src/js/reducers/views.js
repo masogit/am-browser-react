@@ -24,10 +24,10 @@ const initialState = {
 
 const createReverse = (reverse) => {
   var obj = {
-    reversefield: reverse.reversefield,
     sqlname: reverse.sqlname,
     label: reverse.label,
-    reverse: reverse.reverse,
+    src_field: reverse.src_field,
+    dest_field: reverse.dest_field,
     body: {
       sqlname: reverse.body_sqlname,
       label: reverse.body_label,
@@ -58,13 +58,13 @@ const generateFieldsLinks = (body, elements, row) => {
         var reverse = _.cloneDeep(element);
         // set reverse sqlname
         reverse.sqlname = sqlname;
-        // set reversefield
+        // set relative_path
         var position = sqlname.lastIndexOf(".");
         var prefix = "";
         if (position != -1) {
           prefix = sqlname.substring(0, position);
         }
-        reverse.reversefield = ((prefix.length > 0) ? prefix + "." : prefix) + element.reversefield;
+        reverse.src_field.relative_path = prefix;
         // create a reverse link
         link = createReverse(reverse);
       } else {
