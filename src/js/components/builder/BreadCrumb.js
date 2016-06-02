@@ -22,11 +22,13 @@ export default class BreadCrumb extends Component {
     let Next = require('grommet/components/icons/base/Next');
     let breadcrumbs = elements.map((element, index) => {
       if (index == 0) {
-        return <Anchor key={index} icon={<Home />} onClick={this._onDetailClick.bind(this, element, index)} label={element.label}/>;
+        return <Anchor key={index} icon={<Home />} onClick={this._onDetailClick.bind(this, element, index)}
+                       label={element.label+'('+element.sqlname+')'}/>;
       } else if (index == elements.length - 1) {
-        return <Anchor key={index} icon={<Next />} label={element.label}/>;
+        return <Anchor key={index} icon={<Next />} label={element.sqlname}/>;
       } else {
-        return <Anchor key={index} icon={<Next />} onClick={this._onDetailClick.bind(this, element, index)} label={element.label}/>;
+        return <Anchor key={index} icon={<Next />} onClick={this._onDetailClick.bind(this, element, index)}
+                       label={element.sqlname}/>;
       }
     });
 
