@@ -298,7 +298,7 @@ export default class Insight extends Component {
                   <Anchor label={dataMap.aql.name} onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
                 </Header>
                 {
-                  <Box pad="large" align={(dataMap.aql.type=='meter')?'center':'start'}
+                  <Box pad="large" align={(dataMap.aql.type=='meter')?'center':null}
                        full="horizontal">
                     <Graph key={dataMap.aql._id} type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
                            onClick={(filter) => this._showViewRecords(filter, dataMap.aql.view)}/>
@@ -350,7 +350,7 @@ export default class Insight extends Component {
       <Box pad="large" colorIndex="light-2">
         <Header>{aql.name}</Header>
         {
-          <Box key={aql._id} pad="large" align={(aql.type=='meter')?'center':'start'} full="horizontal">
+          <Box key={aql._id} pad="large" align={(aql.type=='meter')?'center':null} full="horizontal">
             <Graph type={aql.type} data={data} config={aql.form}
                    onClick={(filter) => this._showViewRecords(filter, aql.view)}/>
           </Box>
