@@ -31,6 +31,20 @@ app.use(methodOverride('X-HTTP-Method-Override')); // override with the X-HTTP-M
 app.use(session({secret: credentials.cookieSecret}));
 app.use(cors({origin: true, credentials: true}));
 app.use('/', express.static(path.join(__dirname, '/../dist')));
+
+// AM Server Login
+app.post('/am/login', function (req, res) {
+  const user = new Buffer(req.headers.authorization.split(' ')[1], 'base64').toString();
+  const username = user.split(':')[0];
+  const password = user.split(':')[1];
+  // TODO login
+  var am_rest = {};
+  res.cookie('user', username);
+  req.session.user = username;
+  req.session.password = password;
+  res.json(am_rest);
+});
+
 app.use(csrf());
 
 var indexHtml = function (req, res) {
