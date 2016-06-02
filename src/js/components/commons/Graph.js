@@ -1,8 +1,7 @@
 /**
  * Created by huling on 5/22/2016.
  */
-import React, {Component,PropTypes} from 'react';
-import Spinning from 'grommet/components/icons/Spinning';
+import React, {Component, PropTypes} from 'react';
 import {
   Chart,
   Meter,
@@ -53,13 +52,13 @@ export default class Graph extends Component {
           const value = row[item.index] / 1.0;
           if (!isNaN(value)) {
             /*let seriesItem = {
-              x: i,
-              y: value
-            };
-            if (form.type === 'bar') {
-              seriesItem.onClick = onClick;
-            }
-            item.values.push(seriesItem);*/
+             x: i,
+             y: value
+             };
+             if (form.type === 'bar') {
+             seriesItem.onClick = onClick;
+             }
+             item.values.push(seriesItem);*/
             item.values.push([i, value]);
           }
         });
@@ -120,7 +119,10 @@ export default class Graph extends Component {
             label,
             value,
             index,
-            onClick: onClick && onClick.bind(this, {key: data.header[mainFilterKey].Name, value: mainFilterValue},filter)
+            onClick: onClick && onClick.bind(this, {
+              key: data.header[mainFilterKey].Name,
+              value: mainFilterValue
+            }, filter)
           });
         }
       });
@@ -157,7 +159,10 @@ export default class Graph extends Component {
             label,
             value,
             index,
-            onClick: onClick && onClick.bind(this, {key: data.header[mainFilterKey].Name, value: mainFilterValue}, filter)
+            onClick: onClick && onClick.bind(this, {
+              key: data.header[mainFilterKey].Name,
+              value: mainFilterValue
+            }, filter)
           });
         }
       });
@@ -196,7 +201,8 @@ export default class Graph extends Component {
       } else {
         return <div></div>;
       }
-    }
+    } else
+      return <div></div>;
   }
 }
 
