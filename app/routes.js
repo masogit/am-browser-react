@@ -60,7 +60,6 @@ module.exports = function (app) {
     var am_rest = {};
     res.cookie('csrf-token', req.csrfToken());
     am_rest['_csrf'] = req.session ? req.csrfToken() : ''; // CSRF
-    am_rest.headerNavs = getHeadNav(hasAdminPrivilege(username));
     res.json(am_rest);
   });
 

@@ -63,7 +63,7 @@ export function init(email, token) {
 export function login(username, password) {
   return function (dispatch) {
     const auth = 'Basic ' + new Buffer(`${username}:${password}`).toString('base64');
-    Rest.post(HOST_NAME + '/am/login')
+    Rest.get(HOST_NAME + '/am/login')
       .set("Authorization", auth)
       .end((err, res) => {
         if (err) {
@@ -71,6 +71,7 @@ export function login(username, password) {
           throw err;
         } else if (res.ok) {
           if (res.body) {
+            const headerNavs = res.body.headerNavs;
             Rest.get(HOST_NAME + '/am/csrf')
               .set("Authorization", auth)
               .end((err, res) => {
@@ -79,7 +80,7 @@ export function login(username, password) {
                   throw err;
                 } else if (res.ok && res.body) {
                   Rest.setHeader('csrf-token', res.body._csrf);
-                  dispatch(loginSuccess(username, res.body._csrf, res.body.headerNavs));
+                  dispatch(loginSuccess(username, res.body._csrf, headerNavs));
                 }
               });
           } else {
