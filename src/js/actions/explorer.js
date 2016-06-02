@@ -44,6 +44,14 @@ export function getCount(body, callback) {
   loadRecordsByBody(body, callback);
 }
 
+export function getUCMDB(callback) {
+  Rest.get(HOST_NAME + '/ucmdb-browser').then((res) => {
+    callback(res.text);
+  }, (err) => {
+    console.log(err.response ? err.response.text : err);
+  });
+}
+
 export function getBodyByKeyword(body, keyword) {
   var aql = body.fields.filter((field) => {
     return field.searchable;

@@ -12,6 +12,9 @@ module.exports = function (app) {
   var rest_port = process.env.AMB_REST_PORT || properties.get('rest.port');
   var rest_username = process.env.AMB_REST_USERNAME || properties.get('rest.username');
   var rest_password = process.env.AMB_REST_PASSWORD || properties.getRaw('rest.password');
+  var ucmdb_server = process.env.UCMDB_SERVER || properties.get('ucmdb.server');
+  var ucmdb_port = process.env.UCMDB_PORT || properties.get('ucmdb.port');
+  var ucmdb_param = properties.get('ucmdb.param');
   var base = properties.get('rest.base');
   var db_folder = properties.get('db.folder');
   db.init(db_folder);
@@ -127,12 +130,8 @@ module.exports = function (app) {
    * Federate CI from UCMDB
    * /ucmdb-browser/<global_id>
    */
-  app.use('/ucmdb-browser', function (req, res) {
-    var server = properties.get('ucmdb.server');
-    var port = properties.get('ucmdb.port');
-    var param = properties.get('ucmdb.param');
-    checkRight(req);
-    apiProxy.web(req, res, {target: `http://${server}:${port}${param}`});
+  app.get('/ucmdb-browser', function (req, res) {
+    res.send(`http://${ucmdb_server}:${ucmdb_port}${ucmdb_param}`);
   });
 };
 

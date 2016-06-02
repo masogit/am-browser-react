@@ -3,6 +3,7 @@ import RecordList from './RecordList';
 import ActionTab from '../commons/ActionTab';
 import * as ExplorerActions from '../../actions/explorer';
 import {
+  Anchor,
   Layer,
   Tabs,
   Table,
@@ -22,10 +23,11 @@ export default class RecordDetail extends Component {
   }
 
   componentDidMount() {
+    this._getUCMDBURL(this.props.body.fields);
+
     if (this.props.body.links)
       this.props.body.links.forEach((link) => {
         var body = this._getLinkBody(link, this.props.record);
-        console.log(body);
         ExplorerActions.getCount(body, (records) => {
           link.count = records.count;
           var links = this.state.links;
@@ -56,6 +58,19 @@ export default class RecordDetail extends Component {
     return body;
   }
 
+  _getUCMDBURL(fields) {
+    var globalIds = fields.filter((field) => {
+      return field.sqlname.indexOf('GlobalId') > -1;
+    });
+
+    if (globalIds.length > 0)
+      ExplorerActions.getUCMDB((url) => {
+        this.setState({
+          ucmdb: url
+        });
+      });
+  }
+
   render() {
 
     return (
@@ -79,7 +94,15 @@ export default class RecordDetail extends Component {
                   return !field.PK &&
                     <TableRow key={index}>
                       <td>{Format.getDisplayLabel(field)}</td>
-                      <td>{Format.getFieldStrVal(this.props.record, field)}</td>
+                      <td>
+                        {Format.getFieldStrVal(this.props.record, field)}
+                        {
+                          field.sqlname.indexOf('GlobalId') > -1 && this.props.record[field.sqlname] &&
+                          <Anchor href={`${this.state.ucmdb}${this.props.record[field.sqlname]}`}
+                                  target="_blank"
+                                  label={`Open UCMDB Browser`} primary={true}/>
+                        }
+                      </td>
                     </TableRow>;
                 })
               }
