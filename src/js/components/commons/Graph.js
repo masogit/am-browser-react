@@ -196,10 +196,7 @@ export default class Graph extends Component {
       } else {
         return <div></div>;
       }
-    } else if (!data)
-      return <Spinning />;
-    else
-      return <div></div>;
+    }
   }
 }
 
