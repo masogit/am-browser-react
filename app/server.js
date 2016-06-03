@@ -32,7 +32,7 @@ app.use(session({secret: credentials.cookieSecret}));
 app.use(cors({origin: true, credentials: true}));
 app.use('/', express.static(path.join(__dirname, '/../dist')));
 
-app.use(csrf());
+// app.use(csrf());
 
 var indexHtml = function (req, res) {
   res.sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));

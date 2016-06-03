@@ -41,6 +41,16 @@ module.exports = function (app) {
   // AM Server Login
   app.get('/am/login', rest.login);
 
+  app.get('/am/logout', function (req, res) {
+    // TODO logout
+    var am_rest = {};
+    req.session.destroy();
+    res.clearCookie('connect.sid');
+    res.clearCookie('csrf-token');
+    res.clearCookie('user');
+    res.json(am_rest);
+  });
+
   app.get("/*", function (req, res, next) {
     var session = req.session;
     if (!session || !session.user) {
@@ -53,27 +63,6 @@ module.exports = function (app) {
       res.locals._user = session.user;
       next(); // Call the next middleware
     }
-  });
-
-  app.get('/am/csrf', function (req, res) {
-    const user = new Buffer(req.headers.authorization.split(' ')[1], 'base64').toString();
-    const username = user.split(':')[0];
-    const password = user.split(':')[1];
-    // TODO login
-    var am_rest = {};
-    res.cookie('csrf-token', req.csrfToken());
-    am_rest['_csrf'] = req.session ? req.csrfToken() : ''; // CSRF
-    res.json(am_rest);
-  });
-
-  app.get('/am/logout', function (req, res) {
-    // TODO logout
-    var am_rest = {};
-    req.session.destroy();
-    res.clearCookie('connect.sid');
-    res.clearCookie('csrf-token');
-    res.clearCookie('user');
-    res.json(am_rest);
   });
 
 
