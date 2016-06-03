@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import * as ExplorerActions from '../../actions/explorer';
 import RecordList from './RecordList';
 import Box from 'grommet/components/Box';
-import Sidebar from '../commons/Sidebar';
+import SideBar from '../commons/SideBar';
 import {Container, Content} from '../commons/Split';
 
 export default class Explorer extends Component {
@@ -38,7 +38,7 @@ export default class Explorer extends Component {
       child: view.name
     }));
 
-    return <Sidebar title={`Views Navigation (${views.length})`} contents={contents}/>;
+    return <SideBar title={`Views Navigation (${views.length})`} contents={contents}/>;
   }
 
   _toggleViewNavigation() {

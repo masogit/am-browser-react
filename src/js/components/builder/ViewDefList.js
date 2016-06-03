@@ -2,7 +2,7 @@ import React, {Component/*, PropTypes*/} from 'react';
 // import {Link} from 'react-router';
 import history from '../../RouteHistory';
 import Anchor from 'grommet/components/Anchor';
-import Sidebar from '../commons/Sidebar';
+import SideBar from '../commons/SideBar';
 import Builder from './Builder';
 import Add from 'grommet/components/icons/base/Add';
 import Close from 'grommet/components/icons/base/Close';
@@ -76,7 +76,7 @@ export default class ViewsDefList extends Component {
     }
 
     return (
-      <Sidebar title={`Views Builder (${views.length})`} toolbar={toolbar} contents={contents} focus={focus}/>
+      <SideBar title={`Views Builder (${views.length})`} toolbar={toolbar} contents={contents} focus={focus}/>
     );
   }
 }

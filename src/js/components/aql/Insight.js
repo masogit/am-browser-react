@@ -6,6 +6,7 @@ import * as Format from '../../constants/RecordFormat';
 import history from '../../RouteHistory';
 import RecordList from '../explorer/RecordList';
 import AlertForm from '../commons/AlertForm';
+import EmptyIcon from '../commons/EmptyIcon';
 import Add from 'grommet/components/icons/base/Add';
 import Close from 'grommet/components/icons/base/Close';
 import Attachment from 'grommet/components/icons/base/Attachment';
@@ -213,7 +214,7 @@ export default class Insight extends Component {
                   <GroupListItem key={aql._id} groupby={aql.category} search={aql.name}
                                  pad={{horizontal: 'medium', vertical: 'small'}}
                                  onClick={this._attachAQL.bind(this, aql, box, parent)}>
-                    {aql.name}
+                    <EmptyIcon />{aql.name}
                   </GroupListItem>
                 );
               })

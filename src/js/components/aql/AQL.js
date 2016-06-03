@@ -10,7 +10,8 @@ import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
 import RecordList from '../explorer/RecordList';
 import ActionTab from '../commons/ActionTab';
-import Sidebar from '../commons/Sidebar';
+import SideBar from '../commons/SideBar';
+import EmptyIcon from '../commons/EmptyIcon';
 import * as Format from '../../constants/RecordFormat';
 import {Container, Content} from '../commons/Split';
 import Download from 'grommet/components/icons/base/Download';
@@ -284,7 +285,7 @@ export default class AQL extends Component {
                 <GroupListItem key={view._id} groupby={view.category} search={view.name}
                                pad={{horizontal: 'medium', vertical: 'small'}}
                                onClick={this._attachView.bind(this, view)}>
-                  {view.name}
+                  <EmptyIcon />{view.name}
                 </GroupListItem>
               ))
             }
@@ -308,7 +309,7 @@ export default class AQL extends Component {
               this.state.reports.entities.map((report) => (
                 <GroupListItem key={report['ref-link']} groupby={this._getFieldStrVal(report.seType)}
                                search={report.Name} pad="small" onClick={this._loadOOBAQL.bind(this, report)}>
-                  {report.Name}
+                  <EmptyIcon />{report.Name}
                 </GroupListItem>
               ))
             }
@@ -384,7 +385,7 @@ export default class AQL extends Component {
 
     return (
       <Container>
-        <Sidebar title={`Graphs (${this.state.aqls.length})`} toolbar={toolbar} contents={contents} focus={focus}/>
+        <SideBar title={`Graphs (${this.state.aqls.length})`} toolbar={toolbar} contents={contents} focus={focus}/>
         <Content>
           {this.state.alertLayer}
           <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
