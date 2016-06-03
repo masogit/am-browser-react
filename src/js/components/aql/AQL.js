@@ -13,7 +13,6 @@ import ActionTab from '../commons/ActionTab';
 import SideBar from '../commons/SideBar';
 import EmptyIcon from '../commons/EmptyIcon';
 import * as Format from '../../constants/RecordFormat';
-import {Container, Content} from '../commons/Split';
 import Download from 'grommet/components/icons/base/Download';
 import Mail from 'grommet/components/icons/base/Mail';
 
@@ -384,9 +383,9 @@ export default class AQL extends Component {
     const focus = this.state.aql && {expand: this.state.aql.category, selected: this.state.aql._id};
 
     return (
-      <Container>
+      <Box direction="row" flex={true}>
         <SideBar title={`Graphs (${this.state.aqls.length})`} toolbar={toolbar} contents={contents} focus={focus}/>
-        <Content>
+        <Box pad={{horizontal: 'medium'}} flex={true}>
           {this.state.alertLayer}
           <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
             <Title>AQL and Graph</Title>
@@ -462,8 +461,8 @@ export default class AQL extends Component {
             }
             {this.state.popupLayer}
           </Split>
-        </Content>
-      </Container>
+        </Box>
+      </Box>
     );
   }
 }

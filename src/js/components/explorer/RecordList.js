@@ -52,10 +52,8 @@ export default class RecordList extends Component {
             units: ""
           };
           var distributionGraph = (
-            <Box>
-              <Graph type='distribution' data={data} config={distributionConfig}
-                     onClick={(filter) => this._aqlFilterAdd(Format.getFilterFromField(this.props.body.fields, filter))}/>
-            </Box>
+            <Graph type='distribution' data={data} config={distributionConfig}
+                   onClick={(filter) => this._aqlFilterAdd(Format.getFilterFromField(this.props.body.fields, filter))}/>
           );
           this.setState({
             distributionGraph: distributionGraph
@@ -242,7 +240,7 @@ export default class RecordList extends Component {
     };
 
     return (
-      <div>
+      <Box pad={{horizontal: 'medium'}} flex={true}>
         <Header justify="between">
           <Title>{this.props.title}</Title>
           {
@@ -276,24 +274,26 @@ export default class RecordList extends Component {
         </Header>
         {filters}
         {this.state.distributionGraph}
-        <Table selectable={true}
-               onMore={(this.state.numTotal > this.state.records.length && !this.state.filtered)?this._getMoreRecords.bind(this):null}>
-          <thead>
-          <tr>
-            <th><Anchor href="#" reverse={true} icon={this._showOrderByIcon('self')} label="Self"
-                        onClick={this._orderBy.bind(this, 'self')}/></th>
-            {header}
-          </tr>
-          </thead>
-          <tbody>
-          {recordComponents}
-          </tbody>
-        </Table>
+        <Box className='autoScroll'>
+          <Table selectable={true}
+                 onMore={(this.state.numTotal > this.state.records.length && !this.state.filtered)?this._getMoreRecords.bind(this):null}>
+            <thead>
+            <tr>
+              <th><Anchor href="#" reverse={true} icon={this._showOrderByIcon('self')} label="Self"
+                          onClick={this._orderBy.bind(this, 'self')}/></th>
+              {header}
+            </tr>
+            </thead>
+            <tbody>
+            {recordComponents}
+            </tbody>
+          </Table>
+        </Box>
         {
           this.state.record &&
           <RecordDetail body={this.props.body} record={this.state.record} onClose={this._viewDetailClose.bind(this)}/>
         }
-      </div>
+      </Box>
     );
   }
 }

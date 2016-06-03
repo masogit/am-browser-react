@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { navResponsive } from '../actions';
-import { App } from 'grommet';
+import { App, Box } from 'grommet';
 //import Split from 'grommet/components/Split';
 //import NavSidebar from './NavSidebar';
 import NavHeader from './NavHeader';
@@ -22,24 +22,17 @@ class Indexer extends Component {
 
   render() {
     //const { active: navActive } = this.props;
-    let children, header;
+    let header;
     if (cookies.get('csrf-token')) {
       header = <NavHeader headerNavs={this.props.headerNavs}/>;
-      children = (
-        <div className='main-body-container'>
-          <div className='main-body'>
-            {this.props.children}
-          </div>
-        </div>
-      );
-    } else {
-      children = this.props.children;
     }
 
     return (
-      <App centered={false}>
+      <App>
+        <Box full={true}>
         {header}
-        {children}
+          {this.props.children}
+        </Box>
       </App>
     );
   }

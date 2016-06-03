@@ -237,7 +237,7 @@ export default class Search extends Component {
     }
 
     return (
-      <Box align="center" full={true} justify="center">
+      <Box align="center" flex={true} justify="center">
         <Headline size="large">
           Asset Manager Browser
         </Headline>

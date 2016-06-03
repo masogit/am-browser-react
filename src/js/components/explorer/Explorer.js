@@ -3,7 +3,6 @@ import * as ExplorerActions from '../../actions/explorer';
 import RecordList from './RecordList';
 import Box from 'grommet/components/Box';
 import SideBar from '../commons/SideBar';
-import {Container, Content} from '../commons/Split';
 
 export default class Explorer extends Component {
 
@@ -68,26 +67,22 @@ export default class Explorer extends Component {
   render() {
     let content;
     if (this.state.view) {
-      content = (
-        <Content>
-          <RecordList body={this.state.view.body} title={this.state.view.name}/>
-        </Content>
-      );
+      content = <RecordList body={this.state.view.body} title={this.state.view.name}/>;
     } else {
       content = (
-        <Content justify='center' align="center">
+        <Box pad={{horizontal: 'medium'}} flex={true} justify='center' align="center">
           <Box size="large" colorIndex="light-2" pad={{horizontal: 'large', vertical: 'medium'}}>
             Select an item to query.
           </Box>
-        </Content>
+        </Box>
       );
     }
 
     return (
-      <Container>
+      <Box direction="row" flex={true}>
         {this.state.viewNavigation}
         {content}
-      </Container>
+      </Box>
     );
   }
 }

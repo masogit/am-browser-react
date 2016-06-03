@@ -238,7 +238,7 @@ export default class Insight extends Component {
     if (box.child) {
       if (box.child instanceof Array) {
         child = (
-          <Box justify="center" {...box}>{
+          <Box justify="center" {...box} flex={false}>{
             box.child.map((child, i) => {
               child.key = i;
               return this._buildBox(child, parent);
@@ -248,7 +248,7 @@ export default class Insight extends Component {
       } else if (box.child._id && this.state.data[box.child._id]) {
         const dataMap = this.state.data[box.child._id];
         child = (
-          <Box justify="center" {...box} direction="column" pad="medium">
+          <Box justify="center" {...box} direction="column" pad="medium" flex={false}>
             <Header>
               <Anchor label={dataMap.aql.name} onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
             </Header>
@@ -265,7 +265,8 @@ export default class Insight extends Component {
       );
     }
 
-    return (<Box key={box.key} direction="column" separator={this.state.edit?'all':'none'} colorIndex="light-2">
+    return (<Box key={box.key} direction="column" separator={this.state.edit?'all':'none'} colorIndex="light-2"
+                 className='autoScroll'>
       {this._buildActions(box, parent)}
       {child}
     </Box>);

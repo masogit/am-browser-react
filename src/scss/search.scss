@@ -12,26 +12,14 @@
   font-weight: 400;
 }
 
-.main-body {
-  position: absolute;
-  bottom: 0;
-  top: 0;
+.short-form {
+  width: 350px;
+}
+
+.autoScroll {
   overflow: auto;
 }
 
-.main-body-container {
-  position: fixed;
-  top: 75px;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
-
-.box--full,
-.sidebar--full {
-  min-height: 100%;
-}
-
-.short-form {
-  width: 350px;
+.grommet.app {
+  overflow: hidden;
 }

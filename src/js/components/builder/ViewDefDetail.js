@@ -245,26 +245,28 @@ export default class ViewDefDetail extends Component {
         </Header>
 
         <Box>
-          <Split flex="left">
+          <Split flex="left" fixed={false}>
 
             {
               selectedView && !_.isEmpty(selectedView) &&
-              <Box>
+              <Box >
                 {selectedView.body && selectedView.body.fields && this.renderMasterHeader(selectedView)}
-                <Table>
-                  <tbody>
-                  {tableHeader}
-                  <tr>
-                    <td colSpan={8}>
-                      <textarea id="v.body.filter" name="v.body.filter" value={selectedView.body.filter}
-                                placeholder="Input AQL as filter" onChange={this._onChange}
-                                style={{width: '100%', margin: 0,outline: 0,borderWidth: 1,borderStyle: 'hidden'}}>
-                      </textarea>
-                    </td>
-                  </tr>
-                  {selectedView.body && selectedView.body.fields && this.renderTemplateTable(selectedView, true)}
-                  </tbody>
-                </Table>
+                <Box className='autoScroll'>
+                  <Table>
+                    <tbody>
+                    {tableHeader}
+                    <tr>
+                      <td colSpan={8}>
+                        <textarea id="v.body.filter" name="v.body.filter" value={selectedView.body.filter}
+                                  placeholder="Input AQL as filter" onChange={this._onChange}
+                                  style={{width: '100%', margin: 0,outline: 0,borderWidth: 1,borderStyle: 'hidden'}}>
+                        </textarea>
+                      </td>
+                    </tr>
+                    {selectedView.body && selectedView.body.fields && this.renderTemplateTable(selectedView, true)}
+                    </tbody>
+                  </Table>
+                </Box>
               </Box>
             }
 

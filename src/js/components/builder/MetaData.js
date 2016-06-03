@@ -3,8 +3,6 @@ import Anchor from 'grommet/components/Anchor';
 import Box from 'grommet/components/Box';
 import Tabs from 'grommet/components/Tabs';
 import Tab from 'grommet/components/Tab';
-import List from 'grommet/components/List';
-import Split from 'grommet/components/Split';
 import ListItem from 'grommet/components/ListItem';
 import SearchInput from 'grommet/components/SearchInput';
 
@@ -66,7 +64,7 @@ export default class MetaData extends Component {
     let Notes = require('grommet/components/icons/base/Notes');
     let entitiesComponents = entities.sort(this._sortSqlName).map((row, index) => {
       return (
-        <ListItem separator="none" key={index} pad="none">
+        <ListItem separator="none" key={index} pad="none" flex={false}>
           <Anchor href="#" key={index} primary={true} label={row.sqlname}
                   onClick={this._onClick.bind(this, {label: row.label, sqlname: row.sqlname, url: row["ref-link"]})}/>
         </ListItem>
@@ -98,20 +96,22 @@ export default class MetaData extends Component {
       );
     });
     return (
-      <Box>
+      <Box flex={true}>
         <SearchInput id="metadataFilter" placeHolder="Search fields and links..." onDOMChange={this._onSearch}/>
-        <Split>
-          <List>
-            {entitiesComponents}
-          </List>
+        <Box className='autoScroll'>
+          {entitiesComponents}
           {
             entitiesComponents.length == 0 &&
-            <Tabs justify="start">
-              <Tab title={`Links (${linksComponents.length})`}>{linksComponents}</Tab>
-              <Tab title={`Fields (${fieldsComponents.length})`}>{fieldsComponents}</Tab>
+            <Tabs justify="start" flex={true}>
+              <Tab title={`Links (${linksComponents.length})`}>
+                {linksComponents}
+              </Tab>
+              <Tab title={`Fields (${fieldsComponents.length})`}>
+                {fieldsComponents}
+              </Tab>
             </Tabs>
           }
-        </Split>
+        </Box>
       </Box>
     );
   }

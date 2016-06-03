@@ -9,7 +9,7 @@ import IntegrationJobItemContainer from './IntegrationJobItem.js';
 import {statusAdapter} from '../../constants/StatusAdapter.js';
 var Status = require('grommet/components/icons/Status');
 import SideBar from '../commons/SideBar';
-import {Container, Content} from '../commons/Split';
+import Box from 'grommet/components/Box';
 
 let firstStart = true;
 class UCMDBAdapterContainer extends Component {
@@ -148,13 +148,13 @@ class UCMDBAdapterContainer extends Component {
     }
 
     return (
-      <Container>
+      <Box direction="row" flex={true}>
         <SideBar title='Integration Point' contents={pointList} focus={focus}/>
-        <Content justify='between'>
+        <Box pad={{horizontal: 'medium'}} flex={true} justify='between'>
           {jobList}
           {jobItemList}
-        </Content>
-      </Container>
+        </Box>
+      </Box>
     );
   }
 }
@@ -175,7 +175,7 @@ const select = (state) => {
 
 const menuAction = (dispatch, ownProps) => {
   return {
-    onMenuClick: (pointName, tabName) => dispatch(UCMDBAdapterActions.adapterSidebarClick(pointName, tabName)),
+    onMenuClick: (pointName, tabName) => dispatch(UCMDBAdapterActions.adapterSideBarClick(pointName, tabName)),
     getIntegrationPoint: (data, error) => dispatch(UCMDBAdapterActions.adapterDataFetch(data, error)),
     onTabClick: (tabName, pointName) => dispatch(UCMDBAdapterActions.integrationJobTabSwitch(tabName, pointName)),
     onIntegrationJobSelect: (tabName, pointName, jobName) => dispatch(UCMDBAdapterActions.integrationJobSelect(tabName, pointName, jobName)),

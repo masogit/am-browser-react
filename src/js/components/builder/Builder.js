@@ -5,6 +5,7 @@ import * as BuilderActions from '../../actions';
 import * as ViewDefActions from '../../actions/views';
 import MetaData from './MetaData';
 import BreadCrumb from './BreadCrumb';
+import Box from 'grommet/components/Box';
 
 export default class Builder extends Component {
 
@@ -27,11 +28,11 @@ export default class Builder extends Component {
     let boundActionCreators = bindActionCreators(BuilderActions, dispatch);
     let boundActionCreators_views = bindActionCreators(ViewDefActions, dispatch);
     return (
-      <div>
+      <Box>
         <BreadCrumb elements={elements} {...boundActionCreators} clearFilter={this._clearFilter}/>
         <MetaData elements={elements} rows={item} {...boundActionCreators} {...boundActionCreators_views}
                   clearFilter={this._clearFilter} filterEntities={this.props.filterEntities}/>
-      </div>
+      </Box>
     );
   }
 }

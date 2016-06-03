@@ -84,11 +84,12 @@ export default class GroupList extends Component {
           this.props.searchable &&
           <SearchInput placeHolder="Search..." onChange={this._onSearch.bind(this)}/>
         }
+        <Box className='autoScroll'>
         {
           Object.keys(grouped).map((key, i) => {
             const selected = this.props.focus && grouped[key].findIndex(item => this.props.focus.selected == item.key);
             return (
-              <Box key={i} direction="column">
+              <Box key={i} direction="column" flex={false}>
                 <List>
                   <ListItem {...this.props} justify="between" direction="row" separator="none"
                                             onClick={this._expandToggle.bind(this, key)}>
@@ -110,6 +111,7 @@ export default class GroupList extends Component {
             );
           })
         }
+        </Box>
       </Box>
     );
   }

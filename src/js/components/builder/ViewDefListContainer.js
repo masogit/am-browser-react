@@ -8,7 +8,7 @@ import ViewDefPreview from './ViewDefPreview';
 import * as ViewDefActions from '../../actions/views';
 import store from '../../store';
 import history from '../../RouteHistory';
-import {Container, Content} from '../commons/Split';
+import Box from 'grommet/components/Box';
 
 class ViewDefListContainer extends Component {
 
@@ -108,19 +108,19 @@ class ViewDefListContainer extends Component {
     let {dispatch} = store;
     let boundActionCreators = bindActionCreators(ViewDefActions, dispatch);
     return (
-      <Container>
+      <Box direction="row" flex={true}>
         <ViewDefList views={views} isFetchingViewList={isFetchingViewList}
                      selectedView={selectedView} {...boundActionCreators}/>
-        <Content>
+        <Box pad={{horizontal: 'medium'}} flex={true}>
           <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange}
                          onSubmit={this.onSubmit} onSaveSuccess={this.onSaveSuccess}
                          onDeleteTableRow={this.onDeleteTableRow} compact={true}
                          onDuplicateViewDef={this.onDuplicateViewDef}
                          onDeleteViewDef={this.onDeleteViewDef}
                          alertForm={this.props.alertForm} {...boundActionCreators}/>
-        </Content>
+        </Box>
         <ViewDefPreview active={preview} selectedView={selectedView} {...boundActionCreators}/>
-      </Container>
+      </Box>
     );
   }
 }

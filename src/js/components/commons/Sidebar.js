@@ -28,7 +28,7 @@ export default ({title, toolbar, contents, focus}) => {
   }
 
   return (
-    <Sidebar primary={true} pad={{horizontal: 'medium'}} fixed={false} separator="right">
+    <Sidebar primary={true} pad={{horizontal: 'medium'}} fixed={true} separator="right" full={false}>
       <Header justify="between">
         <Title>{title}</Title>
         {toolbar &&
