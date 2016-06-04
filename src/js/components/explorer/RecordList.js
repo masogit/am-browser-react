@@ -38,7 +38,7 @@ export default class RecordList extends Component {
     };
   }
 
-  componentDidMount() {
+  componentWillMount() {
     this._getRecords();
     if (this.props.body.groupby)
       AQLActions.queryAQL(ExplorerActions.getGroupByAql(this.props.body), (data)=> {
@@ -60,10 +60,6 @@ export default class RecordList extends Component {
           });
         }
       });
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this._getRecords();
   }
 
   _getMoreRecords() {
@@ -198,101 +194,133 @@ export default class RecordList extends Component {
     });
   }
 
-  render() {
-    var body = this.props.body;
-    var records = (this.state.filtered) ? this.state.filtered : this.state.records;
-    var header = body.fields.map((field, index) => {
-      return !field.PK && index <= this.state.numColumn &&
-        <th key={index}>
-          <Anchor href="#" reverse={true} icon={this._showOrderByIcon(field.sqlname)}
-                  label={Format.getDisplayLabel(field)}
-                  onClick={this._orderBy.bind(this, field.sqlname)}/>
-        </th>;
-    });
-    var recordComponents = records.map((record, index) => {
-      return (<TableRow key={index} onClick={this._viewDetailShow.bind(this, record)}>
-        <td>{record.self}</td>
-        {
-          body.fields.map((field, tdindex) => {
-            return !field.PK && tdindex <= this.state.numColumn &&
-              <td key={tdindex}>
-                {Format.getFieldStrVal(record, field)}
-              </td>;
-          })
-        }
-      </TableRow>);
-    });
+  renderFieldsHeader() {
+    return (
+      this.props.body.fields.map((field, index) => {
+        return !field.PK && index <= this.state.numColumn &&
+          <th key={index}>
+            <Anchor href="#" reverse={true} icon={this._showOrderByIcon(field.sqlname)}
+                    label={Format.getDisplayLabel(field)}
+                    onClick={this._orderBy.bind(this, field.sqlname)}/>
+          </th>;
+      })
+    );
+  }
 
-    var filters = this.state.param.filters.map((filter, index) => {
-      return (
-        <span>
-          <Anchor href="#" icon={<Close />} onClick={this._filterClear.bind(this, index)}/>
-          <Anchor href="#" onClick={this._filterReuse.bind(this, filter)} label={filter}/>
-        </span>
-      );
-    });
+  renderRecords() {
+    var records = (this.state.filtered) ? this.state.filtered : this.state.records;
+    return (
+      records.map((record, index) => {
+        return (<TableRow key={index} onClick={this._viewDetailShow.bind(this, record)}>
+          <td>{record.self}</td>
+          {
+            this.props.body.fields.map((field, tdindex) => {
+              return !field.PK && tdindex <= this.state.numColumn &&
+                <td key={tdindex}>
+                  {Format.getFieldStrVal(record, field)}
+                </td>;
+            })
+          }
+        </TableRow>);
+      })
+    );
+  }
+
+  renderAQLFilter() {
+    return (
+      <span>
+        {this.state.param.filters.map((filter, index) => {
+          return (
+            <span>
+              <Anchor href="#" icon={<Close />} onClick={this._filterClear.bind(this, index)}/>
+              <Anchor href="#" onClick={this._filterReuse.bind(this, filter)} label={filter}/>
+            </span>
+          );
+        })}
+      </span>
+    );
+  }
+
+  renderToolBox() {
 
     var Spinning = require('grommet/components/icons/Spinning');
     const aqlStyle = {
       'font-weight': 'bold',
-      'color':  '#767676',
+      'color': '#767676',
       'border-color': '#614767'
     };
 
     return (
-      <Box pad={{horizontal: 'medium'}} flex={true}>
-        <Header justify="between">
-          <Title>{this.props.title}</Title>
-          {
-            this.state.loading &&
-            <Spinning />
-          }
-          {
-            !this.state.loading &&
-            <Box>{(this.state.filtered) ? this.state.filtered.length : this.state.records.length}</Box>
-          }
-          /{this.state.numTotal}
-          {this.state.timeQuery}ms
-          {
-            this.state.numTotal > this.state.records.length &&
-            <Anchor href="#" label="More..." onClick={this._getMoreRecords.bind(this)}/>
-          }
-          <input type="text" inline={true} className="flex" ref="search" style={this.state.aqlInput?aqlStyle:{}}
-                 placeholder={this.state.aqlInput?'Input AQL...':'Quick search'}
-                 onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
-          <Menu direction="row" align="center" responsive={false}>
-            <CheckBox id="checkbox_aql" label="AQL" checked={this.state.aqlInput}
-                      onChange={this._toggleAQLInput.bind(this)}
-                      toggle={true}/>
-            <Anchor href="#" icon={<Download />} label="CSV" onClick={this._download.bind(this)}/>
-          </Menu>
-          <form name="Download" ref="downloadForm"
-                action={ExplorerActions.getDownloadQuery({...this.props.body, param: this.state.param})}
-                method="post">
-            <input type="hidden" name="fields" value={JSON.stringify(this.props.body.fields)}/>
-          </form>
-        </Header>
-        {filters}
-        {this.state.distributionGraph}
-        <Box className='autoScroll'>
-          <Table selectable={true}
-                 onMore={(this.state.numTotal > this.state.records.length && !this.state.filtered)?this._getMoreRecords.bind(this):null}>
-            <thead>
-            <tr>
-              <th><Anchor href="#" reverse={true} icon={this._showOrderByIcon('self')} label="Self"
-                          onClick={this._orderBy.bind(this, 'self')}/></th>
-              {header}
-            </tr>
-            </thead>
-            <tbody>
-            {recordComponents}
-            </tbody>
-          </Table>
-        </Box>
+      <Header justify="between">
+        <Title>{this.props.title}</Title>
         {
-          this.state.record &&
-          <RecordDetail body={this.props.body} record={this.state.record} onClose={this._viewDetailClose.bind(this)}/>
+          this.state.loading &&
+          <Spinning />
         }
+        {
+          !this.state.loading &&
+          <Box>{(this.state.filtered) ? this.state.filtered.length : this.state.records.length}</Box>
+        }
+        /{this.state.numTotal}
+        {this.state.timeQuery}ms
+        {
+          this.state.numTotal > this.state.records.length &&
+          <Anchor href="#" label="More..." onClick={this._getMoreRecords.bind(this)}/>
+        }
+        <input type="text" inline={true} className="flex" ref="search" style={this.state.aqlInput?aqlStyle:{}}
+               placeholder={this.state.aqlInput?'Input AQL...':'Quick search'}
+               onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
+        <Menu direction="row" align="center" responsive={false}>
+          <CheckBox id="checkbox_aql" label="AQL" checked={this.state.aqlInput}
+                    onChange={this._toggleAQLInput.bind(this)}
+                    toggle={true}/>
+          <Anchor href="#" icon={<Download />} label="CSV" onClick={this._download.bind(this)}/>
+        </Menu>
+        <form name="Download" ref="downloadForm"
+              action={ExplorerActions.getDownloadQuery({...this.props.body, param: this.state.param})}
+              method="post">
+          <input type="hidden" name="fields" value={JSON.stringify(this.props.body.fields)}/>
+        </form>
+      </Header>
+    );
+  }
+
+  renderList() {
+    return (
+      <Box className='autoScroll'>
+        <Table selectable={true}
+               onMore={(this.state.numTotal > this.state.records.length && !this.state.filtered)?this._getMoreRecords.bind(this):null}>
+          <thead>
+          <tr>
+            <th><Anchor href="#" reverse={true} icon={this._showOrderByIcon('self')} label="Self"
+                        onClick={this._orderBy.bind(this, 'self')}/></th>
+            {this.renderFieldsHeader()}
+          </tr>
+          </thead>
+          <tbody>
+          {this.renderRecords()}
+          </tbody>
+        </Table>
+      </Box>
+    );
+  }
+
+  renderDetail() {
+    return (
+      this.state.record &&
+      <RecordDetail body={this.props.body} record={this.state.record} onClose={this._viewDetailClose.bind(this)}/>
+    );
+  }
+
+  render() {
+
+    return (
+      <Box pad={{horizontal: 'medium'}} flex={true}>
+        {this.renderToolBox()}
+        {this.renderAQLFilter()}
+        {this.state.distributionGraph}
+        {this.renderList()}
+        {this.renderDetail()}
       </Box>
     );
   }
