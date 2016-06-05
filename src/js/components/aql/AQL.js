@@ -251,7 +251,6 @@ export default class AQL extends Component {
     }
     form = form || aql[type];
     aql.form = form;
-    aql[type] = form;
 
     this.setState({aql: aql});
 
