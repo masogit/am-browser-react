@@ -8,6 +8,7 @@ import cookies from 'js-cookie';
 
 // session
 export const INIT = 'INIT';
+export const INIT_TOKEN = 'INIT_TOKEN';
 export const LOGIN = 'LOGIN';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAILURE = 'LOGIN_FAILURE';
@@ -60,10 +61,27 @@ export function init(email, token) {
   return {type: INIT, email, token};
 }
 
+export function initToken(token) {
+  return {type: INIT_TOKEN, token};
+}
+
+export function initLogin() {
+  return function (dispatch) {
+    Rest.get(HOST_NAME + '/am/csrf').end((err, res) => {
+      if (err) {
+        dispatch({type: '', message: 'Init CSRF Failed.'});
+        throw err;
+      } else if (res.ok && res.body) {
+        dispatch({type: '', message: res.body._csrf});
+      }
+    });
+  };
+}
+
 export function login(username, password) {
   return function (dispatch) {
     const auth = 'Basic ' + new Buffer(`${username}:${password}`).toString('base64');
-    Rest.get(HOST_NAME + '/am/login')
+    Rest.post(HOST_NAME + '/am/login')
       .set("Authorization", auth)
       .end((err, res) => {
         if (err) {
@@ -72,7 +90,6 @@ export function login(username, password) {
         } else if (res.ok) {
           if (res.body) {
             const headerNavs = res.body.headerNavs;
-            Rest.setHeader('csrf-token', res.body._csrf);
             dispatch(loginSuccess(username, res.body._csrf, headerNavs));
           } else {
             dispatch(loginFailure({message: res.text}));

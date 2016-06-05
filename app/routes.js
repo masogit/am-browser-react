@@ -38,8 +38,13 @@ module.exports = function (app) {
     logger.error(util.inspect(e));
   });
 
+  app.get('/am/csrf', function (req, res) {
+    res.set('_csrf', req.csrfToken());
+    res.end();
+  });
+
   // AM Server Login
-  app.get('/am/login', rest.login);
+  app.post('/am/login', rest.login);
 
   app.get('/am/logout', function (req, res) {
     // TODO logout
@@ -54,13 +59,12 @@ module.exports = function (app) {
   app.get("/*", function (req, res, next) {
     var session = req.session;
     if (!session || !session.user) {
-      res.clearCookie('connect.sid');
       res.clearCookie('csrf-token');
       res.clearCookie('user');
       res.redirect(401, '/am/login');
     } else {
-      //TODO: do the real check
-      res.locals._user = session.user;
+      res.set('_csrf', req.csrfToken());
+      // res.locals._csrf = req.csrfToken();
       next(); // Call the next middleware
     }
   });

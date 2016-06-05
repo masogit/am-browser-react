@@ -92,11 +92,11 @@ module.exports = function (am) {
       } else {
         var am_rest = {};
         res.cookie('user', username);
-        res.cookie('csrf-token', req.sessionID);
+        res.cookie('csrf-token', req.csrfToken());
         req.session.user = username;
         req.session.password = password;
         req.session.isAdmin = !!data.entities[0].bAdminRight[1];
-        am_rest._csrf = req.session ? req.sessionID : ''; // CSRF
+        am_rest._csrf = req.session ? req.csrfToken() : ''; // CSRF
         am_rest.headerNavs = getHeadNav(req.session.isAdmin);
         res.json(am_rest);
       }
