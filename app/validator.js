@@ -20,10 +20,10 @@ module.exports = function () {
 
 function view(obj) {
   // existing validation
-  if (invalidLength(obj.name, 1, 30))
-    return "Name is required, limit length: 1 to 30!";
-  if (invalidLength(obj.category, 1, 20))
-    return "Category is required, limit length: 1 to 20!";
+  if (invalidLength(obj.name, 1, 100))
+    return "Name is required, limit length: 1 to 100!";
+  if (invalidLength(obj.category, 1, 100))
+    return "Category is required, limit length: 1 to 100!";
   if (!obj.body)
     return "Body is required!";
 
@@ -93,10 +93,10 @@ function link(link) {
 
 function aql(aql) {
   // existing validation
-  if (invalidLength(aql.name, 1, 30))
-    return "Name is required, limit length: 1 to 30!";
-  if (invalidLength(aql.category, 1, 20))
-    return "Category is required, limit length: 1 to 20!";
+  if (invalidLength(aql.name, 1, 100))
+    return "Name is required, limit length: 1 to 100!";
+  if (invalidLength(aql.category, 1, 100))
+    return "Category is required, limit length: 1 to 100!";
   if (invalidLength(aql.str))
     return "AQL is required!";
   if (['chart', 'meter', 'distribution'].indexOf(aql.type) < 0)
@@ -121,7 +121,7 @@ function wall(wall) {
     return "box is required!";
   if (error = box(wall.box))
     return error;
-  
+
   return null;
 }
 
