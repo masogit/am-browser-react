@@ -2,6 +2,7 @@ var Engine = require('tingodb')();
 var tingodbFolder;
 const fs = require('fs');
 var logger = require('./logger.js');
+var Validator = require('./validator.js');
 
 // check db folder and files
 exports.init = function (dbFolder) {
@@ -80,18 +81,25 @@ exports.upsert = function (req, res) {
   var id = req.params.id;
   var obj = req.body;
 
-  if (id)
-    obj._id = id;
+  var validator = new Validator();
+  var error = validator.document(collectionName, obj);
+  if (error) {
+    logger.error(error);
+    res.status(500).send(error);
+  } else {
+    if (id)
+      obj._id = id;
 
-  if (!obj._id)
-    obj._id = (Math.random() + 1).toString(36).substring(7);
+    if (!obj._id)
+      obj._id = (Math.random() + 1).toString(36).substring(7);
 
-  db.collection(collectionName).update({_id: obj._id}, obj, {upsert: true}, function (err, result) {
-    if (err)
-      logger.error(err);
-    res.send(obj._id);
-    db.close();
-  });
+    db.collection(collectionName).update({_id: obj._id}, obj, {upsert: true}, function (err, result) {
+      if (err)
+        logger.error(err);
+      res.send(obj._id);
+      db.close();
+    });
+  }
 };
 
 // tingodb Delete
