@@ -5,7 +5,8 @@ import {
   Layer,
   Form,
   Footer,
-  Header
+  Header,
+  Notification
 } from 'grommet';
 
 export default class AlertForm extends Component {
@@ -25,27 +26,35 @@ export default class AlertForm extends Component {
   render() {
 
     return (
-
-      <Layer onClose={this.props.onClose} closer={true} {...this.props}>
-        <Box full={this.props.full} justify="center">
-          <Form pad={{vertical: 'large'}}>
-            <Header>
-              <h2>
-                {this.props.title}
-              </h2>
-            </Header>
-            <p>
-                {this.props.desc}
-            </p>
-            <Footer>
-              {
-                this.props.onConfirm &&
-                <Button label="Confirm" primary={true} strong={true} onClick={this._onClick.bind(this)}/>
-              }
-            </Footer>
-          </Form>
-        </Box>
-      </Layer>
+      <span>
+        {
+          this.props.status &&
+          <Notification status={this.props.status} message={this.props.desc} onClick={this.props.onClose} />
+        }
+        {
+          !this.props.status &&
+          <Layer onClose={this.props.onClose} closer={true} {...this.props}>
+            <Box full={this.props.full} justify="center">
+              <Form pad={{vertical: 'large'}}>
+                <Header>
+                  <h2>
+                    {this.props.title}
+                  </h2>
+                </Header>
+                <p>
+                  {this.props.desc}
+                </p>
+                <Footer>
+                  {
+                    this.props.onConfirm &&
+                    <Button label="Confirm" primary={true} strong={true} onClick={this._onClick.bind(this)}/>
+                  }
+                </Footer>
+              </Form>
+            </Box>
+          </Layer>
+        }
+      </span>
     );
   }
 }

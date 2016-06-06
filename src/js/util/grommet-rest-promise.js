@@ -1,5 +1,5 @@
 'use strict';
-
+import * as Types from '../constants/ActionTypes';
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -40,7 +40,11 @@ Request.prototype.promise = function () {
 
   return new Promise(function (resolve, reject, onCancel) {
     req.end(function (err, res) {
-      if (typeof res !== "undefined" && res.status >= 400) {
+      // global error message
+      if (err && err.status == 400) {
+        store.default.dispatch({type: Types.RECEIVE_ERROR, msg: err.response.text});
+      }
+      if (typeof res !== "undefined" && res.status > 400) {
         var msg = 'cannot ' + req.method + ' ' + req.url + ' (' + res.status + ')';
         reject(msg);
       } else if (err) {
@@ -75,21 +79,7 @@ Request.prototype.then = function () {
 
 // TODO Change the session, if session changed, the view will be refresh(index.js)
 const store = require('../store');
-const {init} = require('../actions');
-
-const end = Request.prototype.end;
-Request.prototype.end = function (callback) {
-  return end.call(this, (error, response) => {
-    if (error) {
-      console.log(error.response ? error.response.text : error);
-      if (error.status == 401) {
-        store.default.dispatch(init('', ''));
-      }
-    }
-
-    callback(error, response);
-  });
-};
+// const {init} = require('../actions');
 
 // convert params to string, to deal with array values
 function buildQueryParams(params) {

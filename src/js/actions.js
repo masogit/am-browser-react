@@ -3,7 +3,7 @@
 import Rest from './util/grommet-rest-promise';
 //import history from './RouteHistory';
 //import Query from 'grommet-index/utils/Query';
-import {HOST_NAME } from './util/Config';
+import {HOST_NAME} from './util/Config';
 import cookies from 'js-cookie';
 
 // session
@@ -59,10 +59,6 @@ export const DETAIL_RECORD_LOAD_SUCCESS = 'DETAIL_RECORD_LOAD_SUCCESS';
 
 export function init(email, token) {
   return {type: INIT, email, token};
-}
-
-export function initToken(token) {
-  return {type: INIT_TOKEN, token};
 }
 
 export function initLogin() {

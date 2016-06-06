@@ -85,7 +85,7 @@ exports.upsert = function (req, res) {
   var error = validator.document(collectionName, obj);
   if (error) {
     logger.error(error);
-    res.status(500).send(error);
+    res.status(400).send(error);
   } else {
     if (id)
       obj._id = id;
