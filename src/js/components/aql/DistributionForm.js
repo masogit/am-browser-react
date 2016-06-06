@@ -28,7 +28,7 @@ export default class DistributionForm extends GraphForm {
       this.props.data.header.map((header, index) => {
         label_options.push({value:header.Index, text:`${header.Type}: ${header.Name}`});
 
-        if (['Long', 'Short', 'Int', 'Double', 'Byte'].includes(header.Type)) {
+        if (header.Type in ['Long', 'Short', 'Int', 'Double', 'Byte']) {
           col_options.push({value: header.Index, text: `${header.Type}: ${header.Name}`});
         }
       });

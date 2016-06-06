@@ -29,7 +29,7 @@ class Indexer extends Component {
 
     return (
       <App>
-        <Box full={true}>
+        <Box full={true} className='main-container'>
         {header}
           {this.props.children}
         </Box>

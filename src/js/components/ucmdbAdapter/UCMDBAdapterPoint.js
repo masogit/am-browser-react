@@ -50,7 +50,7 @@ class UCMDBAdapterContainer extends Component {
             supportedJobs.push('pushJobs');
           }
 
-          if (!supportedJobs.includes(tabName)) {
+          if (!(tabName in supportedJobs)) {
             tabName = supportedJobs[0];
           }
         }

@@ -8,7 +8,7 @@
   margin-right: 12px;
 }
 
-.sidebar .anchor {
+.fontNormal {
   font-weight: 400;
 }
 
@@ -21,5 +21,26 @@
 }
 
 .grommet.app {
-  overflow: hidden;
+  /*overflow: hidden;*/
+}
+
+/*for the minimum sizing behavior*/
+.main-container > .box {
+  min-height: 0;
+}
+
+.fixMinSizing {
+  min-height: 0;
+}
+
+.autoScrollBox {
+  overflow: auto;
+  height: 300px;
+}
+
+.table-textarea {
+  width: 100%;
+  margin: 0;
+  outline: 0;
+  border: none;
 }

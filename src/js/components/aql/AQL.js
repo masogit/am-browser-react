@@ -106,7 +106,7 @@ export default class AQL extends Component {
         rows: []
       }
     }, () => {
-      if (this.refs && this.refs[aql.type]) {
+      if (window.event && this.refs && this.refs[aql.type]) {
         this.refs[aql.type]._onClickTab(event);
       }
       this._onQuery();
@@ -422,19 +422,21 @@ export default class AQL extends Component {
               </FormFields>
             </Form>
           </Box>
-          <Split flex="left" fixed={false}>
+          <Split flex="left" fixed={false} className='fixMinSizing'>
             <Box pad={{vertical: 'small'}}>
               {this.state.data && this.state.aql.form && this.state.aql.type &&
               <Graph type={this.state.aql.type} data={this.state.data} config={this.state.aql.form}
                      onClick={(filter) => this._showViewRecords(filter, this.state.aql.view)}/>}
-              <Table>
-                <thead>
-                <tr>{header}</tr>
-                </thead>
-                <tbody>
-                {rows}
-                </tbody>
-              </Table>
+              <Box className='autoScroll'>
+                <Table>
+                  <thead>
+                  <tr>{header}</tr>
+                  </thead>
+                  <tbody>
+                  {rows}
+                  </tbody>
+                </Table>
+              </Box>
             </Box>
             {
               this.state.data && this.state.aql.type &&

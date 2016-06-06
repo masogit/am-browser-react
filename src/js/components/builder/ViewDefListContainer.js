@@ -111,14 +111,14 @@ class ViewDefListContainer extends Component {
       <Box direction="row" flex={true}>
         <ViewDefList views={views} isFetchingViewList={isFetchingViewList}
                      selectedView={selectedView} {...boundActionCreators}/>
-        <Box pad={{horizontal: 'medium'}} flex={true}>
-          <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange}
-                         onSubmit={this.onSubmit} onSaveSuccess={this.onSaveSuccess}
-                         onDeleteTableRow={this.onDeleteTableRow} compact={true}
-                         onDuplicateViewDef={this.onDuplicateViewDef}
-                         onDeleteViewDef={this.onDeleteViewDef}
-                         alertForm={this.props.alertForm} {...boundActionCreators}/>
-        </Box>
+
+        <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange}
+                       onSubmit={this.onSubmit} onSaveSuccess={this.onSaveSuccess}
+                       onDeleteTableRow={this.onDeleteTableRow} compact={true}
+                       onDuplicateViewDef={this.onDuplicateViewDef}
+                       onDeleteViewDef={this.onDeleteViewDef}
+                       alertForm={this.props.alertForm} {...boundActionCreators}/>
+
         <ViewDefPreview active={preview} selectedView={selectedView} {...boundActionCreators}/>
       </Box>
     );

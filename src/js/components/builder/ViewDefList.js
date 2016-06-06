@@ -56,10 +56,11 @@ export default class ViewsDefList extends Component {
     let toolbar, contents, focus;
 
     if (this.state.editView) {
-      toolbar = <Anchor href="#" icon={<Close />} label="Close" onClick={this._closeEdit.bind(this)}/>;
+      toolbar =
+        <Anchor href="#" icon={<Close />} label="Close" onClick={this._closeEdit.bind(this)} className='fontNormal'/>;
       contents = this.state.editView;
     } else {
-      toolbar = <Anchor href="#" icon={<Add />} label="New" onClick={this._newView.bind(this)}/>;
+      toolbar = <Anchor href="#" icon={<Add />} label="New" onClick={this._newView.bind(this)} className='fontNormal'/>;
       contents = views.map((view, key) => ({
         key: view._id,
         groupby: view.category,

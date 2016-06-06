@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Title, Split} from 'grommet';
+import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Title, Split,tr } from 'grommet';
 import Close from 'grommet/components/icons/base/Close';
 import Play from 'grommet/components/icons/base/Play';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
@@ -8,6 +8,8 @@ import Download from 'grommet/components/icons/base/Download';
 import Mail from 'grommet/components/icons/base/Mail';
 import _ from 'lodash';
 import AlertForm from '../../components/commons/AlertForm';
+var Filter = require('grommet/components/icons/base/Filter');
+
 
 export default class ViewDefDetail extends Component {
 
@@ -17,6 +19,9 @@ export default class ViewDefDetail extends Component {
     this.renderLinks = this.renderLinks.bind(this);
     this.renderMasterHeader = this.renderMasterHeader.bind(this);
     this._onChange = this._onChange.bind(this);
+    this.state = {
+      mainFilter: false
+    };
   }
 
   componentWillMount() {
@@ -83,15 +88,23 @@ export default class ViewDefDetail extends Component {
     links = selfTable.body.links.map((link, index) => {
       if (link.body && ((link.body.fields && link.body.fields.length > 0) || this.hasLinks(link.body.links))) {
         let currentPath = path + "." + index;
+        const textareaId = `v.${currentPath}.body.filter`;
         return (
           <tr key={"link_" + link.sqlname + "_" + index}>
             <td colSpan={8}>
-              <Header size="small">
-                {link.sqlname}
-              </Header>
+              <Anchor icon={<Filter />} label={link.sqlname} className='fontNormal' reverse={true}
+                      onClick={() => {
+                        const temp = {};
+                        temp[textareaId] = !this.state[textareaId];
+                        this.setState(temp);
+                      }}/>
 
+              {this.state[textareaId] && <textarea type="text" placeholder="Input AQL as filter" id={textareaId}
+                                                   name={`v.${currentPath}.body.filter`} onChange={this._onChange}
+                                                   value={link.body.filter} className='table-textarea'/>
+              }
               <table key={"table_" + link.sqlname}>
-                <tbody>
+                <thead>
                 <tr>
                   <th>Field</th>
                   <th>Alias</th>
@@ -101,14 +114,8 @@ export default class ViewDefDetail extends Component {
                   <th>Order</th>
                   <th>Del</th>
                 </tr>
-                <tr>
-                  <td colSpan={8}>
-                    <textarea type="text" placeholder="Input AQL as filter" id={`v.${currentPath}.body.filter`}
-                              name={`v.${currentPath}.body.filter`} onChange={this._onChange}
-                              value={link.body.filter}
-                              style={{width: '100%', margin: 0,outline: 0,borderWidth: 1,borderStyle: 'hidden'}}/>
-                  </td>
-                </tr>
+                </thead>
+                <tbody>
                 {link.body && link.body.fields && this.renderTemplateTable(link, false, currentPath)}
                 </tbody>
               </table>
@@ -176,7 +183,7 @@ export default class ViewDefDetail extends Component {
             </td>
             <td>
               <a id={`${currentPath}body.fields.${index}.del`} name={`${currentPath}body.fields.${index}`}
-                 onClick={this.props.onDeleteTableRow}><Close /></a>
+                 onClick={this.props.onDeletetr}><Close /></a>
             </td>
           </tr>
           : null
@@ -190,10 +197,9 @@ export default class ViewDefDetail extends Component {
   }
 
   renderMasterHeader(selectedView) {
-    return (
-      <Header size="small">
-        {selectedView.body.label && `${selectedView.body.label} (${selectedView.body.sqlname})`}
-      </Header>
+    return (<Anchor icon={<Filter />} className='fontNormal' reverse={true}
+                    label={selectedView.body.label && `${selectedView.body.label} (${selectedView.body.sqlname})`}
+                    onClick={() => this.setState({mainFilter: !this.state.mainFilter})}/>
     );
   }
 
@@ -228,10 +234,10 @@ export default class ViewDefDetail extends Component {
     );
 
     return (
-      <Box>
-        <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
+      <Box pad={{horizontal: 'medium'}} flex={true}>
+        <Header justify="between" size="small">
           <Title>View Builder</Title>
-          <Menu direction="row" align="center" responsive={false}>
+          <Menu direction="row" align="center" responsive={false} pad={{horizontal: 'small'}}>
             <Anchor link="#" icon={<Play />} onClick={this.props.openPreview}>Query</Anchor>
             <Anchor link="#" icon={<Checkmark />} onClick={this.props.onSubmit}>Save</Anchor>
             <Anchor link="#" icon={<Close />} onClick={this.props.deleteViewDef}>Delete</Anchor>
@@ -243,58 +249,45 @@ export default class ViewDefDetail extends Component {
             <Anchor link="#" icon={<Download />} onClick={this._onDownload.bind(this, selectedView)}>Download</Anchor>
           </Menu>
         </Header>
+        {
+          selectedView && !_.isEmpty(selectedView) &&
+          <Split flex="left" fixed={false} className='fixMinSizing'>
+            <Box>
+              {selectedView.body && selectedView.body.fields && this.renderMasterHeader(selectedView)}
 
-        <Box>
-          <Split flex="left" fixed={false}>
-
-            {
-              selectedView && !_.isEmpty(selectedView) &&
-              <Box >
-                {selectedView.body && selectedView.body.fields && this.renderMasterHeader(selectedView)}
-                <Box className='autoScroll'>
-                  <Table>
-                    <tbody>
-                    {tableHeader}
-                    <tr>
-                      <td colSpan={8}>
-                        <textarea id="v.body.filter" name="v.body.filter" value={selectedView.body.filter}
-                                  placeholder="Input AQL as filter" onChange={this._onChange}
-                                  style={{width: '100%', margin: 0,outline: 0,borderWidth: 1,borderStyle: 'hidden'}}>
-                        </textarea>
-                      </td>
-                    </tr>
-                    {selectedView.body && selectedView.body.fields && this.renderTemplateTable(selectedView, true)}
-                    </tbody>
-                  </Table>
-                </Box>
+              {this.state.mainFilter &&
+              <textarea id="v.body.filter" name="v.body.filter" value={selectedView.body.filter}
+                        placeholder="Input AQL as filter" onChange={this._onChange}
+                        className='table-textarea'/>
+              }
+              <Box className='autoScroll'>
+                <Table>
+                  <tbody>
+                  {tableHeader}
+                  {selectedView.body && selectedView.body.fields && this.renderTemplateTable(selectedView, true)}
+                  </tbody>
+                </Table>
               </Box>
-            }
-
-
-            {
-              selectedView && !_.isEmpty(selectedView) &&
-              <Box pad="small">
-                <Header>Attributes</Header>
-                <Form onSubmit={this.props.onSubmit} compact={this.props.compact}>
-                  <FormField label="Name" htmlFor={p + "item1"}>
-                    <input id="v.name" name="v.name" type="text" onChange={this._onChange}
-                           value={selectedView.name}/>
-                  </FormField>
-                  <FormField label="Description" htmlFor={p + "item2"}>
-                    <textarea id="v.desc" name="v.desc" value={selectedView.desc} onChange={this._onChange}></textarea>
-                  </FormField>
-                  <FormField label="Category" htmlFor={p + "item3"}>
-                    <input id="v.category" name="v.category" type="text" onChange={this._onChange}
-                           value={selectedView.category}/>
-                  </FormField>
-                </Form>
-              </Box>
-            }
-
+            </Box>
+            <Box pad="small">
+              <Header>Attributes</Header>
+              <Form onSubmit={this.props.onSubmit} compact={this.props.compact}>
+                <FormField label="Name" htmlFor={p + "item1"}>
+                  <input id="v.name" name="v.name" type="text" onChange={this._onChange}
+                         value={selectedView.name}/>
+                </FormField>
+                <FormField label="Description" htmlFor={p + "item2"}>
+                  <textarea id="v.desc" name="v.desc" value={selectedView.desc} onChange={this._onChange}></textarea>
+                </FormField>
+                <FormField label="Category" htmlFor={p + "item3"}>
+                  <input id="v.category" name="v.category" type="text" onChange={this._onChange}
+                         value={selectedView.category}/>
+                </FormField>
+              </Form>
+            </Box>
             {alertForms[this.props.alertForm]}
-
           </Split>
-        </Box>
+        }
       </Box>
     );
   }

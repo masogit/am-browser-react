@@ -52,7 +52,7 @@ export default class ChartForm extends GraphForm {
 
       this.props.data.header.map((header, index) => {
         xAxis_col_options.push({value: header.Index, text: `${header.Type}: ${header.Name}`});
-        if (['Long', 'Short', 'Int', 'Double', 'Byte'].includes(header.Type)) {
+        if (header.Type in ['Long', 'Short', 'Int', 'Double', 'Byte']) {
           col_options.push({
             id: header.Index,
             name: 'series_col',
