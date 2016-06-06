@@ -16,7 +16,7 @@ import * as ExplorerActions from '../../actions/explorer';
 import * as AQLActions from '../../actions/aql';
 import Graph from '../commons/Graph';
 import * as Format from '../../constants/RecordFormat';
-import store from '../../store';
+import cookies from 'js-cookie';
 export default class RecordList extends Component {
 
   constructor() {
@@ -281,7 +281,7 @@ export default class RecordList extends Component {
         <form name="Download" ref="downloadForm"
               action={ExplorerActions.getDownloadQuery({...this.props.body, param: this.state.param})}
               method="post">
-          <input type="hidden" name="_csrf" value={this.state.session.token}/>
+          <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
           <input type="hidden" name="fields" value={JSON.stringify(this.props.body.fields)}/>
         </form>
       </Header>
@@ -316,9 +316,6 @@ export default class RecordList extends Component {
   }
 
   render() {
-    var session = store.getState();
-    this.state.session = session.session;
-
     return (
       <Box pad={{horizontal: 'medium'}} flex={true}>
         {this.renderToolBox()}

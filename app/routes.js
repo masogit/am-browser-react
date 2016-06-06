@@ -39,7 +39,7 @@ module.exports = function (app) {
   });
 
   app.get('/am/csrf', function (req, res) {
-    res.set('_csrf', req.csrfToken());
+    res.cookie('csrf-token', req.csrfToken());
     res.end();
   });
 
@@ -63,8 +63,6 @@ module.exports = function (app) {
       res.clearCookie('user');
       res.redirect(401, '/am/login');
     } else {
-      res.set('_csrf', req.csrfToken());
-      // res.locals._csrf = req.csrfToken();
       next(); // Call the next middleware
     }
   });

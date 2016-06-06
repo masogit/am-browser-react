@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _csrf = '';
+var cookies = require('js-cookie');
 
 var _superagent = require('superagent');
 
@@ -75,7 +75,7 @@ Request.prototype.then = function () {
 
 // TODO Change the session, if session changed, the view will be refresh(index.js)
 const store = require('../store');
-const {init, initToken} = require('../actions');
+const {init} = require('../actions');
 
 const end = Request.prototype.end;
 Request.prototype.end = function (callback) {
@@ -85,10 +85,6 @@ Request.prototype.end = function (callback) {
       if (error.status == 401) {
         store.default.dispatch(init('', ''));
       }
-    }
-    if (response && response.header) {
-      _csrf = response.header._csrf;
-      store.default.dispatch(initToken(_csrf));
     }
 
     callback(error, response);
@@ -138,7 +134,7 @@ exports.default = {
     return op;
   },
   patch: function patch(uri, data) {
-    _headers['csrf-token'] = _csrf;
+    _headers['csrf-token'] = cookies.get('csrf-token');
 
     var op = _superagent2.default.patch(uri).withCredentials().send(data);
     op.timeout(_timeout);
@@ -146,7 +142,7 @@ exports.default = {
     return op;
   },
   post: function post(uri, data) {
-    _headers['csrf-token'] = _csrf;
+    _headers['csrf-token'] = cookies.get('csrf-token');
 
     var op = _superagent2.default.post(uri).withCredentials().send(data);
     op.timeout(_timeout);
@@ -154,7 +150,7 @@ exports.default = {
     return op;
   },
   put: function put(uri, data) {
-    _headers['csrf-token'] = _csrf;
+    _headers['csrf-token'] = cookies.get('csrf-token');
 
     var op = _superagent2.default.put(uri).withCredentials().send(data);
     op.timeout(_timeout);
@@ -162,7 +158,7 @@ exports.default = {
     return op;
   },
   del: function del(uri) {
-    _headers['csrf-token'] = _csrf;
+    _headers['csrf-token'] = cookies.get('csrf-token');
 
     var op = _superagent2.default.del(uri).withCredentials();
     op.timeout(_timeout);

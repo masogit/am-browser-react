@@ -90,7 +90,7 @@ export function login(username, password) {
         } else if (res.ok) {
           if (res.body) {
             const headerNavs = res.body.headerNavs;
-            dispatch(loginSuccess(username, res.body._csrf, headerNavs));
+            dispatch(loginSuccess(username, cookies.get('csrf-token'), headerNavs));
           } else {
             dispatch(loginFailure({message: res.text}));
           }
