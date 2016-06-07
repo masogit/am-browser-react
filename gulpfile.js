@@ -14,7 +14,7 @@ var merge = require('merge-stream');
 var download = require("gulp-download");
 var xml2json = require('gulp-xml2json');
 var rename = require('gulp-rename');
-var config = require('./rest/config.json');
+var config = require('./rest/conf/config.json');
 
 var opts = {
   base: '.',
@@ -305,10 +305,10 @@ gulp.task('clean-gen-ws', function () {
 gulp.task('gen-ws-base', ['clean-gen-ws', 'download-ws'], function () {
   console.log('Generate ws package');
   // copy folder and files
-  var copy_properties= gulp.src('./rest/package.properties')
+  var copy_properties= gulp.src('./rest/conf/package.properties')
       .pipe(gulp.dest('./rest/gen/temp/websvc'));
-  var copy_bat = gulp.src('./rest/*.bat')
-      .pipe(gulp.dest('./rest/gen/temp'));
+  var copy_bat = gulp.src('./rest/bin/*.bat')
+      .pipe(gulp.dest('./rest/gen/temp/bin'));
   // copy x64 folder
   var copy_x64 = gulp.src('./rest/x64/**')
       .pipe(gulp.dest('./rest/gen/temp/x64'));
@@ -319,7 +319,7 @@ gulp.task('gen-ws-base', ['clean-gen-ws', 'download-ws'], function () {
       .pipe(rename({basename: 'AssetManagerWebService'}))
       .pipe(gulp.dest('./rest/gen/temp/websvc'));
   // unzip tomcat instance
-  var unzip_tomcat = gulp.src('./rest/apache-tomcat-8.0.18-windows-x64.zip', {base : '.'})
+  var unzip_tomcat = gulp.src('./rest/lib/apache-tomcat-8.0.18-windows-x64.zip', {base : '.'})
       .pipe(unzip())
       .pipe(gulp.dest('./rest/gen/temp'));
   // unzip download zip
@@ -335,7 +335,7 @@ gulp.task('gen-ws-conf', ['gen-ws-base'], function () {
   var copy_conf = gulp.src('./rest/conf/**')
       .pipe(gulp.dest('./rest/gen/temp/apache-tomcat-8.0.18/conf'));
   // unzip ant instance
-  var unzip_ant = gulp.src('./rest/apache-ant-1.8.2.zip', {base : '.'})
+  var unzip_ant = gulp.src('./rest/lib/apache-ant-1.8.2.zip', {base : '.'})
       .pipe(unzip())
       .pipe(gulp.dest('./rest/gen/temp/deploy'));
   // copy x64 files
