@@ -238,15 +238,15 @@ export default class Search extends Component {
 
     return (
       <Box align="center" flex={true} justify="center">
-        <Headline size="large">
+        <Headline size="large" flex={false}>
           Asset Manager Browser
         </Headline>
-        <Box direction="row" pad={{vertical: 'medium'}}>
+        <Box direction="row" pad={{vertical: 'medium'}} flex={false}>
           <input type="search" inline={true} className="flex" placeholder="Global Record search..."
                  onKeyDown={this._onEnter.bind(this)} onChange={this._onSearch.bind(this)} size="120"
                  responsive={true}/>
         </Box>
-        <Tiles flush={false} justify="center" size="large">
+        <Tiles flush={false} justify="center" size="large" flex={false}>
           {
             tiles.map(tile => (
               <Tile key={tile.title} className='box-shadow' onClick={tile.onClick}>

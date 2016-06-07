@@ -276,7 +276,7 @@ export default class Insight extends Component {
     var id = (Math.random() + 1).toString(36).substring(7);
     if (this.state.edit)
       return (
-        <Box direction="row" justify="center" pad="small">
+        <Box direction="row" justify="center" pad="small" flex={false}>
           <CheckBox id={id} label={box.direction==='row'?'Column':'Row'} checked={box.direction!=='column'}
                     onChange={this._toggleDirection.bind(this, box, parent)} toggle={true}/>
           <Anchor href="#" icon={<Add />} label="Split" onClick={this._addBox.bind(this, box, parent)}/>
