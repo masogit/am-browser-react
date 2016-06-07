@@ -1,5 +1,7 @@
 {
   "Nexus": "http://svs-spm-nexus.hpeswlab.net/nexus/content/repositories/local-assetmanager-snapshot/",
+  "Nexus3rd": "http://svs-spm-nexus.hpeswlab.net/nexus/content/repositories/am3rdtest/",
+  "Classifier": "WIN32-en",
   "DSN": "AMBrowser",
   "Description": "AMBrowser",
   "SERVER": "(local)",
