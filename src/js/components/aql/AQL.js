@@ -146,19 +146,6 @@ export default class AQL extends Component {
     });
   }
 
-  _onSave() {
-    if (this.state.aql.str.trim() === '' || this.state.aql.name.trim() === '' || this.state.aql.category.trim() === '') {
-      this.setState({
-        alertLayer: <AlertForm onClose={this._removeAlertLayer.bind(this)}
-                               title={'Save AQL failed!'}
-                               desc={'AQL string or Name or Category empty'}
-                               onConfirm={this._removeAlertLayer.bind(this)}/>
-      });
-    } else {
-      this._onSaveAQL();
-    }
-  }
-
   _onNew() {
     if (this.state.aql.str.trim() !== '') {
       this.setState({
@@ -391,7 +378,7 @@ export default class AQL extends Component {
             <Menu direction="row" align="center" responsive={false}>
               <Anchor link="#" icon={<Play />} onClick={this._onQuery.bind(this)}>Query</Anchor>
               <Anchor link="#" icon={<Add />} onClick={this._onNew.bind(this)}>New</Anchor>
-              <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)}>Save</Anchor>
+              <Anchor link="#" icon={<Checkmark />} onClick={this._onSaveAQL.bind(this)}>Save</Anchor>
               <Anchor link="#" icon={<Close />} onClick={this._onDelete.bind(this)}>Delete</Anchor>
               {
                 this.state.aql._id &&
