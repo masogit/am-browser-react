@@ -4,7 +4,6 @@ import { createStore, combineReducers, compose, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import DevTools from '../DevTools';
 
-// TODO: fix webpack loader to allow import * from './reducers'
 import error from '../reducers/error';
 import session from '../reducers/session';
 import route from '../reducers/route';
