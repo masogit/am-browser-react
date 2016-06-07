@@ -84,8 +84,8 @@ set "CATALINA_BASE=%CATALINA_HOME%"
 set "EXECUTABLE=%CATALINA_HOME%\bin\tomcat8.exe"
 
 rem Set default Service name
-set SERVICE_NAME=Tomcat8
-set DISPLAYNAME=Apache Tomcat 8.0 %SERVICE_NAME%
+set SERVICE_NAME=am-browser-rest-service
+set DISPLAYNAME=HPE %SERVICE_NAME%
 
 if "x%1x" == "xx" goto displayUsage
 set SERVICE_CMD=%1
@@ -95,7 +95,7 @@ if "x%1x" == "xx" goto checkServiceCmd
 if "x%1x" == "x/userx" goto runAsUser
 if "x%1x" == "x--userx" goto runAsUser
 set SERVICE_NAME=%1
-set DISPLAYNAME=Apache Tomcat 8.0 %1
+set DISPLAYNAME=HPE %1
 shift
 if "x%1x" == "xx" goto checkServiceCmd
 goto checkUser
@@ -153,7 +153,7 @@ set "CLASSPATH=%JAVA_HOME%/lib/tools.jar;%CATALINA_HOME%\bin\bootstrap.jar;%CATA
 if not "%CATALINA_HOME%" == "%CATALINA_BASE%" set "CLASSPATH=%CLASSPATH%;%CATALINA_HOME%\bin\tomcat-juli.jar"
 
 "%EXECUTABLE%" //IS//%SERVICE_NAME% ^
-    --Description "Apache Tomcat 8.0.18 Server - http://tomcat.apache.org/" ^
+    --Description "HPE AM Browser Rest Server - http://www.hpe.com/" ^
     --DisplayName "%DISPLAYNAME%" ^
     --Install "%EXECUTABLE%" ^
     --LogPath "%CATALINA_BASE%\logs" ^

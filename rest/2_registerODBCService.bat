@@ -8,7 +8,7 @@ goto end
 :displayUsage
 echo.
 echo Usage: registerODBCService.bat [DSN] [Description] [SERVER] [Database]
-echo Example: registerODBCService.bat AMBrowser AMBrowser (local) AMDemo96en
+echo Example: 2_registerODBCService.bat AMBrowser AMBrowser (local) AMDemo96en
 goto end
 :end
 pause
