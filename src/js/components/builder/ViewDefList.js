@@ -39,6 +39,7 @@ export default class ViewsDefList extends Component {
       editView: editView
     });
     this.props.newSelectedView();
+    history.push(`/views/`);
   }
 
   _closeEdit() {

@@ -42,9 +42,7 @@ class ViewDefListContainer extends Component {
     let nextId = nextProps.params.id;
     let {views} = nextProps;
     if (views && views.length > 0) {
-      if (!currentId && !nextId) { // Click navigation link, no id param.
-        this.props.actions.setSelectedView(views[0]._id, views[0]);
-      } else if (nextId && nextId != currentId) { // Click item in the list, with link like '/views/2', '2' is the id param.
+      if (nextId && nextId != currentId) { // Click item in the list, with link like '/views/2', '2' is the id param.
         let selectedView = views.filter(view => view._id == nextId)[0];
         this.props.actions.setSelectedView(nextId, selectedView);
       }

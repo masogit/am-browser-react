@@ -16,8 +16,8 @@ export default class ViewDefDetail extends Component {
   constructor(props) {
     super(props);
     this.renderTemplateTable = this.renderTemplateTable.bind(this);
+    this.renderTable = this.renderTable.bind(this);
     this.renderLinks = this.renderLinks.bind(this);
-    this.renderMasterHeader = this.renderMasterHeader.bind(this);
     this._onChange = this._onChange.bind(this);
     this.state = {
       mainFilter: false
@@ -89,39 +89,23 @@ export default class ViewDefDetail extends Component {
       if (link.body && ((link.body.fields && link.body.fields.length > 0) || this.hasLinks(link.body.links))) {
         let currentPath = path + "." + index;
         const textareaId = `v.${currentPath}.body.filter`;
-        return (
-          <tr key={"link_" + link.sqlname + "_" + index}>
-            <td colSpan={8}>
-              <Anchor icon={<Filter />} label={link.sqlname} className='fontNormal' reverse={true}
-                      onClick={() => {
-                        const temp = {};
-                        temp[textareaId] = !this.state[textareaId];
-                        this.setState(temp);
-                      }}/>
+        const filter = {
+          id: textareaId,
+          name: `v.${currentPath}.body.filter`,
+          filter: link.body.filter,
+          onChange: this._onChange,
+          show: this.state[textareaId]
+        };
 
-              {this.state[textareaId] && <textarea type="text" placeholder="Input AQL as filter" id={textareaId}
-                                                   name={`v.${currentPath}.body.filter`} onChange={this._onChange}
-                                                   value={link.body.filter} className='table-textarea'/>
-              }
-              <table key={"table_" + link.sqlname}>
-                <thead>
-                <tr>
-                  <th>Field</th>
-                  <th>Alias</th>
-                  <th>Search</th>
-                  <th>Group</th>
-                  <th>Sum</th>
-                  <th>Order</th>
-                  <th>Del</th>
-                </tr>
-                </thead>
-                <tbody>
-                {link.body && link.body.fields && this.renderTemplateTable(link, false, currentPath)}
-                </tbody>
-              </table>
-            </td>
-          </tr>
-        );
+        const title = {
+          label: link.sqlname,
+          onClick: () => {
+            const temp = {};
+            temp[textareaId] = !this.state[textareaId];
+            this.setState(temp);
+          }
+        };
+        return this.renderTable(title, filter, link.body.fields && this.renderTemplateTable(link, false, currentPath), `${link.sqlname}_${index}`);
       }
       return null;
     });
@@ -183,7 +167,7 @@ export default class ViewDefDetail extends Component {
             </td>
             <td>
               <a id={`${currentPath}body.fields.${index}.del`} name={`${currentPath}body.fields.${index}`}
-                 onClick={this.props.onDeletetr}><Close /></a>
+                 onClick={this.props.onDeleteTableRow}><Close /></a>
             </td>
           </tr>
           : null
@@ -196,10 +180,58 @@ export default class ViewDefDetail extends Component {
     return fields.concat(links);
   }
 
-  renderMasterHeader(selectedView) {
-    return (<Anchor icon={<Filter />} className='fontNormal' reverse={true}
-                    label={selectedView.body.label && `${selectedView.body.label} (${selectedView.body.sqlname})`}
-                    onClick={() => this.setState({mainFilter: !this.state.mainFilter})}/>
+  renderTable(title, filter, body, key) {
+    const header = (
+      <tr>
+        <th>Field</th>
+        <th>Alias</th>
+        <th>Search</th>
+        <th>Group</th>
+        <th>Sum</th>
+        <th>Order</th>
+        <th>Del</th>
+      </tr>
+    );
+
+    //TODO: fix the onClick issue, so we can use an icon to toggle the textarea
+    filter.show = true;
+
+    const tBody = (
+      <tbody>
+      {filter.show &&
+      <tr>
+        <td colSpan={8}>
+              <textarea id={filter.id} name={filter.name} value={filter.value}
+                        placeholder="Input AQL as filter" onChange={filter._onChange}
+                        className='textarea'/>
+        </td>
+      </tr>
+      }
+      {body}
+      </tbody>
+    );
+
+    //const filter = <Anchor icon={<Filter />} className='fontNormal' reverse={true} label={title.label} onClick={title.onClick}/>;
+    const titleComp = <Title className='fontNormal'>{title.label}</Title>;
+
+    return key ? (
+      <tr key={`link_${key}`}>
+        <td colSpan={8} className='inner-table'>
+          {titleComp}
+          <table key={`table_${key}`}>
+            {header}
+            {tBody}
+          </table>
+        </td>
+      </tr>
+    ) : (
+      <Box className='autoScroll'>
+        {titleComp}
+        <Table>
+          {header}
+          {tBody}
+        </Table>
+      </Box>
     );
   }
 
@@ -220,18 +252,24 @@ export default class ViewDefDetail extends Component {
                          onConfirm={onDeleteViewDef}/>
     } : {};
 
-    let p = "input";
-    let tableHeader = (
-      <tr>
-        <th>Field</th>
-        <th>Alias</th>
-        <th>Search</th>
-        <th>Group</th>
-        <th>Sum</th>
-        <th>Order</th>
-        <th>Del</th>
-      </tr>
-    );
+    let p = "input", table;
+
+    if (selectedView.body && selectedView.body.fields) {
+      const title = {
+        label: selectedView.body.label && `${selectedView.body.label} (${selectedView.body.sqlname})`,
+        onClick: () => this.setState({mainFilter: !this.state.mainFilter})
+      };
+
+      const filter = {
+        id: 'v.body.filter',
+        name: 'v.body.filter',
+        filter: selectedView.body.filter,
+        onChange: this._onChange,
+        show: this.state.mainFilter
+      };
+
+      table = this.renderTable(title, filter, this.renderTemplateTable(selectedView, true));
+    }
 
     return (
       <Box pad={{horizontal: 'medium'}} flex={true}>
@@ -252,23 +290,7 @@ export default class ViewDefDetail extends Component {
         {
           selectedView && !_.isEmpty(selectedView) &&
           <Split flex="left" fixed={false} className='fixMinSizing'>
-            <Box>
-              {selectedView.body && selectedView.body.fields && this.renderMasterHeader(selectedView)}
-
-              {this.state.mainFilter &&
-              <textarea id="v.body.filter" name="v.body.filter" value={selectedView.body.filter}
-                        placeholder="Input AQL as filter" onChange={this._onChange}
-                        className='table-textarea'/>
-              }
-              <Box className='autoScroll'>
-                <Table>
-                  <tbody>
-                  {tableHeader}
-                  {selectedView.body && selectedView.body.fields && this.renderTemplateTable(selectedView, true)}
-                  </tbody>
-                </Table>
-              </Box>
-            </Box>
+            {table}
             <Box pad="small">
               <Header>Attributes</Header>
               <Form onSubmit={this.props.onSubmit} compact={this.props.compact}>

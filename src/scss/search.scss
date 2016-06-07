@@ -38,9 +38,29 @@
   height: 300px;
 }
 
-.table-textarea {
-  width: 100%;
-  margin: 0;
-  outline: 0;
-  border: none;
+table {
+  margin-bottom: 0;
+
+  .textarea {
+    width: 100%;
+    margin: 0;
+    outline: 0;
+    border: none;
+    height: 24px;
+  }
+
+  .inner-table {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.table {
+  td, th {
+    padding: 5px;
+  }
+}
+
+.hide {
+  display: none;
 }
