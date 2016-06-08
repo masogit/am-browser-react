@@ -8,8 +8,7 @@ import Download from 'grommet/components/icons/base/Download';
 import Mail from 'grommet/components/icons/base/Mail';
 import _ from 'lodash';
 import AlertForm from '../../components/commons/AlertForm';
-var Filter = require('grommet/components/icons/base/Filter');
-
+//var Filter = require('grommet/components/icons/base/Filter');
 
 export default class ViewDefDetail extends Component {
 

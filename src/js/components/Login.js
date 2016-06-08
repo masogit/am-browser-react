@@ -18,16 +18,16 @@ class IndexerLogin extends Component {
     this.state = {responsive: 'multiple'};
   }
 
-  _onSubmit(fields) {
-    this.props.dispatch(login(fields.username, fields.password));
+  componentDidMount() {
+    this.props.dispatch(initLogin());
   }
 
   _onResponsive(responsive) {
     this.setState({responsive: responsive});
   }
 
-  componentDidMount() {
-    this.props.dispatch(initLogin());
+  _onSubmit(fields) {
+    this.props.dispatch(login(fields.username, fields.password));
   }
 
   render() {
