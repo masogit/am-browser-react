@@ -8,6 +8,7 @@ import {
 } from 'grommet';
 import Next from '../../../../node_modules/grommet/components/icons/base/Next';
 import Down from '../../../../node_modules/grommet/components/icons/base/Down';
+import _ from 'lodash';
 
 export default class GroupList extends Component {
 
@@ -87,7 +88,7 @@ export default class GroupList extends Component {
         <Box className='autoScroll'>
         {
           Object.keys(grouped).map((key, i) => {
-            const selected = this.props.focus && grouped[key].findIndex(item => this.props.focus.selected == item.key);
+            const selected = this.props.focus && _.findIndex(grouped[key], (item => this.props.focus.selected == item.key));
             return (
               <Box key={i} direction="column" flex={false}>
                 <List>

@@ -36,7 +36,7 @@ rules:
   #block-scoped-var: 2
   eol-last: 2
   dot-notation: 2
-  consistent-return: 2
+  #consistent-return: 2
   no-unused-vars: [2, args: none]
   semi: [2, "always"]
 

@@ -1,22 +1,25 @@
-var argv = require('yargs').argv;
-var gulp = require('gulp');
-var path = require('path');
-//var nodemon = require('gulp-nodemon');
-var gulpTasks = require('grommet/utils/gulp/gulp-tasks');
-var git = require('gulp-git');
-var del = require('del');
-var mkdirp = require('mkdirp');
-var spawn = require('child_process').spawn;
-var zip = require('gulp-zip');
-var unzip = require('gulp-unzip');
-var clean = require('gulp-clean');
-var merge = require('merge-stream');
-var download = require("gulp-download");
-var xml2json = require('gulp-xml2json');
-var rename = require('gulp-rename');
-var config = require('./rest/conf/config.json');
+import yargs from 'yargs';
+const argv = yargs.argv;
+import gulp from 'gulp';
+import path from 'path';
+//import nodemon from 'gulp-nodemon';
+import grommetToolbox, {getOptions} from 'grommet-toolbox';
+import git from 'gulp-git';
+import del from 'del';
+import mkdirp from 'mkdirp';
+import child_process from 'child_process';
+const spawn = child_process.spawn;
+import zip from 'gulp-zip';
+import unzip from 'gulp-unzip';
+import clean from 'gulp-clean';
+import merge from 'merge-stream';
+import download from 'gulp-download';
+import xml2json from 'gulp-xml2json';
+import rename from 'gulp-rename';
+import webpack from 'webpack';
+import config from './rest/conf/config.json';
 
-var opts = {
+const opts = {
   base: '.',
   dist: path.resolve(__dirname, 'dist/'),
   copyAssets: [
@@ -42,6 +45,20 @@ var opts = {
         path.resolve(__dirname, 'src/scss'),
         path.resolve(__dirname, 'node_modules')
       ]
+    },
+    module: {
+      loaders: [
+        {
+          test: /\.(js|jsx)?$/,
+          loader: 'babel-loader',
+          include: /node_modules\/react-gravatar/
+        },
+        {
+          test: /\.(js|jsx)?$/,
+          loader: 'babel-loader',
+          include: /react-gravatar/
+        }
+      ]
     }
   },
   devServerHost: 'localhost',
@@ -61,16 +78,16 @@ var opts = {
   distPreprocess: ['copy-demo']
 };
 
-gulp.task('set-webpack-alias', function () {
+gulp.task('set-webpack-alias', () => {
   if (opts.alias && argv.useAlias) {
     console.log('Using local alias for development.');
     opts.webpack.resolve.alias = opts.alias;
   }
 });
 
-gulp.task('release:createTmp', function(done) {
+gulp.task('release:createTmp', (done) => {
   del.sync(['./tmp']);
-  mkdirp('./tmp', function(err) {
+  mkdirp('./tmp', (err) => {
     if (err) {
       throw err;
     }
@@ -78,19 +95,19 @@ gulp.task('release:createTmp', function(done) {
   });
 });
 
-gulp.task('release:heroku', ['dist', 'release:createTmp'], function(done) {
+gulp.task('release:heroku', ['dist', 'release:createTmp'], (done) => {
   if (process.env.CI) {
     git.clone('https://' + process.env.GH_TOKEN + '@github.com/grommet/grommet-ferret.git',
       {
         cwd: './tmp/'
       },
-      function(err) {
+      (err) => {
         if (err) {
           throw err;
         }
 
         process.chdir('./tmp/grommet-ferret');
-        git.checkout('heroku', function(err) {
+        git.checkout('heroku', (err) => {
           if (err) {
             throw err;
           }
@@ -99,21 +116,21 @@ gulp.task('release:heroku', ['dist', 'release:createTmp'], function(done) {
             '../../**',
             '!../../.gitignore',
             '!../../.travis.yml'])
-          .pipe(gulp.dest('./')).on('end', function() {
-            git.status({
-              args: '--porcelain'
-            }, function(err, stdout) {
-              if (err) {
-                throw err;
-              }
+            .pipe(gulp.dest('./')).on('end', () => {
+              git.status({
+                args: '--porcelain'
+              }, (err, stdout) => {
+                if (err) {
+                  throw err;
+                }
 
               if (stdout && stdout !== '') {
                 gulp.src('./')
                   .pipe(git.add({
                     args: '--all'
                   }))
-                  .pipe(git.commit('Heroku dev version update.')).on('end', function() {
-                    git.push('origin', 'heroku', { quiet: true }, function(err) {
+                  .pipe(git.commit('Heroku dev version update.')).on('end', () => {
+                    git.push('origin', 'heroku', { quiet: true }, (err) => {
                       if (err) {
                         throw err;
                       }
@@ -370,4 +387,4 @@ gulp.task('register-odbc', function () {
   return spawn('C:/Windows/System32/odbcconf.exe', ['CONFIGSYSDSN', 'SQL Server', 'DSN=' + config.DSN + '|Description=' + config.Description + '|SERVER=' + config.SERVER + '|Trusted_Connection=no|Database=' + config.Database], {stdio: 'inherit'});
 });
 
-gulpTasks(gulp, opts);
+grommetToolbox(gulp, opts);

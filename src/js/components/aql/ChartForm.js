@@ -1,4 +1,5 @@
 import GraphForm from './FormGenerator';
+import _ from 'lodash';
 
 export default class ChartForm extends GraphForm {
 
@@ -57,7 +58,7 @@ export default class ChartForm extends GraphForm {
             id: header.Index,
             name: 'series_col',
             label: `${header.Type} : ${header.Name}`,
-            checked: series_col.includes(header.Index),
+            checked: _.includes(series_col, header.Index),
             onChange: this._setFormValues.bind(this)
           });
         }

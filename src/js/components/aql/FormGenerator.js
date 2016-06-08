@@ -12,6 +12,7 @@ import {
   Footer,
   Anchor
 } from 'grommet';
+import _ from 'lodash';
 
 const SelectField = ({label, name, value, onChange, options}) => {
   const optionsComp = options.map(option=>
@@ -84,7 +85,7 @@ const setValueByJsonPath = (path, val, obj) => {
 // if ignored it will be this.state.distribute.name
 const genOptions = (optionsArray, form, fromType, selections) => {
   return optionsArray.map(({label, name, value, options, type}) => {
-    if (name.includes('.')) {
+    if (_.includes(name, '.')) {
       const [name1, name2] = name.split('.');
       label = label || (name1.charAt(0).toUpperCase() + name1.slice(1) + ' ' + name2);
       value = value || (form.state[fromType][name1] && form.state[fromType][name1][name2]);

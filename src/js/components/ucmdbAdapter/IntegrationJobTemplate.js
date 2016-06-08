@@ -7,6 +7,7 @@ var Status = require('grommet/components/icons/Status');
 import {Tabs, Table, Box} from 'grommet';
 import ActionTab from './../commons/ActionTab.js';
 import React from 'react';
+import _ from 'lodash';
 
 const IntegrationJobTable = ({
   integrationJobDataError,
@@ -82,7 +83,7 @@ const IntegrationJobTable = ({
     );
   }
 
-  const selected = integrationJobData.findIndex((item) => item.name == integrationJobName);
+  const selected = _.findIndex(integrationJobData, ((item) => item.name == integrationJobName));
   return (
     <Table selectable={true} selected={[selected]} onSelect={onIntegrationJobSelect}>
       {tableHeader}
