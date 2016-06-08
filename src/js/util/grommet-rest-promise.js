@@ -45,8 +45,8 @@ Request.prototype.promise = function () {
         store.default.dispatch({type: Types.RECEIVE_ERROR, msg: err.response.text});
       }
       if (typeof res !== "undefined" && res.status > 400) {
-        var msg = 'cannot ' + req.method + ' ' + req.url + ' (' + res.status + ')';
-        reject(msg);
+        err.message = 'cannot ' + req.method + ' ' + req.url + ' (' + res.status + ')';
+        reject(err);
       } else if (err) {
         reject(err);
       } else {

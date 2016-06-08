@@ -118,7 +118,7 @@ export function getConfig() {
     }
     return null;
   }, (err) => {
-    if (err) {
+    if (err.status !== 401) {
       console.log('get setting failed');
       throw err;
     }

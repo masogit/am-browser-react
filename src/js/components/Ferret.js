@@ -6,7 +6,6 @@ import {navResponsive} from '../actions';
 import AlertForm from './commons/AlertForm';
 import {App, Box} from 'grommet';
 import NavHeader from './NavHeader';
-import cookies from 'js-cookie';
 import store from '../store';
 import * as Types from '../constants/ActionTypes';
 
@@ -26,10 +25,10 @@ class Indexer extends Component {
   }
 
   render() {
-    const {newError} = this.props;
+    const {newError, headerNavs} = this.props;
     let header;
-    if (cookies.get('csrf-token')) {
-      header = <NavHeader headerNavs={this.props.headerNavs}/>;
+    if (headerNavs) {
+      header = <NavHeader headerNavs={headerNavs}/>;
     }
     let alert;
     if (newError) {

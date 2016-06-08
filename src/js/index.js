@@ -97,17 +97,13 @@ const renderPage = () => {
   }
 };
 
-if (!cookies.get('csrf-token')) {
-  renderPage();
-} else {
-  getConfig().then(
-    (headerNavs) => {
-      Routes.routes[0].childRoutes = getRoutes(headerNavs);
-      store.dispatch(getConfigSuccess(headerNavs));
-      renderPage();
-    }
-  );
-}
+getConfig().then(
+  (headerNavs) => {
+    Routes.routes[0].childRoutes = getRoutes(headerNavs);
+    store.dispatch(getConfigSuccess(headerNavs));
+    renderPage();
+  }
+);
 
 // simulate initial login
 //store.dispatch(loginSuccess('nobody@grommet.io', 'simulated'));
