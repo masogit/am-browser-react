@@ -57,8 +57,13 @@ export const TEMPLATE_LOAD_SUCCESS = 'TEMPLATE_LOAD_SUCCESS';
 export const RECORD_LOAD_SUCCESS = 'RECORD_LOAD_SUCCESS';
 export const DETAIL_RECORD_LOAD_SUCCESS = 'DETAIL_RECORD_LOAD_SUCCESS';
 
-export function init(email, token) {
-  return {type: INIT, email, token};
+export function init(email, headerString) {
+  try {
+    const headerNavs = JSON.parse(headerString.substring(headerString.indexOf('{')));
+    return {type: INIT, email, headerNavs};
+  } catch (e) {
+    return {type: INIT};
+  }
 }
 
 export function initLogin() {
@@ -86,7 +91,7 @@ export function login(username, password) {
         } else if (res.ok) {
           if (res.body) {
             const headerNavs = res.body.headerNavs;
-            dispatch(loginSuccess(username, cookies.get('csrf-token'), headerNavs));
+            dispatch(loginSuccess(username, headerNavs));
           } else {
             dispatch(loginFailure({message: res.text}));
           }
@@ -108,21 +113,6 @@ export function logout() {
       }
     });
   };
-}
-
-export function getConfig() {
-  return Rest.get(HOST_NAME + '/am/config').then((res) => {
-    if (res.ok && res.body) {
-      //dispatch({type: GET_SETTINGS_SUCCESS, headerNavs: res.body});
-      return res.body;
-    }
-    return null;
-  }, (err) => {
-    if (err.status !== 401) {
-      console.log('get setting failed');
-      throw err;
-    }
-  });
 }
 
 export function getConfigSuccess(headerNavs) {
@@ -178,8 +168,8 @@ export function metadataDetailSuccess(result, elements) {
   };
 }
 
-export function loginSuccess(email, token, headerNavs) {
-  return {type: LOGIN_SUCCESS, email, token, headerNavs};
+export function loginSuccess(email, headerNavs) {
+  return {type: LOGIN_SUCCESS, email, headerNavs};
 }
 
 export function loginFailure(error) {

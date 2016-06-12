@@ -97,6 +97,7 @@ module.exports = function (am) {
         req.session.password = password;
         req.session.isAdmin = !!data.entities[0].bAdminRight[1];
         am_rest.headerNavs = getHeadNav(req.session.isAdmin);
+        res.cookie('headerNavs', am_rest.headerNavs);
         res.json(am_rest);
       }
 
@@ -105,8 +106,6 @@ module.exports = function (am) {
       res.status(500).send(err.toString());
     });
   };
-
-  this.getHeadNav = getHeadNav;
 };
 
 function getFormattedRecords(fields, rawRecords) {

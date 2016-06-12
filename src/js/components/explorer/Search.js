@@ -5,7 +5,7 @@ import * as AQLActions from '../../actions/aql';
 import * as UCMDBAdapterActions from '../../actions/ucmdbAdapter';
 import {Title, Box, Tiles, Headline, Meter, Tile} from 'grommet';
 import Graph from '../commons/Graph';
-
+import store from '../../store';
 
 export default class Search extends Component {
 
@@ -23,69 +23,72 @@ export default class Search extends Component {
   }
 
   componentDidMount() {
-    this._isUnmount = false;
-    ExplorerActions.loadViews((views)=> {
-      if (!this._isUnmount) {
-        this.setState({
-          viewSeries: this._filterFirst7(this._getSeries(views, 'category'))
-        });
-      }
-    });
-    AQLActions.loadAQLs((aqls)=> {
-      if (!this._isUnmount) {
-        this.setState({
-          aqlSeries: this._filterFirst7(this._getSeries(aqls, 'category'))
-        });
-      }
-    });
+    // is headerNavs exists, user is already log in
+    if (store.getState().session.headerNavs) {
+      this._isUnmount = false;
+      ExplorerActions.loadViews((views)=> {
+        if (!this._isUnmount) {
+          this.setState({
+            viewSeries: this._filterFirst7(this._getSeries(views, 'category'))
+          });
+        }
+      });
+      AQLActions.loadAQLs((aqls)=> {
+        if (!this._isUnmount) {
+          this.setState({
+            aqlSeries: this._filterFirst7(this._getSeries(aqls, 'category'))
+          });
+        }
+      });
 
-    if (this._isUCMDBAdpaterSupported()) {
-      UCMDBAdapterActions.getIntegrationPoint((points) => {
-        if (points.length > 0) {
-          let count = 1;
-          points.map((point) => {
-            if (point.populationSupported) {
-              UCMDBAdapterActions.getIntegrationJob(point.name, 'populationJobs', (popJobs) => {
-                if (point.pushSupported) {
-                  UCMDBAdapterActions.getIntegrationJob(point.name, 'pushJobs', (pushJobs) => {
+      if (this._isUCMDBAdpaterSupported()) {
+        UCMDBAdapterActions.getIntegrationPoint((points) => {
+          if (points.length > 0) {
+            let count = 1;
+            points.map((point) => {
+              if (point.populationSupported) {
+                UCMDBAdapterActions.getIntegrationJob(point.name, 'populationJobs', (popJobs) => {
+                  if (point.pushSupported) {
+                    UCMDBAdapterActions.getIntegrationJob(point.name, 'pushJobs', (pushJobs) => {
+                      if (!this._isUnmount) {
+                        this.setState({
+                          ucmdbAdapter: {
+                            ready: count++ === points.length,
+                            pushJobs: this.state.ucmdbAdapter.pushJobs.concat(pushJobs),
+                            popJobs: this.state.ucmdbAdapter.popJobs.concat(popJobs)
+                          }
+                        });
+                      }
+                    });
+                  } else {
                     if (!this._isUnmount) {
                       this.setState({
                         ucmdbAdapter: {
                           ready: count++ === points.length,
-                          pushJobs: this.state.ucmdbAdapter.pushJobs.concat(pushJobs),
+                          pushJobs: this.state.ucmdbAdapter.pushJobs,
                           popJobs: this.state.ucmdbAdapter.popJobs.concat(popJobs)
                         }
                       });
                     }
-                  });
-                } else {
+                  }
+                });
+              } else if (point.pushSupported) {
+                UCMDBAdapterActions.getIntegrationJob(point.name, 'pushJobs', (pushJobs) => {
                   if (!this._isUnmount) {
                     this.setState({
                       ucmdbAdapter: {
                         ready: count++ === points.length,
-                        pushJobs: this.state.ucmdbAdapter.pushJobs,
-                        popJobs: this.state.ucmdbAdapter.popJobs.concat(popJobs)
+                        pushJobs: this.state.ucmdbAdapter.pushJobs.concat(pushJobs),
+                        popJobs: this.state.ucmdbAdapter.popJobs
                       }
                     });
                   }
-                }
-              });
-            } else if (point.pushSupported) {
-              UCMDBAdapterActions.getIntegrationJob(point.name, 'pushJobs', (pushJobs) => {
-                if (!this._isUnmount) {
-                  this.setState({
-                    ucmdbAdapter: {
-                      ready: count++ === points.length,
-                      pushJobs: this.state.ucmdbAdapter.pushJobs.concat(pushJobs),
-                      popJobs: this.state.ucmdbAdapter.popJobs
-                    }
-                  });
-                }
-              });
-            }
-          });
-        }
-      });
+                });
+              }
+            });
+          }
+        });
+      }
     }
   }
 

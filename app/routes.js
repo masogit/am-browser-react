@@ -52,6 +52,7 @@ module.exports = function (app) {
     req.session.destroy();
     res.clearCookie('connect.sid');
     res.clearCookie('csrf-token');
+    res.clearCookie('headerNavs');
     res.clearCookie('user');
     res.json(am_rest);
   });
@@ -60,17 +61,12 @@ module.exports = function (app) {
     var session = req.session;
     if (!session || !session.user) {
       res.clearCookie('csrf-token');
+      res.clearCookie('headerNavs');
       res.clearCookie('user');
       res.redirect(401, '/am/login');
     } else {
       next(); // Call the next middleware
     }
-  });
-
-
-  app.get('/am/config', function (req, res) {
-    const headerNavs = rest.getHeadNav(req.session.isAdmin);
-    res.json(headerNavs);
   });
 
   // CRUD Tingodb

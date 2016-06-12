@@ -17,7 +17,7 @@ import {IntlProvider} from 'react-intl';
 
 import store from './store';
 import history from './RouteHistory';
-import {init, routeChanged, getConfig, getConfigSuccess} from './actions';
+import {init, routeChanged} from './actions';
 import {ReduxRouter} from 'redux-router';
 
 // The port number needs to align with devServerProxy and websocketHost in gulpfile.js
@@ -67,9 +67,12 @@ var localeData = getLocaleData(messages, locale);
 
 import cookies from 'js-cookie';
 
-store.dispatch(init(cookies.get('user'), cookies.get('csrf-token')));
+if (cookies.get('headerNavs')) {
+  store.dispatch(init(cookies.get('user'), cookies.get('headerNavs')));
+}
 
 const renderPage = () => {
+  Routes.routes[0].childRoutes = getRoutes(store.getState().session.headerNavs);
   document.body.classList.remove('loading');
   if (process.env.NODE_ENV === 'production') {
     ReactDOM.render((
@@ -97,13 +100,7 @@ const renderPage = () => {
   }
 };
 
-getConfig().then(
-  (headerNavs) => {
-    Routes.routes[0].childRoutes = getRoutes(headerNavs);
-    store.dispatch(getConfigSuccess(headerNavs));
-    renderPage();
-  }
-);
+renderPage();
 
 // simulate initial login
 //store.dispatch(loginSuccess('nobody@grommet.io', 'simulated'));
@@ -115,12 +112,10 @@ const sessionWatcher = () => {
   const {route, session} = store.getState();
 
   if (route) {
-    if (session.token) {
-      if (session.headerNavs) {
-        Routes.routes[0].childRoutes = getRoutes(session.headerNavs);
-        if (route.pathname === '/login') {
-          history.pushState(null, Routes.path(postLoginPath));
-        }
+    if (session.headerNavs) {
+      Routes.routes[0].childRoutes = getRoutes(session.headerNavs);
+      if (route.pathname === '/login') {
+        history.pushState(null, Routes.path(postLoginPath));
       }
     } else {
       Routes.routes[0].childRoutes = getRoutes(null);

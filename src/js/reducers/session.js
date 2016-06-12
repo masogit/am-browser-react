@@ -1,21 +1,18 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import { INIT, INIT_TOKEN, LOGIN, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT, GET_SETTINGS_SUCCESS } from '../actions';
+import { INIT, LOGIN, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT, GET_SETTINGS_SUCCESS } from '../actions';
 
 const initialState = {
   email: null,
-  token: null,
   error: null,
   headerNavs: null
 };
 
 const handlers = {
-  [INIT]: (_, action) => ({email: action.email, token: action.token, headerNavs: action.headerNavs}),
-  [INIT_TOKEN]: (_, action) => ({token: action.token}),
+  [INIT]: (_, action) => ({email: action.email, headerNavs: action.headerNavs}),
   [LOGIN]: (_, action) => ({email: action.email, error: null}),
   [LOGIN_SUCCESS]: (_, action) => ({
     email: action.email,
-    token: action.token,
     error: null,
     headerNavs: action.headerNavs
   }),
