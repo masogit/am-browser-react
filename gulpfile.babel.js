@@ -184,14 +184,14 @@ gulp.task('clean-gen', function () {
 gulp.task('copy-temp', ['dist', 'clean-gen'], function () {
   console.log('Copy all neccessary files into the gen temp folder');
   // copy node installation folder and cmd to gen temp
-  var unzip_node = gulp.src('./build/node-v4.4.4-x64.zip', {base : '.'})
+  var unzip_node = gulp.src('./build/node/node-v4.4.4-x64.zip', {base : '.'})
       .pipe(unzip())
-      .pipe(gulp.dest('./gen/temp'));
+      .pipe(gulp.dest('./gen/temp/node'));
   // copy nssm for register service
-  var unzip_node = gulp.src('./build/nssm-2.24.zip', {base : '.'})
+  var unzip_node = gulp.src('./build/node/nssm-2.24.zip', {base : '.'})
       .pipe(unzip())
-      .pipe(gulp.dest('./gen/temp'));
-  var copy_cmd = gulp.src('./build/*.cmd')
+      .pipe(gulp.dest('./gen/temp/node'));
+  var copy_cmd = gulp.src('./build/*.bat')
       .pipe(gulp.dest('./gen/temp'));
   // copy files to gen temp
   var copy_file = gulp.src(['./app/**', './db/**', './dist/**', './node_modules/**', './ssl/**', './am-browser-config.properties'], {base : '.'})
