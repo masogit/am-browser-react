@@ -203,24 +203,25 @@ gulp.task('copy-temp', ['dist', 'clean-gen'], function () {
 
 gulp.task('gen', ['copy-temp'], function () {
   console.log('Generate am-browser.zip from temp folder');
-  var timestamp = Math.floor(new Date().getTime()/1000);
-  var name = 'am-browser' + '-' + version.number + '-' + timestamp + '.zip';
+  //var timestamp = Math.floor(new Date().getTime()/1000);
+  var name = 'am-browser' + '-' + version.number + '-' + dateformat(new Date(), 'yyyymmddHHMM') + '.zip';
   // generate am-browser.zip from temp folder
   return gulp.src('./gen/temp/**')
       .pipe(zip(name))
       .pipe(gulp.dest('./gen'));
 });
 
-gulp.task('download-ws-metadata-xml', function () {
-  console.log('Download ws metadata xml');
+gulp.task('clean-download-ws', function () {
+  console.log('Clean download ws folder');
+  // clean download folder
+  return gulp.src('./rest/downloads').pipe(clean({force: true}));
+});
+
+gulp.task('download-metadata-xml', ['clean-download-ws'], function () {
+  console.log('Download ws/binary metadata xml');
   // download ws metadata xml
   var download_ws_metadata = download(config.Nexus + 'com/hp/am/java/ac.ws/MAIN-SNAPSHOT/maven-metadata.xml')
 	  .pipe(gulp.dest('./rest/downloads/ws'));
-  return download_ws_metadata;
-});
-
-gulp.task('download-binary-metadata-xml', function () {
-  console.log('Download binary metadata xml');
   // download x64 binary metadata xml
   var download_x64_metadata = download(config.Nexus + 'com/hp/am/cpp/binary/MAIN-SNAPSHOT/maven-metadata.xml')
 	  .pipe(gulp.dest('./rest/downloads/x64'));
@@ -233,21 +234,16 @@ gulp.task('download-binary-metadata-xml', function () {
   // download libcurl metadata xml
   var download_libcurl_metadata = download(config.Nexus3rd + 'com/hp/am/3rd/libcurl/maven-metadata.xml')
 	  .pipe(gulp.dest('./rest/downloads/libcurl'));
-  return merge(download_x64_metadata, download_openssl_metadata, download_openldap_metadata, download_libcurl_metadata);
+  return merge(download_ws_metadata, download_x64_metadata, download_openssl_metadata, download_openldap_metadata, download_libcurl_metadata);
 });
 
-gulp.task('parse-ws-metadata-xml', ['download-ws-metadata-xml'], function () {
-  console.log('Parse ws metadata xml to json');
+gulp.task('parse-metadata-xml', ['download-metadata-xml'], function () {
+  console.log('Parse ws/binary metadata xml to json');
   // parse ws metadata xml
   var parse_ws = gulp.src('./rest/downloads/ws/maven-metadata.xml')
       .pipe(xml2json())
 	  .pipe(rename({extname: '.json'}))
 	  .pipe(gulp.dest('./rest/downloads/ws/json'));
-  return parse_ws;
-});
-
-gulp.task('parse-binary-metadata-xml', ['download-binary-metadata-xml'], function () {
-  console.log('Parse binary metadata xml to json');
   // parse x64 binary metadata xml
   var parse_x64 = gulp.src('./rest/downloads/x64/maven-metadata.xml')
       .pipe(xml2json())
@@ -268,10 +264,10 @@ gulp.task('parse-binary-metadata-xml', ['download-binary-metadata-xml'], functio
       .pipe(xml2json())
 	  .pipe(rename({extname: '.json'}))
 	  .pipe(gulp.dest('./rest/downloads/libcurl/json'));
-  return merge(parse_x64, parse_openssl, parse_openldap, parse_libcurl);
+  return merge(parse_ws, parse_x64, parse_openssl, parse_openldap, parse_libcurl);
 });
 
-gulp.task('download-ws', ['parse-ws-metadata-xml', 'parse-binary-metadata-xml'], function () {
+gulp.task('download-ws', ['parse-metadata-xml'], function () {
   console.log('Download ws and x64 binary');
   var ws_json = require('./rest/downloads/ws/json/maven-metadata.json');
   var ws_url = config.Nexus + 'com/hp/am/java/ac.ws/MAIN-SNAPSHOT/ac.ws-MAIN-'
@@ -320,13 +316,13 @@ gulp.task('download-ws', ['parse-ws-metadata-xml', 'parse-binary-metadata-xml'],
 gulp.task('clean-gen-ws', function () {
   console.log('Clean gen ws folder');
   // clean gen folder
-  return gulp.src(['./rest/downloads', './rest/gen']).pipe(clean({force: true}));
+  return gulp.src('./rest/gen').pipe(clean({force: true}));
 });
 
 gulp.task('gen-ws-base', ['clean-gen-ws', 'download-ws'], function () {
   console.log('Generate ws package');
   // copy folder and files
-  var copy_properties= gulp.src('./rest/conf/package.properties')
+  var copy_properties= gulp.src('./rest/conf/package.properties.default')
       .pipe(gulp.dest('./rest/gen/temp/websvc'));
   var copy_bat = gulp.src('./rest/bin/*.bat')
       .pipe(gulp.dest('./rest/gen/temp/bin'));

@@ -10,6 +10,7 @@
   </description>
 
   <property file="${env.properties.file}" prefix="PRI" />
+  <property file="../websvc/package.properties.default" prefix="PRI" />
 
   <!-- the following properties are only specified here as defaults.
        They are typically overridden during the build, or ant.tasks.dir
