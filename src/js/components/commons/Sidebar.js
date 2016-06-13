@@ -14,9 +14,9 @@ export default ({title, toolbar, contents, focus}) => {
       <GroupList pad={{vertical: 'small'}} selectable={true} searchable={true} focus={focus}>
         {
           contents.map((listItem, index) => (
-            <GroupListItem key={listItem.key || index} {...listItem}>
+            <GroupListItem key={listItem.key || index} {...listItem} responsive={false}>
               <EmptyIcon />
-              <Box justify='between' direction="row" full='horizontal' pad='none'>
+              <Box justify='between' direction="row" full='horizontal' pad='none' responsive={false}>
                 {listItem.child}
                 {listItem.icon}
               </Box>

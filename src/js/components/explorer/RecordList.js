@@ -12,7 +12,6 @@ import Close from 'grommet/components/icons/base/Close';
 import Ascend from 'grommet/components/icons/base/Ascend';
 import Descend from 'grommet/components/icons/base/Descend';
 import Download from 'grommet/components/icons/base/Download';
-import Down from 'grommet/components/icons/base/Down';
 import * as ExplorerActions from '../../actions/explorer';
 import * as AQLActions from '../../actions/aql';
 import Graph from '../commons/Graph';
@@ -263,31 +262,28 @@ export default class RecordList extends Component {
     return (
       <Header justify="between">
         <Title>{this.props.title}</Title>
-        <Box direction="column">
-          <Box direction="row" style={{fontSize: '70%', fontWeight: 'bold'}}>
-            { this.state.loading && <Spinning /> }
-            {
-              !this.state.loading ?
-                ((this.state.filtered) ? this.state.filtered.length : this.state.records.length) : null
-            }
-            /{this.state.numTotal}
-          </Box>
-          <Box style={{fontSize: '50%'}}>
-            { this.state.loading ? '----' : `${this.state.timeQuery}ms` }
-          </Box>
-        </Box>
-        {
-          this.state.numTotal > this.state.records.length &&
-          <Anchor href="#" label="More..." onClick={this._getMoreRecords.bind(this)}/>
-        }
         <input type="text" inline={true} className="flex" ref="search" style={this.state.aqlInput?aqlStyle:{}}
                placeholder={this.state.aqlInput?'Input AQL...':'Quick search'}
                onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
-        <Menu inline={true} responsive={true} icon={<Down />} direction="row" align="center">
+        <Box direction="column">
+          <Box direction="row" style={{fontSize: '70%', fontWeight: 'bold'}}>
+            {this.state.loading && <Spinning />}
+            {
+              !this.state.loading ?
+              ((this.state.filtered) ? this.state.filtered.length : this.state.records.length) + '/' + this.state.numTotal : null
+            }
+          </Box>
+          <Box style={{fontSize: '50%'}}>
+            {this.state.loading ? '----' : `${this.state.timeQuery}ms`}
+          </Box>
+        </Box>
+        <Menu closeOnClick={false} responsive={true} direction="row" align="center">
+          <Anchor href="#" label="More..." onClick={this._getMoreRecords.bind(this)}
+                  disabled={this.state.numTotal > this.state.records.length ? false : true}/>
           <CheckBox id="checkbox_aql" label="AQL" checked={this.state.aqlInput}
-                    onChange={this._toggleAQLInput.bind(this)} toggle={true}/>
+                    onChange={this._toggleAQLInput.bind(this)}/>
           <CheckBox id="checkbox_fields" label="Full" checked={this.state.allFields}
-                    onChange={this._toggleAllFields.bind(this)} toggle={true}/>
+                    onChange={this._toggleAllFields.bind(this)}/>
           <Anchor href="#" icon={<Download />} label="CSV" onClick={this._download.bind(this)}/>
         </Menu>
         <form name="Download" ref="downloadForm"

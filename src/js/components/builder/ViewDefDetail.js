@@ -274,7 +274,7 @@ export default class ViewDefDetail extends Component {
       <Box pad={{horizontal: 'medium'}} flex={true}>
         <Header justify="between" size="small">
           <Title>View Builder</Title>
-          <Menu direction="row" align="center" responsive={false} pad={{horizontal: 'small'}}>
+          <Menu direction="row" align="center" responsive={true}>
             <Anchor link="#" icon={<Play />} onClick={this.props.openPreview}>Query</Anchor>
             <Anchor link="#" icon={<Checkmark />} onClick={this.props.onSubmit}>Save</Anchor>
             <Anchor link="#" icon={<Close />} onClick={this.props.deleteViewDef}>Delete</Anchor>

@@ -92,7 +92,7 @@ export default class GroupList extends Component {
             return (
               <Box key={i} direction="column" flex={false}>
                 <List>
-                  <ListItem {...this.props} justify="between" direction="row" separator="none"
+                  <ListItem {...this.props} justify="between" direction="row" separator="none" responsive={false}
                                             onClick={this._expandToggle.bind(this, key)}>
                     <Anchor href="#" label={key} icon={(expand===key)?<Down />:<Next />}/>
                     {grouped[key].length}

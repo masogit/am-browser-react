@@ -261,7 +261,8 @@ export default class Insight extends Component {
     } else if (this.state.edit) {
       child = (
         <Box direction="row" justify="center" pad="large">
-          <Anchor href="#" icon={<Attachment />} label="Attach a Graph" onClick={this._selectAQL.bind(this, box, parent)}/>
+          <Anchor href="#" icon={<Attachment />} label="Attach a Graph"
+                  onClick={this._selectAQL.bind(this, box, parent)}/>
         </Box>
       );
     }
@@ -398,38 +399,40 @@ export default class Insight extends Component {
     var data = this.state.data;
     return (
       <Box pad="medium" full="horizontal">
+        <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
+          <Title>AM Insight</Title>
+          {
+            !this.props.params.id &&
+            <Menu direction="row" align="center" responsive={true}>
+              <CheckBox id="carousel" label="Carousel" checked={this.state.carousel}
+                        onChange={this._toggleCarousel.bind(this)}/>
+              <CheckBox id="dashboard" label="Dashboard" checked={!this.state.carousel}
+                        onChange={this._toggleCarousel.bind(this)}/>
+              {
+                this.state.edit &&
+                <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>
+              }
+              {
+                !this.state.edit &&
+                <Anchor href="#" icon={<DocumentPdf />} label="Print" onClick={this._onPrint.bind(this)}/>
+              }
+              <CheckBox id="edit" label="Edit" checked={this.state.edit} onChange={this._toggleEdit.bind(this)}
+                        toggle={true}/>
+            </Menu>
+          }
+          {
+            this.props.params.id && <Anchor label="Back" onClick={() => {
+              history.go(-1);
+            }}/>
+          }
+        </Header>
         {
-          !this.props.params.id &&
-          <Box>
-            <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
-              <Title>AM Insight</Title>
-              <Menu direction="row" align="center" responsive={false}>
-                <CheckBox id="carousel" label="Carousel" checked={this.state.carousel}
-                          onChange={this._toggleCarousel.bind(this)}/>
-                <CheckBox id="dashboard" label="Dashboard" checked={!this.state.carousel}
-                          onChange={this._toggleCarousel.bind(this)}/>
-                {
-                  this.state.edit &&
-                  <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>
-                }
-                {
-                  !this.state.edit &&
-                  <Anchor href="#" icon={<DocumentPdf />} label="Print" onClick={this._onPrint.bind(this)}/>
-                }
-                <CheckBox id="edit" label="Edit" checked={this.state.edit} onChange={this._toggleEdit.bind(this)}
-                          toggle={true}/>
-              </Menu>
-            </Header>
-            {
-              this.state.carousel && !this.state.edit &&
-              this._buildCarousel(data)}
-            {
-              (!this.state.carousel || this.state.edit) &&
-              this._buildBox(box, box)
-            }
-          </Box>
+          this.state.carousel && !this.state.edit && !this.props.params.id &&
+          this._buildCarousel(data)}
+        {
+          (!this.state.carousel || this.state.edit) && !this.props.params.id &&
+          this._buildBox(box, box)
         }
-
         {
           this.props.params.id && this.state.data && this.state.data[this.props.params.id] &&
           this._renderSingleAQL(this.state.data[this.props.params.id])

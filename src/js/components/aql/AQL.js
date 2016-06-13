@@ -372,7 +372,7 @@ export default class AQL extends Component {
           {this.state.alertLayer}
           <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
             <Title>AQL and Graph</Title>
-            <Menu direction="row" align="center" responsive={false}>
+            <Menu direction="row" align="center" responsive={true}>
               <Anchor link="#" icon={<Play />} onClick={this._onQuery.bind(this)}>Query</Anchor>
               <Anchor link="#" icon={<Add />} onClick={this._onNew.bind(this)}>New</Anchor>
               <Anchor link="#" icon={<Checkmark />} onClick={this._onSaveAQL.bind(this)}>Save</Anchor>

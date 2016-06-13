@@ -3,7 +3,6 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router';
 import Header from 'grommet/components/Header';
-import Box from 'grommet/components/Box';
 import Title from 'grommet/components/Title';
 import Logo from './Logo'; // './HPELogo';
 import Menu from 'grommet/components/Menu';
@@ -40,17 +39,16 @@ class NavHeader extends Component {
     }
 
     return (
-      <Header fixed={true} size="small">
-        <Box full="horizontal" direction="row" justify="between" colorIndex="neutral-1" pad={{vertical: 'small'}}>
-          <Title><Logo /> AM Browser</Title>
-          <Menu direction="row" align="center" responsive={false}>
-            {
-              links.map((link, index) => <Link key={index} to={link.to}
-                                               activeClassName="active link-disabled">{link.text}</Link>)
-            }
-            <SessionMenu />
-          </Menu>
-        </Box>
+      <Header fixed={true} size="small" full="horizontal" direction="row" justify="between" colorIndex="neutral-1"
+              pad={{vertical: 'small'}} responsive={false}>
+        <Title><Logo /> AM Browser</Title>
+        <Menu direction="row" align="center" responsive={true}>
+          {
+            links.map((link, index) => <Link key={index} to={link.to}
+                                             activeClassName="active link-disabled">{link.text}</Link>)
+          }
+          <SessionMenu />
+        </Menu>
       </Header>
     );
   }
