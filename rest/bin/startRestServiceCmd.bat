@@ -58,6 +58,7 @@ goto okJavaHome
 :gotJreHome
 if not exist "%JRE_HOME%\bin\java.exe" goto noJavaHome
 if not exist "%JRE_HOME%\bin\javaw.exe" goto noJavaHome
+set "JAVAEXE=%JRE_HOME%\bin\java.exe"
 goto okJavaHome
 :gotJdkHome
 if not exist "%JAVA_HOME%\jre\bin\java.exe" goto noJavaHome
@@ -65,6 +66,7 @@ if not exist "%JAVA_HOME%\jre\bin\javaw.exe" goto noJavaHome
 if not exist "%JAVA_HOME%\bin\javac.exe" goto noJavaHome
 if not "%JRE_HOME%" == "" goto okJavaHome
 set "JRE_HOME=%JAVA_HOME%\jre"
+set "JAVAEXE=%JAVA_HOME%\bin\java.exe"
 goto okJavaHome
 :noJavaHome
 echo The JAVA_HOME environment variable is not defined correctly
@@ -72,7 +74,7 @@ echo This environment variable is needed to run this program
 echo NB: JAVA_HOME should point to a JDK not a JRE
 goto end
 :okJavaHome
-java -d64 -version >nul 2>&1
+%JAVAEXE% -d64 -version >nul 2>&1
 if not errorlevel 1 goto okJava64Home
 echo Java is not 64 bit
 goto end

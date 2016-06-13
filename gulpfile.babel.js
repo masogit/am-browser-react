@@ -17,6 +17,8 @@ import download from 'gulp-download';
 import xml2json from 'gulp-xml2json';
 import rename from 'gulp-rename';
 import webpack from 'webpack';
+import dateformat from 'dateformat';
+import version from './version.json';
 import config from './rest/conf/config.json';
 
 const opts = {
@@ -201,9 +203,11 @@ gulp.task('copy-temp', ['dist', 'clean-gen'], function () {
 
 gulp.task('gen', ['copy-temp'], function () {
   console.log('Generate am-browser.zip from temp folder');
+  var timestamp = Math.floor(new Date().getTime()/1000);
+  var name = 'am-browser' + '-' + version.number + '-' + timestamp + '.zip';
   // generate am-browser.zip from temp folder
   return gulp.src('./gen/temp/**')
-      .pipe(zip('am-browser.zip'))
+      .pipe(zip(name))
       .pipe(gulp.dest('./gen'));
 });
 
@@ -316,7 +320,7 @@ gulp.task('download-ws', ['parse-ws-metadata-xml', 'parse-binary-metadata-xml'],
 gulp.task('clean-gen-ws', function () {
   console.log('Clean gen ws folder');
   // clean gen folder
-  return gulp.src('./rest/gen').pipe(clean({force: true}));
+  return gulp.src(['./rest/downloads', './rest/gen']).pipe(clean({force: true}));
 });
 
 gulp.task('gen-ws-base', ['clean-gen-ws', 'download-ws'], function () {
@@ -377,8 +381,10 @@ gulp.task('gen-ws-conf', ['gen-ws-base'], function () {
 gulp.task('gen-ws', ['gen-ws-conf'], function () {
   console.log('Generate am-browser-rest.zip from temp folder');
   // generate am-browser-rest.zip from temp folder
+  //var timestamp = Math.floor(new Date().getTime()/1000);
+  var name = 'am-browser-rest' + '-' + version.number + '-' + dateformat(new Date(), 'yyyymmddHHMM') + '.zip';
   return gulp.src('./rest/gen/temp/**')
-      .pipe(zip('am-browser-rest.zip'))
+      .pipe(zip(name))
       .pipe(gulp.dest('./rest/gen'));
 });
 
