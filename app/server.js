@@ -21,6 +21,9 @@ var server = process.env.AMB_NODE_SERVER || properties.get('node.server');
 var port = process.env.AMB_NODE_PORT || properties.get('node.port'); 				// set the port
 var https_port = process.env.AMB_REST_HTTPS_PORT || properties.get('node.https_port');     // set the https port
 
+var isDebug = process.env.AMB_NODE_DEBUG || properties.get('node.is_debug');
+var enable_csrf = process.env.AMB_NODE_CSRF || properties.get('node.enable_csrf');
+
 app.use(compression());
 app.use(express.static(__dirname + '/public')); 		// set the static files location /public/img will be /img for users
 app.use(morgan('dev')); // log every request to the console
@@ -29,10 +32,21 @@ app.use(bodyParser.json()); // parse application/json
 app.use(bodyParser.json({type: 'application/vnd.api+json'})); // parse application/vnd.api+json as json
 app.use(methodOverride('X-HTTP-Method-Override')); // override with the X-HTTP-Method-Override header in the request
 app.use(session({secret: credentials.cookieSecret}));
-app.use(cors({origin: true, exposedHeaders:  '_csrf', credentials: true}));
-app.use('/', express.static(path.join(__dirname, '/../dist')));
+if (isDebug) {
+  app.use(cors({origin: true, credentials: true}));
+} else {
+  app.use(cors());
+}
 
-app.use(csrf());
+if (enable_csrf) {
+  app.use(csrf());
+  app.use(function (req, res, next) {
+    res.cookie('csrf-token', req.csrfToken());
+    next();
+  });
+}
+
+app.use('/', express.static(path.join(__dirname, '/../dist')));
 
 var indexHtml = function (req, res) {
   res.sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));
@@ -53,6 +67,12 @@ app.get('/ucmdbAdapter/*/*', indexHtml);
 
 // routes ======================================================================
 require('./routes.js')(app);
+
+app.use(function(err, req, res, next){
+  console.error(err.stack);
+  res.cookie('csrf-token', req.csrfToken());
+  next(err);
+});
 
 // listen (start app with node server.js) ======================================
 app.listen(port, server);

@@ -66,17 +66,15 @@ export function init(email, headerString) {
   }
 }
 
-export function initLogin() {
-  return function (dispatch) {
-    Rest.get(HOST_NAME + '/am/csrf').end((err, res) => {
-      if (err) {
-        dispatch({type: '', message: 'Init CSRF Failed.'});
-        throw err;
-      } else if (res.ok && res.body) {
-        dispatch({type: '', message: res.body._csrf});
-      }
-    });
-  };
+export function initToken() {
+  return Rest.get(HOST_NAME + '/am/csrf').end((err, res) => {
+    if (err || !res.ok) {
+      console.log('Get CSRF failed');
+      throw err;
+    } else {
+      console.log('CSRF: ' + cookies.get('csrf-token'));
+    }
+  });
 }
 
 export function login(username, password) {

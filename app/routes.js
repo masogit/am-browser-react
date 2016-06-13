@@ -2,6 +2,7 @@ var util = require('util');
 var db = require('./db.js');
 var logger = require('./logger.js');
 var REST = require('./rest.js');
+var sessionUtil = require('./sessionUtil.js');
 
 module.exports = function (app) {
   // init variables from properties
@@ -14,6 +15,7 @@ module.exports = function (app) {
   var rest_password = process.env.AMB_REST_PASSWORD || properties.getRaw('rest.password');
   var ucmdb_server = process.env.UCMDB_SERVER || properties.get('ucmdb.server');
   var ucmdb_port = process.env.UCMDB_PORT || properties.get('ucmdb.port');
+  var session_max_age = process.env.AMB_SESSION_MAX_AGE || properties.get('node.session_max_age');
   var ucmdb_param = properties.get('ucmdb.param');
   var base = properties.get('rest.base');
   var db_folder = properties.get('db.folder');
@@ -31,7 +33,8 @@ module.exports = function (app) {
   var rest = new REST({
     user: rest_username,
     password: rest_password,
-    server: rest_server + ":" + rest_port
+    server: rest_server + ":" + rest_port,
+    session_max_age: session_max_age
   });
 
   apiProxy.on('error', function (e) {
@@ -53,18 +56,19 @@ module.exports = function (app) {
     res.clearCookie('connect.sid');
     res.clearCookie('csrf-token');
     res.clearCookie('headerNavs');
-    res.clearCookie('user');
     res.json(am_rest);
   });
 
-  app.get("/*", function (req, res, next) {
+  app.all("/*", function (req, res, next) {
     var session = req.session;
     if (!session || !session.user) {
-      res.clearCookie('csrf-token');
+      res.cookie('csrf-token', req.csrfToken());
       res.clearCookie('headerNavs');
-      res.clearCookie('user');
-      res.redirect(401, '/am/login');
+      res.sendStatus(401);
     } else {
+      req.session.expires = new Date(Date.now() + session_max_age);
+      sessionUtil.touch(req.session, session_max_age);
+
       next(); // Call the next middleware
     }
   });

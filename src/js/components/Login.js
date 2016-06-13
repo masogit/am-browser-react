@@ -2,7 +2,7 @@
 
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { initLogin, login } from '../actions';
+import { login } from '../actions';
 import Split from 'grommet/components/Split';
 import Section from 'grommet/components/Section';
 import Sidebar from 'grommet/components/Sidebar';
@@ -16,10 +16,6 @@ class IndexerLogin extends Component {
     this._onSubmit = this._onSubmit.bind(this);
     this._onResponsive = this._onResponsive.bind(this);
     this.state = {responsive: 'multiple'};
-  }
-
-  componentDidMount() {
-    this.props.dispatch(initLogin());
   }
 
   _onResponsive(responsive) {

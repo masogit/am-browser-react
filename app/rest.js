@@ -1,6 +1,7 @@
 var Client = require('node-rest-client').Client;
 var client = new Client();
 var Convertor = require('json-2-csv');
+var sessionUtil = require('./sessionUtil.js');
 
 module.exports = function (am) {
 
@@ -90,8 +91,10 @@ module.exports = function (am) {
       if (!data.entities || data.count === 0) {
         res.send('user name or password is wrong');
       } else {
+        req.session.expires = new Date(Date.now() + am.session_max_age);
+        sessionUtil.touch(req.session, am.session_max_age);
+
         var am_rest = {};
-        res.cookie('user', username);
         res.cookie('csrf-token', req.csrfToken());
         req.session.user = username;
         req.session.password = password;

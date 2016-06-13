@@ -4,6 +4,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var isDebug = true;
+
 var cookies = require('js-cookie');
 
 var _superagent = require('superagent');
@@ -26,6 +28,8 @@ Promise.config({
   cancellation: true
 });
 
+const store = require('../store');
+const {init} = require('../actions');
 /**
  *
  * Add promise support for grommet REST.
@@ -41,7 +45,8 @@ Request.prototype.promise = function () {
   return new Promise(function (resolve, reject, onCancel) {
     req.end(function (err, res) {
       // global error message
-      if (err && err.status == 400) {
+      if (err && (err.status == 401 || err.status == 403)) {
+        store.default.dispatch(init('', ''));
         store.default.dispatch({type: Types.RECEIVE_ERROR, msg: err.response.text});
       }
       if (typeof res !== "undefined" && res.status > 400) {
@@ -75,11 +80,6 @@ Request.prototype.then = function () {
   var promise = this.promise();
   return promise.then.apply(promise, arguments);
 };
-
-
-// TODO Change the session, if session changed, the view will be refresh(index.js)
-const store = require('../store');
-// const {init} = require('../actions');
 
 // convert params to string, to deal with array values
 function buildQueryParams(params) {
@@ -118,7 +118,11 @@ exports.default = {
     return op;
   },
   get: function get(uri, params) {
-    var op = _superagent2.default.get(uri).withCredentials().query(buildQueryParams(params));
+    var op = _superagent2.default.get(uri);
+    if (isDebug) {
+      op.withCredentials();
+    }
+    op.query(buildQueryParams(params));
     op.timeout(_timeout);
     op.set(_headers);
     return op;
@@ -126,7 +130,11 @@ exports.default = {
   patch: function patch(uri, data) {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
-    var op = _superagent2.default.patch(uri).withCredentials().send(data);
+    var op = _superagent2.default.patch(uri);
+    if (isDebug) {
+      op.withCredentials();
+    }
+    op.send(data);
     op.timeout(_timeout);
     op.set(_headers);
     return op;
@@ -134,7 +142,11 @@ exports.default = {
   post: function post(uri, data) {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
-    var op = _superagent2.default.post(uri).withCredentials().send(data);
+    var op = _superagent2.default.post(uri);
+    if (isDebug) {
+      op.withCredentials();
+    }
+    op.send(data);
     op.timeout(_timeout);
     op.set(_headers);
     return op;
@@ -142,7 +154,11 @@ exports.default = {
   put: function put(uri, data) {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
-    var op = _superagent2.default.put(uri).withCredentials().send(data);
+    var op = _superagent2.default.put(uri);
+    if (isDebug) {
+      op.withCredentials();
+    }
+    op.send(data);
     op.timeout(_timeout);
     op.set(_headers);
     return op;
@@ -150,7 +166,10 @@ exports.default = {
   del: function del(uri) {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
-    var op = _superagent2.default.del(uri).withCredentials();
+    var op = _superagent2.default.del(uri);
+    if (isDebug) {
+      op.withCredentials();
+    }
     op.timeout(_timeout);
     op.set(_headers);
     return op;
