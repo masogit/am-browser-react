@@ -71,7 +71,7 @@ export default class Explorer extends Component {
     } else {
       content = (
         <Box pad={{horizontal: 'medium'}} flex={true} justify='center' align="center">
-          <Box size="large" colorIndex="light-2" pad={{horizontal: 'large', vertical: 'medium'}}>
+          <Box size="medium" colorIndex="light-2" pad={{horizontal: 'large', vertical: 'medium'}} align='center'>
             Select an item to query.
           </Box>
         </Box>

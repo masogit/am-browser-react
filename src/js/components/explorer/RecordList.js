@@ -12,6 +12,7 @@ import Close from 'grommet/components/icons/base/Close';
 import Ascend from 'grommet/components/icons/base/Ascend';
 import Descend from 'grommet/components/icons/base/Descend';
 import Download from 'grommet/components/icons/base/Download';
+import Down from 'grommet/components/icons/base/Down';
 import * as ExplorerActions from '../../actions/explorer';
 import * as AQLActions from '../../actions/aql';
 import Graph from '../commons/Graph';
@@ -36,6 +37,7 @@ export default class RecordList extends Component {
         filters: []
       },
       aqlInput: false,
+      allFields: false,
       session: null
     };
   }
@@ -196,10 +198,16 @@ export default class RecordList extends Component {
     });
   }
 
+  _toggleAllFields() {
+    this.setState({
+      allFields: !this.state.allFields
+    });
+  }
+
   renderFieldsHeader() {
     return (
       this.props.body.fields.map((field, index) => {
-        return !field.PK && index <= this.state.numColumn &&
+        return !field.PK && (this.state.allFields ? true : (index <= this.state.numColumn)) &&
           <th key={index}>
             <Anchor href="#" reverse={true} icon={this._showOrderByIcon(field.sqlname)}
                     label={Format.getDisplayLabel(field)}
@@ -217,7 +225,7 @@ export default class RecordList extends Component {
           <td>{record.self}</td>
           {
             this.props.body.fields.map((field, tdindex) => {
-              return !field.PK && tdindex <= this.state.numColumn &&
+              return !field.PK && (this.state.allFields ? true : tdindex <= this.state.numColumn) &&
                 <td key={tdindex}>
                   {Format.getFieldStrVal(record, field)}
                 </td>;
@@ -255,16 +263,19 @@ export default class RecordList extends Component {
     return (
       <Header justify="between">
         <Title>{this.props.title}</Title>
-        {
-          this.state.loading &&
-          <Spinning />
-        }
-        {
-          !this.state.loading &&
-          <Box>{(this.state.filtered) ? this.state.filtered.length : this.state.records.length}</Box>
-        }
-        /{this.state.numTotal}
-        {this.state.timeQuery}ms
+        <Box direction="column">
+          <Box direction="row" style={{fontSize: '70%', fontWeight: 'bold'}}>
+            { this.state.loading && <Spinning /> }
+            {
+              !this.state.loading ?
+                ((this.state.filtered) ? this.state.filtered.length : this.state.records.length) : null
+            }
+            /{this.state.numTotal}
+          </Box>
+          <Box style={{fontSize: '50%'}}>
+            { this.state.loading ? '----' : `${this.state.timeQuery}ms` }
+          </Box>
+        </Box>
         {
           this.state.numTotal > this.state.records.length &&
           <Anchor href="#" label="More..." onClick={this._getMoreRecords.bind(this)}/>
@@ -272,10 +283,11 @@ export default class RecordList extends Component {
         <input type="text" inline={true} className="flex" ref="search" style={this.state.aqlInput?aqlStyle:{}}
                placeholder={this.state.aqlInput?'Input AQL...':'Quick search'}
                onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
-        <Menu direction="row" align="center" responsive={false}>
+        <Menu inline={true} responsive={true} icon={<Down />} direction="row" align="center">
           <CheckBox id="checkbox_aql" label="AQL" checked={this.state.aqlInput}
-                    onChange={this._toggleAQLInput.bind(this)}
-                    toggle={true}/>
+                    onChange={this._toggleAQLInput.bind(this)} toggle={true}/>
+          <CheckBox id="checkbox_fields" label="Full" checked={this.state.allFields}
+                    onChange={this._toggleAllFields.bind(this)} toggle={true}/>
           <Anchor href="#" icon={<Download />} label="CSV" onClick={this._download.bind(this)}/>
         </Menu>
         <form name="Download" ref="downloadForm"
@@ -290,21 +302,19 @@ export default class RecordList extends Component {
 
   renderList() {
     return (
-      <Box className='autoScroll'>
-        <Table selectable={true}
-               onMore={(this.state.numTotal > this.state.records.length && !this.state.filtered)?this._getMoreRecords.bind(this):null}>
-          <thead>
-          <tr>
-            <th><Anchor href="#" reverse={true} icon={this._showOrderByIcon('self')} label="Self"
-                        onClick={this._orderBy.bind(this, 'self')}/></th>
-            {this.renderFieldsHeader()}
-          </tr>
-          </thead>
-          <tbody>
-          {this.renderRecords()}
-          </tbody>
-        </Table>
-      </Box>
+      <Table selectable={true} className='autoScroll' scrollable={true}
+             onMore={(this.state.numTotal > this.state.records.length && !this.state.filtered)?this._getMoreRecords.bind(this):null}>
+        <thead>
+        <tr>
+          <th><Anchor href="#" reverse={true} icon={this._showOrderByIcon('self')} label="Self"
+                      onClick={this._orderBy.bind(this, 'self')}/></th>
+          {this.renderFieldsHeader()}
+        </tr>
+        </thead>
+        <tbody>
+        {this.renderRecords()}
+        </tbody>
+      </Table>
     );
   }
 
