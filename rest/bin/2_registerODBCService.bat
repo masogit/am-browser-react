@@ -4,11 +4,11 @@ set ODBCCAD=C:/Windows/System32/odbcad32.exe
 if "x%1x" == "xx" goto displayUsage
 if "x%3x" == "xx" goto registerDefaultODBCService
 set DSN=%1
-%ODBCCONF%1 /A {CONFIGSYSDSN "SQL Server" "DSN=%DSN%|Description=%2|SERVER=%3|Trusted_Connection=no|Database=%4"}
+%ODBCCONF% /A {CONFIGSYSDSN "SQL Server" "DSN=%DSN%|Description=%2|SERVER=%3|Trusted_Connection=no|Database=%4"}
 goto errorCheck
 :registerDefaultODBCService
 set DSN=AMBrowser
-%ODBCCONF%1 /A {CONFIGSYSDSN "SQL Server" "DSN=%DSN%|Description=AMBrowser|SERVER=%1|Trusted_Connection=no|Database=%2"}
+%ODBCCONF% /A {CONFIGSYSDSN "SQL Server" "DSN=%DSN%|Description=AMBrowser|SERVER=%1|Trusted_Connection=no|Database=%2"}
 :errorCheck
 if %ERRORLEVEL% NEQ 0 goto registerODBCServiceManually
 echo register %DSN% ODBC Service succeed
