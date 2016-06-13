@@ -102,6 +102,7 @@ export default class Insight extends Component {
   }
 
   _loadWall(user) {
+    this.setState({data: {}});
     AQLActions.loadWalls((walls) => {
       var walls = walls.filter((wall)=> {
         return wall.user == user;
@@ -252,8 +253,8 @@ export default class Insight extends Component {
             <Header>
               <Anchor label={dataMap.aql.name} onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
             </Header>
-            {<Graph type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
-                    onClick={(filter) => this._showViewRecords(filter, dataMap.aql.view)}/>}
+            <Graph type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
+                   onClick={(filter) => this._showViewRecords(filter, dataMap.aql.view)}/>
           </Box>
         );
       }
@@ -289,8 +290,15 @@ export default class Insight extends Component {
   }
 
   _buildCarousel(data) {
+    // disable animation, so Chart can be rendered correctly
+    setTimeout(()=> {
+      if (this.refs.carousel) {
+        this.refs.carousel.refs.carousel.className = this.refs.carousel.refs.carousel.className.replace('disable_animation', '');
+      }
+    }, 1000);
+
     return (
-      <Carousel>
+      <Carousel ref='carousel' className='disable_animation'>
         {
           Object.keys(data).map((key, index)=> {
             const dataMap = data[key];
@@ -299,13 +307,10 @@ export default class Insight extends Component {
                 <Header>
                   <Anchor label={dataMap.aql.name} onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
                 </Header>
-                {
-                  <Box pad="large" align={(dataMap.aql.type=='meter')?'center':null}
-                       full="horizontal">
-                    <Graph key={dataMap.aql._id} type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
-                           onClick={(filter) => this._showViewRecords(filter, dataMap.aql.view)}/>
-                  </Box>
-                }
+                <Box pad="large" align={(dataMap.aql.type=='meter')?'center':null}>
+                  <Graph key={dataMap.aql._id} type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
+                         onClick={(filter) => this._showViewRecords(filter, dataMap.aql.view)}/>
+                </Box>
               </Box>
             );
           })
@@ -351,13 +356,11 @@ export default class Insight extends Component {
     return (
       <Box pad="large" colorIndex="light-2">
         <Header>{aql.name}</Header>
-        {
-          <Box key={aql._id} pad="large" align={(aql.type=='meter')?'center':null} full="horizontal">
-            <Graph type={aql.type} data={data} config={aql.form}
-                   onClick={(filter) => this._showViewRecords(filter, aql.view)}/>
-          </Box>
-        }
-        <Table>
+        <Box key={aql._id} pad="large" align={(aql.type=='meter')?'center':null} flex={false}>
+          <Graph type={aql.type} data={data} config={aql.form}
+                 onClick={(filter) => this._showViewRecords(filter, aql.view)}/>
+        </Box>
+        <Table className='autoScroll'>
           <thead>
           <tr>{header}</tr>
           </thead>
@@ -369,13 +372,12 @@ export default class Insight extends Component {
     );
   }
 
-
   _onSave() {
     var wall = this.state.wall;
     wall.box = this.state.box;
     AQLActions.saveWall(wall, (data) => {
       if (data)
-        this._loadWall();
+        this._loadWall(wall.user);
       var alert = (<AlertForm onClose={this._closeAlert.bind(this)}
                               title={'AM Insight layout saved!'}
                               onConfirm={this._closeAlert.bind(this)}/>);
