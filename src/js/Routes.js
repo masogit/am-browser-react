@@ -13,11 +13,10 @@ import UCMDBAdapterContainer from './components/ucmdbAdapter/UCMDBAdapterPoint';
 var rootPath = "/"; //"/ferret/";
 
 export const getRoutes = (headerNavs) => {
-  const routes = [
-    {path: 'login', component: Login},
-    {path: 'search', component: Search}];
+  const routes = [{path: 'login', component: Login}];
   if (headerNavs) {
     const allRoutes = [
+      {path: 'search', component: Search},
       {path: 'search(/:keyword)', component: RecordSearch},
       {path: 'insight', component: Insight},
       {path: 'insight(/:id)', component: Insight},
@@ -31,7 +30,7 @@ export const getRoutes = (headerNavs) => {
 
     allRoutes.map(route => {
       const basePath = route.path.split('(')[0];
-      if (!headerNavs || headerNavs[basePath]) {
+      if (headerNavs[basePath]) {
         routes.push(route);
       }
     });
@@ -40,7 +39,7 @@ export const getRoutes = (headerNavs) => {
   routes.push({
     path: '*',
     component: Search,
-    onEnter: (nextState, replaceState) => replaceState(null, '/search')
+    onEnter: (nextState, replaceState) => replaceState(null, headerNavs ? '/search' : '/login')
   });
 
   return routes;
