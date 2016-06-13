@@ -42,7 +42,10 @@ export default class AQL extends Component {
     this.state = {
       reports: {},
       aqls: [],
-      aql: {},
+      aql: {
+        name: '',
+        category: ''
+      },
       data: {
         header: [],
         rows: []
@@ -73,7 +76,7 @@ export default class AQL extends Component {
         name: '',
         category: '',
         type: 'chart',
-        form: null
+        form: 'init'
       },
       data: {
         header: [],
@@ -115,7 +118,6 @@ export default class AQL extends Component {
 
   _loadInToolReport() {
     AQLActions.loadReports((data) => {
-      console.log(data);
       this.setState({
         reports: data
       });
@@ -124,15 +126,27 @@ export default class AQL extends Component {
 
   _onQuery() {
     AQLActions.queryAQL(this.state.aql.str, (data) => {
-      this.setState({
-        data
-      });
+      if (this.state.aql.update) {
+        const aql = this.state.aql;
+        aql.form = 'init';
+        aql.update = false;
+        aql.meter = undefined;
+        aql.chart = undefined;
+        aql.distribution = undefined;
+        this.setState({
+          data,
+          aql
+        });
+      } else {
+        this.setState({
+          data
+        });
+      }
     });
   }
 
   _onSaveAQL() {
     AQLActions.saveAQL(this.state.aql, (id) => {
-      console.log("Save AQL: " + id);
       this._loadAQLs(this);
       var aql = this.state.aql;
       aql._id = id;
@@ -200,35 +214,15 @@ export default class AQL extends Component {
   }
 
   _setFormValues(event) {
-    let val;
-    if (event.target.type === 'checkbox') {
-      val = event.target.checked;
-    } else if (event.target.type === 'number') {
-      val = event.target.value / 1;
-    } else {
-      val = event.target.value;
-    }
+    const val = event.target.value;
 
     const path = event.target.name;
     const obj = this.state.aql;
-    this.setValueByJsonPath(path, val, obj);
-    this.setState({aql: obj});
-  }
-
-  setValueByJsonPath(path, val, obj) {
-    var fields = path.split('.');
-    var result = obj;
-    for (var i = 0, n = fields.length; i < n && result !== undefined; i++) {
-      var field = fields[i];
-      if (i === n - 1) {
-        result[field] = val;
-      } else {
-        if (typeof result[field] === 'undefined' || !_.isObject(result[field])) {
-          result[field] = {};
-        }
-        result = result[field];
-      }
+    obj[path] = val;
+    if (path === 'str' && obj.form !== 'init') {
+      obj.update = true;
     }
+    this.setState({aql: obj});
   }
 
   _genGraph(form, type) {
@@ -236,8 +230,13 @@ export default class AQL extends Component {
     if (type) {
       aql.type = type;
     }
-    form = form || aql[type];
-    aql.form = form;
+
+    if (form) {
+      aql.form = form;
+      aql[type] = form;
+    } else {
+      aql.form = aql[type] || 'init';
+    }
 
     this.setState({aql: aql});
 
@@ -343,10 +342,8 @@ export default class AQL extends Component {
     const header = this.state.data.header.map((col) => <th key={col.Index}>{col.Name}</th>);
 
     const rows = this.state.data.rows.map((row, index) => (
-      <TableRow key={index}> {
-        row.map((col, i) => {
-          return (<td key={i}>{col}</td>);
-        })
+      <TableRow key={index}>{
+        row.map((col, i) => <td key={i}>{col}</td>)
       }</TableRow>
     ));
 
@@ -411,22 +408,20 @@ export default class AQL extends Component {
           </Box>
           <Split flex="left" fixed={false} className='fixMinSizing'>
             <Box pad={{vertical: 'small'}}>
-              {this.state.data && this.state.aql.form && this.state.aql.type &&
+              {this.state.data && this.state.aql.form && this.state.aql.form != 'init' && this.state.aql.type &&
               <Graph type={this.state.aql.type} data={this.state.data} config={this.state.aql.form}
                      onClick={(filter) => this._showViewRecords(filter, this.state.aql.view)}/>}
-              <Box className='autoScroll'>
-                <Table>
-                  <thead>
-                  <tr>{header}</tr>
-                  </thead>
-                  <tbody>
-                  {rows}
-                  </tbody>
-                </Table>
-              </Box>
+              <Table className='autoScroll'>
+                <thead>
+                <tr>{header}</tr>
+                </thead>
+                <tbody>
+                {rows}
+                </tbody>
+              </Table>
             </Box>
             {
-              this.state.data && this.state.aql.type &&
+              this.state.data && this.state.aql.form &&
               <Box pad={{horizontal: 'small'}}>
                 <Tabs initialIndex={getIndex(this.state.aql.type)} justify='end'>
                   <ActionTab title="Chart" onClick={this._genGraph.bind(this, null, 'chart')} ref='chart'>

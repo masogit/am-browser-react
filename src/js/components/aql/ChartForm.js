@@ -1,5 +1,4 @@
 import GraphForm from './FormGenerator';
-import _ from 'lodash';
 
 export default class ChartForm extends GraphForm {
 
@@ -53,7 +52,7 @@ export default class ChartForm extends GraphForm {
 
       this.props.data.header.map((header, index) => {
         xAxis_col_options.push({value: header.Index, text: `${header.Type}: ${header.Name}`});
-        if (header.Type in ['Long', 'Short', 'Int', 'Double', 'Byte']) {
+        if (_.includes(['Long', 'Short', 'Int', 'Double', 'Byte'], header.Type)) {
           col_options.push({
             id: header.Index,
             name: 'series_col',

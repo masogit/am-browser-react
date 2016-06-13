@@ -28,7 +28,7 @@ const SelectField = ({label, name, value, onChange, options}) => {
 
 const InputField = ({label, name, value, onChange}) => (
   <FormField label={label} key={name}>
-    <input type="text" name={name} value={value} onChange={onChange}/>
+    <input type="text" name={name} value={value || ''} onChange={onChange}/>
   </FormField>
 );
 
