@@ -45,9 +45,12 @@ Request.prototype.promise = function () {
   return new Promise(function (resolve, reject, onCancel) {
     req.end(function (err, res) {
       // global error message
-      if (err && (err.status == 401 || err.status == 403)) {
-        store.default.dispatch(init('', ''));
-        store.default.dispatch({type: Types.RECEIVE_ERROR, msg: err.response.text});
+      if (err) {
+        if (err.status == 401 || err.status == 403) {
+          store.default.dispatch(init('', ''));
+        } else {
+          store.default.dispatch({type: Types.RECEIVE_ERROR, msg: err.response.text});
+        }
       }
       if (typeof res !== "undefined" && res.status > 400) {
         err.message = 'cannot ' + req.method + ' ' + req.url + ' (' + res.status + ')';
