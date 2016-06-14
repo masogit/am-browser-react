@@ -48,8 +48,10 @@ Request.prototype.promise = function () {
       if (err) {
         if (err.status == 401 || err.status == 403) {
           store.default.dispatch(init('', ''));
-        } else {
-          store.default.dispatch({type: Types.RECEIVE_ERROR, msg: err.response.text});
+        }
+        let msg = err.response ? err.response.text : false || err.message;
+        if (msg) {
+          store.default.dispatch({type: Types.RECEIVE_ERROR, msg: msg});
         }
       }
       if (typeof res !== "undefined" && res.status > 400) {
