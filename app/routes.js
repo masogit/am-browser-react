@@ -16,6 +16,7 @@ module.exports = function (app) {
   var ucmdb_server = process.env.UCMDB_SERVER || properties.get('ucmdb.server');
   var ucmdb_port = process.env.UCMDB_PORT || properties.get('ucmdb.port');
   var session_max_age = process.env.AMB_SESSION_MAX_AGE || properties.get('node.session_max_age');
+  var enable_csrf = process.env.AMB_NODE_CSRF || properties.get('node.enable_csrf');
   var ucmdb_param = properties.get('ucmdb.param');
   var base = properties.get('rest.base');
   var db_folder = properties.get('db.folder');
@@ -34,7 +35,8 @@ module.exports = function (app) {
     user: rest_username,
     password: rest_password,
     server: rest_server + ":" + rest_port,
-    session_max_age: session_max_age
+    session_max_age: session_max_age,
+    enable_csrf: enable_csrf
   });
 
   apiProxy.on('error', function (e) {
@@ -42,7 +44,9 @@ module.exports = function (app) {
   });
 
   app.get('/am/csrf', function (req, res) {
-    res.cookie('csrf-token', req.csrfToken());
+    if (enable_csrf) {
+      res.cookie('csrf-token', req.csrfToken());
+    }
     res.end();
   });
 

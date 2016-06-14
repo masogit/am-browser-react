@@ -70,7 +70,9 @@ require('./routes.js')(app);
 
 app.use(function(err, req, res, next){
   console.error(err.stack);
-  res.cookie('csrf-token', req.csrfToken());
+  if (enable_csrf) {
+    res.cookie('csrf-token', req.csrfToken());
+  }
   next(err);
 });
 

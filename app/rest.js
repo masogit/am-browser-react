@@ -95,7 +95,9 @@ module.exports = function (am) {
         sessionUtil.touch(req.session, am.session_max_age);
 
         var am_rest = {};
-        res.cookie('csrf-token', req.csrfToken());
+        if (am.enable_csrf) {
+          res.cookie('csrf-token', req.csrfToken());
+        }
         req.session.user = username;
         req.session.password = password;
         req.session.isAdmin = !!data.entities[0].bAdminRight[1];
