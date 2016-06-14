@@ -1,7 +1,7 @@
 # am browser contents of properties file
 [node]
 protocol = http
-server = localhost
+server = 0.0.0.0
 port = 8080
 https_port = 8443
 # 30 minutes
@@ -12,9 +12,7 @@ enable_csrf = true
 [rest]
 protocol = http
 server = localhost
-port = 10081
-username = admin
-password =
+port = 8081
 base = /AssetManagerWebService/rs
 # 60 minutes
 jwt_max_age = 60

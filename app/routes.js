@@ -11,8 +11,6 @@ module.exports = function (app) {
   var rest_protocol = process.env.AMB_REST_PROTOCOL || properties.get('rest.protocol');
   var rest_server = process.env.AMB_REST_SERVER || properties.get('rest.server');
   var rest_port = process.env.AMB_REST_PORT || properties.get('rest.port');
-  var rest_username = process.env.AMB_REST_USERNAME || properties.get('rest.username');
-  var rest_password = process.env.AMB_REST_PASSWORD || properties.getRaw('rest.password');
   var ucmdb_server = process.env.UCMDB_SERVER || properties.get('ucmdb.server');
   var ucmdb_port = process.env.UCMDB_PORT || properties.get('ucmdb.port');
   var session_max_age = process.env.AMB_SESSION_MAX_AGE || properties.get('node.session_max_age');
@@ -39,8 +37,6 @@ module.exports = function (app) {
   });
 
   var rest = new REST({
-    user: rest_username,
-    password: rest_password,
     server: rest_server + ":" + rest_port,
     session_max_age: session_max_age,
     jwt_max_age: jwt_max_age,
