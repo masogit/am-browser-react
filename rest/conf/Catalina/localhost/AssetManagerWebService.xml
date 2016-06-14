@@ -1,1 +1,1 @@
-<Context path="/AssetManagerWebService" reloadable="true" docBase="../../websvc/AssetManagerWebService.war"/>
+<Context path="/AssetManagerWebService" reloadable="false" docBase="../../websvc/AssetManagerWebService.war"/>
