@@ -1,14 +1,14 @@
 @echo off
 set SCRIPTPATH=%~dp0
 :db
-if exist %SCRIPTPATH%\db goto ssl
+if exist "%SCRIPTPATH%\db" goto ssl
 mkdir db
-copy %SCRIPTPATH%\demo\db\* %SCRIPTPATH%\db
+copy "%SCRIPTPATH%\demo\db\*" "%SCRIPTPATH%\db"
 if %ERRORLEVEL% NEQ 0 goto errorInfo
 :ssl
-if exist %SCRIPTPATH%\ssl goto main
+if exist "%SCRIPTPATH%\ssl" goto main
 mkdir ssl
-copy %SCRIPTPATH%\demo\ssl\* %SCRIPTPATH%\ssl
+copy "%SCRIPTPATH%\demo\ssl\*" "%SCRIPTPATH%\ssl"
 if %ERRORLEVEL% NEQ 0 goto errorInfo
 goto main
 :errorInfo

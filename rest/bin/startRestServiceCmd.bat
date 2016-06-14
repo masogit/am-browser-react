@@ -74,7 +74,7 @@ echo This environment variable is needed to run this program
 echo NB: JAVA_HOME should point to a JDK not a JRE
 goto end
 :okJavaHome
-%JAVAEXE% -d64 -version >nul 2>&1
+"%JAVAEXE%" -d64 -version >nul 2>&1
 if not errorlevel 1 goto okJava64Home
 echo Java is not 64 bit
 goto end
