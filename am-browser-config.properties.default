@@ -12,7 +12,7 @@ enable_csrf = true
 [rest]
 protocol = http
 server = localhost
-port = 8081
+port = 10081
 base = /AssetManagerWebService/rs
 # 60 minutes
 jwt_max_age = 60
