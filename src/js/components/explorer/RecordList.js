@@ -12,6 +12,7 @@ import Close from 'grommet/components/icons/base/Close';
 import Ascend from 'grommet/components/icons/base/Ascend';
 import Descend from 'grommet/components/icons/base/Descend';
 import Download from 'grommet/components/icons/base/Download';
+import MenuIcon from 'grommet/components/icons/base/Menu';
 import * as ExplorerActions from '../../actions/explorer';
 import * as AQLActions from '../../actions/aql';
 import Graph from '../commons/Graph';
@@ -277,7 +278,7 @@ export default class RecordList extends Component {
             {this.state.loading ? '----' : `${this.state.timeQuery}ms`}
           </Box>
         </Box>
-        <Menu closeOnClick={false} responsive={true} direction="row" align="center">
+        <Menu icon={<MenuIcon />} closeOnClick={false} direction="row" align="center" dropAlign={{top: 'bottom'}}>
           <Anchor href="#" label="More..." onClick={this._getMoreRecords.bind(this)}
                   disabled={this.state.numTotal > this.state.records.length ? false : true}/>
           <CheckBox id="checkbox_aql" label="AQL" checked={this.state.aqlInput}
