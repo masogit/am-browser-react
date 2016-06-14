@@ -9,7 +9,7 @@ module.exports = function (am) {
   this.csv = function (req, res) {
 
     var url = "http://${server}${context}${ref-link}";
-    var auth = (am.user != "") ? 'Basic ' + new Buffer(am.user + ':' + am.password).toString('base64') : undefined;
+    var auth = req.session.jwt ? req.session.jwt.secret : undefined;
     var request;
     var args = {
       path: {
@@ -20,7 +20,7 @@ module.exports = function (am) {
       parameters: req.query,
       headers: (auth) ? {
         "Content-Type": "application/json",
-        "Authorization": auth
+        "X-Authorization": auth
       } : undefined
     };
 
@@ -79,41 +79,88 @@ module.exports = function (am) {
       path: {
         server: am.server,
         context: '/AssetManagerWebService/rs/',
-        "ref-link": `db/amEmplDept`
+        "ref-link": `v1/auth/sign-in`
       },
       parameters: {
-        filter: `UserLogin='${username.trim()}'`
+        username: username,
+        password: password
       },
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": req.headers.authorization
+        "Content-Type": "application/x-www-form-urlencoded"
       }
     };
 
-    request = client.get(url, args, (data, response) => {
-      if (!data.entities || data.count === 0) {
-        logger.warn('user name or password is wrong');
-        res.send('user name or password is wrong');
-      } else {
-        req.session.expires = new Date(Date.now() + am.session_max_age);
-        sessionUtil.touch(req.session, am.session_max_age);
+    request = client.post(url, args, (signData, response) => {
+      req.session.jwt = {
+        secret: signData.toString(),
+        expires: new Date(Date.now() + am.jwt_max_age * 60 * 1000)
+      };
 
-        var am_rest = {};
-        if (am.enable_csrf) {
-          res.cookie('csrf-token', req.csrfToken());
+      args = {
+        path: {
+          server: am.server,
+          context: '/AssetManagerWebService/rs/',
+          "ref-link": `db/amEmplDept`
+        },
+        parameters: {
+          filter: `UserLogin='${username.trim()}'`
+        },
+        headers: {
+          "Content-Type": "application/json",
+          "X-Authorization": req.session.jwt.secret
         }
-        req.session.user = username;
-        req.session.password = password;
-        req.session.isAdmin = !!data.entities[0].bAdminRight[1];
-        am_rest.headerNavs = getHeadNav(req.session.isAdmin);
-        res.cookie('headerNavs', am_rest.headerNavs);
-        res.json(am_rest);
-      }
+      };
 
-      res.end();
+      request = client.get(url, args, (data, response) => {
+        if (!data.entities || data.count === 0) {
+          logger.warn('user name or password is wrong');
+          res.send('user name or password is wrong');
+        } else {
+          req.session.expires = new Date(Date.now() + am.session_max_age * 60 * 1000);
+          sessionUtil.touch(req.session, am.session_max_age);
+
+          var am_rest = {};
+          if (am.enable_csrf) {
+            res.cookie('csrf-token', req.csrfToken());
+          }
+          req.session.user = username;
+          req.session.password = password;
+          req.session.isAdmin = !!data.entities[0].bAdminRight[1];
+          am_rest.headerNavs = getHeadNav(req.session.isAdmin);
+          res.cookie('headerNavs', am_rest.headerNavs);
+          res.json(am_rest);
+        }
+
+        res.end();
+      });
     }).on('error', function (err) {
       logger.error("login failed with error: " + err.toString());
       res.status(500).send(err.toString());
+    });
+  };
+
+  this.jwtRenew = function (req, res) {
+
+    var url = "http://${server}${context}${ref-link}";
+
+    var args = {
+      path: {
+        server: am.server,
+        context: '/AssetManagerWebService/rs/',
+        "ref-link": `v1/auth/renew-token`
+      },
+      parameters: {
+      },
+      headers: {
+        "X-Authorization": req.session.jwt.secret
+      }
+    };
+
+    client.post(url, args, (signData, response) => {
+      req.session.jwt = {
+        secret: signData.toString(),
+        expires: new Date(Date.now() + am.jwt_max_age * 60 * 1000)
+      };
     });
   };
 };

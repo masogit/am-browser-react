@@ -16,6 +16,8 @@ port = 10081
 username = admin
 password =
 base = /AssetManagerWebService/rs
+# 60 minutes
+jwt_max_age = 60
 
 [ucmdb]
 server = 16.187.189.22

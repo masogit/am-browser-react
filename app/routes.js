@@ -16,6 +16,7 @@ module.exports = function (app) {
   var ucmdb_server = process.env.UCMDB_SERVER || properties.get('ucmdb.server');
   var ucmdb_port = process.env.UCMDB_PORT || properties.get('ucmdb.port');
   var session_max_age = process.env.AMB_SESSION_MAX_AGE || properties.get('node.session_max_age');
+  var jwt_max_age = process.env.AMB_JWT_MAX_AGE || properties.get('rest.jwt_max_age');
   var enable_csrf = process.env.AMB_NODE_CSRF || properties.get('node.enable_csrf');
   var ucmdb_param = properties.get('ucmdb.param');
   var base = properties.get('rest.base');
@@ -26,9 +27,7 @@ module.exports = function (app) {
   var apiProxy = httpProxy.createProxyServer();
 
   apiProxy.on('proxyReq', function (proxyReq, req, res, options) {
-    const auth = 'Basic ' + new Buffer(req.session.user + ':' + req.session.password).toString('base64');
-    //logger.info("set request header: " + auth);
-    proxyReq.setHeader('Authorization', auth);
+    proxyReq.setHeader('X-Authorization', req.session.jwt.secret);
   });
 
   apiProxy.on('proxyReq', function (proxyReq, req, res) {
@@ -44,6 +43,7 @@ module.exports = function (app) {
     password: rest_password,
     server: rest_server + ":" + rest_port,
     session_max_age: session_max_age,
+    jwt_max_age: jwt_max_age,
     enable_csrf: enable_csrf
   });
 
@@ -59,7 +59,6 @@ module.exports = function (app) {
   app.post('/am/login', rest.login);
 
   app.get('/am/logout', function (req, res) {
-    // TODO logout
     logger.info((req.session && req.session.user ? req.session.user : "user") + " logout.");
     var am_rest = {};
     req.session.regenerate((err)=>{});
@@ -73,8 +72,12 @@ module.exports = function (app) {
       res.clearCookie('headerNavs');
       res.sendStatus(401);
     } else {
-      req.session.expires = new Date(Date.now() + session_max_age);
+      req.session.expires = new Date(Date.now() + session_max_age * 60 * 1000);
       sessionUtil.touch(req.session, session_max_age);
+      // Renew jwt token.
+      if ((new Date(req.session.jwt.expires) - req.session.expires) < 1 * 60 * 1000) {
+        rest.jwtRenew(req, res);
+      }
 
       next(); // Call the next middleware
     }
