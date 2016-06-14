@@ -77,8 +77,15 @@ app.use(function(err, req, res, next){
 });
 
 // listen (start app with node server.js) ======================================
-app.listen(port, server);
-logger.info("App listening HTTP on port " + port);
+var http_server = http.createServer(app);
+http_server.listen(port, server, () => {
+  logger.info("App listening HTTP on port " + port);
+});
+http_server.on('error', (e) => {
+  if (e.code == 'EADDRINUSE') {
+    logger.error(e.code + ': Port ' + port + ' already in use, please change it in am-browser-config.properties');
+  }
+});
 
 // TODO: 1. Enable this in production. 2. There are some hardcoded HTTP requests in front-end JS, which causes mixed content issues
 const KEY = 'ssl/server-key.pem';
@@ -91,8 +98,15 @@ try {
     cert: fs.readFileSync(CERT),
     ca: fs.readFileSync(CERT) //Optional for dev machine, but for production it's necessary!!!
   };
-  https.createServer(server_options, app).listen(https_port);
-  logger.info("App listening HTTPS on port " + https_port);
+  var https_server = https.createServer(server_options, app);
+  https_server.listen(https_port, () => {
+    logger.info("App listening HTTPS on port " + https_port);
+  });
+  https_server.on('error', (e) => {
+    if (e.code == 'EADDRINUSE') {
+      logger.error(e.code + ': Port ' + https_port + ' already in use, please change it in am-browser-config.properties');
+    }
+  });
 }
 catch (e) {
   logger.warn("HTTPS is not set correctly");
