@@ -15,8 +15,10 @@ var cors = require('cors');
 
 // initial AM REST server
 var PropertiesReader = require('properties-reader');
-var properties = PropertiesReader('am-browser-config.properties');
+var properties = PropertiesReader('am-browser-config.properties.default');
+properties.append('am-browser-config.properties');
 logger.info("Server configuration: " + JSON.stringify(properties));
+
 // initial AM node server
 var server = process.env.AMB_NODE_SERVER || properties.get('node.server');
 var port = process.env.AMB_NODE_PORT || properties.get('node.port'); 				// set the port

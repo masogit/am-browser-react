@@ -12,10 +12,19 @@ copy "%SCRIPTPATH%\demo\ssl\*" "%SCRIPTPATH%\ssl"
 if %ERRORLEVEL% NEQ 0 goto errorInfo
 goto main
 :errorInfo
-echo Cannot initialize demo db, please copy them mannually
+echo ####### ERROR: INITIALIZE DEMO #########
+echo Cannot initialize demo, please copy them mannually
+echo ##########################################################
+echo.
 goto end
 :main
+if not exist "%SCRIPTPATH%\am-browser-config.properties" goto customInfo
 "%SCRIPTPATH%\node\nodejs\node.exe" "%SCRIPTPATH%\app\server.js"
 goto end
+:customInfo
+echo ####### ERROR: CUSTOM CONFIG #########
+echo Not found custom am-browser-config.properties, please generate it from am-browser-config.properties.default
+echo ##########################################################
+echo.
 :end
 pause

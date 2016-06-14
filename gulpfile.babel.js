@@ -197,7 +197,7 @@ gulp.task('copy-temp', ['dist', 'clean-gen'], function () {
   var copy_cmd = gulp.src('./build/*.bat')
       .pipe(gulp.dest('./gen/temp'));
   // copy files to gen temp
-  var copy_file = gulp.src(['./app/**', './demo/**', './dist/**', './node_modules/**', './am-browser-config.properties'], {base : '.'})
+  var copy_file = gulp.src(['./app/**', './demo/**', './dist/**', './node_modules/**', './am-browser-config.properties.default'], {base : '.'})
       .pipe(gulp.dest('./gen/temp'));
   return merge(unzip_node, copy_cmd, copy_file);
 });

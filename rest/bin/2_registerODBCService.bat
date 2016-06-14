@@ -10,18 +10,26 @@ if %ERRORLEVEL% NEQ 0 goto errorInfo
 set DSN=AMBrowser
 %ODBCCONF% /A {CONFIGSYSDSN "SQL Server" "DSN=%DSN%|Description=AMBrowser|SERVER=%1|Trusted_Connection=no|Database=%2"}
 if %ERRORLEVEL% NEQ 0 goto errorInfo
+echo ####### INFO: REGISTER ODBC SERVICE #########
 echo register %DSN% ODBC Service succeed
+echo ##########################################################
+echo.
 goto end
 :errorInfo
+echo ####### ERROR: INSTALL ODBC SERVICE #########
 echo Cannot install ODBC Service automatically, please install it by yourself
+echo ##########################################################
+echo.
 %ODBCCAD%
 goto end
 :displayUsage
-echo.
+echo ####### INFO: DISPLAY USAGE #########
 echo Usage: registerODBCService.bat [SERVER] [Database]
 echo For Example: 2_registerODBCService.bat (local) AMDemo96en
 echo Usage: registerODBCService.bat [DSN] [Description] [SERVER] [Database]
 echo For Example: 2_registerODBCService.bat AMBrowser AMBrowser (local) AMDemo96en
+echo ##########################################################
+echo.
 goto end
 :end
 pause
