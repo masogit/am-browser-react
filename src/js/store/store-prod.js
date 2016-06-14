@@ -2,7 +2,6 @@
 
 import { createStore, combineReducers, compose, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
-import DevTools from '../DevTools';
 
 import error from '../reducers/error';
 import session from '../reducers/session';
