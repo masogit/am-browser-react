@@ -27,8 +27,16 @@ module.exports = function (app) {
 
   apiProxy.on('proxyReq', function (proxyReq, req, res, options) {
     const auth = 'Basic ' + new Buffer(req.session.user + ':' + req.session.password).toString('base64');
-    logger.info("set request header: " + auth);
+    //logger.info("set request header: " + auth);
     proxyReq.setHeader('Authorization', auth);
+  });
+
+  apiProxy.on('proxyReq', function (proxyReq, req, res) {
+    logger.debug(`[proxy] [request] [${req.sessionID}] ${req.method} ${req.originalUrl}`);
+  });
+
+  apiProxy.on('proxyRes', function (proxyRes, req, res) {
+    logger.debug(`[proxy] [response] [${req.sessionID}] ${req.method} ${req.originalUrl} ${proxyRes.statusCode} ${proxyRes.statusMessage}`);
   });
 
   var rest = new REST({
@@ -51,6 +59,8 @@ module.exports = function (app) {
   app.post('/am/login', rest.login);
 
   app.get('/am/logout', function (req, res) {
+    // TODO logout
+    logger.info((req.session && req.session.user ? req.session.user : "user") + " logout.");
     var am_rest = {};
     req.session.regenerate((err)=>{});
     res.clearCookie('headerNavs');
@@ -92,25 +102,26 @@ module.exports = function (app) {
   // Proxy the backend rest service /rs/db -> /am/db
   app.use('/am/db', function (req, res) {
     // TODO: need to take care of https
-    logger.info(`${rest_protocol}://${rest_server}:${rest_port}${base}/db`);
+    logger.info(`[/am/db] ${rest_protocol}://${rest_server}:${rest_port}${base}/db`);
     apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${base}/db`});
   });
 
   app.use('/am/aql', function (req, res) {
     // TODO: need to take care of https
-    logger.info(`${rest_protocol}://${rest_server}:${rest_port}${base}/aql`);
+    logger.info(`[/am/aql] ${rest_protocol}://${rest_server}:${rest_port}${base}/aql`);
     apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${base}/aql`});
   });
 
   app.use('/am/v1/schema', function (req, res) {
     // TODO: need to take care of https
-    logger.info(`${rest_protocol}://${rest_server}:${rest_port}${base}/v1/schema`);
+    logger.info(`[/am/v1/schema] ${rest_protocol}://${rest_server}:${rest_port}${base}/v1/schema`);
     apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${base}/v1/schema`});
   });
 
   // get ucmdb point data
   app.use('/am/ucmdbPoint/', function (req, res) {
     checkRight(req);
+    logger.info(`[/am/ucmdbPoint/] ${rest_protocol}://${rest_server}:${rest_port}${base}/integration/ucmdbAdapter/points`);
     apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${base}/integration/ucmdbAdapter/points`});
   });
 
@@ -119,6 +130,7 @@ module.exports = function (app) {
    * /ucmdb-browser/<global_id>
    */
   app.get('/ucmdb-browser', function (req, res) {
+    logger.info(`[/ucmdb-browser] http://${ucmdb_server}:${ucmdb_port}${ucmdb_param}`);
     res.send(`http://${ucmdb_server}:${ucmdb_port}${ucmdb_param}`);
   });
 };

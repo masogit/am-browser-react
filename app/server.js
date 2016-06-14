@@ -16,6 +16,7 @@ var cors = require('cors');
 // initial AM REST server
 var PropertiesReader = require('properties-reader');
 var properties = PropertiesReader('am-browser-config.properties');
+logger.info("Server configuration: " + JSON.stringify(properties));
 // initial AM node server
 var server = process.env.AMB_NODE_SERVER || properties.get('node.server');
 var port = process.env.AMB_NODE_PORT || properties.get('node.port'); 				// set the port
@@ -26,7 +27,7 @@ var enable_csrf = process.env.AMB_NODE_CSRF || properties.get('node.enable_csrf'
 
 app.use(compression());
 app.use(express.static(__dirname + '/public')); 		// set the static files location /public/img will be /img for users
-app.use(morgan('dev')); // log every request to the console
+//app.use(morgan('dev')); // log every request to the console
 app.use(bodyParser.urlencoded({'extended': 'true'})); // parse application/x-www-form-urlencoded
 app.use(bodyParser.json()); // parse application/json
 app.use(bodyParser.json({type: 'application/vnd.api+json'})); // parse application/vnd.api+json as json
@@ -65,11 +66,23 @@ app.get('/ucmdbAdapter', indexHtml);
 app.get('/ucmdbAdapter/*', indexHtml);
 app.get('/ucmdbAdapter/*/*', indexHtml);
 
+// redirect morgan log to winston
+morgan.token('sessionId', function getSessionId (req) {
+  return req.session ? req.session.id : '';
+})
+var morganFormat = "[:remote-addr] [:remote-user] [:sessionId] :method :url HTTP/:http-version :status :res[content-length] - :response-time ms";
+var stream = {
+  write: function(message, encoding){
+    logger.debug(message);
+  }
+};
+app.use(morgan(morganFormat, {stream: stream}))
+
 // routes ======================================================================
 require('./routes.js')(app);
 
 app.use(function(err, req, res, next){
-  console.error(err.stack);
+  logger.error(`[csrf] [${req.sessionID}] [${req.session.csrfSecret}] [${err.name}: ${err.message}] ${req.method} ${req.url}`);
   if (enable_csrf) {
     res.cookie('csrf-token', req.csrfToken());
   }
@@ -111,3 +124,14 @@ try {
 catch (e) {
   logger.warn("HTTPS is not set correctly");
 }
+
+var shutdown = function () {
+  logger.info("Received kill signal, shut down server.");
+  process.exit();
+}
+
+// listen for TERM signal e.g. kill
+process.on('SIGTERM', shutdown);
+
+// listen for INT signal e.g. Ctrl-C
+process.on('SIGINT', shutdown);

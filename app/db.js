@@ -6,17 +6,18 @@ var Validator = require('./validator.js');
 
 // check db folder and files
 exports.init = function (dbFolder) {
+  logger.info(`Set db folder to ${dbFolder}`);
   tingodbFolder = dbFolder;
   fs.exists(dbFolder, function (db) {
     if (!db) {
-      logger.info("not found db folder");
+      logger.info(`The db folder '${dbFolder}' not found, will create it.`);
 
       fs.mkdir(dbFolder, function (err) {
         if (err) {
           return logger.error(err);
+        }else{
+          logger.info(`The db folder '${dbFolder}' was created.`);
         }
-
-        logger.info("The db folder was created!");
       })
 
     }

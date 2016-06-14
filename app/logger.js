@@ -4,25 +4,8 @@ var path = require('path');
 const LOG_FOLDER = 'log';
 const LOG_FILE = 'ambrowser.log';
 
-try {
-  var logFolder = path.join(__dirname, '../' + LOG_FOLDER);
-  fs.exists(logFolder, function (folder) {
-    if (!folder) {
-      console.log("log folder not found");
-
-      fs.mkdir(logFolder, function (err) {
-        if (err) {
-          return console.log(err);
-        }
-
-        console.log("log folder created!");
-      })
-    }
-  });
-}
-catch (e) {
-  console.error("Cannot create log folder!");
-}
+var logFolder = path.join(__dirname, '../' + LOG_FOLDER);
+fs.existsSync(logFolder) || fs.mkdirSync(logFolder)
 
 var config = {
   levels: {

@@ -1,6 +1,7 @@
 var Client = require('node-rest-client').Client;
 var client = new Client();
 var Convertor = require('json-2-csv');
+var logger = require('./logger.js');
 var sessionUtil = require('./sessionUtil.js');
 
 module.exports = function (am) {
@@ -56,10 +57,12 @@ module.exports = function (am) {
         res.end();
 
     }).on('error', function (err) {
+      logger.error('Export CSV: ' + err.toString());
       res.status(500).send(err.toString());
     });
-    console.log("request.options: " + JSON.stringify(request.options));
+    //console.log("request.options: " + JSON.stringify(request.options));
     request.on('error', function (err) {
+      logger.error('Export CSV: ' + err);
       console.log('request error: ' + err);
     });
 
@@ -89,6 +92,7 @@ module.exports = function (am) {
 
     request = client.get(url, args, (data, response) => {
       if (!data.entities || data.count === 0) {
+        logger.warn('user name or password is wrong');
         res.send('user name or password is wrong');
       } else {
         req.session.expires = new Date(Date.now() + am.session_max_age);
@@ -108,6 +112,7 @@ module.exports = function (am) {
 
       res.end();
     }).on('error', function (err) {
+      logger.error("login failed with error: " + err.toString());
       res.status(500).send(err.toString());
     });
   };
