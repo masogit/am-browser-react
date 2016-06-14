@@ -49,7 +49,7 @@ Request.prototype.promise = function () {
         if (err.status == 401 || err.status == 403) {
           store.default.dispatch(init('', ''));
         }
-        let msg = err.response ? err.response.text : false || err.message;
+        let msg = err.response && err.response.text || err.message;
         if (msg) {
           store.default.dispatch({type: Types.RECEIVE_ERROR, msg: msg});
         }
