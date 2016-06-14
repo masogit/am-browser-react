@@ -8,7 +8,6 @@ import {
   Header,
   Notification
 } from 'grommet';
-import Close from 'grommet/components/icons/base/Close';
 
 export default class AlertForm extends Component {
 
@@ -31,8 +30,7 @@ export default class AlertForm extends Component {
         {
           this.props.status &&
           <Notification status={this.props.status} message={this.props.desc} pad={{vertical: 'small'}}
-                        onClick={this.props.onClose}>
-          </Notification>
+                        onClick={this.props.onClose} />
         }
         {
           !this.props.status &&
