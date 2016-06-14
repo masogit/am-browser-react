@@ -15,6 +15,5 @@ import history from '../RouteHistory';
 
 export default compose(
   reduxReactRouter({history}),
-  applyMiddleware(thunk),
-  DevTools.instrument()
+  applyMiddleware(thunk)
 )(createStore)(combineReducers({session, route, views, metadata, ucmdbAdapter, router: routerStateReducer, error}));
