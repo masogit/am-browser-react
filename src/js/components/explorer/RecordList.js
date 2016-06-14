@@ -299,7 +299,7 @@ export default class RecordList extends Component {
 
   renderList() {
     return (
-      <Table selectable={true} className='autoScroll' scrollable={true}
+      <Table selectable={true} className='autoScroll'
              onMore={(this.state.numTotal > this.state.records.length && !this.state.filtered)?this._getMoreRecords.bind(this):null}>
         <thead>
         <tr>
