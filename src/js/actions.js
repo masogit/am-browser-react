@@ -105,8 +105,6 @@ export function logout() {
         dispatch({message: 'LogoutFailed'});
         throw err;
       } else if (res.ok && res.body) {
-        cookies.remove('connect.sid');
-        cookies.remove('csrf-token');
         dispatch({type: LOGOUT});
       }
     });

@@ -44,9 +44,6 @@ module.exports = function (app) {
   });
 
   app.get('/am/csrf', function (req, res) {
-    if (enable_csrf) {
-      res.cookie('csrf-token', req.csrfToken());
-    }
     res.end();
   });
 
@@ -54,11 +51,8 @@ module.exports = function (app) {
   app.post('/am/login', rest.login);
 
   app.get('/am/logout', function (req, res) {
-    // TODO logout
     var am_rest = {};
-    req.session.destroy();
-    res.clearCookie('connect.sid');
-    res.clearCookie('csrf-token');
+    req.session.regenerate((err)=>{});
     res.clearCookie('headerNavs');
     res.json(am_rest);
   });
