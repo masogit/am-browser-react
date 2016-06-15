@@ -24,9 +24,9 @@ echo.
 goto end
 :displayUsage
 echo ####### INFO: DISPLAY USAGE #########
-echo Usage: registerODBCService.bat [SERVER] [Database]
+echo Usage: 2_registerODBCService.bat [SERVER] [Database]
 echo For Example: 2_registerODBCService.bat (local) AMDemo96en
-echo Usage: registerODBCService.bat [DSN] [Description] [SERVER] [Database]
+echo Usage: 2_registerODBCService.bat [DSN] [Description] [SERVER] [Database]
 echo For Example: 2_registerODBCService.bat AMBrowser AMBrowser (local) AMDemo96en
 echo ##########################################################
 echo.

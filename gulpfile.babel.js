@@ -350,7 +350,9 @@ gulp.task('gen-ws-base', ['clean-gen-ws', 'download-ws'], function () {
 gulp.task('gen-ws-conf', ['gen-ws-base'], function () {
   console.log('Copy ws conf');
   // generate ws package
-  var copy_conf = gulp.src('./rest/conf/**')
+  var copy_conf = gulp.src('./rest/conf/Catalina/**')
+      .pipe(gulp.dest('./rest/gen/temp/apache-tomcat-8.0.18/conf/Catalina'));
+  var copy_server = gulp.src('./rest/conf/server.xml')
       .pipe(gulp.dest('./rest/gen/temp/apache-tomcat-8.0.18/conf'));
   // unzip ant instance
   var unzip_ant = gulp.src('./rest/lib/apache-ant-1.8.2.zip', {base : '.'})
@@ -372,7 +374,7 @@ gulp.task('gen-ws-conf', ['gen-ws-base'], function () {
 	  .pipe(gulp.dest('./rest/gen/temp/x64'));
   var copy_openssl= gulp.src(['./rest/downloads/temp/openssl/openssl-1.0.2h/lib/win/X64/libeay64-10.dll', './rest/downloads/temp/openssl/openssl-1.0.2h/lib/win/X64/ssleay64-10.dll'])
 	  .pipe(gulp.dest('./rest/gen/temp/x64'));
-  return merge(copy_conf, unzip_ant, copy_dll, copy_jni, copy_res, copy_libcurl, copy_openldap, copy_openssl);
+  return merge(copy_conf, copy_server, unzip_ant, copy_dll, copy_jni, copy_res, copy_libcurl, copy_openldap, copy_openssl);
 });
 
 gulp.task('gen-ws', ['gen-ws-conf'], function () {
