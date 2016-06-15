@@ -50,7 +50,7 @@ Request.prototype.promise = function () {
           store.default.dispatch(init('', ''));
         }
         let msg = err.response && err.response.text || err.message;
-        if (msg) {
+        if (msg && err.status == 400) {
           store.default.dispatch({type: Types.RECEIVE_ERROR, msg: msg});
         }
       }
