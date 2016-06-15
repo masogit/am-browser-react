@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react';
+import React, {PropTypes} from 'react';
+import ComponentBase from '../commons/ComponentBase';
 import Anchor from 'grommet/components/Anchor';
 import Box from 'grommet/components/Box';
 import Tabs from 'grommet/components/Tabs';
@@ -6,7 +7,7 @@ import Tab from 'grommet/components/Tab';
 import ListItem from 'grommet/components/ListItem';
 import SearchInput from 'grommet/components/SearchInput';
 
-export default class MetaData extends Component {
+export default class MetaData extends ComponentBase {
 
   constructor() {
     super();
@@ -34,6 +35,9 @@ export default class MetaData extends Component {
   }
 
   _onClick(obj) {
+    if(!this.acquireLock()) {
+      return;
+    }
     this.props.clearFilter();
     this.props.metadataLoadDetail(obj, this.props.elements);
   }

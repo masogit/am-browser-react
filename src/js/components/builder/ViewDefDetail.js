@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react';
+import React, {PropTypes} from 'react';
+import ComponentBase from '../commons/ComponentBase';
 import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Title, Split,tr } from 'grommet';
 import Close from 'grommet/components/icons/base/Close';
 import Play from 'grommet/components/icons/base/Play';
@@ -10,7 +11,7 @@ import _ from 'lodash';
 import AlertForm from '../../components/commons/AlertForm';
 //var Filter = require('grommet/components/icons/base/Filter');
 
-export default class ViewDefDetail extends Component {
+export default class ViewDefDetail extends ComponentBase {
 
   constructor(props) {
     super(props);
@@ -18,6 +19,7 @@ export default class ViewDefDetail extends Component {
     this.renderTable = this.renderTable.bind(this);
     this.renderLinks = this.renderLinks.bind(this);
     this._onChange = this._onChange.bind(this);
+    this._onSubmit = this._onSubmit.bind(this);
     this.state = {
       mainFilter: false
     };
@@ -48,6 +50,13 @@ export default class ViewDefDetail extends Component {
     } else {
       this.props.onValueChange(path.substring(2), event.target.value);
     }
+  }
+
+  _onSubmit() {
+    if(this.acquireLock()) {
+      this.props.onSubmit();
+    }
+
   }
 
   _onDownload(obj) {
@@ -276,7 +285,7 @@ export default class ViewDefDetail extends Component {
           <Title>View Builder</Title>
           <Menu direction="row" align="center" responsive={true}>
             <Anchor link="#" icon={<Play />} onClick={this.props.openPreview}>Query</Anchor>
-            <Anchor link="#" icon={<Checkmark />} onClick={this.props.onSubmit}>Save</Anchor>
+            <Anchor link="#" icon={<Checkmark />} onClick={this._onSubmit}>Save</Anchor>
             <Anchor link="#" icon={<Close />} onClick={this.props.deleteViewDef}>Delete</Anchor>
             <Anchor link="#" icon={<Duplicate />} onClick={this.props.onDuplicateViewDef}>Duplicate</Anchor>
             {
