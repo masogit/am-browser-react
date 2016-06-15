@@ -11,7 +11,7 @@ module.exports = function (am) {
     var url = "http://${server}${context}${ref-link}";
     // TODO Use 'X-Authorization' if jwt token is ready.
     // var auth = req.session.jwt ? req.session.jwt.secret : undefined;
-    var auth = (am.user != "") ? 'Basic ' + new Buffer(am.user + ':' + am.password).toString('base64') : undefined;
+    var auth = (req.session.user != "") ? 'Basic ' + new Buffer(req.session.user + ':' + req.session.password).toString('base64') : undefined;
     var request;
     var args = {
       path: {
