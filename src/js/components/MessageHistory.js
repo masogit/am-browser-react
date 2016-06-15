@@ -7,26 +7,28 @@ import {
   Table,
   TableRow
 } from 'grommet';
+var Status = require('grommet/components/icons/Status');
 
 class MessageHistory extends Component {
 
   render() {
-    var Status = require('grommet/components/icons/Status');
     return (
       <Box pad="large">
         <Header><Title>Message history</Title></Header>
         <Table>
           <thead>
-          <th>Status</th>
-          <th>Time</th>
-          <th>Message</th>
+          <tr>
+            <th>Status</th>
+            <th>Time</th>
+            <th>Message</th>
+          </tr>
           </thead>
           <tbody>
           {
-            this.props.msgs.map((msg, index)=> {
+            this.props.msgs.map((msg, index) => {
               return (
                 <TableRow>
-                  <td> <Status value={msg.status} /> </td>
+                  <td><Status value={msg.status}/></td>
                   <td> {msg.time} </td>
                   <td> {msg.msg} </td>
                 </TableRow>
