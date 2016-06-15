@@ -4,7 +4,6 @@ import Title from 'grommet/components/Title';
 import Table from 'grommet/components/Table';
 import TableRow from 'grommet/components/TableRow';
 import Box from 'grommet/components/Box';
-import CheckBox from 'grommet/components/CheckBox';
 import Anchor from 'grommet/components/Anchor';
 import Header from 'grommet/components/Header';
 import Menu from 'grommet/components/Menu';
@@ -13,6 +12,9 @@ import Ascend from 'grommet/components/icons/base/Ascend';
 import Descend from 'grommet/components/icons/base/Descend';
 import Download from 'grommet/components/icons/base/Download';
 import MenuIcon from 'grommet/components/icons/base/Menu';
+import Checkbox from 'grommet/components/icons/base/Checkbox';
+import More from 'grommet/components/icons/base/More';
+import CheckboxSelected from 'grommet/components/icons/base/CheckboxSelected';
 import * as ExplorerActions from '../../actions/explorer';
 import * as AQLActions from '../../actions/aql';
 import Graph from '../commons/Graph';
@@ -279,18 +281,17 @@ export default class RecordList extends Component {
             {this.state.loading ? '----' : `${this.state.timeQuery}ms`}
           </Box>
         </Box>
-        <Menu icon={<MenuIcon />} closeOnClick={false} direction="row" align="center" dropAlign={{top: 'bottom'}}>
-          <Anchor href="#" label="More..." onClick={this._getMoreRecords.bind(this)}
+        <Menu icon={<MenuIcon />} closeOnClick={false} dropAlign={{top: 'bottom'}}>
+          <Anchor icon={<More />} label="More records" onClick={this._getMoreRecords.bind(this)}
                   disabled={this.state.numTotal > this.state.records.length ? false : true}/>
-          <CheckBox id="checkbox_aql" label="AQL" checked={this.state.aqlInput}
-                    onChange={this._toggleAQLInput.bind(this)}/>
-          <CheckBox id="checkbox_fields" label="Full" checked={this.state.allFields}
-                    onChange={this._toggleAllFields.bind(this)}/>
-          <Anchor href="#" icon={<Download />} label="CSV" onClick={this._download.bind(this)}/>
+          <Anchor icon={this.state.aqlInput?<CheckboxSelected />:<Checkbox />} label="Input AQL"
+                  onClick={this._toggleAQLInput.bind(this)}/>
+          <Anchor icon={this.state.allFields?<CheckboxSelected />:<Checkbox />} label="Full columns"
+                  onClick={this._toggleAllFields.bind(this)}/>
+          <Anchor icon={<Download />} label="Download CSV" onClick={this._download.bind(this)}/>
         </Menu>
-        <form name="Download" ref="downloadForm"
-              action={ExplorerActions.getDownloadQuery({...this.props.body, param: this.state.param})}
-              method="post">
+        <form name="Download" ref="downloadForm" method="post"
+              action={ExplorerActions.getDownloadQuery({...this.props.body, param: this.state.param})}>
           <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
           <input type="hidden" name="fields" value={JSON.stringify(this.props.body.fields)}/>
         </form>
