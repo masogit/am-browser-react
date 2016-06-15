@@ -8,6 +8,7 @@ import {App, Box} from 'grommet';
 import NavHeader from './NavHeader';
 import store from '../store';
 import * as Types from '../constants/ActionTypes';
+let timeout;
 
 class Indexer extends Component {
 
@@ -31,11 +32,15 @@ class Indexer extends Component {
       header = <NavHeader headerNavs={headerNavs}/>;
     }
     let alert;
-    if (message.msg) {
+    if (headerNavs && message.msg) { // not display in login page
+      if (timeout) {
+        clearTimeout(timeout);
+      }
       alert = (
         <AlertForm onClose={this._newMsgRead} status={message.status} title={"Message alert"}
                    desc={message.msg} onConfirm={this._newMsgRead}/>
       );
+      timeout = setTimeout(this._newMsgRead, 5000);
     }
     return (
       <App>
