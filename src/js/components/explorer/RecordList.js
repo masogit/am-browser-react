@@ -16,6 +16,7 @@ import MenuIcon from 'grommet/components/icons/base/Menu';
 import * as ExplorerActions from '../../actions/explorer';
 import * as AQLActions from '../../actions/aql';
 import Graph from '../commons/Graph';
+import EmptyIcon from '../commons/EmptyIcon';
 import * as Format from '../../constants/RecordFormat';
 import cookies from 'js-cookie';
 export default class RecordList extends Component {
@@ -111,7 +112,7 @@ export default class RecordList extends Component {
 
   _showOrderByIcon(sqlname) {
     var orderby = this.state.param.orderby;
-    var icon = (orderby.indexOf(sqlname) > -1) ? ((orderby.indexOf('desc') > -1) ? <Descend /> : <Ascend />) : null;
+    var icon = (orderby.indexOf(sqlname) > -1) ? ((orderby.indexOf('desc') > -1) ? <Descend /> : <Ascend />) : <EmptyIcon />;
     return icon;
   }
 
