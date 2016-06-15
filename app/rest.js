@@ -9,7 +9,9 @@ module.exports = function (am) {
   this.csv = function (req, res) {
 
     var url = "http://${server}${context}${ref-link}";
-    var auth = req.session.jwt ? req.session.jwt.secret : undefined;
+    // TODO Use 'X-Authorization' if jwt token is ready.
+    // var auth = req.session.jwt ? req.session.jwt.secret : undefined;
+    var auth = (am.user != "") ? 'Basic ' + new Buffer(am.user + ':' + am.password).toString('base64') : undefined;
     var request;
     var args = {
       path: {
@@ -20,7 +22,9 @@ module.exports = function (am) {
       parameters: req.query,
       headers: (auth) ? {
         "Content-Type": "application/json",
-        "X-Authorization": auth
+        // TODO Use 'X-Authorization' if jwt token is ready.
+        // "X-Authorization": auth,
+        "Authorization": auth
       } : undefined
     };
 
@@ -107,7 +111,9 @@ module.exports = function (am) {
         },
         headers: {
           "Content-Type": "application/json",
-          "X-Authorization": req.session.jwt.secret
+          // TODO Use 'X-Authorization' if jwt token is ready.
+          // "X-Authorization": req.session.jwt.secret,
+          "Authorization": req.headers.authorization
         }
       };
 

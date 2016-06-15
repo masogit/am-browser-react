@@ -25,7 +25,10 @@ module.exports = function (app) {
   var apiProxy = httpProxy.createProxyServer();
 
   apiProxy.on('proxyReq', function (proxyReq, req, res, options) {
-    proxyReq.setHeader('X-Authorization', req.session.jwt.secret);
+    // TODO Use 'X-Authorization' if jwt token is ready.
+    // proxyReq.setHeader('X-Authorization', req.session.jwt.secret);
+    const auth = 'Basic ' + new Buffer(req.session.user + ':' + req.session.password).toString('base64');
+    proxyReq.setHeader('Authorization', auth);
   });
 
   apiProxy.on('proxyReq', function (proxyReq, req, res) {
@@ -70,10 +73,11 @@ module.exports = function (app) {
     } else {
       req.session.expires = new Date(Date.now() + session_max_age * 60 * 1000);
       sessionUtil.touch(req.session, session_max_age);
-      // Renew jwt token.
-      if ((new Date(req.session.jwt.expires) - req.session.expires) < 1 * 60 * 1000) {
-        rest.jwtRenew(req, res);
-      }
+      // TODO Use 'X-Authorization' if jwt token is ready.
+      // // Renew jwt token.
+      // if ((new Date(req.session.jwt.expires) - req.session.expires) < 1 * 60 * 1000) {
+      //   rest.jwtRenew(req, res);
+      // }
 
       next(); // Call the next middleware
     }
