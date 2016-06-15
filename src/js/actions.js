@@ -89,6 +89,7 @@ export function login(username, password) {
         } else if (res.ok) {
           if (res.body) {
             const headerNavs = res.body.headerNavs;
+            cookies.set("user", username);
             dispatch(loginSuccess(username, headerNavs));
           } else {
             dispatch(loginFailure({message: res.text}));

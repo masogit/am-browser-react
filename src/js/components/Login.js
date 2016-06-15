@@ -8,6 +8,7 @@ import Section from 'grommet/components/Section';
 import Sidebar from 'grommet/components/Sidebar';
 import LoginForm from 'grommet/components/LoginForm';
 import Logo from './Logo';
+import cookies from 'js-cookie';
 
 class IndexerLogin extends Component {
 
@@ -58,7 +59,7 @@ class IndexerLogin extends Component {
             errors={errors}
             usernameType='text'
             defaultValues={{
-              username: 'admin',
+              username: cookies.get('user'),
               rememberMe: true
             }}/>
         </Sidebar>

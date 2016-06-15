@@ -9,6 +9,7 @@ import Anchor from 'grommet/components/Anchor';
 import Layer from 'grommet/components/Layer';
 import User from 'grommet/components/icons/base/User';
 import ErrorHistory from './ErrorHistory';
+import cookies from 'js-cookie';
 
 class SessionMenu extends Component {
 
@@ -45,7 +46,7 @@ class SessionMenu extends Component {
   render() {
     return (
       <Box>
-        <Menu icon={<User />} label="User">
+        <Menu icon={<User />} label={cookies.get('user')}>
           <Anchor href="#" className="active">Settings</Anchor>
           <Anchor onClick={this.showErrorDialog.bind(this)}>Error Log</Anchor>
           <Anchor href="#">Help</Anchor>
