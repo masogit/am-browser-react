@@ -6,17 +6,17 @@ var Validator = require('./validator.js');
 
 // check db folder and files
 exports.init = function (dbFolder) {
-  logger.info(`Set db folder to ${dbFolder}`);
+  logger.info("[server]", `Set db folder to ${dbFolder}`);
   tingodbFolder = dbFolder;
   fs.exists(dbFolder, function (db) {
     if (!db) {
-      logger.info(`The db folder '${dbFolder}' not found, will create it.`);
+      logger.info("[server]", `The db folder '${dbFolder}' not found, will create it.`);
 
       fs.mkdir(dbFolder, function (err) {
         if (err) {
           return logger.error(err);
         }else{
-          logger.info(`The db folder '${dbFolder}' was created.`);
+          logger.info("[server]", `The db folder '${dbFolder}' was created.`);
         }
       })
 
@@ -44,7 +44,7 @@ exports.find = function (req, res) {
   if (id)
     db.collection(collectionName).findOne({_id: id}, function (err, document) {
       if (err)
-        logger.error(err);
+        logger.error("[tingo]", err);
       else if (download)
         JSONDownloader(res, document, (document.name || id) + '.json');
       else
@@ -54,7 +54,7 @@ exports.find = function (req, res) {
   else
     db.collection(collectionName).find().toArray(function (err, documents) {
       if (err)
-        logger.error(err);
+        logger.error("[tingo]", err);
       else if (download)
         JSONDownloader(res, documents, collectionName + '.json');
       else
@@ -68,7 +68,7 @@ exports.findOne = function (collectionName, id, callback) {
 
   db.collection(collectionName).findOne({_id: id}, function (err, documents) {
     if (err)
-      logger.error(err);
+      logger.error("[tingo]", err);
     if (typeof callback == 'function')
       callback(documents);
     db.close();
@@ -85,7 +85,7 @@ exports.upsert = function (req, res) {
   var validator = new Validator();
   var error = validator.document(collectionName, obj);
   if (error) {
-    logger.error(error);
+    logger.error(`[tingo]`, error);
     res.status(400).send(error);
   } else {
     if (id)
@@ -96,7 +96,7 @@ exports.upsert = function (req, res) {
 
     db.collection(collectionName).update({_id: obj._id}, obj, {upsert: true}, function (err, result) {
       if (err)
-        logger.error(err);
+        logger.error("[tingo]", err);
       res.send(obj._id);
       db.close();
     });
@@ -110,7 +110,7 @@ exports.delete = function (req, res) {
   var id = req.params.id;
   db.collection(collectionName).remove([{_id: id}], function (err, result) {
     if (err)
-      logger.error(err);
+      logger.error("[tingo]", err);
     res.send(id);
     db.close();
   });

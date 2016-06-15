@@ -17,7 +17,7 @@ var cors = require('cors');
 var PropertiesReader = require('properties-reader');
 var properties = PropertiesReader('am-browser-config.properties.default');
 properties.append('am-browser-config.properties');
-logger.info("Server configuration: " + JSON.stringify(properties));
+logger.info("[server]", "Server configuration: " + JSON.stringify(properties));
 
 // initial AM node server
 var server = process.env.AMB_NODE_SERVER || properties.get('node.server');
@@ -72,7 +72,7 @@ app.get('/ucmdbAdapter/*/*', indexHtml);
 morgan.token('sessionId', function getSessionId (req) {
   return req.session ? req.session.id : '';
 })
-var morganFormat = "[:remote-addr] [:remote-user] [:sessionId] :method :url HTTP/:http-version :status :res[content-length] - :response-time ms";
+var morganFormat = "[express] [:sessionId] [:remote-addr] [:remote-user] :method :url HTTP/:http-version :status :res[content-length] - :response-time ms";
 var stream = {
   write: function(message, encoding){
     logger.debug(message);
@@ -94,7 +94,7 @@ app.use(function(err, req, res, next){
 // listen (start app with node server.js) ======================================
 var http_server = http.createServer(app);
 http_server.listen(port, server, () => {
-  logger.info("App listening HTTP on port " + port);
+  logger.info("[server]", "App listening HTTP on port " + port);
 });
 http_server.on('error', (e) => {
   if (e.code == 'EADDRINUSE') {
@@ -115,7 +115,7 @@ try {
   };
   var https_server = https.createServer(server_options, app);
   https_server.listen(https_port, () => {
-    logger.info("App listening HTTPS on port " + https_port);
+    logger.info("[server]", "App listening HTTPS on port " + https_port);
   });
   https_server.on('error', (e) => {
     if (e.code == 'EADDRINUSE') {
@@ -124,11 +124,11 @@ try {
   });
 }
 catch (e) {
-  logger.warn("HTTPS is not set correctly");
+  logger.warn("[server]", "HTTPS is not set correctly");
 }
 
 var shutdown = function () {
-  logger.info("Received kill signal, shut down server.");
+  logger.info("[server]", "Received kill signal, shut down server.");
   process.exit();
 }
 

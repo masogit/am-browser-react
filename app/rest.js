@@ -113,7 +113,7 @@ module.exports = function (am) {
 
       request = client.get(url, args, (data, response) => {
         if (!data.entities || data.count === 0) {
-          logger.warn('user name or password is wrong');
+          logger.warn(`[user] [${req.sessionID || '-'}]`, 'user name or password is wrong: ', username);
           res.send('user name or password is wrong');
         } else {
           req.session.expires = new Date(Date.now() + am.session_max_age * 60 * 1000);
@@ -130,11 +130,11 @@ module.exports = function (am) {
           res.cookie('headerNavs', am_rest.headerNavs);
           res.json(am_rest);
         }
-
+        logger.info(`[user] [${req.sessionID || '-'}]`, (req.session && req.session.user ? req.session.user : "user") + " login.");
         res.end();
       });
     }).on('error', function (err) {
-      logger.error("login failed with error: " + err.toString());
+      logger.error(`[user] [${req.sessionID || '-'}]`, "login failed with error: " + err.toString());
       res.status(500).send(err.toString());
     });
   };
