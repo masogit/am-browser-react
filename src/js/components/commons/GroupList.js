@@ -59,8 +59,8 @@ export default class GroupList extends Component {
       });
   }
 
-  _onSearch(keyword) {
-    var keyword = keyword.toLowerCase().trim();
+  _onSearch(event) {
+    var keyword = event.target.value.toLowerCase().trim();
     if (keyword) {
       var filtered = this.props.children.filter((child) => {
         return child.props.groupby.toLowerCase().indexOf(keyword) > -1 ||
@@ -83,7 +83,7 @@ export default class GroupList extends Component {
       <Box direction="column">
         {
           this.props.searchable &&
-          <SearchInput placeHolder="Search..." onChange={this._onSearch.bind(this)}/>
+          <SearchInput placeHolder="Search..." onDOMChange={this._onSearch.bind(this)}/>
         }
         <Box className='autoScroll'>
         {
