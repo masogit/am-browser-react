@@ -2,6 +2,8 @@
 // import * as types from '../constants/ActionTypes';
 import {HOST_NAME} from '../util/Config';
 import Rest from '../util/grommet-rest-promise';
+const store = require('../store');
+import * as Types from '../constants/ActionTypes';
 
 export function saveWall(wall, callback) {
   Rest.post(HOST_NAME + '/coll/wall', wall).then((res) => {
@@ -72,8 +74,10 @@ export function queryAQL(str, callback) {
   var idx_FROM = str.toLowerCase().indexOf("from");
   var idx_WHERE = str.toLowerCase().indexOf("where");
 
-  if (idx_SELECT < 0 || idx_FROM < 0)
-    callback(null);
+  if (idx_SELECT < 0 || idx_FROM < 0) {
+    // callback(null);
+    store.default.dispatch({type: Types.RECEIVE_ERROR, msg: "AQL is invalid! Can not query data for Graph"});
+  }
   else {
     // get fields from SELECT .. FROM
     aql.fields = str.substring(idx_SELECT + 6, idx_FROM).trim();
