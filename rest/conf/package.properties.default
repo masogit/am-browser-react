@@ -54,7 +54,8 @@ DB.passphrase=
 
 # Comma-separated list of Web Services to load on startup
 # example : Head/Administration, Head/* , R50/*
-WebService.LoadOnStartup=Head/*
+# For Restful, no need to load tag on startup
+WebService.LoadOnStartup=
 
 # Set the fetching size for each query result
 DB.FetchingArraySize=30
