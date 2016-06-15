@@ -47,10 +47,12 @@ class SessionMenu extends Component {
     return (
       <Box>
         <Menu icon={<User />} label={cookies.get('user')}>
+          {/*
           <Anchor href="#" className="active">Settings</Anchor>
-          <Anchor onClick={this.showErrorDialog.bind(this)}>Error Log</Anchor>
           <Anchor href="#">Help</Anchor>
           <Anchor href="#">About</Anchor>
+           */}
+          <Anchor onClick={this.showErrorDialog.bind(this)}>Error Log</Anchor>
           <Anchor href="#" onClick={this._onLogout}>Logout</Anchor>
         </Menu>
         {this.state.dialog}
