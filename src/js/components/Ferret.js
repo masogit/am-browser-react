@@ -20,22 +20,21 @@ class Indexer extends Component {
     this.props.dispatch(navResponsive(responsive));
   }
 
-  _newErrorRead() {
-    store.dispatch({type: Types.NEW_ERROR_READ});
+  _newMsgRead() {
+    store.dispatch({type: Types.MESSAGE_READ});
   }
 
   render() {
-    const {newError, headerNavs} = this.props;
+    const {message, headerNavs} = this.props;
     let header;
     if (headerNavs) {
       header = <NavHeader headerNavs={headerNavs}/>;
     }
     let alert;
-    if (newError) {
+    if (message.msg) {
       alert = (
-          // <Notification status="critical" message={newError} onClick={this._newErrorRead}/>
-        <AlertForm onClose={this._newErrorRead} status="critical" title={"Error alert"}
-                   desc={newError} onConfirm={this._newErrorRead}/>
+        <AlertForm onClose={this._newMsgRead} status={message.status} title={"Message alert"}
+                   desc={message.msg} onConfirm={this._newMsgRead}/>
       );
     }
     return (
@@ -55,7 +54,7 @@ let select = (state) => {
     {},
     state.nav,
     {headerNavs: state.session.headerNavs},
-    {newError: state.error ? state.error.new : null}
+    {message: state.message}
   );
 };
 

@@ -8,14 +8,16 @@ import {
   TableRow
 } from 'grommet';
 
-class ErrorHistory extends Component {
+class MessageHistory extends Component {
 
   render() {
+    var Status = require('grommet/components/icons/Status');
     return (
       <Box pad="large">
-        <Header><Title>Error log history</Title></Header>
+        <Header><Title>Message history</Title></Header>
         <Table>
           <thead>
+          <th>Status</th>
           <th>Time</th>
           <th>Message</th>
           </thead>
@@ -24,6 +26,7 @@ class ErrorHistory extends Component {
             this.props.msgs.map((msg, index)=> {
               return (
                 <TableRow>
+                  <td> <Status value={msg.status} /> </td>
                   <td> {msg.time} </td>
                   <td> {msg.msg} </td>
                 </TableRow>
@@ -37,10 +40,10 @@ class ErrorHistory extends Component {
   }
 }
 
-let error = (state) => {
+let message = (state) => {
   return {
-    msgs: state.error.msgs
+    msgs: state.message.msgs
   };
 };
 
-export default connect(error)(ErrorHistory);
+export default connect(message)(MessageHistory);

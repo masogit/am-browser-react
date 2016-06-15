@@ -8,7 +8,7 @@ import Box from 'grommet/components/Box';
 import Anchor from 'grommet/components/Anchor';
 import Layer from 'grommet/components/Layer';
 import User from 'grommet/components/icons/base/User';
-import ErrorHistory from './ErrorHistory';
+import MessageHistory from './MessageHistory';
 import cookies from 'js-cookie';
 
 class SessionMenu extends Component {
@@ -35,7 +35,7 @@ class SessionMenu extends Component {
   showErrorDialog() {
     var layer = (
       <Layer onClose={this.closeDialog.bind(this)} closer={true}>
-        <ErrorHistory />
+        <MessageHistory />
       </Layer>
     );
     this.setState({
@@ -52,7 +52,7 @@ class SessionMenu extends Component {
           <Anchor href="#">Help</Anchor>
           <Anchor href="#">About</Anchor>
            */}
-          <Anchor onClick={this.showErrorDialog.bind(this)}>Error Log</Anchor>
+          <Anchor onClick={this.showErrorDialog.bind(this)}>Message History</Anchor>
           <Anchor href="#" onClick={this._onLogout}>Logout</Anchor>
         </Menu>
         {this.state.dialog}

@@ -3,7 +3,7 @@
 import { createStore, combineReducers, compose, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 
-import error from '../reducers/error';
+import message from '../reducers/message';
 import session from '../reducers/session';
 import route from '../reducers/route';
 import views from '../reducers/views';
@@ -15,4 +15,4 @@ import history from '../RouteHistory';
 export default compose(
   reduxReactRouter({history}),
   applyMiddleware(thunk)
-)(createStore)(combineReducers({session, route, views, metadata, ucmdbAdapter, router: routerStateReducer, error}));
+)(createStore)(combineReducers({session, route, views, metadata, ucmdbAdapter, router: routerStateReducer, message}));
