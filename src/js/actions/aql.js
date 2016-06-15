@@ -77,8 +77,7 @@ export function queryAQL(str, callback) {
   if (idx_SELECT < 0 || idx_FROM < 0) {
     // callback(null);
     store.default.dispatch({type: Types.RECEIVE_ERROR, msg: "AQL is invalid! Can not query data for Graph"});
-  }
-  else {
+  } else {
     // get fields from SELECT .. FROM
     aql.fields = str.substring(idx_SELECT + 6, idx_FROM).trim();
 
