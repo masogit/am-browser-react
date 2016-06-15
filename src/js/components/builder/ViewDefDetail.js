@@ -210,7 +210,7 @@ export default class ViewDefDetail extends ComponentBase {
       <tr>
         <td colSpan={8}>
               <textarea id={filter.id} name={filter.name} value={filter.value}
-                        placeholder="Input AQL as filter" onChange={filter._onChange}
+                        placeholder="Input AQL as filter" onChange={filter.onChange}
                         className='textarea'/>
         </td>
       </tr>
