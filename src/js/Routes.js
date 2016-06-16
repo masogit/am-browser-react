@@ -12,6 +12,8 @@ import TBD from 'grommet/components/TBD';
 import UCMDBAdapterContainer from './components/ucmdbAdapter/UCMDBAdapterPoint';
 var rootPath = "/"; //"/ferret/";
 
+const indexRoute = {component: Ferret};
+
 export const getRoutes = (headerNavs) => {
   const routes = [{path: 'login', component: Login}];
   if (headerNavs) {
@@ -34,6 +36,9 @@ export const getRoutes = (headerNavs) => {
         routes.push(route);
       }
     });
+    indexRoute.component = Search;
+  } else {
+    indexRoute.component = Ferret;
   }
 
   routes.push({
@@ -52,7 +57,7 @@ const Route = {
   path: (path) => (rootPath + path.slice(1)),
   routes: [
     {
-      indexRoute: { component: Search },
+      indexRoute: indexRoute,
       path: rootPath, component: Ferret,
       childRoutes: getRoutes()
     }
