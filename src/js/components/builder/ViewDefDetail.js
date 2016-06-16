@@ -39,6 +39,7 @@ export default class ViewDefDetail extends ComponentBase {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    super.componentDidUpdate(prevProps, prevState);
   }
 
   componentWillUnmount() {

@@ -12,7 +12,7 @@ export default class ComponentBase extends Component {
     };
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
     this.releaseLock();
   }
 
