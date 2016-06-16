@@ -25,12 +25,11 @@ export default class AlertForm extends Component {
 
   render() {
     const {desc, title, status, onClose, onConfirm, full} = this.props;
-    const messages = desc.length > 60 ? desc.substring(0, 60) + '...' : desc;
     return (
       <Box flex={false}>
         {
           this.props.status &&
-          <Notification status={status} message={messages} pad={{vertical: 'small'}}
+          <Notification status={status} message={desc} pad={{vertical: 'small'}} wrap={false}
                         onClick={onClose}/>
         }
         {
