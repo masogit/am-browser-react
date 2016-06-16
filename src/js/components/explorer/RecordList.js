@@ -260,7 +260,7 @@ export default class RecordList extends Component {
     const aqlStyle = {
       'font-weight': 'bold',
       'color': '#767676',
-      'border-color': '#614767'
+      'border-color': '#F04953'
     };
 
     return (
