@@ -4,8 +4,6 @@ var Convertor = require('json-2-csv');
 var sessionUtil = require('./sessionUtil.js');
 var config = require('./config.js');
 var logger = require('./logger.js');
-var child_process = require('child_process');
-var slackProcess = child_process.fork('./app/slack.js');
 
 module.exports = function (am) {
 
@@ -180,16 +178,24 @@ module.exports = function (am) {
 };
 
 function slack(username, message, prefix, callback) {
-  prefix = prefix || '[System]';
+  if (config.slack_url) {
+    var child_process = require('child_process');
+    var slackProcess = child_process.fork('./app/slack.js');
 
-  slackProcess.send({username: username, message: `${prefix} ${message}`});
-  slackProcess.on('message', function (result) {
-    logger[result.status](result.message);
+    prefix = prefix || '[System]';
+
+    slackProcess.send({username: username, message: `${prefix} ${message}`});
+    slackProcess.on('message', function (result) {
+      logger[result.status](result.message);
+      if (callback) {
+        callback(result);
+      }
+    });
+  } else {
     if (callback) {
-      callback(result);
+      callback({status: 'warn', message: 'Slack url is not configured'});
     }
-
-  });
+  }
 }
 
 function getFormattedRecords(fields, rawRecords) {

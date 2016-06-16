@@ -24,30 +24,31 @@ export default class AlertForm extends Component {
   }
 
   render() {
-
+    const {desc, title, status, onClose, onConfirm, full} = this.props;
+    const messages = desc.length > 60 ? desc.substring(0, 60) + '...' : desc;
     return (
       <Box>
         {
           this.props.status &&
-          <Notification status={this.props.status} message={this.props.desc} pad={{vertical: 'small'}}
-                        onClick={this.props.onClose} />
+          <Notification status={status} message={messages} pad={{vertical: 'small'}}
+                        onClick={onClose}/>
         }
         {
           !this.props.status &&
-          <Layer onClose={this.props.onClose} closer={true} {...this.props}>
-            <Box full={this.props.full} justify="center">
+          <Layer onClose={onClose} closer={true} {...this.props}>
+            <Box full={full} justify="center">
               <Form pad={{vertical: 'large'}}>
                 <Header>
                   <h2>
-                    {this.props.title}
+                    {title}
                   </h2>
                 </Header>
                 <p>
-                  {this.props.desc}
+                  {desc}
                 </p>
                 <Footer>
                   {
-                    this.props.onConfirm &&
+                    onConfirm &&
                     <Button label="Confirm" primary={true} strong={true} onClick={this._onClick.bind(this)}/>
                   }
                 </Footer>

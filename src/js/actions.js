@@ -120,8 +120,7 @@ export function sendMessageToSlack(messages) {
         if (res.text) {
           dispatch({type: Types.RECEIVE_WARNING, msg: res.text});
         } else {
-          messages = messages.length > 20 ? messages.substring(0, 60) + '...' : messages;
-          dispatch({type: Types.RECEIVE_INFO, msg: `"${messages}" is sent to Slack successfully`});
+          dispatch({type: Types.RECEIVE_INFO, msg: `Message sent to Slack:"${messages}"`});
         }
       }
     }, err => {

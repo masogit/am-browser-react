@@ -27,7 +27,7 @@ class MessageHistory extends Component {
           {
             this.props.msgs.map((msg, index) => {
               return (
-                <TableRow>
+                <TableRow key={index}>
                   <td><Status value={msg.status}/></td>
                   <td> {msg.time} </td>
                   <td> {msg.msg} </td>
