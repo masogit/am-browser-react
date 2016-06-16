@@ -104,7 +104,8 @@ export function queryAQL(str, callback) {
     Rest.get(HOST_NAME + query).then((res) => {
       callback(simpleAQLResult(res.body.Query));
     }, (err) => {
-      console.log(err.response ? err.response.text : err);
+      const errorMessage = err.rawResponse || (err.response ? err.response.text : err.toString());
+      store.default.dispatch({type: Types.RECEIVE_ERROR, msg: errorMessage});
     });
   }
 }
@@ -149,5 +150,11 @@ function simpleAQLResult(Query) {
       data.rows.push(cols);
   }
 
+  if (data.rows[0] && data.header.length !== data.rows[0].length) {
+    store.default.dispatch({
+      type: Types.RECEIVE_ERROR,
+      msg: 'AQL str is invalid: selected fields is inconsistent with result fields'
+    });
+  }
   return data;
 }

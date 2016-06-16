@@ -367,6 +367,7 @@ export default class AQL extends Component {
     }));
 
     const focus = this.state.aql && {expand: this.state.aql.category, selected: this.state.aql._id};
+    const validData = this.state.data.rows.length > 0 && this.state.data.header.length === this.state.data.rows[0].length;
 
     return (
       <Box direction="row" flex={true}>
@@ -412,7 +413,7 @@ export default class AQL extends Component {
           </Box>
           <Split flex="left" fixed={false} className='fixMinSizing'>
             <Box pad={{vertical: 'small'}}>
-              {this.state.data && this.state.aql.form && this.state.aql.form != 'init' && this.state.aql.type &&
+              {validData && this.state.aql.form && this.state.aql.form != 'init' && this.state.aql.type &&
               <Graph type={this.state.aql.type} data={this.state.data} config={this.state.aql.form}
                      onClick={(filter) => this._showViewRecords(filter, this.state.aql.view)}/>}
               <Table className='autoScroll'>
@@ -425,7 +426,7 @@ export default class AQL extends Component {
               </Table>
             </Box>
             {
-              this.state.data && this.state.aql.form &&
+              validData && this.state.aql.form &&
               <Box pad={{horizontal: 'small'}}>
                 <Tabs initialIndex={getIndex(this.state.aql.type)} justify='end'>
                   <ActionTab title="Chart" onClick={this._genGraph.bind(this, null, 'chart')} ref='chart'>
