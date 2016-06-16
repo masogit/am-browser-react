@@ -6,6 +6,7 @@ import Play from 'grommet/components/icons/base/Play';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
 import Duplicate from 'grommet/components/icons/base/Duplicate';
 import Download from 'grommet/components/icons/base/Download';
+import More from 'grommet/components/icons/base/More';
 import Mail from 'grommet/components/icons/base/Mail';
 import _ from 'lodash';
 import AlertForm from '../../components/commons/AlertForm';
@@ -284,15 +285,14 @@ export default class ViewDefDetail extends ComponentBase {
         <Header justify="between" size="small">
           <Title>View Builder</Title>
           <Menu direction="row" align="center" responsive={true}>
-            <Anchor link="#" icon={<Play />} onClick={this.props.openPreview}>Query</Anchor>
-            <Anchor link="#" icon={<Checkmark />} onClick={this._onSubmit}>Save</Anchor>
-            <Anchor link="#" icon={<Close />} onClick={this.props.deleteViewDef}>Delete</Anchor>
-            <Anchor link="#" icon={<Duplicate />} onClick={this.props.onDuplicateViewDef}>Duplicate</Anchor>
-            {
-              selectedView._id &&
-              <Anchor link="#" icon={<Mail />} onClick={this._onMail.bind(this, selectedView)}>Mail</Anchor>
-            }
-            <Anchor link="#" icon={<Download />} onClick={this._onDownload.bind(this, selectedView)}>Download</Anchor>
+            <Anchor link="#" icon={<Play />} onClick={this.props.openPreview} label="Query" />
+            <Anchor link="#" icon={<Checkmark />} onClick={this._onSubmit} label="Save" />
+            <Anchor link="#" icon={<Close />} onClick={this.props.deleteViewDef} label="Delete" />
+            <Menu icon={<More />}>
+              <Anchor link="#" icon={<Duplicate />} onClick={this.props.onDuplicateViewDef} label="Duplicate" />
+              {selectedView._id && <Anchor link="#" icon={<Mail />} onClick={this._onMail.bind(this, selectedView)} label="Mail" />}
+              <Anchor link="#" icon={<Download />} onClick={this._onDownload.bind(this, selectedView)} label="Download" />
+            </Menu>
           </Menu>
         </Header>
         {

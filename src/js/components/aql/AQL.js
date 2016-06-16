@@ -14,6 +14,7 @@ import SideBar from '../commons/SideBar';
 import EmptyIcon from '../commons/EmptyIcon';
 import * as Format from '../../constants/RecordFormat';
 import Download from 'grommet/components/icons/base/Download';
+import More from 'grommet/components/icons/base/More';
 import Mail from 'grommet/components/icons/base/Mail';
 
 import {
@@ -373,19 +374,20 @@ export default class AQL extends Component {
           <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
             <Title>AQL and Graph</Title>
             <Menu direction="row" align="center" responsive={true}>
-              <Anchor link="#" icon={<Play />} onClick={this._onQuery.bind(this)}>Query</Anchor>
-              <Anchor link="#" icon={<Add />} onClick={this._onNew.bind(this)}>New</Anchor>
-              <Anchor link="#" icon={<Checkmark />} onClick={this._onSaveAQL.bind(this)}>Save</Anchor>
-              <Anchor link="#" icon={<Close />} onClick={this._onDelete.bind(this)}>Delete</Anchor>
-              {
-                this.state.aql._id &&
-                <Anchor link="#" icon={<Mail />} onClick={this._onMail.bind(this, this.state.aql)}>Mail</Anchor>
-              }
-              <Anchor link="#" icon={<Download />}
-                      onClick={this._onDownload.bind(this, this.state.aql)}>Download</Anchor>
-              <Anchor link="#" icon={<Attachment />} onClick={this._selectView.bind(this)}>
-                {this.state.aql.view ? 'Attached view: ' + this.state.aql.view.name : 'Attach View'}
-              </Anchor>
+              <Anchor link="#" icon={<Play />} onClick={this._onQuery.bind(this)} label="Query"/>
+              <Anchor link="#" icon={<Add />} onClick={this._onNew.bind(this)} label="New"/>
+              <Anchor link="#" icon={<Checkmark />} onClick={this._onSaveAQL.bind(this)} label="Save"/>
+              <Anchor link="#" icon={<Close />} onClick={this._onDelete.bind(this)} label="Delete"/>
+              <Menu icon={<More />}>
+                {
+                  this.state.aql._id &&
+                  <Anchor link="#" icon={<Mail />} onClick={this._onMail.bind(this, this.state.aql)} label="Mail"/>
+                }
+                <Anchor link="#" icon={<Download />} onClick={this._onDownload.bind(this, this.state.aql)}
+                        label="Download"/>
+                <Anchor link="#" icon={<Attachment />} onClick={this._selectView.bind(this)}
+                        label={this.state.aql.view ? 'Attached view: ' + this.state.aql.view.name : 'Attach View'}/>
+              </Menu>
             </Menu>
           </Header>
           <Box justify="between" direction="row" className='header'>
