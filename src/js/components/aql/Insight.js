@@ -10,8 +10,9 @@ import EmptyIcon from '../commons/EmptyIcon';
 import Add from 'grommet/components/icons/base/Add';
 import Close from 'grommet/components/icons/base/Close';
 import Attachment from 'grommet/components/icons/base/Attachment';
-import DocumentPdf from 'grommet/components/icons/base/DocumentPdf';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
+import CaretNext from 'grommet/components/icons/base/CaretNext';
+import Previous from 'grommet/components/icons/base/Previous';
 import Graph from './../commons/Graph';
 import {
   Anchor,
@@ -251,7 +252,8 @@ export default class Insight extends Component {
         child = (
           <Box justify="center" {...box} direction="column" pad="medium" flex={false}>
             <Header>
-              <Anchor label={dataMap.aql.name} onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
+              <Anchor icon={<CaretNext />} label={dataMap.aql.name}
+                      onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
             </Header>
             <Graph type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
                    onClick={(filter) => this._showViewRecords(filter, dataMap.aql.view)}/>
@@ -306,7 +308,7 @@ export default class Insight extends Component {
             return (
               <Box pad="large" colorIndex="light-2" key={index}>
                 <Header>
-                  <Anchor label={dataMap.aql.name} onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
+                  <Anchor icon={<CaretNext />} label={dataMap.aql.name} onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
                 </Header>
                 <Box pad="large" align={(dataMap.aql.type=='meter')?'center':null}>
                   <Graph key={dataMap.aql._id} type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
@@ -375,7 +377,8 @@ export default class Insight extends Component {
 
   _onSave() {
     var alert = (<AlertForm onClose={this._closeAlert.bind(this)}
-                            title={'Save your Insight Dashboard?'}
+                            title={'Insight Dashboard modification'}
+                            desc={`Save Insight's layout and graph(s).`}
                             onConfirm={this._onSaveWall.bind(this)}/>);
     this.setState({
       alert: alert
@@ -415,16 +418,12 @@ export default class Insight extends Component {
                 this.state.edit &&
                 <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>
               }
-              {
-                !this.state.edit &&
-                <Anchor href="#" icon={<DocumentPdf />} label="Print" onClick={this._onPrint.bind(this)}/>
-              }
               <CheckBox id="edit" label="Edit" checked={this.state.edit} onChange={this._toggleEdit.bind(this)}
                         toggle={true}/>
             </Menu>
           }
           {
-            this.props.params.id && <Anchor label="Back" onClick={() => {
+            this.props.params.id && <Anchor icon={<Previous />} label="Back" onClick={() => {
               history.go(-1);
             }}/>
           }
