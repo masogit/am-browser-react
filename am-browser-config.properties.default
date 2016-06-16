@@ -31,7 +31,7 @@ power = Full_WriteAccess, Power_leveraged_user
 guest = @anyone
 
 [slack]
-url = https://hooks.slack.com/services/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
+#url = https://hooks.slack.com/services/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
 channel = #betaprogram
 
 [proxy]
