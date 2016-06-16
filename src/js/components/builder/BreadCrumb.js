@@ -33,7 +33,7 @@ export default class BreadCrumb extends Component {
     });
 
     return (
-      <Box pad={breadcrumbs.length > 0 && {vertical: 'small'}} flex={false}>{breadcrumbs}</Box>
+      <Box pad={breadcrumbs.length > 0 ? {vertical: 'small'} : null} flex={false}>{breadcrumbs}</Box>
     );
   }
 }
