@@ -150,9 +150,11 @@ function simpleAQLResult(Query) {
       data.rows.push(cols);
   }
 
-  if (data.rows[0] && data.header.length !== data.rows[0].length) {
+  const result_Row = Query.Result.Row[0] ? Query.Result.Row[0].Column.length : 1;
+
+  if (data.header.length !== result_Row) {
     store.default.dispatch({
-      type: Types.RECEIVE_ERROR,
+      type: Types.RECEIVE_WARNING,
       msg: 'AQL str is invalid: selected fields is inconsistent with result fields'
     });
   }
