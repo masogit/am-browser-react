@@ -1,6 +1,19 @@
 @echo off
 set ODBCCONF=C:/Windows/System32/odbcconf.exe
 set ODBCCAD=C:/Windows/System32/odbcad32.exe
+:check_Permissions
+echo ####### INFO: CHECK PERMISSIONS #########
+net session >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+  echo CHECK PERMISSIONS: Administrative permissions confirmed
+  echo ##########################################################
+  echo.
+) else (
+  echo CHECK PERMISSIONS: Current permissions inadequate, please run it as administrator
+  echo ##########################################################
+  echo.
+  goto end
+)
 if "x%1x" == "xx" goto displayUsage
 if "x%3x" == "xx" goto registerDefaultODBCService
 set DSN=%1
