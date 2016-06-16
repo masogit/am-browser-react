@@ -177,11 +177,14 @@ module.exports = function (am) {
   this.slack = slack;
 };
 
-function slack(username, message, prefix, callback) {
-  if (config.slack_url) {
-    var child_process = require('child_process');
-    var slackProcess = child_process.fork('./app/slack.js');
+var slackProcess;
+if (config.slack_url) {
+  var child_process = require('child_process');
+  slackProcess = child_process.fork('./app/slack.js');
+}
 
+function slack(username, message, prefix, callback) {
+  if (slackProcess) {
     prefix = prefix || '[System]';
 
     slackProcess.send({username: username, message: `${prefix} ${message}`});
