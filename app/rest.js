@@ -121,7 +121,7 @@ module.exports = function (am) {
       };
 
       request = client.get(url, args, (data, response) => {
-        if (!data.entities || data.count === 0) {
+        if (!data.entities || !data.entities[0] || data.count === 0) {
 
           var message = 'The user name or password is incorrect or your account is locked.';
           logger.warn(`[user] [${req.sessionID || '-'}]`, message, username);
