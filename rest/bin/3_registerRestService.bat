@@ -11,6 +11,7 @@ if %ERRORLEVEL% EQU 0 (
   echo CHECK PERMISSIONS: Current permissions inadequate, please run it as administrator
   echo ##########################################################
   echo.
+  pause
   goto end
 )
 call "%SCRIPTPATH%\startRestServiceCmd.bat" install am-browser-rest-service
