@@ -14,3 +14,4 @@ ssl
 **sublime-workspace**
 *.iml
 .idea
+am-browser-config.properties
