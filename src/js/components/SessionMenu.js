@@ -8,6 +8,9 @@ import { Menu, Anchor, Layer, Box } from 'grommet';
 import MessageHistory from './MessageHistory';
 import SlackDialog from './SlackDialog';
 var Close = require('grommet/components/icons/base/Close');
+var Slack = require('grommet/components/icons/base/SocialSlack');
+var Logout = require('grommet/components/icons/base/Logout');
+var History = require('grommet/components/icons/base/History');
 
 import cookies from 'js-cookie';
 
@@ -57,9 +60,9 @@ class SessionMenu extends Component {
           <Anchor href="#">Help</Anchor>
           <Anchor href="#">About</Anchor>
            */}
-          <Anchor onClick={this.showMessageDialog.bind(this)}>Message History</Anchor>
-          <Anchor onClick={this.showSlackDialog.bind(this)}>Slack</Anchor>
-          <Anchor href="#" onClick={this._onLogout.bind(this)}>Logout</Anchor>
+          <Anchor icon={<History />} onClick={this.showMessageDialog.bind(this)}>Message History</Anchor>
+          <Anchor icon={<Slack />} onClick={this.showSlackDialog.bind(this)}>Slack</Anchor>
+          <Anchor icon={<Logout />} onClick={this._onLogout.bind(this)}>Logout</Anchor>
         </Menu>
         {this.state.dialog &&
         <Layer align="center" closer={<Anchor className='layer__closer' icon={<Close/>} onClick={this.closeDialog}/>}>
