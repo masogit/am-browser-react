@@ -102,7 +102,8 @@ export default class MetaData extends ComponentBase {
     return (
       <Box flex={true}>
         <SearchInput id="metadataFilter" placeHolder="Search fields and links..." onDOMChange={this._onSearch}/>
-        <Box className='autoScroll'>
+        <Box pad={{vertical: 'small'}}>
+          <Box className='autoScroll'>
           {entitiesComponents}
           {
             entitiesComponents.length == 0 &&
@@ -115,6 +116,7 @@ export default class MetaData extends ComponentBase {
               </Tab>
             </Tabs>
           }
+          </Box>
         </Box>
       </Box>
     );
