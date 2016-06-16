@@ -125,6 +125,14 @@ export default class RecordList extends Component {
   }
 
   _filterAdd(event) {
+
+    // press '/' switch AQL input
+    if (event.target.value.trim() == '/') {
+      this._toggleAQLInput();
+      event.target.value = "";
+    }
+
+    // press enter to build AQL filter
     if (event.keyCode === 13 && event.target.value.trim()) {
       if (this.state.aqlInput) {
         this._aqlFilterAdd();
@@ -147,10 +155,11 @@ export default class RecordList extends Component {
         }
       }
     } else {
-      if (!this.state.aqlInput)
+      if (!this.state.aqlInput) {
         this.setState({
           filtered: this.state.records.filter((obj) => JSON.stringify(obj).toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1)
         });
+      }
     }
   }
 
@@ -267,7 +276,7 @@ export default class RecordList extends Component {
       <Header justify="between">
         <Title>{this.props.title}</Title>
         <input type="text" inline={true} className="flex" ref="search" style={this.state.aqlInput?aqlStyle:{}}
-               placeholder={this.state.aqlInput?'Input AQL...':'Quick search'}
+               placeholder={this.state.aqlInput?`Input AQL...`:`Quick search, press / input AQL`}
                onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
         <Box direction="column">
           <Box direction="row" style={{fontSize: '70%', fontWeight: 'bold'}}>
