@@ -27,9 +27,9 @@ process.on('message', function (obj) {
   const args = {
     data: {
       channel: config.slack_channel,
-      username: username,
+      username: 'AM broswer',
       text: message,
-      icon_emoji: ":ghost:"
+      icon_emoji: ":skier:"
     },
     headers: {
       'Content-Type': 'application/json'

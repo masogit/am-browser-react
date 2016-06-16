@@ -7,6 +7,7 @@ import User from 'grommet/components/icons/base/User';
 import { Menu, Anchor, Layer, Box } from 'grommet';
 import MessageHistory from './MessageHistory';
 import SlackDialog from './SlackDialog';
+var Close = require('grommet/components/icons/base/Close');
 
 import cookies from 'js-cookie';
 
@@ -61,7 +62,7 @@ class SessionMenu extends Component {
           <Anchor href="#" onClick={this._onLogout.bind(this)}>Logout</Anchor>
         </Menu>
         {this.state.dialog &&
-        <Layer onClose={this.closeDialog} closer={true} flush={true} align="center">
+        <Layer align="center" closer={<Anchor className='layer__closer' icon={<Close/>} onClick={this.closeDialog}/>}>
           {this.state.dialog}
         </Layer>
         }

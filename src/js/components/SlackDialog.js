@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 
 import { Box, Button, Title, FormField, Form, Footer, Menu } from 'grommet';
+var SocialSlack = require('grommet/components/icons/base/SocialSlack');
 
 export default class SlackDialog extends Component {
   constructor() {
@@ -22,7 +23,7 @@ export default class SlackDialog extends Component {
   }
 
   onKeyUp(event) {
-    if (event.keyCode === 13 && !event.ctrlKey && this.state.message.trim()) {
+    if (event.keyCode === 13 && (event.ctrlKey || event.shiftKey) && this.state.message.trim()) {
       this.props.onClick(this.state.message);
       this.props.onClose();
     }
@@ -31,18 +32,28 @@ export default class SlackDialog extends Component {
 
   render() {
     return (
-      <Box pad="large">
-        <Form>
-          <Title>Send message to slack</Title>
+      <Box pad='medium' size='medium'>
+        <Form className='long-form'>
+          <Title>Send message to Slack</Title>
           <fieldset>
-            <FormField label="Messages">
+            <FormField>
               <textarea value={this.state.message} onChange={this.onChange.bind(this)}
-                        onKeyUp={this.onKeyUp.bind(this)}></textarea>
+                        placeholder='What do you want to say to HPE AM Browser team?'
+                        onKeyUp={this.onKeyUp.bind(this)} rows={8}>
+              </textarea>
             </FormField>
           </fieldset>
-          <Footer justify="end">
-            <Menu direction="row" justify="end">
+          <Footer justify="between">
+            <a href='https://ambrowser.slack.com' style={{ lineHeight: '13px', fontSize: '13px'}} target='_blank'>
+              <Box align='center'>
+                <SocialSlack />
+                <span>AM Browser team</span>
+              </Box>
+            </a>
+
+            <Menu direction="row">
               <Button label="Send" primary={true} onClick={this.state.message.trim() ? this.onClick.bind(this) : null}/>
+              <span></span>
               <Button label="Cancel" onClick={this.props.onClose}/>
             </Menu>
           </Footer>

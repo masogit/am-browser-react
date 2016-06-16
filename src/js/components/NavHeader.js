@@ -44,7 +44,7 @@ class NavHeader extends Component {
         <Title><Logo /> AM Browser</Title>
         <Menu direction="row" align="center" responsive={true}>
           {
-            links.map((link, index) => <Link key={index} to={link.to}
+            links.map((link, index) => <Link key={index} to={link.to} className='anchor'
                                              activeClassName="active link-disabled">{link.text}</Link>)
           }
           <SessionMenu />

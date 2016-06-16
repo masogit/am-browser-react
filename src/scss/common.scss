@@ -11,6 +11,10 @@
   width: 350px;
 }
 
+.long-form {
+  width: 700px;
+}
+
 .autoScroll {
   overflow: auto;
 }
@@ -58,8 +62,4 @@ table {
 
 .hide {
   display: none;
-}
-
-a {
-  text-decoration: none !important;
 }

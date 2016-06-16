@@ -13,7 +13,7 @@ class MessageHistory extends Component {
 
   render() {
     return (
-      <Box pad="large">
+      <Box pad="medium" size='large'>
         <Header><Title>Message history</Title></Header>
         <Table>
           <thead>
