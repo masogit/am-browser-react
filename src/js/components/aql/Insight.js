@@ -374,17 +374,20 @@ export default class Insight extends Component {
   }
 
   _onSave() {
+    var alert = (<AlertForm onClose={this._closeAlert.bind(this)}
+                            title={'Save your Insight Dashboard?'}
+                            onConfirm={this._onSaveWall.bind(this)}/>);
+    this.setState({
+      alert: alert
+    });
+  }
+
+  _onSaveWall() {
     var wall = this.state.wall;
     wall.box = this.state.box;
     AQLActions.saveWall(wall, (data) => {
       if (data)
         this._loadWall(wall.user);
-      var alert = (<AlertForm onClose={this._closeAlert.bind(this)}
-                              title={'AM Insight layout saved!'}
-                              onConfirm={this._closeAlert.bind(this)}/>);
-      this.setState({
-        alert: alert
-      });
     });
   }
 

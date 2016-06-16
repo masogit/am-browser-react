@@ -7,7 +7,10 @@ import * as Types from '../constants/ActionTypes';
 
 export function saveWall(wall, callback) {
   Rest.post(HOST_NAME + '/coll/wall', wall).then((res) => {
-    callback(res.text);
+    if (res.text) {
+      store.default.dispatch({type: Types.RECEIVE_INFO, msg: "Insight saved successfully"});
+      callback(res.text);
+    }
   }, (err) => {
     console.log(err.response ? err.response.text : err);
   });
@@ -39,7 +42,10 @@ export function loadAQLs(callback) {
 
 export function saveAQL(aql, callback) {
   Rest.post(HOST_NAME + '/coll/aql', aql).then((res) => {
-    callback(res.text);
+    if (res.text) {
+      store.default.dispatch({type: Types.RECEIVE_INFO, msg: "Graph saved successfully"});
+      callback(res.text);
+    }
   }, (err) => {
     console.log(err.response ? err.response.text : err);
   });
@@ -47,7 +53,10 @@ export function saveAQL(aql, callback) {
 
 export function removeAQL(id, callback) {
   Rest.del(HOST_NAME + '/coll/aql/' + id).then((res) => {
-    callback(res.text);
+    if (res.text) {
+      store.default.dispatch({type: Types.RECEIVE_INFO, msg: "Graph removed successfully"});
+      callback(res.text);
+    }
   }, (err) => {
     console.log(err.response ? err.response.text : err);
   });

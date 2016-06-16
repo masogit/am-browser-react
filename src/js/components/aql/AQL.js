@@ -152,12 +152,14 @@ export default class AQL extends Component {
       var aql = this.state.aql;
       aql._id = id;
       this.setState({aql: aql});
-      this.setState({
-        alertLayer: <AlertForm onClose={this._removeAlertLayer.bind(this)}
-                               title={'AQL: ' + aql.name + ' saved!'}
-                               desc={'AQL string: ' + aql.str}
-                               onConfirm={this._removeAlertLayer.bind(this)}/>
-      });
+    });
+  }
+
+  _onSave() {
+    this.setState({
+      alertLayer: <AlertForm onClose={this._removeAlertLayer.bind(this)}
+                             title={'Save AQL: ' + this.state.aql.name + '?'}
+                             desc={'AQL string: ' + this.state.aql.str} onConfirm={this._onSaveAQL.bind(this)}/>
     });
   }
 
@@ -376,7 +378,7 @@ export default class AQL extends Component {
             <Menu direction="row" align="center" responsive={true}>
               <Anchor link="#" icon={<Play />} onClick={this._onQuery.bind(this)} label="Query"/>
               <Anchor link="#" icon={<Add />} onClick={this._onNew.bind(this)} label="New"/>
-              <Anchor link="#" icon={<Checkmark />} onClick={this._onSaveAQL.bind(this)} label="Save"/>
+              <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>
               <Anchor link="#" icon={<Close />} onClick={this._onDelete.bind(this)} label="Delete"/>
               <Menu icon={<More />}>
                 {
