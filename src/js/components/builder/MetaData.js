@@ -35,7 +35,7 @@ export default class MetaData extends ComponentBase {
   }
 
   _onClick(obj) {
-    if(!this.acquireLock()) {
+    if (!this.acquireLock()) {
       return;
     }
     this.props.clearFilter();

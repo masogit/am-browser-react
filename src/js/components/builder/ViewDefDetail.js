@@ -53,7 +53,7 @@ export default class ViewDefDetail extends ComponentBase {
   }
 
   _onSubmit() {
-    if(this.acquireLock()) {
+    if (this.acquireLock()) {
       this.props.onSubmit();
     }
 

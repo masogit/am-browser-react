@@ -2,20 +2,19 @@
 
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {logout} from '../actions';
-import Menu from 'grommet/components/Menu';
-import Box from 'grommet/components/Box';
-import Anchor from 'grommet/components/Anchor';
-import Layer from 'grommet/components/Layer';
+import {logout, sendMessageToSlack } from '../actions';
 import User from 'grommet/components/icons/base/User';
+import { Menu, Anchor, Layer, Box } from 'grommet';
 import MessageHistory from './MessageHistory';
+import SlackDialog from './SlackDialog';
+
 import cookies from 'js-cookie';
 
 class SessionMenu extends Component {
 
   constructor() {
     super();
-    this._onLogout = this._onLogout.bind(this);
+    this.closeDialog = this.closeDialog.bind(this);
     this.state = {
       dialog: null
     };
@@ -32,15 +31,20 @@ class SessionMenu extends Component {
     });
   }
 
-  showErrorDialog() {
-    var layer = (
-      <Layer onClose={this.closeDialog.bind(this)} closer={true}>
-        <MessageHistory />
-      </Layer>
-    );
+  showMessageDialog() {
     this.setState({
-      dialog: layer
+      dialog: <MessageHistory />
     });
+  }
+
+  showSlackDialog() {
+    this.setState({
+      dialog: <SlackDialog onClick={this._sendMessage.bind(this)} onClose={this.closeDialog}/>
+    });
+  }
+
+  _sendMessage(messages) {
+    this.props.dispatch(sendMessageToSlack(messages));
   }
 
   render() {
@@ -52,14 +56,18 @@ class SessionMenu extends Component {
           <Anchor href="#">Help</Anchor>
           <Anchor href="#">About</Anchor>
            */}
-          <Anchor onClick={this.showErrorDialog.bind(this)}>Message History</Anchor>
-          <Anchor href="#" onClick={this._onLogout}>Logout</Anchor>
+          <Anchor onClick={this.showMessageDialog.bind(this)}>Message History</Anchor>
+          <Anchor onClick={this.showSlackDialog.bind(this)}>Slack</Anchor>
+          <Anchor href="#" onClick={this._onLogout.bind(this)}>Logout</Anchor>
         </Menu>
-        {this.state.dialog}
+        {this.state.dialog &&
+        <Layer onClose={this.closeDialog} closer={true} flush={true} align="center">
+          {this.state.dialog}
+        </Layer>
+        }
       </Box>
     );
   }
-
 }
 
 let select = (state) => ({session: state.session});

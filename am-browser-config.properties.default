@@ -29,3 +29,11 @@ folder = ./db
 admin = @admin, SAM_Manager, Finance_manager
 power = Full_WriteAccess, Power_leveraged_user
 guest = @anyone
+
+[slack]
+url = https://hooks.slack.com/services/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
+channel = #betaprogram
+
+[proxy]
+host =
+port =

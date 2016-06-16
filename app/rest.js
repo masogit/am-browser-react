@@ -1,8 +1,11 @@
 var Client = require('node-rest-client').Client;
 var client = new Client();
 var Convertor = require('json-2-csv');
-var logger = require('./logger.js');
 var sessionUtil = require('./sessionUtil.js');
+var config = require('./config.js');
+var logger = require('./logger.js');
+var child_process = require('child_process');
+var slackProcess = child_process.fork('./app/slack.js');
 
 module.exports = function (am) {
 
@@ -119,8 +122,10 @@ module.exports = function (am) {
 
       request = client.get(url, args, (data, response) => {
         if (!data.entities || data.count === 0) {
-          logger.warn(`[user] [${req.sessionID || '-'}]`, 'user name or password is wrong: ', username);
-          res.send('user name or password is wrong');
+
+          var message = 'The user name or password is incorrect or your account is locked.';
+          logger.warn(`[user] [${req.sessionID || '-'}]`, message, username);
+          res.send(message);
         } else {
           req.session.expires = new Date(Date.now() + am.session_max_age * 60 * 1000);
           sessionUtil.touch(req.session, am.session_max_age);
@@ -135,6 +140,7 @@ module.exports = function (am) {
           am_rest.headerNavs = getHeadNav(req.session.isAdmin);
           res.cookie('headerNavs', am_rest.headerNavs);
           res.json(am_rest);
+          slack(username, `${username} logs in`);
         }
         logger.info(`[user] [${req.sessionID || '-'}]`, (req.session && req.session.user ? req.session.user : "user") + " login.");
         res.end();
@@ -169,7 +175,22 @@ module.exports = function (am) {
       };
     });
   };
+
+  this.slack = slack;
 };
+
+function slack(username, message, prefix, callback) {
+  prefix = prefix || '[System]';
+
+  slackProcess.send({username: username, message: `${prefix} ${message}`});
+  slackProcess.on('message', function (result) {
+    logger[result.status](result.message);
+    if (callback) {
+      callback(result);
+    }
+
+  });
+}
 
 function getFormattedRecords(fields, rawRecords) {
   var records = [];

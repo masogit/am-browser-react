@@ -3,23 +3,19 @@ var db = require('./db.js');
 var logger = require('./logger.js');
 var REST = require('./rest.js');
 var sessionUtil = require('./sessionUtil.js');
+var config = require('./config.js');
 
 module.exports = function (app) {
-  // init variables from properties
-  var PropertiesReader = require('properties-reader');
-  var properties = PropertiesReader('am-browser-config.properties');
-  var rest_protocol = process.env.AMB_REST_PROTOCOL || properties.get('rest.protocol');
-  var rest_server = process.env.AMB_REST_SERVER || properties.get('rest.server');
-  var rest_port = process.env.AMB_REST_PORT || properties.get('rest.port');
-  var ucmdb_server = process.env.UCMDB_SERVER || properties.get('ucmdb.server');
-  var ucmdb_port = process.env.UCMDB_PORT || properties.get('ucmdb.port');
-  var session_max_age = process.env.AMB_SESSION_MAX_AGE || properties.get('node.session_max_age');
-  var jwt_max_age = process.env.AMB_JWT_MAX_AGE || properties.get('rest.jwt_max_age');
-  var enable_csrf = process.env.AMB_NODE_CSRF || properties.get('node.enable_csrf');
-  var ucmdb_param = properties.get('ucmdb.param');
-  var base = properties.get('rest.base');
-  var db_folder = properties.get('db.folder');
-  db.init(db_folder);
+  var rest_protocol = process.env.AMB_REST_PROTOCOL || config.rest_protocol;
+  var rest_server = process.env.AMB_REST_SERVER || config.rest_server;
+  var rest_port = process.env.AMB_REST_PORT || config.rest_port;
+  var ucmdb_server = process.env.UCMDB_SERVER || config.ucmdb_server;
+  var ucmdb_port = process.env.UCMDB_PORT || config.ucmdb_port;
+  var session_max_age = process.env.AMB_SESSION_MAX_AGE || config.session_max_age;
+  var enable_csrf = process.env.AMB_NODE_CSRF || config.enable_csrf;
+  var jwt_max_age = process.env.AMB_JWT_MAX_AGE || config.jwt_max_age;
+
+  db.init(config.db_folder);
 
   var httpProxy = require('http-proxy');
   var apiProxy = httpProxy.createProxyServer();
@@ -60,9 +56,13 @@ module.exports = function (app) {
   app.get('/am/logout', function (req, res) {
     logger.info(`[user] [${req.sessionID || '-'}]`, (req.session && req.session.user ? req.session.user : "user") + " logout.");
     var am_rest = {};
+    const username = req.session.user;
     req.session.regenerate((err)=>{});
     res.clearCookie('headerNavs');
     res.json(am_rest);
+    if (username) {
+      rest.slack(username, `${username} logs out`);
+    }
   });
 
   app.all("/*", function (req, res, next) {
@@ -88,7 +88,13 @@ module.exports = function (app) {
   app.get('/coll/:collection/:id', db.find);
   app.post('/coll/:collection', (req, res) => {
     checkRight(req);
+    var createView = req.originalUrl.indexOf('view') > -1 && !req.body._id;
+
     db.upsert(req, res);
+
+    if (createView) {
+      rest.slack(req.session.user, `${req.session.user} created a view`);
+    }
   });
   app.post('/coll/:collection/:id', (req, res) => {
     checkRight(req);
@@ -105,23 +111,23 @@ module.exports = function (app) {
   // Proxy the backend rest service /rs/db -> /am/db
   app.use('/am/db', function (req, res) {
     // TODO: need to take care of https
-    apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${base}/db`});
+    apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}/db`});
   });
 
   app.use('/am/aql', function (req, res) {
     // TODO: need to take care of https
-    apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${base}/aql`});
+    apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}/aql`});
   });
 
   app.use('/am/v1/schema', function (req, res) {
     // TODO: need to take care of https
-    apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${base}/v1/schema`});
+    apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}/v1/schema`});
   });
 
   // get ucmdb point data
   app.use('/am/ucmdbPoint/', function (req, res) {
     checkRight(req);
-    apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${base}/integration/ucmdbAdapter/points`});
+    apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}/integration/ucmdbAdapter/points`});
   });
 
   /**
@@ -129,9 +135,23 @@ module.exports = function (app) {
    * /ucmdb-browser/<global_id>
    */
   app.get('/ucmdb-browser', function (req, res) {
-    res.send(`http://${ucmdb_server}:${ucmdb_port}${ucmdb_param}`);
+    res.send(`http://${ucmdb_server}:${ucmdb_port}${config.ucmdb_param}`);
+  });
+
+  app.post('/slack', function (req, res) {
+    rest.slack(req.session.user, req.body.messages, '[Comments]', function (result) {
+      if (result) {
+        if (result.status !== 'info') {
+          res.end(result.message);
+        }
+        res.end();
+      } else {
+        res.status(500).end();
+      }
+    });
   });
 };
+
 
 const checkRight = (req) => {
   if (!req.session.isAdmin) {

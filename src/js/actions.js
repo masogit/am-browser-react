@@ -5,6 +5,7 @@ import Rest from './util/grommet-rest-promise';
 //import Query from 'grommet-index/utils/Query';
 import {HOST_NAME} from './util/Config';
 import cookies from 'js-cookie';
+import * as Types from './constants/ActionTypes';
 
 // session
 export const INIT = 'INIT';
@@ -107,6 +108,27 @@ export function logout() {
         throw err;
       } else if (res.ok && res.body) {
         dispatch({type: LOGOUT});
+      }
+    });
+  };
+}
+
+export function sendMessageToSlack(messages) {
+  return function (dispatch) {
+    Rest.post(HOST_NAME + '/slack', {messages}).then(res => {
+      if (res.ok) {
+        if (res.text) {
+          dispatch({type: Types.RECEIVE_WARNING, msg: res.text});
+        } else {
+          dispatch({type: Types.RECEIVE_INFO, msg: `message is send to slack`});
+        }
+      }
+    }, err => {
+      if (err && err.status == 500) {
+        dispatch({
+          type: Types.RECEIVE_WARNING,
+          msg: 'Can not initialize rest client, please check your proxy setting.'
+        });
       }
     });
   };

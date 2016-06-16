@@ -12,20 +12,16 @@ var session = require('express-session');
 var csrf = require('csurf');
 var fs = require('fs'), https = require('https'), http = require('http');
 var cors = require('cors');
+var config = require('./config.js');
 
-// initial AM REST server
-var PropertiesReader = require('properties-reader');
-var properties = PropertiesReader('am-browser-config.properties.default');
-properties.append('am-browser-config.properties');
-logger.info("[server]", "Server configuration: " + JSON.stringify(properties));
 
 // initial AM node server
-var server = process.env.AMB_NODE_SERVER || properties.get('node.server');
-var port = process.env.AMB_NODE_PORT || properties.get('node.port'); 				// set the port
-var https_port = process.env.AMB_REST_HTTPS_PORT || properties.get('node.https_port');     // set the https port
+var server = process.env.AMB_NODE_SERVER || config.node_server;
+var port = process.env.AMB_NODE_PORT || config.node_port; // set the port
+var https_port = process.env.AMB_REST_HTTPS_PORT || config.node_https_port;     // set the https port
 
-var isDebug = process.env.AMB_NODE_DEBUG || properties.get('node.is_debug');
-var enable_csrf = process.env.AMB_NODE_CSRF || properties.get('node.enable_csrf');
+var isDebug = process.env.AMB_NODE_DEBUG || config.isDebug;
+var enable_csrf = process.env.AMB_NODE_CSRF || config.enable_csrf;
 
 app.use(compression());
 app.use(express.static(__dirname + '/public')); 		// set the static files location /public/img will be /img for users
@@ -74,17 +70,17 @@ morgan.token('sessionId', function getSessionId (req) {
 })
 var morganFormat = "[express] [:sessionId] [:remote-addr] [:remote-user] :method :url HTTP/:http-version :status :res[content-length] - :response-time ms";
 var stream = {
-  write: function(message, encoding){
+  write: function (message, encoding) {
     logger.debug(message);
   }
 };
-app.use(morgan(morganFormat, {stream: stream}))
+app.use(morgan(morganFormat, {stream: stream}));
 
 // routes ======================================================================
 require('./routes.js')(app);
 
 app.use(function(err, req, res, next){
-  logger.error(`[csrf] [${req.sessionID}] [${req.session.csrfSecret}] [${err.name}: ${err.message}] ${req.method} ${req.url}`);
+  logger.error(`[csrf] [${req.sessionID}] [${req.session && req.session.csrfSecret}] [${err.name}: ${err.message}] ${req.method} ${req.url}`);
   if (enable_csrf) {
     res.cookie('csrf-token', req.csrfToken());
   }
@@ -130,7 +126,7 @@ catch (e) {
 var shutdown = function () {
   logger.info("[server]", "Received kill signal, shut down server.");
   process.exit();
-}
+};
 
 // listen for TERM signal e.g. kill
 process.on('SIGTERM', shutdown);
