@@ -133,10 +133,14 @@ function simpleAQLResult(Query) {
         row.Column.forEach((col) => {
           if (col.content)
             cols.push(col.content);
+          else
+            cols.push('');
         });
       } else {
         if (row.Column.content)
           cols.push(row.Column.content);
+        else
+          cols.push('');
       }
       if (cols.length > 0)
         data.rows.push(cols);
@@ -150,12 +154,10 @@ function simpleAQLResult(Query) {
       data.rows.push(cols);
   }
 
-  const result_Row = Query.Result.Row[0] ? Query.Result.Row[0].Column.length : 1;
-
-  if (data.header.length !== result_Row) {
+  if (data.rows[0] && data.header.length !== data.rows[0].length) {
     store.default.dispatch({
       type: Types.RECEIVE_WARNING,
-      msg: 'AQL str is invalid: selected fields is inconsistent with result fields'
+      msg: 'AQL str is invalid: query columns is inconsistent with return columns.'
     });
   }
   return data;
