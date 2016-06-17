@@ -20,7 +20,11 @@
 }
 
 .grommet.app {
-  /*overflow: hidden;*/
+  display: flex;
+}
+
+.grommet.app > .box {
+  flex-grow: 1;
 }
 
 /*for the minimum sizing behavior*/
@@ -28,6 +32,7 @@
   min-height: 0;
 }
 
+/*for the minimum sizing behavior*/
 .fixMinSizing {
   min-height: 0;
 }

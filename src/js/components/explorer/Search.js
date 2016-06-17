@@ -236,8 +236,8 @@ export default class Search extends Component {
     }
 
     return (
-      <Box align="center" flex={true} justify="center">
-        <Headline size="large" flex={false}>
+      <Box align="center" justify="center" style={{flexShrink: 0, flexGrow: 1}}>
+        <Headline size="large">
           Asset Manager Browser
         </Headline>
         <Box direction="row" pad={{vertical: 'medium'}} flex={false}>

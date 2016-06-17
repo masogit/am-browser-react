@@ -52,6 +52,22 @@ class SessionMenu extends Component {
   }
 
   render() {
+    const menuItems = [
+      {
+        icon: <History />,
+        onClick: this.showMessageDialog.bind(this),
+        label: 'Message History'
+      }, {
+        icon: <Slack />,
+        onClick: this.showSlackDialog.bind(this),
+        label: 'Slack'
+      }, {
+        icon: <Logout />,
+        onClick: this._onLogout.bind(this),
+        label: 'Logout'
+      }
+    ];
+
     return (
       <Box>
         <Menu icon={<User />} label={cookies.get('user')}>
@@ -60,9 +76,10 @@ class SessionMenu extends Component {
           <Anchor href="#">Help</Anchor>
           <Anchor href="#">About</Anchor>
            */}
-          <Anchor icon={<History />} onClick={this.showMessageDialog.bind(this)}>Message History</Anchor>
-          <Anchor icon={<Slack />} onClick={this.showSlackDialog.bind(this)}>Slack</Anchor>
-          <Anchor icon={<Logout />} onClick={this._onLogout.bind(this)}>Logout</Anchor>
+          {
+            menuItems.map((item) => <Anchor icon={item.icon} onClick={item.onClick} label={item.label}
+                                            key={item.label} className='fontNormal'/>)
+          }
         </Menu>
         {this.state.dialog &&
         <Layer align="center" closer={<Anchor className='layer__closer' icon={<Close/>} onClick={this.closeDialog}/>}>

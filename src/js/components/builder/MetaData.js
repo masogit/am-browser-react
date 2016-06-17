@@ -112,9 +112,9 @@ export default class MetaData extends ComponentBase {
       );
     });
     return (
-      <Box flex={true}>
+      <Box flex={true} className='fixMinSizing'>
         <SearchInput id="metadataFilter" placeHolder="Search fields and links..." onDOMChange={this._onSearch}/>
-        <Box pad={{vertical: 'small'}}>
+        <Box pad={{vertical: 'small'}} className='fixMinSizing'>
           <Box className='autoScroll'>
           {entitiesComponents}
           {

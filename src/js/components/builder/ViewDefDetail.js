@@ -140,7 +140,7 @@ export default class ViewDefDetail extends ComponentBase {
             this.setState(temp);
           }
         };
-        return this.renderTable(title, filter, link.body.fields && this.renderTemplateTable(link, false, currentPath), `${link.sqlname}_${index}`);
+        return this.renderTable(title, filter, link.body.fields && link, false, currentPath, `${link.sqlname}_${index}`);
       }
       return null;
     });
@@ -208,15 +208,13 @@ export default class ViewDefDetail extends ComponentBase {
           : null
       );
     }).filter(field => field != null);
-    let links = [];
-    if (selfView.body.links && selfView.body.links.length > 0) {
-      links = this.renderLinks(links, selfView, currentPath + "body.links");
-    }
-    return fields.concat(links);
+
+    return fields;
   }
 
-  renderTable(title, filter, body, key) {
+  renderTable(title, filter, selectedView, root, path, key) {
     const header = (
+      <thead>
       <tr>
         <th>Field</th>
         <th>Alias</th>
@@ -226,46 +224,41 @@ export default class ViewDefDetail extends ComponentBase {
         <th>Order</th>
         <th>Del</th>
       </tr>
+      </thead>
     );
 
     //TODO: fix the onClick issue, so we can use an icon to toggle the textarea
     filter.show = true;
 
-    const tBody = (
-      <tbody>
-      {filter.show &&
-      <tr>
-        <td colSpan={8}>
+    //const filter = <Anchor icon={<Filter />} className='fontNormal' reverse={true} label={title.label} onClick={title.onClick}/>;
+
+    const currentPath = root ? "" : path + ".";
+    const tableLayer = currentPath.length / 10;
+    const style = {
+      marginLeft: 20 * tableLayer + 'px'
+    };
+
+    return (
+      <Box className='table' key={key} style={style} flex={false}>
+
+        <Title className='fontNormal'>{title.label}</Title>
+
+        <Table>
+          {header}
+          <tbody>
+          {filter.show &&
+          <tr>
+            <td colSpan={8}>
               <textarea id={filter.id} name={filter.name} value={filter.value}
                         placeholder="Input AQL as filter" onChange={filter.onChange}
                         className='textarea'/>
-        </td>
-      </tr>
-      }
-      {body}
-      </tbody>
-    );
-
-    //const filter = <Anchor icon={<Filter />} className='fontNormal' reverse={true} label={title.label} onClick={title.onClick}/>;
-    const titleComp = <Title className='fontNormal'>{title.label}</Title>;
-
-    return key ? (
-      <tr key={`link_${key}`}>
-        <td colSpan={8} className='inner-table'>
-          {titleComp}
-          <table key={`table_${key}`}>
-            {header}
-            {tBody}
-          </table>
-        </td>
-      </tr>
-    ) : (
-      <Box className='autoScroll'>
-        {titleComp}
-        <Table>
-          {header}
-          {tBody}
+            </td>
+          </tr>
+          }
+          {this.renderTemplateTable(selectedView, root, path)}
+          </tbody>
         </Table>
+        {selectedView.body.links && selectedView.body.links.length > 0 && this.renderLinks([], selectedView, currentPath + "body.links")}
       </Box>
     );
   }
@@ -300,13 +293,13 @@ export default class ViewDefDetail extends ComponentBase {
         show: this.state.mainFilter
       };
 
-      table = this.renderTable(title, filter, this.renderTemplateTable(selectedView, true));
+      table = this.renderTable(title, filter, selectedView, true);
     }
 
     return (
       !_.isEmpty(selectedView) ?
-        <Box pad={{horizontal: 'medium'}} flex={true}>
-          <Header justify="between" size="small">
+        <Box flex={true}>
+          <Header justify="between" size="small" pad={{horizontal: 'medium'}}>
             <Title>View Builder</Title>
             <Menu direction="row" align="center" responsive={true}>
               <Anchor link="#" icon={<Play />} onClick={this.props.openPreview} label="Query"/>
@@ -323,26 +316,29 @@ export default class ViewDefDetail extends ComponentBase {
           </Header>
           {
             selectedView && !_.isEmpty(selectedView) &&
-            <Split flex="left" fixed={false} className='fixMinSizing'>
-              {table}
-              <Box pad="small">
-                <Header>Attributes</Header>
-                <Form onSubmit={this.props.onSubmit} compact={this.props.compact}>
-                  <FormField label="Name" htmlFor={p + "item1"}>
-                    <input id="v.name" name="v.name" type="text" onChange={this._onChange}
-                           value={selectedView.name}/>
-                  </FormField>
-                  <FormField label="Description" htmlFor={p + "item2"}>
-                    <textarea id="v.desc" name="v.desc" value={selectedView.desc} onChange={this._onChange}></textarea>
-                  </FormField>
-                  <FormField label="Category" htmlFor={p + "item3"}>
-                    <input id="v.category" name="v.category" type="text" onChange={this._onChange}
-                           value={selectedView.category}/>
-                  </FormField>
-                </Form>
-              </Box>
-              {alertForms[this.state.alertForm]}
-            </Split>
+            <Box className='autoScroll' pad={{horizontal: 'medium'}}>
+              <Split flex="left" fixed={false} className='fixMinSizing'>
+                {table}
+                <Box pad="small">
+                  <Header>Attributes</Header>
+                  <Form onSubmit={this.props.onSubmit} compact={this.props.compact}>
+                    <FormField label="Name" htmlFor={p + "item1"}>
+                      <input id="v.name" name="v.name" type="text" onChange={this._onChange}
+                             value={selectedView.name}/>
+                    </FormField>
+                    <FormField label="Description" htmlFor={p + "item2"}>
+                      <textarea id="v.desc" name="v.desc" value={selectedView.desc}
+                                onChange={this._onChange}></textarea>
+                    </FormField>
+                    <FormField label="Category" htmlFor={p + "item3"}>
+                      <input id="v.category" name="v.category" type="text" onChange={this._onChange}
+                             value={selectedView.category}/>
+                    </FormField>
+                  </Form>
+                </Box>
+                {alertForms[this.state.alertForm]}
+              </Split>
+            </Box>
           }
         </Box>
         :

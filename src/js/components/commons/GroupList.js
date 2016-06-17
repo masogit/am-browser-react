@@ -80,10 +80,12 @@ export default class GroupList extends Component {
     var grouped = this._getGroupedChildren(children);
     const expand = this.state.expand;
     return (
-      <Box direction="column">
+      <Box direction="column" className='fixMinSizing'>
         {
           this.props.searchable &&
-          <SearchInput placeHolder="Search..." onDOMChange={this._onSearch.bind(this)}/>
+          <Box pad='small' flex={false}>
+            <SearchInput placeHolder="Search..." onDOMChange={this._onSearch.bind(this)}/>
+          </Box>
         }
         <Box className='autoScroll'>
         {
@@ -92,7 +94,8 @@ export default class GroupList extends Component {
             return (
               <Box key={i} direction="column" flex={false}>
                 <List>
-                  <ListItem {...this.props} justify="between" direction="row" separator="none" responsive={false}
+                  <ListItem pad='small' {...this.props} justify="between" direction="row" separator="none"
+                            responsive={false}
                                             onClick={this._expandToggle.bind(this, key)}>
                     <Anchor href="#" label={key} icon={(expand===key)?<Down />:<Next />}/>
                     {grouped[key].length}

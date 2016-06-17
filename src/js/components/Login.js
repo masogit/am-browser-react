@@ -32,7 +32,7 @@ class IndexerLogin extends Component {
 
     var image;
     if ('multiple' === this.state.responsive) {
-      image = <Section full={true} pad="none" texture="url(img/login.jpg)" />;
+      image = <Section pad="none" texture="url(img/login.jpg)"/>;
     }
 
     var loginError = session.error;

@@ -14,7 +14,7 @@ export default class GroupListItem extends Component {
 
   render() {
     return (
-      <ListItem {...this.props} pad={{vertical: 'small'}} separator='none'>
+      <ListItem {...this.props} pad='small' separator='none'>
         {this.props.children}
       </ListItem>
     );

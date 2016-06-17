@@ -43,8 +43,8 @@ class Indexer extends Component {
       timeout = setTimeout(this._newMsgRead, 5000);
     }
     return (
-      <App>
-        <Box full={true} className='main-container'>
+      <App >
+        <Box className='main-container'>
           {header}
           {alert}
           {this.props.children}

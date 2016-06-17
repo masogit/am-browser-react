@@ -269,8 +269,8 @@ export default class Insight extends Component {
       );
     }
 
-    return (<Box key={box.key} direction="column" separator={this.state.edit?'all':'none'} colorIndex="light-2"
-                 className='autoScroll'>
+    return (
+      <Box key={box.key} direction="column" separator={this.state.edit?'all':'none'} colorIndex="light-2" flex={true}>
       {this._buildActions(box, parent)}
       {child}
     </Box>);
@@ -301,7 +301,7 @@ export default class Insight extends Component {
     }, 1000);
 
     return (
-      <Carousel ref='carousel' className='disable_animation'>
+      <Carousel ref='carousel' className='disable_animation no-flex'>
         {
           Object.keys(data).map((key, index)=> {
             const dataMap = data[key];
@@ -350,20 +350,20 @@ export default class Insight extends Component {
     const {aql, data} = graph;
     const header = data.header.map((col) => <th key={col.Index}>{col.Name}</th>);
     const rows = data.rows.map((row, index) => (
-      <TableRow key={index}> {
+      <TableRow key={index}>{
         row.map((col, i) => {
           return (<td key={i}>{col}</td>);
         })
       }</TableRow>
     ));
     return (
-      <Box pad="large" colorIndex="light-2">
+      <Box pad="large" colorIndex="light-2" flex={false}>
         <Header>{aql.name}</Header>
-        <Box key={aql._id} pad="large" align={(aql.type=='meter')?'center':null} flex={false}>
+        <Box key={aql._id} pad="large" align={(aql.type=='meter')?'center':null}>
           <Graph type={aql.type} data={data} config={aql.form}
                  onClick={(filter) => this._showViewRecords(filter, aql.view)}/>
         </Box>
-        <Table className='autoScroll'>
+        <Table>
           <thead>
           <tr>{header}</tr>
           </thead>
@@ -428,20 +428,22 @@ export default class Insight extends Component {
             }}/>
           }
         </Header>
-        {
-          this.state.carousel && !this.state.edit && !this.props.params.id &&
-          this._buildCarousel(data)}
-        {
-          (!this.state.carousel || this.state.edit) && !this.props.params.id &&
-          this._buildBox(box, box)
-        }
-        {
-          this.props.params.id && this.state.data && this.state.data[this.props.params.id] &&
-          this._renderSingleAQL(this.state.data[this.props.params.id])
-        }
+        <Box className={this.state.edit ? '' : 'autoScroll'}>
+          {
+            this.state.carousel && !this.state.edit && !this.props.params.id &&
+            this._buildCarousel(data)}
+          {
+            (!this.state.carousel || this.state.edit) && !this.props.params.id &&
+            this._buildBox(box, box)
+          }
+          {
+            this.props.params.id && this.state.data && this.state.data[this.props.params.id] &&
+            this._renderSingleAQL(this.state.data[this.props.params.id])
+          }
 
-        {this.state.layer}
-        {this.state.alert}
+          {this.state.layer}
+          {this.state.alert}
+        </Box>
       </Box>
     );
   }
