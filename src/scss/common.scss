@@ -63,3 +63,9 @@ table {
 .hide {
   display: none;
 }
+
+.text-ellipsis {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: pre;
+}

@@ -11,8 +11,8 @@ import {
   Split,
   Table,
   TableRow,
-  Tiles,
-  Tile
+  Tiles,Title,
+  Tile, Form
 } from 'grommet';
 
 export default class RecordSearch extends Component {
@@ -83,18 +83,26 @@ export default class RecordSearch extends Component {
   }
 
   _getContent(view, record) {
-    return view.body.fields.map((field)=> {
+    return view.body.fields.map((field, index)=> {
       if (field.searchable) {
         var index = record[field.sqlname].toLocaleLowerCase().indexOf(this.state.keyword.toLocaleLowerCase().trim());
         if (index > -1) {
           var length = this.state.keyword.toLocaleLowerCase().trim().length;
-          var pre_str = <Box>{record[field.sqlname].substr(0, index)}</Box>;
-          var key_str = <Box colorIndex="graph-4">{record[field.sqlname].substr(index, length)}</Box>;
-          var suf_str = <Box>{record[field.sqlname].substr(length, record[field.sqlname].length)}</Box>;
-          return (<Box direction="row" pad={{horizontal: 'medium'}}>
-            {`${field.sqlname}: `}
-            <Box direction="row">{pre_str}{key_str}{suf_str}</Box>
-          </Box>);
+          var pre_str = record[field.sqlname].substr(0, index);
+          var key_str = record[field.sqlname].substr(index, length);
+          var suf_str = record[field.sqlname].substr(length, record[field.sqlname].length);
+          const title = pre_str + key_str + suf_str;
+          return (
+            <Box key={field.sqlname + index} direction='row'>
+              <span className='text-ellipsis' title={title}>{
+                `${field.sqlname}: ${pre_str}`
+              }<span className='background-color-index-brand'>{
+                key_str
+              }</span>{
+                suf_str
+              }</span>
+            </Box>
+          );
         }
       }
     });
@@ -152,18 +160,20 @@ export default class RecordSearch extends Component {
 
     return (
       <Box full="horizontal" pad={{horizontal: 'small'}}>
-        <Box direction="row" pad={{vertical: 'medium'}}>
+        <Box direction="row" pad={{vertical: 'medium'}} flex={false}>
           <input type="search" inline={true} className="flex" placeholder="Global Record search..."
                  onKeyDown={this._onEnter.bind(this)} defaultValue={this.props.params.keyword}/>
         </Box>
-        <Split flex="right">
-          <Box pad={{horizontal: 'small'}}>
-            <h4>Search Result:</h4>
+        <Split flex="right" fixed={false}>
+          <Box pad={{horizontal: 'small'}} flex={true}>
+            <Title>Search Result:</Title>
             <Table>
               <thead>
-              <th>View</th>
-              <th>Time (ms)</th>
-              <th>Count</th>
+              <tr>
+                <th>View</th>
+                <th>Time (ms)</th>
+                <th>Count</th>
+              </tr>
               </thead>
               <tbody>
               {
@@ -183,32 +193,33 @@ export default class RecordSearch extends Component {
               </tbody>
             </Table>
           </Box>
-          <Box>
-            <Tiles flush={false} justify="center" colorIndex="light-2" size="large">
-              {
-                this.state.results.map((result, i) => {
-                  return result.records.map((record, j) => {
-                    // var id = record['ref-link'].split('/')[2];
-                    return (
-                      <Tile key={`${i}.${j}`} align="start" separator="top" colorIndex="light-1">
-                        <Header tag="h4" size="small" pad={{horizontal: 'small'}}>
-                          {result.view.name}
-                        </Header>
+          <Tiles flush={false} size="large" className='autoScroll'>
+            {
+              this.state.results.map((result, i) => {
+                return result.records.map((record, j) => {
+                  // var id = record['ref-link'].split('/')[2];
+                  return (
+                    <Tile key={`${i}.${j}`} align="start" className='box-shadow'>
+                      <Header tag="h4" size="small" pad={{horizontal: 'small'}}>
+                        {result.view.name}
+                      </Header>
+                      <Form>
                         <Box pad="small">
-                          <Anchor href="#" primary={true} onClick={this._onClick.bind(this, result.view, record)}>
-                            {record.self}
+                          <Anchor onClick={this._onClick.bind(this, result.view, record)}
+                                  className='text-ellipsis'>
+                            <span title={record.self}><b>{record.self}</b></span>
                           </Anchor>
                           {this._getContent(result.view, record)}
                         </Box>
-                        <Footer justify="between">
-                          Table: {result.view.body.sqlname}
+                        <Footer pad={{horizontal:'small'}}>
+                          {'Table: ' + result.view.body.sqlname}
                         </Footer>
-                      </Tile>);
-                  });
-                })
-              }
-            </Tiles>
-          </Box>
+                      </Form>
+                    </Tile>);
+                });
+              })
+            }
+          </Tiles>
         </Split>
         {
           this.state.record &&
