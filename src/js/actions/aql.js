@@ -104,7 +104,7 @@ export function queryAQL(str, callback) {
     Rest.get(HOST_NAME + query).then((res) => {
       callback(simpleAQLResult(res.body.Query));
     }, (err) => {
-      const errorMessage = err.rawResponse || (err.response ? err.response.text : err.toString());
+      const errorMessage = err.rawResponse || (err.response && err.response.text || err.toString());
       store.default.dispatch({type: Types.RECEIVE_ERROR, msg: errorMessage});
     });
   }

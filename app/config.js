@@ -35,7 +35,6 @@ module.exports = {
   proxy_port: properties.get('proxy.port'),
 
   session_max_age: properties.get('node.session_max_age'),
-  enable_csrf: properties.get('node.enable_csrf'),
 
   jwt_max_age: properties.get('rest.jwt_max_age')
 };
