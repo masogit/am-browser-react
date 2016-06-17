@@ -32,8 +32,8 @@ export function loadViews(selectedViewId, currentPathName, callback) {
       let views = res.body;
       // Load first record of the list in detail.
       if (views.length > 0) {
-        let selectedView = selectedViewId ? views.filter(view => view._id == selectedViewId)[0] : views[0];
-        selectedView = selectedView || views[0];
+        let selectedView = selectedViewId ? views.filter(view => view._id == selectedViewId)[0] : {};
+        selectedView = selectedView || {};
         //console.log("selectedView:");
         //console.log(selectedView);
         dispatch({
@@ -43,7 +43,7 @@ export function loadViews(selectedViewId, currentPathName, callback) {
         });
         // return the url of the first record
         // don't call 'history.push()' here, because unit test will fail ('history' can't be mocked).
-        return !selectedViewId ? currentPathName + "/" + selectedView._id : null;
+        return !selectedViewId && selectedView._id ? currentPathName + "/" + selectedView._id : null;
       }
     }, function (err) {
       dispatch(receiveViewsFailure(err));
@@ -64,8 +64,11 @@ export function saveViewDef(selectedView, callback) {
           type: types.SAVE_VIEW_DEF,
           selectedViewId: _id,
           selectedView: selectedView,
-          editing: false,
-          alertForm: "save"
+          editing: false
+        });
+        dispatch({
+          type: types.RECEIVE_INFO,
+          msg: "View definition saved successfully."
         });
         return _id;
         //if (callback) {
@@ -74,6 +77,7 @@ export function saveViewDef(selectedView, callback) {
       }, function (err) {
         if (err) {
           console.log("cannot save: " + err);
+          throw err;
         }
       }
     )
@@ -88,6 +92,16 @@ export function setSelectedView(selectedViewId, selectedView) {
       type: types.SET_SELECTED_VIEW,
       selectedViewId: selectedViewId,
       selectedView: selectedView
+    });
+  };
+}
+
+export function clearSelectedView() {
+  return dispatch => {
+    dispatch({
+      type: types.SET_SELECTED_VIEW,
+      selectedViewId: null,
+      selectedView: {}
     });
   };
 }
@@ -128,29 +142,32 @@ export function duplicateViewDef(selectedView) {
     clonedView.name = `${clonedView.name} (Duplicated)`;
     dispatch({
       type: types.DUPLICATE_VIEW_DEF,
-      selectedView: clonedView,
-      alertForm: "duplicate"
+      selectedView: clonedView
     });
-  };
-}
-
-export function deleteViewDef(selectedView, callback) {
-  return function (dispatch) {
     dispatch({
-      type: types.ALERT_FORM,
-      alertForm: "delete"
+      type: types.RECEIVE_INFO,
+      msg: "View definition duplicated as '" + clonedView.name + "'."
     });
   };
 }
 
 export function confirmDeleteViewDef(selectedView, callback) {
-  return function (dispatch) {
+  return function (dispatch, getState) {
     Rest.del(HOST_NAME + VIEW_DEF_URL + "/" + selectedView._id)
       .then((res) => {
         console.log("delete successfully - " + selectedView._id);
+        let views = getState().views.views;
+        let idx = _.findIndex(views, {_id: selectedView._id});
+        let updatedViews = [...views.slice(0, idx), ...views.slice(idx + 1)];
         dispatch({
           type: types.DELETE_VIEW_DEF,
-          deletedViewId: selectedView._id
+          selectedViewId: "",
+          selectedView: {},
+          views: updatedViews
+        });
+        dispatch({
+          type: types.RECEIVE_INFO,
+          msg: `View definition '${selectedView.name}' deleted.`
         });
         //dispatch({
         //  type: types.UPDATE_VIEW_DEF_LIST,
@@ -197,15 +214,6 @@ export function closePreview() {
     dispatch({
       type: types.CLOSE_PREVIEW,
       preview: false
-    });
-  };
-}
-
-export function closeAlertForm() {
-  return dispatch => {
-    dispatch({
-      type: types.ALERT_FORM,
-      alertForm: null
     });
   };
 }

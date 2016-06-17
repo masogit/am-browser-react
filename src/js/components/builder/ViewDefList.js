@@ -46,6 +46,7 @@ export default class ViewsDefList extends Component {
     this.setState({
       editView: null
     });
+    this.props.clearSelectedView();
   }
 
   _goView(id) {
@@ -74,7 +75,7 @@ export default class ViewsDefList extends Component {
           </span>
         )
       }));
-      focus = {expand: selectedView.category, selected: selectedView._id};
+      focus = {expand: selectedView ? selectedView.category : false, selected: selectedView ? selectedView._id: ""};
     }
 
     return (

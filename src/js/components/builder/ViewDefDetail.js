@@ -20,9 +20,14 @@ export default class ViewDefDetail extends ComponentBase {
     this.renderTable = this.renderTable.bind(this);
     this.renderLinks = this.renderLinks.bind(this);
     this._onChange = this._onChange.bind(this);
+    this.openAlert = this.openAlert.bind(this);
+    this.closeAlertForm = this.closeAlertForm.bind(this);
     this._onSubmit = this._onSubmit.bind(this);
+    this._onDuplicate = this._onDuplicate.bind(this);
+    this._onDelete = this._onDelete.bind(this);
     this.state = {
-      mainFilter: false
+      mainFilter: false,
+      alertForm: null
     };
   }
 
@@ -54,11 +59,31 @@ export default class ViewDefDetail extends ComponentBase {
     }
   }
 
-  _onSubmit() {
-    if (this.acquireLock()) {
-      this.props.onSubmit();
-    }
+  openAlert(type) {
+    this.setState({
+      alertForm: type
+    });
+  }
 
+  closeAlertForm() {
+    this.setState({
+      alertForm: null
+    });
+  }
+
+  _onSubmit() {
+    this.props.onSubmit();
+    this.closeAlertForm();
+  }
+
+  _onDuplicate() {
+    this.props.onDuplicateViewDef();
+    this.closeAlertForm();
+  }
+
+  _onDelete() {
+    this.props.onDeleteViewDef();
+    this.closeAlertForm();
   }
 
   _onDownload(obj) {
@@ -246,25 +271,22 @@ export default class ViewDefDetail extends ComponentBase {
   }
 
   render() {
-    let {selectedView, closeAlertForm, onDeleteViewDef, onSaveSuccess} = this.props;
+    let {selectedView} = this.props;
     let alertForms = selectedView ? {
-      save: <AlertForm onClose={closeAlertForm}
-                       title={"Save view definition"}
-                       desc={"'" + selectedView.name + "' saved successfully."}
-                       onConfirm={onSaveSuccess}/>,
-      duplicate: <AlertForm onClose={closeAlertForm}
-                            title={"Duplicate view definition"}
-                            desc={"View definition duplicated as '" + selectedView.name + "'."}
-                            onConfirm={closeAlertForm}/>,
-      delete: <AlertForm onClose={closeAlertForm}
-                         title={'Delete view definition'}
-                         desc={"You're about to delete '" + selectedView.name + "', continue?"}
-                         onConfirm={onDeleteViewDef}/>
+      save: <AlertForm onClose={this.closeAlertForm}
+                       title={"Save '" + selectedView.name + "'?"}
+                       onConfirm={this._onSubmit}/>,
+      duplicate: <AlertForm onClose={this.closeAlertForm}
+                            title={"Duplicate view definition '" + selectedView.name + "'?"}
+                            onConfirm={this._onDuplicate}/>,
+      delete: <AlertForm onClose={this.closeAlertForm}
+                         title={"You're about to delete '" + selectedView.name + "', continue?"}
+                         onConfirm={this._onDelete}/>
     } : {};
 
     let p = "input", table;
 
-    if (selectedView.body && selectedView.body.fields) {
+    if (selectedView && selectedView.body && selectedView.body.fields) {
       const title = {
         label: selectedView.body.label && `${selectedView.body.label} (${selectedView.body.sqlname})`,
         onClick: () => this.setState({mainFilter: !this.state.mainFilter})
@@ -282,44 +304,54 @@ export default class ViewDefDetail extends ComponentBase {
     }
 
     return (
-      <Box pad={{horizontal: 'medium'}} flex={true}>
-        <Header justify="between" size="small">
-          <Title>View Builder</Title>
-          <Menu direction="row" align="center" responsive={true}>
-            <Anchor link="#" icon={<Play />} onClick={this.props.openPreview} label="Query" />
-            <Anchor link="#" icon={<Checkmark />} onClick={this._onSubmit} label="Save" />
-            <Anchor link="#" icon={<Close />} onClick={this.props.deleteViewDef} label="Delete" />
-            <Menu icon={<More />}>
-              <Anchor link="#" icon={<Duplicate />} onClick={this.props.onDuplicateViewDef} label="Duplicate" />
-              {selectedView._id && <Anchor link="#" icon={<Mail />} onClick={this._onMail.bind(this, selectedView)} label="Mail" />}
-              <Anchor link="#" icon={<Download />} onClick={this._onDownload.bind(this, selectedView)} label="Download" />
+      !_.isEmpty(selectedView) ?
+        <Box pad={{horizontal: 'medium'}} flex={true}>
+          <Header justify="between" size="small">
+            <Title>View Builder</Title>
+            <Menu direction="row" align="center" responsive={true}>
+              <Anchor link="#" icon={<Play />} onClick={this.props.openPreview} label="Query"/>
+              <Anchor link="#" icon={<Checkmark />} onClick={() => this.openAlert("save")} label="Save"/>
+              <Anchor link="#" icon={<Close />} onClick={() => this.openAlert("delete")} label="Delete"/>
+              <Menu icon={<More />}>
+                <Anchor link="#" icon={<Duplicate />} onClick={() => this.openAlert("duplicate")} label="Duplicate"/>
+                {selectedView._id &&
+                <Anchor link="#" icon={<Mail />} onClick={this._onMail.bind(this, selectedView)} label="Mail"/>}
+                <Anchor link="#" icon={<Download />} onClick={this._onDownload.bind(this, selectedView)}
+                        label="Download"/>
+              </Menu>
             </Menu>
-          </Menu>
-        </Header>
-        {
-          selectedView && !_.isEmpty(selectedView) &&
-          <Split flex="left" fixed={false} className='fixMinSizing'>
-            {table}
-            <Box pad="small">
-              <Header>Attributes</Header>
-              <Form onSubmit={this.props.onSubmit} compact={this.props.compact}>
-                <FormField label="Name" htmlFor={p + "item1"}>
-                  <input id="v.name" name="v.name" type="text" onChange={this._onChange}
-                         value={selectedView.name}/>
-                </FormField>
-                <FormField label="Description" htmlFor={p + "item2"}>
-                  <textarea id="v.desc" name="v.desc" value={selectedView.desc} onChange={this._onChange}></textarea>
-                </FormField>
-                <FormField label="Category" htmlFor={p + "item3"}>
-                  <input id="v.category" name="v.category" type="text" onChange={this._onChange}
-                         value={selectedView.category}/>
-                </FormField>
-              </Form>
-            </Box>
-            {alertForms[this.props.alertForm]}
-          </Split>
-        }
-      </Box>
+          </Header>
+          {
+            selectedView && !_.isEmpty(selectedView) &&
+            <Split flex="left" fixed={false} className='fixMinSizing'>
+              {table}
+              <Box pad="small">
+                <Header>Attributes</Header>
+                <Form onSubmit={this.props.onSubmit} compact={this.props.compact}>
+                  <FormField label="Name" htmlFor={p + "item1"}>
+                    <input id="v.name" name="v.name" type="text" onChange={this._onChange}
+                           value={selectedView.name}/>
+                  </FormField>
+                  <FormField label="Description" htmlFor={p + "item2"}>
+                    <textarea id="v.desc" name="v.desc" value={selectedView.desc} onChange={this._onChange}></textarea>
+                  </FormField>
+                  <FormField label="Category" htmlFor={p + "item3"}>
+                    <input id="v.category" name="v.category" type="text" onChange={this._onChange}
+                           value={selectedView.category}/>
+                  </FormField>
+                </Form>
+              </Box>
+              {alertForms[this.state.alertForm]}
+            </Split>
+          }
+        </Box>
+        :
+        <Box pad={{horizontal: 'medium'}} flex={true} justify='center' align="center">
+          <Box size="medium" colorIndex="light-2" pad={{horizontal: 'large', vertical: 'medium'}} align='center'>
+            Select an item or create a new one.
+          </Box>
+        </Box>
+
     );
   }
 }

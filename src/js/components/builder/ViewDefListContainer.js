@@ -65,6 +65,7 @@ class ViewDefListContainer extends Component {
       //this.props.actions.updateViewDefList(updatedView);
       //history.push("/views/" + id);
       //this.props.actions.loadViews(id, this.props.location.pathname);
+      this.onSaveSuccess();
     }, (err) => console.log("onSubmit - err: " + err));
   }
 
@@ -115,7 +116,7 @@ class ViewDefListContainer extends Component {
                        onDeleteTableRow={this.onDeleteTableRow} compact={true}
                        onDuplicateViewDef={this.onDuplicateViewDef}
                        onDeleteViewDef={this.onDeleteViewDef}
-                       alertForm={this.props.alertForm} {...boundActionCreators}/>
+                       {...boundActionCreators}/>
 
         <ViewDefPreview active={preview} selectedView={selectedView} {...boundActionCreators}/>
       </Box>
@@ -129,8 +130,7 @@ let mapStateToProps = (state) => {
     selectedView: state.views.selectedView,
     selectedViewId: state.views.selectedViewId,
     templateTable: state.views.templateTable,
-    preview: state.views.preview,
-    alertForm: state.views.alertForm
+    preview: state.views.preview
   };
 };
 

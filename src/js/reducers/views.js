@@ -243,22 +243,10 @@ const handlers = {
     };
   },
   [DELETE_VIEW_DEF]: (state, action) => {
-    let views = state.views;
-    let idx = _.findIndex(views, {_id: action.deletedViewId});
-    let selectedViewId, selectedView;
-    if (views.length > 1) { // find which record to display after deleting current one
-      if (idx == views.length - 1) {
-        selectedView = views[idx - 1];
-      } else {
-        selectedView = views[idx + 1];
-      }
-      selectedViewId = selectedView._id;
-    }
-    let updatedViews = [...views.slice(0, idx), ...views.slice(idx + 1)];
     return {
-      selectedViewId: selectedViewId,
-      selectedView: selectedView,
-      views: updatedViews
+      selectedViewId: action.selectedViewId,
+      selectedView: action.selectedView,
+      views: action.views
     };
   },
   [OPEN_PREVIEW]: (state, action) => {
