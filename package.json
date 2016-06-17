@@ -52,6 +52,7 @@
     "gulp-clean": "^0.3.2",
     "gulp-download": "0.0.1",
     "gulp-git": "^1.2.3",
+    "gulp-json-editor": "^2.2.1",
     "gulp-nodemon": "^2.0.3",
     "gulp-rename": "^1.2.2",
     "gulp-rsync": "0.0.5",

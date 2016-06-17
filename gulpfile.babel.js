@@ -18,6 +18,7 @@ import xml2json from 'gulp-xml2json';
 import rename from 'gulp-rename';
 import webpack from 'webpack';
 import dateformat from 'dateformat';
+import jeditor from 'gulp-json-editor';
 import version from './version.json';
 import config from './rest/conf/config.json';
 
@@ -80,6 +81,9 @@ const opts = {
   // disable scsslint temporarily
   scsslint: false
 };
+
+var express;
+var timestamp = dateformat(new Date(), 'yyyymmddHHMM');
 
 gulp.task('set-webpack-alias', () => {
   if (opts.alias && argv.useAlias) {
@@ -163,7 +167,6 @@ gulp.task('copy-demo', function () {
   gulp.src('./demo/**').pipe(gulp.dest('./', {overwrite: false}));
 });
 
-var express;
 gulp.task('start-node', function () {
   console.log('Starting node app/server.js');
   if (express) express.kill();
@@ -197,15 +200,18 @@ gulp.task('copy-temp', ['dist', 'clean-gen'], function () {
   var copy_cmd = gulp.src('./build/*.bat')
       .pipe(gulp.dest('./gen/temp'));
   // copy files to gen temp
-  var copy_file = gulp.src(['./app/**', './demo/**', './dist/**', './node_modules/**', './am-browser-config.properties.default', './version.json'], {base : '.'})
+  var copy_file = gulp.src(['./app/**', './demo/**', './dist/**', './node_modules/**', './am-browser-config.properties.default'], {base : '.'})
       .pipe(gulp.dest('./gen/temp'));
-  return merge(unzip_node, copy_cmd, copy_file);
+  var gen_timestamp = gulp.src('./version.json', {base : '.'})
+      .pipe(jeditor({'timestamp': timestamp}))
+      .pipe(gulp.dest('./gen/temp'));
+  return merge(unzip_node, copy_cmd, copy_file, gen_timestamp);
 });
 
 gulp.task('gen', ['copy-temp'], function () {
   console.log('Generate am-browser.zip from temp folder');
   //var timestamp = Math.floor(new Date().getTime()/1000);
-  var name = 'am-browser' + '-' + version.number + '-' + dateformat(new Date(), 'yyyymmddHHMM') + '_' + version.stage + '.zip';
+  var name = 'am-browser' + '-' + version.number + '-' + timestamp + '_' + version.stage + '.zip';
   // generate am-browser.zip from temp folder
   return gulp.src('./gen/temp/**')
       .pipe(zip(name))
@@ -381,7 +387,7 @@ gulp.task('gen-ws', ['gen-ws-conf'], function () {
   console.log('Generate am-browser-rest.zip from temp folder');
   // generate am-browser-rest.zip from temp folder
   //var timestamp = Math.floor(new Date().getTime()/1000);
-  var name = 'am-browser-rest' + '-' + version.number + '-' + dateformat(new Date(), 'yyyymmddHHMM') + '_' + version.stage + '.zip';
+  var name = 'am-browser-rest' + '-' + version.number + '-' + timestamp + '_' + version.stage + '.zip';
   return gulp.src('./rest/gen/temp/**')
       .pipe(zip(name))
       .pipe(gulp.dest('./rest/gen'));
