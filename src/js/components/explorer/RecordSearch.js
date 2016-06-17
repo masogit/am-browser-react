@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import * as ExplorerAction from '../../actions/explorer';
 import RecordDetail from './RecordDetail';
 import RecordList from './RecordList';
+import history from '../../RouteHistory';
 import {
   Anchor,
   Box,
@@ -124,6 +125,7 @@ export default class RecordSearch extends Component {
 
   _onEnter(event) {
     if ((event.keyCode === 13)) {
+      history.push(`/search/${event.target.value.trim()}`);
       this.setState({
         keyword: event.target.value.trim()
       });
