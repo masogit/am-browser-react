@@ -84,12 +84,9 @@ module.exports = function (am) {
       path: {
         server: am.server,
         context: '/AssetManagerWebService/rs/',
-        "ref-link": `v1/auth/sign-in`
+        "ref-link": 'v1/auth/sign-in'
       },
-      parameters: {
-        username: username,
-        password: password
-      },
+      data: `username=${username}&password=${password}`,
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
       }
