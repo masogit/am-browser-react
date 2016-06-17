@@ -139,7 +139,9 @@ export function getGroupByAql(body) {
     var aggregate = (body.sum) ? `sum(${body.sum})` : 'count(*)';
     var aql = `select ${body.groupby}, ${aggregate} from ${body.sqlname}`;
     if (body.filter)
-      aql += ` where ${body.filter}`;
+      aql += ` where (${body.filter}) AND (PK <> 0)`; // PK <> 0 to avoid the invalid empty record
+    else
+      aql += ` where PK <> 0`; // PK <> 0 to avoid the invalid empty record
     if (body.groupby)
       aql += ` group by ${body.groupby}`;
     if (body.orderby && body.orderby.indexOf(body.groupby) > -1)
