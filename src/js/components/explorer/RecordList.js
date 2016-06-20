@@ -1,12 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import RecordDetail from './RecordDetail';
-import Title from 'grommet/components/Title';
-import Table from 'grommet/components/Table';
-import TableRow from 'grommet/components/TableRow';
-import Box from 'grommet/components/Box';
-import Anchor from 'grommet/components/Anchor';
-import Header from 'grommet/components/Header';
-import Menu from 'grommet/components/Menu';
+import {Title, Table, TableRow, Box, Anchor, Header, Menu }from 'grommet';
 import Close from 'grommet/components/icons/base/Close';
 import Ascend from 'grommet/components/icons/base/Ascend';
 import Descend from 'grommet/components/icons/base/Descend';
@@ -72,7 +66,7 @@ export default class RecordList extends Component {
   _getMoreRecords() {
     console.log('get more record');
     if (this.state.numTotal > this.state.records.length) {
-      var param = {...this.state.param};
+      var param = Object.assign({}, this.state.param);
       param.offset = this.state.records.length;
       this._getRecords(param);  // sync pass param to query, then records append
     } else {
@@ -82,7 +76,7 @@ export default class RecordList extends Component {
   }
 
   _getRecords(param) {
-    var body = {...this.props.body, param: (param) ? param : this.state.param}; // if sync pass param to query, then records append
+    var body = Object.assign({}, this.props.body, {param: (param) ? param : this.state.param});
     var timeStart = Date.now();
     this.setState({
       loading: true
@@ -100,7 +94,7 @@ export default class RecordList extends Component {
   }
 
   _orderBy(sqlname) {
-    var param = {...this.state.param};
+    var param = Object.assign({}, this.state.param);
     if (param.orderby == (sqlname + ' desc'))
       param.orderby = "";
     else if (param.orderby == sqlname)
@@ -114,8 +108,8 @@ export default class RecordList extends Component {
 
   _showOrderByIcon(sqlname) {
     var orderby = this.state.param.orderby;
-    var icon = (orderby.indexOf(sqlname) > -1) ? ((orderby.indexOf('desc') > -1) ? <Descend /> : <Ascend />) : <EmptyIcon />;
-    return icon;
+    return (orderby.indexOf(sqlname) > -1) ? ((orderby.indexOf('desc') > -1) ? <Descend /> : <Ascend />) :
+      <EmptyIcon />;
   }
 
   _viewDetailShow(record) {
@@ -198,6 +192,7 @@ export default class RecordList extends Component {
       event.preventDefault();
     }
     this.setState({record: null});
+    return true;
   }
 
   _download() {
@@ -292,7 +287,7 @@ export default class RecordList extends Component {
         </Box>
         <Menu icon={<MenuIcon />} closeOnClick={false} dropAlign={{top: 'bottom'}}>
           <Anchor icon={<More />} label="More records" onClick={this._getMoreRecords.bind(this)}
-                  disabled={this.state.numTotal > this.state.records.length ? false : true}/>
+                  disabled={this.state.numTotal <= this.state.records.length}/>
           <Anchor icon={this.state.aqlInput?<CheckboxSelected />:<Checkbox />} label="Input AQL"
                   onClick={this._toggleAQLInput.bind(this)}/>
           <Anchor icon={this.state.allFields?<CheckboxSelected />:<Checkbox />} label="Full columns"
@@ -300,7 +295,7 @@ export default class RecordList extends Component {
           <Anchor icon={<Download />} label="Download CSV" onClick={this._download.bind(this)}/>
         </Menu>
         <form name="Download" ref="downloadForm" method="post"
-              action={ExplorerActions.getDownloadQuery({...this.props.body, param: this.state.param})}>
+              action={ExplorerActions.getDownloadQuery(Object.assign({}, this.props.body, {param: this.state.param}))}>
           <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
           <input type="hidden" name="fields" value={JSON.stringify(this.props.body.fields)}/>
         </form>
