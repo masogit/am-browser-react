@@ -21,11 +21,11 @@ module.exports = function () {
 function view(obj) {
   // existing validation
   if (invalidLength(obj.name, 1, 100))
-    return "Name is required, limit length: 1 to 100!";
+    return "View's name is required, limit length: 1 to 100!";
   if (invalidLength(obj.category, 1, 100))
-    return "Category is required, limit length: 1 to 100!";
+    return "View's category is required, limit length: 1 to 100!";
   if (!obj.body)
-    return "Body is required!";
+    return "View's body is required!";
 
   // content validation
   if (error = body(obj.body))
@@ -37,11 +37,11 @@ function view(obj) {
 function body(obj) {
   // existing validation
   if (invalidLength(obj.sqlname))
-    return "Provide a table!";
+    return "sqlname (table's name) is required in body";
   if (invalidLength(obj.label))
     return "label is required in body!";
   if (!(obj.fields && obj.fields instanceof Array && obj.fields.length > 0))
-    return "Fields is required in body!";
+    return "At least one field in body!";
 
   // content validation
   obj.fields.forEach((obj) => {
@@ -83,10 +83,26 @@ function field(obj) {
   return null;
 }
 
-function link(link) {
+function link(obj) {
   /*
    TODO: sqlname, label, src_field.sqlname, src_field.relative_path, dest_field.sqlname
    */
+  // existing validation
+  if (invalidLength(obj.sqlname))
+    return "sqlname is required in link";
+  if (invalidLength(obj.label))
+    return "label is required in body!";
+  if (!obj.src_field || !obj.src_field.sqlname || !obj.src_field.relative_path)
+    return "src_field is required in link; sqlname and relative_path are required in src_field";
+  if (!obj.dest_field || !obj.dest_field.sqlname)
+    return "dest_field is required in link; sqlname is required in dest_field";
+
+  if (!obj.body)
+    return "link's body is required!";
+
+  // content validation
+  if (error = body(obj.body))
+    return error;
 
   return null;
 }
@@ -111,6 +127,8 @@ function aql(aql) {
 }
 
 function form(form) {
+  // TODO validate form
+
   return null;
 }
 
@@ -126,6 +144,17 @@ function wall(wall) {
 }
 
 function box(box) {
+  // TODO validate box
+  if (!box.direction || !(box.direction == 'column' || box.direction == 'row'))
+    return "direction is required in a layout element, value: column or row";
+  // if (box.child && box.child instanceof Array)
+  //   box.child.forEach((obj)=> {
+  //     if (error = this.box(obj))
+  //       return error;
+  //   });
+  // else if (box.child && !box.child._id)
+  //   return "Graph's _id is required for layout element";
+
   return null;
 }
 
