@@ -21,9 +21,10 @@ module.exports = {
   isDebug: properties.get('node.is_debug'),
   enable_csrf: properties.get('node.enable_csrf'),
 
-  ucmdb_server: properties.get('ucmdb.server'),
-  ucmdb_port: properties.get('ucmdb.port'),
-  ucmdb_param: properties.get('ucmdb.param'),
+  ucmdb_adapter_enabled: properties.get('ucmdb.adapter'),
+  ucmdb_browser_server: properties.get('ucmdb.browser_server'),
+  ucmdb_browser_port: properties.get('ucmdb.browser_port'),
+  ucmdb_browser_param: properties.get('ucmdb.browser_param'),
 
   base: properties.get('rest.base'),
   db_folder: properties.get('db.folder'),

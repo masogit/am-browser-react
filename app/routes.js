@@ -9,8 +9,8 @@ module.exports = function (app) {
   var rest_protocol = process.env.AMB_REST_PROTOCOL || config.rest_protocol;
   var rest_server = process.env.AMB_REST_SERVER || config.rest_server;
   var rest_port = process.env.AMB_REST_PORT || config.rest_port;
-  var ucmdb_server = process.env.UCMDB_SERVER || config.ucmdb_server;
-  var ucmdb_port = process.env.UCMDB_PORT || config.ucmdb_port;
+  var ucmdb_browser_server = process.env.UCMDB_BROWSER_SERVER || config.ucmdb_browser_server;
+  var ucmdb_browser_port = process.env.UCMDB_BROWSER_PORT || config.ucmdb_browser_port;
   var session_max_age = process.env.AMB_SESSION_MAX_AGE || config.session_max_age;
   var enable_csrf = process.env.AMB_NODE_CSRF || config.enable_csrf;
   var jwt_max_age = process.env.AMB_JWT_MAX_AGE || config.jwt_max_age;
@@ -135,7 +135,7 @@ module.exports = function (app) {
    * /ucmdb-browser/<global_id>
    */
   app.get('/ucmdb-browser', function (req, res) {
-    res.send(`http://${ucmdb_server}:${ucmdb_port}${config.ucmdb_param}`);
+    res.send(`http://${ucmdb_browser_server}:${ucmdb_browser_port}${config.ucmdb_browser_param}`);
   });
 
   app.post('/slack', function (req, res) {

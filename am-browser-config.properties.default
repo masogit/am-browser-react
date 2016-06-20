@@ -18,9 +18,10 @@ base = /AssetManagerWebService/rs
 jwt_max_age = 60
 
 [ucmdb]
-server = 16.187.189.22
-port = 8080
-param = /ucmdb-browser/ucmdb_widget.jsp?server=Default%20Client&locale=en#widget=properties;refocus-selection=
+adapter = true
+browser_server = ucmdbhost
+browser_port = 8080
+browser_param = /ucmdb-browser/ucmdb_widget.jsp?server=Default%20Client&locale=en#widget=properties;refocus-selection=
 
 [db]
 folder = ./db
