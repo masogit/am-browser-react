@@ -29,6 +29,7 @@ import {
 import GroupList from '../commons/GroupList';
 import GroupListItem from '../commons/GroupListItem';
 
+let idList = [];
 export default class Insight extends Component {
 
   constructor() {
@@ -249,6 +250,7 @@ export default class Insight extends Component {
         );
       } else if (box.child._id && this.state.data[box.child._id]) {
         const dataMap = this.state.data[box.child._id];
+        idList.push(box.child._id);
         child = (
           <Box justify="center" {...box} direction="column" pad="medium" flex={false}>
             <Header>
@@ -303,7 +305,7 @@ export default class Insight extends Component {
     return (
       <Carousel ref='carousel' className='disable_animation no-flex'>
         {
-          Object.keys(data).map((key, index)=> {
+          idList.slice(-Object.keys(data).length).map((key, index)=> {
             const dataMap = data[key];
             return (
               <Box pad="large" colorIndex="light-2" key={index}>
