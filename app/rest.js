@@ -216,8 +216,10 @@ function getFieldStrVal(record, field) {
   if (field.user_type && field.user_type == 'System Itemized List')
     val = val[Object.keys(val)[0]];
   else if (field.type && field.type.indexOf('Date') > -1) {
-    var d = new Date(val * 1000);
-    val = d.toLocaleString();
+    if (val) {
+      var d = new Date(val * 1000);
+      val = d.toLocaleString();
+    }
   } else if (val instanceof Object)
     val = val[Object.keys(val)[0]];
 
