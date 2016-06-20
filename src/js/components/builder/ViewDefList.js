@@ -27,7 +27,7 @@ export default class ViewsDefList extends Component {
   }
 
   _editView(sqlname) {
-    var editView = (<Builder filterEntities={sqlname}/>);
+    var editView = (<Builder schemaToLoad={sqlname}/>);
     this.setState({
       editView: editView
     });
@@ -47,6 +47,8 @@ export default class ViewsDefList extends Component {
       editView: null
     });
     this.props.clearSelectedView();
+    this.props.metadataDetailSuccess([], []);
+    history.push(`/views/`);
   }
 
   _goView(id) {

@@ -6,6 +6,7 @@ import Tabs from 'grommet/components/Tabs';
 import Tab from 'grommet/components/Tab';
 import ListItem from 'grommet/components/ListItem';
 import SearchInput from 'grommet/components/SearchInput';
+import Notes from 'grommet/components/icons/base/Notes';
 
 export default class MetaData extends ComponentBase {
 
@@ -58,14 +59,25 @@ export default class MetaData extends ComponentBase {
 
   render() {
     let rows = this.props.rows;
-    let filterEntities = this.props.filterEntities;
+    let {filterEntities, schemaToLoad} = this.props;
     let filterValue = document.getElementById("metadataFilter") ? document.getElementById("metadataFilter").value : "";
     let rowsState = this.state && this.state.filtered && (filterValue && filterValue != "") ? this.state.filtered : rows;
-    let entities = rowsState.entities ? ((filterEntities ? rowsState.entities.filter((obj) => obj.sqlname.toLowerCase().indexOf(filterEntities.toLowerCase().trim()) !== -1) : rowsState.entities)) : [];
+    let entities = rowsState.entities ?
+      (schemaToLoad ?
+        rowsState.entities.filter((obj) => obj.sqlname == schemaToLoad)
+          :
+        (filterEntities ?
+        rowsState.entities.filter((obj) => obj.sqlname.toLowerCase().indexOf(filterEntities.toLowerCase().trim()) !== -1)
+        : rowsState.entities)
+      )
+      : [];
+    if(schemaToLoad && entities.length > 0) {
+      this.props.metadataLoadDetail({label: entities[0].label, sqlname: entities[0].sqlname, url: entities[0]["ref-link"]}, this.props.elements);
+      return null;
+    }
     let links = rowsState.links ? rowsState.links : [];
     let fields = rowsState.fields ? rowsState.fields : [];
     // let LinkNext = require('grommet/components/icons/base/LinkNext');
-    let Notes = require('grommet/components/icons/base/Notes');
     let entitiesComponents = entities.sort(this._sortSqlName).map((row, index) => {
       return (
         <ListItem separator="none" key={index} pad="none" flex={false}>

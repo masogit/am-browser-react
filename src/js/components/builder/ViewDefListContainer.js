@@ -6,6 +6,7 @@ import ViewDefDetail from './ViewDefDetail';
 import ViewDefList from './ViewDefList';
 import ViewDefPreview from './ViewDefPreview';
 import * as ViewDefActions from '../../actions/views';
+import * as MetadataActions from '../../actions';
 import store from '../../store';
 import history from '../../RouteHistory';
 import Box from 'grommet/components/Box';
@@ -106,10 +107,11 @@ class ViewDefListContainer extends Component {
     const {views, isFetchingViewList, selectedView, preview} = this.props;
     let {dispatch} = store;
     let boundActionCreators = bindActionCreators(ViewDefActions, dispatch);
+    let boundActionCreators2 = bindActionCreators(MetadataActions, dispatch);
     return (
       <Box direction="row" flex={true}>
         <ViewDefList views={views} isFetchingViewList={isFetchingViewList}
-                     selectedView={selectedView} {...boundActionCreators}/>
+                     selectedView={selectedView} {...boundActionCreators} {...boundActionCreators2}/>
 
         <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange}
                        onSubmit={this.onSubmit} onSaveSuccess={this.onSaveSuccess}

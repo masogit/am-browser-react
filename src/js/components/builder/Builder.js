@@ -31,7 +31,7 @@ export default class Builder extends Component {
       <Box>
         <BreadCrumb elements={elements} {...boundActionCreators} clearFilter={this._clearFilter}/>
         <MetaData elements={elements} rows={item} {...boundActionCreators} {...boundActionCreators_views}
-                  clearFilter={this._clearFilter} filterEntities={this.props.filterEntities}/>
+                  clearFilter={this._clearFilter} {...this.props}/>
       </Box>
     );
   }
