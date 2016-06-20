@@ -26,14 +26,14 @@ export default class Search extends Component {
     ExplorerActions.loadViews((views)=> {
       if (!this._isUnmount) {
         this.setState({
-          viewSeries: this._filterFirst7(this._getSeries(views, 'category'))
+          viewSeries: this._filter(this._getSeries(views, 'category'), 5)
         });
       }
     });
     AQLActions.loadAQLs((aqls)=> {
       if (!this._isUnmount) {
         this.setState({
-          aqlSeries: this._filterFirst7(this._getSeries(aqls, 'category'))
+          aqlSeries: this._filter(this._getSeries(aqls, 'category'), 7)
         });
       }
     });
@@ -101,8 +101,8 @@ export default class Search extends Component {
     return this.state.ucmdbAdapter.supported;
   }
 
-  _filterFirst7(objs) {
-    return objs.length > 7 ? objs.filter((item, index) => index < 7) : objs;
+  _filter(objs, num) {
+    return objs.length > num ? objs.filter((item, index) => index < num) : objs;
   }
 
   _onEnter(event) {
