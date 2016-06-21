@@ -2,7 +2,7 @@
 
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { login, initAbout } from '../actions';
+import { login, initAbout, loginFailure } from '../actions';
 import Split from 'grommet/components/Split';
 import Section from 'grommet/components/Section';
 import Sidebar from 'grommet/components/Sidebar';
@@ -32,7 +32,11 @@ class IndexerLogin extends Component {
   }
 
   _onSubmit(fields) {
-    this.props.dispatch(login(fields.username, fields.password));
+    if (fields.username) {
+      this.props.dispatch(login(fields.username, fields.password));
+    } else {
+      this.props.dispatch(loginFailure({message: 'Please type your user name'}));
+    }
   }
 
   render() {

@@ -87,15 +87,30 @@ export function initAbout() {
   });
 }
 
-export function login(username, password) {
+export function login(username, password, retry) {
   return function (dispatch) {
     const auth = 'Basic ' + new Buffer(`${username}:${password}`).toString('base64');
     Rest.post(HOST_NAME + '/am/login')
       .set("Authorization", auth)
       .end((err, res) => {
         if (err) {
-          dispatch(loginFailure({message: 'LoginFailed'}));
-          throw err;
+          let message;
+          if (err.status) {
+            if (err.status == 500) {
+              message = res.text.indexOf('ECONNREFUSED') ? 'Can not connect to rest server.' : res.text;
+            } else if (err.status == 403 && res.text.indexOf('invalid csrf token') > -1) {
+              message = 'Invalid csrf token';
+              if (!retry) {
+                login(username, password, true)(dispatch);
+              }
+            } else {
+              message = 'Please contact administrator.';
+            }
+          } else {
+            message = err.message.indexOf('network is offline') ? 'Can not connect to node server.' : err.message;
+          }
+
+          dispatch(loginFailure({message: 'Login failed. ' + message}));
         } else if (res.ok) {
           if (res.body) {
             const headerNavs = res.body.headerNavs;
