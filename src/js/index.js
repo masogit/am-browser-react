@@ -17,9 +17,7 @@ import {IntlProvider} from 'react-intl';
 
 import store from './store';
 import history from './RouteHistory';
-// TODO initToken is just for dev environment(webpack)
 import {init, initToken, routeChanged} from './actions';
-// import {init, routeChanged} from './actions';
 import {ReduxRouter} from 'redux-router';
 
 // The port number needs to align with devServerProxy and websocketHost in gulpfile.js
@@ -102,9 +100,11 @@ const renderPage = () => {
   }
 };
 
-// TODO initToken is just for dev environment(webpack)
-initToken().end(renderPage());
-// renderPage();
+if (process.env.NODE_ENV === 'production') {
+  renderPage();
+} else {
+  initToken().end(renderPage());
+}
 
 // simulate initial login
 //store.dispatch(loginSuccess('nobody@grommet.io', 'simulated'));

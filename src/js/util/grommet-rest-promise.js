@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var isDebug = true;
+var isProduction = (process.env.NODE_ENV === 'production');
 
 var cookies = require('js-cookie');
 
@@ -117,14 +117,22 @@ exports.default = {
     _headers[name] = value;
   },
   head: function head(uri, params) {
-    var op = _superagent2.default.head(uri).query(buildQueryParams(params));
+    _headers['csrf-token'] = cookies.get('csrf-token');
+
+    var op = _superagent2.default.head(uri);
+    if (!isProduction) {
+      op.withCredentials();
+    }
+    op.query(buildQueryParams(params));
     op.timeout(_timeout);
     op.set(_headers);
     return op;
   },
   get: function get(uri, params) {
+    _headers['csrf-token'] = cookies.get('csrf-token');
+
     var op = _superagent2.default.get(uri);
-    if (isDebug) {
+    if (!isProduction) {
       op.withCredentials();
     }
     op.query(buildQueryParams(params));
@@ -136,7 +144,7 @@ exports.default = {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
     var op = _superagent2.default.patch(uri);
-    if (isDebug) {
+    if (!isProduction) {
       op.withCredentials();
     }
     op.send(data);
@@ -148,7 +156,7 @@ exports.default = {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
     var op = _superagent2.default.post(uri);
-    if (isDebug) {
+    if (!isProduction) {
       op.withCredentials();
     }
     op.send(data);
@@ -160,7 +168,7 @@ exports.default = {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
     var op = _superagent2.default.put(uri);
-    if (isDebug) {
+    if (!isProduction) {
       op.withCredentials();
     }
     op.send(data);
@@ -172,7 +180,7 @@ exports.default = {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
     var op = _superagent2.default.del(uri);
-    if (isDebug) {
+    if (!isProduction) {
       op.withCredentials();
     }
     op.timeout(_timeout);

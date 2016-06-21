@@ -39,15 +39,12 @@ if (isDebug) {
 
 if (enable_csrf) {
   app.use(csrf());
-  app.use(function (req, res, next) {
-    res.cookie('csrf-token', req.csrfToken());
-    next();
-  });
 }
 
 app.use('/', express.static(path.join(__dirname, '/../dist')));
 
 var indexHtml = function (req, res) {
+  res.cookie('csrf-token', req.csrfToken());
   res.sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));
 };
 
@@ -81,7 +78,7 @@ require('./routes.js')(app);
 
 app.use(function(err, req, res, next){
   logger.error(`[csrf] [${req.sessionID}] [${req.session && req.session.csrfSecret}] [${err.name}: ${err.message}] ${req.method} ${req.url}`);
-  if (enable_csrf) {
+  if (enable_csrf && (err.code === 'EBADCSRFTOKEN') ) {
     res.cookie('csrf-token', req.csrfToken());
   }
   next(err);
