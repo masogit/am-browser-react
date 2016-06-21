@@ -7,10 +7,12 @@ import User from 'grommet/components/icons/base/User';
 import { Menu, Anchor, Layer, Box } from 'grommet';
 import MessageHistory from './MessageHistory';
 import SlackDialog from './SlackDialog';
+import AboutDialog from './AboutDialog';
 var Close = require('grommet/components/icons/base/Close');
 var Slack = require('grommet/components/icons/base/SocialSlack');
 var Logout = require('grommet/components/icons/base/Logout');
 var History = require('grommet/components/icons/base/History');
+var About = require('grommet/components/icons/base/Information');
 
 import cookies from 'js-cookie';
 
@@ -35,38 +37,22 @@ class SessionMenu extends Component {
     });
   }
 
-  showMessageDialog() {
-    this.setState({
-      dialog: <MessageHistory />
-    });
-  }
-
-  showSlackDialog() {
-    this.setState({
-      dialog: <SlackDialog onClick={this._sendMessage.bind(this)} onClose={this.closeDialog}/>
-    });
-  }
-
   _sendMessage(messages) {
     this.props.dispatch(sendMessageToSlack(messages));
   }
 
+  showDialog(type) {
+    this.setState({
+      dialog: type
+    });
+  }
+
   render() {
-    const menuItems = [
-      {
-        icon: <History />,
-        onClick: this.showMessageDialog.bind(this),
-        label: 'Message History'
-      }, {
-        icon: <Slack />,
-        onClick: this.showSlackDialog.bind(this),
-        label: 'Slack'
-      }, {
-        icon: <Logout />,
-        onClick: this._onLogout.bind(this),
-        label: 'Logout'
-      }
-    ];
+    let dialog = {
+      about: <AboutDialog />,
+      history: <MessageHistory />,
+      slack: <SlackDialog onClick={this._sendMessage.bind(this)} onClose={this.closeDialog}/>
+    };
 
     return (
       <Box>
@@ -74,16 +60,15 @@ class SessionMenu extends Component {
           {/*
           <Anchor href="#" className="active">Settings</Anchor>
           <Anchor href="#">Help</Anchor>
-          <Anchor href="#">About</Anchor>
            */}
-          {
-            menuItems.map((item) => <Anchor icon={item.icon} onClick={item.onClick} label={item.label}
-                                            key={item.label} className='fontNormal'/>)
-          }
+          <Anchor icon={<About />} onClick={() => this.showDialog("about")} key="About" className="fontNormal">About</Anchor>
+          <Anchor icon={<History />} onClick={() => this.showDialog("history")} key="Message History" className="fontNormal">Message History</Anchor>
+          <Anchor icon={<Slack />} onClick={() => this.showDialog("slack")} key="Slack" className="fontNormal">Slack</Anchor>
+          <Anchor icon={<Logout />} onClick={this._onLogout.bind(this)} key="Logout" className="fontNormal">Logout</Anchor>
         </Menu>
         {this.state.dialog &&
         <Layer align="center" closer={<Anchor className='layer__closer' icon={<Close/>} onClick={this.closeDialog}/>}>
-          {this.state.dialog}
+          {dialog[this.state.dialog]}
         </Layer>
         }
       </Box>

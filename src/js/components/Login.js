@@ -2,11 +2,13 @@
 
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { login } from '../actions';
+import { login, initAbout } from '../actions';
 import Split from 'grommet/components/Split';
 import Section from 'grommet/components/Section';
 import Sidebar from 'grommet/components/Sidebar';
 import LoginForm from 'grommet/components/LoginForm';
+import Footer from 'grommet/components/Footer';
+import Label from 'grommet/components/Label';
 import Logo from './Logo';
 import cookies from 'js-cookie';
 
@@ -16,7 +18,13 @@ class IndexerLogin extends Component {
     super();
     this._onSubmit = this._onSubmit.bind(this);
     this._onResponsive = this._onResponsive.bind(this);
-    this.state = {responsive: 'multiple'};
+    this.state = {responsive: 'multiple', ambVersion: null};
+  }
+
+  componentDidMount() {
+    initAbout().then((res) => {
+      this.setState({ambVersion: res.about.ambVersion});
+    });
   }
 
   _onResponsive(responsive) {
@@ -62,6 +70,11 @@ class IndexerLogin extends Component {
               username: cookies.get('user'),
               rememberMe: true
             }}/>
+          <Footer justify="end">
+            <Label>
+              {this.state.ambVersion}
+            </Label>
+          </Footer>
         </Sidebar>
       </Split>
     );

@@ -78,6 +78,15 @@ export function initToken() {
   });
 }
 
+export function initAbout() {
+  return Rest.get(HOST_NAME + '/am/about').then((res) => {
+    return res.body;
+  }, (err) => {
+    console.log('Get About failed');
+    throw err;
+  });
+}
+
 export function login(username, password) {
   return function (dispatch) {
     const auth = 'Basic ' + new Buffer(`${username}:${password}`).toString('base64');

@@ -4,6 +4,7 @@ var logger = require('./logger.js');
 var REST = require('./rest.js');
 var sessionUtil = require('./sessionUtil.js');
 var config = require('./config.js');
+var version = require('../version.json');
 
 module.exports = function (app) {
   var rest_protocol = process.env.AMB_REST_PROTOCOL || config.rest_protocol;
@@ -48,6 +49,24 @@ module.exports = function (app) {
 
   app.get('/am/csrf', function (req, res) {
     res.end();
+  });
+
+  app.get('/am/about', function (req, res) {
+    logger.info(`[/about]`);
+    res.json({
+      about: {
+        amVersion: '',
+        ambVersion: version.number + (version.timestamp ? (`-` + version.timestamp) : ``) + (version.stage ? (`_` + version.stage) : ``),
+        rest: {
+          server: rest_server,
+          port: rest_port
+        },
+        ucmdb: {
+          server: ucmdb_browser_server,
+          port: ucmdb_browser_port
+        }
+      }
+    });
   });
 
   // AM Server Login
