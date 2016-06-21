@@ -61,10 +61,11 @@ class SessionMenu extends Component {
           <Anchor href="#" className="active">Settings</Anchor>
           <Anchor href="#">Help</Anchor>
            */}
-          <Anchor icon={<About />} onClick={() => this.showDialog("about")} key="About" className="fontNormal">About</Anchor>
-          <Anchor icon={<History />} onClick={() => this.showDialog("history")} key="Message History" className="fontNormal">Message History</Anchor>
-          <Anchor icon={<Slack />} onClick={() => this.showDialog("slack")} key="Slack" className="fontNormal">Slack</Anchor>
-          <Anchor icon={<Logout />} onClick={this._onLogout.bind(this)} key="Logout" className="fontNormal">Logout</Anchor>
+          <Anchor icon={<About />} onClick={() => this.showDialog("about")} label="About" className="fontNormal"/>
+          <Anchor icon={<History />} onClick={() => this.showDialog("history")} label="Message History"
+                  className="fontNormal"/>
+          <Anchor icon={<Slack />} onClick={() => this.showDialog("slack")} label="Slack" className="fontNormal"/>
+          <Anchor icon={<Logout />} onClick={this._onLogout.bind(this)} label="Logout" className="fontNormal"/>
         </Menu>
         {this.state.dialog &&
         <Layer align="center" closer={<Anchor className='layer__closer' icon={<Close/>} onClick={this.closeDialog}/>}>
