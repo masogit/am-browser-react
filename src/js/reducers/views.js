@@ -177,14 +177,8 @@ const handlers = {
     };
   },
   [DELETE_TABLE_ROW]: (state, action) => {
-    let editing = state.views.editing;
-    let clonedView = action.selectedView;
-    if (!editing) {
-      clonedView = _.cloneDeep(action.selectedView);
-    }
-    objectPath.del(clonedView, action.path);
     return {
-      selectedView: clonedView,
+      selectedView: action.selectedView,
       editing: true
     };
   },

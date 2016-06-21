@@ -3,6 +3,7 @@ import _ from 'lodash';
 import * as types from '../constants/ActionTypes';
 import {HOST_NAME, VIEW_DEF_URL} from '../util/Config';
 import Rest from '../util/grommet-rest-promise';
+import objectPath from 'object-path';
 
 function requestViews() {
   return {
@@ -126,13 +127,65 @@ export function updateSelectedView(selectedView, path, newValue) {
 }
 
 export function deleteTableRow(selectedView, path) {
-  return dispatch => {
+  return (dispatch, getState) => {
+    let editing = getState().views.views.editing;
+    let clonedView = editing ? selectedView : _.cloneDeep(selectedView);
+    let bodyPath = path.substring(0, path.lastIndexOf("body") + 4);
+
+    // check and remove orderby, groupby and sum
+    let orderByPath = bodyPath.concat(".orderby");
+    let groupByPath = bodyPath.concat(".groupby");
+    let sumPath = bodyPath.concat(".sum");
+    let orderBy = objectPath.get(clonedView, orderByPath);
+    let groupBy = objectPath.get(clonedView, groupByPath);
+    let sum = objectPath.get(clonedView, sumPath);
+    let field = objectPath.get(clonedView, path);
+    if(field.sqlname == orderBy) {
+      objectPath.del(clonedView, orderByPath);
+    }
+    if(field.sqlname == groupBy) {
+      objectPath.del(clonedView, groupByPath);
+    }
+    if(field.sqlname == sum) {
+      objectPath.del(clonedView, sumPath);
+    }
+
+    objectPath.del(clonedView, path);
+    checkAndRemoveParent(clonedView, path);
     dispatch({
       type: types.DELETE_TABLE_ROW,
-      selectedView: selectedView,
+      selectedView: clonedView,
       path: path
     });
   };
+}
+
+function checkAndRemoveParent(clonedView, path) {
+  let lastIndexOfBody = path.lastIndexOf("body");
+  if(lastIndexOfBody <= 0 ) {
+    return;
+  }
+  let bodyPath = path.substring(0, lastIndexOfBody + 4);
+  let fieldsPath = bodyPath.concat(".fields");
+  let fields = objectPath.get(clonedView, fieldsPath);
+  let fieldsEmpty = !fields.some((field) => {
+    return !field.PK;
+  });
+  if(fieldsEmpty && fields.length > 0) {
+    objectPath.empty(clonedView, fieldsPath);
+  }
+  let linksPath = bodyPath.concat(".links");
+  let links = objectPath.get(clonedView, linksPath);
+
+  lastIndexOfBody = bodyPath.lastIndexOf(".body");
+  let lastIndexOfLinks = bodyPath.lastIndexOf(".links");
+  // check if there is a parent table
+  if(fieldsEmpty && (!links || links.length == 0) && lastIndexOfLinks > 0) {
+    // remove current link element
+    let currentLinkPath = bodyPath.substring(0, lastIndexOfBody); // links.0
+    objectPath.del(clonedView, currentLinkPath);
+    checkAndRemoveParent(clonedView, currentLinkPath);
+  }
 }
 
 export function duplicateViewDef(selectedView) {
