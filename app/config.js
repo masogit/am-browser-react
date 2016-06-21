@@ -10,6 +10,8 @@ properties.append('am-browser-config.properties');
 logger.info("[server]", "Server configuration: " + JSON.stringify(properties));
 
 module.exports = {
+  session_secret: properties.get('node.session_secret'),
+
   rest_protocol: properties.get('rest.protocol'),
   rest_server: properties.get('rest.server'),
   rest_port: properties.get('rest.port'),
