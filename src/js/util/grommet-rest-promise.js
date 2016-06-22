@@ -53,6 +53,10 @@ Request.prototype.promise = function () {
         if (msg && err.status == 400) {
           store.default.dispatch({type: Types.RECEIVE_ERROR, msg: msg});
         }
+        if (msg && err.status == 500) {
+          store.default.dispatch({type: Types.RECEIVE_ERROR, msg: "Server error."});
+          console.log(msg);
+        }
       }
       if (typeof res !== "undefined" && res.status > 400) {
         err.message = 'cannot ' + req.method + ' ' + req.url + ' (' + res.status + ')';
