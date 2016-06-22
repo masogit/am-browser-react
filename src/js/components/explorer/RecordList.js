@@ -15,8 +15,8 @@ import Graph from '../commons/Graph';
 import EmptyIcon from '../commons/EmptyIcon';
 import * as Format from '../../constants/RecordFormat';
 import cookies from 'js-cookie';
-export default class RecordList extends Component {
 
+export default class RecordList extends Component {
   constructor() {
     super();
     this.state = {
@@ -35,7 +35,8 @@ export default class RecordList extends Component {
       },
       aqlInput: false,
       allFields: false,
-      session: null
+      session: null,
+      onMoreLock: false
     };
   }
 
@@ -76,21 +77,28 @@ export default class RecordList extends Component {
   }
 
   _getRecords(param) {
-    var body = Object.assign({}, this.props.body, {param: (param) ? param : this.state.param});
-    var timeStart = Date.now();
-    this.setState({
-      loading: true
-    });
-    ExplorerActions.loadRecordsByBody(body, (data) => {
-      var records = this.state.records;
+    if (this.state.onMoreLock === false) {
+      this.setState({onMoreLock: true});
+      var body = Object.assign({}, this.props.body, {param: (param) ? param : this.state.param});
+      var timeStart = Date.now();
       this.setState({
-        loading: false,
-        timeQuery: Date.now() - timeStart,
-        numTotal: data.count,
-        records: (param) ? records.concat(data.entities) : data.entities, // if sync pass param to query, then records append
-        filtered: null
+        loading: true
       });
-    });
+      ExplorerActions.loadRecordsByBody(body, (data) => {
+        var records = this.state.records;
+        this.setState({
+          loading: false,
+          timeQuery: Date.now() - timeStart,
+          numTotal: data.count,
+          records: (param) ? records.concat(data.entities) : data.entities, // if sync pass param to query, then records append
+          filtered: null
+        }, ()=> {
+          if (this.state.records.length < this.state.numTotal) {
+            this.setState({onMoreLock: false});
+          }
+        });
+      });
+    }
   }
 
   _orderBy(sqlname) {
@@ -266,6 +274,7 @@ export default class RecordList extends Component {
       'color': '#767676',
       'border-color': '#FFD144'
     };
+    const resultRecords = this.state.filtered ? this.state.filtered : this.state.records;
 
     return (
       <Header justify="between">
@@ -275,11 +284,7 @@ export default class RecordList extends Component {
                onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
         <Box direction="column">
           <Box direction="row" style={{fontSize: '70%', fontWeight: 'bold'}}>
-            {this.state.loading && <Spinning />}
-            {
-              !this.state.loading ?
-              ((this.state.filtered) ? this.state.filtered.length : this.state.records.length) + '/' + this.state.numTotal : null
-            }
+            {this.state.loading ? <Spinning /> : `${resultRecords.length}/${this.state.numTotal}`}
           </Box>
           <Box style={{fontSize: '50%'}}>
             {this.state.loading ? '----' : `${this.state.timeQuery}ms`}
@@ -287,7 +292,7 @@ export default class RecordList extends Component {
         </Box>
         <Menu icon={<MenuIcon />} closeOnClick={false} dropAlign={{top: 'bottom'}}>
           <Anchor icon={<More />} label="More records" onClick={this._getMoreRecords.bind(this)}
-                  disabled={this.state.numTotal <= this.state.records.length}/>
+                  disabled={this.state.onMoreLock}/>
           <Anchor icon={this.state.aqlInput?<CheckboxSelected />:<Checkbox />} label="Input AQL"
                   onClick={this._toggleAQLInput.bind(this)}/>
           <Anchor icon={this.state.allFields?<CheckboxSelected />:<Checkbox />} label="Full columns"
@@ -306,7 +311,7 @@ export default class RecordList extends Component {
   renderList() {
     return (
       <Table selectable={true} className='autoScroll'
-             onMore={(this.state.numTotal > this.state.records.length && !this.state.filtered)?this._getMoreRecords.bind(this):null}>
+             onMore={this.state.onMoreLock ? null : this._getMoreRecords.bind(this)}>
         <thead>
         <tr>
           <th><Anchor href="#" reverse={true} icon={this._showOrderByIcon('self')} label="Self"
