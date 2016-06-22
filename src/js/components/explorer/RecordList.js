@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import RecordDetail from './RecordDetail';
-import {Title, Table, TableRow, Box, Anchor, Header, Menu }from 'grommet';
+import {Title, Table, TableRow, Box, Anchor, Header, Menu}from 'grommet';
 import Close from 'grommet/components/icons/base/Close';
 import Ascend from 'grommet/components/icons/base/Ascend';
 import Descend from 'grommet/components/icons/base/Descend';
@@ -70,15 +70,15 @@ export default class RecordList extends Component {
       var param = Object.assign({}, this.state.param);
       param.offset = this.state.records.length;
       this.refs.search.value = "";
-      this._getRecords(param);  // sync pass param to query, then records append
+      this._getRecords(param, true);  // sync pass param to query, then records append
     } else {
       console.log('no more record');
       return null;
     }
   }
 
-  _getRecords(param) {
-    if (this.state.onMoreLock === false) {
+  _getRecords(param, onMore) {
+    if ((onMore && this.state.onMoreLock === false) || !onMore) {
       this.setState({onMoreLock: true});
       var body = Object.assign({}, this.props.body, {param: param || this.state.param});
       var timeStart = Date.now();
