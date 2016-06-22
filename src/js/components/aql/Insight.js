@@ -412,7 +412,7 @@ export default class Insight extends Component {
             <Menu direction="row" align="center" responsive={true}>
               {!edit &&
               <RadioButton id="carousel" name="choice" label="Carousel" onChange={this._toggleCarousel.bind(this)}
-                           checked={carousel} disabled={edit}/> }
+                           checked={carousel} disabled={edit}/>}
               {!edit &&
               <RadioButton id="dashboard" name="choice" label="Dashboard" onChange={this._toggleCarousel.bind(this)}
                            checked={!carousel || edit}/>
