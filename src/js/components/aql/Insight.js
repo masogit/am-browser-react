@@ -14,18 +14,7 @@ import Checkmark from 'grommet/components/icons/base/Checkmark';
 import CaretNext from 'grommet/components/icons/base/CaretNext';
 import Previous from 'grommet/components/icons/base/Previous';
 import Graph from './../commons/Graph';
-import {
-  Anchor,
-  Box,
-  CheckBox,
-  Header,
-  Menu,
-  Title,
-  Table,
-  TableRow,
-  Layer,
-  Carousel
-} from 'grommet';
+import { Anchor, Box, CheckBox, Header, Menu, Title, Table, TableRow,  Layer, Carousel, RadioButton } from 'grommet';
 import GroupList from '../commons/GroupList';
 import GroupListItem from '../commons/GroupListItem';
 
@@ -273,9 +262,10 @@ export default class Insight extends Component {
 
     return (
       <Box key={box.key} direction="column" separator={this.state.edit?'all':'none'} colorIndex="light-2" flex={true}>
-      {this._buildActions(box, parent)}
-      {child}
-    </Box>);
+        {this._buildActions(box, parent)}
+        {child}
+      </Box>
+    );
   }
 
   _buildActions(box, parent) {
@@ -403,51 +393,47 @@ export default class Insight extends Component {
   }
 
   render() {
-    var box = this.state.box;
-    var data = this.state.data;
+    const {box, data, carousel, edit, layer, alert} = this.state;
+    const id = this.props.params.id;
+    let content;
+    if (id) {
+      content = data && data[id] &&
+        this._renderSingleAQL(data[id]);
+    } else {
+      content = carousel && !edit ? this._buildCarousel(data) : this._buildBox(box, box);
+    }
+
     return (
       <Box pad="medium" full="horizontal">
         <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
           <Title>AM Insight</Title>
           {
-            !this.props.params.id &&
+            !id &&
             <Menu direction="row" align="center" responsive={true}>
-              <CheckBox id="carousel" label="Carousel" checked={this.state.carousel}
-                        onChange={this._toggleCarousel.bind(this)}/>
-              <CheckBox id="dashboard" label="Dashboard" checked={!this.state.carousel}
-                        onChange={this._toggleCarousel.bind(this)}/>
-              {
-                this.state.edit &&
-                <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>
+              {!edit &&
+              <RadioButton id="carousel" name="choice" label="Carousel" onChange={this._toggleCarousel.bind(this)}
+                           checked={carousel} disabled={edit}/> }
+              {!edit &&
+              <RadioButton id="dashboard" name="choice" label="Dashboard" onChange={this._toggleCarousel.bind(this)}
+                           checked={!carousel || edit}/>
               }
-              <CheckBox id="edit" label="Edit" checked={this.state.edit} onChange={this._toggleEdit.bind(this)}
+              {edit && <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>}
+              <CheckBox id="edit" label="Edit" checked={edit} onChange={this._toggleEdit.bind(this)}
                         toggle={true}/>
             </Menu>
           }
           {
-            this.props.params.id && <Anchor icon={<Previous />} label="Back" onClick={() => {
+            id && <Anchor icon={<Previous />} label="Back" onClick={() => {
               history.go(-1);
             }}/>
           }
         </Header>
-        <Box className={this.state.edit ? '' : 'autoScroll'}>
-          {
-            this.state.carousel && !this.state.edit && !this.props.params.id &&
-            this._buildCarousel(data)}
-          {
-            (!this.state.carousel || this.state.edit) && !this.props.params.id &&
-            this._buildBox(box, box)
-          }
-          {
-            this.props.params.id && this.state.data && this.state.data[this.props.params.id] &&
-            this._renderSingleAQL(this.state.data[this.props.params.id])
-          }
-
-          {this.state.layer}
-          {this.state.alert}
+        <Box className={edit ? '' : 'autoScroll'}>
+          {content}
+          {layer}
+          {alert}
         </Box>
       </Box>
     );
   }
 }
-
