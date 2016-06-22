@@ -1,12 +1,11 @@
 // import request from 'superagent-bluebird-promise';
 // import * as types from '../constants/ActionTypes';
-import {HOST_NAME} from '../util/Config';
 import Rest from '../util/grommet-rest-promise';
 const store = require('../store');
 import * as Types from '../constants/ActionTypes';
 
 export function saveWall(wall, callback) {
-  Rest.post(HOST_NAME + '/coll/wall', wall).then((res) => {
+  Rest.post('/coll/wall', wall).then((res) => {
     if (res.text) {
       store.default.dispatch({type: Types.RECEIVE_INFO, msg: "Insight saved successfully"});
       callback(res.text);
@@ -17,7 +16,7 @@ export function saveWall(wall, callback) {
 }
 
 export function loadWalls(callback) {
-  Rest.get(HOST_NAME + '/coll/wall').then((res) => {
+  Rest.get('/coll/wall').then((res) => {
     callback(res.body);
   }, (err) => {
     console.log(err.response ? err.response.text : err);
@@ -25,7 +24,7 @@ export function loadWalls(callback) {
 }
 
 export function loadAQL(id, callback) {
-  Rest.get(HOST_NAME + '/coll/aql/' + id).then((res) => {
+  Rest.get('/coll/aql/' + id).then((res) => {
     callback(res.body);
   }, (err) => {
     console.log(err.response ? err.response.text : err);
@@ -33,7 +32,7 @@ export function loadAQL(id, callback) {
 }
 
 export function loadAQLs(callback) {
-  Rest.get(HOST_NAME + '/coll/aql').then((res) => {
+  Rest.get('/coll/aql').then((res) => {
     callback(res.body);
   }, (err) => {
     console.log(err.response ? err.response.text : err);
@@ -41,7 +40,7 @@ export function loadAQLs(callback) {
 }
 
 export function saveAQL(aql, callback) {
-  Rest.post(HOST_NAME + '/coll/aql', aql).then((res) => {
+  Rest.post('/coll/aql', aql).then((res) => {
     if (res.text) {
       store.default.dispatch({type: Types.RECEIVE_INFO, msg: "Graph saved successfully"});
       callback(res.text);
@@ -52,7 +51,7 @@ export function saveAQL(aql, callback) {
 }
 
 export function removeAQL(id, callback) {
-  Rest.del(HOST_NAME + '/coll/aql/' + id).then((res) => {
+  Rest.del('/coll/aql/' + id).then((res) => {
     if (res.text) {
       store.default.dispatch({type: Types.RECEIVE_INFO, msg: "Graph removed successfully"});
       callback(res.text);
@@ -63,7 +62,7 @@ export function removeAQL(id, callback) {
 }
 
 export function loadReports(callback) {
-  Rest.get(HOST_NAME + '/am/db/amInToolReport').then((res) => {
+  Rest.get('/am/db/amInToolReport').then((res) => {
     callback(res.body);
   }, (err) => {
     console.log(err.response ? err.response.text : err);
@@ -101,7 +100,7 @@ export function queryAQL(str, callback) {
       query += " " + aql.where;
     }
 
-    Rest.get(HOST_NAME + query).then((res) => {
+    Rest.get(query).then((res) => {
       callback(simpleAQLResult(res.body.Query));
     }, (err) => {
       const errorMessage = err.rawResponse || (err.response && err.response.text || err.toString());

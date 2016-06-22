@@ -1,7 +1,7 @@
 //import request from 'superagent-bluebird-promise';
 import _ from 'lodash';
 import * as types from '../constants/ActionTypes';
-import {HOST_NAME, VIEW_DEF_URL} from '../util/Config';
+import {VIEW_DEF_URL} from '../util/Config';
 import Rest from '../util/grommet-rest-promise';
 import objectPath from 'object-path';
 
@@ -28,7 +28,7 @@ function receiveViewsFailure(err) {
 export function loadViews(selectedViewId, currentPathName, callback) {
   return dispatch => {
     dispatch(requestViews());
-    return Rest.get(HOST_NAME + VIEW_DEF_URL).then(function (res) {
+    return Rest.get(VIEW_DEF_URL).then(function (res) {
       dispatch(receiveViewsSuccess(res.body));
       let views = res.body;
       // Load first record of the list in detail.
@@ -55,7 +55,7 @@ export function loadViews(selectedViewId, currentPathName, callback) {
 export function saveViewDef(selectedView, callback) {
   //console.log(selectedView);
   return function (dispatch) {
-    return Rest.post(HOST_NAME + VIEW_DEF_URL)
+    return Rest.post(VIEW_DEF_URL)
       .set("Content-Type", "application/json")
       .send(JSON.stringify(selectedView))
       .then(function (res) {
@@ -206,7 +206,7 @@ export function duplicateViewDef(selectedView) {
 
 export function confirmDeleteViewDef(selectedView, callback) {
   return function (dispatch, getState) {
-    Rest.del(HOST_NAME + VIEW_DEF_URL + "/" + selectedView._id)
+    Rest.del(VIEW_DEF_URL + "/" + selectedView._id)
       .then((res) => {
         console.log("delete successfully - " + selectedView._id);
         let views = getState().views.views;

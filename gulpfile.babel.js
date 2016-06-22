@@ -68,7 +68,11 @@ const opts = {
   devServerPort: 8001,
   // The 8010 port number needs to align with hostName in index.js
   devServerProxy: {
-    "/rest/*": 'http://localhost:8010'
+    '/am/*': 'http://localhost:8080',
+	'/coll/*': 'http://localhost:8080',
+	'/download/*': 'http://localhost:8080',
+	'/ucmdb-browser/*': 'http://localhost:8080',
+	'/slack/*': 'http://localhost:8080'
   },
   websocketHost: 'localhost:8010',
   alias: {

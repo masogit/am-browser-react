@@ -3,7 +3,6 @@
 import Rest from './util/grommet-rest-promise';
 //import history from './RouteHistory';
 //import Query from 'grommet-index/utils/Query';
-import {HOST_NAME} from './util/Config';
 import cookies from 'js-cookie';
 import * as Types from './constants/ActionTypes';
 
@@ -68,7 +67,7 @@ export function init(email, headerString) {
 }
 
 export function initToken() {
-  return Rest.get(HOST_NAME + '/am/csrf').end((err, res) => {
+  return Rest.get('/am/csrf').end((err, res) => {
     if (err || !res.ok) {
       console.log('Get CSRF failed');
       throw err;
@@ -90,7 +89,7 @@ export function initAbout() {
 export function login(username, password, retry) {
   return function (dispatch) {
     const auth = 'Basic ' + new Buffer(`${username}:${password}`).toString('base64');
-    Rest.post(HOST_NAME + '/am/login')
+    Rest.post('/am/login')
       .set("Authorization", auth)
       .end((err, res) => {
         if (err) {
@@ -129,7 +128,7 @@ export function login(username, password, retry) {
 
 export function logout() {
   return function (dispatch) {
-    Rest.get(HOST_NAME + '/am/logout').end((err, res) => {
+    Rest.get('/am/logout').end((err, res) => {
       if (err) {
         dispatch({message: 'LogoutFailed'});
         throw err;
@@ -142,7 +141,7 @@ export function logout() {
 
 export function sendMessageToSlack(messages) {
   return function (dispatch) {
-    Rest.post(HOST_NAME + '/slack', {messages}).then(res => {
+    Rest.post('/slack', {messages}).then(res => {
       if (res.ok) {
         if (res.text) {
           dispatch({type: Types.RECEIVE_WARNING, msg: res.text});
@@ -167,7 +166,7 @@ export function getConfigSuccess(headerNavs) {
 
 export function metadataLoad() {
   return function (dispatch) {
-    Rest.get(HOST_NAME + '/am/v1/schema')
+    Rest.get('/am/v1/schema')
       .set('Content-Type', 'Application/json')
       .end(function (err, res) {
         if (!err) {
@@ -180,7 +179,7 @@ export function metadataLoad() {
 
 export function metadataLoadDetail(obj, elements, index) {
   return function (dispatch) {
-    Rest.get(HOST_NAME + '/am/v1/' + obj.url)
+    Rest.get('/am/v1/' + obj.url)
       .set('Content-Type', 'Application/json')
       .end(function (err, res) {
         if (!err) {

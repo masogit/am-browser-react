@@ -1,7 +1,6 @@
 /**
  * Created by mansh on 4/25/2016.
  */
-import {HOST_NAME} from '../util/Config';
 import Rest from '../util/grommet-rest-promise';
 
 function param2aql(param) {
@@ -17,7 +16,7 @@ function param2aql(param) {
 }
 
 export function loadViews(callback) {
-  Rest.get(HOST_NAME + '/coll/view/').then((res) => {
+  Rest.get('/coll/view/').then((res) => {
     callback(res.body);
   }, (err) => {
     console.log(err.response ? err.response.text : err);
@@ -25,7 +24,7 @@ export function loadViews(callback) {
 }
 
 export function loadView(id, callback) {
-  Rest.get(HOST_NAME + '/coll/view/' + id).then((res) => {
+  Rest.get('/coll/view/' + id).then((res) => {
     if (res.ok && res.body) {
       callback(res.body);
     } else {
@@ -49,7 +48,7 @@ export function getCount(body, callback) {
 }
 
 export function getUCMDB(callback) {
-  Rest.get(HOST_NAME + '/ucmdb-browser').then((res) => {
+  Rest.get('/ucmdb-browser').then((res) => {
     callback(res.text);
   }, (err) => {
     console.log(err.response ? err.response.text : err);
@@ -70,7 +69,7 @@ export function getBodyByKeyword(body, keyword) {
 }
 
 export function loadRecordsByBody(body, callback) {
-  Rest.get(HOST_NAME + '/am/db/' + getQueryByBody(body)).then((res) => {
+  Rest.get('/am/db/' + getQueryByBody(body)).then((res) => {
     if (res.body.count && res.body.entities)
       callback(res.body);
     else
@@ -167,5 +166,5 @@ export function getDownloadQuery(body) {
         type: field.type
       });
   });
-  return HOST_NAME + '/download/db/' + getQueryByBody(body);
+  return '/download/db/' + getQueryByBody(body);
 }

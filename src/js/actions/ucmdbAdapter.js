@@ -2,7 +2,6 @@
  * Created by huling on 5/4/2016.
  */
 import Rest from '../util/grommet-rest-promise';
-import {HOST_NAME} from '../util/Config';
 import history from '../RouteHistory';
 
 export const ADAPTER_DATA_SUCCESS = 'ADAPTER_DATA_SUCCESS';
@@ -21,7 +20,7 @@ export const adapterDataFetch = (data, error) => ({
 });
 
 export const getIntegrationPoint = (callback) => {
-  const url = `${HOST_NAME}/am/ucmdbPoint/`;
+  const url = '/am/ucmdbPoint/';
   Rest.get(url).then((res) => {
     const data = res && res.ok && res.body || [];
     if (callback) {
@@ -42,7 +41,7 @@ export const integrationJobDataSuccess = (integrationJobData, error) =>({
 });
 
 export const getIntegrationJob = (pointName, jobType, callback) => {
-  const url = `${HOST_NAME}/am/ucmdbPoint/${pointName}/${jobType}`;
+  const url = `/am/ucmdbPoint/${pointName}/${jobType}`;
   Rest.get(url).then((res) => {
     const data = res && res.ok && res.body || [];
     const points = data.map((point)=> {
@@ -68,7 +67,7 @@ export const integrationJobItemDataSuccess = (integrationJobItemData, error) =>(
 });
 
 export const getIntegrationJobItem = (pointName, jobType, jobName, callback) => {
-  const url = `${HOST_NAME}/am/ucmdbPoint/${pointName}/${jobType}/${jobName}`;
+  const url = `/am/ucmdbPoint/${pointName}/${jobType}/${jobName}`;
   Rest.get(url).then((res) => {
     const data = res && res.ok && res.body && res.body.jobStatuses || [];
     const jobStatuses = data.map((jobStatus)=> {
