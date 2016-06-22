@@ -7,7 +7,7 @@ var PropertiesReader = require('properties-reader');
 var properties = PropertiesReader('am-browser-config.properties.default');
 var logger = require('./logger.js');
 properties.append('am-browser-config.properties');
-logger.info("[server]", "Server configuration: " + JSON.stringify(properties));
+// logger.info("[server]", "Server configuration: " + JSON.stringify(properties));
 
 module.exports = {
   session_secret: properties.get('node.session_secret'),
