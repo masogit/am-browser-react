@@ -50,6 +50,8 @@ export default class RecordSearch extends Component {
   }
 
   _search(keyword) {
+    //  Escaped for SQL. e.g. org.apache.commons.lang.StringEscapeUtils.escapeSql(String str).
+    keyword = keyword.replace(new RegExp("'", "g"), "''");
     this.setState({
       messages: {},
       results: [],
