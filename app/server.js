@@ -28,7 +28,11 @@ app.use(bodyParser.urlencoded({'extended': 'true'})); // parse application/x-www
 app.use(bodyParser.json()); // parse application/json
 app.use(bodyParser.json({type: 'application/vnd.api+json'})); // parse application/vnd.api+json as json
 app.use(methodOverride('X-HTTP-Method-Override')); // override with the X-HTTP-Method-Override header in the request
-app.use(session({secret: config.session_secret}));
+app.use(session({
+  resave: true,
+  saveUninitialized: true,
+  secret: config.session_secret
+}));
 if (isDebug) {
   app.use(cors({origin: true, credentials: true}));
 } else {
