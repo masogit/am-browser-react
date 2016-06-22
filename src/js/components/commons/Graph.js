@@ -51,15 +51,14 @@ export default class Graph extends Component {
         series.forEach(item => {
           const value = row[item.index] / 1.0;
           if (!isNaN(value)) {
-            /*let seriesItem = {
-             x: i,
-             y: value
-             };
-             if (form.type === 'bar') {
-             seriesItem.onClick = onClick;
-             }
-             item.values.push(seriesItem);*/
-            item.values.push([i, value]);
+            let seriesItem = {
+              x: i,
+              y: value
+            };
+            if (form.type === 'bar') {
+              seriesItem.onClick = onClick;
+            }
+            item.values.push(seriesItem);
           }
         });
 

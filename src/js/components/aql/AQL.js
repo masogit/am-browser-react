@@ -52,6 +52,7 @@ export default class AQL extends Component {
         rows: []
       }
     };
+    this._onClose = this._onClose.bind(this);
   }
 
   componentDidMount() {
@@ -255,57 +256,19 @@ export default class AQL extends Component {
     };
     this.setState({
       aql: aql,
-      popupLayer: null
+      layer: null
     });
   }
 
   _selectView() {
-    var popupLayer = (
-      <Layer onClose={this._onClose.bind(this)} closer={true} align="left">
-        <Box full="vertical" justify="center">
-          <Box pad={{vertical: 'medium'}}>
-            <Title>Views Selector ({this.state.views.length})</Title>
-          </Box>
-          <GroupList pad={{vertical: 'small'}} searchable={true}>
-            {
-              this.state.views.map((view) => (
-                <GroupListItem key={view._id} groupby={view.category} search={view.name}
-                               pad={{horizontal: 'medium', vertical: 'small'}}
-                               onClick={this._attachView.bind(this, view)}>
-                  <EmptyIcon />{view.name}
-                </GroupListItem>
-              ))
-            }
-          </GroupList>
-        </Box>
-      </Layer>
-    );
     this.setState({
-      popupLayer: popupLayer
+      layer: 'view'
     });
   }
 
   _selectReports() {
-    var popupLayer = (
-      <Layer onClose={this._onClose.bind(this)} closer={true} align="left">
-        <Box full="vertical" justify="center">
-          <Box pad={{vertical: 'medium'}}><Title>AQL Selector ({this.state.reports.entities.length})</Title></Box>
-          <GroupList pad={{vertical: 'small'}} searchable={true}>
-            {
-              this.state.reports.entities &&
-              this.state.reports.entities.map((report) => (
-                <GroupListItem key={report['ref-link']} groupby={this._getFieldStrVal(report.seType)}
-                               search={report.Name} pad="small" onClick={this._loadOOBAQL.bind(this, report)}>
-                  <EmptyIcon />{report.Name}
-                </GroupListItem>
-              ))
-            }
-          </GroupList>
-        </Box>
-      </Layer>
-    );
     this.setState({
-      popupLayer: popupLayer
+      layer: 'reports'
     });
   }
 
@@ -315,16 +278,12 @@ export default class AQL extends Component {
         var body = view.body;
         var newFilter = Format.getFilterFromField(view.body.fields, filter);
         body.filter = (body.filter) ? `(${body.filter} AND ${newFilter})` : newFilter;
-        var popupLayer = (
-          <Layer onClose={this._onClose.bind(this)} closer={true} flush={true} align="center">
-            <Box full={true} pad="large">
-              <RecordList body={body} title={view.name}/>
-            </Box>
-          </Layer>
-        );
 
         this.setState({
-          popupLayer: popupLayer
+          layer: {
+            type: 'records',
+            args: {body, name: view.name}
+          }
         });
       });
   }
@@ -337,8 +296,61 @@ export default class AQL extends Component {
 
   _onClose() {
     this.setState({
-      popupLayer: null
+      layer: null
     });
+  }
+
+  popupLayer(type) {
+    if (type == 'reports') {
+      return (
+        <Layer onClose={this._onClose} closer={true} align="left">
+          <Box full="vertical" justify="center">
+            <Box
+              pad={{vertical: 'medium'}}><Title>{`AQL Selector (${this.state.reports.entities.length})`}</Title></Box>
+            <GroupList pad={{vertical: 'small'}} searchable={true}>
+              {
+                this.state.reports.entities &&
+                this.state.reports.entities.map((report) => (
+                  <GroupListItem key={report['ref-link']} groupby={this._getFieldStrVal(report.seType)}
+                                 search={report.Name} pad="small" onClick={this._loadOOBAQL.bind(this, report)}>
+                    <EmptyIcon />{report.Name}
+                  </GroupListItem>
+                ))
+              }
+            </GroupList>
+          </Box>
+        </Layer>
+      );
+    } else if (type == 'view') {
+      return (
+        <Layer onClose={this._onClose} closer={true} align="left">
+          <Box full="vertical" justify="center">
+            <Box pad={{vertical: 'medium'}}>
+              <Title>{`Views Selector (${this.state.views && this.state.views.length})`}</Title>
+            </Box>
+            <GroupList pad={{vertical: 'small'}} searchable={true}>
+              {
+                this.state.views.map((view) => (
+                  <GroupListItem key={view._id} groupby={view.category} search={view.name}
+                                 pad={{horizontal: 'medium', vertical: 'small'}}
+                                 onClick={this._attachView.bind(this, view)}>
+                    <EmptyIcon />{view.name}
+                  </GroupListItem>
+                ))
+              }
+            </GroupList>
+          </Box>
+        </Layer>
+      );
+    } else if (typeof type == 'object' && type.type == 'records') {
+      return (
+        <Layer onClose={this._onClose} closer={true} flush={true} align="center">
+          <Box full={true} pad="large">
+            <RecordList body={type.args.body} title={type.args.name}/>
+          </Box>
+        </Layer>
+      );
+    }
   }
 
   render() {
@@ -448,7 +460,7 @@ export default class AQL extends Component {
                   </Tabs>
                 </Box>
               }
-              {this.state.popupLayer}
+              {this.state.layer && this.popupLayer(this.state.layer)}
             </Split>
           </Box>
         </Box>
