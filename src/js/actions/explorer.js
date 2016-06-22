@@ -26,7 +26,11 @@ export function loadViews(callback) {
 
 export function loadView(id, callback) {
   Rest.get(HOST_NAME + '/coll/view/' + id).then((res) => {
-    callback(res.body);
+    if (res.ok && res.body) {
+      callback(res.body);
+    } else {
+      console.log(`view ${id} is not exists`);
+    }
   }, (err) => {
     console.log(err.response ? err.response.text : err);
   });
