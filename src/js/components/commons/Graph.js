@@ -51,12 +51,16 @@ export default class Graph extends Component {
         series.forEach(item => {
           const value = row[item.index] / 1.0;
           if (!isNaN(value)) {
-            let seriesItem = {
-              x: i,
-              y: value
-            };
+            let seriesItem = [i, value];
             if (form.type === 'bar') {
-              seriesItem.onClick = onClick;
+              let val = row[form.xAxis_col];
+              let filter = this._getFullCol(row, data.header);
+              let mainFilterKey = form.label || form.xAxis_col;
+              let mainFilterValue = form.label ? label : val;
+              seriesItem.onClick = onClick && onClick.bind(this, {
+                  key: data.header[mainFilterKey].Name,
+                  value: mainFilterValue
+                }, filter);
             }
             item.values.push(seriesItem);
           }
