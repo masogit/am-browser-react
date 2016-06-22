@@ -94,7 +94,7 @@ export function login(username, password, retry) {
       .set("Authorization", auth)
       .end((err, res) => {
         if (err) {
-          let message;
+          let message, retrying = false;
           if (err.status) {
             if (err.status == 500) {
               message = res.text.indexOf('ECONNREFUSED') ? 'Can not connect to rest server.' : res.text;
@@ -102,6 +102,7 @@ export function login(username, password, retry) {
               message = 'Invalid csrf token';
               if (!retry) {
                 login(username, password, true)(dispatch);
+                retrying = true;
               }
             } else {
               message = 'Please contact administrator.';
@@ -110,7 +111,9 @@ export function login(username, password, retry) {
             message = err.message.indexOf('network is offline') ? 'Can not connect to node server.' : err.message;
           }
 
-          dispatch(loginFailure({message: 'Login failed. ' + message}));
+          if (!retrying) {
+            dispatch(loginFailure({message: 'Login failed. ' + message}));
+          }
         } else if (res.ok) {
           if (res.body) {
             const headerNavs = res.body.headerNavs;
