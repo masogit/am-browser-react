@@ -5,6 +5,9 @@ var REST = require('./rest.js');
 var sessionUtil = require('./sessionUtil.js');
 var config = require('./config.js');
 var version = require('../version.json');
+var multer  = require('multer');
+var storage = multer.memoryStorage()
+var upload = multer({ storage: storage })
 
 module.exports = function (app) {
   var rest_protocol = process.env.AMB_REST_PROTOCOL || config.rest_protocol;
@@ -107,7 +110,7 @@ module.exports = function (app) {
   // CRUD Tingodb
   app.get('/coll/:collection', db.find);
   app.get('/coll/:collection/:id', db.find);
-  app.post('/coll/:collection', (req, res) => {
+  app.post('/coll/:collection', upload.single('docFile'), (req, res) => {
     checkRight(req);
     var createView = req.originalUrl.indexOf('view') > -1 && !req.body._id;
 
@@ -117,7 +120,7 @@ module.exports = function (app) {
       rest.slack(req.session.user, `${req.session.user} created a view`);
     }
   });
-  app.post('/coll/:collection/:id', (req, res) => {
+  app.post('/coll/:collection/:id', upload.single('docFile'), (req, res) => {
     checkRight(req);
     db.upsert(req, res);
   });

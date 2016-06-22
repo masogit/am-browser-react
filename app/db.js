@@ -80,7 +80,7 @@ exports.upsert = function (req, res) {
   var db = new Engine.Db(tingodbFolder, {});
   var collectionName = req.params.collection;
   var id = req.params.id;
-  var obj = req.body;
+  var obj = req.file ? JSON.parse(req.file.buffer) : req.body;
 
   var validator = new Validator();
   var error = validator.document(collectionName, obj);
