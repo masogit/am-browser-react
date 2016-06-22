@@ -12,7 +12,8 @@ export default class SideBar extends Component {
 
   render() {
     const {title, toolbar, contents, focus} = this.props;
-    let sidebarContent;
+  // 1) Show group list
+  // 2) Show table schema
     if (contents instanceof Array) {
       sidebarContent = (
         <GroupList selectable={true} searchable={true} focus={focus}>

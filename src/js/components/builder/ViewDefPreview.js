@@ -23,6 +23,5 @@ export default class ViewDefPreview extends Component {
 
 ViewDefPreview.propTypes = {
   active: PropTypes.bool.isRequired,
-  onClose: PropTypes.func,
   selectedView: PropTypes.object
 };
