@@ -69,6 +69,7 @@ export default class RecordList extends Component {
     if (this.state.numTotal > this.state.records.length) {
       var param = Object.assign({}, this.state.param);
       param.offset = this.state.records.length;
+      this.refs.search.value = "";
       this._getRecords(param);  // sync pass param to query, then records append
     } else {
       console.log('no more record');
@@ -79,7 +80,7 @@ export default class RecordList extends Component {
   _getRecords(param) {
     if (this.state.onMoreLock === false) {
       this.setState({onMoreLock: true});
-      var body = Object.assign({}, this.props.body, {param: (param) ? param : this.state.param});
+      var body = Object.assign({}, this.props.body, {param: param || this.state.param});
       var timeStart = Date.now();
       this.setState({
         loading: true
@@ -90,7 +91,7 @@ export default class RecordList extends Component {
           loading: false,
           timeQuery: Date.now() - timeStart,
           numTotal: data.count,
-          records: (param) ? records.concat(data.entities) : data.entities, // if sync pass param to query, then records append
+          records: param ? records.concat(data.entities) : data.entities, // if sync pass param to query, then records append
           filtered: null
         }, ()=> {
           if (this.state.records.length < this.state.numTotal) {
@@ -127,7 +128,6 @@ export default class RecordList extends Component {
   }
 
   _filterAdd(event) {
-
     // press '/' switch AQL input
     if (event.target.value.trim() == '/') {
       this._toggleAQLInput();
@@ -159,10 +159,23 @@ export default class RecordList extends Component {
     } else {
       if (!this.state.aqlInput) {
         this.setState({
-          filtered: this.state.records.filter((obj) => JSON.stringify(obj).toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1)
+          filtered: this.state.records.filter((obj) => this.getObjectString(obj).indexOf(event.target.value.toLowerCase().trim()) !== -1)
         });
       }
     }
+  }
+
+  getDisplayFields() {
+    const displayNum = this.state.allFields ? this.props.body.fields.length : this.state.numColumn;
+    return this.props.body.fields.filter((field, index) => {
+      if (!field.PK && index <= displayNum) {
+        return field;
+      }
+    });
+  }
+
+  getObjectString(obj) {
+    return this.getDisplayFields().map((field, index) => Format.getFieldStrVal(obj, field)).join('').toLowerCase();
   }
 
   _aqlFilterAdd(filter) {
@@ -220,33 +233,30 @@ export default class RecordList extends Component {
   }
 
   renderFieldsHeader() {
-    return (
-      this.props.body.fields.map((field, index) => {
-        return !field.PK && (this.state.allFields ? true : (index <= this.state.numColumn)) &&
-          <th key={index}>
-            <Anchor href="#" reverse={true} icon={this._showOrderByIcon(field.sqlname)}
-                    label={Format.getDisplayLabel(field)}
-                    onClick={this._orderBy.bind(this, field.sqlname)}/>
-          </th>;
-      })
-    );
+    return this.getDisplayFields().map((field, index) => (
+      <th key={index}>
+        <Anchor href="#" reverse={true} icon={this._showOrderByIcon(field.sqlname)}
+                label={Format.getDisplayLabel(field)}
+                onClick={this._orderBy.bind(this, field.sqlname)}/>
+      </th>
+    ));
   }
 
   renderRecords() {
     var records = (this.state.filtered) ? this.state.filtered : this.state.records;
     return (
       records.map((record, index) => {
-        return (<TableRow key={index} onClick={this._viewDetailShow.bind(this, record)}>
-          <td>{record.self}</td>
-          {
-            this.props.body.fields.map((field, tdindex) => {
-              return !field.PK && (this.state.allFields ? true : tdindex <= this.state.numColumn) &&
+        return (
+          <TableRow key={index} onClick={this._viewDetailShow.bind(this, record)}>
+            <td>{record.self}</td>
+            {
+              this.getDisplayFields().map((field, tdindex) => (
                 <td key={tdindex}>
                   {Format.getFieldStrVal(record, field)}
-                </td>;
-            })
-          }
-        </TableRow>);
+                </td>
+              ))
+            }</TableRow>
+        );
       })
     );
   }
@@ -311,7 +321,7 @@ export default class RecordList extends Component {
   renderList() {
     return (
       <Table selectable={true} className='autoScroll'
-             onMore={this.state.onMoreLock ? null : this._getMoreRecords.bind(this)}>
+             onMore={this.state.onMoreLock || this.state.filtered ? null : this._getMoreRecords.bind(this)}>
         <thead>
         <tr>
           <th><Anchor href="#" reverse={true} icon={this._showOrderByIcon('self')} label="Self"
