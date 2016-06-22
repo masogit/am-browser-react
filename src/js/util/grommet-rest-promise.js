@@ -50,8 +50,9 @@ Request.prototype.promise = function () {
           store.default.dispatch(init('', ''));
         }
         let msg = err.response && err.response.text || err.message;
-        if (msg && err.status == 400) {
-          store.default.dispatch({type: Types.RECEIVE_ERROR, msg: msg});
+        if (msg && (err.status == 400 || err.status == 500)) {
+          store.default.dispatch({type: Types.RECEIVE_ERROR, msg: "Server error."});
+          console.log(msg);
         }
       }
       if (typeof res !== "undefined" && res.status > 400) {

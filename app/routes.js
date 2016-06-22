@@ -37,6 +37,9 @@ module.exports = function (app) {
 
   apiProxy.on('proxyRes', function (proxyRes, req, res) {
     logger.debug(`[proxy] [${req.sessionID}] [response] ${req.method} ${req.originalUrl} ${proxyRes.statusCode} ${proxyRes.statusMessage}`);
+    if(proxyRes.statusCode == 401) {
+      proxyRes.statusCode = 500;
+    }
   });
 
   var rest = new REST({
