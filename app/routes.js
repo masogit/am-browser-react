@@ -54,7 +54,9 @@ module.exports = function (app) {
   });
 
   app.get('/am/csrf', function (req, res) {
-    res.cookie('csrf-token', req.csrfToken());
+    if (enable_csrf) {
+      res.cookie('csrf-token', req.csrfToken());
+    }
     res.end();
   });
 
@@ -94,7 +96,9 @@ module.exports = function (app) {
   app.all("/*", function (req, res, next) {
     var session = req.session;
     if (!session || !session.user) {
-      res.cookie('csrf-token', req.csrfToken());
+      if (enable_csrf) {
+        res.cookie('csrf-token', req.csrfToken());
+      }
       res.clearCookie('headerNavs');
       res.sendStatus(401);
     } else {

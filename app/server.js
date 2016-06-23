@@ -46,7 +46,9 @@ if (enable_csrf) {
 app.use('/', express.static(path.join(__dirname, '/../dist')));
 
 var indexHtml = function (req, res) {
-  res.cookie('csrf-token', req.csrfToken());
+  if (enable_csrf) {
+    res.cookie('csrf-token', req.csrfToken());
+  }
   res.sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));
 };
 
