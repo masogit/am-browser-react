@@ -181,6 +181,7 @@ export default class RecordList extends Component {
   _aqlFilterAdd(filter) {
     var searchValue = filter || this.refs.search.value;
     if (searchValue) {
+      searchValue = searchValue.trim();
       var param = this.state.param;
       if (param.filters.indexOf(searchValue) == -1)
         param.filters.push(searchValue);
@@ -201,6 +202,7 @@ export default class RecordList extends Component {
   }
 
   _filterReuse(filter) {
+    this.setState({aqlInput: true});
     var search = this.refs.search.value.trim();
     if (search && search !== filter)
       this.refs.search.value += ' AND ' + filter;
