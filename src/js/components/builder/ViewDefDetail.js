@@ -9,6 +9,7 @@ import Download from 'grommet/components/icons/base/Download';
 import More from 'grommet/components/icons/base/More';
 import Mail from 'grommet/components/icons/base/Mail';
 import _ from 'lodash';
+// import cookies from 'js-cookie';
 import AlertForm from '../../components/commons/AlertForm';
 //var Filter = require('grommet/components/icons/base/Filter');
 
@@ -127,7 +128,7 @@ export default class ViewDefDetail extends ComponentBase {
         const filter = {
           id: textareaId,
           name: `v.${currentPath}.body.filter`,
-          filter: link.body.filter,
+          value: link.body.filter,
           onChange: this._onChange,
           show: this.state[textareaId]
         };
@@ -288,7 +289,7 @@ export default class ViewDefDetail extends ComponentBase {
       const filter = {
         id: 'v.body.filter',
         name: 'v.body.filter',
-        filter: selectedView.body.filter,
+        value: selectedView.body.filter,
         onChange: this._onChange,
         show: this.state.mainFilter
       };
@@ -313,6 +314,13 @@ export default class ViewDefDetail extends ComponentBase {
                         label="Download"/>
               </Menu>
             </Menu>
+            {/* upload form
+            <form method="post" encType="multipart/form-data" action="http://localhost:8080/coll/view">
+              <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
+              <input type="file" name="docFile" accept=".json" />
+              <input type="submit" />
+            </form>
+            */}
           </Header>
           {
             selectedView && !_.isEmpty(selectedView) &&
