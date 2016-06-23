@@ -57,10 +57,11 @@ export default class Graph extends Component {
               let filter = this._getFullCol(row, data.header);
               let mainFilterKey = form.label || form.xAxis_col;
               let mainFilterValue = form.label ? label : val;
-              seriesItem.onClick = onClick && onClick.bind(this, {
-                key: data.header[mainFilterKey].Name,
-                value: mainFilterValue
-              }, filter);
+              if (mainFilterKey)
+                seriesItem.onClick = onClick && onClick.bind(this, {
+                  key: data.header[mainFilterKey].Name,
+                  value: mainFilterValue
+                }, filter);
             }
             item.values.push(seriesItem);
           }
@@ -69,7 +70,7 @@ export default class Graph extends Component {
         // gen xAxis
         if (form.xAxis) {
           const xAxisLabel = form.xAxis_col ? row[form.xAxis_col] : i;
-          form.xAxis.data.push({"label": '' + xAxisLabel, "value": i});
+          form.xAxis.data.push({ "label": '' + xAxisLabel, "value": i });
         }
       });
       chart.series = series.length > 0 ? series : form.series;
