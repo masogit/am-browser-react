@@ -58,9 +58,9 @@ export default class Graph extends Component {
               let mainFilterKey = form.label || form.xAxis_col;
               let mainFilterValue = form.label ? label : val;
               seriesItem.onClick = onClick && onClick.bind(this, {
-                  key: data.header[mainFilterKey].Name,
-                  value: mainFilterValue
-                }, filter);
+                key: data.header[mainFilterKey].Name,
+                value: mainFilterValue
+              }, filter);
             }
             item.values.push(seriesItem);
           }
