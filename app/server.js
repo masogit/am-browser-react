@@ -53,13 +53,15 @@ var indexHtml = function (req, res) {
 };
 
 app.get('/login', indexHtml);
+app.get('/search', indexHtml);
+app.get('/search/*', indexHtml);
 app.get('/insight', indexHtml);
 app.get('/insight/*', indexHtml);
 app.get('/explorer', indexHtml);
-app.get('/aql', indexHtml);
-app.get('/views', indexHtml);
 app.get('/explorer/*', indexHtml);
+app.get('/aql', indexHtml);
 app.get('/aql/*', indexHtml);
+app.get('/views', indexHtml);
 app.get('/views/*', indexHtml);
 app.get('/ucmdbAdapter', indexHtml);
 app.get('/ucmdbAdapter/*', indexHtml);
