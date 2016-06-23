@@ -210,13 +210,12 @@ export function confirmDeleteViewDef(selectedView, callback) {
       .then((res) => {
         console.log("delete successfully - " + selectedView._id);
         let views = getState().views.views;
-        let idx = _.findIndex(views, {_id: selectedView._id});
-        let updatedViews = [...views.slice(0, idx), ...views.slice(idx + 1)];
+        let idx = selectedView._id ? _.findIndex(views, {_id: selectedView._id}) : -1;
         dispatch({
           type: types.DELETE_VIEW_DEF,
           selectedViewId: "",
           selectedView: {},
-          views: updatedViews
+          views: idx < 0 ? views : [...views.slice(0, idx), ...views.slice(idx + 1)]
         });
         dispatch({
           type: types.RECEIVE_INFO,
