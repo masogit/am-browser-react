@@ -4,7 +4,7 @@ import nock from 'nock';
 import expect from 'expect';
 import * as actions from '../../src/js/actions/views';
 import * as types from '../../src/js/constants/ActionTypes';
-import {HOST_NAME, HOST_NAME_DEV, VIEW_DEF_URL} from '../../src/js/util/Config';
+import {HOST_NAME_DEV, VIEW_DEF_URL} from '../../src/js/util/Config';
 import mockResponse from '../mockdata/views.json';
 
 const middlewares = [thunk];
@@ -16,8 +16,7 @@ describe('views - actions/views-spec.js', () => {
   })
 
   it('load views - success', (done) => {
-    expect(HOST_NAME).toEqual(HOST_NAME_DEV);
-    nock(HOST_NAME)
+    nock(HOST_NAME_DEV)
       .get(VIEW_DEF_URL)
       .reply(200, mockResponse);
 
@@ -47,8 +46,7 @@ describe('views - actions/views-spec.js', () => {
   })
 
   it('load views - failure', (done) => {
-    expect(HOST_NAME).toEqual(HOST_NAME_DEV);
-    nock(HOST_NAME)
+    nock(HOST_NAME_DEV)
       .get(VIEW_DEF_URL)
       .reply(500, "Server error");
 
