@@ -150,7 +150,7 @@ export function getGroupByAql(body) {
     if (body.orderby && body.orderby.indexOf(body.groupby) > -1)
       aql += ` order by ${body.orderby}`;
 
-    return encodeURI(aql);
+    return aql;
   } else {
     return '';
   }
