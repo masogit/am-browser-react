@@ -145,6 +145,17 @@ function simpleAQLResult(Query) {
         data.rows.push(cols);
     });
 
+  } else if (Query.Result.Row.Column instanceof Array) {
+    var cols = [];
+    Query.Result.Row.Column.forEach((col) => {
+      if (col.content)
+        cols.push(col.content);
+      else
+        cols.push('');
+    });
+    if (cols.length > 0)
+      data.rows.push(cols);
+
   } else {
     var cols = [];
     if (Query.Result.Row && Query.Result.Row.Column.content)
