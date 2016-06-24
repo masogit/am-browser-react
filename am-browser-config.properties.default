@@ -15,6 +15,7 @@ protocol = http
 server = localhost
 port = 10081
 base = /AssetManagerWebService/rs
+version = /v1
 # 60 minutes
 jwt_max_age = 60
 

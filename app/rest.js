@@ -9,7 +9,7 @@ module.exports = function (am) {
 
   this.csv = function (req, res) {
 
-    var url = "http://${server}${context}${ref-link}";
+    var url = "http://${server}${context}/${ref-link}";
     // TODO Use 'X-Authorization' if jwt token is ready.
     // var auth = req.session.jwt ? req.session.jwt.secret : undefined;
     var auth = (req.session.user != "") ? 'Basic ' + new Buffer(req.session.user + ':' + req.session.password).toString('base64') : undefined;
@@ -17,10 +17,10 @@ module.exports = function (am) {
     var args = {
       path: {
         server: am.server,
-        context: '/AssetManagerWebService/rs/',
+        context: am.context,
         "ref-link": req.params[0]
       },
-      parameters: req.query,
+      parameters: Object.assign(req.query, {countEnabled: true}),
       headers: (auth) ? {
         "Content-Type": "application/json",
         // TODO Use 'X-Authorization' if jwt token is ready.
@@ -83,8 +83,8 @@ module.exports = function (am) {
     var args = {
       path: {
         server: am.server,
-        context: '/AssetManagerWebService/rs/',
-        "ref-link": 'v1/auth/sign-in'
+        context: am.config,
+        "ref-link": '/auth/sign-in'
       },
       data: `username=${username}&password=${password}`,
       headers: {
@@ -101,8 +101,8 @@ module.exports = function (am) {
       args = {
         path: {
           server: am.server,
-          context: '/AssetManagerWebService/rs/',
-          "ref-link": `db/amEmplDept`
+          context: am.context,
+          "ref-link": `/db/amEmplDept`
         },
         parameters: {
           filter: `UserLogin='${username.trim()}'`
@@ -116,7 +116,7 @@ module.exports = function (am) {
       };
 
       request = client.get(url, args, (data, response) => {
-        if (!data.entities || !data.entities[0] || data.count === 0) {
+        if (!data.entities || !data.entities[0]) {
 
           var message = 'The user name or password is incorrect or your account is locked.';
           logger.warn(`[user] [${req.sessionID || '-'}]`, message, username);
@@ -153,8 +153,8 @@ module.exports = function (am) {
     var args = {
       path: {
         server: am.server,
-        context: '/AssetManagerWebService/rs/',
-        "ref-link": `v1/auth/renew-token`
+        context: am.context,
+        "ref-link": `/auth/renew-token`
       },
       parameters: {
       },

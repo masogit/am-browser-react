@@ -8,6 +8,7 @@ function param2aql(param) {
   let aql = '';
   aql += '?limit=' + param.limit;
   aql += '&offset=' + param.offset;
+  aql += '&countEnabled=true';
   aql += '&fields=' + param.fields.join(',');
   aql += param.filter ? '&filter=' + param.filter : '';
   aql += param.orderby ? '&orderby=' + param.orderby : '';

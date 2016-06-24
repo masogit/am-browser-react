@@ -46,7 +46,8 @@ module.exports = function (app) {
     server: rest_server + ":" + rest_port,
     session_max_age: session_max_age,
     jwt_max_age: jwt_max_age,
-    enable_csrf: enable_csrf
+    enable_csrf: enable_csrf,
+    context: config.base + config.version
   });
 
   apiProxy.on('error', function (e, req, res) {
@@ -142,7 +143,7 @@ module.exports = function (app) {
   // Proxy the backend rest service /rs/db -> /am/db
   app.use('/am/db', function (req, res) {
     // TODO: need to take care of https
-    apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}/db`});
+    apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}${config.version}/db`});
   });
 
   app.use('/am/aql', function (req, res) {
@@ -150,9 +151,9 @@ module.exports = function (app) {
     apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}/aql`});
   });
 
-  app.use('/am/v1/schema', function (req, res) {
+  app.use('/am/schema', function (req, res) {
     // TODO: need to take care of https
-    apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}/v1/schema`});
+    apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}${config.version}/schema`});
   });
 
   // get ucmdb point data
