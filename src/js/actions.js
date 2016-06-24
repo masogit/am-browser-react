@@ -166,7 +166,7 @@ export function getConfigSuccess(headerNavs) {
 
 export function metadataLoad() {
   return function (dispatch) {
-    Rest.get('/am/v1/schema')
+    Rest.get('/am/schema')
       .set('Content-Type', 'Application/json')
       .end(function (err, res) {
         if (!err) {
@@ -179,7 +179,7 @@ export function metadataLoad() {
 
 export function metadataLoadDetail(obj, elements, index) {
   return function (dispatch) {
-    Rest.get('/am/v1/' + obj.url)
+    Rest.get('/am/' + obj.url)
       .set('Content-Type', 'Application/json')
       .end(function (err, res) {
         if (!err) {

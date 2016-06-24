@@ -29,6 +29,7 @@ module.exports = {
   ucmdb_browser_param: properties.get('ucmdb.browser_param'),
 
   base: properties.get('rest.base'),
+  version: properties.get('rest.version'),
   db_folder: properties.get('db.folder'),
 
   slack_url: properties.get('slack.url'),
