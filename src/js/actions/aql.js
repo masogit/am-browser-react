@@ -97,7 +97,7 @@ export function queryAQL(str, callback) {
 
     var query = "/am/aql/" + aql.tableName + "/" + aql.fields;
     if (aql.where) {
-      query += " " + aql.where;
+      query += " " + encodeURI(aql.where);
     }
 
     Rest.get(query).then((res) => {
