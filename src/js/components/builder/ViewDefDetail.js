@@ -306,7 +306,7 @@ export default class ViewDefDetail extends ComponentBase {
               <Anchor link="#" icon={<Play />} onClick={this.props.openPreview} label="Query"/>
               <Anchor link="#" icon={<Checkmark />} onClick={() => this.openAlert("save")} label="Save"/>
               <Anchor link="#" icon={<Close />} onClick={() => this.openAlert("delete")} label="Delete"/>
-              <Menu icon={<More />}>
+              <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }}>
                 <Anchor link="#" icon={<Duplicate />} onClick={() => this.openAlert("duplicate")} label="Duplicate"/>
                 {selectedView._id &&
                 <Anchor link="#" icon={<Mail />} onClick={this._onMail.bind(this, selectedView)} label="Mail"/>}

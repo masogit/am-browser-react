@@ -302,7 +302,7 @@ export default class RecordList extends Component {
             {this.state.loading ? '----' : `${this.state.timeQuery}ms`}
           </Box>
         </Box>
-        <Menu icon={<MenuIcon />} closeOnClick={false} dropAlign={{top: 'bottom'}}>
+        <Menu icon={<MenuIcon />} closeOnClick={false} dropAlign={{ right: 'right', top: 'top' }}>
           <Anchor icon={<More />} label="More records" onClick={this._getMoreRecords.bind(this)}
                   disabled={this.state.onMoreLock}/>
           <Anchor icon={this.state.aqlInput?<CheckboxSelected />:<Checkbox />} label="Input AQL"

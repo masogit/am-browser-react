@@ -56,7 +56,7 @@ class SessionMenu extends Component {
 
     return (
       <Box>
-        <Menu icon={<User />} label={cookies.get('user')}>
+        <Menu icon={<User />} label={cookies.get('user')} dropAlign={{ right: 'right', top: 'top' }}>
           {/*
           <Anchor href="#" className="active">Settings</Anchor>
           <Anchor href="#">Help</Anchor>
