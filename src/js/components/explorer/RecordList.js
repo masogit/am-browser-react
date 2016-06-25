@@ -42,6 +42,10 @@ export default class RecordList extends Component {
 
   componentWillMount() {
     this._getRecords();
+    this._getGroupDistribution();
+  }
+
+  _getGroupDistribution() {
     if (this.props.body.groupby)
       AQLActions.queryAQL(ExplorerActions.getGroupByAql(this.props.body), (data)=> {
         if (data.rows.length > 0) {
