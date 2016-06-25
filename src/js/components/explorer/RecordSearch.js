@@ -131,7 +131,7 @@ export default class RecordSearch extends Component {
 
   _showViewRecords(view) {
     var layer = (
-      <Layer onClose={this._onClose.bind(this) } closer={true} flush={true} align="center">
+      <Layer onClose={this._onClose.bind(this)} closer={true} flush={true} align="center">
         <Box full={true} pad="large">
           <RecordList body={view.body} title={view.name}/>
         </Box>
@@ -161,7 +161,7 @@ export default class RecordSearch extends Component {
         <Header>
           <Title>Global Search</Title>
           <input type="search" inline={true} className="flex" placeholder="Global Record search..." ref="search"
-            onKeyDown={this._onEnter.bind(this) } defaultValue={this.props.params.keyword}/>
+            onKeyDown={this._onEnter.bind(this)} defaultValue={this.props.params.keyword}/>
           <button onClick={()=>this._onSearch(this.refs.search.value)}>Search</button>
         </Header>
         <Split flex="right" fixed={false}>
@@ -183,7 +183,7 @@ export default class RecordSearch extends Component {
                       <td>
                         {
                           msg.num > 0 ?
-                            <Anchor onClick={this._showViewRecords.bind(this, msg.view) } label={msg.num}/> : msg.num
+                            <Anchor onClick={this._showViewRecords.bind(this, msg.view)} label={msg.num}/> : msg.num
                         }
                       </td>
                     </TableRow>);
@@ -204,11 +204,11 @@ export default class RecordSearch extends Component {
                       </Header>
                       <Form>
                         <Box pad="small">
-                          <Anchor onClick={this._onClick.bind(this, result.view, record) }
+                          <Anchor onClick={this._onClick.bind(this, result.view, record)}
                             className='text-ellipsis'>
                             <span title={record.self}><b>{record.self}</b></span>
                           </Anchor>
-                          {this._getContent(result.view, record) }
+                          {this._getContent(result.view, record)}
                         </Box>
                         <Footer pad={{ horizontal: 'small' }}>
                           {'Table: ' + result.view.body.sqlname}
@@ -222,7 +222,7 @@ export default class RecordSearch extends Component {
         </Split>
         {
           this.state.record &&
-          <RecordDetail body={this.state.view.body} record={this.state.record} onClose={this._onClose.bind(this) }/>
+          <RecordDetail body={this.state.view.body} record={this.state.record} onClose={this._onClose.bind(this)}/>
         }
         {this.state.layer}
       </Box>
