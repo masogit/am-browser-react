@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { initAbout } from '../actions';
+import {initAbout} from '../actions';
 import {
   Box,
   Header,
@@ -14,18 +14,20 @@ export default class About extends Component {
 
   constructor() {
     super();
-    this.state = {about: {
-      amVersion: null,
-      ambVersion: null,
-      rest: {
-        server: null,
-        port: null
-      },
-      ucmdb: {
-        server: null,
-        port: null
+    this.state = {
+      about: {
+        amVersion: null,
+        ambVersion: null,
+        rest: {
+          server: null,
+          port: null
+        },
+        ucmdb: {
+          server: null,
+          port: null
+        }
       }
-    }};
+    };
   }
 
   componentDidMount() {
@@ -36,44 +38,36 @@ export default class About extends Component {
 
   render() {
     return (
-      <Box size="large">
-        <Header><Title><Logo /> AM Browser</Title></Header>
+      <Box size="medium">
+        <Header><Title><Logo /> Asset Manager Browser</Title></Header>
         <Table>
-          <thead>
-          <tr>
-            <th></th>
-            <th></th>
-          </tr>
-          </thead>
           <tbody>
-            <TableRow>
-              <td> Asset Manager Browser Version: </td>
-              <td> {this.state.about.ambVersion} </td>
-            </TableRow>
-            <TableRow>
-              <td> REST Server: </td>
-              <td> {this.state.about.rest.server} </td>
-            </TableRow>
-            <TableRow>
-              <td> REST Port: </td>
-              <td> {this.state.about.rest.port} </td>
-            </TableRow>
-            <TableRow>
-              <td> UCMDB Server: </td>
-              <td> {this.state.about.ucmdb.server} </td>
-            </TableRow>
-            <TableRow>
-              <td> UCMDB Port: </td>
-              <td> {this.state.about.ucmdb.port} </td>
-            </TableRow>
+          <TableRow>
+            <td> Version:</td>
+            <td> {this.state.about.ambVersion} </td>
+          </TableRow>
+          <TableRow>
+            <td> AM REST Server:</td>
+            <td> {this.state.about.rest.server} </td>
+          </TableRow>
+          <TableRow>
+            <td> AM REST Port:</td>
+            <td> {this.state.about.rest.port} </td>
+          </TableRow>
+          <TableRow>
+            <td> UCMDB Browser Server:</td>
+            <td> {this.state.about.ucmdb.server} </td>
+          </TableRow>
+          <TableRow>
+            <td> UCMDB Browser Port:</td>
+            <td> {this.state.about.ucmdb.port} </td>
+          </TableRow>
           </tbody>
         </Table>
-        <Box full="horizontal">
-          <Label className='copyright'>
-            © 1994-2016 Hewlett Packard Enterprise Development LP All rights reserved.
-            This software is protected by international copyright law.
-          </Label>
-        </Box>
+        <Label className='copyright'>
+          © 1994-2016 Hewlett Packard Enterprise Development LP All rights reserved.<br />
+          This software is protected by international copyright law.
+        </Label>
       </Box>
     );
   }
