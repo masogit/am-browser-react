@@ -38,9 +38,6 @@ export function loadView(id, callback) {
 
 export function getCount(body, callback) {
   body.orderby = '';
-  body.fields = [{
-    sqlname: 'PK'
-  }];
   body.param = {
     limit: 1,
     offset: 0
