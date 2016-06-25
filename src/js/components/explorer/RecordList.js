@@ -20,7 +20,7 @@ export default class RecordList extends Component {
   constructor() {
     super();
     this.state = {
-      numColumn: 4, // default column number, not include Self
+      numColumn: 5,
       numTotal: 0,
       timeQuery: 0,
       records: [],
@@ -172,7 +172,7 @@ export default class RecordList extends Component {
   getDisplayFields() {
     const displayNum = this.state.allFields ? this.props.body.fields.length : this.state.numColumn;
     return this.props.body.fields.filter((field, index) => {
-      if (!field.PK && index <= displayNum) {
+      if (!field.PK && index < displayNum) {
         return field;
       }
     });
@@ -299,21 +299,21 @@ export default class RecordList extends Component {
                placeholder={this.state.aqlInput?`Input AQL...`:`Quick search, press / input AQL`}
                onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
         <Box direction="column">
-          <Box direction="row" style={{fontSize: '70%', fontWeight: 'bold'}}>
-            {`${resultRecords.length}/${this.state.numTotal}`}
-          </Box>
-          <Box style={{fontSize: '50%'}}>
-            {this.state.loading ? '----' : `${this.state.timeQuery}ms`}
+          <Anchor onClick={this._getMoreRecords.bind(this)} disabled={this.state.loading}>
+            <Box style={{fontSize: '70%', fontWeight: 'bold'}}>
+              {(this.state.loading?'...':resultRecords.length) + '/' + this.state.numTotal}
+            </Box>
+          </Anchor>
+          <Box style={{fontSize: '60%'}} align="end">
+            {`${this.state.timeQuery}ms`}
           </Box>
         </Box>
-        <Anchor icon={this.state.loading ? <Spinning /> : <More />}
-                onClick={this._getMoreRecords.bind(this)} disabled={this.state.onMoreLock}/>
         <Menu icon={<MenuIcon />} closeOnClick={false} dropAlign={{ right: 'right', top: 'top' }}>
           <Anchor icon={this.state.aqlInput?<CheckboxSelected />:<Checkbox />} label="Input AQL"
                   onClick={this._toggleAQLInput.bind(this)}/>
           <Anchor icon={this.state.allFields?<CheckboxSelected />:<Checkbox />} label="Full columns"
                   onClick={this._toggleAllFields.bind(this)}
-                  disabled={this.props.body.fields.length <= this.state.numColumn + 1}/>
+                  disabled={this.props.body.fields.length <= this.state.numColumn}/>
           <Anchor icon={<Download />} label="Download CSV" onClick={this._download.bind(this)}/>
         </Menu>
         <form name="Download" ref="downloadForm" method="post"
