@@ -296,15 +296,15 @@ export default class RecordList extends Component {
                onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
         <Box direction="column">
           <Box direction="row" style={{fontSize: '70%', fontWeight: 'bold'}}>
-            {this.state.loading ? <Spinning /> : `${resultRecords.length}/${this.state.numTotal}`}
+            {`${resultRecords.length}/${this.state.numTotal}`}
           </Box>
           <Box style={{fontSize: '50%'}}>
             {this.state.loading ? '----' : `${this.state.timeQuery}ms`}
           </Box>
         </Box>
+        <Anchor icon={this.state.loading ? <Spinning /> : <More />}
+                onClick={this._getMoreRecords.bind(this)} disabled={this.state.onMoreLock}/>
         <Menu icon={<MenuIcon />} closeOnClick={false} dropAlign={{ right: 'right', top: 'top' }}>
-          <Anchor icon={<More />} label="More records" onClick={this._getMoreRecords.bind(this)}
-                  disabled={this.state.onMoreLock}/>
           <Anchor icon={this.state.aqlInput?<CheckboxSelected />:<Checkbox />} label="Input AQL"
                   onClick={this._toggleAQLInput.bind(this)}/>
           <Anchor icon={this.state.allFields?<CheckboxSelected />:<Checkbox />} label="Full columns"
