@@ -308,7 +308,8 @@ export default class RecordList extends Component {
           <Anchor icon={this.state.aqlInput?<CheckboxSelected />:<Checkbox />} label="Input AQL"
                   onClick={this._toggleAQLInput.bind(this)}/>
           <Anchor icon={this.state.allFields?<CheckboxSelected />:<Checkbox />} label="Full columns"
-                  onClick={this._toggleAllFields.bind(this)}/>
+                  onClick={this._toggleAllFields.bind(this)}
+                  disabled={this.props.body.fields.length <= this.state.numColumn + 1}/>
           <Anchor icon={<Download />} label="Download CSV" onClick={this._download.bind(this)}/>
         </Menu>
         <form name="Download" ref="downloadForm" method="post"
