@@ -189,11 +189,7 @@ export default class Insight extends Component {
       layer: null
     });
   }
-
-  _onPrint() {
-    window.print();
-  }
-
+  
   _getLayer(box, parent) {
     return (
       <Layer onClose={this._onClose.bind(this)} closer={true} align="left">
