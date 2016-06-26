@@ -16,6 +16,7 @@ import * as Format from '../../constants/RecordFormat';
 import Download from 'grommet/components/icons/base/Download';
 import More from 'grommet/components/icons/base/More';
 import Mail from 'grommet/components/icons/base/Mail';
+import Trash from 'grommet/components/icons/base/Trash';
 
 import {
   Anchor,
@@ -204,6 +205,15 @@ export default class AQL extends Component {
       console.log("Remove AQL: " + id);
       this._loadAQLs(this);
       this._initAQL();
+    });
+  }
+
+  _removeView() {
+    this.setState({
+      alertLayer: <AlertForm onClose={this._removeAlertLayer.bind(this)}
+                             title={'Remove attached view?'}
+                             desc={'View name: ' + this.state.aql.view.name}
+                             onConfirm={()=>{this.state.aql.view=null}} />
     });
   }
 
@@ -421,6 +431,13 @@ export default class AQL extends Component {
                     <input id="AQL_Category" type="text" name="category" value={this.state.aql.category}
                            onChange={this._setFormValues.bind(this)}/>
                   </FormField>
+                  {
+                    this.state.aql.view &&
+                    <FormField label="Link to" htmlFor="AQL_LinkTo">
+                      <Anchor link="#" icon={<Trash />} onClick={this._removeView.bind(this)}
+                              label={'View: ' + this.state.aql.view.name}/>
+                    </FormField>
+                  }
                 </FormFields>
               </Form>
             </Box>
