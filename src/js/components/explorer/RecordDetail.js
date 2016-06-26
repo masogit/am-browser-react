@@ -9,7 +9,7 @@ import {
   Table,
   TableRow
 } from 'grommet';
-import * as Format from '../../constants/RecordFormat';
+import * as Format from '../../util/RecordFormat';
 
 export default class RecordDetail extends Component {
 

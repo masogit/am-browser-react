@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import cookies from 'js-cookie';
 import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
-import * as Format from '../../constants/RecordFormat';
+import * as Format from '../../util/RecordFormat';
 import history from '../../RouteHistory';
 import RecordList from '../explorer/RecordList';
 import AlertForm from '../commons/AlertForm';

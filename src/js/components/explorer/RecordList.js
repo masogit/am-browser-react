@@ -12,7 +12,7 @@ import * as ExplorerActions from '../../actions/explorer';
 import * as AQLActions from '../../actions/aql';
 import Graph from '../commons/Graph';
 import EmptyIcon from '../commons/EmptyIcon';
-import * as Format from '../../constants/RecordFormat';
+import * as Format from '../../util/RecordFormat';
 import cookies from 'js-cookie';
 
 export default class RecordList extends Component {

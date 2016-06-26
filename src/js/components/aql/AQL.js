@@ -12,7 +12,7 @@ import RecordList from '../explorer/RecordList';
 import ActionTab from '../commons/ActionTab';
 import SideBar from '../commons/SideBar';
 import EmptyIcon from '../commons/EmptyIcon';
-import * as Format from '../../constants/RecordFormat';
+import * as Format from '../../util/RecordFormat';
 import Download from 'grommet/components/icons/base/Download';
 import More from 'grommet/components/icons/base/More';
 import Mail from 'grommet/components/icons/base/Mail';
