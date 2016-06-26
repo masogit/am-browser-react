@@ -29,7 +29,7 @@ Promise.config({
 });
 
 const store = require('../store');
-const {init} = require('../actions');
+const {init} = require('../actions/system');
 /**
  *
  * Add promise support for grommet REST.

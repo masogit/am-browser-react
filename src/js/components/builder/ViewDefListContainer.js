@@ -6,7 +6,7 @@ import ViewDefDetail from './ViewDefDetail';
 import ViewDefList from './ViewDefList';
 import ViewDefPreview from './ViewDefPreview';
 import * as ViewDefActions from '../../actions/views';
-import * as MetadataActions from '../../actions';
+import * as MetadataActions from '../../actions/system';
 import store from '../../store';
 import history from '../../RouteHistory';
 import Box from 'grommet/components/Box';

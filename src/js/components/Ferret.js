@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {navResponsive} from '../actions';
+import {navResponsive} from '../actions/system';
 import AlertForm from './commons/AlertForm';
 import {App, Box} from 'grommet';
 import NavHeader from './NavHeader';

@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import * as BuilderActions from '../../actions';
+import * as BuilderActions from '../../actions/system';
 import * as ViewDefActions from '../../actions/views';
 import MetaData from './MetaData';
 import BreadCrumb from './BreadCrumb';

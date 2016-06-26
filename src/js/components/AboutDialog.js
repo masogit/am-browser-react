@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {initAbout} from '../actions';
+import {initAbout} from '../actions/system';
 import {
   Box,
   Header,

@@ -3,7 +3,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
-import { itemLoad, itemUnload, itemEdit } from '../actions';
+import { itemLoad, itemUnload, itemEdit } from '../actions/system';
 import Header from 'grommet/components/Header';
 import Menu from 'grommet/components/Menu';
 import Anchor from 'grommet/components/Anchor';

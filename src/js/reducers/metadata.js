@@ -1,6 +1,6 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import { METADATA_SUCCESS, METADATA_DETAIL_SUCCESS } from '../actions';
+import { METADATA_SUCCESS, METADATA_DETAIL_SUCCESS } from '../actions/system';
 
 const initialState = {
   rows: {},

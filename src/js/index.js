@@ -17,7 +17,7 @@ import {IntlProvider} from 'react-intl';
 
 import store from './store';
 import history from './RouteHistory';
-import {init, initToken, routeChanged} from './actions';
+import {init, initToken, routeChanged} from './actions/system';
 import {ReduxRouter} from 'redux-router';
 
 // The port number needs to align with devServerProxy and websocketHost in gulpfile.js

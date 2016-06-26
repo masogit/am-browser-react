@@ -1,8 +1,8 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import Rest from './util/grommet-rest-promise';
+import Rest from '../util/grommet-rest-promise';
 import cookies from 'js-cookie';
-import * as Types from './constants/ActionTypes';
+import * as Types from '../constants/ActionTypes';
 import {
   CSRF_DEF_URL,
   ABOUT_DEF_URL,
@@ -11,7 +11,7 @@ import {
   SLACK_DEF_URL,
   AM_SCHEMA_DEF_URL,
   AM_DEF_URL
-} from './constants/ServiceConfig';
+} from '../constants/ServiceConfig';
 
 // session
 export const INIT = 'INIT';

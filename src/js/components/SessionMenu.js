@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {logout, sendMessageToSlack } from '../actions';
+import {logout, sendMessageToSlack } from '../actions/system';
 import User from 'grommet/components/icons/base/User';
 import { Menu, Anchor, Layer, Box } from 'grommet';
 import MessageHistory from './MessageHistory';
