@@ -11,7 +11,7 @@ import Add from 'grommet/components/icons/base/Add';
 import Close from 'grommet/components/icons/base/Close';
 import Attachment from 'grommet/components/icons/base/Attachment';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
-import CaretNext from 'grommet/components/icons/base/CaretNext';
+import Search from 'grommet/components/icons/base/Search';
 import Previous from 'grommet/components/icons/base/Previous';
 import Graph from './../commons/Graph';
 import { Anchor, Box, CheckBox, Header, Menu, Title, Table, TableRow,  Layer, Carousel, RadioButton } from 'grommet';
@@ -243,7 +243,7 @@ export default class Insight extends Component {
         child = (
           <Box justify="center" {...box} direction="column" pad="medium" flex={false}>
             <Header>
-              <Anchor icon={<CaretNext />} label={dataMap.aql.name}
+              <Anchor icon={<Search />} label={dataMap.aql.name}
                       onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
             </Header>
             <Graph type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
@@ -300,7 +300,7 @@ export default class Insight extends Component {
             return (
               <Box pad="large" colorIndex="light-2" key={index}>
                 <Header>
-                  <Anchor icon={<CaretNext />} label={dataMap.aql.name} onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
+                  <Anchor icon={<Search />} label={dataMap.aql.name} onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
                 </Header>
                 <Box pad="large" align={(dataMap.aql.type=='meter')?'center':null}>
                   <Graph key={dataMap.aql._id} type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
