@@ -7,7 +7,6 @@ import Descend from 'grommet/components/icons/base/Descend';
 import Download from 'grommet/components/icons/base/Download';
 import MenuIcon from 'grommet/components/icons/base/Menu';
 import Checkbox from 'grommet/components/icons/base/Checkbox';
-import More from 'grommet/components/icons/base/More';
 import CheckboxSelected from 'grommet/components/icons/base/CheckboxSelected';
 import * as ExplorerActions from '../../actions/explorer';
 import * as AQLActions from '../../actions/aql';
@@ -284,7 +283,6 @@ export default class RecordList extends Component {
 
   renderToolBox() {
 
-    var Spinning = require('grommet/components/icons/Spinning');
     const aqlStyle = {
       'font-weight': 'bold',
       'color': '#767676',

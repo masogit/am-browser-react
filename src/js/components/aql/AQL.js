@@ -213,7 +213,9 @@ export default class AQL extends Component {
       alertLayer: <AlertForm onClose={this._removeAlertLayer.bind(this)}
                              title={'Remove attached view?'}
                              desc={'View name: ' + this.state.aql.view.name}
-                             onConfirm={()=>{this.state.aql.view=null}} />
+                             onConfirm={()=>{
+                               this.state.aql.view=null;
+                             }} />
     });
   }
 
