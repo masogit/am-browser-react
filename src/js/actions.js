@@ -1,14 +1,20 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
 import Rest from './util/grommet-rest-promise';
-//import history from './RouteHistory';
-//import Query from 'grommet-index/utils/Query';
 import cookies from 'js-cookie';
 import * as Types from './constants/ActionTypes';
+import {
+  CSRF_DEF_URL,
+  ABOUT_DEF_URL,
+  LOGIN_DEF_URL,
+  LOGOUT_DEF_URL,
+  SLACK_DEF_URL,
+  AM_SCHEMA_DEF_URL,
+  AM_DEF_URL
+} from './constants/ServiceConfig';
 
 // session
 export const INIT = 'INIT';
-export const INIT_TOKEN = 'INIT_TOKEN';
 export const LOGIN = 'LOGIN';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAILURE = 'LOGIN_FAILURE';
@@ -23,39 +29,8 @@ export const NAV_PEEK = 'NAV_PEEK';
 export const NAV_ACTIVATE = 'NAV_ACTIVATE';
 export const NAV_RESPONSIVE = 'NAV_RESPONSIVE';
 
-// index page
-export const INDEX_NAV = 'INDEX_NAV';
-export const INDEX_LOAD = 'INDEX_LOAD';
-export const INDEX_SELECT = 'INDEX_SELECT';
-export const INDEX_QUERY = 'INDEX_QUERY';
-export const INDEX_UNLOAD = 'INDEX_UNLOAD';
-
-// item page
-export const ITEM_LOAD = 'ITEM_LOAD';
-export const ITEM_UNLOAD = 'ITEM_UNLOAD';
-export const ITEM_NEW = 'ITEM_NEW';
-export const ITEM_ADD = 'ITEM_ADD';
-export const ITEM_EDIT = 'ITEM_EDIT';
-export const ITEM_UPDATE = 'ITEM_UPDATE';
-export const ITEM_REMOVE = 'ITEM_REMOVE';
-
-// index api
-export const INDEX_SUCCESS = 'INDEX_SUCCESS';
-export const INDEX_AGGREGATE_SUCCESS = 'INDEX_AGGREGATE_SUCCESS';
-export const ITEM_SUCCESS = 'ITEM_SUCCESS';
-export const ITEM_FAILURE = 'ITEM_FAILURE';
-export const ITEM_ADD_SUCCESS = 'ITEM_ADD_SUCCESS';
-export const ITEM_ADD_FAILURE = 'ITEM_ADD_FAILURE';
-export const ITEM_NOTIFICATIONS_SUCCESS = 'ITEM_NOTIFICATIONS_SUCCESS';
-export const ITEM_NOTIFICATIONS_FAILURE = 'ITEM_NOTIFICATIONS_FAILURE';
-export const ITEM_MAP_SUCCESS = 'ITEM_MAP_SUCCESS';
-export const ITEM_MAP_FAILURE = 'ITEM_MAP_FAILURE';
 export const METADATA_SUCCESS = 'METADATA_SUCCESS';
 export const METADATA_DETAIL_SUCCESS = 'METADATA_DETAIL_SUCCESS';
-
-export const TEMPLATE_LOAD_SUCCESS = 'TEMPLATE_LOAD_SUCCESS';
-export const RECORD_LOAD_SUCCESS = 'RECORD_LOAD_SUCCESS';
-export const DETAIL_RECORD_LOAD_SUCCESS = 'DETAIL_RECORD_LOAD_SUCCESS';
 
 export function init(email, headerString) {
   try {
@@ -67,7 +42,7 @@ export function init(email, headerString) {
 }
 
 export function initToken() {
-  return Rest.get('/am/csrf').end((err, res) => {
+  return Rest.get(CSRF_DEF_URL).end((err, res) => {
     if (err || !res.ok) {
       console.log('Get CSRF failed');
       throw err;
@@ -78,7 +53,7 @@ export function initToken() {
 }
 
 export function initAbout() {
-  return Rest.get('/am/about').then((res) => {
+  return Rest.get(ABOUT_DEF_URL).then((res) => {
     return res.body;
   }, (err) => {
     console.log('Get About failed');
@@ -89,7 +64,7 @@ export function initAbout() {
 export function login(username, password, retry) {
   return function (dispatch) {
     const auth = 'Basic ' + new Buffer(`${username}:${password}`).toString('base64');
-    Rest.post('/am/login')
+    Rest.post(LOGIN_DEF_URL)
       .set("Authorization", auth)
       .end((err, res) => {
         if (err) {
@@ -128,7 +103,7 @@ export function login(username, password, retry) {
 
 export function logout() {
   return function (dispatch) {
-    Rest.get('/am/logout').end((err, res) => {
+    Rest.get(LOGOUT_DEF_URL).end((err, res) => {
       if (err) {
         dispatch({message: 'LogoutFailed'});
         throw err;
@@ -141,7 +116,7 @@ export function logout() {
 
 export function sendMessageToSlack(messages) {
   return function (dispatch) {
-    Rest.post('/slack', {messages}).then(res => {
+    Rest.post(SLACK_DEF_URL, {messages}).then(res => {
       if (res.ok) {
         if (res.text) {
           dispatch({type: Types.RECEIVE_WARNING, msg: res.text});
@@ -160,13 +135,9 @@ export function sendMessageToSlack(messages) {
   };
 }
 
-export function getConfigSuccess(headerNavs) {
-  return {type: GET_SETTINGS_SUCCESS, headerNavs};
-}
-
 export function metadataLoad() {
   return function (dispatch) {
-    Rest.get('/am/schema')
+    Rest.get(AM_SCHEMA_DEF_URL)
       .set('Content-Type', 'Application/json')
       .end(function (err, res) {
         if (!err) {
@@ -179,7 +150,7 @@ export function metadataLoad() {
 
 export function metadataLoadDetail(obj, elements, index) {
   return function (dispatch) {
-    Rest.get('/am/' + obj.url)
+    Rest.get(AM_DEF_URL + obj.url)
       .set('Content-Type', 'Application/json')
       .end(function (err, res) {
         if (!err) {
@@ -223,14 +194,6 @@ export function loginFailure(error) {
 
 export function routeChanged(route, prefix) {
   return {type: ROUTE_CHANGED, route: route, prefix: prefix};
-}
-
-export function navPeek(peek) {
-  return {type: NAV_PEEK, peek: peek};
-}
-
-export function navActivate(active) {
-  return {type: NAV_ACTIVATE, active: active};
 }
 
 export function navResponsive(responsive) {

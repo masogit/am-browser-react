@@ -1,7 +1,7 @@
 //import request from 'superagent-bluebird-promise';
 import _ from 'lodash';
 import * as types from '../constants/ActionTypes';
-import {VIEW_DEF_URL} from '../util/Config';
+import {VIEW_DEF_URL} from '../constants/ServiceConfig';
 import Rest from '../util/grommet-rest-promise';
 import objectPath from 'object-path';
 
@@ -206,7 +206,7 @@ export function duplicateViewDef(selectedView) {
 
 export function confirmDeleteViewDef(selectedView, callback) {
   return function (dispatch, getState) {
-    Rest.del(VIEW_DEF_URL + "/" + selectedView._id)
+    Rest.del(VIEW_DEF_URL + selectedView._id)
       .then((res) => {
         console.log("delete successfully - " + selectedView._id);
         let views = getState().views.views;

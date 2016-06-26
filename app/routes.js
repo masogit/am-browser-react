@@ -138,7 +138,7 @@ module.exports = function (app) {
   });
 
   // Download CSV in server side
-  app.use('/download/*', rest.csv);
+  app.use('/am/download/*', rest.csv);
 
   // Proxy the backend rest service /rs/db -> /am/db
   app.use('/am/db', function (req, res) {
@@ -166,7 +166,7 @@ module.exports = function (app) {
    * Federate CI from UCMDB
    * /ucmdb-browser/<global_id>
    */
-  app.get('/ucmdb-browser', function (req, res) {
+  app.get('/ucmdb-browser/', function (req, res) {
     res.send(`http://${ucmdb_browser_server}:${ucmdb_browser_port}${config.ucmdb_browser_param}`);
   });
 

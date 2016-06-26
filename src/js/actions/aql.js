@@ -1,11 +1,10 @@
-// import request from 'superagent-bluebird-promise';
-// import * as types from '../constants/ActionTypes';
+import {GRAPH_DEF_URL, INSIGHT_DEF_URL, AM_DB_DEF_URL, AM_AQL_DEF_URL} from '../constants/ServiceConfig';
 import Rest from '../util/grommet-rest-promise';
 const store = require('../store');
 import * as Types from '../constants/ActionTypes';
 
 export function saveWall(wall, callback) {
-  Rest.post('/coll/wall', wall).then((res) => {
+  Rest.post(INSIGHT_DEF_URL, wall).then((res) => {
     if (res.text) {
       store.default.dispatch({type: Types.RECEIVE_INFO, msg: "Insight saved successfully"});
       callback(res.text);
@@ -16,7 +15,7 @@ export function saveWall(wall, callback) {
 }
 
 export function loadWalls(callback) {
-  Rest.get('/coll/wall').then((res) => {
+  Rest.get(INSIGHT_DEF_URL).then((res) => {
     callback(res.body);
   }, (err) => {
     console.log(err.response ? err.response.text : err);
@@ -24,7 +23,7 @@ export function loadWalls(callback) {
 }
 
 export function loadAQL(id, callback) {
-  Rest.get('/coll/aql/' + id).then((res) => {
+  Rest.get(GRAPH_DEF_URL + id).then((res) => {
     callback(res.body);
   }, (err) => {
     console.log(err.response ? err.response.text : err);
@@ -32,7 +31,7 @@ export function loadAQL(id, callback) {
 }
 
 export function loadAQLs(callback) {
-  Rest.get('/coll/aql').then((res) => {
+  Rest.get(GRAPH_DEF_URL).then((res) => {
     callback(res.body);
   }, (err) => {
     console.log(err.response ? err.response.text : err);
@@ -40,7 +39,7 @@ export function loadAQLs(callback) {
 }
 
 export function saveAQL(aql, callback) {
-  Rest.post('/coll/aql', aql).then((res) => {
+  Rest.post(GRAPH_DEF_URL, aql).then((res) => {
     if (res.text) {
       store.default.dispatch({type: Types.RECEIVE_INFO, msg: "Graph saved successfully"});
       callback(res.text);
@@ -51,7 +50,7 @@ export function saveAQL(aql, callback) {
 }
 
 export function removeAQL(id, callback) {
-  Rest.del('/coll/aql/' + id).then((res) => {
+  Rest.del(GRAPH_DEF_URL + id).then((res) => {
     if (res.text) {
       store.default.dispatch({type: Types.RECEIVE_INFO, msg: "Graph removed successfully"});
       callback(res.text);
@@ -62,7 +61,7 @@ export function removeAQL(id, callback) {
 }
 
 export function loadReports(callback) {
-  Rest.get('/am/db/amInToolReport').then((res) => {
+  Rest.get(AM_DB_DEF_URL + 'amInToolReport').then((res) => {
     callback(res.body);
   }, (err) => {
     console.log(err.response ? err.response.text : err);
@@ -95,7 +94,7 @@ export function queryAQL(str, callback) {
     // get where start from WHERE (not include WHERE, where is optional)
     aql.where = (idx_WHERE < 0) ? "" : str.substring(idx_WHERE).trim();
 
-    var query = "/am/aql/" + aql.tableName + "/" + aql.fields;
+    var query = AM_AQL_DEF_URL + aql.tableName + "/" + aql.fields;
     if (aql.where) {
       query += " " + encodeURI(aql.where);
     }
@@ -145,7 +144,7 @@ function simpleAQLResult(Query) {
         data.rows.push(cols);
     });
 
-  } else if (Query.Result.Row.Column instanceof Array) {
+  } else if (Query.Result.Row && Query.Result.Row.Column instanceof Array) {
     var cols = [];
     Query.Result.Row.Column.forEach((col) => {
       if (col.content)

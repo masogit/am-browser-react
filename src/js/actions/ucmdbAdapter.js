@@ -3,6 +3,7 @@
  */
 import Rest from '../util/grommet-rest-promise';
 import history from '../RouteHistory';
+import {POINT_DEF_URL, ADAPTER_DEF_URL} from '../constants/ServiceConfig';
 
 export const ADAPTER_DATA_SUCCESS = 'ADAPTER_DATA_SUCCESS';
 export const INTEGRATION_JOB_DATA_SUCCESS = 'INTEGRATION_JOB_DATA_SUCCESS';
@@ -20,8 +21,7 @@ export const adapterDataFetch = (data, error) => ({
 });
 
 export const getIntegrationPoint = (callback) => {
-  const url = '/am/ucmdbPoint/';
-  Rest.get(url).then((res) => {
+  Rest.get(POINT_DEF_URL).then((res) => {
     const data = res && res.ok && res.body || [];
     if (callback) {
       callback(data, null);
@@ -41,7 +41,7 @@ export const integrationJobDataSuccess = (integrationJobData, error) =>({
 });
 
 export const getIntegrationJob = (pointName, jobType, callback) => {
-  const url = `/am/ucmdbPoint/${pointName}/${jobType}`;
+  const url = `${POINT_DEF_URL}${pointName}/${jobType}`;
   Rest.get(url).then((res) => {
     const data = res && res.ok && res.body || [];
     const points = data.map((point)=> {
@@ -67,7 +67,7 @@ export const integrationJobItemDataSuccess = (integrationJobItemData, error) =>(
 });
 
 export const getIntegrationJobItem = (pointName, jobType, jobName, callback) => {
-  const url = `/am/ucmdbPoint/${pointName}/${jobType}/${jobName}`;
+  const url = `${POINT_DEF_URL}${pointName}/${jobType}/${jobName}`;
   Rest.get(url).then((res) => {
     const data = res && res.ok && res.body && res.body.jobStatuses || [];
     const jobStatuses = data.map((jobStatus)=> {
@@ -87,7 +87,7 @@ export const getIntegrationJobItem = (pointName, jobType, jobName, callback) => 
 };
 
 export const adapterSideBarClick = (pointName, tabName) => {
-  history.pushState(null, '/ucmdbAdapter/' + pointName + '/' + tabName);
+  history.pushState(null, ADAPTER_DEF_URL + pointName + '/' + tabName);
   return {type: ADAPTER_SIDEBAR_CLICK, pointName, tabName};
 };
 
@@ -96,7 +96,7 @@ export const integrationJobSelect = (tabName, pointName, integrationJobName) => 
 };
 
 export const integrationJobTabSwitch = (tabName, pointName) => {
-  history.pushState(null, '/ucmdbAdapter/' + pointName + '/' + tabName);
+  history.pushState(null, ADAPTER_DEF_URL + pointName + '/' + tabName);
   return {
     type: TAB_SWITCH_SUCCESS,
     tabName

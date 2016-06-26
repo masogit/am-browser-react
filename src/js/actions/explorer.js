@@ -1,6 +1,4 @@
-/**
- * Created by mansh on 4/25/2016.
- */
+import {AM_DB_DEF_URL, VIEW_DEF_URL, DOWNLOAD_DEF_URL, UCMDB_DEF_URL} from '../constants/ServiceConfig';
 import Rest from '../util/grommet-rest-promise';
 
 function param2aql(param) {
@@ -17,7 +15,7 @@ function param2aql(param) {
 }
 
 export function loadViews(callback) {
-  Rest.get('/coll/view/').then((res) => {
+  Rest.get(VIEW_DEF_URL).then((res) => {
     callback(res.body);
   }, (err) => {
     console.log(err.response ? err.response.text : err);
@@ -25,7 +23,7 @@ export function loadViews(callback) {
 }
 
 export function loadView(id, callback) {
-  Rest.get('/coll/view/' + id).then((res) => {
+  Rest.get(VIEW_DEF_URL + id).then((res) => {
     if (res.ok && res.body) {
       callback(res.body);
     } else {
@@ -46,7 +44,7 @@ export function getCount(body, callback) {
 }
 
 export function getUCMDB(callback) {
-  Rest.get('/ucmdb-browser').then((res) => {
+  Rest.get(UCMDB_DEF_URL).then((res) => {
     callback(res.text);
   }, (err) => {
     console.log(err.response ? err.response.text : err);
@@ -67,7 +65,7 @@ export function getBodyByKeyword(body, keyword) {
 }
 
 export function loadRecordsByBody(body, callback) {
-  Rest.get('/am/db/' + getQueryByBody(body)).then((res) => {
+  Rest.get(AM_DB_DEF_URL + getQueryByBody(body)).then((res) => {
     if (res.body.count && res.body.entities)
       callback(res.body);
     else
@@ -164,5 +162,5 @@ export function getDownloadQuery(body) {
         type: field.type
       });
   });
-  return '/download/db/' + getQueryByBody(body);
+  return DOWNLOAD_DEF_URL + getQueryByBody(body);
 }

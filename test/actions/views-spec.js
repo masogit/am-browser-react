@@ -4,7 +4,7 @@ import nock from 'nock';
 import expect from 'expect';
 import * as actions from '../../src/js/actions/views';
 import * as types from '../../src/js/constants/ActionTypes';
-import {HOST_NAME_DEV, VIEW_DEF_URL} from '../../src/js/util/Config';
+import {HOST_NAME_DEV, VIEW_DEF_URL} from '../../src/js/constants/ServiceConfig';
 import mockResponse from '../mockdata/views.json';
 
 const middlewares = [thunk];
