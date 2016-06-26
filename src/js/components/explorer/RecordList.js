@@ -122,9 +122,16 @@ export default class RecordList extends Component {
   }
 
   _showOrderByIcon(sqlname) {
-    var orderby = this.state.param.orderby;
-    return (orderby.indexOf(sqlname) > -1) ? ((orderby.indexOf('desc') > -1) ? <Descend /> : <Ascend />) :
-      <EmptyIcon />;
+    var orderby = this.state.param.orderby.split(' ');
+    if (orderby[0] == sqlname) {
+      if (orderby[1] == 'desc') {
+        return <Descend />;
+      } else {
+        return <Ascend />;
+      }
+    } else {
+      return <EmptyIcon />;
+    }
   }
 
   _viewDetailShow(record) {
