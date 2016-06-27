@@ -85,7 +85,7 @@ export default class RecordSearch extends Component {
           var length = this.state.keyword.toLocaleLowerCase().trim().length;
           var pre_str = record[field.sqlname].substr(0, index);
           var key_str = record[field.sqlname].substr(index, length);
-          var suf_str = record[field.sqlname].substr(length, record[field.sqlname].length);
+          var suf_str = record[field.sqlname].substr(index + length);
           const title = pre_str + key_str + suf_str;
           return (
             <Box key={field.sqlname + index} direction='row'>
