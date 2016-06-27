@@ -205,8 +205,7 @@ function getFormattedRecords(fields, rawRecords) {
   rawRecords.forEach((rawRecord) => {
     var record = {Self: escapeStr(rawRecord.self)};
     fields.forEach((field) => {
-      if (!field.PK)
-        record[getDisplayLabel(field)] = getFieldStrVal(rawRecord, field);
+      record[getDisplayLabel(field)] = getFieldStrVal(rawRecord, field);
     });
     records.push(record);
   });

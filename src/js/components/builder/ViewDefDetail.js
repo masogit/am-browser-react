@@ -154,59 +154,57 @@ export default class ViewDefDetail extends ComponentBase {
     // map, then filter out null elements, the index is correct; filter out PK fields, then map, the index is wrong.
     let fields = selfView.body.fields.map((field, index) => {
       return (
-        !field.PK ?
-          <tr id={`${currentPath}_${selfView.body.sqlname}_${field.sqlname}_${index}_row`}
-              key={`${currentPath}_${selfView.body.sqlname}_${field.sqlname}_${index}_row`}>
-            <td>{field.sqlname}</td>
-            <td>
-              <input id={`v.${currentPath}body.fields.${index}.alias`}
-                     name={`v.${currentPath}body.fields.${index}.alias`}
-                     type="text"
-                     placeholder="Add alias here..."
-                     value={field.alias}
-                     onChange={this._onChange}
-                     style={{display: 'inline-block',margin: 0,padding: 0,outline: 0,borderWidth: 0,borderStyle: 'hidden'}}
-              />
-            </td>
-            <td>
-              <CheckBox id={`v.${currentPath}body.fields.${index}.searchable`}
-                        name={`v.${currentPath}body.fields.${index}.searchable`} checked={field.searchable}
-                        disabled={(selfView.body.fields.filter(field => field.searchable == true).length >= 2) && !field.searchable}
-                        onChange={this._onChange}/>
-            </td>
-            <td>
-              <CheckBox id={`v.${currentPath}body.groupby`} name={`v.${currentPath}body.groupby`}
-                        value={field.sqlname} checked={selfView.body.groupby==field.sqlname?true:false}
-                        disabled={(selfView.body.groupby&&selfView.body.groupby!=field.sqlname)?true:false}
-                        onChange={
-                          (event) => {
-                            this._onChange(event, field.sqlname);
-                          }}/>
-            </td>
-            <td>
-              <CheckBox id={`v.${currentPath}body.sum`} name={`v.${currentPath}body.sum`}
-                        value={field.sqlname} checked={selfView.body.sum==field.sqlname?true:false}
-                        disabled={(selfView.body.sum&&selfView.body.sum!=field.sqlname)?true:false}
-                        onChange={
-                          (event) => {
-                            this._onChange(event, field.sqlname);
-                          }}/>
-            </td>
-            <td>
-              <CheckBox id={`v.${currentPath}body.orderby`} name={`v.${currentPath}body.orderby`}
-                        value={field.sqlname} checked={selfView.body.orderby==field.sqlname?true:false}
-                        disabled={(selfView.body.orderby&&selfView.body.orderby!=field.sqlname)?true:false}
-                        onChange={
-                          (event) => {
-                            this._onChange(event, field.sqlname);
-                          }}/>
-            </td>
-            <td>
-              <a id={`${currentPath}body.fields.${index}.del`} name={`${currentPath}body.fields.${index}`}
-                 onClick={this.props.onDeleteTableRow}><Close /></a>
-            </td>
-          </tr>
-          : null
+        <tr id={`${currentPath}_${selfView.body.sqlname}_${field.sqlname}_${index}_row`}
+            key={`${currentPath}_${selfView.body.sqlname}_${field.sqlname}_${index}_row`}>
+          <td>{field.sqlname}</td>
+          <td>
+            <input id={`v.${currentPath}body.fields.${index}.alias`}
+                    name={`v.${currentPath}body.fields.${index}.alias`}
+                    type="text"
+                    placeholder="Add alias here..."
+                    value={field.alias}
+                    onChange={this._onChange}
+                    style={{display: 'inline-block',margin: 0,padding: 0,outline: 0,borderWidth: 0,borderStyle: 'hidden'}}
+            />
+          </td>
+          <td>
+            <CheckBox id={`v.${currentPath}body.fields.${index}.searchable`}
+                      name={`v.${currentPath}body.fields.${index}.searchable`} checked={field.searchable}
+                      disabled={(selfView.body.fields.filter(field => field.searchable == true).length >= 2) && !field.searchable}
+                      onChange={this._onChange}/>
+          </td>
+          <td>
+            <CheckBox id={`v.${currentPath}body.groupby`} name={`v.${currentPath}body.groupby`}
+                      value={field.sqlname} checked={selfView.body.groupby==field.sqlname?true:false}
+                      disabled={(selfView.body.groupby&&selfView.body.groupby!=field.sqlname)?true:false}
+                      onChange={
+                        (event) => {
+                          this._onChange(event, field.sqlname);
+                        }}/>
+          </td>
+          <td>
+            <CheckBox id={`v.${currentPath}body.sum`} name={`v.${currentPath}body.sum`}
+                      value={field.sqlname} checked={selfView.body.sum==field.sqlname?true:false}
+                      disabled={(selfView.body.sum&&selfView.body.sum!=field.sqlname)?true:false}
+                      onChange={
+                        (event) => {
+                          this._onChange(event, field.sqlname);
+                        }}/>
+          </td>
+          <td>
+            <CheckBox id={`v.${currentPath}body.orderby`} name={`v.${currentPath}body.orderby`}
+                      value={field.sqlname} checked={selfView.body.orderby==field.sqlname?true:false}
+                      disabled={(selfView.body.orderby&&selfView.body.orderby!=field.sqlname)?true:false}
+                      onChange={
+                        (event) => {
+                          this._onChange(event, field.sqlname);
+                        }}/>
+          </td>
+          <td>
+            <a id={`${currentPath}body.fields.${index}.del`} name={`${currentPath}body.fields.${index}`}
+                onClick={this.props.onDeleteTableRow}><Close /></a>
+          </td>
+        </tr>
       );
     }).filter(field => field != null);
 

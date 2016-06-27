@@ -168,9 +168,7 @@ function checkAndRemoveParent(clonedView, path) {
   let bodyPath = path.substring(0, lastIndexOfBody + 4);
   let fieldsPath = bodyPath.concat(".fields");
   let fields = objectPath.get(clonedView, fieldsPath);
-  let fieldsEmpty = !fields.some((field) => {
-    return !field.PK;
-  });
+  let fieldsEmpty = (fields.length == 0);
   if(fieldsEmpty && fields.length > 0) {
     objectPath.empty(clonedView, fieldsPath);
   }

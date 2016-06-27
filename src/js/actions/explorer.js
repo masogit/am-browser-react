@@ -77,10 +77,6 @@ export function getQueryByBody(body) {
         var relative_path = link.src_field.relative_path;
         return relative_path ? relative_path + '.' + link.src_field.sqlname : link.src_field.sqlname;
       }
-
-      // TODO remove this part reversefield was replaced by src_field
-      if (link.reversefield)
-        return link.reversefield;
     });
 
     // remove same fields

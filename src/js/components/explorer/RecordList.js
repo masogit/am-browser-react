@@ -178,7 +178,7 @@ export default class RecordList extends Component {
   getDisplayFields() {
     const displayNum = this.state.allFields ? this.props.body.fields.length : this.state.numColumn;
     return this.props.body.fields.filter((field, index) => {
-      if (!field.PK && index < displayNum) {
+      if (index < displayNum) {
         return field;
       }
     });

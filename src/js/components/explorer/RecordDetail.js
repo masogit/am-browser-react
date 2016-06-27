@@ -51,8 +51,7 @@ export default class RecordDetail extends Component {
       var relative_path = link.src_field.relative_path;
       var src_field = relative_path ? relative_path + '.' + link.src_field.sqlname : link.src_field.sqlname;
       AQL = link.dest_field.sqlname + '=' + record[src_field];
-    } else
-      AQL = link.reverse + '.PK=' + record[link.reversefield]; // TODO remove reversefield
+    }
 
     body.filter = body.filter ? '(' + body.filter + ') AND ' + AQL : AQL;
     return body;
@@ -91,7 +90,7 @@ export default class RecordDetail extends Component {
               </TableRow>
               {
                 this.props.body.fields.map((field, index) => {
-                  return !field.PK &&
+                  return (
                     <TableRow key={index}>
                       <td>{Format.getDisplayLabel(field)}</td>
                       <td>
@@ -103,7 +102,8 @@ export default class RecordDetail extends Component {
                                   label={`Open UCMDB Browser`} primary={true}/>
                         }
                       </td>
-                    </TableRow>;
+                    </TableRow>
+                  );
                 })
               }
               </tbody>
