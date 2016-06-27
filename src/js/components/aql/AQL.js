@@ -51,7 +51,8 @@ export default class AQL extends Component {
       data: {
         header: [],
         rows: []
-      }
+      },
+      graphData: {}
     };
     this._onClose = this._onClose.bind(this);
   }
@@ -84,7 +85,8 @@ export default class AQL extends Component {
       data: {
         header: [],
         rows: []
-      }
+      },
+      graphData: {}
     }, callback);
   }
 
@@ -105,12 +107,17 @@ export default class AQL extends Component {
   }
 
   _loadAQL(aql) {
+    let graphData = {};
+    if (aql.type) {
+      graphData[aql.type] = aql.form;
+    }
     this.setState({
       aql: {...aql},
       data: {
         header: [],
         rows: []
-      }
+      },
+      graphData: graphData
     }, () => {
       if (window.event && this.refs && this.refs[aql.type]) {
         this.refs[aql.type]._onClickTab(event);
@@ -131,14 +138,16 @@ export default class AQL extends Component {
     AQLActions.queryAQL(this.state.aql.str, (data) => {
       if (this.state.aql.update) {
         const aql = this.state.aql;
+        const graphData = this.state.graphData;
         aql.form = 'init';
         aql.update = false;
-        aql.meter = undefined;
-        aql.chart = undefined;
-        aql.distribution = undefined;
+        graphData.meter = undefined;
+        graphData.chart = undefined;
+        graphData.distribution = undefined;
         this.setState({
           data,
-          aql
+          aql,
+          graphData
         });
       } else {
         this.setState({
@@ -242,19 +251,20 @@ export default class AQL extends Component {
   }
 
   _genGraph(form, type) {
-    var aql = this.state.aql;
+    let aql = this.state.aql;
+    let graphData = this.state.graphData;
     if (type) {
       aql.type = type;
     }
 
     if (form) {
       aql.form = form;
-      aql[type] = form;
+      graphData[type] = form;
     } else {
-      aql.form = aql[type] || 'init';
+      aql.form = graphData[type] || 'init';
     }
 
-    this.setState({aql: aql});
+    this.setState({aql, graphData});
 
     //TODO: meter: data less than 7/4
     //TODO: distribution: data must be all positive
@@ -462,14 +472,14 @@ export default class AQL extends Component {
                 <Box pad={{horizontal: 'small'}}>
                   <Tabs initialIndex={getIndex(this.state.aql.type)} justify='end'>
                     <ActionTab title="Chart" onClick={this._genGraph.bind(this, null, 'chart')} ref='chart'>
-                      <ChartForm {...this.state.aql} genGraph={this._genGraph.bind(this)} data={this.state.data}/>
+                      <ChartForm {...this.state.aql} {...this.state.graphData} genGraph={this._genGraph.bind(this)} data={this.state.data}/>
                     </ActionTab>
                     <ActionTab title="Meter" onClick={this._genGraph.bind(this, null, 'meter')} ref='meter'>
-                      <MeterForm {...this.state.aql} genGraph={this._genGraph.bind(this)} data={this.state.data}/>
+                      <MeterForm {...this.state.aql} {...this.state.graphData} genGraph={this._genGraph.bind(this)} data={this.state.data}/>
                     </ActionTab>
                     <ActionTab title="Distribution" onClick={this._genGraph.bind(this, null, 'distribution')}
                                ref='distribution'>
-                      <DistributionForm {...this.state.aql} genGraph={this._genGraph.bind(this)}
+                      <DistributionForm {...this.state.aql} {...this.state.graphData} genGraph={this._genGraph.bind(this)}
                                                             data={this.state.data}/>
                     </ActionTab>
                     {

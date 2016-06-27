@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-const Next = require('grommet/components/icons/base/Next');
-const Previous = require('grommet/components/icons/base/Previous');
+import Next from'grommet/components/icons/base/Next';
+import Previous from 'grommet/components/icons/base/Previous';
 import {
   CheckBox,
   // Split,
@@ -13,6 +13,7 @@ import {
   Anchor
 } from 'grommet';
 import _ from 'lodash';
+import objectPath from 'object-path';
 
 const SelectField = ({label, name, value, onChange, options}) => {
   const optionsComp = options.map(option=>
@@ -56,22 +57,6 @@ const NumberField = ({label, name, value, onChange}) => (
     <NumberInput name={name} value={value / 1.0} onChange={onChange}/>
   </FormField>
 );
-
-const setValueByJsonPath = (path, val, obj) => {
-  const fields = path.split('.');
-  let result = obj;
-  for (let i = 0, n = fields.length; i < n && result !== undefined; i++) {
-    const field = fields[i];
-    if (i === n - 1) {
-      result[field] = val;
-    } else {
-      if (typeof result[field] === 'undefined' || !_.isObject(result[field])) {
-        result[field] = {};
-      }
-      result = result[field];
-    }
-  }
-};
 
 // each object in optionsArray has label, name, type, options, value
 // name and type is required,  label, options, value is optional
@@ -170,7 +155,7 @@ export default class GraphForm extends Component {
       val = obj.series_col;
     }
 
-    setValueByJsonPath(path, val, obj);
+    objectPath.set(obj, path, val);
 
     newState[type] = obj;
     this.setState(newState, this.props.genGraph(obj, type));

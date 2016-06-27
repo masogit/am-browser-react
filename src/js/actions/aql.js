@@ -2,6 +2,7 @@ import {GRAPH_DEF_URL, INSIGHT_DEF_URL, AM_DB_DEF_URL, AM_AQL_DEF_URL} from '../
 import Rest from '../util/grommet-rest-promise';
 const store = require('../store');
 import * as Types from '../constants/ActionTypes';
+import _ from 'lodash';
 
 export function saveWall(wall, callback) {
   Rest.post(INSIGHT_DEF_URL, wall).then((res) => {
@@ -39,6 +40,12 @@ export function loadAQLs(callback) {
 }
 
 export function saveAQL(aql, callback) {
+  let clonedAql = _.cloneDeep(aql);
+  // TODO: delete the following 4 lines after aql templates are cleaned up.
+  delete clonedAql.data;
+  delete clonedAql.meter;
+  delete clonedAql.distribution;
+  delete clonedAql.chart;
   Rest.post(GRAPH_DEF_URL, aql).then((res) => {
     if (res.text) {
       store.default.dispatch({type: Types.RECEIVE_INFO, msg: "Graph saved successfully"});
