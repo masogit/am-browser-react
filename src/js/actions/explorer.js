@@ -1,19 +1,6 @@
 import {AM_DB_DEF_URL, VIEW_DEF_URL, DOWNLOAD_DEF_URL, UCMDB_DEF_URL} from '../constants/ServiceConfig';
 import Rest from '../util/grommet-rest-promise';
 
-function param2aql(param) {
-
-  let aql = '';
-  aql += '?limit=' + param.limit;
-  aql += '&offset=' + param.offset;
-  aql += '&countEnabled=true';
-  aql += '&fields=' + param.fields.join(',');
-  aql += param.filter ? '&filter=' + param.filter : '';
-  aql += param.orderby ? '&orderby=' + param.orderby : '';
-
-  return encodeURI(aql);
-}
-
 export function loadViews(callback) {
   Rest.get(VIEW_DEF_URL).then((res) => {
     callback(res.body);
@@ -65,7 +52,7 @@ export function getBodyByKeyword(body, keyword) {
 }
 
 export function loadRecordsByBody(body, callback) {
-  Rest.get(AM_DB_DEF_URL + getQueryByBody(body)).then((res) => {
+  Rest.get(AM_DB_DEF_URL + body.sqlname).query(getQueryByBody(body)).then((res) => {
     if (res.body.count && res.body.entities)
       callback(res.body);
     else
@@ -104,14 +91,18 @@ export function getQueryByBody(body) {
     fields = fields.concat(src_fields);
   }
 
-  var query = body.sqlname;
   var param = {
     limit: 100,
     offset: 0,
-    filter: body.filter,
-    orderby: body.orderby,
-    fields: fields
+    countEnabled: true,
+    fields: fields.join(',')
   };
+  if (body.orderby) {
+    param.orderby = body.orderby;
+  }
+  if (body.filter) {
+    param.filter = body.filter;
+  }
 
   var userParam = body.param;
   if (userParam) {
@@ -129,8 +120,7 @@ export function getQueryByBody(body) {
     }
   }
 
-  var aql = param2aql(param);
-  return query + aql;
+  return param;
 }
 
 export function getGroupByAql(body) {

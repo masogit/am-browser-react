@@ -42,7 +42,8 @@ export default class RecordSearch extends Component {
 
   _search(keyword) {
     //  Escaped for SQL. e.g. org.apache.commons.lang.StringEscapeUtils.escapeSql(String str).
-    keyword = keyword.replace(new RegExp("'", "g"), "''");
+    keyword = keyword.replace(/[']/g, '\'\'');
+    keyword = encodeURI(keyword);
     this.setState({
       messages: {},
       results: [],
@@ -117,7 +118,7 @@ export default class RecordSearch extends Component {
   }
 
   _onSearch(keyword) {
-    history.push(`/search/${keyword}`);
+    history.push(`/search/${encodeURI(keyword)}`);
     this.setState({
       keyword: keyword
     });

@@ -208,7 +208,7 @@ export default class Search extends Component {
   }
 
   _goRecordSearch(keyword) {
-    history.push(`/search/${keyword}`);
+    history.push(`/search/${encodeURI(keyword)}`);
   }
 
   render() {
