@@ -46,7 +46,7 @@ export function saveAQL(aql, callback) {
   delete clonedAql.meter;
   delete clonedAql.distribution;
   delete clonedAql.chart;
-  Rest.post(GRAPH_DEF_URL, aql).then((res) => {
+  Rest.post(GRAPH_DEF_URL, clonedAql).then((res) => {
     if (res.text) {
       store.default.dispatch({type: Types.RECEIVE_INFO, msg: "Graph saved successfully"});
       callback(res.text);
