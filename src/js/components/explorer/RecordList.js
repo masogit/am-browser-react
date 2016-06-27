@@ -81,11 +81,8 @@ export default class RecordList extends Component {
   }
 
   _getRecords(param, onMore) {
-    if (!onMore || !this.state.onMoreLock) {
-      if (onMore) {
-        this.setState({onMoreLock: true});
-      }
-
+    if ((onMore && this.state.onMoreLock === false) || !onMore) {
+      this.setState({onMoreLock: true});
       var body = Object.assign({}, this.props.body, {param: param || this.state.param});
       var timeStart = Date.now();
       this.setState({
