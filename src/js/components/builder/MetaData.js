@@ -57,6 +57,24 @@ export default class MetaData extends ComponentBase {
     return 0; //default return value (no sorting)
   }
 
+  linkSort(links) {
+    return links.sort(this._sortSqlName).map((row, index) => {
+      let newRow = {
+        label: row.label,
+        sqlname: row.sqlname,
+        url: row.dest_table["ref-link"],
+        card11: row.card11,
+        src_field: row.src_field,
+        dest_field: row.dest_field
+      };
+      return (
+        <ListItem separator="none" key={index} pad="none">
+          <Anchor href="#" key={index} primary={true} onClick={this._onClick.bind(this, newRow)} label={row.sqlname}/>
+        </ListItem>
+      );
+    });
+  }
+
   render() {
     let rows = this.props.rows;
     let {filterEntities, schemaToLoad} = this.props;
@@ -86,21 +104,9 @@ export default class MetaData extends ComponentBase {
         </ListItem>
       );
     });
-    let linksComponents = links.sort(this._sortSqlName).map((row, index) => {
-      let newRow = {
-        label: row.label,
-        sqlname: row.sqlname,
-        url: row.dest_table["ref-link"],
-        card11: row.card11,
-        src_field: row.src_field,
-        dest_field: row.dest_field
-      };
-      return (
-        <ListItem separator="none" key={index} pad="none">
-          <Anchor href="#" key={index} primary={true} onClick={this._onClick.bind(this, newRow)} label={row.sqlname}/>
-        </ListItem>
-      );
-    });
+    //
+    let linksComponents = this.linkSort(links.filter((obj) => obj.card11 == true));
+    let m2mLinksComponents = this.linkSort(links.filter((obj) => obj.card11 != true));
     //let fieldsComponents = fields.sort().map((row, index) => {
     //  return <TableRow key={index}><td><CheckBox key={index} id={`checkbox_${row.sqlname}`} checked={row.checked} onChange={this._onChange.bind(this, row)}/><Notes/>{row.sqlname}</td></TableRow>;
     //});
@@ -120,7 +126,10 @@ export default class MetaData extends ComponentBase {
           {
             entitiesComponents.length == 0 &&
             <Tabs justify="start" flex={true}>
-              <Tab title={`Links (${linksComponents.length})`}>
+              <Tab title={`1-M Links (${m2mLinksComponents.length})`}>
+                {m2mLinksComponents}
+              </Tab>
+              <Tab title={`1-1 Links (${linksComponents.length})`}>
                 {linksComponents}
               </Tab>
               <Tab title={`Fields (${fieldsComponents.length})`}>

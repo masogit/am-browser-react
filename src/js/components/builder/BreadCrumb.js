@@ -25,7 +25,7 @@ export default class BreadCrumb extends Component {
         return (<Anchor key={index} icon={<Home />} onClick={this._onDetailClick.bind(this, element, index)}
                         label={element.label+'('+element.sqlname+')'}/>);
       } else if (index == elements.length - 1) {
-        return <Anchor key={index} icon={<Next />} label={element.sqlname}/>;
+        return <Anchor key={index} icon={<Next />} label={element.sqlname} disabled={true}/>;
       } else {
         return (<Anchor key={index} icon={<Next />} onClick={this._onDetailClick.bind(this, element, index)}
                         label={element.sqlname}/>);
