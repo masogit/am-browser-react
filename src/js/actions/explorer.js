@@ -142,15 +142,6 @@ export function getGroupByAql(body) {
   }
 }
 
-export function getDownloadQuery(body) {
-  var rawFields = [];
-  body.fields.forEach((field)=> {
-    if (!field.PK)
-      rawFields.push({
-        sqlname: field.sqlname,
-        label: field.alias || field.label,
-        type: field.type
-      });
-  });
-  return DOWNLOAD_DEF_URL + getQueryByBody(body);
+export function getDownloadQuery(sqlname) {
+  return DOWNLOAD_DEF_URL + '/' + sqlname;
 }

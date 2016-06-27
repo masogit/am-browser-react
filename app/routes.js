@@ -138,7 +138,7 @@ module.exports = function (app) {
   });
 
   // Download CSV in server side
-  app.use('/am/download/*', rest.csv);
+  app.use('/am/download/:tableName', rest.csv);
 
   // Proxy the backend rest service /rs/db -> /am/db
   app.use('/am/db', function (req, res) {

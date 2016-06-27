@@ -321,9 +321,9 @@ export default class RecordList extends Component {
                   disabled={this.props.body.fields.length <= this.state.numColumn}/>
           <Anchor icon={<Download />} label="Download CSV" onClick={this._download.bind(this)}/>
         </Menu>
-        <form name="Download" ref="downloadForm" method="post"
-              action={ExplorerActions.getDownloadQuery(Object.assign({}, this.props.body, {param: this.state.param}))}>
+        <form name="Download" ref="downloadForm" method="post" action={ExplorerActions.getDownloadQuery(this.props.body.sqlname)}>
           <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
+          <input type="hidden" name="param" value={JSON.stringify(ExplorerActions.getQueryByBody(Object.assign({}, this.props.body, {param: this.state.param})))}/>
           <input type="hidden" name="fields" value={JSON.stringify(this.props.body.fields)}/>
         </form>
       </Header>

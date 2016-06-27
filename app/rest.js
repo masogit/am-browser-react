@@ -9,18 +9,19 @@ module.exports = function (am) {
 
   this.csv = function (req, res) {
 
-    var url = "http://${server}${context}/${ref-link}";
+    var url = "http://${server}${context}${ref-link}";
     // TODO Use 'X-Authorization' if jwt token is ready.
     // var auth = req.session.jwt ? req.session.jwt.secret : undefined;
     var auth = (req.session.user != "") ? 'Basic ' + new Buffer(req.session.user + ':' + req.session.password).toString('base64') : undefined;
     var request;
+    var param = JSON.parse(req.body.param);
     var args = {
       path: {
         server: am.server,
         context: am.context,
-        "ref-link": req.params[0]
+        "ref-link": '/db/' + req.params.tableName
       },
-      parameters: Object.assign(req.query, {countEnabled: true}),
+      parameters: param,
       headers: (auth) ? {
         "Content-Type": "application/json",
         // TODO Use 'X-Authorization' if jwt token is ready.
@@ -30,28 +31,29 @@ module.exports = function (am) {
     };
 
     request = client.get(url, args, (data, response) => {
-      var isOffset = !req.query['offset'] || req.query['offset'] === 0 || req.query['offset'] === "0";
+      var isOffset = !param.offset || param.offset === 0 || param.offset === "0";
       if (isOffset) {
-        req.query['offset'] = 0;
-        res.setHeader('Content-disposition', 'attachment; filename=' + req.params[0] + '.csv');
+        param.offset = 0;
+        res.setHeader('Content-disposition', 'attachment; filename=' + req.params.tableName + '.csv');
         res.setHeader('Content-type', 'text/csv');
       }
 
       if (data.count >= 10000)
-        req.query.limit = 1000;
+        param.limit = 1000;
       else if (data.count < 10000 && data.count >= 1000)
-        req.query.limit = parseInt(data.count / 10);
+        param.limit = parseInt(data.count / 10);
       else
-        req.query.limit = 100;
+        param.limit = 100;
 
       if (data.entities && data.entities.length > 0)
         Convertor.json2csv(getFormattedRecords(JSON.parse(req.body.fields), data.entities), (err, csv) => {
           res.write(csv, 'binary');
 
-          if (data.count > data.entities.length + req.query.offset) {
-            req.query.offset += data.entities.length;
+          if (data.count > data.entities.length + param.offset) {
+            param.offset += data.entities.length;
             var REST = require('./rest.js');
             var rest = new REST(am);
+            req.body.param = JSON.stringify(param);
             rest.csv(req, res);
           } else
             res.end();
