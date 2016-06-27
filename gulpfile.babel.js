@@ -21,6 +21,7 @@ import dateformat from 'dateformat';
 import jeditor from 'gulp-json-editor';
 import version from './version.json';
 import config from './rest/conf/config.json';
+import amb_config from './app/config';
 
 const opts = {
   base: '.',
@@ -68,11 +69,7 @@ const opts = {
   devServerPort: 8001,
   // The 8010 port number needs to align with hostName in index.js
   devServerProxy: {
-    '/am/*': 'http://localhost:8080',
-	'/coll/*': 'http://localhost:8080',
-	'/download/*': 'http://localhost:8080',
-	'/ucmdb-browser/*': 'http://localhost:8080',
-	'/slack/*': 'http://localhost:8080'
+    '/*': `http://${amb_config.node_server=='0.0.0.0'?'localhost':amb_config.node_server}:${amb_config.node_port}`
   },
   websocketHost: 'localhost:8010',
   alias: {
