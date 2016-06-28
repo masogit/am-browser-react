@@ -15,7 +15,8 @@ export default class RecordSearch extends Component {
       messages: {},
       results: [],
       record: null,
-      view: null
+      view: null,
+      warning: null
     };
     this._setMessage.bind(this);
   }
@@ -41,6 +42,17 @@ export default class RecordSearch extends Component {
   }
 
   _search(keyword) {
+    if (keyword.length <= 2) {
+      this.setState({
+        warning: 'Please type at least 3 words to search'
+      });
+      return;
+    }
+
+    this.setState({
+      warning: ''
+    });
+
     //  Escaped for SQL. e.g. org.apache.commons.lang.StringEscapeUtils.escapeSql(String str).
     keyword = keyword.replace(/[']/g, '\'\'');
     keyword = encodeURI(keyword);
@@ -126,8 +138,9 @@ export default class RecordSearch extends Component {
   }
 
   _onEnter(event) {
-    if ((event.keyCode === 13))
+    if (event.keyCode === 13) {
       this._onSearch(event.target.value.trim());
+    }
   }
 
   _showViewRecords(view) {
@@ -193,33 +206,42 @@ export default class RecordSearch extends Component {
               </tbody>
             </Table>
           </Box>
-          <Tiles flush={false} size="large" className='autoScroll' justify="around">
-            {
-              this.state.results.map((result, i) => {
-                return result.records.map((record, j) => {
-                  // var id = record['ref-link'].split('/')[2];
-                  return (
-                    <Tile key={`${i}.${j}`} align="start" className='box-shadow'>
-                      <Header tag="h4" size="small" pad={{ horizontal: 'small' }}>
-                        {result.view.name}
-                      </Header>
-                      <Form>
-                        <Box pad="small">
-                          <Anchor onClick={this._onClick.bind(this, result.view, record)}
-                            className='text-ellipsis'>
-                            <span title={record.self}><b>{record.self}</b></span>
-                          </Anchor>
-                          {this._getContent(result.view, record)}
-                        </Box>
-                        <Footer pad={{ horizontal: 'small' }}>
-                          {'Table: ' + result.view.body.sqlname}
-                        </Footer>
-                      </Form>
-                    </Tile>);
-                });
-              })
-            }
-          </Tiles>
+          {
+            this.state.warning ?
+              <Box pad='small' flex={true} justify='center' align="center">
+                <Box colorIndex="light-2" pad={{horizontal: 'large', vertical: 'medium'}}>
+                  {this.state.warning}
+                </Box>
+              </Box>
+              :
+              <Tiles flush={false} size="large" className='autoScroll' justify="around">
+                {
+                  this.state.results.map((result, i) => {
+                    return result.records.map((record, j) => {
+                      // var id = record['ref-link'].split('/')[2];
+                      return (
+                        <Tile key={`${i}.${j}`} align="start" className='box-shadow'>
+                          <Header tag="h4" size="small" pad={{ horizontal: 'small' }}>
+                            {result.view.name}
+                          </Header>
+                          <Form>
+                            <Box pad="small">
+                              <Anchor onClick={this._onClick.bind(this, result.view, record)}
+                                      className='text-ellipsis'>
+                                <span title={record.self}><b>{record.self}</b></span>
+                              </Anchor>
+                              {this._getContent(result.view, record)}
+                            </Box>
+                            <Footer pad={{ horizontal: 'small' }}>
+                              {'Table: ' + result.view.body.sqlname}
+                            </Footer>
+                          </Form>
+                        </Tile>);
+                    });
+                  })
+                }
+              </Tiles>
+          }
         </Split>
         {
           this.state.record &&
