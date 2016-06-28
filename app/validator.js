@@ -40,8 +40,9 @@ function body(obj) {
     return "sqlname (table's name) is required in body";
   if (invalidLength(obj.label))
     return "label is required in body!";
-  if (!(obj.fields && obj.fields instanceof Array && obj.fields.length > 0))
-    return "At least one field in body!";
+  if (!(obj.fields && obj.fields instanceof Array && obj.fields.length > 0)
+     && !(obj.links && obj.links instanceof Array && obj.links.length > 0))
+    return "At least one field or one link in body!";
 
   // content validation
   obj.fields.forEach((obj) => {
@@ -53,7 +54,7 @@ function body(obj) {
     if (!obj.links instanceof Array)
       return "links must is array!";
 
-    obj.links.forEach((obj)=> {
+    obj.links.forEach((obj) => {
       if (error = link(obj))
         return error;
     });
