@@ -1,19 +1,15 @@
 import React, {Component, PropTypes} from 'react';
 import Anchor from 'grommet/components/Anchor';
 import Box from 'grommet/components/Box';
+import {metadataLoadDetail} from '../../actions/system';
 
 export default class BreadCrumb extends Component {
-
-  constructor() {
-    super();
-  }
-
-  componentDidMount() {
-  }
-
-  _onDetailClick(obj, index) {
+  _onDetailClick(index) {
     this.props.clearFilter();
-    this.props.metadataLoadDetail(obj, this.props.elements, index);
+    const obj = this.props.elements[index];
+    metadataLoadDetail(obj, []).then(({rows}) => {
+      this.props.updateData(this.props.elements.slice(0, index + 1), rows);
+    });
   }
 
   render() {
@@ -22,12 +18,12 @@ export default class BreadCrumb extends Component {
     let Next = require('grommet/components/icons/base/Next');
     let breadcrumbs = elements.map((element, index) => {
       if (index == 0) {
-        return (<Anchor key={index} icon={<Home />} onClick={this._onDetailClick.bind(this, element, index)}
-                        label={element.label+'('+element.sqlname+')'}/>);
+        return (<Anchor key={index} icon={<Home />} onClick={this._onDetailClick.bind(this, index)}
+                        label={`${element.label}(${element.sqlname})`}/>);
       } else if (index == elements.length - 1) {
         return <Anchor key={index} icon={<Next />} label={element.sqlname} disabled={true}/>;
       } else {
-        return (<Anchor key={index} icon={<Next />} onClick={this._onDetailClick.bind(this, element, index)}
+        return (<Anchor key={index} icon={<Next />} onClick={this._onDetailClick.bind(this, index)}
                         label={element.sqlname}/>);
       }
     });

@@ -22,6 +22,7 @@ class ViewDefListContainer extends Component {
     this.onDuplicateViewDef = this.onDuplicateViewDef.bind(this);
     this.onDeleteViewDef = this.onDeleteViewDef.bind(this);
     this.onClosePreview = this.onClosePreview.bind(this);
+    this._onClickTableTitle = this._onClickTableTitle.bind(this);
   }
 
   componentWillMount() {
@@ -103,6 +104,14 @@ class ViewDefListContainer extends Component {
 
   }
 
+  _onClickTableTitle(nameList) {
+    this.refs.viewDefList.setState({
+      editView: true,
+      linkNames: nameList,
+      schema: ''
+    });
+  }
+
   render() {
     const {views, isFetchingViewList, selectedView, preview} = this.props;
     let {dispatch} = store;
@@ -110,7 +119,7 @@ class ViewDefListContainer extends Component {
     let boundActionCreators2 = bindActionCreators(MetadataActions, dispatch);
     return (
       <Box direction="row" flex={true}>
-        <ViewDefList views={views} isFetchingViewList={isFetchingViewList}
+        <ViewDefList views={views} isFetchingViewList={isFetchingViewList} ref='viewDefList'
                      selectedView={selectedView} {...boundActionCreators} {...boundActionCreators2}/>
 
         <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange}
@@ -118,6 +127,7 @@ class ViewDefListContainer extends Component {
                        onDeleteTableRow={this.onDeleteTableRow} compact={true}
                        onDuplicateViewDef={this.onDuplicateViewDef}
                        onDeleteViewDef={this.onDeleteViewDef}
+                       onClickTableTitle={this._onClickTableTitle}
                        {...boundActionCreators}/>
 
         <ViewDefPreview active={preview} selectedView={selectedView} {...boundActionCreators}/>

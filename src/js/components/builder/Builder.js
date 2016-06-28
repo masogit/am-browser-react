@@ -1,8 +1,4 @@
-import React, {Component, PropTypes} from 'react';
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
-import * as BuilderActions from '../../actions/system';
-import * as ViewDefActions from '../../actions/views';
+import React, {Component} from 'react';
 import MetaData from './MetaData';
 import BreadCrumb from './BreadCrumb';
 import Box from 'grommet/components/Box';
@@ -11,42 +7,56 @@ export default class Builder extends Component {
 
   constructor() {
     super();
+    this._clearFilter = this._clearFilter.bind(this);
+    this.state = {
+      elements: [],
+      rows: {},
+      linkNames: []
+    };
   }
 
   componentDidMount() {
-    this.props.dispatch(BuilderActions.metadataLoad());
+    if (this.props.linkNames.length > 0) {
+      this.setState({
+        linkNames: this.props.linkNames
+      });
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.linkNames.length > 0) {
+      this.setState({
+        elements: [],
+        rows: this.refs.metaData.refs.wrappedInstance.allRows || {},
+        linkNames: nextProps.linkNames
+      });
+    }
   }
 
   _clearFilter() {
-    document.getElementById("metadataFilter").value = "";
+    this.refs.metaData.refs.wrappedInstance.setState({
+      searchText: ''
+    });
+  }
+
+  updateData(elements, rows) {
+    const linkNames = elements && elements.map((element) => element.sqlname);
+    this.setState({
+      elements: elements || this.state.elements,
+      rows: rows || this.state.rows,
+      linkNames: linkNames || this.state.linkNames
+    });
   }
 
   render() {
-    let item = this.props.rows;
-    let elements = this.props.elements;
-    let {dispatch} = this.props;
-    let boundActionCreators = bindActionCreators(BuilderActions, dispatch);
-    let boundActionCreators_views = bindActionCreators(ViewDefActions, dispatch);
     return (
       <Box pad={{horizontal: 'small'}} className='fixMinSizing'>
-        <BreadCrumb elements={elements} {...boundActionCreators} clearFilter={this._clearFilter}/>
-        <MetaData elements={elements} rows={item} {...boundActionCreators} {...boundActionCreators_views}
-                  clearFilter={this._clearFilter} {...this.props}/>
+        <BreadCrumb elements={this.state.elements} clearFilter={this._clearFilter}
+                    updateData={this.updateData.bind(this)}/>
+        <MetaData ref='metaData' clearFilter={this._clearFilter} elements={this.state.elements} rows={this.state.rows}
+                  updateData={this.updateData.bind(this)} linkNames={this.state.linkNames}
+                  schemaToLoad={this.props.schemaToLoad}/>
       </Box>
     );
   }
 }
-
-Builder.propTypes = {
-  rows: PropTypes.object.isRequired,
-  elements: PropTypes.array.isRequired
-};
-
-let select = (state, props) => {
-  return {
-    rows: state.metadata.rows,
-    elements: state.metadata.elements
-  };
-};
-
-export default connect(select)(Builder);

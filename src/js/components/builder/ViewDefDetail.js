@@ -9,9 +9,7 @@ import Download from 'grommet/components/icons/base/Download';
 import More from 'grommet/components/icons/base/More';
 import Mail from 'grommet/components/icons/base/Mail';
 import _ from 'lodash';
-// import cookies from 'js-cookie';
 import AlertForm from '../../components/commons/AlertForm';
-//var Filter = require('grommet/components/icons/base/Filter');
 
 export default class ViewDefDetail extends ComponentBase {
 
@@ -54,7 +52,7 @@ export default class ViewDefDetail extends ComponentBase {
   _onChange(event, value) {
     let path = event.target.name; // why not 'event.target.id'? because of radio button.
     if (event.target.type == "checkbox") {
-      this.props.onValueChange(path.substring(2), event.target.checked ? (value ? value : true) : (value ? "" : false));
+      this.props.onValueChange(path.substring(2), value ? event.target.checked && value || '' : event.target.checked);
     } else {
       this.props.onValueChange(path.substring(2), event.target.value);
     }
@@ -119,7 +117,7 @@ export default class ViewDefDetail extends ComponentBase {
   }
 
 
-  renderLinks(links, table, path) {
+  renderLinks(links, table, path, key) {
     let selfTable = table;
     links = selfTable.body.links.map((link, index) => {
       if (link.body && ((link.body.fields && link.body.fields.length > 0) || this.hasLinks(link.body.links))) {
@@ -141,7 +139,7 @@ export default class ViewDefDetail extends ComponentBase {
             this.setState(temp);
           }
         };
-        return this.renderTable(title, filter, link.body.fields && link, false, currentPath, `${link.sqlname}_${index}`);
+        return this.renderTable(title, filter, link.body.fields && link, false, currentPath, `${key}_${link.sqlname}`);
       }
       return null;
     });
@@ -239,9 +237,7 @@ export default class ViewDefDetail extends ComponentBase {
 
     return (
       <Box className='table' key={key} style={style} flex={false}>
-
-        <Title className='fontNormal'>{title.label}</Title>
-
+        <Anchor icon={<Play />} onClick={this._onClickTableTitle.bind(this, key)} label={title.label}/>
         <Table>
           {header}
           <tbody>
@@ -257,14 +253,18 @@ export default class ViewDefDetail extends ComponentBase {
           {this.renderTemplateTable(selectedView, root, path)}
           </tbody>
         </Table>
-        {selectedView.body.links && selectedView.body.links.length > 0 && this.renderLinks([], selectedView, currentPath + "body.links")}
+        {selectedView.body.links && selectedView.body.links.length > 0 && this.renderLinks([], selectedView, currentPath + "body.links", key)}
       </Box>
     );
   }
 
+  _onClickTableTitle(nameList) {
+    this.props.onClickTableTitle(nameList.split('.'));
+  }
+
   render() {
     let {selectedView} = this.props;
-    let alertForms = selectedView ? {
+    let alertForms = selectedView && selectedView.name ? {
       save: <AlertForm onClose={this.closeAlertForm}
                        title={"Save '" + selectedView.name + "'?"}
                        onConfirm={this._onSubmit}/>,
@@ -274,11 +274,11 @@ export default class ViewDefDetail extends ComponentBase {
       delete: <AlertForm onClose={this.closeAlertForm}
                          title={"You're about to delete '" + selectedView.name + "', continue?"}
                          onConfirm={this._onDelete}/>
-    } : {};
+    } : null;
 
     let p = "input", table;
 
-    if (selectedView && selectedView.body && selectedView.body.fields) {
+    if (selectedView && selectedView.body && (selectedView.body.fields.length > 0 || selectedView.body.links.length > 0)) {
       const title = {
         label: selectedView.body.label && `${selectedView.body.label} (${selectedView.body.sqlname})`,
         onClick: () => this.setState({mainFilter: !this.state.mainFilter})
@@ -292,7 +292,7 @@ export default class ViewDefDetail extends ComponentBase {
         show: this.state.mainFilter
       };
 
-      table = this.renderTable(title, filter, selectedView, true);
+      table = this.renderTable(title, filter, selectedView, true, '', selectedView.body.sqlname);
     }
 
     return (
@@ -301,15 +301,19 @@ export default class ViewDefDetail extends ComponentBase {
           <Header justify="between" size="small" pad={{horizontal: 'medium'}}>
             <Title>View Builder</Title>
             <Menu direction="row" align="center" responsive={true}>
-              <Anchor link="#" icon={<Play />} onClick={this.props.openPreview} label="Query"/>
-              <Anchor link="#" icon={<Checkmark />} onClick={() => this.openAlert("save")} label="Save"/>
-              <Anchor link="#" icon={<Close />} onClick={() => this.openAlert("delete")} label="Delete"/>
+              <Anchor icon={<Play />} onClick={this.props.openPreview} label="Query" disabled={!table}/>
+              <Anchor icon={<Checkmark />} onClick={() => this.openAlert("save")} label="Save"
+                      disabled={!selectedView.name || !selectedView.category}/>
+              <Anchor icon={<Close />} onClick={() => this.openAlert("delete")} label="Delete"
+                      disabled={!selectedView._id}/>
               <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }}>
-                <Anchor link="#" icon={<Duplicate />} onClick={() => this.openAlert("duplicate")} label="Duplicate"/>
+                <Anchor link="#" icon={<Duplicate />} onClick={() => this.openAlert("duplicate")} label="Duplicate"
+                        disabled={!selectedView._id}/>
                 {selectedView._id &&
-                <Anchor link="#" icon={<Mail />} onClick={this._onMail.bind(this, selectedView)} label="Mail"/>}
-                <Anchor link="#" icon={<Download />} onClick={this._onDownload.bind(this, selectedView)}
-                        label="Download"/>
+                <Anchor icon={<Mail />} onClick={this._onMail.bind(this, selectedView)} label="Mail"
+                        disabled={!selectedView._id}/>}
+                <Anchor icon={<Download />} onClick={this._onDownload.bind(this, selectedView)} label="Download"
+                        disabled={!selectedView._id}/>
               </Menu>
             </Menu>
             {/* upload form
@@ -320,32 +324,28 @@ export default class ViewDefDetail extends ComponentBase {
             </form>
             */}
           </Header>
-          {
-            selectedView && !_.isEmpty(selectedView) &&
-            <Box className='autoScroll' pad={{horizontal: 'medium'}}>
-              <Split flex="left" fixed={false} className='fixMinSizing'>
-                {table}
-                <Box pad="small">
-                  <Header>Attributes</Header>
-                  <Form onSubmit={this.props.onSubmit} compact={this.props.compact}>
-                    <FormField label="Name" htmlFor={p + "item1"}>
-                      <input id="v.name" name="v.name" type="text" onChange={this._onChange}
-                             value={selectedView.name}/>
-                    </FormField>
-                    <FormField label="Description" htmlFor={p + "item2"}>
-                      <textarea id="v.desc" name="v.desc" value={selectedView.desc}
-                                onChange={this._onChange}></textarea>
-                    </FormField>
-                    <FormField label="Category" htmlFor={p + "item3"}>
-                      <input id="v.category" name="v.category" type="text" onChange={this._onChange}
-                             value={selectedView.category}/>
-                    </FormField>
-                  </Form>
-                </Box>
-                {alertForms[this.state.alertForm]}
-              </Split>
-            </Box>
-          }
+          <Box className='autoScroll' pad={{horizontal: 'medium'}}>
+            <Split flex="left" fixed={false} className='fixMinSizing'>
+              {table}
+              <Box pad={table ? 'small' : 'none'}>
+                <Form onSubmit={this.props.onSubmit} compact={this.props.compact}>
+                  <FormField label="Name" htmlFor={p + "item1"}>
+                    <input id="v.name" name="v.name" type="text" onChange={this._onChange}
+                           value={selectedView.name}/>
+                  </FormField>
+                  <FormField label="Description" htmlFor={p + "item2"}>
+                    <textarea id="v.desc" name="v.desc" value={selectedView.desc}
+                              onChange={this._onChange}></textarea>
+                  </FormField>
+                  <FormField label="Category" htmlFor={p + "item3"}>
+                    <input id="v.category" name="v.category" type="text" onChange={this._onChange}
+                           value={selectedView.category}/>
+                  </FormField>
+                </Form>
+              </Box>
+              {alertForms && alertForms[this.state.alertForm]}
+            </Split>
+          </Box>
         </Box>
         :
         <Box pad={{horizontal: 'medium'}} flex={true} justify='center' align="center">

@@ -240,12 +240,11 @@ export function updateViewDefList(selectedView) {
   };
 }
 
-export function syncSelectedView(elements, row) {
+export function syncSelectedView(selectedView) {
   return dispatch => {
     dispatch({
       type: types.SYNC_SELECTED_VIEW,
-      elements: elements,
-      row: row
+      selectedView: selectedView
     });
   };
 }

@@ -136,52 +136,26 @@ export function sendMessageToSlack(messages) {
 }
 
 export function metadataLoad() {
-  return function (dispatch) {
-    Rest.get(AM_SCHEMA_DEF_URL)
-      .set('Content-Type', 'Application/json')
-      .end(function (err, res) {
-        if (!err) {
-          let data = res.body;
-          dispatch(metadataSuccess(data, []));
-        }
-      });
-  };
+  return Rest.get(AM_SCHEMA_DEF_URL)
+    .set('Content-Type', 'Application/json')
+    .then(res => {
+      if (res.ok) {
+        return res.body;
+      }
+    });
 }
 
-export function metadataLoadDetail(obj, elements, index) {
-  return function (dispatch) {
-    Rest.get(AM_DEF_URL + obj.url)
-      .set('Content-Type', 'Application/json')
-      .end(function (err, res) {
-        if (!err) {
-          let data = res.body;
-          if (typeof index === 'undefined') {
-            obj.body_label = data.label;
-            obj.body_sqlname = data.sqlname;
-            elements.push(obj);
-          } else {
-            elements = elements.slice(0, index + 1);
-          }
-          dispatch(metadataDetailSuccess(data, elements));
-        }
-      });
-  };
-}
-
-export function metadataSuccess(result, elements) {
-  return {
-    type: METADATA_SUCCESS,
-    rows: result,
-    elements: elements
-  };
-}
-
-export function metadataDetailSuccess(result, elements) {
-  return {
-    type: METADATA_DETAIL_SUCCESS,
-    rows: result,
-    elements: elements
-  };
+export function metadataLoadDetail(obj, elements) {
+  return Rest.get(AM_DEF_URL + obj.url)
+    .set('Content-Type', 'Application/json')
+    .then(res => {
+      if (res.ok) {
+        let data = res.body;
+        obj.body_label = data.label;
+        obj.body_sqlname = data.sqlname;
+        return {rows: data, elements: [...elements, obj]};
+      }
+    });
 }
 
 export function loginSuccess(email, headerNavs) {
