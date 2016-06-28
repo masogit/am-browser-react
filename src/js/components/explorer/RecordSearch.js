@@ -4,7 +4,7 @@ import RecordDetail from './RecordDetail';
 import RecordList from './RecordList';
 import history from '../../RouteHistory';
 import {
-  Anchor, Box, Header, Footer, Layer, Split, Table, TableRow, Tiles, Title, Tile, Form
+  Anchor, Box, Button, Header, Footer, Layer, Split, Table, TableRow, Tiles, Title, Tile, Form
 } from 'grommet';
 
 export default class RecordSearch extends Component {
@@ -163,7 +163,7 @@ export default class RecordSearch extends Component {
           <Title>Global Search</Title>
           <input type="search" inline={true} className="flex" placeholder="Global Record search..." ref="search"
             onKeyDown={this._onEnter.bind(this)} defaultValue={this.props.params.keyword}/>
-          <button onClick={()=>this._onSearch(this.refs.search.value)}>Search</button>
+          <Button label="Search" onClick={()=>this._onSearch(this.refs.search.value)} />
         </Header>
         <Split flex="right" fixed={false}>
           <Box pad={{ horizontal: 'small' }} flex={true}>
