@@ -10,9 +10,7 @@ module.exports = function (am) {
   this.csv = function (req, res) {
 
     var url = "http://${server}${context}${ref-link}";
-    // TODO Use 'X-Authorization' if jwt token is ready.
-    // var auth = req.session.jwt ? req.session.jwt.secret : undefined;
-    var auth = (req.session.user != "") ? 'Basic ' + new Buffer(req.session.user + ':' + req.session.password).toString('base64') : undefined;
+    var auth = req.session.jwt ? req.session.jwt.secret : undefined;
     var request;
     var param = JSON.parse(req.body.param);
     var args = {
@@ -24,9 +22,7 @@ module.exports = function (am) {
       parameters: param,
       headers: (auth) ? {
         "Content-Type": "application/json",
-        // TODO Use 'X-Authorization' if jwt token is ready.
-        // "X-Authorization": auth,
-        "Authorization": auth
+        "X-Authorization": auth
       } : undefined
     };
 
@@ -85,7 +81,7 @@ module.exports = function (am) {
     var args = {
       path: {
         server: am.server,
-        context: am.config,
+        context: am.context,
         "ref-link": '/auth/sign-in'
       },
       data: `username=${username}&password=${password}`,
@@ -111,9 +107,7 @@ module.exports = function (am) {
         },
         headers: {
           "Content-Type": "application/json",
-          // TODO Use 'X-Authorization' if jwt token is ready.
-          // "X-Authorization": req.session.jwt.secret,
-          "Authorization": req.headers.authorization
+          "X-Authorization": req.session.jwt.secret
         }
       };
 

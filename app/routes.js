@@ -25,10 +25,7 @@ module.exports = function (app) {
   var apiProxy = httpProxy.createProxyServer();
 
   apiProxy.on('proxyReq', function (proxyReq, req, res, options) {
-    // TODO Use 'X-Authorization' if jwt token is ready.
-    // proxyReq.setHeader('X-Authorization', req.session.jwt.secret);
-    const auth = 'Basic ' + new Buffer(req.session.user + ':' + req.session.password).toString('base64');
-    proxyReq.setHeader('Authorization', auth);
+    proxyReq.setHeader('X-Authorization', req.session.jwt.secret);
   });
 
   apiProxy.on('proxyReq', function (proxyReq, req, res) {
