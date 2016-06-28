@@ -50,7 +50,7 @@ export default class Builder extends Component {
 
   render() {
     return (
-      <Box pad={{horizontal: 'small'}} className='fixMinSizing'>
+      <Box pad={{horizontal: 'small'}} className='fixMinSizing' flex={true}>
         <BreadCrumb elements={this.state.elements} clearFilter={this._clearFilter}
                     updateData={this.updateData.bind(this)}/>
         <MetaData ref='metaData' clearFilter={this._clearFilter} elements={this.state.elements} rows={this.state.rows}

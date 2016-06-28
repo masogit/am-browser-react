@@ -80,7 +80,7 @@ export default class GroupList extends Component {
     var grouped = this._getGroupedChildren(children);
     const expand = this.state.expand;
     return (
-      <Box direction="column" className='fixMinSizing'>
+      <Box direction="column" className='fixMinSizing' flex={true}>
         {
           this.props.searchable &&
           <Box pad='small' flex={false}>

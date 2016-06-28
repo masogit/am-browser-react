@@ -3,7 +3,7 @@
  */
 
 import React, {Component} from 'react';
-import { Title, Header, Sidebar, Menu, Box } from 'grommet';
+import { Title, Header, Sidebar, Menu, Box, Footer } from 'grommet';
 import GroupList from './GroupList';
 import GroupListItem from './GroupListItem';
 import EmptyIcon from './EmptyIcon';
@@ -11,7 +11,7 @@ import EmptyIcon from './EmptyIcon';
 export default class SideBar extends Component {
 
   render() {
-    const {title, toolbar, contents, focus} = this.props;
+    const {title, toolbar, contents, focus, footer} = this.props;
     // 1) Show group list
     // 2) Show table schema
     let sidebarContent;
@@ -47,6 +47,9 @@ export default class SideBar extends Component {
             }
           </Header>
           {sidebarContent}
+          <Footer separator="top" justify="center">
+            {footer ? footer : (new Date()).toLocaleString()}
+          </Footer>
         </Box>
       </Sidebar>
     );
