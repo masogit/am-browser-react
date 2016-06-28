@@ -6,6 +6,7 @@ import Play from 'grommet/components/icons/base/Play';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
 import Duplicate from 'grommet/components/icons/base/Duplicate';
 import Download from 'grommet/components/icons/base/Download';
+import CaretPrevious from 'grommet/components/icons/base/CaretPrevious';
 import More from 'grommet/components/icons/base/More';
 import Mail from 'grommet/components/icons/base/Mail';
 import _ from 'lodash';
@@ -237,7 +238,7 @@ export default class ViewDefDetail extends ComponentBase {
 
     return (
       <Box className='table' key={key} style={style} flex={false}>
-        <Anchor icon={<Play />} onClick={this._onClickTableTitle.bind(this, key)} label={title.label}/>
+        <Anchor icon={<CaretPrevious />} onClick={this._onClickTableTitle.bind(this, key)} label={title.label}/>
         <Table>
           {header}
           <tbody>
@@ -326,7 +327,9 @@ export default class ViewDefDetail extends ComponentBase {
           </Header>
           <Box className='autoScroll' pad={{horizontal: 'medium'}}>
             <Split flex="left" fixed={false} className='fixMinSizing'>
-              {table}
+              <Box flex={true}>
+                {table}
+              </Box>
               <Box pad={table ? 'small' : 'none'}>
                 <Form onSubmit={this.props.onSubmit} compact={this.props.compact}>
                   <FormField label="Name" htmlFor={p + "item1"}>
