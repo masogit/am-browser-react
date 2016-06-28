@@ -169,7 +169,9 @@ export default class RecordList extends Component {
     } else {
       if (!this.state.aqlInput) {
         this.setState({
-          filtered: this.state.records.filter((obj) => this.getObjectString(obj).indexOf(event.target.value.toLowerCase().trim()) !== -1)
+          filtered: this.state.records.filter((obj) => this.getObjectString(obj).some((str) => {
+            return str.toString().toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1;
+          }))
         });
       }
     }
@@ -185,7 +187,7 @@ export default class RecordList extends Component {
   }
 
   getObjectString(obj) {
-    return this.getDisplayFields().map((field, index) => Format.getFieldStrVal(obj, field)).join('').toLowerCase();
+    return this.getDisplayFields().map((field, index) => Format.getFieldStrVal(obj, field)).concat(obj.self || '');
   }
 
   _aqlFilterAdd(filter) {
@@ -248,7 +250,7 @@ export default class RecordList extends Component {
     return this.getDisplayFields().map((field, index) => (
       <th key={index}>
         <Anchor href="#" reverse={true} icon={this._showOrderByIcon(field.sqlname)}
-                label={Format.getDisplayLabel(field)}
+                label={Format.getDisplayLabel(field)} key={`fieldsheader_${index}`}
                 onClick={this._orderBy.bind(this, field.sqlname)}/>
       </th>
     ));
@@ -278,7 +280,7 @@ export default class RecordList extends Component {
       <span>
         {this.state.param.filters.map((filter, index) => {
           return (
-            <span>
+            <span key={`aqlfilter_${index}`}>
               <Anchor href="#" icon={<Close />} onClick={this._filterClear.bind(this, index)}/>
               <Anchor href="#" onClick={this._filterReuse.bind(this, filter)} label={filter}/>
             </span>
