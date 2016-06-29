@@ -162,7 +162,7 @@ export default class RecordSearch extends Component {
         <Header>
           <Title>Global Search</Title>
           <input type="search" inline={true} className="flex" placeholder="Global Record search..." ref="search"
-            onKeyDown={this._onEnter.bind(this)} defaultValue={this.props.params.keyword}/>
+            onKeyDown={this._onEnter.bind(this)} defaultValue={this.props.params.keyword} maxLength={50}/>
           <Button label="Search" onClick={()=>this._onSearch(this.refs.search.value)} />
         </Header>
         <Split flex="right" fixed={false}>
