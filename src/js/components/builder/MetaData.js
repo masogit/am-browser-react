@@ -378,10 +378,8 @@ export default class MetaData extends ComponentBase {
         <SearchInput value={this.state.searchText} placeHolder="Search fields and links..."
                      onDOMChange={this._onSearch}/>
         <Box pad={{vertical: 'small'}} className='fixMinSizing'>
-          <Box className='autoScroll'>
           {entitiesComponents}
-          {
-            entitiesComponents.length == 0 &&
+          {entitiesComponents.length == 0 &&
             <Tabs justify="start" flex={true}>
               <Tab title={`1-M Links (${m2mLinksComponents.length})`}>
                 {m2mLinksComponents}
@@ -394,7 +392,6 @@ export default class MetaData extends ComponentBase {
               </Tab>
             </Tabs>
           }
-          </Box>
         </Box>
       </Box>
     );

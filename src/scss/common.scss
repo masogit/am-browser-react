@@ -74,3 +74,21 @@ table {
   overflow: hidden;
   white-space: pre;
 }
+
+div[role=tablist] {
+  display: flex;
+  flex-direction: column;
+
+  & ul {
+    flex-shrink: 0;
+  }
+}
+
+div[role=tabpanel] {
+  display: flex;
+  overflow-y: auto;
+
+  & li {
+    flex-shrink: 0;
+  }
+}
