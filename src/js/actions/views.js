@@ -160,6 +160,25 @@ export function deleteTableRow(selectedView, path) {
   };
 }
 
+export function moveRow(selectedView, path, up) {
+  return (dispatch, getState) => {
+    let clonedView = _.cloneDeep(selectedView);
+    let lastIndexOfDot = path.lastIndexOf(".");
+    let arrayPath = path.substring(0, lastIndexOfDot);
+    let rows = objectPath.get(clonedView, arrayPath);
+    let currentElementIndex = parseInt(path.substring(lastIndexOfDot + 1));
+    let currentElement = objectPath.get(clonedView, path);
+    let targetIndex = up ? currentElementIndex - 1 : currentElementIndex + 1;
+    let targetElement = objectPath.get(clonedView, `${arrayPath}.${targetIndex}`);
+    rows[currentElementIndex] = targetElement;
+    rows[targetIndex] = currentElement;
+    dispatch({
+      type: types.SYNC_SELECTED_VIEW,
+      selectedView: clonedView
+    });
+  };
+}
+
 function checkAndRemoveParent(clonedView, path) {
   let lastIndexOfBody = path.lastIndexOf("body");
   if(lastIndexOfBody <= 0 ) {

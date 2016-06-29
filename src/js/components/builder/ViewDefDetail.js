@@ -2,6 +2,8 @@ import React, {PropTypes} from 'react';
 import ComponentBase from '../commons/ComponentBase';
 import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Title, Split,tr } from 'grommet';
 import Close from 'grommet/components/icons/base/Close';
+import Up from 'grommet/components/icons/base/LinkUp';
+import Down from 'grommet/components/icons/base/LinkDown';
 import Play from 'grommet/components/icons/base/Play';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
 import Duplicate from 'grommet/components/icons/base/Duplicate';
@@ -155,6 +157,19 @@ export default class ViewDefDetail extends ComponentBase {
       return (
         <tr id={`${currentPath}_${selfView.body.sqlname}_${field.sqlname}_${index}_row`}
             key={`${currentPath}_${selfView.body.sqlname}_${field.sqlname}_${index}_row`}>
+          <td>
+            {index == 0 &&
+            <Up className='icon-empty2'/>
+            }
+            {index != 0 &&
+            <a id={`${currentPath}body.fields.${index}.up`} name={`${currentPath}body.fields.${index}`}
+               onClick={this.props.onMoveRowUp}><Up size="small" style={{color: "#666"}}/></a>
+            }
+            {index != selfView.body.fields.length - 1 &&
+            <a id={`${currentPath}body.fields.${index}.down`} name={`${currentPath}body.fields.${index}`}
+               onClick={this.props.onMoveRowDown}><Down size="small" type="status" style={{color: "#666"}}/></a>
+            }
+          </td>
           <td>{field.sqlname}</td>
           <td>
             <input id={`v.${currentPath}body.fields.${index}.alias`}
@@ -201,7 +216,7 @@ export default class ViewDefDetail extends ComponentBase {
           </td>
           <td>
             <a id={`${currentPath}body.fields.${index}.del`} name={`${currentPath}body.fields.${index}`}
-                onClick={this.props.onDeleteTableRow}><Close /></a>
+               onClick={this.props.onDeleteTableRow}><Close /></a>
           </td>
         </tr>
       );
@@ -214,6 +229,7 @@ export default class ViewDefDetail extends ComponentBase {
     const header = (
       <thead>
       <tr>
+        <th></th>
         <th>Field</th>
         <th>Alias</th>
         <th>Search</th>
@@ -244,6 +260,7 @@ export default class ViewDefDetail extends ComponentBase {
           <tbody>
           {filter.show &&
           <tr>
+            <td></td>
             <td colSpan={8}>
               <textarea id={filter.id} name={filter.name} value={filter.value}
                         placeholder="Input AQL as filter" onChange={filter.onChange}

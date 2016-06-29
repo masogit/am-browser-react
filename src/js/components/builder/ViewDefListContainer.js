@@ -15,13 +15,14 @@ class ViewDefListContainer extends Component {
 
   constructor(props) {
     super(props);
-    this.onValueChange = this.onValueChange.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
-    this.onSaveSuccess = this.onSaveSuccess.bind(this);
-    this.onDeleteTableRow = this.onDeleteTableRow.bind(this);
-    this.onDuplicateViewDef = this.onDuplicateViewDef.bind(this);
-    this.onDeleteViewDef = this.onDeleteViewDef.bind(this);
-    this.onClosePreview = this.onClosePreview.bind(this);
+    this._onValueChange = this._onValueChange.bind(this);
+    this._onSubmit = this._onSubmit.bind(this);
+    this._onSaveSuccess = this._onSaveSuccess.bind(this);
+    this._onDeleteTableRow = this._onDeleteTableRow.bind(this);
+    this._onDuplicateViewDef = this._onDuplicateViewDef.bind(this);
+    this._onDeleteViewDef = this._onDeleteViewDef.bind(this);
+    this._onMoveRowUp = this._onMoveRowUp.bind(this);
+    this._onMoveRowDown = this._onMoveRowDown.bind(this);
     this._onClickTableTitle = this._onClickTableTitle.bind(this);
   }
 
@@ -54,7 +55,7 @@ class ViewDefListContainer extends Component {
   componentWillUpdate(nextProps, nextState) {
   }
 
-  onValueChange(path, newValue) {
+  _onValueChange(path, newValue) {
     //console.log("ViewDefListContainer - onValueChange - path: ");
     //console.log(path);
     //console.log("ViewDefListContainer - onValueChange - newValue: ");
@@ -62,16 +63,16 @@ class ViewDefListContainer extends Component {
     this.props.actions.updateSelectedView(this.props.selectedView, path, newValue);
   }
 
-  onSubmit() {
+  _onSubmit() {
     this.props.actions.saveViewDef(this.props.selectedView).then((id) => {
       //this.props.actions.updateViewDefList(updatedView);
       //history.push("/views/" + id);
       //this.props.actions.loadViews(id, this.props.location.pathname);
-      this.onSaveSuccess();
+      this._onSaveSuccess();
     }, (err) => console.log("onSubmit - err: " + err));
   }
 
-  onSaveSuccess() {
+  _onSaveSuccess() {
     let {selectedViewId} = this.props;
     if (selectedViewId) {
       //history.push("/views/" + selectedViewId);
@@ -83,25 +84,31 @@ class ViewDefListContainer extends Component {
     }
   }
 
-  onDeleteTableRow(event) {
+  _onMoveRowUp(event) {
+    event.preventDefault();
+    this.props.actions.moveRow(this.props.selectedView, event.currentTarget.name, true);
+  }
+
+  _onMoveRowDown(event) {
+    event.preventDefault();
+    this.props.actions.moveRow(this.props.selectedView, event.currentTarget.name);
+  }
+
+  _onDeleteTableRow(event) {
     event.preventDefault();
     this.props.actions.deleteTableRow(this.props.selectedView, event.currentTarget.name);
   }
 
-  onDuplicateViewDef(event) {
+  _onDuplicateViewDef(event) {
     this.props.actions.duplicateViewDef(this.props.selectedView);
   }
 
-  onDeleteViewDef() {
+  _onDeleteViewDef() {
     this.props.actions.confirmDeleteViewDef(this.props.selectedView, (id) => {
       if (!this.props.selectedViewId) { // all records deleted
         history.push("/views");
       }
     });
-  }
-
-  onClosePreview() {
-
   }
 
   _onClickTableTitle(nameList) {
@@ -122,11 +129,12 @@ class ViewDefListContainer extends Component {
         <ViewDefList views={views} isFetchingViewList={isFetchingViewList} ref='viewDefList'
                      selectedView={selectedView} {...boundActionCreators} {...boundActionCreators2}/>
 
-        <ViewDefDetail selectedView={selectedView} onValueChange={this.onValueChange}
-                       onSubmit={this.onSubmit} onSaveSuccess={this.onSaveSuccess}
-                       onDeleteTableRow={this.onDeleteTableRow} compact={true}
-                       onDuplicateViewDef={this.onDuplicateViewDef}
-                       onDeleteViewDef={this.onDeleteViewDef}
+        <ViewDefDetail selectedView={selectedView} onValueChange={this._onValueChange}
+                       onSubmit={this._onSubmit} onSaveSuccess={this._onSaveSuccess}
+                       onMoveRowUp={this._onMoveRowUp} onMoveRowDown={this._onMoveRowDown}
+                       onDeleteTableRow={this._onDeleteTableRow} compact={true}
+                       onDuplicateViewDef={this._onDuplicateViewDef}
+                       onDeleteViewDef={this._onDeleteViewDef}
                        onClickTableTitle={this._onClickTableTitle}
                        {...boundActionCreators}/>
 
