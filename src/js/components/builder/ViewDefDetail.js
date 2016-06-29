@@ -189,8 +189,8 @@ export default class ViewDefDetail extends ComponentBase {
           </td>
           <td>
             <CheckBox id={`v.${currentPath}body.groupby`} name={`v.${currentPath}body.groupby`}
-                      value={field.sqlname} checked={selfView.body.groupby==field.sqlname?true:false}
-                      disabled={(selfView.body.groupby&&selfView.body.groupby!=field.sqlname)?true:false}
+                      value={field.sqlname} checked={selfView.body.groupby==field.sqlname}
+                      disabled={(selfView.body.groupby&&selfView.body.groupby!=field.sqlname)}
                       onChange={
                         (event) => {
                           this._onChange(event, field.sqlname);
@@ -198,8 +198,8 @@ export default class ViewDefDetail extends ComponentBase {
           </td>
           <td>
             <CheckBox id={`v.${currentPath}body.sum`} name={`v.${currentPath}body.sum`}
-                      value={field.sqlname} checked={selfView.body.sum==field.sqlname?true:false}
-                      disabled={(selfView.body.sum&&selfView.body.sum!=field.sqlname)?true:false}
+                      value={field.sqlname} checked={selfView.body.sum==field.sqlname}
+                      disabled={(selfView.body.sum&&selfView.body.sum!=field.sqlname)}
                       onChange={
                         (event) => {
                           this._onChange(event, field.sqlname);
@@ -207,8 +207,8 @@ export default class ViewDefDetail extends ComponentBase {
           </td>
           <td>
             <CheckBox id={`v.${currentPath}body.orderby`} name={`v.${currentPath}body.orderby`}
-                      value={field.sqlname} checked={selfView.body.orderby==field.sqlname?true:false}
-                      disabled={(selfView.body.orderby&&selfView.body.orderby!=field.sqlname)?true:false}
+                      value={field.sqlname} checked={selfView.body.orderby==field.sqlname}
+                      disabled={(selfView.body.orderby&&selfView.body.orderby!=field.sqlname)}
                       onChange={
                         (event) => {
                           this._onChange(event, field.sqlname);
