@@ -293,8 +293,8 @@ function getHeadNav(rights) {
     explorer: rights.index < 2,
     'explorer/:id': rights.index < 3,
     tbd: rights.index < 2,
-    ucmdbAdapter: rights.index < 1,
-    'ucmdbAdapter(/:pointName)(/:tabName)(/:integrationJobName)': rights.index < 1,
+    ucmdbAdapter: config.ucmdb_adapter_enabled && rights.index < 1,
+    'ucmdbAdapter(/:pointName)(/:tabName)(/:integrationJobName)': config.ucmdb_adapter_enabled && rights.index < 1,
     aql: rights.index < 1,
     views: rights.index < 1,
     'views/:id': rights.index < 1

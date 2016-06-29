@@ -165,7 +165,9 @@ module.exports = function (app) {
    * /ucmdb-browser/<global_id>
    */
   app.get('/ucmdb-browser/', function (req, res) {
-    res.send(`http://${ucmdb_browser_server}:${ucmdb_browser_port}${config.ucmdb_browser_param}`);
+    if (config.ucmdb_adapter_enabled) {
+      res.send(`http://${ucmdb_browser_server}:${ucmdb_browser_port}${config.ucmdb_browser_param}`);
+    }
   });
 
   app.post('/slack', function (req, res) {
