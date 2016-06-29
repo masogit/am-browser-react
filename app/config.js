@@ -5,7 +5,7 @@
 
 var PropertiesReader = require('properties-reader');
 var properties = PropertiesReader('am-browser-config.properties.default');
-var logger = require('./logger.js');
+//var logger = require('./logger.js');
 properties.append('am-browser-config.properties');
 // logger.info("[server]", "Server configuration: " + JSON.stringify(properties));
 
@@ -40,5 +40,9 @@ module.exports = {
 
   session_max_age: properties.get('node.session_max_age'),
 
-  jwt_max_age: properties.get('rest.jwt_max_age')
+  jwt_max_age: properties.get('rest.jwt_max_age'),
+
+  rights_admin: properties.get('user.admin'),
+  rights_power: properties.get('user.power'),
+  rights_guest: properties.get('user.guest')
 };

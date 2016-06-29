@@ -14,29 +14,33 @@ var rootPath = "/"; //"/ferret/";
 
 const indexRoute = {component: Ferret};
 
+export let postLoginPath = '/search';
+export const setPostLoginPath = (path) => postLoginPath = path;
+
 export const getRoutes = (headerNavs) => {
   const routes = [{path: 'login', component: Login}];
   if (headerNavs) {
     const allRoutes = [
       {path: 'search', component: Search},
       {path: 'search(/:keyword)', component: RecordSearch},
-      {path: 'insight', component: Insight},
-      {path: 'insight(/:id)', component: Insight},
       {path: 'explorer', component: Explorer},
-      {path: 'explorer(/:id)', component: Explorer},
+      {path: 'explorer/:id', component: Explorer},
+      {path: 'insight', component: Insight},
+      {path: 'insight/:id', component: Insight},
       {path: 'tbd', component: TBD},
+      {path: 'ucmdbAdapter', component: UCMDBAdapterContainer},
       {path: 'ucmdbAdapter(/:pointName)(/:tabName)(/:integrationJobName)', component: UCMDBAdapterContainer},
       {path: 'aql', component: AQL},
-      {path: 'views(/:id)', component: ViewDefListContainer}
+      {path: 'views', component: ViewDefListContainer},
+      {path: 'views/:id', component: ViewDefListContainer}
     ];
 
     allRoutes.map(route => {
-      const basePath = route.path.split('(')[0];
-      if (headerNavs[basePath]) {
+      if (headerNavs[route.path]) {
         routes.push(route);
       }
     });
-    indexRoute.component = Search;
+    indexRoute.component = routes[1].component;
   } else {
     indexRoute.component = Ferret;
   }
@@ -44,7 +48,15 @@ export const getRoutes = (headerNavs) => {
   routes.push({
     path: '*',
     component: Search,
-    onEnter: (nextState, replaceState) => replaceState(null, headerNavs ? '/search' : '/login')
+    onEnter: (nextState, replaceState) => {
+      var goToLink = routes[0].path;
+      if (headerNavs) {
+        goToLink = routes[1].path;
+      } else {
+        postLoginPath = nextState.location.pathname;
+      }
+      replaceState(null, '/' + goToLink);
+    }
   });
 
   return routes;

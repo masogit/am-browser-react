@@ -10,7 +10,7 @@ import Rest from './util/grommet-rest-promise';
 import {getCurrentLocale, getLocaleData} from 'grommet/utils/Locale';
 import {addLocaleData} from 'react-intl';
 import en from 'react-intl/locale-data/en';
-import Routes, {getRoutes} from './Routes';
+import Routes, {getRoutes, postLoginPath, setPostLoginPath} from './Routes';
 import DevTools from './DevTools';
 import {Provider} from 'react-redux';
 import {IntlProvider} from 'react-intl';
@@ -106,11 +106,6 @@ if (process.env.NODE_ENV === 'production') {
   initToken().end(renderPage());
 }
 
-// simulate initial login
-//store.dispatch(loginSuccess('nobody@grommet.io', 'simulated'));
-
-let postLoginPath = '/search';
-
 // check for session
 const sessionWatcher = () => {
   const {route, session} = store.getState();
@@ -124,7 +119,7 @@ const sessionWatcher = () => {
     } else {
       Routes.routes[0].childRoutes = getRoutes(null);
       if (route.pathname !== Routes.path('/login')) {
-        postLoginPath = route.pathname;
+        setPostLoginPath(route.pathname);
         history.pushState(null, Routes.path('/login'));
       }
     }

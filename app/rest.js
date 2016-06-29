@@ -1,9 +1,10 @@
 var Client = require('node-rest-client').Client;
 var client = new Client();
 var Convertor = require('json-2-csv');
-var sessionUtil = require('./sessionUtil.js');
-var config = require('./config.js');
-var logger = require('./logger.js');
+var sessionUtil = require('./sessionUtil');
+var config = require('./config');
+var rights = require('./constants').rights;
+var logger = require('./logger');
 
 module.exports = function (am) {
 
@@ -90,11 +91,13 @@ module.exports = function (am) {
       }
     };
 
-    request = client.post(url, args, (signData, response) => {
+    client.post(url, args, (signData, response) => {
       req.session.jwt = {
         secret: signData.toString(),
         expires: new Date(Date.now() + am.jwt_max_age * 60 * 1000)
       };
+
+      var user_rights = config.rights_admin.indexOf('@anyone') > -1 ? rights.admin : rights.guest;
 
       args = {
         path: {
@@ -111,30 +114,52 @@ module.exports = function (am) {
         }
       };
 
-      request = client.get(url, args, (data, response) => {
+      client.get(url, args, (data, response) => {
         if (!data.entities || !data.entities[0]) {
-
-          var message = 'The user name or password is incorrect or your account is locked.';
+          var message = response.statusMessage;
           logger.warn(`[user] [${req.sessionID || '-'}]`, message, username);
-          res.send(message);
+          res.status(response.statusCode).send(message);
         } else {
-          req.session.expires = new Date(Date.now() + am.session_max_age * 60 * 1000);
-          sessionUtil.touch(req.session, am.session_max_age);
+          var isAdmin = !!data.entities[0].bAdminRight[1];
+          var email = data.entities[0].EMail;
+          if (user_rights === rights.admin || (isAdmin && config.rights_admin.indexOf('@admin') > -1)) {
+            loginSuccess(req, res, username, password, email, rights.admin, am);
+            res.end();
+          } else {
+            // get detail rights
+            args = {
+              path: {
+                server: am.server,
+                context: config.base,
+                "ref-link": `/aql/amMasterProfile%20MP,%20amRelEmplMProf%20REM,%20amEmplDept%20ED/MP.SQLName%20WHERE%20MP.lMProfileId%20=%20REM.lMProfileId%20AND%20REM.lEmplDeptId%20=%20ED.lEmplDeptId%20AND%20ED.Name%20=%20'${username.trim()}'`
+              },
+              headers: {
+                Accept: "application/json",
+                "X-Authorization": req.session.jwt.secret
+              }
+            };
 
-          var am_rest = {};
-          if (am.enable_csrf) {
-            res.cookie('csrf-token', req.csrfToken());
+            client.get(url, args, (data, response) => {
+              if (data.Query.Result == true) {
+                user_rights = rights.admin;
+              } else {
+                for (var i = 0; i < data.Query.Result.Row.length; i++) {
+                  var currentRight = data.Query.Result.Row[i].Column.content;
+                  if (config.rights_admin.indexOf(currentRight) > -1) {
+                    user_rights = rights.admin;
+                    break;
+                  } else if (user_rights.index > 1 && (config.rights_power.indexOf('@admin') > -1 || config.rights_power.indexOf(am_rights[i]) > -1)) {
+                    user_rights = rights.power;
+                  }
+                }
+              }
+
+              loginSuccess(req, res, username, password, email, user_rights, am);
+
+              res.end();
+            });
           }
-          req.session.user = username;
-          req.session.password = password;
-          req.session.isAdmin = !!data.entities[0].bAdminRight[1];
-          am_rest.headerNavs = getHeadNav(req.session.isAdmin);
-          res.cookie('headerNavs', am_rest.headerNavs);
-          res.json(am_rest);
-          slack(username, `${username} logs in`);
         }
-        logger.info(`[user] [${req.sessionID || '-'}]`, (req.session && req.session.user ? req.session.user : "user") + " login.");
-        res.end();
       });
     }).on('error', function (err) {
       logger.error(`[user] [${req.sessionID || '-'}]`, "login failed with error: " + err.toString());
@@ -194,6 +219,25 @@ function slack(username, message, prefix, callback) {
   }
 }
 
+function loginSuccess(req, res, username, password, email, rights, am) {
+  req.session.expires = new Date(Date.now() + am.session_max_age * 60 * 1000);
+  sessionUtil.touch(req.session, am.session_max_age);
+
+  var am_rest = {};
+  if (am.enable_csrf) {
+    res.cookie('csrf-token', req.csrfToken());
+  }
+  req.session.user = username;
+  req.session.rights = rights;
+  am_rest.headerNavs = getHeadNav(rights);
+  res.cookie('headerNavs', am_rest.headerNavs);
+  res.cookie("user", username);
+  res.cookie("email", email);
+  res.json(am_rest);
+  slack(username, `${username} logs in`);
+  logger.info(`[user] [${req.sessionID || '-'}]`, (req.session && req.session.user ? req.session.user : "user") + " login.");
+}
+
 function getFormattedRecords(fields, rawRecords) {
   var records = [];
   rawRecords.forEach((rawRecord) => {
@@ -238,16 +282,21 @@ function getDisplayLabel(field) {
   return field.alias ? field.alias : (field.label ? field.label : field.sqlname);
 }
 
-function getHeadNav(isAdmin) {
+function getHeadNav(rights) {
   return {
     login: true,
     home: true,
-    search: true,
-    insight: true,
-    explorer: true,
-    tbd: true,
-    ucmdbAdapter: isAdmin,
-    aql: isAdmin,
-    views: isAdmin
+    search: rights.index < 2,
+    'search/:keyword': rights.index < 2,
+    insight: rights.index < 2,
+    'insight/:id': rights.index < 3,
+    explorer: rights.index < 2,
+    'explorer/:id': rights.index < 3,
+    tbd: rights.index < 2,
+    ucmdbAdapter: rights.index < 1,
+    'ucmdbAdapter(/:pointName)(/:tabName)(/:integrationJobName)': rights.index < 1,
+    aql: rights.index < 1,
+    views: rights.index < 1,
+    'views/:id': rights.index < 1
   };
-};
+}

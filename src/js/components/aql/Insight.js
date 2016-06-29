@@ -189,7 +189,7 @@ export default class Insight extends Component {
       layer: null
     });
   }
-  
+
   _getLayer(box, parent) {
     return (
       <Layer onClose={this._onClose.bind(this)} closer={true} align="left">
@@ -388,6 +388,10 @@ export default class Insight extends Component {
     });
   }
 
+  showBack() {
+    return this.props.routes[1].childRoutes.filter((route) => route.path == 'insight').length > 0;
+  }
+
   render() {
     const {box, data, carousel, edit, layer, alert} = this.state;
     const id = this.props.params.id;
@@ -419,7 +423,7 @@ export default class Insight extends Component {
             </Menu>
           }
           {
-            id && <Anchor icon={<Previous />} label="Back" onClick={() => {
+            id && this.showBack() && <Anchor icon={<Previous />} label="Back" onClick={() => {
               history.go(-1);
             }}/>
           }

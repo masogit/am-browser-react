@@ -19,11 +19,14 @@ class IndexerLogin extends Component {
     this._onSubmit = this._onSubmit.bind(this);
     this._onResponsive = this._onResponsive.bind(this);
     this.state = {responsive: 'multiple', ambVersion: null};
+    this._isUnmount = false;
   }
 
   componentDidMount() {
     initAbout().then((res) => {
-      this.setState({ambVersion: res.about.ambVersion});
+      if (!this._isUnmount) {
+        this.setState({ambVersion: res.about.ambVersion});
+      }
     });
   }
 
@@ -37,6 +40,10 @@ class IndexerLogin extends Component {
     } else {
       this.props.dispatch(loginFailure({message: 'Please type your user name'}));
     }
+  }
+
+  componentWillUnmount() {
+    this._isUnmount = true;
   }
 
   render() {

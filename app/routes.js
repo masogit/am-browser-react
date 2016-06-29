@@ -6,8 +6,9 @@ var sessionUtil = require('./sessionUtil.js');
 var config = require('./config.js');
 var version = require('../version.json');
 var multer  = require('multer');
-var storage = multer.memoryStorage()
-var upload = multer({ storage: storage })
+var storage = multer.memoryStorage();
+var upload = multer({storage: storage});
+var isAuthenticated = require('./authentication').isAuthenticated;
 
 module.exports = function (app) {
   var rest_protocol = process.env.AMB_REST_PROTOCOL || config.rest_protocol;
@@ -115,22 +116,23 @@ module.exports = function (app) {
   // CRUD Tingodb
   app.get('/coll/:collection', db.find);
   app.get('/coll/:collection/:id', db.find);
-  app.post('/coll/:collection', upload.single('docFile'), (req, res) => {
-    checkRight(req);
-    var createView = req.originalUrl.indexOf('view') > -1 && !req.body._id;
 
-    db.upsert(req, res);
-
-    if (createView) {
+  const sendSlack = (req, res, next) => {
+    if (req.originalUrl.indexOf('view') > -1 && !req.body._id) {
+      next();
       rest.slack(req.session.user, `${req.session.user} created a view`);
+    } else {
+      next();
     }
-  });
-  app.post('/coll/:collection/:id', upload.single('docFile'), (req, res) => {
-    checkRight(req);
+  };
+  app.post('/coll/:collection', upload.single('docFile'), isAuthenticated, sendSlack, (req, res) => {
     db.upsert(req, res);
   });
-  app.delete('/coll/:collection/:id', (req, res) => {
-    checkRight(req);
+
+  app.post('/coll/:collection/:id', upload.single('docFile'), isAuthenticated, (req, res) => {
+    db.upsert(req, res);
+  });
+  app.delete('/coll/:collection/:id', isAuthenticated, (req, res) => {
     db.delete(req, res);
   });
 
@@ -154,8 +156,7 @@ module.exports = function (app) {
   });
 
   // get ucmdb point data
-  app.use('/am/ucmdbPoint/', function (req, res) {
-    checkRight(req);
+  app.use('/am/ucmdbPoint/', isAuthenticated, function (req, res) {
     apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}/integration/ucmdbAdapter/points`});
   });
 
@@ -180,11 +181,3 @@ module.exports = function (app) {
     });
   });
 };
-
-
-const checkRight = (req) => {
-  if (!req.session.isAdmin) {
-    throw 'user has no permission';
-  }
-};
-
