@@ -148,7 +148,7 @@ module.exports = function (am) {
                   if (config.rights_admin.indexOf(currentRight) > -1) {
                     user_rights = rights.admin;
                     break;
-                  } else if (user_rights.index > 1 && (config.rights_power.indexOf('@admin') > -1 || config.rights_power.indexOf(am_rights[i]) > -1)) {
+                  } else if (user_rights.index > 1 && (config.rights_power.indexOf('@admin') > -1 || config.rights_power.indexOf(currentRight) > -1)) {
                     user_rights = rights.power;
                   }
                 }
