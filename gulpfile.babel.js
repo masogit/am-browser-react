@@ -362,7 +362,7 @@ gulp.task('gen-ws-conf', ['gen-ws-base'], function () {
   var copy_server = gulp.src('./rest/conf/server.xml')
       .pipe(gulp.dest('./rest/gen/temp/apache-tomcat-8.0.18/conf'));
   var copy_product =  gulp.src('./rest/product.str')
-      .pipe(gulp.dest('./rest/gen/temp/product.str'));
+      .pipe(gulp.dest('./rest/gen/temp'));
   // unzip ant instance
   var unzip_ant = gulp.src('./rest/lib/apache-ant-1.8.2.zip', {base : '.'})
       .pipe(unzip())
