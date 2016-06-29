@@ -130,6 +130,13 @@ echo Failed removing '%SERVICE_NAME%' service
 goto end
 :removed
 echo The service '%SERVICE_NAME%' has been removed
+if not exist "%CATALINA_BASE%\webapps\AssetManagerWebService" goto end
+rmdir /s /q "%CATALINA_BASE%\webapps\AssetManagerWebService"
+if not errorlevel 1 (
+  echo AssetManagerWebService template folder has been removed
+) else (
+  echo Failed removing AssetManagerWebService template folder, please remove it manually, otherwise your war may not updated acoordinaly
+)
 goto end
 
 :doInstall
