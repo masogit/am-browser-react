@@ -22,7 +22,7 @@ export const getRoutes = (headerNavs) => {
   if (headerNavs) {
     const allRoutes = [
       {path: 'search', component: Search},
-      {path: 'search(/:keyword)', component: RecordSearch},
+      {path: 'search/:keyword', component: RecordSearch},
       {path: 'explorer', component: Explorer},
       {path: 'explorer/:id', component: Explorer},
       {path: 'insight', component: Insight},
