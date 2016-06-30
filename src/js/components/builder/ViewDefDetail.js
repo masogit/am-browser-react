@@ -4,6 +4,9 @@ import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Title, Spli
 import Close from 'grommet/components/icons/base/Close';
 import Up from 'grommet/components/icons/base/LinkUp';
 import Down from 'grommet/components/icons/base/LinkDown';
+import Ascend from 'grommet/components/icons/base/Ascend';
+import Descend from 'grommet/components/icons/base/Descend';
+import Sort from 'grommet/components/icons/base/Sort';
 import Play from 'grommet/components/icons/base/Play';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
 import Duplicate from 'grommet/components/icons/base/Duplicate';
@@ -59,6 +62,11 @@ export default class ViewDefDetail extends ComponentBase {
     } else {
       this.props.onValueChange(path.substring(2), event.target.value);
     }
+  }
+
+  _onTripleStateChange(event, value) {
+    let path = event.currentTarget.name;
+    this.props.onValueChange(path.substring(2), value);
   }
 
   openAlert(type) {
@@ -206,13 +214,33 @@ export default class ViewDefDetail extends ComponentBase {
                         }}/>
           </td>
           <td>
-            <CheckBox id={`v.${currentPath}body.orderby`} name={`v.${currentPath}body.orderby`}
-                      value={field.sqlname} checked={selfView.body.orderby==field.sqlname}
-                      disabled={(selfView.body.orderby&&selfView.body.orderby!=field.sqlname)}
-                      onChange={
+            {(!selfView.body.orderby || selfView.body.orderby.trim()=="" || !selfView.body.orderby.startsWith(field.sqlname)) &&
+            <a name={`v.${currentPath}body.orderby`}
+               onClick={
                         (event) => {
-                          this._onChange(event, field.sqlname);
-                        }}/>
+                          this._onTripleStateChange(event, field.sqlname);
+                        }}>
+              <Sort size="small"/>
+            </a>
+            }
+            {selfView.body.orderby && selfView.body.orderby==field.sqlname &&
+            <a name={`v.${currentPath}body.orderby`}
+               onClick={
+                        (event) => {
+                          this._onTripleStateChange(event, `${field.sqlname} desc`);
+                        }}>
+              <Ascend size="small"/>
+            </a>
+            }
+            {selfView.body.orderby && selfView.body.orderby==`${field.sqlname} desc` &&
+            <a name={`v.${currentPath}body.orderby`}
+               onClick={
+                        (event) => {
+                          this._onTripleStateChange(event, "");
+                        }}>
+              <Descend size="small"/>
+            </a>
+            }
           </td>
           <td>
             <a id={`${currentPath}body.fields.${index}.del`} name={`${currentPath}body.fields.${index}`}
