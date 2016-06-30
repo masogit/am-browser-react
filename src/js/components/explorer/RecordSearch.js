@@ -171,14 +171,14 @@ export default class RecordSearch extends Component {
     });
 
     return (
-      <Box full="horizontal" pad={{ horizontal: 'small' }}>
+      <Box pad={{ horizontal: 'small' }} flex={true}>
         <Header>
           <Title>Global Search</Title>
           <input type="search" inline={true} className="flex" placeholder="Global Record search..." ref="search"
             onKeyDown={this._onEnter.bind(this)} defaultValue={this.props.params.keyword} maxLength={50}/>
           <Button label="Search" onClick={()=>this._onSearch(this.refs.search.value)} />
         </Header>
-        <Split flex="right" fixed={false}>
+        <Split flex="right" fixed={false} className={this.state.warning?'flex':''}>
           <Box pad={{ horizontal: 'small' }} flex={true}>
             <Table>
               <thead>
