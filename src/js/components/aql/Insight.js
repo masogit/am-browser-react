@@ -479,7 +479,7 @@ export default class Insight extends Component {
       content = (
         <Tabs justify='center' className='flex'>{
           tabs.map((tab) => (
-            <ActionTab title={tab.name} key={tab.name} onClick={this._setFocusTab.bind(this, tab)} onEdit={true}
+            <ActionTab title={tab.name} key={tab.name} onClick={this._setFocusTab.bind(this, tab)} onEdit={edit}
                        onDoubleClick={this.state.edit ? this._onUpdateTitle.bind(this, tab) : null}>
               {carousel && !edit ? this._buildCarousel(tab) : this._buildBox(tab.box, tab.box, tab.name)}
             </ActionTab>
