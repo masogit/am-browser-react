@@ -16,5 +16,10 @@ module.exports = {
       value: 'guest',
       index: 2
     }
+  },
+  modules: {
+    view: '/coll/view',
+    insight: '/coll/wall',
+    graph: '/coll/aql'
   }
 };

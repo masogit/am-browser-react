@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import cookies from 'js-cookie';
 import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
 import * as Format from '../../util/RecordFormat';
@@ -45,7 +44,6 @@ export default class Insight extends Component {
 
   componentDidMount() {
     // get user name from localstorage
-    var user = cookies.get('user') && cookies.get('user').toLowerCase();
     if (user) {
       if (this.props.params.id) {
         AQLActions.loadAQL(this.props.params.id, (aql)=> {
@@ -53,7 +51,7 @@ export default class Insight extends Component {
         });
       } else {
         this._loadAQLs();
-        this._loadWall(user);
+        this._loadWall();
       }
     }
 
@@ -92,13 +90,9 @@ export default class Insight extends Component {
     });
   }
 
-  _loadWall(user) {
+  _loadWall() {
     this.setState({data: {}});
     AQLActions.loadWalls((walls) => {
-      var walls = walls.filter((wall)=> {
-        return wall.user == user;
-      });
-
       if (walls[0])
         this.setState({
           wall: walls[0],
@@ -107,7 +101,6 @@ export default class Insight extends Component {
       else
         this.setState({
           wall: {
-            user: user,
             box: this.state.box
           }
         });
@@ -378,7 +371,7 @@ export default class Insight extends Component {
     wall.box = this.state.box;
     AQLActions.saveWall(wall, (data) => {
       if (data)
-        this._loadWall(wall.user);
+        this._loadWall();
     });
   }
 

@@ -113,10 +113,6 @@ module.exports = function (app) {
     }
   });
 
-  // CRUD Tingodb
-  app.get('/coll/:collection', db.find);
-  app.get('/coll/:collection/:id', db.find);
-
   const sendSlack = (req, res, next) => {
     if (req.originalUrl.indexOf('view') > -1 && !req.body._id) {
       next();
@@ -125,16 +121,13 @@ module.exports = function (app) {
       next();
     }
   };
-  app.post('/coll/:collection', upload.single('docFile'), isAuthenticated, sendSlack, (req, res) => {
-    db.upsert(req, res);
-  });
 
-  app.post('/coll/:collection/:id', upload.single('docFile'), isAuthenticated, (req, res) => {
-    db.upsert(req, res);
-  });
-  app.delete('/coll/:collection/:id', isAuthenticated, (req, res) => {
-    db.delete(req, res);
-  });
+  // CRUD Tingodb
+  app.get('/coll/:collection', db.find);
+  app.get('/coll/:collection/:id', db.find);
+  app.post('/coll/:collection', upload.single('docFile'), isAuthenticated, sendSlack, db.upsert);
+  app.post('/coll/:collection/:id', upload.single('docFile'), isAuthenticated, db.upsert);
+  app.delete('/coll/:collection/:id', isAuthenticated, db.delete);
 
   // Download CSV in server side
   app.use('/am/download/:tableName', rest.csv);

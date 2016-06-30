@@ -3,6 +3,7 @@ var tingodbFolder;
 const fs = require('fs');
 var logger = require('./logger.js');
 var Validator = require('./validator.js');
+var modules = require('./constants').modules;
 
 // check db folder and files
 exports.init = function (dbFolder) {
@@ -41,8 +42,15 @@ exports.find = function (req, res) {
   var collectionName = req.params.collection;
   var id = req.params.id;
   var download = req.query.download;
+
+  // Insight get data by user
+  var filter = {};
+  if (req.originalUrl.indexOf(modules.insight) > -1) {
+    filter = {user: req.session.user}
+  }
+
   if (id)
-    db.collection(collectionName).findOne({_id: id}, function (err, document) {
+    db.collection(collectionName).findOne(Object.assign({_id: id}, filter), function (err, document) {
       if (err)
         logger.error("[tingo]", err);
       else if (download)
@@ -52,7 +60,7 @@ exports.find = function (req, res) {
       db.close();
     });
   else
-    db.collection(collectionName).find().toArray(function (err, documents) {
+    db.collection(collectionName).find(filter).toArray(function (err, documents) {
       if (err)
         logger.error("[tingo]", err);
       else if (download)
@@ -66,7 +74,13 @@ exports.find = function (req, res) {
 exports.findOne = function (collectionName, id, callback) {
   var db = new Engine.Db(tingodbFolder, {});
 
-  db.collection(collectionName).findOne({_id: id}, function (err, documents) {
+  // Insight get data by user
+  var filter = {};
+  if (req.originalUrl.indexOf(modules.insight) > -1) {
+    filter = {user: req.session.user}
+  }
+
+  db.collection(collectionName).findOne(Object.assign({_id: id}, filter), function (err, documents) {
     if (err)
       logger.error("[tingo]", err);
     if (typeof callback == 'function')
@@ -81,6 +95,11 @@ exports.upsert = function (req, res) {
   var collectionName = req.params.collection;
   var id = req.params.id;
   var obj = req.file ? JSON.parse(req.file.buffer) : req.body;
+
+  // Insight save by user
+  if (req.originalUrl.indexOf(modules.insight) > -1) {
+    obj = Object.assign(obj, {user: req.session.user});
+  }
 
   var validator = new Validator();
   var error = validator.document(collectionName, obj);
