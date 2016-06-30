@@ -106,7 +106,8 @@ module.exports = function (am) {
           "ref-link": `/db/amEmplDept`
         },
         parameters: {
-          filter: `UserLogin='${username.trim()}'`
+          fields: `bAdminRight`,
+          filter: `lEmplDeptId=CurrentUser.lEmplDeptId`
         },
         headers: {
           "Content-Type": "application/json",
