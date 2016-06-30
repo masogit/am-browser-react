@@ -7,7 +7,7 @@
 module.exports = function () {
 
   this.document = function (documentName, document) {
-    return eval('this.' + documentName)(document);
+    return this[documentName](document);
   };
 
   // register validate document
@@ -134,20 +134,20 @@ function form(form) {
 }
 
 function wall(wall) {
-  if (!wall.user)
-    return "user is required!";
-  if (!wall.box)
+  if (!wall.tabs)
     return "box is required!";
-  if (error = box(wall.box))
-    return error;
 
-  return null;
+  return box(wall.tabs);
 }
 
-function box(box) {
+function box(tabs) {
   // TODO validate box
-  if (!box.direction || !(box.direction == 'column' || box.direction == 'row'))
-    return "direction is required in a layout element, value: column or row";
+  tabs.forEach(function (tab) {
+    var box = tab.box;
+    if (!box.direction || !(box.direction == 'column' || box.direction == 'row'))
+      return "direction is required in a layout element, value: column or row";
+  });
+
   // if (box.child && box.child instanceof Array)
   //   box.child.forEach((obj)=> {
   //     if (error = this.box(obj))

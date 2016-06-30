@@ -178,3 +178,7 @@ function simpleAQLResult(Query) {
   }
   return data;
 }
+
+export function popWarningMessage(msg) {
+  store.default.dispatch({type: Types.RECEIVE_WARNING, msg});
+}

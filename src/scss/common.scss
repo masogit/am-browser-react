@@ -79,7 +79,7 @@ table {
   white-space: pre;
 }
 
-div[role=tablist] {
+.autoScroll div[role=tablist] {
   display: flex;
   flex-direction: column;
 
@@ -88,11 +88,19 @@ div[role=tablist] {
   }
 }
 
-div[role=tabpanel] {
+.autoScroll div[role=tabpanel] {
   display: flex;
   overflow-y: auto;
 
   & li {
     flex-shrink: 0;
   }
+}
+
+.flex .tabs__content {
+  flex-grow: 1;
+}
+
+.anchor.small .anchor__icon {
+  padding: 0 2px;
 }

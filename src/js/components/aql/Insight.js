@@ -13,11 +13,12 @@ import Checkmark from 'grommet/components/icons/base/Checkmark';
 import Search from 'grommet/components/icons/base/Search';
 import Previous from 'grommet/components/icons/base/Previous';
 import Graph from './../commons/Graph';
-import { Anchor, Box, CheckBox, Header, Menu, Title, Table, TableRow,  Layer, Carousel, RadioButton } from 'grommet';
+import ActionTab from './../commons/ActionTab';
+import { Anchor, Box, CheckBox, Header, Menu, Title, Table, TableRow,  Layer, Carousel, RadioButton, Tabs } from 'grommet';
 import GroupList from '../commons/GroupList';
 import GroupListItem from '../commons/GroupListItem';
 
-let idList = [];
+let tabIdMap = {};
 export default class Insight extends Component {
 
   constructor() {
@@ -27,10 +28,16 @@ export default class Insight extends Component {
       edit: false,
       carousel: false,
       aqls: [],
-      box: {
-        direction: 'row',
-        child: null
-      },
+      tabs: [
+        {
+          name: 'default',
+          box: {
+            direction: 'row',
+            child: null
+          }
+        }
+      ],
+
       data: {}
     };
     this._buildBox.bind(this);
@@ -60,13 +67,21 @@ export default class Insight extends Component {
   _findAqls(box) {
     if (box.child && box.child._id) {
       AQLActions.loadAQL(box.child._id, (aql)=> {
-        this._queryData(aql);
+        if (!this.state.data[aql._id]) {
+          this._queryData(aql);
+        }
       });
     } else if (box.child && box.child instanceof Array) {
       box.child.forEach((child)=> {
         this._findAqls(child);
       });
     }
+  }
+
+  findTabAqls(tabs) {
+    tabs.forEach(tab => {
+      this._findAqls(tab.box);
+    });
   }
 
   _loadAQLs() {
@@ -96,12 +111,12 @@ export default class Insight extends Component {
       if (walls[0])
         this.setState({
           wall: walls[0],
-          box: walls[0].box
-        }, this._findAqls(walls[0].box));
+          tabs: walls[0].tabs
+        }, this.findTabAqls(walls[0].tabs));
       else
         this.setState({
           wall: {
-            box: this.state.box
+            tabs: this.state.tabs
           }
         });
     });
@@ -214,7 +229,7 @@ export default class Insight extends Component {
     }, this._onClose(this));
   }
 
-  _buildBox(box, parent) {
+  _buildBox(box, parent, tabName) {
     let child;
     if (box.child) {
       if (box.child instanceof Array) {
@@ -222,13 +237,17 @@ export default class Insight extends Component {
           <Box justify="center" {...box} flex={false}>{
             box.child.map((child, i) => {
               child.key = i;
-              return this._buildBox(child, parent);
+              return this._buildBox(child, parent, tabName);
             })
           }</Box>
         );
       } else if (box.child._id && this.state.data[box.child._id]) {
         const dataMap = this.state.data[box.child._id];
-        idList.push(box.child._id);
+        if (!tabIdMap[tabName]) {
+          tabIdMap[tabName] = {dataIds: []};
+        }
+
+        tabIdMap[tabName].dataIds.push(box.child._id);
         child = (
           <Box justify="center" {...box} direction="column" pad="medium" flex={false}>
             <Header>
@@ -273,7 +292,7 @@ export default class Insight extends Component {
       );
   }
 
-  _buildCarousel(data) {
+  _buildCarousel(tab) {
     // disable animation, so Chart can be rendered correctly
     setTimeout(()=> {
       if (this.refs.carousel) {
@@ -281,11 +300,13 @@ export default class Insight extends Component {
       }
     }, 1000);
 
+    const dataIds = tabIdMap[tab.name].dataIds;
     return (
       <Carousel ref='carousel' className='disable_animation no-flex'>
         {
-          idList.slice(-Object.keys(data).length).map((key, index)=> {
-            const dataMap = data[key];
+          // dataIds contains a lot duplicated ids, and the last unique ids is the right order
+          dataIds.slice(-_.uniq(dataIds).length).map((key, index)=> {
+            const dataMap = this.state.data[key];
             return (
               <Box pad="large" colorIndex="light-2" key={index}>
                 <Header>
@@ -368,7 +389,7 @@ export default class Insight extends Component {
 
   _onSaveWall() {
     var wall = this.state.wall;
-    wall.box = this.state.box;
+    wall.tabs = this.state.tabs;
     AQLActions.saveWall(wall, (data) => {
       if (data)
         this._loadWall();
@@ -385,15 +406,64 @@ export default class Insight extends Component {
     return this.props.routes[1].childRoutes.filter((route) => route.path == 'insight').length > 0;
   }
 
+  addTab() {
+    let newName = 'Tab';
+    let index = this.state.tabs.length + 1;
+    this.state.tabs.forEach(tab => {
+      const name = `${newName}_${index}`;
+      if (tab == name) {
+        index++;
+      }
+    });
+
+    const name = `${newName}_${index}`;
+    this.setState({
+      tabs: [...this.state.tabs, {
+        name: name,
+        box: {
+          direction: 'row',
+          child: null
+        }
+      }]
+    });
+  }
+
+  _onUpdateTitle(tab, name) {
+    const sameNameTabs = this.state.tabs.filter(tab => tab.name == name);
+    if (sameNameTabs.length > 0) {
+      AQLActions.popWarningMessage('name already exists');
+      return false;
+    } else {
+      tab.name = name;
+      return true;
+    }
+  }
+
+  _onRemoveTab(targetTab) {
+    this.setState({
+      tabs: this.state.tabs.filter((tab) => tab.name != targetTab.name)
+    });
+  }
+
   render() {
-    const {box, data, carousel, edit, layer, alert} = this.state;
+    const {tabs, data, carousel, edit, layer, alert} = this.state;
     const id = this.props.params.id;
     let content;
     if (id) {
-      content = data && data[id] &&
-        this._renderSingleAQL(data[id]);
+      content = data && data[id] && this._renderSingleAQL(data[id]);
     } else {
-      content = carousel && !edit ? this._buildCarousel(data) : this._buildBox(box, box);
+      content = (
+        <Tabs justify='start' className='flex'>{
+          tabs.map((tab) => (
+            <ActionTab title={tab.name} key={tab.name}
+                       onEdit={this.state.edit ? this._onUpdateTitle.bind(this, tab) : null}
+                       onRemove={this.state.edit ? this._onRemoveTab.bind(this, tab) : null}>
+              {carousel && !edit ? this._buildCarousel(tab) : this._buildBox(tab.box, tab.box, tab.name)}
+            </ActionTab>
+          ))
+        }
+        </Tabs>
+      );
     }
 
     return (
@@ -410,7 +480,8 @@ export default class Insight extends Component {
               <RadioButton id="dashboard" name="choice" label="Dashboard" onChange={this._toggleCarousel.bind(this)}
                            checked={!carousel || edit}/>
               }
-              {edit && <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>}
+              {edit && <Anchor icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>}
+              {edit && <Anchor icon={<Add />} onClick={this.addTab.bind(this)} label="Add Tab"/>}
               <CheckBox id="edit" label="Edit" checked={edit} onChange={this._toggleEdit.bind(this)}
                         toggle={true}/>
             </Menu>
@@ -421,7 +492,7 @@ export default class Insight extends Component {
             }}/>
           }
         </Header>
-        <Box className={edit ? '' : 'autoScroll'}>
+        <Box className={edit || carousel ? '' : 'autoScroll'} flex={true}>
           {content}
           {layer}
           {alert}

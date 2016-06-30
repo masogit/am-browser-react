@@ -377,7 +377,7 @@ export default class MetaData extends ComponentBase {
       <Box flex={true} className='fixMinSizing'>
         <SearchInput value={this.state.searchText} placeHolder="Search fields and links..."
                      onDOMChange={this._onSearch}/>
-        <Box pad={{vertical: 'small'}} className='fixMinSizing'>
+        <Box pad={{vertical: 'small'}} className='fixMinSizing autoScroll'>
           {entitiesComponents}
           {entitiesComponents.length == 0 &&
             <Tabs justify="start" flex={true}>
