@@ -103,12 +103,10 @@ module.exports = function (app) {
     } else {
       req.session.expires = new Date(Date.now() + session_max_age * 60 * 1000);
       sessionUtil.touch(req.session, session_max_age);
-      // TODO Use 'X-Authorization' if jwt token is ready.
-      // // Renew jwt token.
-      // if ((new Date(req.session.jwt.expires) - req.session.expires) < 1 * 60 * 1000) {
-      //   rest.jwtRenew(req, res);
-      // }
-
+      // Renew jwt token.
+      if ((new Date(req.session.jwt.expires) - req.session.expires) < 1 * 60 * 1000) {
+        rest.jwtRenew(req, res);
+      }
       next(); // Call the next middleware
     }
   });
