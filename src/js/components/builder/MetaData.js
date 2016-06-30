@@ -174,7 +174,7 @@ export default class MetaData extends ComponentBase {
   }
 
   componentWillMount() {
-    this.getAllRows(() => {
+    this.getAllRows().then(() => {
       this.setState({
         schemaToLoad: this.props.schemaToLoad,
         elements: this.props.elements
@@ -182,22 +182,16 @@ export default class MetaData extends ComponentBase {
     });
   }
 
-  getAllRows(callback) {
-    if (!this.allRows) {
+  getAllRows() {
+    if (!this.getAllRowsPromise) {
       this.loading += 'getAllRows';
-      metadataLoad().then((rows) => {
+      this.getAllRowsPromise = metadataLoad().then((rows) => {
         this.loading = this.loading.replace('getAllRows', '');
         this.allRows = rows;
         this.props.updateData(undefined, rows);
-        if (callback) {
-          callback();
-        }
       });
-    } else {
-      if (callback) {
-        callback();
-      }
     }
+    return this.getAllRowsPromise;
   }
 
   _onSearch(event) {
@@ -237,8 +231,15 @@ export default class MetaData extends ComponentBase {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.linkNames.join('') != this.props.linkNames.join('')) {
-      this.generateSidebar(nextProps.linkNames);
+      const diff = nextProps.elements.filter((element, index) => element.sqlname != nextProps.linkNames[index]);
+      if (nextProps.elements.length == 0 || diff.length > 0) {
+        this.generateSidebar(nextProps.linkNames);
+      }
     }
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return !nextProps.rows.sqlname || nextProps.rows.sqlname != this.props.rows.sqlname || this.state.searchText != nextState.searchText;
   }
 
   linkSort(links) {
@@ -297,7 +298,7 @@ export default class MetaData extends ComponentBase {
     if (linkNames && linkNames.length > 0 && linkNames.join('_') != this.schemaName) {
       this.loading += 'generateSidebar';
       this.schemaName = linkNameList.join('&');
-      this.getAllRows(() => {
+      this.getAllRows().then(() => {
         const root = this.allRows.entities.filter(obj => linkNames[0] == obj.sqlname)[0];
         let bread, links = [];
 
