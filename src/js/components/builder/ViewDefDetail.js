@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import ComponentBase from '../commons/ComponentBase';
-import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Title, Split,tr } from 'grommet';
+import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Title, Split, SearchInput} from 'grommet';
 import Close from 'grommet/components/icons/base/Close';
 import Up from 'grommet/components/icons/base/LinkUp';
 import Down from 'grommet/components/icons/base/LinkDown';
@@ -30,6 +30,7 @@ export default class ViewDefDetail extends ComponentBase {
     this._onSubmit = this._onSubmit.bind(this);
     this._onDuplicate = this._onDuplicate.bind(this);
     this._onDelete = this._onDelete.bind(this);
+    this._setCategory = this._setCategory.bind(this);
     this.state = {
       mainFilter: false,
       alertForm: null
@@ -62,6 +63,10 @@ export default class ViewDefDetail extends ComponentBase {
     } else {
       this.props.onValueChange(path.substring(2), event.target.value);
     }
+  }
+
+  _setCategory(event) {
+    this.props.onValueChange(event.target.name.substring(2), event.suggestion);
   }
 
   _onTripleStateChange(event, value) {
@@ -181,12 +186,12 @@ export default class ViewDefDetail extends ComponentBase {
           <td>{field.sqlname}</td>
           <td>
             <input id={`v.${currentPath}body.fields.${index}.alias`}
-                    name={`v.${currentPath}body.fields.${index}.alias`}
-                    type="text"
-                    placeholder="Add alias here..."
-                    value={field.alias}
-                    onChange={this._onChange}
-                    style={{display: 'inline-block',margin: 0,padding: 0,outline: 0,borderWidth: 0,borderStyle: 'hidden'}}
+                   name={`v.${currentPath}body.fields.${index}.alias`}
+                   type="text"
+                   placeholder="Add alias here..."
+                   value={field.alias}
+                   onChange={this._onChange}
+                   style={{display: 'inline-block',margin: 0,padding: 0,outline: 0,borderWidth: 0,borderStyle: 'hidden'}}
             />
           </td>
           <td>
@@ -214,7 +219,7 @@ export default class ViewDefDetail extends ComponentBase {
                         }}/>
           </td>
           <td>
-            {(!selfView.body.orderby || selfView.body.orderby.trim()=="" || !selfView.body.orderby.startsWith(field.sqlname)) &&
+            {(!selfView.body.orderby || selfView.body.orderby.trim() == "" || !selfView.body.orderby.startsWith(field.sqlname)) &&
             <a name={`v.${currentPath}body.orderby`}
                onClick={
                         (event) => {
@@ -223,7 +228,7 @@ export default class ViewDefDetail extends ComponentBase {
               <Sort size="small"/>
             </a>
             }
-            {selfView.body.orderby && selfView.body.orderby==field.sqlname &&
+            {selfView.body.orderby && selfView.body.orderby == field.sqlname &&
             <a name={`v.${currentPath}body.orderby`}
                onClick={
                         (event) => {
@@ -232,7 +237,7 @@ export default class ViewDefDetail extends ComponentBase {
               <Ascend size="small"/>
             </a>
             }
-            {selfView.body.orderby && selfView.body.orderby==`${field.sqlname} desc` &&
+            {selfView.body.orderby && selfView.body.orderby == `${field.sqlname} desc` &&
             <a name={`v.${currentPath}body.orderby`}
                onClick={
                         (event) => {
@@ -363,12 +368,12 @@ export default class ViewDefDetail extends ComponentBase {
               </Menu>
             </Menu>
             {/* upload form
-            <form method="post" encType="multipart/form-data" action="http://localhost:8080/coll/view">
-              <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
-              <input type="file" name="docFile" accept=".json" />
-              <input type="submit" />
-            </form>
-            */}
+             <form method="post" encType="multipart/form-data" action="http://localhost:8080/coll/view">
+             <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
+             <input type="file" name="docFile" accept=".json" />
+             <input type="submit" />
+             </form>
+             */}
           </Header>
           <Box className='autoScroll' pad={{horizontal: 'medium'}}>
             <Split flex="left" fixed={false} className='fixMinSizing'>
@@ -386,8 +391,9 @@ export default class ViewDefDetail extends ComponentBase {
                               onChange={this._onChange}></textarea>
                   </FormField>
                   <FormField label="Category" htmlFor={p + "item3"}>
-                    <input id="v.category" name="v.category" type="text" onChange={this._onChange}
-                           value={selectedView.category}/>
+                    <SearchInput id="v.category" name="v.category" value={selectedView.category}
+                                 suggestions={this.props.categories} onDOMChange={this._onChange}
+                                 onSelect={this._setCategory}/>
                   </FormField>
                 </Form>
               </Box>
