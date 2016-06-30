@@ -1,9 +1,7 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 import Tab from '../../../../node_modules/grommet/components/Tab';
 import React, {PropTypes} from 'react';
-import Edit from 'grommet/components/icons/base/Edit';
-import Close from 'grommet/components/icons/base/Close';
-import { Box, Anchor } from 'grommet';
+import {Box} from 'grommet';
 
 export default class ActionTab extends Tab {
   constructor() {
@@ -36,7 +34,8 @@ export default class ActionTab extends Tab {
   _toggleEdit() {
     let canUpdate = true;
     if (this.state.editing && this.state.title && this.state.title != this.props.title) {
-      canUpdate = this.props.onEdit(this.state.title);
+      if (this.props.onDoubleClick)
+        canUpdate = this.props.onDoubleClick(this.state.title);
     }
 
     this.setState({
@@ -66,11 +65,7 @@ export default class ActionTab extends Tab {
             {this.state.editing ?
               <input autoFocus={true} ref='input' value={title} onBlur={this._toggleEdit.bind(this)}
                      onChange={this._onChange.bind(this)} onKeyDown={this._onChange.bind(this)}/> :
-              <label onClick={this._onClickTab}>{title}</label>}
-            <Box direction='row' style={{paddingLeft: '12px', display: 'inline-flex'}}>
-              {!this.state.editing && <Anchor icon={<Edit/>} className='small' onClick={this._toggleEdit.bind(this)}/>}
-              {!this.state.editing && <Anchor icon={<Close/>} className='small' onClick={this.props.onRemove}/>}
-            </Box>
+              <label onClick={this._onClickTab} onDoubleClick={this._toggleEdit.bind(this)}>{title}</label>}
           </Box>
         </Box>
       );
