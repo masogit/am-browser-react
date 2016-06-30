@@ -127,11 +127,14 @@ module.exports = function (am) {
             res.end();
           } else {
             // get detail rights
+            var aqlUrl = "http://${server}${context}/aql/${tables}/${fields} WHERE ${clause}";
             args = {
               path: {
                 server: am.server,
                 context: config.base,
-                "ref-link": `/aql/amMasterProfile%20MP,%20amRelEmplMProf%20REM,%20amEmplDept%20ED/MP.SQLName%20WHERE%20MP.lMProfileId%20=%20REM.lMProfileId%20AND%20REM.lEmplDeptId%20=%20ED.lEmplDeptId%20AND%20ED.Name%20=%20'${username.trim()}'`
+                tables: "amMasterProfile MP,amRelEmplMProf REM,amEmplDept ED",
+                fields: "MP.SQLName",
+                clause: `MP.lMProfileId=REM.lMProfileId AND REM.lEmplDeptId=ED.lEmplDeptId AND ED.Name='${username.trim()}'`
               },
               headers: {
                 Accept: "application/json",
@@ -139,7 +142,7 @@ module.exports = function (am) {
               }
             };
 
-            client.get(url, args, (data, response) => {
+            client.get(aqlUrl, args, (data, response) => {
               if (data.Query.Result == true) {
                 user_rights = rights.admin;
               } else {
