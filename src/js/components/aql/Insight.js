@@ -439,6 +439,16 @@ export default class Insight extends Component {
     }
   }
 
+  _onRemove(targetTab) {
+    var alert = (<AlertForm onClose={this._closeAlert.bind(this)}
+                            title={'Confirm to remove'}
+                            desc={`Remove this tab: ${targetTab.name}?`}
+                            onConfirm={this._onRemoveTab.bind(this, targetTab)}/>);
+    this.setState({
+      alert: alert
+    });
+  }
+
   _onRemoveTab(targetTab) {
     this.setState({
       tabs: this.state.tabs.filter((tab) => tab.name != targetTab.name)
@@ -453,11 +463,11 @@ export default class Insight extends Component {
       content = data && data[id] && this._renderSingleAQL(data[id]);
     } else {
       content = (
-        <Tabs justify='start' className='flex'>{
+        <Tabs justify='center' className='flex'>{
           tabs.map((tab) => (
             <ActionTab title={tab.name} key={tab.name}
                        onEdit={this.state.edit ? this._onUpdateTitle.bind(this, tab) : null}
-                       onRemove={this.state.edit ? this._onRemoveTab.bind(this, tab) : null}>
+                       onRemove={this.state.edit ? this._onRemove.bind(this, tab) : null}>
               {carousel && !edit ? this._buildCarousel(tab) : this._buildBox(tab.box, tab.box, tab.name)}
             </ActionTab>
           ))
@@ -477,7 +487,7 @@ export default class Insight extends Component {
               <RadioButton id="carousel" name="choice" label="Carousel" onChange={this._toggleCarousel.bind(this)}
                            checked={carousel} disabled={edit}/>}
               {!edit &&
-              <RadioButton id="dashboard" name="choice" label="Dashboard" onChange={this._toggleCarousel.bind(this)}
+              <RadioButton id="dashboard" name="choice" label="Desk" onChange={this._toggleCarousel.bind(this)}
                            checked={!carousel || edit}/>
               }
               {edit && <Anchor icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>}
