@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import _ from 'lodash';
 import ChartForm from './ChartForm';
 import MeterForm from './MeterForm';
 import DistributionForm from './DistributionForm';
@@ -19,17 +20,7 @@ import Mail from 'grommet/components/icons/base/Mail';
 import Trash from 'grommet/components/icons/base/Trash';
 
 import {
-  Anchor,
-  Box,
-  Split,
-  Form,
-  FormField, FormFields,
-  Layer,
-  Tabs,
-  Table,
-  TableRow,
-  Title, Header,
-  Menu
+  Anchor, Box, Split, SearchInput, Form, FormField, FormFields, Layer, Tabs, Table, TableRow, Title, Header, Menu
 } from 'grommet';
 import Play from 'grommet/components/icons/base/Play';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
@@ -44,6 +35,7 @@ export default class AQL extends Component {
     this.state = {
       reports: {},
       aqls: [],
+      categories: [],
       aql: {
         name: '',
         category: ''
@@ -100,8 +92,12 @@ export default class AQL extends Component {
 
   _loadAQLs() {
     AQLActions.loadAQLs((data) => {
+      let categories = _.uniq(data.map((aql) => {
+        return aql.category;
+      }));
       this.setState({
-        aqls: data
+        aqls: data,
+        categories: categories
       });
     });
   }
@@ -224,7 +220,7 @@ export default class AQL extends Component {
                              desc={'View name: ' + this.state.aql.view.name}
                              onConfirm={()=>{
                                this.state.aql.view=null;
-                             }} />
+                             }}/>
     });
   }
 
@@ -314,6 +310,14 @@ export default class AQL extends Component {
     if (val instanceof Object)
       val = val[Object.keys(val)[0]];
     return val;
+  }
+
+  _setCategory(event) {
+    var aql = this.state.aql;
+    aql.category = event.suggestion;
+    this.setState({
+      aql: aql
+    });
   }
 
   _onClose() {
@@ -440,8 +444,9 @@ export default class AQL extends Component {
                            onChange={this._setFormValues.bind(this)}/>
                   </FormField>
                   <FormField label="Category" htmlFor="AQL_Category">
-                    <input id="AQL_Category" type="text" name="category" value={this.state.aql.category}
-                           onChange={this._setFormValues.bind(this)}/>
+                    <SearchInput id="AQL_Category" type="text" name="category" value={this.state.aql.category}
+                                 onDOMChange={this._setFormValues.bind(this)} suggestions={this.state.categories}
+                                 onSelect={this._setCategory.bind(this)} />
                   </FormField>
                   {
                     this.state.aql.view &&
@@ -472,15 +477,18 @@ export default class AQL extends Component {
                 <Box pad={{horizontal: 'small'}}>
                   <Tabs initialIndex={getIndex(this.state.aql.type)} justify='end'>
                     <ActionTab title="Chart" onClick={this._genGraph.bind(this, null, 'chart')} ref='chart'>
-                      <ChartForm {...this.state.aql} {...this.state.graphData} genGraph={this._genGraph.bind(this)} data={this.state.data}/>
+                      <ChartForm {...this.state.aql} {...this.state.graphData} genGraph={this._genGraph.bind(this)}
+                                                                               data={this.state.data}/>
                     </ActionTab>
                     <ActionTab title="Meter" onClick={this._genGraph.bind(this, null, 'meter')} ref='meter'>
-                      <MeterForm {...this.state.aql} {...this.state.graphData} genGraph={this._genGraph.bind(this)} data={this.state.data}/>
+                      <MeterForm {...this.state.aql} {...this.state.graphData} genGraph={this._genGraph.bind(this)}
+                                                                               data={this.state.data}/>
                     </ActionTab>
                     <ActionTab title="Distribution" onClick={this._genGraph.bind(this, null, 'distribution')}
                                ref='distribution'>
-                      <DistributionForm {...this.state.aql} {...this.state.graphData} genGraph={this._genGraph.bind(this)}
-                                                            data={this.state.data}/>
+                      <DistributionForm {...this.state.aql} {...this.state.graphData}
+                        genGraph={this._genGraph.bind(this)}
+                        data={this.state.data}/>
                     </ActionTab>
                     {
                       /*<Tab title="Value"/>
