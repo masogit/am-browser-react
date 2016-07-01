@@ -12,9 +12,11 @@ import Attachment from 'grommet/components/icons/base/Attachment';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
 import Search from 'grommet/components/icons/base/Search';
 import Previous from 'grommet/components/icons/base/Previous';
+import Shift from 'grommet/components/icons/base/Shift';
+import More from 'grommet/components/icons/base/More';
 import Graph from './../commons/Graph';
 import ActionTab from './../commons/ActionTab';
-import { Anchor, Box, CheckBox, Header, Menu, Title, Table, TableRow,  Layer, Carousel, RadioButton, Tabs } from 'grommet';
+import {Anchor, Box, CheckBox, Header, Menu, Title, Table, TableRow, Layer, Carousel, RadioButton, Tabs} from 'grommet';
 import GroupList from '../commons/GroupList';
 import GroupListItem from '../commons/GroupListItem';
 
@@ -24,6 +26,7 @@ export default class Insight extends Component {
   constructor() {
     super();
     this.state = {
+      focusTab: null,
       wall: {},
       edit: false,
       carousel: false,
@@ -64,6 +67,12 @@ export default class Insight extends Component {
 
   }
 
+  _setFocusTab(tab) {
+    this.setState({
+      focusTab: tab
+    });
+  }
+
   _findAqls(box) {
     if (box.child && box.child._id) {
       AQLActions.loadAQL(box.child._id, (aql)=> {
@@ -78,7 +87,7 @@ export default class Insight extends Component {
     }
   }
 
-  findTabAqls(tabs) {
+  _findTabAqls(tabs) {
     tabs.forEach(tab => {
       this._findAqls(tab.box);
     });
@@ -111,8 +120,9 @@ export default class Insight extends Component {
       if (walls[0])
         this.setState({
           wall: walls[0],
-          tabs: walls[0].tabs
-        }, this.findTabAqls(walls[0].tabs));
+          tabs: walls[0].tabs,
+          focusTab: walls[0].tabs[0]
+        }, this._findTabAqls(walls[0].tabs));
       else
         this.setState({
           wall: {
@@ -280,15 +290,18 @@ export default class Insight extends Component {
     var id = (Math.random() + 1).toString(36).substring(7);
     if (this.state.edit)
       return (
-        <Box direction="row" justify="center" pad="small" flex={false}>
-          <CheckBox id={id} label={box.direction==='row'?'Column':'Row'} checked={box.direction!=='column'}
-                    onChange={this._toggleDirection.bind(this, box, parent)} toggle={true}/>
-          <Anchor href="#" icon={<Add />} label="Split" onClick={this._addBox.bind(this, box, parent)}/>
-          {
-            box.child &&
-            <Anchor href="#" icon={<Close />} label="Delete" onClick={this._deleteBox.bind(this, box, parent)}/>
-          }
-        </Box>
+        <Header justify="center">
+          <Menu icon={<More />} closeOnClick={false}>
+            <CheckBox id={id} label={box.direction==='row'?'Column':'Row'} checked={box.direction!=='column'}
+                      onChange={this._toggleDirection.bind(this, box, parent)} toggle={true}/>
+            <Anchor href="#" icon={<Shift />} label={`Split to ${box.direction==='row'?'Column':'Row'}`}
+                    onClick={this._addBox.bind(this, box, parent)}/>
+            {
+              box.child &&
+              <Anchor href="#" icon={<Close />} label="Delete last element" onClick={this._deleteBox.bind(this, box, parent)}/>
+            }
+          </Menu>
+        </Header>
       );
   }
 
@@ -310,7 +323,8 @@ export default class Insight extends Component {
             return (
               <Box pad="large" colorIndex="light-2" key={index}>
                 <Header>
-                  <Anchor icon={<Search />} label={dataMap.aql.name} onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
+                  <Anchor icon={<Search />} label={dataMap.aql.name}
+                          onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
                 </Header>
                 <Box pad="large" align={(dataMap.aql.type=='meter')?'center':null}>
                   <Graph key={dataMap.aql._id} type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
@@ -402,11 +416,11 @@ export default class Insight extends Component {
     });
   }
 
-  showBack() {
+  _showBack() {
     return this.props.routes[1].childRoutes.filter((route) => route.path == 'insight').length > 0;
   }
 
-  addTab() {
+  _addTab() {
     let newName = 'Tab';
     let index = this.state.tabs.length + 1;
     this.state.tabs.forEach(tab => {
@@ -439,6 +453,16 @@ export default class Insight extends Component {
     }
   }
 
+  _onRemove(targetTab) {
+    var alert = (<AlertForm onClose={this._closeAlert.bind(this)}
+                            title={'Confirm to remove'}
+                            desc={`Remove this tab: ${targetTab.name}?`}
+                            onConfirm={this._onRemoveTab.bind(this, targetTab)}/>);
+    this.setState({
+      alert: alert
+    });
+  }
+
   _onRemoveTab(targetTab) {
     this.setState({
       tabs: this.state.tabs.filter((tab) => tab.name != targetTab.name)
@@ -453,11 +477,10 @@ export default class Insight extends Component {
       content = data && data[id] && this._renderSingleAQL(data[id]);
     } else {
       content = (
-        <Tabs justify='start' className='flex'>{
+        <Tabs justify='center' className='flex'>{
           tabs.map((tab) => (
-            <ActionTab title={tab.name} key={tab.name}
-                       onEdit={this.state.edit ? this._onUpdateTitle.bind(this, tab) : null}
-                       onRemove={this.state.edit ? this._onRemoveTab.bind(this, tab) : null}>
+            <ActionTab title={tab.name} key={tab.name} onClick={this._setFocusTab.bind(this, tab)} onEdit={edit}
+                       onDoubleClick={this.state.edit ? this._onUpdateTitle.bind(this, tab) : null}>
               {carousel && !edit ? this._buildCarousel(tab) : this._buildBox(tab.box, tab.box, tab.name)}
             </ActionTab>
           ))
@@ -477,17 +500,19 @@ export default class Insight extends Component {
               <RadioButton id="carousel" name="choice" label="Carousel" onChange={this._toggleCarousel.bind(this)}
                            checked={carousel} disabled={edit}/>}
               {!edit &&
-              <RadioButton id="dashboard" name="choice" label="Dashboard" onChange={this._toggleCarousel.bind(this)}
+              <RadioButton id="dashboard" name="choice" label="Desk" onChange={this._toggleCarousel.bind(this)}
                            checked={!carousel || edit}/>
               }
               {edit && <Anchor icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>}
-              {edit && <Anchor icon={<Add />} onClick={this.addTab.bind(this)} label="Add Tab"/>}
+              {edit && <Anchor icon={<Add />} onClick={this._addTab.bind(this)} label="Add Tab"/>}
+              {edit &&
+              <Anchor icon={<Close />} onClick={this._onRemove.bind(this, this.state.focusTab)} label="Delete Tab"/>}
               <CheckBox id="edit" label="Edit" checked={edit} onChange={this._toggleEdit.bind(this)}
                         toggle={true}/>
             </Menu>
           }
           {
-            id && this.showBack() && <Anchor icon={<Previous />} label="Back" onClick={() => {
+            id && this._showBack() && <Anchor icon={<Previous />} label="Back" onClick={() => {
               history.go(-1);
             }}/>
           }

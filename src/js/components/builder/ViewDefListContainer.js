@@ -1,5 +1,5 @@
 import React, {Component /*, PropTypes*/} from 'react';
-//import PureRenderMixin from 'react-addons-pure-render-mixin';
+import _ from 'lodash';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import ViewDefDetail from './ViewDefDetail';
@@ -121,6 +121,9 @@ class ViewDefListContainer extends Component {
 
   render() {
     const {views, isFetchingViewList, selectedView, preview} = this.props;
+    let categories = _.uniq(views.map((view) => {
+      return view.category;
+    }));
     let {dispatch} = store;
     let boundActionCreators = bindActionCreators(ViewDefActions, dispatch);
     let boundActionCreators2 = bindActionCreators(MetadataActions, dispatch);
@@ -129,10 +132,13 @@ class ViewDefListContainer extends Component {
         <ViewDefList views={views} isFetchingViewList={isFetchingViewList} ref='viewDefList'
                      selectedView={selectedView} {...boundActionCreators} {...boundActionCreators2}/>
 
-        <ViewDefDetail selectedView={selectedView} onValueChange={this._onValueChange}
-                       onSubmit={this._onSubmit} onSaveSuccess={this._onSaveSuccess}
-                       onMoveRowUp={this._onMoveRowUp} onMoveRowDown={this._onMoveRowDown}
-                       onDeleteTableRow={this._onDeleteTableRow} compact={true}
+        <ViewDefDetail selectedView={selectedView} categories={categories} compact={true}
+                       onValueChange={this._onValueChange}
+                       onSubmit={this._onSubmit}
+                       onSaveSuccess={this._onSaveSuccess}
+                       onMoveRowUp={this._onMoveRowUp}
+                       onMoveRowDown={this._onMoveRowDown}
+                       onDeleteTableRow={this._onDeleteTableRow}
                        onDuplicateViewDef={this._onDuplicateViewDef}
                        onDeleteViewDef={this._onDeleteViewDef}
                        onClickTableTitle={this._onClickTableTitle}
