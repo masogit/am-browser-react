@@ -25,11 +25,8 @@ module.exports = function (app) {
   var httpProxy = require('http-proxy');
   var apiProxy = httpProxy.createProxyServer();
 
-  apiProxy.on('proxyReq', function (proxyReq, req, res, options) {
-    proxyReq.setHeader('X-Authorization', req.session.jwt.secret);
-  });
-
   apiProxy.on('proxyReq', function (proxyReq, req, res) {
+    proxyReq.setHeader('X-Authorization', req.session.jwt.secret);
     logger.debug(`[proxy] [${req.sessionID}] [request] ${req.method} ${req.originalUrl}`);
   });
 

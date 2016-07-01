@@ -9,6 +9,7 @@ import Explorer from './components/explorer/Explorer';
 import ViewDefListContainer from './components/builder/ViewDefListContainer';
 import AQL from './components/aql/AQL';
 import TBD from 'grommet/components/TBD';
+import UnAuthorized from './components/error/UnAuthorized';
 import UCMDBAdapterContainer from './components/ucmdbAdapter/UCMDBAdapterPoint';
 var rootPath = "/"; //"/ferret/";
 
@@ -38,6 +39,11 @@ export const getRoutes = (headerNavs) => {
     allRoutes.map(route => {
       if (headerNavs[route.path]) {
         routes.push(route);
+      } else {
+        routes.push({
+          path: route.path,
+          component: UnAuthorized
+        });
       }
     });
     indexRoute.component = routes[1].component;

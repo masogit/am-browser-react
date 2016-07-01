@@ -5,6 +5,7 @@ import * as AQLActions from '../../actions/aql';
 import * as UCMDBAdapterActions from '../../actions/ucmdbAdapter';
 import {Title, Box, Tiles, Headline, Meter, Tile} from 'grommet';
 import Graph from '../commons/Graph';
+import UCMDBAdapterContainer from '../ucmdbAdapter/UCMDBAdapterPoint';
 
 export default class Search extends Component {
 
@@ -95,7 +96,7 @@ export default class Search extends Component {
 
   _isUCMDBAdpaterSupported() {
     if (this.state.ucmdbAdapter.supported === undefined) {
-      const route = this.props.routes[1].childRoutes.filter((item)=> item.path.indexOf('ucmdbAdapter') > -1);
+      const route = this.props.routes[1].childRoutes.filter((item)=> item.path.indexOf('ucmdbAdapter') > -1 && item.component == UCMDBAdapterContainer);
       this.state.ucmdbAdapter.supported = route.length > 0;
     }
     return this.state.ucmdbAdapter.supported;

@@ -52,25 +52,10 @@ var indexHtml = function (req, res) {
   res.sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));
 };
 
-app.get('/login', indexHtml);
-app.get('/search', indexHtml);
-app.get('/search/*', indexHtml);
-app.get('/insight', indexHtml);
-app.get('/insight/*', indexHtml);
-app.get('/explorer', indexHtml);
-app.get('/explorer/*', indexHtml);
-app.get('/aql', indexHtml);
-app.get('/aql/*', indexHtml);
-app.get('/views', indexHtml);
-app.get('/views/*', indexHtml);
-app.get('/ucmdbAdapter', indexHtml);
-app.get('/ucmdbAdapter/*', indexHtml);
-app.get('/ucmdbAdapter/*/*', indexHtml);
-
 // redirect morgan log to winston
 morgan.token('sessionId', function getSessionId (req) {
   return req.session ? req.session.id : '';
-})
+});
 var morganFormat = "[express] [:sessionId] [:remote-addr] [:remote-user] :method :url HTTP/:http-version :status :res[content-length] - :response-time ms";
 var stream = {
   write: function (message, encoding) {
@@ -82,7 +67,9 @@ app.use(morgan(morganFormat, {stream: stream}));
 // routes ======================================================================
 require('./routes.js')(app);
 
-app.use(function(err, req, res, next){
+app.get('/*', indexHtml);
+
+app.use(function (err, req, res, next) {
   logger.error(`[csrf] [${req.sessionID}] [${req.session && req.session.csrfSecret}] [${err.name}: ${err.message}] ${req.method} ${req.url}`);
   if (enable_csrf && (err.code === 'EBADCSRFTOKEN') ) {
     res.cookie('csrf-token', req.csrfToken());
@@ -121,8 +108,7 @@ try {
       logger.error(e.code + ': Port ' + https_port + ' already in use, please change it in am-browser-config.properties');
     }
   });
-}
-catch (e) {
+} catch (e) {
   logger.warn("[server]", "HTTPS is not set correctly");
 }
 

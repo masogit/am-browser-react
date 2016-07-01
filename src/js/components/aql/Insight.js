@@ -416,8 +416,8 @@ export default class Insight extends Component {
     });
   }
 
-  _showBack() {
-    return this.props.routes[1].childRoutes.filter((route) => route.path == 'insight').length > 0;
+  showBack() {
+    return this.props.routes[1].childRoutes.filter((route) => route.path == 'insight' && route.component == Insight).length > 0;
   }
 
   _addTab() {
@@ -512,7 +512,7 @@ export default class Insight extends Component {
             </Menu>
           }
           {
-            id && this._showBack() && <Anchor icon={<Previous />} label="Back" onClick={() => {
+            id && this.showBack() && <Anchor icon={<Previous />} label="Back" onClick={() => {
               history.go(-1);
             }}/>
           }
