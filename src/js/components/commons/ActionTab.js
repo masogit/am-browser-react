@@ -12,6 +12,12 @@ export default class ActionTab extends Tab {
     };
   }
 
+  componentDidMount() {
+    this.setState({
+      title: this.props.title
+    });
+  }
+
   componentWillReceiveProps(nextProps) {
     if (this.props.disabled) {
       //TODO: set disabled style
@@ -33,7 +39,7 @@ export default class ActionTab extends Tab {
 
   _toggleEdit() {
     let canUpdate = true;
-    if (this.state.editing && this.state.title && this.state.title != this.props.title) {
+    if (this.state.editing && this.state.title != this.props.title) {
       if (this.props.onDoubleClick)
         canUpdate = this.props.onDoubleClick(this.state.title);
     }
@@ -58,14 +64,13 @@ export default class ActionTab extends Tab {
 
   render() {
     if (this.props.onEdit) {
-      const title = this.state.title || this.props.title;
       return (
         <Box className={this.props.active ? 'tab--active' : ''} pad={{horizontal: 'small'}}>
           <Box direction='row' className='tab__label' style={{display: 'flex'}}>
             {this.state.editing ?
-              <input autoFocus={true} ref='input' value={title} onBlur={this._toggleEdit.bind(this)}
+              <input autoFocus={true} ref='input' value={this.state.title} onBlur={this._toggleEdit.bind(this)}
                      onChange={this._onChange.bind(this)} onKeyDown={this._onChange.bind(this)}/> :
-              <label onClick={this._onClickTab} onDoubleClick={this._toggleEdit.bind(this)}>{title}</label>}
+              <label onClick={this._onClickTab} onDoubleClick={this._toggleEdit.bind(this)}>{this.state.title}</label>}
           </Box>
         </Box>
       );

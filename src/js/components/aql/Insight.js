@@ -443,13 +443,17 @@ export default class Insight extends Component {
   }
 
   _onUpdateTitle(tab, name) {
-    const sameNameTabs = this.state.tabs.filter(tab => tab.name == name);
-    if (sameNameTabs.length > 0) {
-      AQLActions.popWarningMessage('name already exists');
-      return false;
+    if (name) {
+      const sameNameTabs = this.state.tabs.filter(tab => tab.name == name);
+      if (sameNameTabs.length > 0) {
+        AQLActions.popWarningMessage('Tab name already exists');
+        return false;
+      } else {
+        tab.name = name;
+        return true;
+      }
     } else {
-      tab.name = name;
-      return true;
+      AQLActions.popWarningMessage('Tab name can not be empty');
     }
   }
 
