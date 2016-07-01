@@ -9,6 +9,7 @@ var multer  = require('multer');
 var storage = multer.memoryStorage();
 var upload = multer({storage: storage});
 var isAuthenticated = require('./authentication').isAuthenticated;
+var path = require('path');
 
 module.exports = function (app) {
   var rest_protocol = process.env.AMB_REST_PROTOCOL || config.rest_protocol;
@@ -96,7 +97,7 @@ module.exports = function (app) {
         res.cookie('csrf-token', req.csrfToken());
       }
       res.clearCookie('headerNavs');
-      res.sendStatus(401);
+      res.status(401).sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));
     } else {
       req.session.expires = new Date(Date.now() + session_max_age * 60 * 1000);
       sessionUtil.touch(req.session, session_max_age);
