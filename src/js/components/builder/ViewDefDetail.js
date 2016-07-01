@@ -194,7 +194,7 @@ export default class ViewDefDetail extends ComponentBase {
             />
           </td>
           <td>
-            <CheckBox id={`v.${currentPath}body.fields.${index}.searchable`}
+            <CheckBox id={`v.${currentPath}body.fields.${index}.searchable`} value={field.sqlname}
                       name={`v.${currentPath}body.fields.${index}.searchable`} checked={field.searchable}
                       disabled={(selfView.body.fields.filter(field => field.searchable == true).length >= 2) && !field.searchable}
                       onChange={this._onChange}/>
@@ -202,7 +202,7 @@ export default class ViewDefDetail extends ComponentBase {
           <td>
             <CheckBox id={`v.${currentPath}body.groupby`} name={`v.${currentPath}body.groupby`}
                       value={field.sqlname} checked={selfView.body.groupby==field.sqlname}
-                      disabled={(selfView.body.groupby&&selfView.body.groupby!=field.sqlname)}
+                      disabled={(!!selfView.body.groupby&&selfView.body.groupby!=field.sqlname)}
                       onChange={
                         (event) => {
                           this._onChange(event, field.sqlname);
@@ -211,7 +211,7 @@ export default class ViewDefDetail extends ComponentBase {
           <td>
             <CheckBox id={`v.${currentPath}body.sum`} name={`v.${currentPath}body.sum`}
                       value={field.sqlname} checked={selfView.body.sum==field.sqlname}
-                      disabled={(selfView.body.sum&&selfView.body.sum!=field.sqlname)}
+                      disabled={(!!selfView.body.sum&&selfView.body.sum!=field.sqlname)}
                       onChange={
                         (event) => {
                           this._onChange(event, field.sqlname);
@@ -220,8 +220,9 @@ export default class ViewDefDetail extends ComponentBase {
           <td>
             {(!selfView.body.orderby || selfView.body.orderby.trim() == "" || !selfView.body.orderby.startsWith(field.sqlname)) &&
             <CheckBox id={`v.${currentPath}body.orderby`} name={`v.${currentPath}body.orderby`}
-                      value={field.sqlname} checked={selfView.body.orderby && selfView.body.orderby.startsWith(field.sqlname)}
-                      disabled={selfView.body.orderby && !selfView.body.orderby.startsWith(field.sqlname)}
+                      value={field.sqlname}
+                      checked={!!selfView.body.orderby && selfView.body.orderby.startsWith(field.sqlname)}
+                      disabled={!!selfView.body.orderby && !selfView.body.orderby.startsWith(field.sqlname)}
                       onChange={
                         (event) => {
                           this._onTripleStateChange(event, field.sqlname);
