@@ -97,7 +97,11 @@ module.exports = function (app) {
         res.cookie('csrf-token', req.csrfToken());
       }
       res.clearCookie('headerNavs');
-      res.status(401).sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));
+      if (req.headers['x-api-version']) {
+        res.sendStatus(401); // if the request is from rest, won't send file
+      } else {
+        res.status(401).sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));
+      }
     } else {
       req.session.expires = new Date(Date.now() + session_max_age * 60 * 1000);
       sessionUtil.touch(req.session, session_max_age);
