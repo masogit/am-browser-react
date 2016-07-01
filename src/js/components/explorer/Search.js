@@ -6,6 +6,7 @@ import * as UCMDBAdapterActions from '../../actions/ucmdbAdapter';
 import {Title, Box, Tiles, Headline, Meter, Tile} from 'grommet';
 import Graph from '../commons/Graph';
 import UCMDBAdapterContainer from '../ucmdbAdapter/UCMDBAdapterPoint';
+import AQL from '../aql/AQL';
 
 export default class Search extends Component {
 
@@ -31,15 +32,17 @@ export default class Search extends Component {
         });
       }
     });
-    AQLActions.loadAQLs((aqls)=> {
-      if (!this._isUnmount) {
-        this.setState({
-          aqlSeries: this._filter(this._getSeries(aqls, 'category'), 7)
-        });
-      }
-    });
+    if (this.isAQLSupported()) {
+      AQLActions.loadAQLs((aqls)=> {
+        if (!this._isUnmount) {
+          this.setState({
+            aqlSeries: this._filter(this._getSeries(aqls, 'category'), 7)
+          });
+        }
+      });
+    }
 
-    if (this._isUCMDBAdpaterSupported()) {
+    if (this.isUCMDBAdpaterSupported()) {
       UCMDBAdapterActions.getIntegrationPoint((points) => {
         if (points.length > 0) {
           let count = 1;
@@ -94,7 +97,14 @@ export default class Search extends Component {
     this._isUnmount = true;
   }
 
-  _isUCMDBAdpaterSupported() {
+  isAQLSupported() {
+    if (this.aql_supported === undefined) {
+      this.aql_supported = this.props.routes[1].childRoutes.filter((item)=> item.path.indexOf('aql') > -1 && item.component == AQL).length > 0;
+    }
+    return this.aql_supported;
+  }
+
+  isUCMDBAdpaterSupported() {
     if (this.state.ucmdbAdapter.supported === undefined) {
       const route = this.props.routes[1].childRoutes.filter((item)=> item.path.indexOf('ucmdbAdapter') > -1 && item.component == UCMDBAdapterContainer);
       this.state.ucmdbAdapter.supported = route.length > 0;
@@ -217,14 +227,18 @@ export default class Search extends Component {
       title: 'Browser Views',
       onClick: this._goExplorer,
       graph: this.state.viewSeries && <Meter legend={{"total": true}} series={this.state.viewSeries} vertical={true}/>
-    }, {
-      title: 'AQL Graphs',
-      onClick: this._goAQL,
-      graph: this.state.aqlSeries &&
-      <Meter legend={{"placement": "inline"}} series={this.state.aqlSeries} a11yTitle="meter-title-12"/>
     }];
 
-    if (this._isUCMDBAdpaterSupported()) {
+    if (this.isAQLSupported()) {
+      tiles.push({
+        title: 'AQL Graphs',
+        onClick: this._goAQL,
+        graph: this.state.aqlSeries &&
+        <Meter legend={{"placement": "inline"}} series={this.state.aqlSeries} a11yTitle="meter-title-12"/>
+      });
+    }
+
+    if (this.isUCMDBAdpaterSupported()) {
       tiles.push({
         title: 'UCMDB Adapter Jobs Status',
         onClick: this._goUCMDB,
