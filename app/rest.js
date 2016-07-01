@@ -74,7 +74,7 @@ module.exports = function (am) {
   };
 
   this.login = function (req, res) {
-    var url = "http://${server}${context}${ref-link}", request;
+    var url = "http://${server}${context}${ref-link}";
 
     const user = new Buffer(req.headers.authorization.split(' ')[1], 'base64').toString();
     const username = user.split(':')[0];
@@ -97,7 +97,7 @@ module.exports = function (am) {
         expires: new Date(Date.now() + am.jwt_max_age * 60 * 1000)
       };
 
-      var user_rights = config.rights_admin.indexOf('@anyone') > -1 ? rights.admin : rights.guest;
+      var am_rights = ['@anyone'];
 
       args = {
         path: {
@@ -106,7 +106,7 @@ module.exports = function (am) {
           "ref-link": `/db/amEmplDept`
         },
         parameters: {
-          fields: `bAdminRight`,
+          fields: `bAdminRight, lEmplDeptId, EMail`,
           filter: `lEmplDeptId=CurrentUser.lEmplDeptId`
         },
         headers: {
@@ -121,9 +121,14 @@ module.exports = function (am) {
           logger.warn(`[user] [${req.sessionID || '-'}]`, message, username);
           res.status(response.statusCode).send(message);
         } else {
-          var isAdmin = !!data.entities[0].bAdminRight[1];
           var email = data.entities[0].EMail;
-          if (user_rights === rights.admin || (isAdmin && config.rights_admin.indexOf('@admin') > -1)) {
+          var isAdmin = !!data.entities[0].bAdminRight[1];
+          var empId = data.entities[0].lEmplDeptId;
+          if (isAdmin) {
+            am_rights.push('@admin');
+          }
+
+          if (config.rights_power.indexOf('@anyone') > -1 || isAdmin && config.rights_power.indexOf('@admin') > -1) {
             loginSuccess(req, res, username, password, email, rights.admin, am);
             res.end();
           } else {
@@ -133,9 +138,9 @@ module.exports = function (am) {
               path: {
                 server: am.server,
                 context: config.base,
-                tables: "amMasterProfile MP,amRelEmplMProf REM,amEmplDept ED",
+                tables: "amMasterProfile MP,amRelEmplMProf REM",
                 fields: "MP.SQLName",
-                clause: `MP.lMProfileId=REM.lMProfileId AND REM.lEmplDeptId=ED.lEmplDeptId AND ED.Name='${username.trim()}'`
+                clause: `MP.lMProfileId=REM.lMProfileId AND REM.lEmplDeptId=${empId}`
               },
               headers: {
                 Accept: "application/json",
@@ -144,17 +149,26 @@ module.exports = function (am) {
             };
 
             client.get(aqlUrl, args, (data, response) => {
-              if (data.Query.Result == true) {
-                user_rights = rights.admin;
-              } else {
-                for (var i = 0; i < data.Query.Result.Row.length; i++) {
-                  var currentRight = data.Query.Result.Row[i].Column.content;
-                  if (config.rights_admin.indexOf(currentRight) > -1) {
-                    user_rights = rights.admin;
-                    break;
-                  } else if (user_rights.index > 1 && (config.rights_power.indexOf('@admin') > -1 || config.rights_power.indexOf(currentRight) > -1)) {
-                    user_rights = rights.power;
-                  }
+              // get user right defined in AM
+              if (data.Query.Result.Row) {
+                var row = data.Query.Result.Row;
+                if (!row.length) {
+                  am_rights.push(row.Column.content);
+                } else {
+                  row.forEach(data => {
+                    am_rights.push(data.Column.content);
+                  });
+                }
+              }
+
+              // match am_rights and amb rights
+              var user_rights = rights.guest;
+              for (var i = 0; i < am_rights.length; i++) {
+                if (config.rights_admin.indexOf(am_rights[i]) > -1) {
+                  user_rights = rights.admin;
+                  break;
+                } else if (config.rights_power.indexOf(am_rights[i]) > -1) {
+                  user_rights = rights.power;
                 }
               }
 
