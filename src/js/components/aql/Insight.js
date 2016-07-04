@@ -16,7 +16,7 @@ import Shift from 'grommet/components/icons/base/Shift';
 import More from 'grommet/components/icons/base/More';
 import Graph from './../commons/Graph';
 import ActionTab from './../commons/ActionTab';
-import {Anchor, Box, CheckBox, Header, Menu, Title, Table, TableRow, Layer, Carousel, RadioButton, Tabs} from 'grommet';
+import {Anchor, Box, Button, CheckBox, Header, Menu, Title, Table, TableRow, Layer, Carousel, RadioButton, Tabs} from 'grommet';
 import GroupList from '../commons/GroupList';
 import GroupListItem from '../commons/GroupListItem';
 
@@ -291,14 +291,14 @@ export default class Insight extends Component {
     if (this.state.edit)
       return (
         <Header justify="center">
-          <Menu icon={<More />} closeOnClick={false}>
+          <Menu icon={<More />} closeOnClick={false} inline={true} direction="row">
             <CheckBox id={id} label={box.direction==='row'?'Column':'Row'} checked={box.direction!=='column'}
                       onChange={this._toggleDirection.bind(this, box, parent)} toggle={true}/>
-            <Anchor href="#" icon={<Shift />} label={`Split to ${box.direction==='row'?'Column':'Row'}`}
+            <Button icon={<Shift className={box.direction==='column'?'icon_rotate90':''}/>}
                     onClick={this._addBox.bind(this, box, parent)}/>
             {
               box.child &&
-              <Anchor href="#" icon={<Close />} label="Delete last element" onClick={this._deleteBox.bind(this, box, parent)}/>
+              <Button icon={<Close />} onClick={this._deleteBox.bind(this, box, parent)}/>
             }
           </Menu>
         </Header>
@@ -504,7 +504,7 @@ export default class Insight extends Component {
               <RadioButton id="carousel" name="choice" label="Carousel" onChange={this._toggleCarousel.bind(this)}
                            checked={carousel} disabled={edit}/>}
               {!edit &&
-              <RadioButton id="dashboard" name="choice" label="Desk" onChange={this._toggleCarousel.bind(this)}
+              <RadioButton id="dashboard" name="choice" label="Deck" onChange={this._toggleCarousel.bind(this)}
                            checked={!carousel || edit}/>
               }
               {edit && <Anchor icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>}
