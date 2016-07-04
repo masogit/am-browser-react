@@ -15,6 +15,7 @@ import More from 'grommet/components/icons/base/More';
 import Mail from 'grommet/components/icons/base/Mail';
 import _ from 'lodash';
 import AlertForm from '../../components/commons/AlertForm';
+import FieldTypes from '../../constants/FieldTypes';
 
 export default class ViewDefDetail extends ComponentBase {
 
@@ -117,6 +118,13 @@ export default class ViewDefDetail extends ComponentBase {
     window.open(`mailto:test@example.com?subject=${subject}&body=${content}`, '_self');
   }
 
+  _isNumber(field) {
+    if (FieldTypes.number.indexOf(field.type) > -1 && !field.user_type)
+      return true;
+    else
+      return false;
+  }
+
   hasLinks(links) {
     if (links) {
       for (let i = 0; i < links.length; i++) {
@@ -211,7 +219,7 @@ export default class ViewDefDetail extends ComponentBase {
           <td>
             <CheckBox id={`v.${currentPath}body.sum`} name={`v.${currentPath}body.sum`}
                       value={field.sqlname} checked={selfView.body.sum==field.sqlname}
-                      disabled={(!!selfView.body.sum&&selfView.body.sum!=field.sqlname)}
+                      disabled={(!!selfView.body.sum&&selfView.body.sum!=field.sqlname) || !this._isNumber(field) || !selfView.body.groupby}
                       onChange={
                         (event) => {
                           this._onChange(event, field.sqlname);
