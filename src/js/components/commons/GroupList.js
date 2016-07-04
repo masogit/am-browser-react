@@ -36,6 +36,21 @@ export default class GroupList extends Component {
     }
   }
 
+  _selectSuggestion(event) {
+    event.target.value = event.suggestion;
+    this._onSearch(event);
+  }
+
+  _getSuggestions(children) {
+    var suggestions = [];
+    children.forEach((child) => {
+      if (child.props.search) {
+        suggestions.push(child.props.search);
+      }
+    });
+    return suggestions;
+  }
+
   _getGroupedChildren(children) {
     var grouped = {};
     children.forEach((child) => {
@@ -78,13 +93,15 @@ export default class GroupList extends Component {
   render() {
     var children = this.state.filtered || this.props.children;
     var grouped = this._getGroupedChildren(children);
+    var suggestions = this._getSuggestions(children);
     const expand = this.state.expand;
     return (
       <Box direction="column" className='fixMinSizing' flex={true}>
         {
           this.props.searchable &&
           <Box pad='small' flex={false}>
-            <SearchInput placeHolder="Search..." onDOMChange={this._onSearch.bind(this)}/>
+            <SearchInput ref="search" placeHolder="Search..."  suggestions={suggestions}
+                         onSelect={this._selectSuggestion.bind(this)} onDOMChange={this._onSearch.bind(this)}/>
           </Box>
         }
         <Box className='autoScroll'>
@@ -95,8 +112,7 @@ export default class GroupList extends Component {
               <Box key={i} direction="column" flex={false}>
                 <List>
                   <ListItem pad='small' {...this.props} justify="between" direction="row" separator="none"
-                            responsive={false}
-                                            onClick={this._expandToggle.bind(this, key)}>
+                            responsive={false} onClick={this._expandToggle.bind(this, key)}>
                     <Anchor href="#" label={key} icon={(expand===key)?<Down />:<Next />}/>
                     {grouped[key].length}
                   </ListItem>
