@@ -1,6 +1,6 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import Ferret from './components/Ferret';
+import Main from './components/Main';
 import Login from './components/Login';
 import Search from './components/explorer/Search';
 import RecordSearch from './components/explorer/RecordSearch';
@@ -11,9 +11,9 @@ import AQL from './components/aql/AQL';
 import TBD from 'grommet/components/TBD';
 import UnAuthorized from './components/error/UnAuthorized';
 import UCMDBAdapterContainer from './components/ucmdbAdapter/UCMDBAdapterPoint';
-var rootPath = "/"; //"/ferret/";
+var rootPath = "/";
 
-const indexRoute = {component: Ferret};
+const indexRoute = {component: Main};
 
 export let postLoginPath = '/search';
 export const setPostLoginPath = (path) => postLoginPath = path;
@@ -48,7 +48,7 @@ export const getRoutes = (headerNavs) => {
     });
     indexRoute.component = routes[1].component;
   } else {
-    indexRoute.component = Ferret;
+    indexRoute.component = Main;
   }
 
   routes.push({
@@ -76,7 +76,7 @@ const Route = {
   routes: [
     {
       indexRoute: indexRoute,
-      path: rootPath, component: Ferret,
+      path: rootPath, component: Main,
       childRoutes: getRoutes()
     }
   ]
