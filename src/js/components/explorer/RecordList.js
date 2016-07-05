@@ -48,6 +48,13 @@ export default class RecordList extends Component {
       this._getGroupDistribution();
   }
 
+  _clearGroupBy(groupby) {
+    if (this.state.groupby == groupby)
+      this.setState({
+        groupby: ''
+      }, this._getGroupDistribution());
+  }
+
   _getGroupDistribution(groupby) {
     let body = Object.assign({}, this.props.body);
 
@@ -322,9 +329,12 @@ export default class RecordList extends Component {
     let type = this.props.body.sum ? `SUM ${this.props.body.sum}` : `COUNT *`;
     let menus = this.props.body.fields.map((field) => {
       let selected = (field.sqlname == (this.state.groupby || this.props.body.groupby));
+      let label = field.sqlname;
+      if (this.props.body.groupby == field.sqlname)
+        label += ' (default)';
       return (
-        <Anchor icon={selected?<CheckboxSelected />:<Checkbox />} label={field.sqlname}
-                onClick={this._getGroupDistribution.bind(this, field.sqlname)}/>
+        <Anchor icon={selected?<CheckboxSelected />:<Checkbox />} label={label} disabled={this.props.body.groupby == field.sqlname}
+                onClick={selected?this._clearGroupBy.bind(this, field.sqlname):this._getGroupDistribution.bind(this, field.sqlname)}/>
       );
     });
     menus.unshift(<Anchor label={type} icon={<Aggregate />} disabled={true}/>);
