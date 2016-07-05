@@ -168,11 +168,11 @@ export default class GraphForm extends Component {
     const basic = genOptions(basicOptions, this, this.state.type, selections);
     formFields = basic;
     if (!showAdvance) {
-      label = 'advance';
+      label = 'Advance';
       icon = <Next />;
       formFields = basic;
     } else {
-      label = 'basic';
+      label = 'Basic';
       icon = <Previous />;
       formFields = advance;
     }

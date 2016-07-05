@@ -419,7 +419,7 @@ export default class AQL extends Component {
               <Anchor link="#" icon={<Add />} onClick={this._onNew.bind(this)} label="New"/>
               <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>
               <Anchor link="#" icon={<Close />} onClick={this._onDelete.bind(this)} label="Delete"/>
-              <Menu icon={<More />}>
+              <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }}>
                 {
                   this.state.aql._id &&
                   <Anchor link="#" icon={<Mail />} onClick={this._onMail.bind(this, this.state.aql)} label="Mail"/>
