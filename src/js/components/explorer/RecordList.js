@@ -29,6 +29,7 @@ export default class RecordList extends Component {
       record: null,
       groupby: "",
       graphType: "distribution",
+      graphData: null,
       param: {
         orderby: "",
         offset: 0,
@@ -45,17 +46,17 @@ export default class RecordList extends Component {
   componentWillMount() {
     this._getRecords();
     if (this.props.body.groupby)
-      this._getGroupDistribution();
+      this._getGroupByData();
   }
 
   _clearGroupBy(groupby) {
     if (this.state.groupby == groupby)
       this.setState({
         groupby: ''
-      }, this._getGroupDistribution());
+      }, this._getGroupByData());
   }
 
-  _getGroupDistribution(groupby) {
+  _getGroupByData(groupby) {
     let body = Object.assign({}, this.props.body);
 
     // Filter then groupby
@@ -76,21 +77,8 @@ export default class RecordList extends Component {
     if (body.groupby)
       AQLActions.queryAQL(ExplorerActions.getGroupByAql(body), (data)=> {
         if (data.rows.length > 0) {
-          var config = {
-            series_col: "1",
-            label: "0",
-            size: "small",
-            legendTotal: false,
-            full: true,
-            units: "",
-            total: true
-          };
-          var distributionGraph = (
-            <Graph type={this.state.graphType} data={data} config={config}
-                    onClick={(filter) => this._aqlFilterAdd(Format.getFilterFromField(this.props.body.fields, filter))}/>
-          );
           this.setState({
-            distributionGraph: distributionGraph
+            graphData: data
           });
         }
       });
@@ -283,7 +271,7 @@ export default class RecordList extends Component {
   _toggleGraphType() {
     this.setState({
       graphType: this.state.graphType=='legend' ? 'distribution' : 'legend'
-    }, this._getGroupDistribution(this.state.groupby));
+    });
   }
 
   _toggleAllFields() {
@@ -345,7 +333,7 @@ export default class RecordList extends Component {
         label += ' (default)';
       return (
         <Anchor icon={selected?<CheckboxSelected />:<Checkbox />} label={label} disabled={this.props.body.groupby == field.sqlname}
-                onClick={selected?this._clearGroupBy.bind(this, field.sqlname):this._getGroupDistribution.bind(this, field.sqlname)}/>
+                onClick={selected?this._clearGroupBy.bind(this, field.sqlname):this._getGroupByData.bind(this, field.sqlname)}/>
       );
     });
     menus.unshift(<Anchor label={type} icon={<Aggregate />} disabled={true}/>);
@@ -425,19 +413,35 @@ export default class RecordList extends Component {
     );
   }
 
+  renderGraph() {
+    var config = {
+      series_col: "1",
+      label: "0",
+      size: "small",
+      legendTotal: false,
+      full: true,
+      units: "",
+      total: true
+    };
+    return (
+      <Graph type={this.state.graphType} data={this.state.graphData} config={config}
+             onClick={(filter) => this._aqlFilterAdd(Format.getFilterFromField(this.props.body.fields, filter))}/>
+    );
+  }
+
   render() {
     return (
       <Box pad={{horizontal: 'medium'}} flex={true}>
         {this.renderToolBox()}
         {this.renderAQLFilter()}
         {
-          this.state.graphType=='legend'&&this.state.distributionGraph?
+          this.state.graphType=='legend'&&this.state.graphData?
           <Box flex={true} direction="row">
-            <Box pad={{vertical: 'large'}}>{this.state.distributionGraph}</Box>
+            <Box pad={{vertical: 'large'}}>{this.renderGraph()}</Box>
             <Box flex={true}>{this.renderList()}</Box>
           </Box>
           :
-          <Box>{this.state.distributionGraph}{this.renderList()}</Box>
+          <Box>{this.renderGraph()}{this.renderList()}</Box>
         }
         {this.renderDetail()}
       </Box>
