@@ -4,6 +4,7 @@
 import React, {Component, PropTypes} from 'react';
 import {
   Chart,
+  Legend,
   Meter,
   Distribution
 } from 'grommet';
@@ -120,6 +121,7 @@ export default class Graph extends Component {
           const mainFilterKey = form.label || form.series_col;
           const mainFilterValue = form.label ? label : value;
           distribution.series.push({
+            colorIndex: 'graph-' + (index % 8 + 1),
             label,
             value,
             index,
@@ -160,6 +162,7 @@ export default class Graph extends Component {
           const mainFilterKey = form.col_unit || form.series_col;
           const mainFilterValue = form.col_unit ? label : value;
           meter.series.push({
+            colorIndex: 'graph-' + (index % 8 + 1),
             label,
             value,
             index,
@@ -187,6 +190,39 @@ export default class Graph extends Component {
     return meter;
   }
 
+  _gen_legend(form, data, onClick) {
+    const legend = {
+      series_col: form.series_col,
+      series: [],
+      col_unit: form.col_unit,
+      units: form.units,
+      total: form.total
+    };
+
+    if (form.series_col) {
+      data.rows.filter((row, index) => {
+        const value = row[form.series_col] / 1.0;
+        if (!isNaN(value)) {
+          const label = form.label ? '' + row[form.label] : '';
+          const filter = this._getFullCol(row, data.header);
+          const mainFilterKey = form.label || form.series_col;
+          const mainFilterValue = form.label ? label : value;
+          legend.series.push({
+            colorIndex: 'graph-' + (index % 8 + 1),
+            label,
+            value,
+            index,
+            onClick: onClick && onClick.bind(this, {
+              key: data.header[mainFilterKey].Name,
+              value: mainFilterValue
+            }, filter)
+          });
+        }
+      });
+    }
+
+    return legend;
+  }
 
   render() {
     const {type, config, onClick, data} = this.props;
@@ -201,6 +237,8 @@ export default class Graph extends Component {
             return <Meter {...graph} />;
           case 'distribution':
             return <Distribution {...graph} />;
+          case 'legend':
+            return <Legend {...graph} />;
         }
       } else {
         return <div></div>;

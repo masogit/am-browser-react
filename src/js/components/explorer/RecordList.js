@@ -28,6 +28,7 @@ export default class RecordList extends Component {
       filtered: null,
       record: null,
       groupby: "",
+      graphType: "distribution",
       param: {
         orderby: "",
         offset: 0,
@@ -68,16 +69,17 @@ export default class RecordList extends Component {
     if (body.groupby)
       AQLActions.queryAQL(ExplorerActions.getGroupByAql(body), (data)=> {
         if (data.rows.length > 0) {
-          var distributionConfig = {
+          var config = {
             series_col: "1",
             label: "0",
             size: "small",
             legendTotal: false,
             full: true,
-            units: ""
+            units: "",
+            total: true
           };
           var distributionGraph = (
-            <Graph type='distribution' data={data} config={distributionConfig}
+            <Graph type={this.state.graphType} data={data} config={config}
                     onClick={(filter) => this._aqlFilterAdd(Format.getFilterFromField(this.props.body.fields, filter))}/>
           );
           this.setState({
@@ -260,6 +262,12 @@ export default class RecordList extends Component {
     });
   }
 
+  _toggleGraphType() {
+    this.setState({
+      graphType: this.state.graphType=='legend' ? 'distribution' : 'legend'
+    }, this._getGroupDistribution(this.state.groupby));
+  }
+
   _toggleAllFields() {
     this.setState({
       allFields: !this.state.allFields
@@ -353,6 +361,8 @@ export default class RecordList extends Component {
           {this.renderGroupBy()}
         </Menu>
         <Menu icon={<MenuIcon />} closeOnClick={false} dropAlign={{ right: 'right', top: 'top' }}>
+          <Anchor icon={this.state.graphType=='legend'?<CheckboxSelected />:<Checkbox />} label="Vertical Graph"
+                  onClick={this._toggleGraphType.bind(this)}/>
           <Anchor icon={this.state.aqlInput?<CheckboxSelected />:<Checkbox />} label="Input AQL"
                   onClick={this._toggleAQLInput.bind(this)}/>
           <Anchor icon={this.state.allFields?<CheckboxSelected />:<Checkbox />} label="Full columns"
@@ -399,8 +409,15 @@ export default class RecordList extends Component {
       <Box pad={{horizontal: 'medium'}} flex={true}>
         {this.renderToolBox()}
         {this.renderAQLFilter()}
-        {this.state.distributionGraph}
-        {this.renderList()}
+        {
+          this.state.graphType=='legend'&&this.state.distributionGraph?
+          <Box flex={true} direction="row">
+            <Box pad={{vertical: 'large'}}>{this.state.distributionGraph}</Box>
+            <Box flex={true}>{this.renderList()}</Box>
+          </Box>
+          :
+          <Box>{this.state.distributionGraph}{this.renderList()})</Box>
+        }
         {this.renderDetail()}
       </Box>
     );
