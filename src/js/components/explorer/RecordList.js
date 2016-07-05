@@ -7,6 +7,8 @@ import Descend from 'grommet/components/icons/base/Descend';
 import Download from 'grommet/components/icons/base/Download';
 import MenuIcon from 'grommet/components/icons/base/Menu';
 import Checkbox from 'grommet/components/icons/base/Checkbox';
+import Filter from 'grommet/components/icons/base/Filter';
+import Aggregate from 'grommet/components/icons/base/Aggregate';
 import CheckboxSelected from 'grommet/components/icons/base/CheckboxSelected';
 import * as ExplorerActions from '../../actions/explorer';
 import * as AQLActions from '../../actions/aql';
@@ -41,12 +43,30 @@ export default class RecordList extends Component {
 
   componentWillMount() {
     this._getRecords();
-    this._getGroupDistribution();
+    if (this.props.body.groupby)
+      this._getGroupDistribution();
   }
 
-  _getGroupDistribution() {
-    if (this.props.body.groupby)
-      AQLActions.queryAQL(ExplorerActions.getGroupByAql(this.props.body), (data)=> {
+  _getGroupDistribution(groupby) {
+    let body = Object.assign({}, this.props.body);
+
+    // Filter then groupby
+    if (this.state.param.filters.length > 0) {
+      let userFilters = this.state.param.filters.map((filter) => {
+        return '(' + filter + ')';
+      }).join(" AND ");
+      body.filter = body.filter ? body.filter + ' AND (' + userFilters + ')' : userFilters;
+    }
+
+    if (groupby) {
+      body.groupby = groupby;
+      this.setState({
+        groupby: groupby
+      });
+    }
+
+    if (body.groupby)
+      AQLActions.queryAQL(ExplorerActions.getGroupByAql(body), (data)=> {
         if (data.rows.length > 0) {
           var distributionConfig = {
             series_col: "1",
@@ -58,7 +78,7 @@ export default class RecordList extends Component {
           };
           var distributionGraph = (
             <Graph type='distribution' data={data} config={distributionConfig}
-                   onClick={(filter) => this._aqlFilterAdd(Format.getFilterFromField(this.props.body.fields, filter))}/>
+                    onClick={(filter) => this._aqlFilterAdd(Format.getFilterFromField(this.props.body.fields, filter))}/>
           );
           this.setState({
             distributionGraph: distributionGraph
@@ -290,6 +310,20 @@ export default class RecordList extends Component {
     );
   }
 
+  renderGroupBy() {
+    let type = this.props.body.sum ? `SUM ${this.props.body.sum}` : `COUNT *`;
+    let menus = this.props.body.fields.map((field) => {
+      let selected = (field.sqlname == (this.state.groupby || this.props.body.groupby));
+      return (
+        <Anchor icon={selected?<CheckboxSelected />:<Checkbox />} label={field.sqlname}
+                onClick={this._getGroupDistribution.bind(this, field.sqlname)}/>
+      );
+    });
+    menus.unshift(<Anchor label={type} icon={<Aggregate />} disabled={true}/>);
+
+    return menus;
+  }
+
   renderToolBox() {
 
     const aqlStyle = {
@@ -315,6 +349,9 @@ export default class RecordList extends Component {
             {`${this.state.timeQuery}ms`}
           </Box>
         </Box>
+        <Menu icon={<Filter />} dropAlign={{ right: 'right', top: 'top' }}>
+          {this.renderGroupBy()}
+        </Menu>
         <Menu icon={<MenuIcon />} closeOnClick={false} dropAlign={{ right: 'right', top: 'top' }}>
           <Anchor icon={this.state.aqlInput?<CheckboxSelected />:<Checkbox />} label="Input AQL"
                   onClick={this._toggleAQLInput.bind(this)}/>

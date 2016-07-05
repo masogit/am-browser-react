@@ -120,22 +120,18 @@ export function getQueryByBody(body) {
 }
 
 export function getGroupByAql(body) {
-  if (body.groupby) {
-    var aggregate = (body.sum) ? `sum(${body.sum})` : 'count(*)';
-    var aql = `select ${body.groupby}, ${aggregate} from ${body.sqlname}`;
-    if (body.filter)
-      aql += ` where (${body.filter}) AND (PK <> 0)`; // PK <> 0 to avoid the invalid empty record
-    else
-      aql += ` where PK <> 0`; // PK <> 0 to avoid the invalid empty record
-    if (body.groupby)
-      aql += ` group by ${body.groupby}`;
-    if (body.orderby && body.orderby.indexOf(body.groupby) > -1)
-      aql += ` order by ${body.orderby}`;
+  var aggregate = (body.sum) ? `sum(${body.sum})` : 'count(*)';
+  var aql = `select ${body.groupby}, ${aggregate} from ${body.sqlname}`;
+  if (body.filter)
+    aql += ` where (${body.filter}) AND (PK <> 0)`; // PK <> 0 to avoid the invalid empty record
+  else
+    aql += ` where PK <> 0`; // PK <> 0 to avoid the invalid empty record
+  if (body.groupby)
+    aql += ` group by ${body.groupby}`;
+  if (body.orderby && body.orderby.indexOf(body.groupby) > -1)
+    aql += ` order by ${body.orderby}`;
 
-    return aql;
-  } else {
-    return '';
-  }
+  return aql;
 }
 
 export function getDownloadQuery(sqlname) {
