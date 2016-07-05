@@ -79,6 +79,26 @@ if not errorlevel 1 goto okJava64Home
 echo Java is not 64 bit
 goto end
 :okJava64Home
+for /f "tokens=3" %%g in ('%JAVAEXE% -version 2^>^&1 ^| findstr /i "version"') do (
+  set JAVAVER=%%g
+)
+rem remove double quotes
+set JAVAVER=%JAVAVER:"=%
+for /f "delims=. tokens=1-3" %%v in ("%JAVAVER%") do (
+  rem get major and minor version
+  set Major=%%v
+  set Minor=%%w
+)
+rem jave version need to be 1.7 and above
+if %Major% EQU 1 if %Minor% GEQ 7 goto okJava64Version
+echo Java version is not 7 or above
+goto end
+:okJava64Version
+if %Minor% EQU 7 (
+  set PERMGEN_OPTS=-XX:PermSize=128M
+) else (
+  set PERMGEN_OPTS=-XX:MetaspaceSize=128M
+)
 if not "%CATALINA_BASE%" == "" goto gotBase
 set "CATALINA_BASE=%CATALINA_HOME%"
 :gotBase
@@ -179,7 +199,7 @@ if not "%CATALINA_HOME%" == "%CATALINA_BASE%" set "CLASSPATH=%CLASSPATH%;%CATALI
     --StopClass org.apache.catalina.startup.Bootstrap ^
     --StartParams start ^
     --StopParams stop ^
-    --JvmOptions "-Dcatalina.home=%CATALINA_HOME%;-Dcatalina.base=%CATALINA_BASE%;-Djava.endorsed.dirs=%CATALINA_HOME%\endorsed;-Djava.io.tmpdir=%CATALINA_BASE%\temp;-Djava.library.path=%JAVA_LIB_PATH%;-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager;-Djava.util.logging.config.file=%CATALINA_BASE%\conf\logging.properties;" ^
+    --JvmOptions "-Dcatalina.home=%CATALINA_HOME%;-Dcatalina.base=%CATALINA_BASE%;-Djava.endorsed.dirs=%CATALINA_HOME%\endorsed;-Djava.io.tmpdir=%CATALINA_BASE%\temp;-Djava.library.path=%JAVA_LIB_PATH%;-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager;-Djava.util.logging.config.file=%CATALINA_BASE%\conf\logging.properties;%PERMGEN_OPTS%" ^
     --JvmMs 1536 ^
     --JvmMx 1536
 if not errorlevel 1 goto installed
