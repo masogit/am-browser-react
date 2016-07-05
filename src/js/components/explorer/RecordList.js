@@ -220,10 +220,21 @@ export default class RecordList extends Component {
   }
 
   _aqlFilterAdd(filter) {
-    var searchValue = filter || this.refs.search.value;
+    let searchValue = filter || this.refs.search.value;
     if (searchValue) {
       searchValue = searchValue.trim();
-      var param = this.state.param;
+      let param = this.state.param;
+
+      // replace filter
+      if (searchValue.indexOf('=') > -1) {
+        let key = searchValue.split('=')[0];
+        param.filters.forEach((filter, index) => {
+          if (filter.indexOf(key) > -1)
+            param.filters.splice(index, 1);
+        });
+
+      }
+
       if (param.filters.indexOf(searchValue) == -1)
         param.filters.push(searchValue);
       this.refs.search.value = "";
@@ -426,7 +437,7 @@ export default class RecordList extends Component {
             <Box flex={true}>{this.renderList()}</Box>
           </Box>
           :
-          <Box>{this.state.distributionGraph}{this.renderList()})</Box>
+          <Box>{this.state.distributionGraph}{this.renderList()}</Box>
         }
         {this.renderDetail()}
       </Box>
