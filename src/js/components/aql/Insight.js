@@ -259,7 +259,7 @@ export default class Insight extends Component {
 
         tabIdMap[tabName].dataIds.push(box.child._id);
         child = (
-          <Box justify="center" {...box} direction="column" pad="medium" flex={false}>
+          <Box justify="center" {...box} direction="column" pad="medium" flex={true} className='box-graph'>
             <Header>
               <Anchor icon={<Search />} label={dataMap.aql.name}
                       onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
@@ -321,7 +321,7 @@ export default class Insight extends Component {
           dataIds.slice(-_.uniq(dataIds).length).map((key, index)=> {
             const dataMap = this.state.data[key];
             return (
-              <Box pad="large" colorIndex="light-2" key={index}>
+              <Box pad="large" key={index} className='box-graph'>
                 <Header>
                   <Anchor icon={<Search />} label={dataMap.aql.name}
                           onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
