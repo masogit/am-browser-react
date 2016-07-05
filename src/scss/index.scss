@@ -85,6 +85,10 @@ $hpe-fonts-path: './fonts';
   }
 }
 
+.active {
+  border-bottom: 3px solid #01A982;
+}
+
 @include keyframes(slide-sidebar) {
   0% {
     width: 0px;

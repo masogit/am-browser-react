@@ -4,7 +4,6 @@ import React, {Component} from 'react';
 import {Link} from 'react-router';
 import Header from 'grommet/components/Header';
 import Title from 'grommet/components/Title';
-import Logo from './Logo'; // './HPELogo';
 import Menu from 'grommet/components/Menu';
 import SessionMenu from './SessionMenu';
 
@@ -38,14 +37,20 @@ class NavHeader extends Component {
       });
     }
 
+    let logoStyle = {
+      marginLeft: '20px',
+      marginRight: '20px'
+    };
     return (
       <Header fixed={true} size="small" full="horizontal" direction="row" justify="between" colorIndex="neutral-1"
               pad={{vertical: 'small'}} responsive={false}>
-        <Title><Logo /> AM Browser</Title>
+        <Title>
+          <img src="../../img/favicon.png" style={logoStyle}/> AM Browser
+        </Title>
         <Menu direction="row" align="center" responsive={true}>
           {
             links.map((link, index) => <Link key={index} to={link.to} className='anchor'
-                                             activeClassName="active link-disabled">{link.text}</Link>)
+                                             activeClassName="active">{link.text}</Link>)
           }
           <SessionMenu />
         </Menu>

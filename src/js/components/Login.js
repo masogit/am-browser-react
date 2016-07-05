@@ -9,7 +9,7 @@ import Sidebar from 'grommet/components/Sidebar';
 import LoginForm from 'grommet/components/LoginForm';
 import Footer from 'grommet/components/Footer';
 import Label from 'grommet/components/Label';
-import Logo from './Logo';
+import HPELogo from './HPELogo';
 import cookies from 'js-cookie';
 
 class IndexerLogin extends Component {
@@ -31,7 +31,9 @@ class IndexerLogin extends Component {
   }
 
   _onResponsive(responsive) {
-    this.setState({responsive: responsive});
+    this.setState({
+      responsive: responsive
+    });
   }
 
   _onSubmit(fields) {
@@ -72,7 +74,6 @@ class IndexerLogin extends Component {
         {image}
         <Sidebar justify="center" align="center" pad="medium" size="large">
           <LoginForm
-            logo={<Logo size="large" />}
             title="Asset Manager Browser"
             onSubmit={this._onSubmit}
             errors={errors}
@@ -81,7 +82,8 @@ class IndexerLogin extends Component {
               username: cookies.get('user'),
               rememberMe: true
             }}/>
-          <Footer justify="end">
+          <Footer justify="between">
+            <HPELogo size="large"/>
             <Label>
               {this.state.ambVersion}
             </Label>
