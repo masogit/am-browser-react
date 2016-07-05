@@ -36,7 +36,7 @@ export default class SideBar extends Component {
     }
 
     return (
-      <Sidebar fixed={true} separator="right" full={false} style={{minHeight: '100%'}}>
+      <Sidebar fixed={true} separator="right" full={false} style={{minHeight: '100%'}} colorIndex="light-2">
         <Box style={{overflow: 'visible'}} className='fixMinSizing'>
           <Header justify="between" size="small" pad='small'>
             <Title>{title}</Title>
