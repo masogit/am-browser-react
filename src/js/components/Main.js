@@ -26,10 +26,10 @@ class Indexer extends Component {
   }
 
   render() {
-    const {message, headerNavs} = this.props;
+    const {message, headerNavs, path} = this.props;
     let header;
     if (headerNavs) {
-      header = <NavHeader headerNavs={headerNavs}/>;
+      header = <NavHeader headerNavs={headerNavs} path={path}/>;
     }
     let alert;
     if (headerNavs && message.msg) { // not display in login page
@@ -59,7 +59,8 @@ let select = (state) => {
     {},
     state.nav,
     {headerNavs: state.session.headerNavs},
-    {message: state.message}
+    {message: state.message},
+    {path: state.router.location.pathname}
   );
 };
 

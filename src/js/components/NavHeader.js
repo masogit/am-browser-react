@@ -16,6 +16,10 @@ class NavHeader extends Component {
   componentDidMount() {
   }
 
+  getActive(to) {
+    return this.props.path.indexOf(to) > -1 ? 'active' : '';
+  }
+
   render() {
     const defaultLinks = [
       // {to: '/home', text: 'Home'},
@@ -41,6 +45,8 @@ class NavHeader extends Component {
       marginLeft: '20px',
       marginRight: '20px'
     };
+
+
     return (
       <Header fixed={true} size="small" full="horizontal" direction="row" justify="between" colorIndex="neutral-1"
               pad={{vertical: 'small'}} responsive={false}>
@@ -49,8 +55,7 @@ class NavHeader extends Component {
         </Title>
         <Menu direction="row" align="center" responsive={true}>
           {
-            links.map((link, index) => <Link key={index} to={link.to} className='anchor'
-                                             activeClassName="active">{link.text}</Link>)
+            links.map((link, index) => <Link key={index} to={link.to} className={`anchor ${this.getActive(link.to)}`}>{link.text}</Link>)
           }
           <SessionMenu />
         </Menu>
