@@ -441,12 +441,12 @@ export default class RecordList extends Component {
         {this.renderAQLFilter()}
         {
           this.state.graphType=='legend'&&this.state.graphData?
-          <Box flex={true} direction="row">
+          <Box flex={true} direction="row" className='fixMinSizing'>
             <Box pad={{vertical: 'large'}}>{this.renderGraph()}</Box>
             <Box flex={true}>{this.renderList()}</Box>
           </Box>
           :
-          <Box>{this.renderGraph()}{this.renderList()}</Box>
+          <Box className='fixMinSizing'>{this.renderGraph()}{this.renderList()}</Box>
         }
         {this.renderDetail()}
       </Box>
