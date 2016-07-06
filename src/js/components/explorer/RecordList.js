@@ -185,11 +185,16 @@ export default class RecordList extends Component {
       }
     } else {
       if (!this.state.aqlInput) {
-        this.setState({
-          filtered: this.state.records.filter((obj) => this.getObjectString(obj).some((str) => {
-            return str.toString().toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1;
-          }))
-        });
+        if (event.target.value.trim() == "")
+          this.setState({
+            filtered: null
+          });
+        else
+          this.setState({
+            filtered: this.state.records.filter((obj) => this.getObjectString(obj).some((str) => {
+              return str.toString().toLowerCase().indexOf(event.target.value.toLowerCase().trim()) !== -1;
+            }))
+          });
       }
     }
   }
