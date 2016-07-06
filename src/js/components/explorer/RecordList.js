@@ -333,11 +333,10 @@ export default class RecordList extends Component {
     let type = this.props.body.sum ? `SUM ${this.props.body.sum}` : `COUNT *`;
     let menus = this.props.body.fields.map((field) => {
       let selected = (field.sqlname == (this.state.groupby || this.props.body.groupby));
-      let label = field.sqlname;
-      if (this.props.body.groupby == field.sqlname)
-        label += ' (default)';
+      let label = Format.getDisplayLabel(field);
       return (
-        <Anchor icon={selected?<CheckboxSelected />:<Checkbox />} label={label} disabled={this.props.body.groupby == field.sqlname}
+        <Anchor icon={selected?<CheckboxSelected />:<Checkbox />} disabled={this.props.body.groupby == field.sqlname}
+                label={label} primary={this.props.body.groupby == field.sqlname}
                 onClick={selected?this._clearGroupBy.bind(this, field.sqlname):this._getGroupByData.bind(this, field.sqlname)}/>
       );
     });
