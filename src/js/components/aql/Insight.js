@@ -494,8 +494,8 @@ export default class Insight extends Component {
     }
 
     return (
-      <Box pad="medium" full="horizontal">
-        <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
+      <Box full="horizontal">
+        <Header justify="between" pad={{'horizontal': 'medium'}}>
           <Title>AM Insight</Title>
           {
             !id &&

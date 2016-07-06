@@ -412,7 +412,7 @@ export default class AQL extends Component {
         <SideBar title={`Graphs (${this.state.aqls.length})`} toolbar={toolbar} contents={contents} focus={focus}/>
         <Box flex={true}>
           {this.state.alertLayer}
-          <Header justify="between" size="small" pad={{'horizontal': 'small'}}>
+          <Header justify="between" pad={{'horizontal': 'medium'}}>
             <Title>AQL and Graph</Title>
             <Menu direction="row" align="center" responsive={true}>
               <Anchor link="#" icon={<Play />} onClick={this._onQuery.bind(this)} label="Query"/>

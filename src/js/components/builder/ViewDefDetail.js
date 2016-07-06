@@ -357,7 +357,7 @@ export default class ViewDefDetail extends ComponentBase {
     return (
       !_.isEmpty(selectedView) ?
         <Box flex={true}>
-          <Header justify="between" size="small" pad={{horizontal: 'medium'}}>
+          <Header justify="between" pad={{horizontal: 'medium'}}>
             <Title>View Builder</Title>
             <Menu direction="row" align="center" responsive={true}>
               <Anchor icon={<Play />} onClick={this.props.openPreview} label="Query" disabled={!table}/>
