@@ -15,7 +15,7 @@ export function getFieldStrVal(record, field) {
   } else if (val instanceof Object)
     val = val[Object.keys(val)[0]];
 
-  return val;
+  return val || '';
 }
 
 export function getDisplayLabel(field) {

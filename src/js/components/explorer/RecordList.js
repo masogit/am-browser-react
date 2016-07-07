@@ -331,16 +331,16 @@ export default class RecordList extends Component {
 
   renderGroupBy() {
     let type = this.props.body.sum ? `SUM ${this.props.body.sum}` : `COUNT *`;
-    let menus = this.props.body.fields.map((field) => {
+    let menus = this.props.body.fields.map((field, index) => {
       let selected = (field.sqlname == (this.state.groupby || this.props.body.groupby));
       let label = Format.getDisplayLabel(field);
       return (
-        <Anchor icon={selected?<CheckboxSelected />:<Checkbox />} disabled={this.props.body.groupby == field.sqlname}
+        <Anchor key={`a_groupby_${index}`} icon={selected?<CheckboxSelected />:<Checkbox />} disabled={this.props.body.groupby == field.sqlname}
                 label={label} primary={this.props.body.groupby == field.sqlname}
                 onClick={selected?this._clearGroupBy.bind(this, field.sqlname):this._getGroupByData.bind(this, field.sqlname)}/>
       );
     });
-    menus.unshift(<Anchor label={type} icon={<Aggregate />} disabled={true}/>);
+    menus.unshift(<Anchor key={`a_groupby_${this.props.body.fields.length}`} label={type} icon={<Aggregate />} disabled={true}/>);
 
     return menus;
   }
