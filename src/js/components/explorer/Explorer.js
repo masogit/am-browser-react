@@ -40,19 +40,6 @@ export default class Explorer extends Component {
     return <SideBar title={`Views Navigation (${views.length})`} contents={contents}/>;
   }
 
-  _toggleViewNavigation() {
-    if (this.state.viewNavigation)
-      this.setState({
-        viewNavigation: null
-      });
-    else
-      ExplorerActions.loadViews((views)=> {
-        this.setState({
-          viewNavigation: this._getViewNavigation(views)
-        });
-      });
-  }
-
   _queryView(view) {
     this.setState({
       view: null
