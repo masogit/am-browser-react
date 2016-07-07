@@ -313,6 +313,9 @@ export default class Insight extends Component {
       }
     }, 1000);
 
+    if(!tabIdMap[tab.name] || !tabIdMap[tab.name].dataIds) { // prevent console error: cannot get dataIds of undefined.
+      return null;
+    }
     const dataIds = tabIdMap[tab.name].dataIds;
     return (
       <Carousel ref='carousel' className='disable_animation no-flex'>
@@ -321,16 +324,19 @@ export default class Insight extends Component {
           dataIds.slice(-_.uniq(dataIds).length).map((key, index)=> {
             const dataMap = this.state.data[key];
             return (
-              <Box pad="large" key={index} className='box-graph'>
-                <Header>
-                  <Anchor icon={<Search />} label={dataMap.aql.name}
-                          onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
-                </Header>
-                <Box pad="large" align={(dataMap.aql.type=='meter')?'center':null}>
-                  <Graph key={dataMap.aql._id} type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
-                         onClick={(filter) => this._showViewRecords(filter, dataMap.aql.view)}/>
+              dataMap ? // fix console error: cannot get aql of undefined.
+                <Box pad="large" key={index} className='box-graph'>
+                  <Header>
+                    <Anchor icon={<Search />} label={dataMap.aql.name}
+                            onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
+                  </Header>
+                  <Box pad="large" align={(dataMap.aql.type=='meter')?'center':null}>
+                    <Graph key={dataMap.aql._id} type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
+                           onClick={(filter) => this._showViewRecords(filter, dataMap.aql.view)}/>
+                  </Box>
                 </Box>
-              </Box>
+                :
+                null
             );
           })
         }
