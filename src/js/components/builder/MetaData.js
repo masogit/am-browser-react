@@ -380,7 +380,7 @@ export default class MetaData extends ComponentBase {
                      onDOMChange={this._onSearch}/>
         <Box pad={{vertical: 'small'}} className='fixMinSizing autoScroll'>
           {entitiesComponents}
-          {entitiesComponents.length == 0 && (links.length > 0 || fields.length > 0) &&
+          {entitiesComponents.length == 0 && !rows.entities &&
             <Tabs justify="start" flex={true}>
               <Tab title={`1-M Links (${m2mLinksComponents.length})`}>
                 {m2mLinksComponents}
