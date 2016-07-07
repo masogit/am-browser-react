@@ -67,6 +67,8 @@ if not exist "%JAVA_HOME%\bin\javac.exe" goto noJavaHome
 if not "%JRE_HOME%" == "" goto okJavaHome
 set "JRE_HOME=%JAVA_HOME%\jre"
 set "JAVAEXE=%JAVA_HOME%\bin\java.exe"
+rem short path
+for %%x in ("%JAVAEXE%") do set JAVAEXE=%%~sx
 goto okJavaHome
 :noJavaHome
 echo The JAVA_HOME environment variable is not defined correctly
@@ -99,6 +101,7 @@ if %Minor% EQU 7 (
 ) else (
   set PERMGEN_OPTS=-XX:MetaspaceSize=128M
 )
+echo %PERMGEN_OPTS%
 if not "%CATALINA_BASE%" == "" goto gotBase
 set "CATALINA_BASE=%CATALINA_HOME%"
 :gotBase
