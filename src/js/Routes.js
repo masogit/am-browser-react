@@ -14,9 +14,12 @@ import UCMDBAdapterContainer from './components/ucmdbAdapter/UCMDBAdapterPoint';
 var rootPath = "/";
 
 const indexRoute = {component: Main};
+const DEFAULT_PATH = '/search';
 
-export let postLoginPath = '/search';
+let postLoginPath = DEFAULT_PATH;
+export const getPostLoginPath = () => postLoginPath;
 export const setPostLoginPath = (path) => postLoginPath = path;
+export const resetPostLoginPath = () => postLoginPath = DEFAULT_PATH;
 
 export const getRoutes = (headerNavs) => {
   const routes = [{path: 'login', component: Login}];

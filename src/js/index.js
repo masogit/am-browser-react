@@ -10,7 +10,7 @@ import Rest from './util/grommet-rest-promise';
 import {getCurrentLocale, getLocaleData} from 'grommet/utils/Locale';
 import {addLocaleData} from 'react-intl';
 import en from 'react-intl/locale-data/en';
-import Routes, {getRoutes, postLoginPath, setPostLoginPath} from './Routes';
+import Routes, {getRoutes, getPostLoginPath, setPostLoginPath, resetPostLoginPath} from './Routes';
 import DevTools from './DevTools';
 import {Provider} from 'react-redux';
 import {IntlProvider} from 'react-intl';
@@ -109,12 +109,15 @@ if (process.env.NODE_ENV === 'production') {
 // check for session
 const sessionWatcher = () => {
   const {route, session} = store.getState();
+  if (session.loggedout) {
+    resetPostLoginPath();
+  }
 
   if (route) {
     if (session.headerNavs) {
       Routes.routes[0].childRoutes = getRoutes(session.headerNavs);
       if (route.pathname === '/login') {
-        history.pushState(null, Routes.path(postLoginPath));
+        history.pushState(null, Routes.path(getPostLoginPath()));
       }
     } else {
       Routes.routes[0].childRoutes = getRoutes(null);

@@ -5,7 +5,8 @@ import { INIT, LOGIN, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT, GET_SETTINGS_SUCCESS
 const initialState = {
   email: null,
   error: null,
-  headerNavs: null
+  headerNavs: null,
+  loggedout: false
 };
 
 const handlers = {
@@ -17,7 +18,12 @@ const handlers = {
     headerNavs: action.headerNavs
   }),
   [LOGIN_FAILURE]: (_, action) => ({error: action.error}),
-  [LOGOUT]: () => initialState,
+  [LOGOUT]: () => ({
+    email: null,
+    error: null,
+    headerNavs: null,
+    loggedout: true
+  }),
   [GET_SETTINGS_SUCCESS]: (_, action) => ({headerNavs: action.headerNavs})
 };
 
