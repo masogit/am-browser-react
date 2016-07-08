@@ -1,5 +1,6 @@
 import {AM_DB_DEF_URL, VIEW_DEF_URL, DOWNLOAD_DEF_URL, UCMDB_DEF_URL} from '../constants/ServiceConfig';
 import Rest from '../util/grommet-rest-promise';
+import _ from 'lodash';
 
 export function loadViews(callback) {
   Rest.get(VIEW_DEF_URL).then((res) => {
@@ -120,12 +121,15 @@ export function getQueryByBody(body) {
 }
 
 export function getGroupByAql(body) {
-  var aggregate = (body.sum) ? `sum(${body.sum})` : 'count(*)';
-  var aql = `select ${body.groupby}, ${aggregate} from ${body.sqlname}`;
+  let aggregate = (body.sum) ? `sum(${body.sum})` : 'count(*)';
+  let aql = `select ${body.groupby}, ${aggregate} from ${body.sqlname}`;
+  let fieldsWhere = getWhereFromFields(body.fields);
   if (body.filter)
     aql += ` where (${body.filter}) AND (PK <> 0)`; // PK <> 0 to avoid the invalid empty record
   else
     aql += ` where PK <> 0`; // PK <> 0 to avoid the invalid empty record
+  if (fieldsWhere)
+    aql += ` AND ${fieldsWhere}`;
   if (body.groupby)
     aql += ` group by ${body.groupby}`;
   if (body.orderby && body.orderby.indexOf(body.groupby) > -1)
@@ -136,4 +140,17 @@ export function getGroupByAql(body) {
 
 export function getDownloadQuery(sqlname) {
   return DOWNLOAD_DEF_URL + '/' + sqlname;
+}
+
+export function getWhereFromFields(fields) {
+  let links = [];
+  fields.forEach((field) => {
+    let paths = field.sqlname.split('.');
+    if (paths.length > 1) {
+      paths.pop();
+      links.push(paths.join('.') + ' <> 0');
+    }
+  });
+
+  return _.uniq(links).join(' AND ');
 }
