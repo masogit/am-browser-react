@@ -155,8 +155,8 @@ export function metadataLoadDetail(obj, elements) {
     });
 }
 
-export function loginSuccess(email, headerNavs) {
-  return {type: LOGIN_SUCCESS, email, headerNavs};
+export function loginSuccess(username, headerNavs) {
+  return {type: LOGIN_SUCCESS, username, headerNavs};
 }
 
 export function loginFailure(error) {

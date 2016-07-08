@@ -248,9 +248,9 @@ function loginSuccess(req, res, username, password, email, rights, am) {
   req.session.user = username;
   req.session.rights = rights;
   am_rest.headerNavs = getHeadNav(rights);
-  res.cookie('headerNavs', am_rest.headerNavs);
-  res.cookie("user", username);
-  res.cookie("email", email);
+  // res.cookie('headerNavs', am_rest.headerNavs);
+  // res.cookie("user", username);
+  // res.cookie("email", email);
   res.json(am_rest);
   slack(username, `${username} logs in`);
   logger.info(`[user] [${req.sessionID || '-'}]`, (req.session && req.session.user ? req.session.user : "user") + " login.");
