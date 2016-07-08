@@ -344,7 +344,7 @@ gulp.task('gen-ws-base', ['clean-gen-ws', 'download-ws'], function () {
       .pipe(rename({basename: 'AssetManagerWebService'}))
       .pipe(gulp.dest('./rest/gen/temp/websvc'));
   // unzip tomcat instance
-  var unzip_tomcat = gulp.src('./rest/lib/apache-tomcat-8.0.18-windows-x64.zip', {base : '.'})
+  var unzip_tomcat = gulp.src('./rest/lib/apache-tomcat-' + config.Tomcat + '-windows-x64.zip', {base : '.'})
       .pipe(unzip())
       .pipe(gulp.dest('./rest/gen/temp'));
   // unzip download zip
@@ -358,9 +358,9 @@ gulp.task('gen-ws-conf', ['gen-ws-base'], function () {
   console.log('Copy ws conf');
   // generate ws package
   var copy_conf = gulp.src('./rest/conf/Catalina/**')
-      .pipe(gulp.dest('./rest/gen/temp/apache-tomcat-8.0.18/conf/Catalina'));
+      .pipe(gulp.dest('./rest/gen/temp/apache-tomcat-' + config.Tomcat + '/conf/Catalina'));
   var copy_server = gulp.src('./rest/conf/server.xml')
-      .pipe(gulp.dest('./rest/gen/temp/apache-tomcat-8.0.18/conf'));
+      .pipe(gulp.dest('./rest/gen/temp/apache-tomcat-' + config.Tomcat + '/conf'));
   var copy_product =  gulp.src('./rest/product.str')
       .pipe(gulp.dest('./rest/gen/temp'));
   // unzip ant instance
