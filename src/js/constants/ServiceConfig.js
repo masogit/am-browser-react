@@ -17,6 +17,7 @@ export const CSRF_DEF_URL = "/am/csrf";
 export const ABOUT_DEF_URL = "/am/about";
 export const LOGIN_DEF_URL = "/am/login";
 export const LOGOUT_DEF_URL = "/am/logout";
+export const SESSION_DEF_URL = "/am/session";
 export const DOWNLOAD_DEF_URL = "/am/download";
 
 // UCMDB SERVICE

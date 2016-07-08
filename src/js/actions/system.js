@@ -4,6 +4,7 @@ import Rest from '../util/grommet-rest-promise';
 import cookies from 'js-cookie';
 import * as Types from '../constants/ActionTypes';
 import {
+  SESSION_DEF_URL,
   CSRF_DEF_URL,
   ABOUT_DEF_URL,
   LOGIN_DEF_URL,
@@ -32,10 +33,13 @@ export const NAV_RESPONSIVE = 'NAV_RESPONSIVE';
 export const METADATA_SUCCESS = 'METADATA_SUCCESS';
 export const METADATA_DETAIL_SUCCESS = 'METADATA_DETAIL_SUCCESS';
 
-export function init(email, headerString) {
+export function init() {
   try {
-    const headerNavs = JSON.parse(headerString.substring(headerString.indexOf('{')));
-    return {type: INIT, email, headerNavs};
+    return Rest.post(SESSION_DEF_URL).then((res) => {
+      return {type: INIT, username: res.body.user, headerNavs: res.body.headerNavs};
+    }, (err) => {
+      console.log(err.response ? err.response.text : err);
+    });
   } catch (e) {
     return {type: INIT};
   }
