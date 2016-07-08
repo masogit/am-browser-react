@@ -35,7 +35,7 @@ export const METADATA_DETAIL_SUCCESS = 'METADATA_DETAIL_SUCCESS';
 
 export function init() {
   try {
-    return Rest.post(SESSION_DEF_URL).then((res) => {
+    return Rest.get(SESSION_DEF_URL).then((res) => {
       return {type: INIT, username: res.body.user, headerNavs: res.body.headerNavs};
     }, (err) => {
       console.log(err.response ? err.response.text : err);
