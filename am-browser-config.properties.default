@@ -40,3 +40,7 @@ channel = #betaprogram
 [proxy]
 host =
 port =
+
+# Logging level. Valid levels are: error, warn, info, verbose, debug, silly.
+[logging]
+level = info

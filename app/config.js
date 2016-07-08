@@ -44,5 +44,7 @@ module.exports = {
 
   rights_admin: properties.get('user.admin'),
   rights_power: properties.get('user.power'),
-  rights_guest: properties.get('user.guest')
+  rights_guest: properties.get('user.guest'),
+
+  logging_level: properties.get('logging.level')
 };
