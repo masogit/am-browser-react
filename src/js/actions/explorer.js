@@ -123,13 +123,13 @@ export function getQueryByBody(body) {
 export function getGroupByAql(body) {
   let aggregate = (body.sum) ? `sum(${body.sum})` : 'count(*)';
   let aql = `select ${body.groupby}, ${aggregate} from ${body.sqlname}`;
-  let fieldsWhere = getWhereFromFields(body.fields);
+  // let fieldsWhere = getWhereFromFields(body.fields);
   if (body.filter)
     aql += ` where (${body.filter}) AND (PK <> 0)`; // PK <> 0 to avoid the invalid empty record
   else
     aql += ` where PK <> 0`; // PK <> 0 to avoid the invalid empty record
-  if (fieldsWhere)
-    aql += ` AND ${fieldsWhere}`;
+  // if (fieldsWhere)
+  //   aql += ` AND ${fieldsWhere}`;
   if (body.groupby)
     aql += ` group by ${body.groupby}`;
   if (body.orderby && body.orderby.indexOf(body.groupby) > -1)
@@ -148,7 +148,7 @@ export function getWhereFromFields(fields) {
     let paths = field.sqlname.split('.');
     if (paths.length > 1) {
       paths.pop();
-      links.push(paths.join('.') + ' <> 0');
+      links.push(paths.join('.') + '.PK <> 0');
     }
   });
 
