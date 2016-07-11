@@ -226,11 +226,11 @@ export default class ViewDefDetail extends ComponentBase {
                         }}/>
           </td>
           <td>
-            {(!selfView.body.orderby || selfView.body.orderby.trim() == "" || !selfView.body.orderby.startsWith(field.sqlname)) &&
+            {(!selfView.body.orderby || selfView.body.orderby.trim() == "" || !_.startsWith(selfView.body.orderby, field.sqlname)) &&
             <CheckBox id={`v.${currentPath}body.orderby`} name={`v.${currentPath}body.orderby`}
                       value={field.sqlname}
-                      checked={!!selfView.body.orderby && selfView.body.orderby.startsWith(field.sqlname)}
-                      disabled={!!selfView.body.orderby && !selfView.body.orderby.startsWith(field.sqlname)}
+                      checked={!!selfView.body.orderby && _.startsWith(selfView.body.orderby, field.sqlname)}
+                      disabled={!!selfView.body.orderby && !_.startsWith(selfView.body.orderby, field.sqlname)}
                       onChange={
                         (event) => {
                           this._onTripleStateChange(event, field.sqlname);
