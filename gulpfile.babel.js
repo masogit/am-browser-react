@@ -278,18 +278,26 @@ gulp.task('parse-metadata-xml', ['download-metadata-xml'], function () {
 gulp.task('download-ws', ['parse-metadata-xml'], function () {
   console.log('Download ws and x64 binary');
   var ws_json = require('./rest/downloads/ws/json/maven-metadata.json');
+  var ws_version_info = ws_json.metadata.versioning[0].snapshot[0].timestamp + '-' + ws_json.metadata.versioning[0].snapshot[0].buildNumber;
+  if (config.Release_WS) {
+	  ws_version_info = config.Release_WS;
+  }
   var ws_url = config.Nexus + 'com/hp/am/java/ac.ws/MAIN-SNAPSHOT/ac.ws-MAIN-'
-      + ws_json.metadata.versioning[0].snapshot[0].timestamp + '-' + ws_json.metadata.versioning[0].snapshot[0].buildNumber + '.war';
+      + ws_version_info + '.war';
   console.log('Ws url is : ' + ws_url);
   var x64_json = require('./rest/downloads/x64/json/maven-metadata.json');
+  var x64_version_info = "";
   var x64_url = "";
   var snapshotVersion = x64_json.metadata.versioning[0].snapshotVersions[0].snapshotVersion;
   for (var i = 0; i < snapshotVersion.length; i++) {
 	  if (snapshotVersion[i].classifier && snapshotVersion[i].classifier[0] == config.Classifier) {
-	      x64_url = config.Nexus + 'com/hp/am/cpp/binary/MAIN-SNAPSHOT/binary-'
-              + snapshotVersion[i].value[0] + '-' + config.Classifier + '.' + snapshotVersion[i].extension[0];
+	      x64_version_info = snapshotVersion[i].value[0] + '-' + config.Classifier + '.' + snapshotVersion[i].extension[0];
 	  }
   }
+  if (config.Release_CPP) {
+	  x64_version_info = 'MAIN-' + config.Release_CPP + + '-' + config.Classifier + '.zip';
+  }
+  x64_url = config.Nexus + 'com/hp/am/cpp/binary/MAIN-SNAPSHOT/binary-' +　x64_version_info；
   console.log('x64 binary url is : ' + x64_url);
   var openssl_json = require('./rest/downloads/openssl/json/maven-metadata.json');
   var openssl_url = config.Nexus3rd + 'com/hp/am/3rd/openssl/'

@@ -6,5 +6,7 @@
   "Description": "AMBrowser",
   "SERVER": "(local)",
   "Database": "AMDemo96en",
-  "Tomcat": "8.0.36"
+  "Tomcat": "8.0.36",
+  "Release_WS": "20160711.115618-443",
+  "Release_CPP": "20160628.122358-695"
 }
