@@ -45,6 +45,10 @@ export function init() {
   }
 }
 
+export function exit() {
+  return {type: INIT, username: '', headerNavs: ''};
+}
+
 export function initToken() {
   return Rest.get(CSRF_DEF_URL).end((err, res) => {
     if (err || !res.ok) {

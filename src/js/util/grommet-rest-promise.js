@@ -29,7 +29,7 @@ Promise.config({
 });
 
 const store = require('../store');
-const {init} = require('../actions/system');
+const {exit} = require('../actions/system');
 /**
  *
  * Add promise support for grommet REST.
@@ -47,7 +47,7 @@ Request.prototype.promise = function () {
       // global error message
       if (err) {
         if (err.status == 401 || err.status == 403) {
-          store.default.dispatch(init('', ''));
+          store.default.dispatch(exit());
         }
         let msg = err.response && err.response.text || err.message;
         if (msg && err.status == 400) {
