@@ -77,7 +77,7 @@ module.exports = function (app) {
 
   // AM Server Login
   app.post('/am/login', rest.login);
-  app.get('/am/session', rest.session);
+  app.post('/am/session', rest.session);
   app.get('/am/logout', function (req, res) {
     logger.info(`[user] [${req.sessionID || '-'}]`, (req.session && req.session.user ? req.session.user : "user") + " logout.");
     var am_rest = {};
