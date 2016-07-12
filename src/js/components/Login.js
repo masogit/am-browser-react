@@ -30,6 +30,10 @@ class IndexerLogin extends Component {
     });
   }
 
+  componentWillUnmount() {
+    this._isUnmount = true;
+  }
+
   _onResponsive(responsive) {
     this.setState({
       responsive: responsive
@@ -42,10 +46,6 @@ class IndexerLogin extends Component {
     } else {
       this.props.dispatch(loginFailure({message: 'Please type your user name'}));
     }
-  }
-
-  componentWillUnmount() {
-    this._isUnmount = true;
   }
 
   render() {
