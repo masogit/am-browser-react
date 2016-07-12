@@ -113,6 +113,9 @@ export default class ViewDefDetail extends ComponentBase {
   _onMail(view) {
     let br = "%0D%0A";
     let subject = `AM Browser View: ${view.name}`;
+    if (!window.location.origin) {
+      window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
+    }
     let url = window.location.origin + '/explorer/' + view._id;
     let content = `URL: ${url}${br}Description: ${view.desc}`;
     window.open(`mailto:test@example.com?subject=${subject}&body=${content}`, '_self');

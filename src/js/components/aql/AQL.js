@@ -194,6 +194,9 @@ export default class AQL extends Component {
   _onMail(aql) {
     // let br = "%0D%0A";
     let subject = `AM Browser Graph: ${aql.name}`;
+    if (!window.location.origin) {
+      window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
+    }
     let url = window.location.origin + '/insight/' + aql._id;
     let content = `URL: ${url}`;
     window.open(`mailto:test@example.com?subject=${subject}&body=${content}`, '_self');
