@@ -4,7 +4,9 @@ import 'index.scss';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+//import Router from 'react-router';
 import Rest from './util/grommet-rest-promise';
+//import RestWatch from './RestWatch';
 import {getCurrentLocale, getLocaleData} from 'grommet/utils/Locale';
 import {addLocaleData} from 'react-intl';
 import en from 'react-intl/locale-data/en';
@@ -18,9 +20,37 @@ import history from './RouteHistory';
 import {init, initToken, routeChanged} from './actions/system';
 import {ReduxRouter} from 'redux-router';
 
+// The port number needs to align with devServerProxy and websocketHost in gulpfile.js
+//let hostName = NODE_ENV === 'development' ? 'localhost:8010' : window.location.host;
+
+//RestWatch.initialize('ws://' + hostName + '/rest/ws');
+
 
 Rest.setHeader('Accept', 'application/json');
 Rest.setHeader('X-API-Version', 200);
+
+// From a comment in https://github.com/rackt/redux/issues/637
+// this factory returns a history implementation which reads the current state
+// from the redux store and delegates push state to a different history.
+//let createStoreHistory = () => {
+//  return {
+//    listen: (callback) => {
+//      // subscribe to the redux store. when `route` changes, notify the listener
+//      let notify = () => {
+//        const route = store.getState().route;
+//        if (route) {
+//          callback(route);
+//        }
+//      };
+//      const unsubscribe = store.subscribe(notify);
+//
+//      return unsubscribe;
+//    },
+//    createHref: history.createHref,
+//    pushState: history.pushState,
+//    push: history.push
+//  };
+//};
 
 let element = document.getElementById('content');
 
@@ -34,6 +64,12 @@ try {
   messages = require('../messages/en-US');
 }
 var localeData = getLocaleData(messages, locale);
+
+import cookies from 'js-cookie';
+
+if (cookies.get('headerNavs')) {
+  store.dispatch(init(cookies.get('user'), cookies.get('headerNavs')));
+}
 
 const renderPage = () => {
   Routes.routes[0].childRoutes = getRoutes(store.getState().session.headerNavs);
@@ -69,11 +105,6 @@ if (process.env.NODE_ENV === 'production') {
 } else {
   initToken().end(renderPage());
 }
-
-// get user info from req.session
-init(store).then((action) => {
-  store.dispatch(action);
-});
 
 // check for session
 const sessionWatcher = () => {

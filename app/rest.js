@@ -185,15 +185,6 @@ module.exports = function (am) {
     });
   };
 
-  this.session = function (req, res) {
-    var am_rest = {};
-    if (req.session.rights) {
-      am_rest.headerNavs = getHeadNav(req.session.rights);
-      am_rest.user = req.session.user;
-    }
-    res.json(am_rest);
-  };
-
   this.jwtRenew = function (req, res) {
 
     var url = "http://${server}${context}${ref-link}";
