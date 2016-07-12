@@ -297,7 +297,7 @@ gulp.task('download-ws', ['parse-metadata-xml'], function () {
   if (config.Release_CPP) {
 	  x64_version_info = 'MAIN-' + config.Release_CPP + + '-' + config.Classifier + '.zip';
   }
-  x64_url = config.Nexus + 'com/hp/am/cpp/binary/MAIN-SNAPSHOT/binary-' +　x64_version_info；
+  x64_url = config.Nexus + 'com/hp/am/cpp/binary/MAIN-SNAPSHOT/binary-' +　x64_version_info;
   console.log('x64 binary url is : ' + x64_url);
   var openssl_json = require('./rest/downloads/openssl/json/maven-metadata.json');
   var openssl_url = config.Nexus3rd + 'com/hp/am/3rd/openssl/'
