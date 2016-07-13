@@ -113,7 +113,7 @@ export function getQueryByBody(body) {
       var userFilters = userParam.filters.map((filter) => {
         return '(' + filter + ')';
       }).join(" AND ");
-      param.filter = param.filter ? param.filter + ' AND (' + userFilters + ')' : userFilters;
+      param.filter = param.filter ? `(${param.filter}) AND (${userFilters})` : userFilters;
     }
   }
 
