@@ -434,7 +434,7 @@ export default class AQL extends Component {
               </Menu>
             </Menu>
           </Header>
-          <Box className='autoScroll' pad={{horizontal: 'medium'}}>
+          <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'medium'}}>
             <Box justify="between" direction="row" className='header'>
               <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_Box">
                   <textarea id="AQL_Box" name="str" value={this.state.aql.str} rows="3"

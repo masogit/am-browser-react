@@ -386,7 +386,7 @@ export default class ViewDefDetail extends ComponentBase {
              </form>
              */}
           </Header>
-          <Box className='autoScroll' pad={{horizontal: 'medium'}}>
+          <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'medium'}}>
             <Split flex="left" fixed={false} className='fixMinSizing'>
               <Box flex={true}>
                 {table}

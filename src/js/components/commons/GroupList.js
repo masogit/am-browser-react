@@ -104,7 +104,7 @@ export default class GroupList extends Component {
                          onSelect={this._selectSuggestion.bind(this)} onDOMChange={this._onSearch.bind(this)}/>
           </Box>
         }
-        <Box className='autoScroll'>
+        <Box className='autoScroll fixIEScrollBar'>
         {
           Object.keys(grouped).map((key, i) => {
             const selected = this.props.focus && _.findIndex(grouped[key], (item => this.props.focus.selected == item.key));

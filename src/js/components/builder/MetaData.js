@@ -375,7 +375,7 @@ export default class MetaData extends ComponentBase {
       );
     });
     return (
-      <Box flex={true} className='fixMinSizing'>
+      <Box flex={true} className='fixMinSizing fixIEScrollBar'>
         <SearchInput value={this.state.searchText} placeHolder="Search fields and links..."
                      onDOMChange={this._onSearch}/>
         <Box pad={{vertical: 'small'}} className='fixMinSizing autoScroll'>

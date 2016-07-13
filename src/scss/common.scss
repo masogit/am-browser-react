@@ -41,6 +41,11 @@
   min-height: 0;
 }
 
+.fixIEScrollBar {
+  flex-grow: 1;
+  flex-basis: 0;
+}
+
 .autoScrollBox {
   overflow: auto;
   height: 300px;
