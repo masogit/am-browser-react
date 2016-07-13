@@ -3,23 +3,23 @@
 import { INIT, LOGIN, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT, GET_SETTINGS_SUCCESS } from '../actions/system';
 
 const initialState = {
-  username: null,
+  email: null,
   error: null,
   headerNavs: null,
   loggedout: false
 };
 
 const handlers = {
-  [INIT]: (_, action) => ({username: action.username, headerNavs: action.headerNavs}),
-  [LOGIN]: (_, action) => ({username: action.username, error: null}),
+  [INIT]: (_, action) => ({email: action.email, headerNavs: action.headerNavs}),
+  [LOGIN]: (_, action) => ({email: action.email, error: null}),
   [LOGIN_SUCCESS]: (_, action) => ({
-    username: action.username,
+    email: action.email,
     error: null,
     headerNavs: action.headerNavs
   }),
   [LOGIN_FAILURE]: (_, action) => ({error: action.error}),
   [LOGOUT]: () => ({
-    username: null,
+    email: null,
     error: null,
     headerNavs: null,
     loggedout: true

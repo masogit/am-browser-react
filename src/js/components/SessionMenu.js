@@ -14,6 +14,8 @@ var Logout = require('grommet/components/icons/base/Logout');
 var History = require('grommet/components/icons/base/History');
 var About = require('grommet/components/icons/base/Information');
 
+import cookies from 'js-cookie';
+
 class SessionMenu extends Component {
 
   constructor() {
@@ -54,7 +56,7 @@ class SessionMenu extends Component {
 
     return (
       <Box>
-        <Menu icon={<User />} label={this.props.session.username} dropAlign={{ right: 'right', top: 'top' }}>
+        <Menu icon={<User />} label={cookies.get('user')} dropAlign={{ right: 'right', top: 'top' }}>
           {/*
           <Anchor href="#" className="active">Settings</Anchor>
           <Anchor href="#">Help</Anchor>
