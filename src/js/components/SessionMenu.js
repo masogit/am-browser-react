@@ -13,6 +13,7 @@ var Slack = require('grommet/components/icons/base/SocialSlack');
 var Logout = require('grommet/components/icons/base/Logout');
 var History = require('grommet/components/icons/base/History');
 var About = require('grommet/components/icons/base/Information');
+var Help = require('grommet/components/icons/base/Help');
 
 import cookies from 'js-cookie';
 
@@ -61,6 +62,7 @@ class SessionMenu extends Component {
           <Anchor href="#" className="active">Settings</Anchor>
           <Anchor href="#">Help</Anchor>
            */}
+          <Anchor icon={<Help />} href="http://ambrowser.readthedocs.io" target="about:blank" label="Help" className="fontNormal"/>
           <Anchor icon={<About />} onClick={() => this.showDialog("about")} label="About" className="fontNormal"/>
           <Anchor icon={<History />} onClick={() => this.showDialog("history")} label="Message History"
                   className="fontNormal"/>
