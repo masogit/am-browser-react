@@ -16,6 +16,7 @@ import Mail from 'grommet/components/icons/base/Mail';
 import _ from 'lodash';
 import AlertForm from '../../components/commons/AlertForm';
 import FieldTypes from '../../constants/FieldTypes';
+import {saveAs} from 'file-saver';
 
 export default class ViewDefDetail extends ComponentBase {
 
@@ -102,12 +103,8 @@ export default class ViewDefDetail extends ComponentBase {
   }
 
   _onDownload(obj) {
-    var content = "data:application/json;charset=utf-8,";
-    var encodedUri = encodeURI(content + JSON.stringify(obj));
-    var link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", (obj.name || obj.body.sqlname || 'view') + ".json");
-    link.click();
+    let blob = new Blob([JSON.stringify(obj)], {type: "data:application/json;charset=utf-8"});
+    saveAs(blob, (obj.name || obj.body.sqlname || 'view') + ".json");
   }
 
   _onMail(view) {

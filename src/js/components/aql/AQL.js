@@ -18,6 +18,7 @@ import Download from 'grommet/components/icons/base/Download';
 import More from 'grommet/components/icons/base/More';
 import Mail from 'grommet/components/icons/base/Mail';
 import Trash from 'grommet/components/icons/base/Trash';
+import {saveAs} from 'file-saver';
 
 import {
   Anchor, Box, Split, SearchInput, Form, FormField, FormFields, Layer, Tabs, Table, TableRow, Title, Header, Menu
@@ -57,12 +58,8 @@ export default class AQL extends Component {
   }
 
   _onDownload(obj) {
-    var content = "data:application/json;charset=utf-8,";
-    var encodedUri = encodeURI(content + JSON.stringify(obj));
-    var link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", (obj.name || 'graph') + ".json");
-    link.click();
+    let blob = new Blob([JSON.stringify(obj)], {type: "data:application/json;charset=utf-8"});
+    saveAs(blob, (obj.name || 'graph') + ".json");
   }
 
   _initAQL(callback) {
