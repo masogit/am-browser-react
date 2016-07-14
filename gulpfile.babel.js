@@ -212,7 +212,8 @@ gulp.task('copy-temp', ['dist', 'clean-gen'], function () {
 gulp.task('gen', ['copy-temp'], function () {
   console.log('Generate am-browser.zip from temp folder');
   //var timestamp = Math.floor(new Date().getTime()/1000);
-  var name = 'am-browser' + '-' + version.number + '-' + timestamp + '_' + version.stage + '.zip';
+  var build = version.stage ? version.number + '-' + timestamp + '_' + version.stage : '';
+  var name = 'am-browser' + '-' + build + '.zip';
   // generate am-browser.zip from temp folder
   return gulp.src('./gen/temp/**')
       .pipe(zip(name))
@@ -398,7 +399,8 @@ gulp.task('gen-ws', ['gen-ws-conf'], function () {
   console.log('Generate am-browser-rest.zip from temp folder');
   // generate am-browser-rest.zip from temp folder
   //var timestamp = Math.floor(new Date().getTime()/1000);
-  var name = 'am-browser-rest' + '-' + version.number + '-' + timestamp + '_' + version.stage + '.zip';
+  var build = version.stage ? version.number + '-' + timestamp + '_' + version.stage : '';
+  var name = 'am-browser-rest' + '-' + build + '.zip';
   return gulp.src('./rest/gen/temp/**')
       .pipe(zip(name))
       .pipe(gulp.dest('./rest/gen'));
