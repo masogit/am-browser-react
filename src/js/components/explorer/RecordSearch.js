@@ -2,12 +2,13 @@ import React, {Component} from 'react';
 import * as ExplorerAction from '../../actions/explorer';
 import RecordDetail from './RecordDetail';
 import RecordList from './RecordList';
+import ComponentBase from '../commons/ComponentBase'
 import history from '../../RouteHistory';
 import {
   Anchor, Box, Button, Header, Footer, Layer, Split, Table, TableRow, Tiles, Title, Tile, Form
 } from 'grommet';
 
-export default class RecordSearch extends Component {
+export default class RecordSearch extends ComponentBase {
 
   constructor() {
     super();
@@ -23,6 +24,9 @@ export default class RecordSearch extends Component {
 
   componentDidMount() {
     this._search(this.props.params.keyword);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
   }
 
   componentWillReceiveProps(nextProps) {
@@ -80,6 +84,7 @@ export default class RecordSearch extends Component {
                     this.setState({
                       results: [...results]
                     });
+                    this.releaseLock();
                   }
                 });
               }
@@ -130,6 +135,9 @@ export default class RecordSearch extends Component {
   }
 
   _onSearch(keyword) {
+    if (!this.acquireLock()) {
+      return;
+    }
     history.push(`/search/${encodeURI(keyword)}`);
     this.setState({
       keyword: keyword
