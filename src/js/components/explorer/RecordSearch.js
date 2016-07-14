@@ -1,8 +1,8 @@
-import React, {Component} from 'react';
+import React from 'react';
 import * as ExplorerAction from '../../actions/explorer';
 import RecordDetail from './RecordDetail';
 import RecordList from './RecordList';
-import ComponentBase from '../commons/ComponentBase'
+import ComponentBase from '../commons/ComponentBase';
 import history from '../../RouteHistory';
 import {
   Anchor, Box, Button, Header, Footer, Layer, Split, Table, TableRow, Tiles, Title, Tile, Form
