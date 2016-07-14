@@ -204,7 +204,7 @@ gulp.task('copy-temp', ['dist', 'clean-gen'], function () {
   var copy_file = gulp.src(['./app/**', './demo/**', './dist/**', './node_modules/**', './am-browser-config.properties.default'], {base : '.'})
       .pipe(gulp.dest('./gen/temp'));
   var gen_timestamp = gulp.src('./version.json', {base : '.'})
-      .pipe(jeditor({'timestamp': timestamp}))
+      .pipe(jeditor({'timestamp': version.stage ? timestamp : ''}))
       .pipe(gulp.dest('./gen/temp'));
   return merge(unzip_node, copy_cmd, copy_file, gen_timestamp);
 });
