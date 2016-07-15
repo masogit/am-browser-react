@@ -54,7 +54,7 @@ export default class Explorer extends Component {
   render() {
     let content;
     if (this.state.view) {
-      content = <RecordList body={this.state.view.body} title={this.state.view.name}/>;
+      content = <RecordList body={this.state.view.body} title={this.state.view.name} layer={false}/>;
     } else {
       content = (
         <Box pad={{horizontal: 'medium'}} flex={true} justify='center' align="center">
