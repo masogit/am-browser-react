@@ -11,7 +11,7 @@
     "express": "^4.10.6",
     "express-session": "^1.13.0",
     "file-saver": "^1.3.2",
-    "grommet": "https://github.com/grommet/grommet/tarball/stable",
+    "grommet": "0.6.7",
     "grommet-index": "https://github.com/grommet/grommet-index/tarball/stable",
     "history": "^1.17.0",
     "http-proxy": "^1.13.2",
