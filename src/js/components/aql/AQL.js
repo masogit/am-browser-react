@@ -129,24 +129,12 @@ export default class AQL extends Component {
 
   _onQuery() {
     AQLActions.queryAQL(this.state.aql.str, (data) => {
-      if (this.state.aql.update) {
-        const aql = this.state.aql;
-        const graphData = this.state.graphData;
-        aql.form = 'init';
-        aql.update = false;
-        graphData.meter = undefined;
-        graphData.chart = undefined;
-        graphData.distribution = undefined;
-        this.setState({
-          data,
-          aql,
-          graphData
-        });
-      } else {
-        this.setState({
-          data
-        });
-      }
+      const aql = this.state.aql;
+      aql.form = 'init';
+      this.setState({
+        aql,
+        data
+      });
     });
   }
 
@@ -239,11 +227,19 @@ export default class AQL extends Component {
 
     const path = event.target.name;
     const obj = this.state.aql;
+    let graphData = this.state.graphData;
+    let data = this.state.data;
     obj[path] = val;
     if (path === 'str' && obj.form !== 'init') {
-      obj.update = true;
+      // when AQL change, reset data, form and graphData
+      obj.form = null;
+      data = {
+        header: [],
+        rows: []
+      };
+      graphData = {};
     }
-    this.setState({aql: obj});
+    this.setState({aql: obj, graphData: graphData, data: data});
   }
 
   _genGraph(form, type) {
