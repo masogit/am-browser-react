@@ -52,6 +52,11 @@ var indexHtml = function (req, res) {
   res.sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));
 };
 
+// routes ======================================================================
+require('./routes.js')(app);
+
+app.get('/*', indexHtml);
+
 // redirect morgan log to winston
 morgan.token('sessionId', function getSessionId (req) {
   return req.session ? req.session.id : '';
@@ -63,11 +68,6 @@ var stream = {
   }
 };
 app.use(morgan(morganFormat, {stream: stream}));
-
-// routes ======================================================================
-require('./routes.js')(app);
-
-app.get('/*', indexHtml);
 
 app.use(function (err, req, res, next) {
   logger.error(`[csrf] [${req.sessionID}] [${req.session && req.session.csrfSecret}] [${err.name}: ${err.message}] ${req.method} ${req.url}`);
