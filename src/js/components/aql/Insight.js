@@ -473,9 +473,20 @@ export default class Insight extends Component {
   }
 
   _onRemoveTab(targetTab) {
-    this.setState({
-      tabs: this.state.tabs.filter((tab) => tab.name != targetTab.name)
+    let focusIndex = -1;
+    let tabs = this.state.tabs;
+    let leftTabs = tabs.filter((tab, index) => {
+      if (tab.name != targetTab.name) {
+        return tab;
+      } else {
+        focusIndex = index;
+      }
     });
+    let focusTab = tabs[(focusIndex + 1) % tabs.length];
+    this.setState({
+      tabs: leftTabs,
+      focusTab
+    }, () => this.refs[focusTab.name].props.onRequestForActive());
   }
 
   render() {
@@ -488,7 +499,8 @@ export default class Insight extends Component {
       content = (
         <Tabs justify='center' className='flex'>{
           tabs.map((tab) => (
-            <ActionTab title={tab.name} key={tab.name} onClick={this._setFocusTab.bind(this, tab)} onEdit={edit}
+            <ActionTab ref={tab.name} title={tab.name} key={tab.name} onClick={this._setFocusTab.bind(this, tab)}
+                       onEdit={edit}
                        onDoubleClick={this.state.edit ? this._onUpdateTitle.bind(this, tab) : null}>
               {carousel && !edit ? this._buildCarousel(tab) : this._buildBox(tab.box, tab.box, tab.name)}
             </ActionTab>
