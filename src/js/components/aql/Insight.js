@@ -426,16 +426,18 @@ export default class Insight extends Component {
   }
 
   _addTab() {
-    let newName = 'Tab';
-    let index = this.state.tabs.length + 1;
+    let namePrefix = 'Tab_';
+    let maxIndex = 1;
     this.state.tabs.forEach(tab => {
-      const name = `${newName}_${index}`;
-      if (tab == name) {
-        index++;
+      if (tab.name.indexOf(namePrefix) == 0) {
+        let index = tab.name.substr(namePrefix.length) / 1;
+        // if index == NaN, will always return false
+        if (index > maxIndex)
+          maxIndex = index;
       }
     });
 
-    const name = `${newName}_${index}`;
+    const name = `${namePrefix}${maxIndex + 1}`;
     this.setState({
       tabs: [...this.state.tabs, {
         name: name,
