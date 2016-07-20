@@ -2,12 +2,7 @@
  * Created by huling on 5/22/2016.
  */
 import React, {Component, PropTypes} from 'react';
-import {
-  Chart,
-  Legend,
-  Meter,
-  Distribution
-} from 'grommet';
+import {Chart, Legend, Meter, Distribution, Table, TableRow} from 'grommet';
 
 const assignObjectProp = (from, to, propName) => {
   if (from[propName]) {
@@ -224,8 +219,32 @@ export default class Graph extends Component {
     return legend;
   }
 
+  _gen_table(data) {
+    const header = data.header.map((col) => <th key={col.Index}>{col.Name}</th>);
+    const rows = data.rows.map((row, index) => (
+      <TableRow key={index}>{
+        row.map((col, i) => <td key={i}>{col}</td>)
+      }</TableRow>
+    ));
+
+    return (
+      <Table>
+        <thead>
+        <tr>{header}</tr>
+        </thead>
+        <tbody>
+        {rows}
+        </tbody>
+      </Table>
+    );
+  }
+
   render() {
     const {type, config, onClick, data} = this.props;
+
+    if (config == 'init') {
+      return this._gen_table(data);
+    }
 
     if (data && data.rows.length > 0) {
       const graph = this['_gen_' + type](config, data, onClick);

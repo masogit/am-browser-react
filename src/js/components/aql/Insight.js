@@ -381,10 +381,13 @@ export default class Insight extends Component {
     return (
       <Box pad="large" colorIndex="light-2" flex={false}>
         <Header>{aql.name}</Header>
-        <Box key={aql._id} pad="large" align={(aql.type=='meter')?'center':null}>
-          <Graph type={aql.type} data={data} config={aql.form}
-                 onClick={(filter) => this._showViewRecords(filter, aql.view)}/>
-        </Box>
+        {
+          aql.form instanceof Object &&
+          <Box key={aql._id} pad="large" align={(aql.type=='meter')?'center':null}>
+            <Graph type={aql.type} data={data} config={aql.form}
+                  onClick={(filter) => this._showViewRecords(filter, aql.view)}/>
+          </Box>
+        }
         <Table>
           <thead>
           <tr>{header}</tr>

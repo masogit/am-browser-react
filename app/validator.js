@@ -118,8 +118,8 @@ function aql(aql) {
     return "AQL is required!";
   if (['chart', 'meter', 'distribution'].indexOf(aql.type) < 0)
     return "type must in: chart, meter, distribution!";
-  if (!aql.form || aql.form == 'init')
-    return "Need proper Graph form. Specified column is required! ";
+  if (!aql.form)
+    return "Need Graph form!";
 
   if (error = form(form))
     return error;
