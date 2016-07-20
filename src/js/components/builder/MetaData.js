@@ -213,15 +213,15 @@ export default class MetaData extends ComponentBase {
       return;
     }
     this.props.clearFilter();
-    this.metadataLoadDetail(obj, this.props.elements);
+    this.metadataLoadDetail(obj, this.props.elements, true);
   }
 
-  metadataLoadDetail(obj, eles, callback) {
+  metadataLoadDetail(obj, eles, userClick) {
     metadataLoadDetail(obj, eles).then(({rows, elements}) => {
-      if (rows.sqlname != this.state.schemaToLoad || eles.length == 0) {
-        eles = elements;
+      this.props.updateData(userClick ? elements : eles, rows);
+      if (userClick) {
+        this.releaseLock();
       }
-      this.props.updateData(eles, rows);
     });
   }
 
