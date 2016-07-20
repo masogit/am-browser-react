@@ -242,6 +242,16 @@ export default class MetaData extends ComponentBase {
     return !nextProps.rows.sqlname || nextProps.rows.sqlname != this.props.rows.sqlname || this.state.searchText != nextState.searchText;
   }
 
+  _sortSqlName(a, b) {
+    var nameA = a.sqlname.toLowerCase();
+    var nameB = b.sqlname.toLowerCase();
+    if (nameA < nameB) //sort string ascending
+      return -1;
+    if (nameA > nameB)
+      return 1;
+    return 0; //default return value (no sorting)
+  }
+
   linkSort(links) {
     return links.sort(this._sortSqlName).map((row, index) => {
       let newRow = {
