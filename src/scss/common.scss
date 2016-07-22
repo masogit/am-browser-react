@@ -47,6 +47,11 @@
 }
 
 /** IE11: */
+/*@media screen and (-ms-high-contrast:active), all and (-ms-high-contrast:none)*/
+.grommetux-header--small {
+    height: auto;
+}
+
 .fixIEScrollBar {
   flex-grow: 1;
   flex-basis: 0;
@@ -106,14 +111,14 @@ table {
   }
 }
 
-.flex .tabs__content {
+.flex .grommetux-tabs__content {
   flex-grow: 1;
 }
 
-.anchor.small .anchor__icon {
+.anchor.small .grommetux-anchor__icon {
   padding: 0 2px;
 }
 
-.menu--row.menu--inline > div > div {
+.grommetux-menu--row.grommetux-menu--inline > div > div {
 	height: 48px ;
 }
