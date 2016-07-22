@@ -53,18 +53,14 @@ export default class Insight extends Component {
   }
 
   componentDidMount() {
-    // get user name from localstorage
-    if (user) {
-      if (this.props.params.id) {
-        AQLActions.loadAQL(this.props.params.id, (aql)=> {
-          this._queryData(aql);
-        });
-      } else {
-        this._loadAQLs();
-        this._loadWall();
-      }
+    if (this.props.params.id) {
+      AQLActions.loadAQL(this.props.params.id, (aql)=> {
+        this._queryData(aql);
+      });
+    } else {
+      this._loadAQLs();
+      this._loadWall();
     }
-
   }
 
   _setFocusTab(tab) {
