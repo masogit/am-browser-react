@@ -1,14 +1,8 @@
 import yargs from 'yargs';
-const argv = yargs.argv;
 import gulp from 'gulp';
 import path from 'path';
-//import nodemon from 'gulp-nodemon';
-import grommetToolbox, {getOptions} from 'grommet-toolbox';
-import git from 'gulp-git';
-import del from 'del';
-import mkdirp from 'mkdirp';
+import grommetToolbox from 'grommet-toolbox';
 import child_process from 'child_process';
-const spawn = child_process.spawn;
 import zip from 'gulp-zip';
 import unzip from 'gulp-unzip';
 import clean from 'gulp-clean';
@@ -16,12 +10,14 @@ import merge from 'merge-stream';
 import download from 'gulp-download';
 import xml2json from 'gulp-xml2json';
 import rename from 'gulp-rename';
-import webpack from 'webpack';
 import dateformat from 'dateformat';
 import jeditor from 'gulp-json-editor';
 import version from './version.json';
 import config from './rest/conf/config.json';
 import amb_config from './app/config';
+
+const argv = yargs.argv;
+const spawn = child_process.spawn;
 
 const opts = {
   base: '.',
@@ -37,31 +33,12 @@ const opts = {
   jsAssets: ['src/js/**/*.js'],
   mainJs: 'src/js/index.js',
   mainScss: 'src/scss/index.scss',
-  sync: {
-    hostname: 'grommet.us.rdlabs.hpecorp.net',
-    username: 'ligo',
-    remoteDestination: '/var/www/html/examples/ferret/dist'
-  },
   webpack: {
     resolve: {
       root: [
         path.resolve(__dirname, 'src/js'),
         path.resolve(__dirname, 'src/scss'),
         path.resolve(__dirname, 'node_modules')
-      ]
-    },
-    module: {
-      loaders: [
-        {
-          test: /\.(js|jsx)?$/,
-          loader: 'babel-loader',
-          include: /node_modules\/react-gravatar/
-        },
-        {
-          test: /\.(js|jsx)?$/,
-          loader: 'babel-loader',
-          include: /react-gravatar/
-        }
       ]
     }
   },
@@ -90,76 +67,6 @@ gulp.task('set-webpack-alias', () => {
   if (opts.alias && argv.useAlias) {
     console.log('Using local alias for development.');
     opts.webpack.resolve.alias = opts.alias;
-  }
-});
-
-gulp.task('release:createTmp', (done) => {
-  del.sync(['./tmp']);
-  mkdirp('./tmp', (err) => {
-    if (err) {
-      throw err;
-    }
-    done();
-  });
-});
-
-gulp.task('release:heroku', ['dist', 'release:createTmp'], (done) => {
-  if (process.env.CI) {
-    git.clone('https://' + process.env.GH_TOKEN + '@github.com/grommet/grommet-ferret.git',
-      {
-        cwd: './tmp/'
-      },
-      (err) => {
-        if (err) {
-          throw err;
-        }
-
-        process.chdir('./tmp/grommet-ferret');
-        git.checkout('heroku', (err) => {
-          if (err) {
-            throw err;
-          }
-
-          gulp.src([
-            '../../**',
-            '!../../.gitignore',
-            '!../../.travis.yml'])
-            .pipe(gulp.dest('./')).on('end', () => {
-              git.status({
-                args: '--porcelain'
-              }, (err, stdout) => {
-                if (err) {
-                  throw err;
-                }
-
-              if (stdout && stdout !== '') {
-                gulp.src('./')
-                  .pipe(git.add({
-                    args: '--all'
-                  }))
-                  .pipe(git.commit('Heroku dev version update.')).on('end', () => {
-                    git.push('origin', 'heroku', { quiet: true }, (err) => {
-                      if (err) {
-                        throw err;
-                      }
-
-                      process.chdir(__dirname);
-                      done();
-                    });
-                  });
-              } else {
-                console.log('No difference since last commit, skipping heroku release.');
-
-                process.chdir(__dirname);
-                done();
-              }
-            });
-          });
-        });
-      }
-    );
-  } else {
-    console.warn('Skipping release. Release:heroku task should be executed by CI only.');
   }
 });
 

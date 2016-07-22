@@ -55,7 +55,7 @@ class NavHeader extends Component {
         </Title>
         <Menu direction="row" align="center" responsive={true}>
           {
-            links.map((link, index) => <Link key={index} to={link.to} className={`anchor ${this.getActive(link.to)}`}>{link.text}</Link>)
+            links.map((link, index) => <Link key={index} to={link.to} className={`${this.getActive(link.to)}`} style={{textDecoration: 'none'}}>{link.text}</Link>)
           }
           <SessionMenu />
         </Menu>

@@ -357,7 +357,7 @@ export default class RecordList extends Component {
     return (
       <Header justify="between">
         <Title>{this.props.title}</Title>
-        <input type="text" inline={true} className="flex" ref="search" style={this.state.aqlInput?aqlStyle:{}}
+        <input type="text" className="flex" ref="search" style={this.state.aqlInput?aqlStyle:{}}
                placeholder={this.state.aqlInput?`Input AQL...`:`Quick search, press / input AQL`}
                onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
         <Box direction="column">

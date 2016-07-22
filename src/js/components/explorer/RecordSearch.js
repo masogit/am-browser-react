@@ -106,9 +106,9 @@ export default class RecordSearch extends ComponentBase {
           const title = pre_str + key_str + suf_str;
           return (
             <Box key={field.sqlname + index} direction='row'>
-              <span className='text-ellipsis' title={title}>{
+              <span className='grommetux-text-ellipsis' title={title}>{
                 `${field.sqlname}: ${pre_str}`
-              }<span className='background-color-index-brand'>{
+              }<span className='grommetux-background-color-index-brand'>{
                 key_str
               }</span>{
                   suf_str
@@ -182,7 +182,7 @@ export default class RecordSearch extends ComponentBase {
       <Box flex={true}>
         <Header justify="between" pad={{'horizontal': 'medium'}}>
           <Title>Global Search</Title>
-          <input type="search" inline={true} className="flex" placeholder="Global Record search..." ref="search" style={{marginLeft: '20px', marginRight: '20px'}}
+          <input type="search" className="flex" placeholder="Global Record search..." ref="search" style={{marginLeft: '20px', marginRight: '20px'}}
             onKeyDown={this._onEnter.bind(this)} defaultValue={this.props.params.keyword} maxLength={50}/>
           <Button label="Search" onClick={()=>this._onSearch(this.refs.search.value)} />
         </Header>
@@ -235,7 +235,7 @@ export default class RecordSearch extends ComponentBase {
                           <Form>
                             <Box pad="small">
                               <Anchor onClick={this._onClick.bind(this, result.view, record)}
-                                      className='text-ellipsis'>
+                                      className='grommetux-text-ellipsis'>
                                 <span title={record.self}><b>{record.self}</b></span>
                               </Anchor>
                               {this._getContent(result.view, record)}

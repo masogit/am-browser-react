@@ -1,7 +1,6 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
-import Tab from '../../../../node_modules/grommet/components/Tab';
 import React, {PropTypes} from 'react';
-import {Box} from 'grommet';
+import {Box, Tab} from 'grommet';
 
 export default class ActionTab extends Tab {
   constructor() {
@@ -65,8 +64,8 @@ export default class ActionTab extends Tab {
   render() {
     if (this.props.onEdit) {
       return (
-        <Box className={this.props.active ? 'tab--active' : ''} pad={{horizontal: 'small'}}>
-          <Box direction='row' className='tab__label' style={{display: 'flex'}}>
+        <Box className={this.props.active ? 'grommetux-tab--active' : ''} pad={{horizontal: 'small'}}>
+          <Box direction='row' className='grommetux-tab__label' style={{display: 'flex'}}>
             {this.state.editing ?
               <input autoFocus={true} ref='input' value={this.state.title} onBlur={this._toggleEdit.bind(this)}
                      onChange={this._onChange.bind(this)} onKeyDown={this._onChange.bind(this)}/> :

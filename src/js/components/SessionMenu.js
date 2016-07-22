@@ -70,7 +70,7 @@ class SessionMenu extends Component {
           <Anchor icon={<Logout />} onClick={this._onLogout.bind(this)} label="Logout" className="fontNormal"/>
         </Menu>
         {this.state.dialog &&
-        <Layer align="center" closer={<Anchor className='layer__closer' icon={<Close/>} onClick={this.closeDialog}/>}>
+        <Layer align="center" closer={<Anchor className='grommetux-layer__closer' icon={<Close/>} onClick={this.closeDialog}/>}>
           {dialog[this.state.dialog]}
         </Layer>
         }

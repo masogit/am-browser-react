@@ -2,7 +2,7 @@
 
 import React, { Component, PropTypes } from 'react';
 
-const CLASS_ROOT = 'logo-icon';
+const CLASS_ROOT = 'grommetux-logo-icon';
 
 class FerretLogo extends Component {
 
@@ -10,7 +10,7 @@ class FerretLogo extends Component {
     var classes = [CLASS_ROOT];
     if (this.props.size) {
       classes.push(CLASS_ROOT + '--' + this.props.size);
-      classes.push('color-index-brand');
+      classes.push('grommetux-color-index-brand');
     }
     if (this.props.className) {
       classes.push(this.props.className);

@@ -23,32 +23,33 @@
   overflow: auto;
 }
 
-.grommet.app {
+/** Grommet: */
+.grommet.grommetux-app {
   display: flex;
 }
 
-.grommet.app > .box {
+.grommet.grommetux-app > .grommetux-box {
   flex-grow: 1;
 }
 
-/*for the minimum sizing behavior*/
-.main-container > .box {
+.grommetux-tabs__content {
+  flex-grow: 1;
+}
+
+/** Firefox: for the minimum sizing behavior*/
+.main-container > .grommetux-box {
   min-height: 0;
 }
 
-/*for the minimum sizing behavior*/
+/** Firefox: for the minimum sizing behavior*/
 .fixMinSizing {
   min-height: 0;
 }
 
+/** IE11: */
 .fixIEScrollBar {
   flex-grow: 1;
   flex-basis: 0;
-}
-
-.autoScrollBox {
-  overflow: auto;
-  height: 300px;
 }
 
 table {
@@ -84,21 +85,24 @@ table {
   white-space: pre;
 }
 
-.autoScroll div[role=tablist] {
-  display: flex;
-  flex-direction: column;
+/** Tab: */
+.autoScroll {
+  & div[role=tablist] {
+    display: flex;
+    flex-direction: column;
 
-  & ul {
-    flex-shrink: 0;
+    & ul {
+      flex-shrink: 0;
+    }
   }
-}
 
-.autoScroll div[role=tabpanel] {
-  display: flex;
-  overflow-y: auto;
+  & div[role=tabpanel] {
+    display: flex;
+    overflow-y: auto;
 
-  & li {
-    flex-shrink: 0;
+    & li {
+      flex-shrink: 0;
+    }
   }
 }
 
