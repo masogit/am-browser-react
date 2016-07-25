@@ -147,10 +147,13 @@ export function metadataLoadDetail(obj, elements) {
     .set('Content-Type', 'Application/json')
     .then(res => {
       if (res.ok) {
-        let data = res.body;
-        obj.body_label = data.label;
-        obj.body_sqlname = data.sqlname;
-        return {rows: data, elements: [...elements, obj]};
+        const rows = res.body;
+        obj.body_label = rows.label;
+        obj.body_sqlname = rows.sqlname;
+        return {
+          rows,
+          elements: [...elements, obj]
+        };
       }
     });
 }
@@ -169,6 +172,14 @@ export function routeChanged(route, prefix) {
 
 export function navResponsive(responsive) {
   return {type: NAV_RESPONSIVE, responsive: responsive};
+}
+
+export function loadMetadataDetailSuccess(rows, elements) {
+  return {type: Types.LOAD_METADATA_DETAIL_SUCCESS, rows, elements};
+}
+
+export function loadAllMetadataSuccess(rows) {
+  return {type: Types.LOAD_ALL_METADATA_SUCCESS, rows};
 }
 
 

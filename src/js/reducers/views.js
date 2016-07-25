@@ -4,7 +4,7 @@ import { REQUEST_VIEWS, RECEIVE_VIEWS_SUCCESS, RECEIVE_VIEWS_FAILURE, SET_SELECT
   REQUEST_TEMPLATE_TABLE, RECEIVE_TEMPLATE_TABLE_SUCCESS, RECEIVE_TEMPLATE_TABLE_FAILURE,
   NEW_SELECTED_VIEW, UPDATE_SELECTED_VIEW, SYNC_SELECTED_VIEW, SAVE_VIEW_DEF, DELETE_TABLE_ROW,
   DUPLICATE_VIEW_DEF, DELETE_VIEW_DEF, UPDATE_VIEW_DEF_LIST, OPEN_PREVIEW, CLOSE_PREVIEW,
-  ALERT_FORM}
+  ALERT_FORM, LOAD_METADATA_DETAIL_SUCCESS, LOAD_ALL_METADATA_SUCCESS}
   from '../constants/ActionTypes';
 import _ from 'lodash';
 import emptyViewDef from './EmptyViewDef.json';
@@ -19,7 +19,9 @@ const initialState = {
   err: '',
   editing: false,
   preview: false,
-  alertForm: null
+  alertForm: null,
+  elements: [],
+  rows: {}
 };
 
 const handlers = {
@@ -139,8 +141,18 @@ const handlers = {
     return {
       alertForm: action.alertForm
     };
+  },
+  [LOAD_METADATA_DETAIL_SUCCESS]: (state, action) => {
+    return {
+      rows: action.rows,
+      elements: action.elements
+    };
+  },
+  [LOAD_ALL_METADATA_SUCCESS]: (state, action) => {
+    return {
+      rows: action.rows
+    };
   }
-
 };
 
 export default function viewsReducer(state = initialState, action) {

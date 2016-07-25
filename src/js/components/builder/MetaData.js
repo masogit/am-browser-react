@@ -9,7 +9,7 @@ import SearchInput from 'grommet/components/SearchInput';
 import Notes from 'grommet/components/icons/base/Notes';
 import Spinning from 'grommet/components/icons/Spinning';
 
-import {metadataLoadDetail, metadataLoad} from '../../actions/system';
+import {metadataLoadDetail, metadataLoad, loadAllMetadataSuccess, loadMetadataDetailSuccess } from '../../actions/system';
 import {syncSelectedView} from '../../actions/views';
 import _ from 'lodash';
 import {connect} from 'react-redux';
@@ -160,35 +160,21 @@ const findItem = (links, name) => {
   });
 };
 
-export default class MetaData extends ComponentBase {
-
-  constructor() {
-    super();
+class MetaData extends ComponentBase {
+  componentWillMount() {
     this._onSearch = this._onSearch.bind(this);
     this.state = {
-      searchText: '',
-      schemaToLoad: '',
-      elements: []
+      searchText: ''
     };
-    this.loading = '';
-  }
-
-  componentWillMount() {
-    this.getAllRows().then(() => {
-      this.setState({
-        schemaToLoad: this.props.schemaToLoad,
-        elements: this.props.elements
-      });
-    });
+    this.getAllRows();
+    this.generateSidebar(this.props.linkNames);
   }
 
   getAllRows() {
     if (!this.getAllRowsPromise) {
-      this.loading += 'getAllRows';
       this.getAllRowsPromise = metadataLoad().then((rows) => {
-        this.loading = this.loading.replace('getAllRows', '');
+        this.props.dispatch(loadAllMetadataSuccess(rows));
         this.allRows = rows;
-        this.props.updateData(undefined, rows);
       });
     }
     return this.getAllRowsPromise;
@@ -208,52 +194,30 @@ export default class MetaData extends ComponentBase {
     });
   }
 
-  _onClick(obj) {
+  _onClick(rows) {
     if (!this.acquireLock()) {
       return;
     }
     this.props.clearFilter();
-    this.metadataLoadDetail(obj, this.props.elements, true);
+    this.metadataLoadDetail(rows, this.props.elements);
   }
 
-  metadataLoadDetail(obj, eles, userClick) {
-    metadataLoadDetail(obj, eles).then(({rows, elements}) => {
-      this.props.updateData(userClick ? elements : eles, rows);
-      if (userClick) {
-        this.releaseLock();
-      }
-    });
+  metadataLoadDetail(rows, elements) {
+    metadataLoadDetail(rows, elements).then(({rows, elements}) => this.props.dispatch(loadMetadataDetailSuccess(rows, elements)));
   }
 
-  _onChange(obj) {
-    this.props.dispatch(syncSelectedView(updateView(this.props.elements, obj, this.props.selectedView)));
+  _onChange(rows) {
+    this.props.dispatch(syncSelectedView(updateView(this.props.elements, rows, this.props.selectedView)));
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.linkNames.join('') != this.props.linkNames.join('')) {
-      const diff = nextProps.elements.filter((element, index) => element.sqlname != nextProps.linkNames[index]);
-      if (nextProps.elements.length == 0 || diff.length > 0) {
-        this.generateSidebar(nextProps.linkNames);
-      }
+      this.generateSidebar(nextProps.linkNames);
     }
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return !nextProps.rows.sqlname || nextProps.rows.sqlname != this.props.rows.sqlname || this.state.searchText != nextState.searchText;
-  }
-
-  _sortSqlName(a, b) {
-    var nameA = a.sqlname.toLowerCase();
-    var nameB = b.sqlname.toLowerCase();
-    if (nameA < nameB) //sort string ascending
-      return -1;
-    if (nameA > nameB)
-      return 1;
-    return 0; //default return value (no sorting)
-  }
-
   linkSort(links) {
-    return links.sort(this._sortSqlName).map((row, index) => {
+    return links.sort(sortSqlName).map((row, index) => {
       let newRow = {
         label: row.label,
         sqlname: row.sqlname,
@@ -270,32 +234,25 @@ export default class MetaData extends ComponentBase {
     });
   }
 
-  updateState(elements) {
-    this.loading = this.loading.replace('generateSidebar', '');
-    this.setState({
-      schemaToLoad: elements.length > 1 ? elements[elements.length - 1].dest_table.sqlname : elements[0].sqlname,
-      elements: elements
-    });
-  }
-
-  getLink(nameList, links, bread) {
-    let items = findItem(links, nameList[0]);
+  getLink(nameList, rows, elements) {
+    let items = findItem(rows.links, nameList[0]);
     if (items.length > 0) {
       let parent = items[0];
       parent.url = parent.dest_table["ref-link"];
-      bread.push(parent);
+      elements.push(parent);
 
-      if (nameList.length > 1) {
-        metadataLoadDetail({
-          label: parent.label,
-          sqlname: parent.sqlname,
-          url: parent.dest_table["ref-link"]
-        }, bread).then(({rows}) => {
-          this.getLink(nameList.slice(1), rows.links, bread);
-        });
-      } else {
-        this.updateState(bread);
-      }
+      metadataLoadDetail({
+        label: parent.label,
+        sqlname: parent.sqlname,
+        url: parent.dest_table["ref-link"]
+      }, elements).then(({rows}) => {
+        if (nameList.length > 1) {
+          this.getLink(nameList.slice(1), rows, elements);
+        } else {
+          this.loading = false;
+          this.props.dispatch(loadMetadataDetailSuccess(rows, elements));
+        }
+      });
     }
   }
 
@@ -306,40 +263,40 @@ export default class MetaData extends ComponentBase {
     }
 
     if (linkNames && linkNames.length > 0 && linkNames.join('_') != this.schemaName) {
-      this.loading += 'generateSidebar';
+      this.loading = true;
       this.schemaName = linkNameList.join('&');
       this.getAllRows().then(() => {
         const root = this.allRows.entities.filter(obj => linkNames[0] == obj.sqlname)[0];
-        let bread, links = [];
 
         metadataLoadDetail({
           label: root.label,
           sqlname: root.sqlname,
           url: root["ref-link"]
         }, []).then(({rows, elements}) => {
-          bread = elements;
-          links = rows.links;
-
           if (linkNames.length > 1) {
-            this.getLink(linkNames.slice(1), links, bread);
+            this.getLink(linkNames.slice(1), rows, elements);
           } else {
-            this.updateState(bread);
+            this.loading = false;
+            this.props.dispatch(loadMetadataDetailSuccess(rows, elements));
           }
         });
       });
     }
   }
 
+  componentWillUnmount() {
+    this.props.dispatch(loadMetadataDetailSuccess({}, []));
+  }
+
   render() {
-    if (this.loading) {
+    let {filterEntities, elements, rows, schemaToLoad} = this.props;
+
+    let rowsState = this.state.searchText && this.state.filtered ? this.state.filtered : rows;
+
+    if (this.loading || !(rowsState.entities || rowsState.links || rowsState.fields)) {
       return <Spinning />;
     }
 
-    let {filterEntities, rows} = this.props;
-    const elements = this.state.elements;
-    const schemaToLoad = this.state.schemaToLoad;
-
-    let rowsState = this.state.searchText && this.state.filtered ? this.state.filtered : rows;
 
     let entities = [];
     if (rowsState.entities) {
@@ -362,7 +319,7 @@ export default class MetaData extends ComponentBase {
 
     let links = rowsState.links ? rowsState.links : [];
     let fields = rowsState.fields ? rowsState.fields : [];
-    // let LinkNext = require('grommet/components/icons/base/LinkNext');
+
     let entitiesComponents = entities.sort(sortSqlName).map((row, index) => {
       return (
         <ListItem separator="none" key={index} pad="none" flex={false}>
@@ -371,13 +328,13 @@ export default class MetaData extends ComponentBase {
         </ListItem>
       );
     });
-    //
+
     let linksComponents = this.linkSort(links.filter((obj) => obj.card11 == true));
     let m2mLinksComponents = this.linkSort(links.filter((obj) => obj.card11 != true));
     //let fieldsComponents = fields.sort().map((row, index) => {
     //  return <TableRow key={index}><td><CheckBox key={index} id={`checkbox_${row.sqlname}`} checked={row.checked} onChange={this._onChange.bind(this, row)}/><Notes/>{row.sqlname}</td></TableRow>;
     //});
-    let fieldsComponents = fields.sort(this._sortSqlName).map((row, index) => {
+    let fieldsComponents = fields.sort(sortSqlName).map((row, index) => {
       return (
         <ListItem separator="none" key={index} pad="none">
           <Anchor href="#" key={index} icon={<Notes />} onClick={this._onChange.bind(this, row)} label={row.sqlname}/>
@@ -411,7 +368,9 @@ export default class MetaData extends ComponentBase {
 
 let select = (state, props) => {
   return {
-    selectedView: state.views.selectedView
+    selectedView: state.views.selectedView,
+    elements: state.views.elements,
+    rows: state.views.rows
   };
 };
 

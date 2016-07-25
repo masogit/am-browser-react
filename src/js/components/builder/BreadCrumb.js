@@ -1,21 +1,21 @@
 import React, {Component, PropTypes} from 'react';
 import Anchor from 'grommet/components/Anchor';
 import Box from 'grommet/components/Box';
-import {metadataLoadDetail} from '../../actions/system';
+import {metadataLoadDetail, loadMetadataDetailSuccess} from '../../actions/system';
+import {connect} from 'react-redux';
+let Home = require('grommet/components/icons/base/Home');
+let Next = require('grommet/components/icons/base/Next');
 
-export default class BreadCrumb extends Component {
+class BreadCrumb extends Component {
   _onDetailClick(index) {
     this.props.clearFilter();
-    const obj = this.props.elements[index];
-    metadataLoadDetail(obj, []).then(({rows}) => {
-      this.props.updateData(this.props.elements.slice(0, index + 1), rows);
-    });
+    const rows = this.props.elements[index];
+    const elements = this.props.elements.slice(0, index);
+    metadataLoadDetail(rows, elements).then(({rows, elements}) => this.props.dispatch(loadMetadataDetailSuccess(rows, elements)));
   }
 
   render() {
     let elements = this.props.elements;
-    let Home = require('grommet/components/icons/base/Home');
-    let Next = require('grommet/components/icons/base/Next');
     let breadcrumbs = elements.map((element, index) => {
       if (index == 0) {
         return (<Anchor key={index} icon={<Home />} onClick={this._onDetailClick.bind(this, index)}
@@ -37,3 +37,11 @@ export default class BreadCrumb extends Component {
 BreadCrumb.propTypes = {
   elements: PropTypes.array.isRequired
 };
+
+let select = (state, props) => {
+  return {
+    elements: state.views.elements
+  };
+};
+
+export default connect(select)(BreadCrumb);

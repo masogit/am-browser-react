@@ -9,7 +9,6 @@ import Close from 'grommet/components/icons/base/Close';
 import Edit from 'grommet/components/icons/base/Edit';
 
 export default class ViewsDefList extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -17,19 +16,6 @@ export default class ViewsDefList extends Component {
       schema: '',
       linkNames: []
     };
-  }
-
-  componentDidMount() {
-  }
-
-  componentWillReceiveProps(nextProps) {
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    return !this.state.editView || nextState.linkNames != this.state.linkNames || nextState.schema != this.state.schema;
-  }
-
-  componentWillUpdate(nextProps, nextState) {
   }
 
   _editView(sqlname) {
@@ -49,11 +35,9 @@ export default class ViewsDefList extends Component {
   }
 
   _closeEdit() {
-    this.setState({
-      editView: null
-    });
     this.props.clearSelectedView();
     this.setState({
+      editView: null,
       schema: '',
       linkNames: []
     });
@@ -72,8 +56,7 @@ export default class ViewsDefList extends Component {
       toolbar =
         <Anchor href="#" icon={<Close />} label="Close" onClick={this._closeEdit.bind(this)} className='fontNormal'/>;
       contents = this.state.editView &&
-        <Builder schemaToLoad={this.state.schema} linkNames={this.state.schema ? [] : this.state.linkNames}
-                 ref='builder'/>;
+        <Builder schemaToLoad={this.state.schema} linkNames={this.state.linkNames} ref='builder'/>;
     } else {
       toolbar = <Anchor href="#" icon={<Add />} label="New" onClick={this._newView.bind(this)} className='fontNormal'/>;
       contents = views.map((view, key) => ({
