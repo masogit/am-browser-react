@@ -3,8 +3,8 @@ import Anchor from 'grommet/components/Anchor';
 import Box from 'grommet/components/Box';
 import {metadataLoadDetail, loadMetadataDetailSuccess} from '../../actions/system';
 import {connect} from 'react-redux';
-let Home = require('grommet/components/icons/base/Home');
-let Next = require('grommet/components/icons/base/Next');
+import Home from 'grommet/components/icons/base/Home';
+import Next from 'grommet/components/icons/base/Next';
 
 class BreadCrumb extends Component {
   _onDetailClick(index) {

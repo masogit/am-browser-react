@@ -7,7 +7,7 @@ import {
   Table,
   TableRow
 } from 'grommet';
-var Status = require('grommet/components/icons/Status');
+import Status from 'grommet/components/icons/Status';
 
 class MessageHistory extends Component {
 

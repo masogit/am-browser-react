@@ -4,7 +4,8 @@
 
 import {statusAdapter} from '../../constants/StatusAdapter.js';
 import React from 'react';
-var Status = require('grommet/components/icons/Status');
+import Status from 'grommet/components/icons/Status';
+
 import {Table, Box} from 'grommet';
 
 export const IntegrationJobItemTemplate = ({

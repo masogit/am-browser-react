@@ -7,7 +7,7 @@ import IntegrationJobContainer from './IntegrationJob.js';
 import IntegrationJobItemContainer from './IntegrationJobItem.js';
 
 import {statusAdapter} from '../../constants/StatusAdapter.js';
-var Status = require('grommet/components/icons/Status');
+import Status from 'grommet/components/icons/Status';
 import SideBar from '../commons/SideBar';
 import Box from 'grommet/components/Box';
 

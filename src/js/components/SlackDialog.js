@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 import { Box, Button, Title, FormField, Form, Footer, Menu } from 'grommet';
-var SocialSlack = require('grommet/components/icons/base/SocialSlack');
+import SocialSlack from 'grommet/components/icons/base/SocialSlack';
 
 export default class SlackDialog extends Component {
   constructor() {

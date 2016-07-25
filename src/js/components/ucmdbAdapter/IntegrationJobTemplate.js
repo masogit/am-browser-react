@@ -3,7 +3,7 @@
  */
 
 import {statusAdapter} from '../../constants/StatusAdapter.js';
-var Status = require('grommet/components/icons/Status');
+import Status from 'grommet/components/icons/Status';
 import {Tabs, Table, Box} from 'grommet';
 import ActionTab from './../commons/ActionTab.js';
 import React from 'react';

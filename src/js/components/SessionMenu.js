@@ -8,12 +8,12 @@ import { Menu, Anchor, Layer, Box } from 'grommet';
 import MessageHistory from './MessageHistory';
 import SlackDialog from './SlackDialog';
 import AboutDialog from './AboutDialog';
-var Close = require('grommet/components/icons/base/Close');
-var Slack = require('grommet/components/icons/base/SocialSlack');
-var Logout = require('grommet/components/icons/base/Logout');
-var History = require('grommet/components/icons/base/History');
-var About = require('grommet/components/icons/base/Information');
-var Help = require('grommet/components/icons/base/Help');
+import Close from 'grommet/components/icons/base/Close';
+import Slack from 'grommet/components/icons/base/SocialSlack';
+import Logout from 'grommet/components/icons/base/Logout';
+import History from 'grommet/components/icons/base/History';
+import About from 'grommet/components/icons/base/Information';
+import Help from 'grommet/components/icons/base/Help';
 
 import cookies from 'js-cookie';
 
