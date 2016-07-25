@@ -8,7 +8,6 @@ import {
   TableRow
 } from 'grommet';
 import Label from 'grommet/components/Label';
-import Logo from './Logo'; // './HPELogo';
 
 export default class About extends Component {
 
@@ -39,7 +38,7 @@ export default class About extends Component {
   render() {
     return (
       <Box size="medium">
-        <Header><Title><Logo /> Asset Manager Browser</Title></Header>
+        <Header><Title><img src="../../img/favicon.png" className='logo'/> Asset Manager Browser</Title></Header>
         <Table>
           <tbody>
           <TableRow>
@@ -65,7 +64,7 @@ export default class About extends Component {
           </tbody>
         </Table>
         <Label className='copyright'>
-          © 1994-2016 Hewlett Packard Enterprise Development LP All rights reserved.<br />
+          © 2016 Hewlett Packard Enterprise Development LP All rights reserved.<br />
           This software is protected by international copyright law.
         </Label>
       </Box>

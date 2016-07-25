@@ -41,17 +41,11 @@ class NavHeader extends Component {
       });
     }
 
-    let logoStyle = {
-      marginLeft: '20px',
-      marginRight: '20px'
-    };
-
-
     return (
       <Header fixed={true} size="small" full="horizontal" direction="row" justify="between" colorIndex="neutral-1"
               pad={{vertical: 'small'}} responsive={false}>
         <Title>
-          <img src="../../img/favicon.png" style={logoStyle}/> AM Browser
+          <img src="../../img/favicon.png" className='logo'/> AM Browser
         </Title>
         <Menu direction="row" align="center" responsive={true}>
           {
