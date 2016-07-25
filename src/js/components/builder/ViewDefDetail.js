@@ -18,6 +18,32 @@ import AlertForm from '../../components/commons/AlertForm';
 import FieldTypes from '../../constants/FieldTypes';
 import {saveAs} from 'file-saver';
 
+const _onMail = (view) => {
+  if (view.id) {
+    let br = "%0D%0A";
+    let subject = `AM Browser View: ${view.name}`;
+    if (!window.location.origin) {
+      window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
+    }
+    let url = window.location.origin + '/explorer/' + view._id;
+    let content = `URL: ${url}${br}Description: ${view.desc}`;
+    window.open(`mailto:test@example.com?subject=${subject}&body=${content}`, '_self');
+  }
+};
+
+const _onDownload = (view) => {
+  if (view.id) {
+    let blob = new Blob([JSON.stringify(view)], {type: "data:application/json;charset=utf-8"});
+    saveAs(blob, (view.name || view.body.sqlname || 'view') + ".json");
+  }
+};
+
+const isNumber = (field) => {
+  return FieldTypes.number.indexOf(field.type) > -1 && !field.user_type;
+};
+
+
+
 export default class ViewDefDetail extends ComponentBase {
 
   constructor(props) {
@@ -36,25 +62,6 @@ export default class ViewDefDetail extends ComponentBase {
       mainFilter: false,
       alertForm: null
     };
-  }
-
-  componentWillMount() {
-  }
-
-  componentDidMount() {
-  }
-
-  componentWillReceiveProps(nextProps) {
-  }
-
-  componentWillUpdate(nextProps, nextState) {
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    super.componentDidUpdate(prevProps, prevState);
-  }
-
-  componentWillUnmount() {
   }
 
   _onChange(event, value) {
@@ -102,29 +109,6 @@ export default class ViewDefDetail extends ComponentBase {
     this.closeAlertForm();
   }
 
-  _onDownload(obj) {
-    let blob = new Blob([JSON.stringify(obj)], {type: "data:application/json;charset=utf-8"});
-    saveAs(blob, (obj.name || obj.body.sqlname || 'view') + ".json");
-  }
-
-  _onMail(view) {
-    let br = "%0D%0A";
-    let subject = `AM Browser View: ${view.name}`;
-    if (!window.location.origin) {
-      window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
-    }
-    let url = window.location.origin + '/explorer/' + view._id;
-    let content = `URL: ${url}${br}Description: ${view.desc}`;
-    window.open(`mailto:test@example.com?subject=${subject}&body=${content}`, '_self');
-  }
-
-  _isNumber(field) {
-    if (FieldTypes.number.indexOf(field.type) > -1 && !field.user_type)
-      return true;
-    else
-      return false;
-  }
-
   hasLinks(links) {
     if (links) {
       for (let i = 0; i < links.length; i++) {
@@ -141,8 +125,7 @@ export default class ViewDefDetail extends ComponentBase {
 
 
   renderLinks(links, table, path, key) {
-    let selfTable = table;
-    links = selfTable.body.links.map((link, index) => {
+    links = table.body.links.map((link, index) => {
       if (link.body && ((link.body.fields && link.body.fields.length > 0) || this.hasLinks(link.body.links))) {
         let currentPath = path + "." + index;
         const textareaId = `v.${currentPath}.body.filter`;
@@ -173,7 +156,7 @@ export default class ViewDefDetail extends ComponentBase {
     let currentPath = root ? "" : path + ".";
     let selfView = selectedView;
     // map, then filter out null elements, the index is correct; filter out PK fields, then map, the index is wrong.
-    let fields = selfView.body.fields.map((field, index) => {
+    return selfView.body.fields.map((field, index) => {
       return (
         <tr id={`${currentPath}_${selfView.body.sqlname}_${field.sqlname}_${index}_row`}
             key={`${currentPath}_${selfView.body.sqlname}_${field.sqlname}_${index}_row`}>
@@ -219,7 +202,7 @@ export default class ViewDefDetail extends ComponentBase {
           <td>
             <CheckBox id={`v.${currentPath}body.sum`} name={`v.${currentPath}body.sum`}
                       value={field.sqlname} checked={selfView.body.sum==field.sqlname}
-                      disabled={(!!selfView.body.sum&&selfView.body.sum!=field.sqlname) || !this._isNumber(field) || !selfView.body.groupby}
+                      disabled={(!!selfView.body.sum&&selfView.body.sum!=field.sqlname) || !isNumber(field) || !selfView.body.groupby}
                       onChange={
                         (event) => {
                           this._onChange(event, field.sqlname);
@@ -262,8 +245,6 @@ export default class ViewDefDetail extends ComponentBase {
         </tr>
       );
     }).filter(field => field != null);
-
-    return fields;
   }
 
   renderTable(title, filter, selectedView, root, path, key) {
@@ -361,17 +342,19 @@ export default class ViewDefDetail extends ComponentBase {
             <Title>View Builder</Title>
             <Menu direction="row" align="center" responsive={true}>
               <Anchor icon={<Play />} onClick={this.props.openPreview} label="Query" disabled={!table}/>
-              <Anchor icon={<Checkmark />} onClick={() => this.openAlert("save")} label="Save"
+              <Anchor icon={<Checkmark />}
+                      onClick={() => selectedView.name && selectedView.category && this.openAlert("save")} label="Save"
                       disabled={!selectedView.name || !selectedView.category}/>
-              <Anchor icon={<Close />} onClick={() => this.openAlert("delete")} label="Delete"
+              <Anchor icon={<Close />} onClick={() => selectedView._id && this.openAlert("delete")} label="Delete"
                       disabled={!selectedView._id}/>
               <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }}>
-                <Anchor link="#" icon={<Duplicate />} onClick={() => this.openAlert("duplicate")} label="Duplicate"
+                <Anchor link="#" icon={<Duplicate />} onClick={() => selectedView._id && this.openAlert("duplicate")}
+                        label="Duplicate"
                         disabled={!selectedView._id}/>
                 {selectedView._id &&
-                <Anchor icon={<Mail />} onClick={this._onMail.bind(this, selectedView)} label="Mail"
+                <Anchor icon={<Mail />} onClick={(selectedView) => _onMail(selectedView)} label="Mail"
                         disabled={!selectedView._id}/>}
-                <Anchor icon={<Download />} onClick={this._onDownload.bind(this, selectedView)} label="Download"
+                <Anchor icon={<Download />} onClick={(selectedView) => _onDownload(selectedView)} label="Download"
                         disabled={!selectedView._id}/>
               </Menu>
             </Menu>
