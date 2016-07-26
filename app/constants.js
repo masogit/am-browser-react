@@ -1,6 +1,11 @@
 /**
  * Created by huling on 6/29/2016.
  */
+var db = {
+  view: 'view',
+  insight: 'wall',
+  graph: 'aql'
+};
 
 module.exports = {
   rights: {
@@ -18,8 +23,9 @@ module.exports = {
     }
   },
   modules: {
-    view: '/coll/view',
-    insight: '/coll/wall',
-    graph: '/coll/aql'
-  }
+    view: '/coll/' + db.view,
+    insight: '/coll/' + db.insight,
+    graph: '/coll/' + db.graph
+  },
+  collections: db
 };

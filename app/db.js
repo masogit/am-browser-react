@@ -89,6 +89,23 @@ exports.findOne = function (collectionName, id, callback) {
   });
 };
 
+// tingodb Find by filter
+exports.findBy = function (collectionName, filter) {
+  var db = new Engine.Db(tingodbFolder, {});
+
+  return new Promise(function (resolve, reject) {
+    db.collection(collectionName).find(filter).toArray(function (err, documents) {
+      if (err) {
+        logger.error("[tingo]", err);
+        reject(err);
+      }
+
+      resolve(documents);
+      db.close();
+    });
+  });
+};
+
 // tingodb Insert or Update
 exports.upsert = function (req, res) {
   var db = new Engine.Db(tingodbFolder, {});
@@ -101,12 +118,33 @@ exports.upsert = function (req, res) {
     obj = Object.assign(obj, {user: req.session.user});
   }
 
+  // Validation then save or update
   var validator = new Validator();
   var error = validator.document(collectionName, obj);
-  if (error) {
+  if (error instanceof String) {  // Simple String error
     logger.error(`[tingo]`, error);
     res.status(400).send(error);
-  } else {
+  } else if (error instanceof Promise) {  // Promise
+    error.then((message) => {
+      if (message) {
+        logger.error(`[tingo]`, message);
+        res.status(400).send(message);
+      } else {
+        if (id)
+          obj._id = id;
+
+        if (!obj._id)
+          obj._id = (Math.random() + 1).toString(36).substring(7);
+
+        db.collection(collectionName).update({_id: obj._id}, obj, {upsert: true}, function (err, result) {
+          if (err)
+            logger.error("[tingo]", err);
+          res.send(obj._id);
+          db.close();
+        });
+      }
+    });
+  } else {  // no error message
     if (id)
       obj._id = id;
 

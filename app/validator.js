@@ -4,6 +4,9 @@
  * @param document
  * @returns error message
  */
+var db = require('./db.js');
+var coll = require('./constants').collections;
+
 module.exports = function () {
 
   this.document = function (documentName, document) {
@@ -31,7 +34,13 @@ function view(obj) {
   if (error = body(obj.body))
     return error;
 
-  return null;
+  // check duplicate
+  return db.findBy(coll.view, {name: {'$regex' : `^${obj.name}$`, '$options' : 'i'}, category: {'$regex' : `^${obj.category}$`, '$options' : 'i'}}).then((documents) => {
+    if (documents.length > 0 && documents[0]._id != obj._id)
+      return "View name can not duplicate in same category!";
+    else
+      return null;
+  });
 }
 
 function body(obj) {
@@ -124,7 +133,13 @@ function aql(aql) {
   if (error = form(form))
     return error;
 
-  return null;
+  // check duplicate
+  return db.findBy(coll.graph, {name: {'$regex' : `^${aql.name}$`, '$options' : 'i'}, category: {'$regex' : `^${aql.category}$`, '$options' : 'i'}}).then((documents) => {
+    if (documents.length > 0 && documents[0]._id != aql._id)
+      return "Graph name can not duplicate in same category!";
+    else
+      return null;
+  });
 }
 
 function form(form) {
