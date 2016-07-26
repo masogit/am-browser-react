@@ -19,7 +19,7 @@ exports.init = function (dbFolder) {
         }else{
           logger.info("[server]", `The db folder '${dbFolder}' was created.`);
         }
-      })
+      });
 
     }
   });
@@ -46,7 +46,7 @@ exports.find = function (req, res) {
   // Insight get data by user
   var filter = {};
   if (req.originalUrl.indexOf(modules.insight) > -1) {
-    filter = {user: req.session.user}
+    filter = {user: req.session.user};
   }
 
   if (id)
@@ -77,7 +77,7 @@ exports.findOne = function (collectionName, id, callback) {
   // Insight get data by user
   var filter = {};
   if (req.originalUrl.indexOf(modules.insight) > -1) {
-    filter = {user: req.session.user}
+    filter = {user: req.session.user};
   }
 
   db.collection(collectionName).findOne(Object.assign({_id: id}, filter), function (err, documents) {
