@@ -52,14 +52,12 @@ export function loadViews(selectedViewId, currentPathName, callback) {
   };
 }
 
-export function saveViewDef(selectedView, callback) {
-  //console.log(selectedView);
+export function saveViewDef(selectedView) {
   return function (dispatch) {
     return Rest.post(VIEW_DEF_URL)
       .set("Content-Type", "application/json")
       .send(JSON.stringify(selectedView))
       .then(function (res) {
-        console.log("save successfully.");
         let _id = res.text;
         dispatch({
           type: types.SAVE_VIEW_DEF,
@@ -72,23 +70,17 @@ export function saveViewDef(selectedView, callback) {
           msg: "View definition saved successfully."
         });
         return _id;
-        //if (callback) {
-        //  callback(_id);
-        //}
       }, function (err) {
         if (err) {
-          console.log("cannot save: " + err);
           throw err;
         }
       }
-    )
-      ;
+    );
   };
 }
 
 export function setSelectedView(selectedViewId, selectedView) {
   return dispatch => {
-    //console.log("setSelectedView: " + selectedViewId);
     dispatch({
       type: types.SET_SELECTED_VIEW,
       selectedViewId: selectedViewId,
@@ -223,9 +215,8 @@ export function duplicateViewDef(selectedView) {
 
 export function confirmDeleteViewDef(selectedView, callback) {
   return function (dispatch, getState) {
-    Rest.del(VIEW_DEF_URL + selectedView._id)
+    return Rest.del(VIEW_DEF_URL + selectedView._id)
       .then((res) => {
-        console.log("delete successfully - " + selectedView._id);
         let views = getState().views.views;
         let idx = selectedView._id ? _.findIndex(views, {_id: selectedView._id}) : -1;
         dispatch({
