@@ -1,6 +1,6 @@
-import expect from 'expect'
-import reducer from '../../src/js/reducers/views'
-import * as types from '../../src/js/constants/ActionTypes'
+import expect from 'expect';
+import reducer from '../../src/js/reducers/views';
+import * as types from '../../src/js/constants/ActionTypes';
 import mockViews from '../mockdata/views.json';
 
 describe('views - reducers/views-spec.js', () => {
@@ -17,10 +17,13 @@ describe('views - reducers/views-spec.js', () => {
         templateTable: {},
         err: '',
         editing: false,
-        preview: false
+        preview: false,
+        alertForm: null,
+        elements: [],
+        rows: {}
       }
-    )
-  })
+    );
+  });
 
   it('should handle REQUEST_VIEWS', () => {
     expect(
@@ -31,8 +34,8 @@ describe('views - reducers/views-spec.js', () => {
       {
         isFetchingViewList: true
       }
-    )
-  })
+    );
+  });
 
   it('should handle RECEIVE_VIEWS_SUCCESS', () => {
     expect(
@@ -45,8 +48,8 @@ describe('views - reducers/views-spec.js', () => {
         isFetchingViewList: false,
         views: mockViews
       }
-    )
-  })
+    );
+  });
 
   it('should handle RECEIVE_VIEWS_FAILURE', () => {
     expect(
@@ -59,6 +62,6 @@ describe('views - reducers/views-spec.js', () => {
         isFetchingViewList: false,
         err: "error"
       }
-    )
-  })
-})
+    );
+  });
+});
