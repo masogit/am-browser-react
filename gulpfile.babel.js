@@ -98,7 +98,7 @@ gulp.task('clean-gen', function () {
 gulp.task('copy-temp', ['dist', 'clean-gen'], function () {
   console.log('Copy all neccessary files into the gen temp folder');
   // copy node installation folder and cmd to gen temp
-  var unzip_node = gulp.src('./build/node/node-v4.4.4-x64.zip', {base : '.'})
+  var unzip_node = gulp.src('./build/node/node-v4.4.7-x64.zip', {base : '.'})
       .pipe(unzip())
       .pipe(gulp.dest('./gen/temp/node'));
   // copy nssm for register service
