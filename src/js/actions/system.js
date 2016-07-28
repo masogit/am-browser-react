@@ -23,12 +23,12 @@ export function init(email, headerString) {
 }
 
 export function initToken() {
-  return Rest.get(CSRF_DEF_URL).end((err, res) => {
-    if (err || !res.ok) {
+  return Rest.get(CSRF_DEF_URL).then(res => {
+    console.log('CSRF: ' + cookies.get('csrf-token'));
+  }, err => {
+    if (err) {
       console.log('Get CSRF failed');
       throw err;
-    } else {
-      console.log('CSRF: ' + cookies.get('csrf-token'));
     }
   });
 }
@@ -45,10 +45,18 @@ export function initAbout() {
 export function login(username, password, retry) {
   return function (dispatch) {
     const auth = 'Basic ' + new Buffer(`${username}:${password}`).toString('base64');
-    Rest.post(LOGIN_DEF_URL)
+    return Rest.post(LOGIN_DEF_URL)
       .set("Authorization", auth)
-      .end((err, res) => {
+      .then(res => {
+        if (res.body) {
+          const headerNavs = res.body.headerNavs;
+          dispatch(loginSuccess(username, headerNavs));
+        } else {
+          dispatch(loginFailure({message: res.text}));
+        }
+      }, err => {
         if (err) {
+          const res = err.response;
           let message = res.text, retrying = false;
           if (err.status) {
             if (err.status == 500 && res.text.indexOf('ECONNREFUSED') > -1) {
@@ -67,13 +75,6 @@ export function login(username, password, retry) {
           if (!retrying) {
             dispatch(loginFailure({message: 'Login failed. ' + message}));
           }
-        } else if (res.ok) {
-          if (res.body) {
-            const headerNavs = res.body.headerNavs;
-            dispatch(loginSuccess(username, headerNavs));
-          } else {
-            dispatch(loginFailure({message: res.text}));
-          }
         }
       });
   };
@@ -81,12 +82,11 @@ export function login(username, password, retry) {
 
 export function logout() {
   return function (dispatch) {
-    Rest.get(LOGOUT_DEF_URL).end((err, res) => {
+    return Rest.get(LOGOUT_DEF_URL).then(res => {
+      dispatch({type: Types.LOGOUT});
+    }, err => {
       if (err) {
-        dispatch({message: 'LogoutFailed'});
         throw err;
-      } else if (res.ok && res.body) {
-        dispatch({type: Types.LOGOUT});
       }
     });
   };
@@ -94,13 +94,11 @@ export function logout() {
 
 export function sendMessageToSlack(messages) {
   return function (dispatch) {
-    Rest.post(SLACK_DEF_URL, {messages}).then(res => {
-      if (res.ok) {
-        if (res.text) {
-          dispatch({type: Types.RECEIVE_WARNING, msg: res.text});
-        } else {
-          dispatch({type: Types.RECEIVE_INFO, msg: `Message sent to Slack:"${messages}"`});
-        }
+    return Rest.post(SLACK_DEF_URL, {messages}).then(res => {
+      if (res.text) {
+        dispatch({type: Types.RECEIVE_WARNING, msg: res.text});
+      } else {
+        dispatch({type: Types.RECEIVE_INFO, msg: `Message sent to Slack:"${messages}"`});
       }
     }, err => {
       if (err && err.status == 500) {
@@ -139,7 +137,7 @@ export function metadataLoadDetail(obj, elements) {
     });
 }
 
-export function loginSuccess(email, headerNavs) {
+function loginSuccess(email, headerNavs) {
   return {type: Types.LOGIN_SUCCESS, email, headerNavs};
 }
 

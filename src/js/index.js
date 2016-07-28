@@ -103,7 +103,7 @@ const renderPage = () => {
 if (process.env.NODE_ENV === 'production') {
   renderPage();
 } else {
-  initToken().end(renderPage());
+  initToken().then(renderPage());
 }
 
 // check for session

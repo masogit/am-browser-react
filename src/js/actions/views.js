@@ -25,7 +25,7 @@ function receiveViewsFailure(err) {
   };
 }
 
-export function loadViews(selectedViewId, currentPathName, callback) {
+export function loadViews(selectedViewId, currentPathName) {
   return dispatch => {
     dispatch(requestViews());
     return Rest.get(VIEW_DEF_URL).then(function (res) {
