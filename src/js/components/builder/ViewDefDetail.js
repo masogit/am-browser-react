@@ -19,7 +19,7 @@ import FieldTypes from '../../constants/FieldTypes';
 import {saveAs} from 'file-saver';
 
 const _onMail = (view) => {
-  if (view.id) {
+  if (view._id) {
     let br = "%0D%0A";
     let subject = `AM Browser View: ${view.name}`;
     if (!window.location.origin) {
@@ -32,7 +32,7 @@ const _onMail = (view) => {
 };
 
 const _onDownload = (view) => {
-  if (view.id) {
+  if (view._id) {
     let blob = new Blob([JSON.stringify(view)], {type: "data:application/json;charset=utf-8"});
     saveAs(blob, (view.name || view.body.sqlname || 'view') + ".json");
   }
@@ -352,9 +352,9 @@ export default class ViewDefDetail extends ComponentBase {
                         label="Duplicate"
                         disabled={!selectedView._id}/>
                 {selectedView._id &&
-                <Anchor icon={<Mail />} onClick={(selectedView) => _onMail(selectedView)} label="Mail"
+                <Anchor icon={<Mail />} onClick={() => _onMail(selectedView)} label="Mail"
                         disabled={!selectedView._id}/>}
-                <Anchor icon={<Download />} onClick={(selectedView) => _onDownload(selectedView)} label="Download"
+                <Anchor icon={<Download />} onClick={() => _onDownload(selectedView)} label="Download"
                         disabled={!selectedView._id}/>
               </Menu>
             </Menu>
