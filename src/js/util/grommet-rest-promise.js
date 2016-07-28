@@ -20,7 +20,7 @@ function _interopRequireDefault(obj) {
 
 var _headers = {'Accept': 'application/json'}; // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-var _timeout = 10000; // 10s
+var _timeout = 20000; // 10s
 var Promise = require("bluebird");
 var Request = _superagent2.default.Request;
 Promise.config({
