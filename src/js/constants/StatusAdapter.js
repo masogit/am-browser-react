@@ -50,6 +50,5 @@ let status = {
 };
 
 export default (type) => {
-  console.log(type);
   return status[type] || status.UNKNOWN;
 };
