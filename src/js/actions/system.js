@@ -13,31 +13,12 @@ import {
   AM_DEF_URL
 } from '../constants/ServiceConfig';
 
-// session
-export const INIT = 'INIT';
-export const LOGIN = 'LOGIN';
-export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
-export const LOGIN_FAILURE = 'LOGIN_FAILURE';
-export const LOGOUT = 'LOGOUT';
-export const GET_SETTINGS_SUCCESS = 'GET_SETTINGS_SUCCESS';
-
-// route
-export const ROUTE_CHANGED = 'ROUTE_CHANGED';
-
-// nav
-export const NAV_PEEK = 'NAV_PEEK';
-export const NAV_ACTIVATE = 'NAV_ACTIVATE';
-export const NAV_RESPONSIVE = 'NAV_RESPONSIVE';
-
-export const METADATA_SUCCESS = 'METADATA_SUCCESS';
-export const METADATA_DETAIL_SUCCESS = 'METADATA_DETAIL_SUCCESS';
-
 export function init(email, headerString) {
   try {
     const headerNavs = JSON.parse(headerString.substring(headerString.indexOf('{')));
-    return {type: INIT, email, headerNavs};
+    return {type: Types.INIT, email, headerNavs};
   } catch (e) {
-    return {type: INIT};
+    return {type: Types.INIT};
   }
 }
 
@@ -105,7 +86,7 @@ export function logout() {
         dispatch({message: 'LogoutFailed'});
         throw err;
       } else if (res.ok && res.body) {
-        dispatch({type: LOGOUT});
+        dispatch({type: Types.LOGOUT});
       }
     });
   };
@@ -159,19 +140,19 @@ export function metadataLoadDetail(obj, elements) {
 }
 
 export function loginSuccess(email, headerNavs) {
-  return {type: LOGIN_SUCCESS, email, headerNavs};
+  return {type: Types.LOGIN_SUCCESS, email, headerNavs};
 }
 
 export function loginFailure(error) {
-  return {type: LOGIN_FAILURE, error: error};
+  return {type: Types.LOGIN_FAILURE, error: error};
 }
 
 export function routeChanged(route, prefix) {
-  return {type: ROUTE_CHANGED, route: route, prefix: prefix};
+  return {type: Types.ROUTE_CHANGED, route: route, prefix: prefix};
 }
 
 export function navResponsive(responsive) {
-  return {type: NAV_RESPONSIVE, responsive: responsive};
+  return {type: Types.NAV_RESPONSIVE, responsive: responsive};
 }
 
 export function loadMetadataDetailSuccess(rows, elements) {

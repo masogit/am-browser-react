@@ -26,3 +26,15 @@ export const MESSAGE_READ = 'MESSAGE_READ';
 
 export const LOAD_METADATA_DETAIL_SUCCESS = 'LOAD_METADATA_DETAIL_SUCCESS';
 export const LOAD_ALL_METADATA_SUCCESS = 'LOAD_ALL_METADATA_SUCCESS';
+
+// session
+export const INIT = 'INIT';
+export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
+export const LOGIN_FAILURE = 'LOGIN_FAILURE';
+export const LOGOUT = 'LOGOUT';
+
+// route
+export const ROUTE_CHANGED = 'ROUTE_CHANGED';
+
+// nav
+export const NAV_RESPONSIVE = 'NAV_RESPONSIVE';
