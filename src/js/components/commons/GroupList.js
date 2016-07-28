@@ -8,6 +8,7 @@ import {
 } from 'grommet';
 import Next from 'grommet/components/icons/base/Next';
 import Down from 'grommet/components/icons/base/Down';
+import Spinning from 'grommet/components/icons/Spinning';
 import _ from 'lodash';
 
 export default class GroupList extends Component {
@@ -29,7 +30,7 @@ export default class GroupList extends Component {
 
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.focus && nextProps.focus.expand !== this.props.focus.expand) {
+    if (nextProps.focus && (!this.props.focus || nextProps.focus.expand !== this.props.focus.expand)) {
       this.setState({
         expand: nextProps.focus.expand
       });
@@ -105,6 +106,7 @@ export default class GroupList extends Component {
           </Box>
         }
         <Box className='autoScroll fixIEScrollBar'>
+          {this.props.loading && <ListItem separator="none"><Spinning /></ListItem>}
         {
           Object.keys(grouped).map((key, i) => {
             const selected = this.props.focus && _.findIndex(grouped[key], (item => this.props.focus.selected == item.key));

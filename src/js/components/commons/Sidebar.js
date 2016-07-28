@@ -11,13 +11,13 @@ import EmptyIcon from './EmptyIcon';
 export default class SideBar extends Component {
 
   render() {
-    const {title, toolbar, contents, focus, footer} = this.props;
+    const {title, toolbar, contents, focus, footer, loading} = this.props;
     // 1) Show group list
     // 2) Show table schema
     let sidebarContent;
     if (contents instanceof Array) {
       sidebarContent = (
-        <GroupList selectable={true} searchable={true} focus={focus}>
+        <GroupList selectable={true} searchable={true} focus={focus} loading={loading}>
           {
             contents.map((listItem, index) => (
               <GroupListItem key={listItem.key || index} {...listItem} responsive={false}>

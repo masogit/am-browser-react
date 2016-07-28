@@ -10,19 +10,14 @@ import statusAdapter from '../../constants/StatusAdapter';
 import Status from 'grommet/components/icons/Status';
 import SideBar from '../commons/SideBar';
 import Box from 'grommet/components/Box';
+import {bindActionCreators} from 'redux';
 
 let firstStart = true;
 class UCMDBAdapterContainer extends Component {
-  constructor () {
-    super();
-    this.getRecentPoint = this.getRecentPoint.bind(this);
-    this.onMenuClick = this.onMenuClick.bind(this);
-  }
-
   componentDidMount() {
-    this._getPoints();
+    this.getPoints();
     this.integrationPointInterval = setInterval(() => {
-      this._getPoints();
+      this.getPoints();
     },60*1000);
   }
 
@@ -56,11 +51,10 @@ class UCMDBAdapterContainer extends Component {
         }
       }
 
-      this.props.onMenuClick(pointName, tabName);
-      //this.props.onTabClick(tabName, pointName);
+      this.props.actions.adapterSideBarClick(pointName, tabName);
       firstStart = false;
     } else if (nextProps.params.pointName && nextProps.params.pointName != nextProps.pointName) {
-      this.props.onMenuClick(nextProps.params.pointName, nextProps.tabName);
+      this.props.actions.adapterSideBarClick(nextProps.params.pointName, nextProps.tabName);
     }
   }
 
@@ -69,36 +63,18 @@ class UCMDBAdapterContainer extends Component {
     firstStart = true;
   }
 
-  _getPoints() {
-    UCMDBAdapterActions.getIntegrationPoint(this.props.getIntegrationPoint);
+  getPoints() {
+    this.props.actions.getIntegrationPoint();
   }
 
-  _getJob() {
-    const {pointName, tabName, getIntegrationJob} = this.props;
-    UCMDBAdapterActions.getIntegrationJob(pointName, tabName, getIntegrationJob);
+  getJob() {
+    const {pointName, tabName} = this.props;
+    this.props.actions.getIntegrationJob(pointName, tabName);
   }
 
-  _getJobItem() {
-    const {pointName, tabName, integrationJobName, getIntegrationJobItem} = this.props;
-    UCMDBAdapterActions.getIntegrationJobItem(pointName, tabName, integrationJobName, getIntegrationJobItem);
-  }
-
-  onMenuClick(pointName, tabName) {
-    /*const point = this.getRecentPoint(this.props.data, pointName);
-    const supportedJobs = [];
-    if (point.populationSupported) {
-      supportedJobs.push('populationJobs');
-    }
-    if (point.pushSupported) {
-      supportedJobs.push('pushJobs');
-    }
-
-    if (!supportedJobs.includes(tabName)) {
-      tabName = supportedJobs[0];
-    }*/
-
-    this.props.onMenuClick(pointName, tabName);
-    //this.props.onTabClick(tabName, pointName);
+  getJobItem() {
+    const {pointName, tabName, integrationJobName} = this.props;
+    this.props.actions.getIntegrationJobItem(pointName, tabName, integrationJobName);
   }
 
   getRecentPoint(points, pointName) {
@@ -111,49 +87,45 @@ class UCMDBAdapterContainer extends Component {
   }
 
   render () {
-    if (this.props.dataError) {
-      return (<div>{this.props.dataError}</div>);
+    const {dataError, pointName, tabName, actions, data, integrationJobName} = this.props;
+    if (dataError) {
+      return (<div>{dataError}</div>);
     }
 
-    let jobList, jobItemList, point, pointList, focus;
-    if (this.props.pointName) {
-      if (this.props.dataError) {
-        pointList = <div>{this.props.dataError}</div>;
+    let point, pointList, focus;
+    if (pointName) {
+      if (dataError) {
+        pointList = <Box flex={true}>{dataError}</Box>;
       } else {
-        pointList = this.props.data.map(adapter => ({
+        pointList = data.map(adapter => ({
           key: adapter.name,
           groupby: adapter.adapterType,
-          onClick: this.onMenuClick.bind(this, adapter.name, this.props.tabName),
+          //onClick: this.onMenuClick.bind(this, adapter.name, this.props.tabName),
+          onClick: actions.adapterSideBarClick.bind(this, adapter.name, tabName),
           search: adapter.name,
           child: adapter.name,
           icon: <Status value={statusAdapter(adapter.status).status}/>
         }));
       }
 
-      point = this.getRecentPoint(this.props.data, this.props.pointName);
-      focus = {expand: point.adapterType, selected: this.props.pointName};
-    }
-
-    if (point && this.props.tabName) {
-      jobList = (
-        <IntegrationJobContainer {...this.props}
-          pushSupported={point.pushSupported}
-          populationSupported={point.populationSupported}
-          getJob={this._getJob.bind(this)}/>
-      );
-    }
-
-    if (jobList && this.props.integrationJobName) {
-      jobItemList = <IntegrationJobItemContainer {...this.props} getJobItem={this._getJobItem.bind(this)}/>;
+      point = this.getRecentPoint(data, pointName);
+      focus = {expand: point.adapterType, selected: pointName};
     }
 
     return (
       <Box direction="row" flex={true}>
-        <SideBar title='Integration Point' contents={pointList} focus={focus}/>
+        <SideBar title='Integration Point' contents={pointList || []} focus={focus} loading={!pointList}/>
+        {point && tabName &&
         <Box pad={{horizontal: 'medium'}} flex={true} justify='between'>
-          {jobList}
-          {jobItemList}
+          <IntegrationJobContainer {...this.props}
+            pushSupported={point.pushSupported}
+            populationSupported={point.populationSupported}
+            onTabClick={actions.integrationJobTabSwitch}
+            onIntegrationJobSelect={actions.integrationJobSelect}
+            getJob={this.getJob.bind(this)}/>
+          {integrationJobName && <IntegrationJobItemContainer {...this.props} getJobItem={this.getJobItem.bind(this)}/>}
         </Box>
+        }
       </Box>
     );
   }
@@ -173,15 +145,8 @@ const select = (state) => {
   };
 };
 
-const menuAction = (dispatch, ownProps) => {
-  return {
-    onMenuClick: (pointName, tabName) => dispatch(UCMDBAdapterActions.adapterSideBarClick(pointName, tabName)),
-    getIntegrationPoint: (data, error) => dispatch(UCMDBAdapterActions.adapterDataFetch(data, error)),
-    onTabClick: (tabName, pointName) => dispatch(UCMDBAdapterActions.integrationJobTabSwitch(tabName, pointName)),
-    onIntegrationJobSelect: (tabName, pointName, jobName) => dispatch(UCMDBAdapterActions.integrationJobSelect(tabName, pointName, jobName)),
-    getIntegrationJob: (points, error) => dispatch(UCMDBAdapterActions.integrationJobDataSuccess(points, error)),
-    getIntegrationJobItem: (jobStatuses, error) => dispatch(UCMDBAdapterActions.integrationJobItemDataSuccess(jobStatuses, error))
-  };
-};
+let mapDispatchToProps = (dispatch) => ({
+  actions: bindActionCreators(UCMDBAdapterActions, dispatch)
+});
 
-export default connect(select, menuAction)(UCMDBAdapterContainer);
+export default connect(select, mapDispatchToProps)(UCMDBAdapterContainer);

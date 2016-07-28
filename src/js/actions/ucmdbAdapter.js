@@ -14,76 +14,70 @@ export const ADAPTER_SIDEBAR_CLICK = 'ADAPTER_SIDEBAR_CLICK';
 
 const dateFormatter = (date) => date === 0 ? '' : new Date(date).toUTCString();
 
-export const adapterDataFetch = (data, error) => ({
+const adapterDataFetch = (data, error) => ({
   type: ADAPTER_DATA_SUCCESS,
   data,
   error
 });
 
-export const getIntegrationPoint = (callback) => {
-  Rest.get(POINT_DEF_URL).then((res) => {
-    const data = res && res.ok && res.body || [];
-    if (callback) {
-      callback(data, null);
-    }
-  }, (err) => {
-    const error = err.rawResponse || err.message;
-    if (callback) {
-      callback([], error);
-    }
-  });
+export const getIntegrationPoint = () => {
+  return dispatch => {
+    return Rest.get(POINT_DEF_URL).then((res) => {
+      const data = res && res.ok && res.body || [];
+      dispatch(adapterDataFetch(data, null));
+    }, (err) => {
+      const error = err.response.text;
+      dispatch(adapterDataFetch([], error));
+    });
+  };
 };
 
-export const integrationJobDataSuccess = (integrationJobData, error) =>({
+const integrationJobDataSuccess = (integrationJobData, error) =>({
   type: INTEGRATION_JOB_DATA_SUCCESS,
   integrationJobData,
   error
 });
 
-export const getIntegrationJob = (pointName, jobType, callback) => {
+export const getIntegrationJob = (pointName, jobType) => {
   const url = `${POINT_DEF_URL}${pointName}/${jobType}`;
-  Rest.get(url).then((res) => {
-    const data = res && res.ok && res.body || [];
-    const points = data.map((point)=> {
-      if (point.startTime !== undefined) point.startTime = dateFormatter(point.startTime);
-      if (point.stopTime !== undefined) point.stopTime = dateFormatter(point.stopTime);
-      return point;
+  return dispatch => {
+    return Rest.get(url).then((res) => {
+      const data = res && res.ok && res.body || [];
+      const points = data.map((point)=> {
+        if (point.startTime !== undefined) point.startTime = dateFormatter(point.startTime);
+        if (point.stopTime !== undefined) point.stopTime = dateFormatter(point.stopTime);
+        return point;
+      });
+      dispatch(integrationJobDataSuccess(points, null));
+    }, (err) => {
+      const error = err.response.text;
+      dispatch(integrationJobDataSuccess([], error));
     });
-    if (callback) {
-      callback(points, null);
-    }
-  }, (err) => {
-    const error = err && (err.rawResponse || err.message);
-    if (callback) {
-      callback([], error);
-    }
-  });
+  };
 };
 
-export const integrationJobItemDataSuccess = (integrationJobItemData, error) =>({
+const integrationJobItemDataSuccess = (integrationJobItemData, error) =>({
   type: INTEGRATION_JOB_ITEM_DATA_SUCCESS,
   integrationJobItemData,
   error
 });
 
-export const getIntegrationJobItem = (pointName, jobType, jobName, callback) => {
+export const getIntegrationJobItem = (pointName, jobType, jobName) => {
   const url = `${POINT_DEF_URL}${pointName}/${jobType}/${jobName}`;
-  Rest.get(url).then((res) => {
-    const data = res && res.ok && res.body && res.body.jobStatuses || [];
-    const jobStatuses = data.map((jobStatus)=> {
-      if (jobStatus.startTime !== undefined) jobStatus.startTime = dateFormatter(jobStatus.startTime);
-      if (jobStatus.stopTime !== undefined) jobStatus.stopTime = dateFormatter(jobStatus.stopTime);
-      return jobStatus;
+  return dispatch => {
+    return Rest.get(url).then((res) => {
+      const data = res && res.ok && res.body && res.body.jobStatuses || [];
+      const jobStatuses = data.map((jobStatus)=> {
+        if (jobStatus.startTime !== undefined) jobStatus.startTime = dateFormatter(jobStatus.startTime);
+        if (jobStatus.stopTime !== undefined) jobStatus.stopTime = dateFormatter(jobStatus.stopTime);
+        return jobStatus;
+      });
+      dispatch(integrationJobItemDataSuccess(jobStatuses, null));
+    }, (err) => {
+      const error = err.response.text;
+      dispatch(integrationJobItemDataSuccess([], error));
     });
-    if (callback) {
-      callback(jobStatuses, null);
-    }
-  }, (err) => {
-    const error = err && (err.rawResponse || err.message);
-    if (callback) {
-      callback([], error);
-    }
-  });
+  };
 };
 
 export const adapterSideBarClick = (pointName, tabName) => {
