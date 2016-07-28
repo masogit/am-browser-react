@@ -2,7 +2,7 @@
  * Created by huling on 5/9/2016.
  */
 
-import {statusAdapter} from '../../constants/StatusAdapter.js';
+import statusAdapter from '../../constants/StatusAdapter';
 import React from 'react';
 import Status from 'grommet/components/icons/Status';
 
@@ -66,8 +66,8 @@ export const IntegrationJobItemTemplate = ({
           <td>{data.deleted}</td>
           <td>{data.failed}</td>
           <td>
-            <Status value={statusAdapter[data.status].status}/>
-            <span>{statusAdapter[data.status].text}</span>
+            <Status value={statusAdapter(data.status).status}/>
+            <span>{statusAdapter(data.status).text}</span>
           </td>
         </tr>);
       })
@@ -84,8 +84,8 @@ export const IntegrationJobItemTemplate = ({
             <td>{data.deleted}</td>
             <td>{data.failed}</td>
             <td>
-              <Status value={statusAdapter[data.status].status}/>
-              <span>{statusAdapter[data.status].text}</span>
+              <Status value={statusAdapter(data.status).status}/>
+              <span>{statusAdapter(data.status).text}</span>
             </td>
             <td>{data.startTime}</td>
             <td>{data.stopTime}</td>

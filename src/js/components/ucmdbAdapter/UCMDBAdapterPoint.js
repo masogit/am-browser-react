@@ -6,7 +6,7 @@ import * as UCMDBAdapterActions from '../../actions/ucmdbAdapter';
 import IntegrationJobContainer from './IntegrationJob.js';
 import IntegrationJobItemContainer from './IntegrationJobItem.js';
 
-import {statusAdapter} from '../../constants/StatusAdapter.js';
+import statusAdapter from '../../constants/StatusAdapter';
 import Status from 'grommet/components/icons/Status';
 import SideBar from '../commons/SideBar';
 import Box from 'grommet/components/Box';
@@ -126,7 +126,7 @@ class UCMDBAdapterContainer extends Component {
           onClick: this.onMenuClick.bind(this, adapter.name, this.props.tabName),
           search: adapter.name,
           child: adapter.name,
-          icon: <Status value={statusAdapter[adapter.status].status}/>
+          icon: <Status value={statusAdapter(adapter.status).status}/>
         }));
       }
 

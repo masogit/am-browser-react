@@ -2,7 +2,7 @@
  * Created by huling on 5/9/2016.
  */
 
-import {statusAdapter} from '../../constants/StatusAdapter.js';
+import statusAdapter from '../../constants/StatusAdapter';
 import Status from 'grommet/components/icons/Status';
 import {Tabs, Table, Box} from 'grommet';
 import ActionTab from './../commons/ActionTab.js';
@@ -44,8 +44,8 @@ const IntegrationJobTable = ({
             <tr key={data.name}>
               <td>{data.name}</td>
               <td>
-                <Status value={statusAdapter[data.status].status}/>
-                <span>{statusAdapter[data.status].text}</span>
+                <Status value={statusAdapter(data.status).status}/>
+                <span>{statusAdapter(data.status).text}</span>
               </td>
               <td>{data.startTime}</td>
               <td>{data.stopTime}</td>
@@ -71,8 +71,8 @@ const IntegrationJobTable = ({
             <tr key={data.name}>
               <td>{data.name}</td>
               <td>
-                <Status value={statusAdapter[data.status].status}/>
-                <span>{statusAdapter[data.status].text}</span>
+                <Status value={statusAdapter(data.status).status}/>
+                <span>{statusAdapter(data.status).text}</span>
               </td>
               <td>{data.isFullSynchronization ? 'Full' : 'Changes'}</td>
             </tr>

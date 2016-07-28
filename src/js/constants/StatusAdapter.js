@@ -1,4 +1,8 @@
-export const statusAdapter = {
+let status = {
+  "SUCCESSFULL" : {
+    status: "ok",
+    text: 'Completed successfully'
+  },
   "SUCESSFULL" : {
     status: "ok",
     text: 'Completed successfully'
@@ -6,6 +10,18 @@ export const statusAdapter = {
   "FAILED" : {
     status: "critical",
     text: 'Failed'
+  },
+  "DISABLED" : {
+    status: "disabled",
+    text: 'Disabled'
+  },
+  "PASSED_WITH_WARNINGS" : {
+    status: "warning",
+    text: 'Passed with warnings'
+  },
+  "SUCCESSFULL_WITH_WARNINGS" : {
+    status: "warning",
+    text: 'Completed with warnings'
   },
   "SUCCESS_WITH_WARNINGS" : {
     status: "warning",
@@ -31,4 +47,9 @@ export const statusAdapter = {
     status: "unknown",
     text: 'Preparing to run'
   }
+};
+
+export default (type) => {
+  console.log(type);
+  return status[type] || status.UNKNOWN;
 };
