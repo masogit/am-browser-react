@@ -411,18 +411,24 @@ export default class AQL extends Component {
           <Header justify="between" pad={{'horizontal': 'medium'}}>
             <Title>AQL and Graph</Title>
             <Menu direction="row" align="center" responsive={true}>
-              <Anchor link="#" icon={<Play />} onClick={this._onQuery.bind(this)} label="Query"/>
+              <Anchor link="#" icon={<Play />} onClick={() => this.state.aql.str && this._onQuery()} label="Query"
+                      disabled={!this.state.aql.str}/>
               <Anchor link="#" icon={<Add />} onClick={this._onNew.bind(this)} label="New"/>
-              <Anchor link="#" icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>
-              <Anchor link="#" icon={<Close />} onClick={this._onDelete.bind(this)} label="Delete"/>
+              <Anchor link="#" icon={<Checkmark />} onClick={() => this.state.aql.str && this._onSave()} label="Save"
+                      disabled={!this.state.aql.str}/>
+              <Anchor link="#" icon={<Close />} onClick={() => this.state.aql._id && this._onDelete()} label="Delete"
+                      disabled={!this.state.aql._id}/>
               <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }}>
                 {
                   this.state.aql._id &&
-                  <Anchor link="#" icon={<Mail />} onClick={this._onMail.bind(this, this.state.aql)} label="Mail"/>
+                  <Anchor link="#" icon={<Mail />} onClick={() => this.state.aql._id && this._onMail(this.state.aql)}
+                          label="Mail" disabled={!this.state.aql._id}/>
                 }
-                <Anchor link="#" icon={<Download />} onClick={this._onDownload.bind(this, this.state.aql)}
-                        label="Download"/>
-                <Anchor link="#" icon={<Attachment />} onClick={this._selectView.bind(this)}
+                <Anchor link="#" icon={<Download />}
+                        onClick={() => this.state.aql._id && this._onDownload(this.state.aql)}
+                        label="Download" disabled={!this.state.aql._id}/>
+                <Anchor link="#" icon={<Attachment />} onClick={() => this.state.aql.str && this._selectView()}
+                        disabled={!this.state.aql.str}
                         label={this.state.aql.view ? 'Attached view: ' + this.state.aql.view.name : 'Attach View'}/>
               </Menu>
             </Menu>
