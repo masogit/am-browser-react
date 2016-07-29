@@ -121,7 +121,7 @@ exports.upsert = function (req, res) {
   // Validation then save or update
   var validator = new Validator();
   var error = validator.document(collectionName, obj);
-  if (error instanceof String) {  // Simple String error
+  if (typeof error == 'string') {  // Simple String error
     logger.error(`[tingo]`, error);
     res.status(400).send(error);
   } else if (error instanceof Promise) {  // Promise
