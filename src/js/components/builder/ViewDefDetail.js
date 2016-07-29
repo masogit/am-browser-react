@@ -341,7 +341,7 @@ export default class ViewDefDetail extends ComponentBase {
           <Header justify="between" pad={{horizontal: 'medium'}}>
             <Title>View Builder</Title>
             <Menu direction="row" align="center" responsive={true}>
-              <Anchor icon={<Play />} onClick={this.props.openPreview} label="Query" disabled={!table}/>
+              <Anchor icon={<Play />} onClick={() => table && this.props.openPreview()} label="Query" disabled={!table}/>
               <Anchor icon={<Checkmark />}
                       onClick={() => selectedView.name && selectedView.category && this.openAlert("save")} label="Save"
                       disabled={!selectedView.name || !selectedView.category}/>
