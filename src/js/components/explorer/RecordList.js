@@ -82,6 +82,10 @@ export default class RecordList extends Component {
           });
         }
       });
+    else
+      this.setState({
+        graphData: null
+      });
   }
 
   _getMoreRecords() {
