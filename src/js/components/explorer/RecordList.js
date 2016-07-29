@@ -247,7 +247,13 @@ export default class RecordList extends Component {
     param.filters.splice(index, 1);
     this.setState({
       param: param
-    }, this._getRecords);
+    }, () => {
+      this._getRecords();
+
+      // re-groupby
+      let groupby = this.state.groupby || this.props.body.groupby;
+      this._getGroupByData(groupby);
+    });
   }
 
   _filterReuse(filter) {
