@@ -27,6 +27,7 @@ export default class RecordList extends Component {
       records: [],
       filtered: null,
       record: null,
+      searchFields: null,
       groupby: "",
       graphType: "distribution",
       graphData: null,
@@ -44,9 +45,23 @@ export default class RecordList extends Component {
   }
 
   componentWillMount() {
+    this._getSearchableFields();
     this._getRecords();
     if (this.props.body.groupby)
       this._getGroupByData();
+  }
+
+  _getSearchableFields() {
+    let searchFields = this.props.body.fields.filter((field) => {
+      return field.searchable;
+    }).map((field) => {
+      return Format.getDisplayLabel(field);
+    }).join(', ');
+
+    if (searchFields)
+      this.setState({
+        searchFields: searchFields
+      });
   }
 
   _clearGroupBy(groupby) {
@@ -349,11 +364,12 @@ export default class RecordList extends Component {
     let type = this.props.body.sum ? `SUM ${this.props.body.sum}` : `COUNT *`;
     let menus = this.props.body.fields.map((field, index) => {
       let selected = (field.sqlname == (this.state.groupby || this.props.body.groupby));
+      let disabled = this.props.body.groupby == field.sqlname;
       let label = Format.getDisplayLabel(field);
       return (
-        <Anchor key={`a_groupby_${index}`} icon={selected?<CheckboxSelected />:<Checkbox />} disabled={this.props.body.groupby == field.sqlname}
+        <Anchor key={`a_groupby_${index}`} icon={selected?<CheckboxSelected />:<Checkbox />} disabled={disabled}
                 label={label} primary={this.props.body.groupby == field.sqlname}
-                onClick={selected?this._clearGroupBy.bind(this, field.sqlname):this._getGroupByData.bind(this, field.sqlname)}/>
+                onClick={() => !disabled && (selected ? this._clearGroupBy(field.sqlname) : this._getGroupByData(field.sqlname))}/>
       );
     });
     menus.unshift(<Anchor key={`a_groupby_${this.props.body.fields.length}`} label={type} icon={<Aggregate />} disabled={true}/>);
@@ -364,18 +380,21 @@ export default class RecordList extends Component {
   renderToolBox() {
 
     const aqlStyle = {
-      'font-weight': 'bold',
+      'fontWeight': 'bold',
       'color': '#767676',
-      'border-color': '#FFD144'
+      'borderColor': '#FFD144'
     };
     const resultRecords = this.state.filtered ? this.state.filtered : this.state.records;
+
+    const aqlWhere = "press / input AQL where statement";
+    const quickSearch = this.state.searchFields ? `press Enter to quick search in ${this.state.searchFields}; ${aqlWhere}` : aqlWhere;
+    const placeholder = this.state.aqlInput ? "input AQL where statement…" : quickSearch;
 
     return (
       <Header justify="between">
         <Title>{this.props.title}</Title>
         <input type="text" className="flex" ref="search" style={this.state.aqlInput?aqlStyle:{}}
-               placeholder={this.state.aqlInput?`Input AQL...`:`Quick search, press / input AQL`}
-               onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
+               placeholder={placeholder} onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
         <Box direction="column">
           <Anchor onClick={this._getMoreRecords.bind(this)} disabled={this.state.loading}>
             <Box style={{fontSize: '70%', fontWeight: 'bold'}}>
