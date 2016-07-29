@@ -55,6 +55,10 @@ class ViewDefListContainer extends Component {
   componentWillUpdate(nextProps, nextState) {
   }
 
+  componentWillUnmount() {
+    this.props.actions.setSelectedView(null, {});
+  }
+
   _onValueChange(path, newValue) {
     //console.log("ViewDefListContainer - onValueChange - path: ");
     //console.log(path);
