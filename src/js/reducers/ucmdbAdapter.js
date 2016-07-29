@@ -6,7 +6,7 @@ import { ADAPTER_DATA_SUCCESS,
     JOB_SELECT_SUCCESS,
     TAB_SWITCH_SUCCESS,
     ADAPTER_SIDEBAR_CLICK
-} from '../actions/ucmdbAdapter';
+} from '../constants/ActionTypes';
 
 const initialState = {
   data: [],

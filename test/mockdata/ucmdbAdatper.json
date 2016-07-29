@@ -1,0 +1,80 @@
+{
+  "points": [
+    {
+      "adapterType": "AMGenericAdapter",
+      "name": "push_GA",
+      "status": "SUCESSFULL",
+      "enabled": false,
+      "pushSupported": true,
+      "populationSupported": true
+    },
+    {
+      "adapterType": "AMGenericAdapter",
+      "name": "IS_GA_Push",
+      "status": "PASSED_WITH_WARNINGS",
+      "enabled": true,
+      "pushSupported": true,
+      "populationSupported": true
+    },
+    {
+      "adapterType": "AMGenericAdapter",
+      "name": "push_sunlife",
+      "status": "SUCESSFULL",
+      "enabled": true,
+      "pushSupported": true,
+      "populationSupported": true
+    }
+  ],
+  "jobs": [
+    {
+      "name": "computer",
+      "startTime": "Tue, 26 Jul 2016 03:08:39 GMT",
+      "created": 0,
+      "updated": 0,
+      "deleted": 0,
+      "failed": 0,
+      "errorDescription": "",
+      "stopTime": "Tue, 26 Jul 2016 03:09:05 GMT",
+      "jobStatuses": [],
+      "status": "SUCCESSFULL"
+    },
+    {
+      "name": "test",
+      "startTime": "Tue, 26 Jul 2016 08:51:12 GMT",
+      "created": 29,
+      "updated": 375,
+      "deleted": 14,
+      "failed": 0,
+      "errorDescription": "",
+      "stopTime": "Tue, 26 Jul 2016 08:53:12 GMT",
+      "jobStatuses": [],
+      "status": "SUCCESSFULL"
+    },
+    {
+      "name": "AM Populate",
+      "startTime": "Tue, 26 Jul 2016 03:01:12 GMT",
+      "created": 1696,
+      "updated": 895,
+      "deleted": 0,
+      "failed": 0,
+      "errorDescription": "",
+      "stopTime": "Tue, 26 Jul 2016 03:03:32 GMT",
+      "jobStatuses": [],
+      "status": "SUCCESSFULL_WITH_WARNINGS"
+    }
+  ],
+  "jobItems": [
+    {
+      "name": "AM Node Push 2.0",
+      "startTime": 1469168410568,
+      "stopTime": 1469168428016,
+      "status": "SUCESSFULL",
+      "created": 0,
+      "updated": 1,
+      "deleted": 0,
+      "failed": 0,
+      "errorDescription": "",
+      "totalNumberOfCIs": 0
+    }
+  ]
+}

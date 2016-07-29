@@ -15,9 +15,9 @@ import {bindActionCreators} from 'redux';
 let firstStart = true;
 class UCMDBAdapterContainer extends Component {
   componentDidMount() {
-    this.getPoints();
+    this.props.actions.getIntegrationPoint();
     this.integrationPointInterval = setInterval(() => {
-      this.getPoints();
+      this.props.actions.getIntegrationPoint();
     },60*1000);
   }
 
@@ -63,20 +63,6 @@ class UCMDBAdapterContainer extends Component {
     firstStart = true;
   }
 
-  getPoints() {
-    this.props.actions.getIntegrationPoint();
-  }
-
-  getJob() {
-    const {pointName, tabName} = this.props;
-    this.props.actions.getIntegrationJob(pointName, tabName);
-  }
-
-  getJobItem() {
-    const {pointName, tabName, integrationJobName} = this.props;
-    this.props.actions.getIntegrationJobItem(pointName, tabName, integrationJobName);
-  }
-
   getRecentPoint(points, pointName) {
     for (let point of points) {
       if (point.name == pointName) {
@@ -87,7 +73,8 @@ class UCMDBAdapterContainer extends Component {
   }
 
   render () {
-    const {dataError, pointName, tabName, actions, data, integrationJobName} = this.props;
+    const {dataError, pointName, tabName, actions, data,
+      integrationJobName, integrationJobItemData, integrationJobItemDataError} = this.props;
     if (dataError) {
       return (<div>{dataError}</div>);
     }
@@ -122,8 +109,13 @@ class UCMDBAdapterContainer extends Component {
             populationSupported={point.populationSupported}
             onTabClick={actions.integrationJobTabSwitch}
             onIntegrationJobSelect={actions.integrationJobSelect}
-            getJob={this.getJob.bind(this)}/>
-          {integrationJobName && <IntegrationJobItemContainer {...this.props} getJobItem={this.getJobItem.bind(this)}/>}
+            getJob={actions.getIntegrationJob.bind(this, pointName, tabName)}/>
+          {integrationJobName &&
+          <IntegrationJobItemContainer
+            integrationJobItemDataError={integrationJobItemDataError}
+            integrationJobItemData={integrationJobItemData}
+            tabName={tabName}
+            getJobItem={actions.getIntegrationJobItem.bind(this, pointName, tabName, integrationJobName)}/>}
         </Box>
         }
       </Box>

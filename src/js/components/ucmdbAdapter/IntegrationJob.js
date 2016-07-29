@@ -1,10 +1,10 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
-
 import React, { Component } from 'react';
 import ActionTab from './../commons/ActionTab.js';
 import {Tabs, Table, Box} from 'grommet';
 import Status from 'grommet/components/icons/Status';
 import statusAdapter from '../../constants/StatusAdapter';
+import _ from 'lodash';
 
 export default class IntegrationJobContainer extends Component {
   componentDidMount() {
@@ -76,16 +76,17 @@ export default class IntegrationJobContainer extends Component {
       tabName,
       pointName,
       pushSupported,
-      populationSupported
+      populationSupported,
+      onTabClick
       } = this.props;
 
     return (
       <Tabs justify="start" initialIndex={tabName === 'populationJobs' ? 0: 1}>
-        <ActionTab title="Population" onClick={this.props.onTabClick.bind(this, 'populationJobs', pointName)}
+        <ActionTab title="Population" onClick={onTabClick.bind(this, 'populationJobs', pointName)}
                    disabled={!populationSupported}>
           {integrationJobDataError ? <Box>{integrationJobDataError}</Box> : this.getJobTable()}
         </ActionTab>
-        <ActionTab title="Data Push" onClick={this.props.onTabClick.bind(this, 'pushJobs', pointName)}
+        <ActionTab title="Data Push" onClick={onTabClick.bind(this, 'pushJobs', pointName)}
                    disabled={!pushSupported}>
           {integrationJobDataError ? <Box>{integrationJobDataError}</Box> : this.getJobTable()}
         </ActionTab>
