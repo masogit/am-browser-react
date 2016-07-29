@@ -237,7 +237,13 @@ export default class RecordList extends Component {
       this.refs.search.value = "";
       this.setState({
         param: param
-      }, this._getRecords);
+      }, () => {
+        this._getRecords();
+
+        // re-groupby
+        let groupby = this.state.groupby || this.props.body.groupby;
+        this._getGroupByData(groupby);
+      });
     }
 
   }
