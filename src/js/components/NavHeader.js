@@ -25,6 +25,7 @@ class NavHeader extends Component {
       // {to: '/home', text: 'Home'},
       {to: '/search', text: 'Search'},
       {to: '/insight', text: 'Insight'},
+      {to: '/sam', text: 'SAM'},
       {to: '/explorer', text: 'Viewer'},
       {to: '/views', text: 'Builder'},
       {to: '/aql', text: 'Graph'},
