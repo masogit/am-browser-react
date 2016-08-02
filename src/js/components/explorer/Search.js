@@ -55,16 +55,15 @@ export default class Search extends Component {
             }
           });
         }
-      })
-        .catch((error) => {
-          if (!this._isUnmount) {
-            this.setState({
-              ucmdbAdapter: {
-                ready: true,
-                errorMsg: error
-              }
-            });
-          }
+      }).catch((error) => {
+        if (!this._isUnmount) {
+          this.setState({
+            ucmdbAdapter: {
+              ready: true,
+              errorMsg: error
+            }
+          });
+        }
       });
     }
   }
