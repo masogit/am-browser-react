@@ -51,3 +51,22 @@ export function vendorWithOverCompliance(vendors, callback) {
     }
   });
 }
+
+export function productInVendor(vendorName, callback) {
+  let aqlVendorWithNonCompliance = `SELECT Brand.Name, sum(dUnusedInstall), sum(dEntitled), count(*) FROM amSoftLicCounter WHERE (bType = 0) AND (bLicUpgrade = 0) AND (dSoftInstallCount> 0)  AND Brand.PK<>0 AND Brand.Company.Name = '${vendorName}' GROUP BY Brand.Name`;
+
+  aql.queryAQL(aqlVendorWithNonCompliance, (aqlData) => {
+    if (aqlData.rows) {
+      let products = aqlData.rows.map((product) => {
+        return {
+          name: product[0],
+          unused: Number(product[1]),
+          entitled: Number(product[2]),
+          versions: Number(product[3])
+        };
+      });
+
+      callback(products);
+    }
+  });
+}
