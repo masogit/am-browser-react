@@ -4,8 +4,9 @@ import { ADAPTER_DATA_SUCCESS,
     INTEGRATION_JOB_DATA_SUCCESS,
     INTEGRATION_JOB_ITEM_DATA_SUCCESS,
     JOB_SELECT_SUCCESS,
-    TAB_SWITCH_SUCCESS,
-    ADAPTER_SIDEBAR_CLICK
+  ADAPTER_SIDEBAR_CLICK,
+  CLEAR_JOB_SELECTION,
+  CLEAR_JOB_ITEM_SELECTION
 } from '../constants/ActionTypes';
 
 const initialState = {
@@ -17,16 +18,24 @@ const initialState = {
   tabName: "",
   integrationJobItemData: [],
   integrationJobItemDataError: null,
-  integrationJobName: ""
+  integrationJobName: "",
+  loading: true
 };
 
 const handlers = {
-  [ADAPTER_DATA_SUCCESS]: (state, action) => ({data: action.data, dataError: action.error}),
-  [INTEGRATION_JOB_DATA_SUCCESS]: (state, action) => ({integrationJobData: action.integrationJobData, integrationJobDataError: action.error}),
-  [INTEGRATION_JOB_ITEM_DATA_SUCCESS]: (state, action) => ({integrationJobItemData: action.integrationJobItemData, integrationJobItemDataError: action.error}),
-  [JOB_SELECT_SUCCESS]: (state, action) => ({integrationJobName: action.integrationJobName}),
-  [TAB_SWITCH_SUCCESS]: (state, action) => ({tabName: action.tabName, integrationJobName: '', integrationJobItemData: []}),
-  [ADAPTER_SIDEBAR_CLICK]: (state, action) => ({pointName: action.pointName, tabName: action.tabName, integrationJobName: '', integrationJobItemData: []})
+  [ADAPTER_DATA_SUCCESS]: (state, action) => ({data: action.data, dataError: action.error, loading: false}),
+  [INTEGRATION_JOB_DATA_SUCCESS]: (state, action) => ({integrationJobData: action.integrationJobData, integrationJobDataError: action.error, loading: false}),
+  [INTEGRATION_JOB_ITEM_DATA_SUCCESS]: (state, action) => ({integrationJobItemData: action.integrationJobItemData, integrationJobItemDataError: action.error, loading: false}),
+  [JOB_SELECT_SUCCESS]: (state, action) => ({integrationJobName: action.integrationJobName, loading: true}),
+  [ADAPTER_SIDEBAR_CLICK]: (state, action) => ({
+    pointName: action.pointName,
+    tabName: action.tabName,
+    integrationJobName: '',
+    integrationJobItemData: [],
+    loading: true
+  }),
+  [CLEAR_JOB_SELECTION]: (state, action) => ({integrationJobData: []}),
+  [CLEAR_JOB_ITEM_SELECTION]: (state, action) => ({integrationJobName: '', integrationJobItemData: []})
 };
 
 export default function pushAdapterReducer (state = initialState, action) {

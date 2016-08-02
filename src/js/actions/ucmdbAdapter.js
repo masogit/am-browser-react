@@ -19,7 +19,7 @@ export const getJobList = () => {
   return Rest.get(POINT_DEF_URL)
     .then((res) => res.body || [],
     (err) => {
-      throw new Error(err.response.text);
+      throw new Error(err.response ? err.response.text : err.message);
     })
     .then(points => {
       points.map((point) => {
@@ -47,7 +47,7 @@ export const getIntegrationPoint = () => {
       const data = res.body || [];
       dispatch(adapterDataFetch(data, null));
     }, (err) => {
-      const error = err.response.text;
+      const error = err.response ? err.response.text : err.message;
       dispatch(adapterDataFetch([], error));
     });
   };
@@ -71,7 +71,7 @@ export const getIntegrationJob = (pointName, jobType) => {
       });
       dispatch(integrationJobDataSuccess(points, null));
     }, (err) => {
-      const error = err.response.text;
+      const error = err.response ? err.response.text : err.message;
       dispatch(integrationJobDataSuccess([], error));
     });
   };
@@ -95,10 +95,18 @@ export const getIntegrationJobItem = (pointName, jobType, jobName) => {
       });
       dispatch(integrationJobItemDataSuccess(jobStatuses, null));
     }, (err) => {
-      const error = err.response.text;
+      const error = err.response ? err.response.text : err.message;
       dispatch(integrationJobItemDataSuccess([], error));
     });
   };
+};
+
+export const clearJobSelection = () => {
+  return {type: Types.CLEAR_JOB_SELECTION};
+};
+
+export const clearJobItemSelection = () => {
+  return {type: Types.CLEAR_JOB_ITEM_SELECTION};
 };
 
 export const adapterSideBarClick = (pointName, tabName) => {
@@ -108,12 +116,4 @@ export const adapterSideBarClick = (pointName, tabName) => {
 
 export const integrationJobSelect = (tabName, pointName, integrationJobName) => {
   return {type: Types.JOB_SELECT_SUCCESS, integrationJobName};
-};
-
-export const integrationJobTabSwitch = (tabName, pointName) => {
-  history.pushState(null, ADAPTER_DEF_URL + pointName + '/' + tabName);
-  return {
-    type: Types.TAB_SWITCH_SUCCESS,
-    tabName
-  };
 };

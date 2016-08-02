@@ -45,26 +45,28 @@ export default class Search extends Component {
     }
 
     if (this.isUCMDBAdpaterSupported()) {
-      getJobList().then(({pushJobs, popJobs}) => {
-        if (!this._isUnmount) {
-          this.setState({
-            ucmdbAdapter: {
-              ready: true,
-              pushJobs: pushJobs,
-              popJobs: popJobs
-            }
-          });
-        }
-      }).catch((error) => {
-        if (!this._isUnmount) {
-          this.setState({
-            ucmdbAdapter: {
-              ready: true,
-              errorMsg: error.message
-            }
-          });
-        }
-      });
+      getJobList()
+        .then(({pushJobs, popJobs}) => {
+          if (!this._isUnmount) {
+            this.setState({
+              ucmdbAdapter: {
+                ready: true,
+                pushJobs: pushJobs,
+                popJobs: popJobs
+              }
+            });
+          }
+        })
+        .catch((error) => {
+          if (!this._isUnmount) {
+            this.setState({
+              ucmdbAdapter: {
+                ready: true,
+                errorMsg: error.message
+              }
+            });
+          }
+        });
     }
   }
 

@@ -4,33 +4,46 @@ import React, { Component } from 'react';
 import {Table, Box} from 'grommet';
 import statusAdapter from '../../constants/StatusAdapter';
 import Status from 'grommet/components/icons/Status';
+import Spinning from 'grommet/components/icons/Spinning';
 
 export default class IntegrationJobItemContainer extends Component {
   componentDidMount() {
-    this.props.getJobItem();
-    this.integrationJobItemInterval = setInterval(() => {
-      this.props.getJobItem();
-    }, 60 * 1000);
+    const {pointName, tabName, integrationJobName} = this.props;
+    this.setInterval(this.props.getJobItem, pointName, tabName, integrationJobName);
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.pointName !== this.props.pointName || nextProps.tabName !== this.props.tabName || this.props.integrationJobName !== nextProps.integrationJobName) {
-      this.props.getJobItem();
+      this.setInterval(this.props.getJobItem, nextProps.pointName, nextProps.tabName, nextProps.integrationJobName);
     }
   }
 
   componentWillUnmount() {
-    clearInterval(this.integrationJobItemInterval);
+    clearInterval(this.Interval);
+  }
+
+  setInterval(func, pointName, tabName, jobName) {
+    clearInterval(this.Interval);
+    func(pointName, tabName, jobName);
+    this.Interval = setInterval(() => {
+      func(pointName, tabName, jobName);
+    }, 60 * 1000);
   }
 
   render() {
     const {
       integrationJobItemDataError,
       integrationJobItemData,
-      tabName
+      tabName,
+      integrationJobName,
+      loading
       } = this.props;
 
-    if (integrationJobItemDataError) {
+    if (!integrationJobName) {
+      return null;
+    } else if (loading && integrationJobItemData.length == 0) {
+      return <Spinning/>;
+    } else if (integrationJobItemDataError) {
       return <Box>{integrationJobItemDataError}</Box>;
     }
 

@@ -5,26 +5,32 @@ import {Tabs, Table, Box} from 'grommet';
 import Status from 'grommet/components/icons/Status';
 import statusAdapter from '../../constants/StatusAdapter';
 import _ from 'lodash';
+import Spinning from 'grommet/components/icons/Spinning';
 
 export default class IntegrationJobContainer extends Component {
   componentDidMount() {
-    this.props.getJob();
-    this.integrationJobInterval = setInterval(() => {
-      this.props.getJob();
-    }, 60 * 1000);
+    const {pointName, tabName} = this.props;
+    this.setInterval(this.props.getJob, pointName, tabName);
   }
 
   componentWillReceiveProps(nextProps) {
-    if ( nextProps.tabName && (this.props.pointName !== nextProps.pointName || this.props.tabName !== nextProps.tabName)) {
-      this.props.getJob(nextProps);
-    } else if (nextProps.params.tabName && nextProps.params.tabName != nextProps.tabName) {
-      // if use change url manually
-      this.props.onTabClick(nextProps.params.tabName, nextProps.pointName);
+    if (nextProps.tabName && (this.props.pointName !== nextProps.pointName || this.props.tabName !== nextProps.tabName)
+      || nextProps.params.tabName && nextProps.params.tabName != nextProps.tabName) {
+      this.props.clearJobSelection();
+      this.setInterval(this.props.getJob, nextProps.pointName, nextProps.tabName);
     }
   }
 
   componentWillUnmount () {
-    clearInterval(this.integrationJobInterval);
+    clearInterval(this.Interval);
+  }
+
+  setInterval(func, pointName, tabName) {
+    clearInterval(this.Interval);
+    func(pointName, tabName);
+    this.Interval = setInterval(() => {
+      func(pointName, tabName);
+    }, 60 * 1000);
   }
 
   getJobTable() {
@@ -33,12 +39,17 @@ export default class IntegrationJobContainer extends Component {
       pointName,
       tabName,
       integrationJobName,
-      onIntegrationJobSelect
+      onIntegrationJobSelect,
+      clearJobItemSelection
       } = this.props;
 
     integrationJobData.sort((a, b) => a.name.localeCompare(b.name));
     const selected = _.findIndex(integrationJobData, ((item) => item.name == integrationJobName));
-    const onSelect = (selected) => onIntegrationJobSelect(tabName, pointName, integrationJobData[selected].name);
+    const onSelect = (selected) => {
+      clearJobItemSelection();
+      onIntegrationJobSelect(tabName, pointName, integrationJobData[selected].name);
+    };
+
     return (
       <Table selectable={true} selected={[selected]} onSelect={onSelect}>
         <thead>
@@ -73,22 +84,36 @@ export default class IntegrationJobContainer extends Component {
 
   render () {
     const {integrationJobDataError,
+      integrationJobData,
       tabName,
       pointName,
       pushSupported,
       populationSupported,
-      onTabClick
+      clearJobItemSelection,
+      clearJobSelection,
+      onTabClick,
+      loading
       } = this.props;
+
+    const jobTable = loading && integrationJobData.length == 0 ? <Spinning/> : (integrationJobDataError ? <Box>{integrationJobDataError}</Box> : this.getJobTable());
 
     return (
       <Tabs justify="start" initialIndex={tabName === 'populationJobs' ? 0: 1}>
-        <ActionTab title="Population" onClick={onTabClick.bind(this, 'populationJobs', pointName)}
+        <ActionTab title="Population" onClick={() => {
+          clearJobSelection();
+          clearJobItemSelection();
+          onTabClick(pointName, 'populationJobs');
+        }}
                    disabled={!populationSupported}>
-          {integrationJobDataError ? <Box>{integrationJobDataError}</Box> : this.getJobTable()}
+          {jobTable}
         </ActionTab>
-        <ActionTab title="Data Push" onClick={onTabClick.bind(this, 'pushJobs', pointName)}
+        <ActionTab title="Data Push" onClick={() => {
+          clearJobSelection();
+          clearJobItemSelection();
+          onTabClick(pointName, 'pushJobs');
+        }}
                    disabled={!pushSupported}>
-          {integrationJobDataError ? <Box>{integrationJobDataError}</Box> : this.getJobTable()}
+          {jobTable}
         </ActionTab>
       </Tabs>
     );

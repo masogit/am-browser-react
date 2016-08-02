@@ -12,13 +12,22 @@ import SideBar from '../commons/SideBar';
 import Box from 'grommet/components/Box';
 import {bindActionCreators} from 'redux';
 
+const getRecentPoint = (points, pointName) => {
+  for (let point of points) {
+    if (point.name == pointName) {
+      return point;
+    }
+  }
+  return null;
+};
+
 let firstStart = true;
 class UCMDBAdapterContainer extends Component {
   componentDidMount() {
     this.props.actions.getIntegrationPoint();
     this.integrationPointInterval = setInterval(() => {
       this.props.actions.getIntegrationPoint();
-    },60*1000);
+    }, 60 * 1000);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -30,7 +39,7 @@ class UCMDBAdapterContainer extends Component {
       let { pointName, tabName } = nextProps.params;
       pointName = pointName || nextProps.pointName;
       pointName = pointName || nextProps.data[0].name;
-      const point = this.getRecentPoint(nextProps.data, pointName);
+      const point = getRecentPoint(nextProps.data, pointName);
 
       if (point) {
         // find the tab name from:  url >  point supported tab type
@@ -63,18 +72,8 @@ class UCMDBAdapterContainer extends Component {
     firstStart = true;
   }
 
-  getRecentPoint(points, pointName) {
-    for (let point of points) {
-      if (point.name == pointName) {
-        return point;
-      }
-    }
-    return null;
-  }
-
   render () {
-    const {dataError, pointName, tabName, actions, data,
-      integrationJobName, integrationJobItemData, integrationJobItemDataError} = this.props;
+    const {dataError, pointName, tabName, actions, data, loading} = this.props;
     if (dataError) {
       return (<div>{dataError}</div>);
     }
@@ -88,34 +87,35 @@ class UCMDBAdapterContainer extends Component {
           key: adapter.name,
           groupby: adapter.adapterType,
           //onClick: this.onMenuClick.bind(this, adapter.name, this.props.tabName),
-          onClick: actions.adapterSideBarClick.bind(this, adapter.name, tabName),
+          onClick: () => {
+            actions.clearJobSelection();
+            actions.adapterSideBarClick(adapter.name, tabName);
+          },
           search: adapter.name,
           child: adapter.name,
           icon: <Status value={statusAdapter(adapter.status).status}/>
         }));
       }
 
-      point = this.getRecentPoint(data, pointName);
+      point = getRecentPoint(data, pointName);
       focus = {expand: point.adapterType, selected: pointName};
     }
 
     return (
       <Box direction="row" flex={true}>
-        <SideBar title='Integration Point' contents={pointList || []} focus={focus} loading={!pointList}/>
+        <SideBar title='Integration Point' contents={pointList || []} focus={focus} loading={loading && !pointList}/>
         {point && tabName &&
         <Box pad={{horizontal: 'medium'}} flex={true} justify='between'>
           <IntegrationJobContainer {...this.props}
             pushSupported={point.pushSupported}
             populationSupported={point.populationSupported}
-            onTabClick={actions.integrationJobTabSwitch}
+            onTabClick={actions.adapterSideBarClick}
             onIntegrationJobSelect={actions.integrationJobSelect}
-            getJob={actions.getIntegrationJob.bind(this, pointName, tabName)}/>
-          {integrationJobName &&
-          <IntegrationJobItemContainer
-            integrationJobItemDataError={integrationJobItemDataError}
-            integrationJobItemData={integrationJobItemData}
-            tabName={tabName}
-            getJobItem={actions.getIntegrationJobItem.bind(this, pointName, tabName, integrationJobName)}/>}
+            clearJobSelection={actions.clearJobSelection}
+            clearJobItemSelection={actions.clearJobItemSelection}
+            getJob={actions.getIntegrationJob}/>
+          <IntegrationJobItemContainer {...this.props}
+            getJobItem={actions.getIntegrationJobItem}/>
         </Box>
         }
       </Box>
@@ -133,7 +133,8 @@ const select = (state) => {
     integrationJobDataError: state.ucmdbAdapter.integrationJobDataError,
     integrationJobName: state.ucmdbAdapter.integrationJobName,
     integrationJobItemData: state.ucmdbAdapter.integrationJobItemData,
-    integrationJobItemDataError: state.ucmdbAdapter.integrationJobItemDataError
+    integrationJobItemDataError: state.ucmdbAdapter.integrationJobItemDataError,
+    loading: state.ucmdbAdapter.loading
   };
 };
 
