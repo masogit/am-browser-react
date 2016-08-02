@@ -19,7 +19,7 @@ export const getJobList = () => {
   return Rest.get(POINT_DEF_URL)
     .then((res) => res.body || [],
     (err) => {
-      throw err.response.text;
+      throw new Error(err.response.text);
     })
     .then(points => {
       points.map((point) => {

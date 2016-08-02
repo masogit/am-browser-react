@@ -60,7 +60,7 @@ export default class Search extends Component {
           this.setState({
             ucmdbAdapter: {
               ready: true,
-              errorMsg: error
+              errorMsg: error.message
             }
           });
         }
