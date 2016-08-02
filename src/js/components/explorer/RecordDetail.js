@@ -28,7 +28,7 @@ export default class RecordDetail extends Component {
     if (this.props.body.links)
       this.props.body.links.forEach((link) => {
         var body = this._getLinkBody(link, this.props.record);
-        ExplorerActions.getCount(body, (records) => {
+        ExplorerActions.getCount(body).then(records => {
           link.count = records.count;
           var links = this.state.links;
           links.push(link);
@@ -63,10 +63,12 @@ export default class RecordDetail extends Component {
     });
 
     if (globalIds.length > 0)
-      ExplorerActions.getUCMDB((url) => {
-        this.setState({
-          ucmdb: url
-        });
+      ExplorerActions.getUCMDB().then(url=> {
+        if (url) {
+          this.setState({
+            ucmdb: url
+          });
+        }
       });
   }
 

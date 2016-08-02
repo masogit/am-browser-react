@@ -66,7 +66,7 @@ export default class RecordSearch extends ComponentBase {
       keyword: keyword
     }, () => {
       if (keyword)
-        ExplorerAction.loadViews((views) => {
+        ExplorerAction.loadViews().then(views => {
           if (views instanceof Array) {
             views.forEach((view) => {
               // check searchable
@@ -76,7 +76,7 @@ export default class RecordSearch extends ComponentBase {
               if (aql.length > 0) {
                 ExplorerAction.getBodyByKeyword(view.body, keyword);
                 this._setMessage(view, Date.now(), 0);
-                ExplorerAction.loadRecordsByBody(view.body, (data) => {
+                ExplorerAction.loadRecordsByBody(view.body).then((data) => {
                   this._setMessage(view, Date.now(), data.count);
                   if (data && data.entities.length > 0) {
                     var results = this.state.results;

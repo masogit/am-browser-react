@@ -124,7 +124,7 @@ export default class RecordList extends Component {
       this.setState({
         loading: true
       });
-      ExplorerActions.loadRecordsByBody(body, (data) => {
+      ExplorerActions.loadRecordsByBody(body).then((data) => {
         var records = this.state.records;
         this.setState({
           loading: false,

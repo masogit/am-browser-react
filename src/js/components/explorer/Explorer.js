@@ -15,13 +15,15 @@ export default class Explorer extends Component {
 
   componentDidMount() {
     if (this.props.params.id)
-      ExplorerActions.loadView(this.props.params.id, (view) => {
-        this.setState({
-          view: view
-        });
+      ExplorerActions.loadView(this.props.params.id).then(view => {
+        if (view) {
+          this.setState({
+            view: view
+          });
+        }
       });
     else
-      ExplorerActions.loadViews((views) => {
+      ExplorerActions.loadViews().then(views => {
         this.setState({
           viewNavigation: this._getViewNavigation(views)
         });

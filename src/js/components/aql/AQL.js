@@ -80,7 +80,7 @@ export default class AQL extends Component {
   }
 
   _loadViews() {
-    ExplorerActions.loadViews((data) => {
+    ExplorerActions.loadViews().then(data => {
       this.setState({
         views: data
       });

@@ -1,19 +1,18 @@
 import {AM_DB_DEF_URL, VIEW_DEF_URL, DOWNLOAD_DEF_URL, UCMDB_DEF_URL} from '../constants/ServiceConfig';
 import Rest from '../util/grommet-rest-promise';
-import _ from 'lodash';
 
-export function loadViews(callback) {
-  Rest.get(VIEW_DEF_URL).then((res) => {
-    callback(res.body);
+export function loadViews() {
+  return Rest.get(VIEW_DEF_URL).then((res) => {
+    return res.body;
   }, (err) => {
     console.log(err.response ? err.response.text : err);
   });
 }
 
-export function loadView(id, callback) {
-  Rest.get(VIEW_DEF_URL + id).then((res) => {
-    if (res.ok && res.body) {
-      callback(res.body);
+export function loadView(id) {
+  return Rest.get(VIEW_DEF_URL + id).then((res) => {
+    if (res.body) {
+      return res.body;
     } else {
       console.log(`view ${id} is not exists`);
     }
@@ -22,18 +21,18 @@ export function loadView(id, callback) {
   });
 }
 
-export function getCount(body, callback) {
+export function getCount(body) {
   body.orderby = '';
   body.param = {
     limit: 1,
     offset: 0
   };
-  loadRecordsByBody(body, callback);
+  return loadRecordsByBody(body);
 }
 
-export function getUCMDB(callback) {
-  Rest.get(UCMDB_DEF_URL).then((res) => {
-    callback(res.text);
+export function getUCMDB() {
+  return Rest.get(UCMDB_DEF_URL).then((res) => {
+    return res.text;
   }, (err) => {
     console.log(err.response ? err.response.text : err);
   });
@@ -52,15 +51,15 @@ export function getBodyByKeyword(body, keyword) {
   return body;
 }
 
-export function loadRecordsByBody(body, callback) {
-  Rest.get(AM_DB_DEF_URL + body.sqlname).query(getQueryByBody(body)).then((res) => {
+export function loadRecordsByBody(body) {
+  return Rest.get(AM_DB_DEF_URL + body.sqlname).query(getQueryByBody(body)).then((res) => {
     if (res.body.count && res.body.entities)
-      callback(res.body);
+      return res.body;
     else
-      callback({count: 0, entities: []});
+      return({count: 0, entities: []});
   }, (err) => {
     console.log(err.response ? err.response.text : err);
-    callback({count: 0, entities: []});
+    return({count: 0, entities: []});
   });
 }
 
@@ -142,7 +141,7 @@ export function getDownloadQuery(sqlname) {
   return DOWNLOAD_DEF_URL + '/' + sqlname;
 }
 
-export function getWhereFromFields(fields) {
+/*function getWhereFromFields(fields) {
   let links = [];
   fields.forEach((field) => {
     let paths = field.sqlname.split('.');
@@ -153,4 +152,4 @@ export function getWhereFromFields(fields) {
   });
 
   return _.uniq(links).join(' AND ');
-}
+}*/

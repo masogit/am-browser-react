@@ -27,7 +27,7 @@ export default class Search extends Component {
 
   componentDidMount() {
     this._isUnmount = false;
-    ExplorerActions.loadViews((views)=> {
+    ExplorerActions.loadViews().then(views=> {
       if (!this._isUnmount) {
         this.setState({
           viewSeries: this.filter(this.getSeries(views, 'category'), 5)
