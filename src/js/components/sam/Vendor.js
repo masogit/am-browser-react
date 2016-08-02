@@ -24,6 +24,9 @@ export default class Vendor extends Component {
 
   render() {
     let tiles = this.props.data.map((vendor, index) => {
+      let nonCompliance = vendor.nonCompliance || 0;
+      let overCompliance = vendor.overCompliance || 0;
+      let compliance = nonCompliance + overCompliance;
       return (
         <Tile key={index} separator="top" colorIndex="light-1" pad="small">
           <Header>{vendor.name}</Header>
@@ -31,7 +34,7 @@ export default class Vendor extends Component {
           {this.renderOverCompliance(vendor.overCompliance)}
           <Footer justify="between">
             <Box>Total Products:</Box>
-            <Box>{vendor.products}</Box>
+            <Box>{vendor.products > compliance ? vendor.products : compliance}</Box>
           </Footer>
         </Tile>
       );
