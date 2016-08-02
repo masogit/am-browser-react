@@ -14,10 +14,37 @@ const adapterDataFetch = (data, error) => ({
   error
 });
 
+export const getJobList = () => {
+  let promiseList = [], pushJobs = [], popJobs = [];
+  return Rest.get(POINT_DEF_URL)
+    .then((res) => res.body || [],
+    (err) => {
+      throw err.response.text;
+    })
+    .then(points => {
+      points.map((point) => {
+        if (point.populationSupported) {
+          const url = `${POINT_DEF_URL}${point.name}/populationJobs`;
+          promiseList.push(Rest.get(url).then((res) => {
+            popJobs = popJobs.concat(res.body || []);
+          }));
+        }
+
+        if (point.pushSupported) {
+          const url = `${POINT_DEF_URL}${point.name}/populationJobs`;
+          promiseList.push(Rest.get(url).then((res) => {
+            pushJobs = pushJobs.concat(res.body || []);
+          }));
+        }
+      });
+      return Promise.all(promiseList).then(() => ({pushJobs, popJobs}));
+    });
+};
+
 export const getIntegrationPoint = () => {
   return dispatch => {
     return Rest.get(POINT_DEF_URL).then((res) => {
-      const data = res && res.ok && res.body || [];
+      const data = res.body || [];
       dispatch(adapterDataFetch(data, null));
     }, (err) => {
       const error = err.response.text;
