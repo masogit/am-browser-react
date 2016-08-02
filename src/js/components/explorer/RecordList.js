@@ -198,7 +198,13 @@ export default class RecordList extends Component {
             event.target.value = "";
             this.setState({
               param: param
-            }, this._getRecords);
+            }, () => {
+              this._getRecords();
+
+              // re-groupby
+              let groupby = this.state.groupby || this.props.body.groupby;
+              this._getGroupByData(groupby);
+            });
           }
         }
       }
@@ -255,9 +261,11 @@ export default class RecordList extends Component {
       }, () => {
         this._getRecords();
 
-        // re-groupby
-        let groupby = this.state.groupby || this.props.body.groupby;
-        this._getGroupByData(groupby);
+        // re-groupby when user manually input AQL where clause
+        if (!filter) {
+          let groupby = this.state.groupby || this.props.body.groupby;
+          this._getGroupByData(groupby);
+        }
       });
     }
 
