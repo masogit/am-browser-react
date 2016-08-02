@@ -54,7 +54,7 @@ export default class Insight extends Component {
 
   componentDidMount() {
     if (this.props.params.id) {
-      AQLActions.loadAQL(this.props.params.id, (aql)=> {
+      AQLActions.loadAQL(this.props.params.id).then((aql)=> {
         this._queryData(aql);
       });
     } else {
@@ -71,7 +71,7 @@ export default class Insight extends Component {
 
   _findAqls(box) {
     if (box.child && box.child._id) {
-      AQLActions.loadAQL(box.child._id, (aql)=> {
+      AQLActions.loadAQL(box.child._id).then((aql)=> {
         if (!this.state.data[aql._id]) {
           this._queryData(aql);
         }
@@ -90,7 +90,7 @@ export default class Insight extends Component {
   }
 
   _loadAQLs() {
-    AQLActions.loadAQLs((data) => {
+    AQLActions.loadAQLs().then((data) => {
       this.setState({
         aqls: data
       });
@@ -112,7 +112,7 @@ export default class Insight extends Component {
 
   _loadWall() {
     this.setState({data: {}});
-    AQLActions.loadWalls((walls) => {
+    AQLActions.loadWalls().then(walls => {
       if (walls[0])
         this.setState({
           wall: walls[0],
@@ -409,7 +409,7 @@ export default class Insight extends Component {
   _onSaveWall() {
     var wall = this.state.wall;
     wall.tabs = this.state.tabs;
-    AQLActions.saveWall(wall, (data) => {
+    AQLActions.saveWall(wall).then(data => {
       if (data)
         this._loadWall();
     });

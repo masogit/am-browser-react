@@ -1,0 +1,274 @@
+[
+  {
+    "str": "SELECT Asset. PortfolioItem. Computer.ComputerType, count(0) 'number of asset', SUM(mDebit) 'US$' FROM amExpenseLine WHERE lTenantId=0 AND lCostId>0 AND Asset.Model.Nature.OverflowTbl = 'amComputer' AND dBilling > (SELECT dStart FROM amFinancialYear where getDate() >= dStart and getDate() <= dEnd) group by Asset.PortfolioItem.Computer.ComputerType",
+    "name": "Hardware Cost",
+    "category": "IT Spending",
+    "type": "meter",
+    "form": {
+      "series_col": "2",
+      "series": [],
+      "type": "bar",
+      "size": "medium",
+      "legend": {
+        "position": "overlay",
+        "units": "",
+        "total": false
+      },
+      "important": 0,
+      "threshold": 0,
+      "max": 0,
+      "min": 0,
+      "vertical": false,
+      "stacked": false,
+      "value": 0,
+      "col_unit": "0"
+    },
+    "update": false,
+    "_id": "vtkmilcv7vi",
+    "meter": {
+      "series_col": "2",
+      "series": [],
+      "type": "bar",
+      "size": "medium",
+      "legend": {
+        "position": "overlay",
+        "units": "",
+        "total": false
+      },
+      "important": 0,
+      "threshold": 0,
+      "max": 0,
+      "min": 0,
+      "vertical": false,
+      "stacked": false,
+      "value": 0,
+      "col_unit": "0"
+    },
+    "view": {
+      "_id": "f2o0tyjsjor",
+      "name": "Expense Line (Cost Center)"
+    }
+  },
+  {
+    "str": "SELECT Asset.Model.Brand.Company.name , count(0) 'number of software title', SUM(mDebit) 'US$' FROM amExpenseLine WHERE lTenantId=0 AND lCostId>0 AND Asset.Model.Nature.bSoftLicense = 1 AND dBilling > (SELECT dStart FROM amFinancialYear where getDate() >= dStart and getDate() <= dEnd) group by Asset.Model.Brand.Company.name",
+    "name": "Software Cost",
+    "category": "IT Spending",
+    "type": "chart",
+    "form": {
+      "series_col": [
+        "2"
+      ],
+      "series": [],
+      "xAxis": {
+        "placement": "bottom",
+        "data": [
+          {
+            "label": "",
+            "value": 0
+          },
+          {
+            "label": "Adobe",
+            "value": 1
+          },
+          {
+            "label": "Autodesk",
+            "value": 2
+          },
+          {
+            "label": "BMC Software",
+            "value": 3
+          },
+          {
+            "label": "HP",
+            "value": 4
+          },
+          {
+            "label": "IBM",
+            "value": 5
+          },
+          {
+            "label": "Microsoft",
+            "value": 6
+          },
+          {
+            "label": "Oracle",
+            "value": 7
+          },
+          {
+            "label": "Red Hat",
+            "value": 8
+          },
+          {
+            "label": "SAP",
+            "value": 9
+          },
+          {
+            "label": "Symantec",
+            "value": 10
+          },
+          {
+            "label": "TIBCO",
+            "value": 11
+          },
+          {
+            "label": "VMWare",
+            "value": 12
+          }
+        ],
+        "label": ""
+      },
+      "xAxis_col": "0",
+      "type": "bar",
+      "size": "medium",
+      "legend": {
+        "position": "",
+        "units": "",
+        "total": false
+      },
+      "important": 0,
+      "threshold": 0,
+      "max": 0,
+      "min": 0,
+      "points": false,
+      "segmented": false,
+      "sparkline": false
+    },
+    "chart": {
+      "series_col": [
+        "2"
+      ],
+      "series": [],
+      "xAxis": {
+        "placement": "bottom",
+        "data": [
+          {
+            "label": "",
+            "value": 0
+          },
+          {
+            "label": "Adobe",
+            "value": 1
+          },
+          {
+            "label": "Autodesk",
+            "value": 2
+          },
+          {
+            "label": "BMC Software",
+            "value": 3
+          },
+          {
+            "label": "HP",
+            "value": 4
+          },
+          {
+            "label": "IBM",
+            "value": 5
+          },
+          {
+            "label": "Microsoft",
+            "value": 6
+          },
+          {
+            "label": "Oracle",
+            "value": 7
+          },
+          {
+            "label": "Red Hat",
+            "value": 8
+          },
+          {
+            "label": "SAP",
+            "value": 9
+          },
+          {
+            "label": "Symantec",
+            "value": 10
+          },
+          {
+            "label": "TIBCO",
+            "value": 11
+          },
+          {
+            "label": "VMWare",
+            "value": 12
+          }
+        ],
+        "label": ""
+      },
+      "xAxis_col": "0",
+      "type": "bar",
+      "size": "medium",
+      "legend": {
+        "position": "",
+        "units": "",
+        "total": false
+      },
+      "important": 0,
+      "threshold": 0,
+      "max": 0,
+      "min": 0,
+      "points": false,
+      "segmented": false,
+      "sparkline": false
+    },
+    "_id": "gayd620529",
+    "view": {
+      "_id": "e7jyjxj38fr",
+      "name": "Expense Line"
+    },
+    "update": false
+  },
+  {
+    "str": "SELECT Asset.Model.Nature.Name, count(0) 'number of asset', SUM(mDebit) 'US$' FROM amExpenseLine WHERE lTenantId=0 AND lCostId>0 AND (Asset.Model.Nature.OverflowTbl <> 'amComputer' AND Asset.Model.Nature.bSoftLicense <> 1) AND dBilling > (SELECT dStart FROM amFinancialYear where getDate() >= dStart and getDate() <= dEnd) group by Asset.Model.Nature.Name",
+    "name": "Other Cost",
+    "category": "IT Spending",
+    "type": "meter",
+    "form": {
+      "series_col": "2",
+      "series": [],
+      "type": "spiral",
+      "size": "medium",
+      "legend": {
+        "position": "overlay",
+        "units": "",
+        "total": false
+      },
+      "important": 0,
+      "threshold": 0,
+      "max": 0,
+      "min": 0,
+      "vertical": false,
+      "stacked": false,
+      "value": 0,
+      "col_unit": "0",
+      "units": "US$"
+    },
+    "meter": {
+      "series_col": "2",
+      "series": [],
+      "type": "spiral",
+      "size": "medium",
+      "legend": {
+        "position": "overlay",
+        "units": "",
+        "total": false
+      },
+      "important": 0,
+      "threshold": 0,
+      "max": 0,
+      "min": 0,
+      "vertical": false,
+      "stacked": false,
+      "value": 0,
+      "col_unit": "0",
+      "units": "US$"
+    },
+    "_id": "7j7xnf561or",
+    "update": false,
+    "view": {
+      "_id": "f2o0tyjsjor",
+      "name": "Expense Line (Cost Center)"
+    }
+  }
+]

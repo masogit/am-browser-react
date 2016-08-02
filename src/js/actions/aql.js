@@ -4,78 +4,78 @@ const store = require('../store');
 import * as Types from '../constants/ActionTypes';
 import _ from 'lodash';
 
-export function saveWall(wall, callback) {
-  Rest.post(INSIGHT_DEF_URL, wall).then((res) => {
+export function saveWall(wall) {
+  return Rest.get(INSIGHT_DEF_URL).query(wall).then((res) => {
     if (res.text) {
       store.default.dispatch({type: Types.RECEIVE_INFO, msg: "Insight saved successfully"});
-      callback(res.text);
+      return res.text;
     }
   }, (err) => {
     console.log(err.response ? err.response.text : err);
   });
 }
 
-export function loadWalls(callback) {
-  Rest.get(INSIGHT_DEF_URL).then((res) => {
-    callback(res.body);
+export function loadWalls() {
+  return Rest.get(INSIGHT_DEF_URL).then((res) => {
+    return res.body;
   }, (err) => {
     console.log(err.response ? err.response.text : err);
   });
 }
 
-export function loadAQL(id, callback) {
-  Rest.get(GRAPH_DEF_URL + id).then((res) => {
-    callback(res.body);
+export function loadAQL(id) {
+  return Rest.get(GRAPH_DEF_URL + id).then((res) => {
+    return res.body;
   }, (err) => {
     console.log(err.response ? err.response.text : err);
   });
 }
 
-export function loadAQLs(callback) {
-  Rest.get(GRAPH_DEF_URL).then((res) => {
-    callback(res.body);
+export function loadAQLs() {
+  return Rest.get(GRAPH_DEF_URL).then((res) => {
+    return res.body;
   }, (err) => {
     console.log(err.response ? err.response.text : err);
   });
 }
 
-export function saveAQL(aql, callback) {
+export function saveAQL(aql) {
   let clonedAql = _.cloneDeep(aql);
   // TODO: delete the following 4 lines after aql templates are cleaned up.
   delete clonedAql.data;
   delete clonedAql.meter;
   delete clonedAql.distribution;
   delete clonedAql.chart;
-  Rest.post(GRAPH_DEF_URL, clonedAql).then((res) => {
+  return Rest.post(GRAPH_DEF_URL, clonedAql).then((res) => {
     if (res.text) {
       store.default.dispatch({type: Types.RECEIVE_INFO, msg: "Graph saved successfully"});
-      callback(res.text);
+      return res.text;
     }
   }, (err) => {
     console.log(err.response ? err.response.text : err);
   });
 }
 
-export function removeAQL(id, callback) {
-  Rest.del(GRAPH_DEF_URL + id).then((res) => {
+export function removeAQL(id) {
+  return Rest.del(GRAPH_DEF_URL + id).then((res) => {
     if (res.text) {
       store.default.dispatch({type: Types.RECEIVE_INFO, msg: "Graph removed successfully"});
-      callback(res.text);
+      return res.text;
     }
   }, (err) => {
     console.log(err.response ? err.response.text : err);
   });
 }
 
-export function loadReports(callback) {
-  Rest.get(AM_DB_DEF_URL + 'amInToolReport').then((res) => {
-    callback(res.body);
+export function loadReports() {
+  return Rest.get(AM_DB_DEF_URL + 'amInToolReport').then((res) => {
+    return res.body;
   }, (err) => {
     console.log(err.response ? err.response.text : err);
   });
 }
 
-export function queryAQL(str, callback) {
+export function queryAQL(str) {
   var aql = {
     tableName: "",
     where: "",
@@ -89,7 +89,6 @@ export function queryAQL(str, callback) {
   var idx_WHERE = str.toLowerCase().indexOf("where");
 
   if (idx_SELECT < 0 || idx_FROM < 0) {
-    // callback(null);
     store.default.dispatch({type: Types.RECEIVE_ERROR, msg: "AQL is invalid! Can not query data for Graph"});
   } else {
     // get fields from SELECT .. FROM
@@ -106,8 +105,8 @@ export function queryAQL(str, callback) {
       query += " " + encodeURI(aql.where);
     }
 
-    Rest.get(query).then((res) => {
-      callback(simpleAQLResult(res.body.Query));
+    return Rest.get(query).then((res) => {
+      return simpleAQLResult(res.body.Query);
     }, (err) => {
       const errorMessage = err.rawResponse || (err.response && err.response.text || err.toString());
       store.default.dispatch({type: Types.RECEIVE_ERROR, msg: errorMessage});

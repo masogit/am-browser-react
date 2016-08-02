@@ -35,7 +35,7 @@ export default class Search extends Component {
       }
     });
     if (this.isAQLSupported()) {
-      AQLActions.loadAQLs((aqls)=> {
+      AQLActions.loadAQLs().then((aqls)=> {
         if (!this._isUnmount) {
           this.setState({
             aqlSeries: this.filter(this.getSeries(aqls, 'category'), 7)

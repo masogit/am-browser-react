@@ -88,7 +88,7 @@ export default class AQL extends Component {
   }
 
   _loadAQLs() {
-    AQLActions.loadAQLs((data) => {
+    AQLActions.loadAQLs().then((data) => {
       let categories = _.uniq(data.map((aql) => {
         return aql.category;
       }));
@@ -120,10 +120,12 @@ export default class AQL extends Component {
   }
 
   _loadInToolReport() {
-    AQLActions.loadReports((data) => {
-      this.setState({
-        reports: data
-      });
+    AQLActions.loadReports().then(data => {
+      if (data) {
+        this.setState({
+          reports: data
+        });
+      }
     });
   }
 
@@ -139,11 +141,13 @@ export default class AQL extends Component {
   }
 
   _onSaveAQL() {
-    AQLActions.saveAQL(this.state.aql, (id) => {
-      this._loadAQLs(this);
-      var aql = this.state.aql;
-      aql._id = id;
-      this.setState({aql: aql});
+    AQLActions.saveAQL(this.state.aql).then(id => {
+      if (id) {
+        this._loadAQLs(this);
+        var aql = this.state.aql;
+        aql._id = id;
+        this.setState({aql: aql});
+      }
     });
   }
 
@@ -194,10 +198,12 @@ export default class AQL extends Component {
   }
 
   _removeAQL() {
-    AQLActions.removeAQL(this.state.aql._id, (id) => {
-      console.log("Remove AQL: " + id);
-      this._loadAQLs(this);
-      this._initAQL();
+    AQLActions.removeAQL(this.state.aql._id).then(id => {
+      if (id) {
+        console.log("Remove AQL: " + id);
+        this._loadAQLs(this);
+        this._initAQL();
+      }
     });
   }
 

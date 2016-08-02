@@ -46,6 +46,10 @@ let status = {
   "PREPARING_TO_RUN" : {
     status: "unknown",
     text: 'Preparing to run'
+  },
+  "RUNNING" : {
+    status: "running",
+    text: 'Running'
   }
 };
 

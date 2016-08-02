@@ -1,0 +1,48 @@
+{
+  "tabs": [
+    {
+      "name": "default",
+      "box": {
+        "direction": "column",
+        "child": [
+          {
+            "direction": "row",
+            "child": [
+              {
+                "direction": "row",
+                "child": {
+                  "_id": "vtkmilcv7vi"
+                },
+                "key": 0
+              },
+              {
+                "direction": "row",
+                "child": {
+                  "_id": "v9hh5jnhfr"
+                },
+                "key": 1
+              }
+            ],
+            "key": 0
+          },
+          {
+            "direction": "row",
+            "child": {
+              "_id": "gayd620529"
+            },
+            "key": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "Tab_2",
+      "box": {
+        "direction": "row",
+        "child": null
+      }
+    }
+  ],
+  "user": "Admin",
+  "_id": "zbwpzh3erk9"
+}
