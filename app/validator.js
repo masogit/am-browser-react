@@ -35,7 +35,7 @@ function view(obj) {
     return error;
 
   // check duplicate
-  return db.findBy(coll.view, {name: {'$regex' : `^${obj.name}$`, '$options' : 'i'}, category: {'$regex' : `^${obj.category}$`, '$options' : 'i'}}).then((documents) => {
+  return db.findBy(coll.view, {name: {'$regex' : `^${obj.name.trim()}$`, '$options' : 'i'}, category: {'$regex' : `^${obj.category.trim()}$`, '$options' : 'i'}}).then((documents) => {
     if (documents.length > 0 && documents[0]._id != obj._id)
       return "View name can not duplicate in same category!";
     else
@@ -134,7 +134,7 @@ function aql(aql) {
     return error;
 
   // check duplicate
-  return db.findBy(coll.graph, {name: {'$regex' : `^${aql.name}$`, '$options' : 'i'}, category: {'$regex' : `^${aql.category}$`, '$options' : 'i'}}).then((documents) => {
+  return db.findBy(coll.graph, {name: {'$regex' : `^${aql.name.trim()}$`, '$options' : 'i'}, category: {'$regex' : `^${aql.category.trim()}$`, '$options' : 'i'}}).then((documents) => {
     if (documents.length > 0 && documents[0]._id != aql._id)
       return "Graph name can not duplicate in same category!";
     else
