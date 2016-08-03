@@ -102,7 +102,7 @@ const updateView = (elements, row, selectedView) => {
   // temp logic only for function works
   // will refactor later
   var clonedView = _.cloneDeep(selectedView);
-
+  clonedView.body = clonedView.body || {};
   var body = clonedView.body;
   var elemLength = elements.length;
   // 1) create a new view: body.sqlname is empty
