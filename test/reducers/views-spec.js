@@ -1,5 +1,6 @@
 import expect from 'expect';
 import reducer from '../../src/js/reducers/views';
+import emptyViewDef from '../../src/js/reducers/EmptyViewDef.json';
 import * as Types from '../../src/js/constants/ActionTypes';
 import mockViews from '../mockdata/views.json';
 import mockMetadata from '../mockdata/metadata.json';
@@ -17,7 +18,6 @@ describe('views - reducers/views-spec.js', () => {
         selectedViewId: '',
         templateTable: {},
         err: '',
-        editing: false,
         preview: false,
         alertForm: null,
         elements: [],
@@ -89,7 +89,6 @@ describe('views - reducers/views-spec.js', () => {
       newValue: 'dBilling'
     });
     expect(state.selectedView.body.groupby).toEqual('dBilling');
-    expect(state.editing).toEqual(true);
   });
 
   it('should handle DELETE_TABLE_ROW', () => {
@@ -99,8 +98,7 @@ describe('views - reducers/views-spec.js', () => {
         selectedView: mockViews[2]
       })
     ).toEqual({
-      selectedView: mockViews[2],
-      editing: true
+      selectedView: mockViews[2]
     });
   });
 
@@ -111,8 +109,7 @@ describe('views - reducers/views-spec.js', () => {
         selectedView: mockViews[2]
       })
     ).toEqual({
-      selectedView: mockViews[2],
-      editing: true
+      selectedView: mockViews[2]
     });
   });
 
@@ -136,8 +133,7 @@ describe('views - reducers/views-spec.js', () => {
       })
     ).toEqual({
       selectedView: mockViews[2],
-      selectedViewId: mockViews[2]._id,
-      editing: false
+      selectedViewId: mockViews[2]._id
     });
   });
 
@@ -173,6 +169,16 @@ describe('views - reducers/views-spec.js', () => {
       })
     ).toEqual({
       preview: false
+    });
+  });
+
+  it('should handle NEW_SELECTED_VIEW', () => {
+    expect(
+      reducer({}, {
+        type: Types.NEW_SELECTED_VIEW
+      })
+    ).toEqual({
+      selectedView: emptyViewDef
     });
   });
 
