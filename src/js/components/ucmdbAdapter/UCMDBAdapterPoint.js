@@ -13,12 +13,7 @@ import Box from 'grommet/components/Box';
 import {bindActionCreators} from 'redux';
 
 const getRecentPoint = (points, pointName) => {
-  for (let point of points) {
-    if (point.name == pointName) {
-      return point;
-    }
-  }
-  return null;
+  return  points.filter(point => point.name == pointName)[0];
 };
 
 let firstStart = true;
