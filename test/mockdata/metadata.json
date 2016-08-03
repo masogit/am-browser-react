@@ -1,0 +1,198 @@
+{
+  "rows": {
+    "is_system": false,
+    "ref-link": "schema/amItemReceived",
+    "label": "Items received",
+    "has_main_field": true,
+    "is_feature_table": false,
+    "has_feature_table": true,
+    "main_field": {
+      "ref-link": "schema/amItemReceived/field/lItemReceivedId",
+      "sqlname": "lItemReceivedId"
+    },
+    "international_index": "ItmRecvd_ItemNo",
+    "links": [
+      {
+        "ref-link": "schema/amItemReceived/link/Used1",
+        "user_type": "Normal",
+        "dest_table": {
+          "ref-link": "schema/amItemReceived",
+          "sqlname": "amItemReceived"
+        },
+        "src_field": {
+          "ref-link": "schema/amItemReceived/field/lUsed1Id",
+          "sqlname": "lUsed1Id"
+        },
+        "dest_field": {
+          "ref-link": "schema/amItemReceived/field/lItemReceivedId",
+          "sqlname": "lItemReceivedId"
+        },
+        "label": "Asset to use",
+        "card11": true,
+        "sqlname": "Used1",
+        "type": "Neutral",
+        "reverse": "CntrcUseAsset",
+        "long_desc": "Asset to use"
+      },
+      {
+        "ref-link": "schema/amItemReceived/link/Used2",
+        "user_type": "Normal",
+        "dest_table": {
+          "ref-link": "schema/amItemReceived",
+          "sqlname": "amItemReceived"
+        },
+        "src_field": {
+          "ref-link": "schema/amItemReceived/field/lUsed2Id",
+          "sqlname": "lUsed2Id"
+        },
+        "dest_field": {
+          "ref-link": "schema/amItemReceived/field/lItemReceivedId",
+          "sqlname": "lItemReceivedId"
+        },
+        "label": "Contract to use",
+        "card11": true,
+        "sqlname": "Used2",
+        "type": "Neutral",
+        "reverse": "CntrcUseContract",
+        "long_desc": "Contract to use"
+      },
+      {
+        "ref-link": "schema/amItemReceived/link/CrtdReservation",
+        "user_type": "Normal",
+        "dest_table": {
+          "ref-link": "schema/amReservation",
+          "sqlname": "amReservation"
+        },
+        "src_field": {
+          "ref-link": "schema/amItemReceived/field/lCrtdReservationId",
+          "sqlname": "lCrtdReservationId"
+        },
+        "dest_field": {
+          "ref-link": "schema/amReservation/field/lResaId",
+          "sqlname": "lResaId"
+        },
+        "label": "Reservation",
+        "card11": true,
+        "sqlname": "CrtdReservation",
+        "type": "Neutral",
+        "reverse": "ItemsReceived",
+        "long_desc": "Reservation"
+      },
+      {
+        "ref-link": "schema/amItemReceived/link/FeatValues",
+        "user_type": "Normal",
+        "dest_table": {
+          "ref-link": "schema/amFVItemReceived",
+          "sqlname": "amFVItemReceived"
+        },
+        "src_field": {
+          "ref-link": "schema/amItemReceived/field/lItemReceivedId",
+          "sqlname": "lItemReceivedId"
+        },
+        "dest_field": {
+          "ref-link": "schema/amFVItemReceived/field/lItemReceivedId",
+          "sqlname": "lItemReceivedId"
+        },
+        "label": "List of features",
+        "card11": false,
+        "sqlname": "FeatValues",
+        "type": "OwnCopy",
+        "reverse": "ItemReceived",
+        "long_desc": "FVItemReceived"
+      }
+    ],
+    "sqlname": "amItemReceived",
+    "fields": [
+      {
+        "ref-link": "schema/amItemReceived/field/lRecptLineId",
+        "user_type": "",
+        "size": 4,
+        "user_type_format": "",
+        "label": "ID of link Receipt line",
+        "sqlname": "lRecptLineId",
+        "type": "Long",
+        "is_calc": false,
+        "long_desc": "ID of link Receipt line"
+      },
+      {
+        "ref-link": "schema/amItemReceived/field/lTenantId",
+        "user_type": "",
+        "size": 4,
+        "user_type_format": "",
+        "label": "ID of link Tenant",
+        "sqlname": "lTenantId",
+        "type": "Long",
+        "is_calc": false,
+        "long_desc": "ID of link Tenant"
+      },
+      {
+        "ref-link": "schema/amItemReceived/field/ItemNo",
+        "user_type": "",
+        "size": 12,
+        "user_type_format": "",
+        "label": "Item number",
+        "sqlname": "ItemNo",
+        "type": "String",
+        "is_calc": false,
+        "long_desc": "Item number"
+      }
+    ],
+    "desc": "Items received",
+    "main_index": "ItmRecvd_lItemReceivedId"
+  },
+  "elements": [
+    {
+      "label": "Expense lines",
+      "sqlname": "amExpenseLine",
+      "url": "schema/amExpenseLine",
+      "body_label": "Expense lines",
+      "body_sqlname": "amExpenseLine"
+    },
+    {
+      "ref-link": "schema/amExpenseLine/link/Portfolio",
+      "user_type": "Normal",
+      "dest_table": {
+        "ref-link": "schema/amPortfolio",
+        "sqlname": "amPortfolio"
+      },
+      "src_field": {
+        "ref-link": "schema/amExpenseLine/field/lPortfolioItemId",
+        "sqlname": "lPortfolioItemId"
+      },
+      "dest_field": {
+        "ref-link": "schema/amPortfolio/field/lPortfolioItemId",
+        "sqlname": "lPortfolioItemId"
+      },
+      "label": "Portfolio item",
+      "card11": true,
+      "sqlname": "Portfolio",
+      "type": "Neutral",
+      "reverse": "ExpenseLines",
+      "long_desc": "Portfolio item",
+      "url": "schema/amPortfolio"
+    },
+    {
+      "ref-link": "schema/amPortfolio/link/ItemsReceived",
+      "user_type": "Normal",
+      "dest_table": {
+        "ref-link": "schema/amItemReceived",
+        "sqlname": "amItemReceived"
+      },
+      "src_field": {
+        "ref-link": "schema/amPortfolio/field/lPortfolioItemId",
+        "sqlname": "lPortfolioItemId"
+      },
+      "dest_field": {
+        "ref-link": "schema/amItemReceived/field/lCrtdPItemId",
+        "sqlname": "lCrtdPItemId"
+      },
+      "label": "Items received",
+      "card11": false,
+      "sqlname": "ItemsReceived",
+      "type": "Normal",
+      "reverse": "CrtdPItem",
+      "long_desc": "Items received",
+      "url": "schema/amItemReceived"
+    }
+  ]
+}

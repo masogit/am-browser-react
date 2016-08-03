@@ -108,10 +108,8 @@ class ViewDefListContainer extends Component {
   }
 
   _onDeleteViewDef() {
-    this.props.actions.confirmDeleteViewDef(this.props.selectedView, (id) => {
-      if (!this.props.selectedViewId) { // all records deleted
-        history.push("/views");
-      }
+    this.props.actions.confirmDeleteViewDef(this.props.selectedView).then(() => {
+      history.push("/views");
     });
   }
 

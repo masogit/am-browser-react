@@ -62,8 +62,7 @@ export function saveViewDef(selectedView) {
         dispatch({
           type: types.SAVE_VIEW_DEF,
           selectedViewId: _id,
-          selectedView: selectedView,
-          editing: false
+          selectedView: selectedView
         });
         dispatch({
           type: types.RECEIVE_INFO,
@@ -213,29 +212,18 @@ export function duplicateViewDef(selectedView) {
   };
 }
 
-export function confirmDeleteViewDef(selectedView, callback) {
-  return function (dispatch, getState) {
+export function confirmDeleteViewDef(selectedView) {
+  return function (dispatch) {
     return Rest.del(VIEW_DEF_URL + selectedView._id)
       .then((res) => {
-        let views = getState().views.views;
-        let idx = selectedView._id ? _.findIndex(views, {_id: selectedView._id}) : -1;
         dispatch({
           type: types.DELETE_VIEW_DEF,
-          selectedViewId: "",
-          selectedView: {},
-          views: idx < 0 ? views : [...views.slice(0, idx), ...views.slice(idx + 1)]
+          selectedViewId: selectedView._id
         });
         dispatch({
           type: types.RECEIVE_INFO,
           msg: `View definition '${selectedView.name}' deleted.`
         });
-        //dispatch({
-        //  type: types.UPDATE_VIEW_DEF_LIST,
-        //  selectedView: selectedView
-        //});
-        if (callback) {
-          callback(selectedView._id);
-        }
       }, (err) => {
         console.log("cannot delete - ");
         console.log(err.response ? err.response.text : err);
@@ -262,8 +250,7 @@ export function syncSelectedView(selectedView) {
 export function openPreview() {
   return dispatch => {
     dispatch({
-      type: types.OPEN_PREVIEW,
-      preview: true
+      type: types.OPEN_PREVIEW
     });
   };
 }
@@ -271,8 +258,7 @@ export function openPreview() {
 export function closePreview() {
   return dispatch => {
     dispatch({
-      type: types.CLOSE_PREVIEW,
-      preview: false
+      type: types.CLOSE_PREVIEW
     });
   };
 }
