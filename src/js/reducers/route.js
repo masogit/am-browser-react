@@ -7,8 +7,7 @@ const initialState = null;
 const handlers = {
   [ROUTE_CHANGED]: (_, action) => {
     return { ...action.route, ...{
-      prefix: action.prefix,
-      appPathname: action.route.pathname.slice(action.prefix.length - 1)
+      prefix: action.prefix
     }};
   }
 };

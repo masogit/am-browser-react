@@ -4,7 +4,7 @@ import TestUtils from 'react-addons-test-utils';
 import View from '../../../src/js/components/builder/ViewDefDetail';
 import Views from '../../../src/js/components/builder/ViewDefList';
 import { Provider } from 'react-redux';
-import store from '../../store/views';
+import store from '../../store';
 import mockViews from '../../mockdata/views.json';
 import GroupListItem from '../../../src/js/components/commons/GroupListItem';
 

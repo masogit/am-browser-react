@@ -6,7 +6,7 @@ import React from 'react';
 import TestUtils from 'react-addons-test-utils';
 import IntegrationJobItem from '../../../src/js/components/ucmdbAdapter/IntegrationJobItem';
 import { Provider } from 'react-redux';
-import store from '../../store/ucmdbAdapter';
+import store from '../../store';
 import mockData from '../../mockdata/ucmdbAdatper.json';
 import {Table} from 'grommet';
 import Status from 'grommet/components/icons/Status';

@@ -17,7 +17,8 @@ describe('ucmdbAdatper - reducers/ucmdbAdatper-spec.js', () => {
         tabName: "",
         integrationJobItemData: [],
         integrationJobItemDataError: null,
-        integrationJobName: ""
+        integrationJobName: "",
+        loading: true
       }
     );
   });
@@ -32,7 +33,8 @@ describe('ucmdbAdatper - reducers/ucmdbAdatper-spec.js', () => {
     ).toEqual(
       {
         data: mockData.points,
-        dataError: null
+        dataError: null,
+        loading: false
       }
     );
   });
@@ -47,7 +49,8 @@ describe('ucmdbAdatper - reducers/ucmdbAdatper-spec.js', () => {
     ).toEqual(
       {
         integrationJobDataError: null,
-        integrationJobData: mockData.jobs
+        integrationJobData: mockData.jobs,
+        loading: false
       }
     );
   });
@@ -62,7 +65,8 @@ describe('ucmdbAdatper - reducers/ucmdbAdatper-spec.js', () => {
     ).toEqual(
       {
         integrationJobItemDataError: null,
-        integrationJobItemData: mockData.jobItems
+        integrationJobItemData: mockData.jobItems,
+        loading: false
       }
     );
   });
@@ -75,22 +79,8 @@ describe('ucmdbAdatper - reducers/ucmdbAdatper-spec.js', () => {
       })
     ).toEqual(
       {
-        integrationJobName: mockData.jobs[0].name
-      }
-    );
-  });
-
-  it('should handle TAB_SWITCH_SUCCESS', () => {
-    expect(
-      reducer({}, {
-        type: Types.TAB_SWITCH_SUCCESS,
-        tabName: 'pushJobs'
-      })
-    ).toEqual(
-      {
-        tabName: 'pushJobs',
-        integrationJobName: '',
-        integrationJobItemData: []
+        integrationJobName: mockData.jobs[0].name,
+        loading: true
       }
     );
   });
@@ -106,6 +96,32 @@ describe('ucmdbAdatper - reducers/ucmdbAdatper-spec.js', () => {
       {
         tabName: 'pushJobs',
         pointName: mockData.points[0].name,
+        integrationJobName: '',
+        integrationJobItemData: [],
+        loading: true
+      }
+    );
+  });
+
+  it('should handle CLEAR_JOB_SELECTION', () => {
+    expect(
+      reducer({}, {
+        type: Types.CLEAR_JOB_SELECTION
+      })
+    ).toEqual(
+      {
+        integrationJobData: []
+      }
+    );
+  });
+
+  it('should handle CLEAR_JOB_ITEM_SELECTION', () => {
+    expect(
+      reducer({}, {
+        type: Types.CLEAR_JOB_ITEM_SELECTION
+      })
+    ).toEqual(
+      {
         integrationJobName: '',
         integrationJobItemData: []
       }
