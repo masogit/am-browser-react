@@ -44,7 +44,7 @@ export default class SAMContainer extends Component {
   renderVersion(selected) {
     let body = {
       sqlname: 'amSoftLicCounter',
-      groupby: 'Brand.Name',
+      groupby: 'LicType.Name',
       fields: [{
         sqlname: 'LicType.Name',
         alias: 'License Metric'
