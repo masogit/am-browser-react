@@ -1,17 +1,22 @@
 import React, {Component} from 'react';
 import * as SAMActions from '../../actions/sam';
-import {Split, Box} from 'grommet';
+import {Box, Header, Title} from 'grommet';
+import RecordList from '../explorer/RecordList';
 import Vendor from './Vendor';
 import Product from './Product';
+// import Version from './Version';
+
 
 export default class SAMContainer extends Component {
   constructor() {
     super();
     this.state = {
       vendors: [],
-      products: []
+      products: [],
+      versionQuery: ''
     };
     this.renderProduct = this.renderProduct.bind(this);
+    this.renderVersion = this.renderVersion.bind(this);
   }
 
   componentWillMount() {
@@ -22,29 +27,67 @@ export default class SAMContainer extends Component {
     });
   }
 
-  renderProduct(selectedVendor) {
-    let vendorName = this.state.vendors[selectedVendor].name;
+  renderProduct(selected) {
+    let name = this.state.vendors[selected].name;
 
-    SAMActions.productInVendor(vendorName).then((products) => {
+    SAMActions.productInVendor(name).then((products) => {
       this.setState({
         products: products
       });
     });
   }
 
+  renderVersion(selected) {
+    let body = {
+      sqlname: 'amSoftLicCounter',
+      groupby: 'Brand.Name',
+      fields: [{
+        sqlname: 'dCompliancy',
+        alias: 'Compliancy'
+      }, {
+        sqlname: 'dSoftInstallCount',
+        alias: 'Installed'
+      }, {
+        sqlname: 'dUnusedInstall',
+        alias: 'Un-Installed'
+      }, {
+        sqlname: 'dEntitled',
+        alias: 'Entitled'
+      }],
+      filter: `dSoftInstallCount> 0 AND Brand.Name='${this.state.products[selected].name}'`
+    };
+
+    this.setState({
+      versionQuery: body,
+      version: null
+    }, () => {
+      this.setState({
+        version: <RecordList body={body} title="Version" root={true}/>
+      });
+    });
+
+  }
+
   render() {
     return (
-      <Split separator={true} flex="left">
-        <Box flex={true} align="center" justify="center">
+      <Box flex={true} direction="row">
+        <Box flex={true} align="center" justify="center" style={this.state.products.length > 0 && {'width': '500px'}}>
+          <Header>
+            <Title>Vendor</Title>
+          </Header>
           <Vendor data={this.state.vendors} onSelect={this.renderProduct}/>
         </Box>
         {
           this.state.products.length > 0 &&
-          <Box flex={true} align="center" justify="center">
-            <Product data={this.state.products} onSelect={this.renderProduct}/>
+          <Box flex={true} align="stretch" justify="center">
+            <Header>
+              <Title>Product</Title>
+            </Header>
+            <Product data={this.state.products} onSelect={this.renderVersion}/>
+            {this.state.version}
           </Box>
         }
-      </Split>
+      </Box>
     );
   }
 }
