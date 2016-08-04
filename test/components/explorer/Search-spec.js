@@ -7,7 +7,12 @@ import {Box, Headline, Tiles} from 'grommet';
 describe('explorer - components/explorer/Search-spec.js', () => {
   it('should render Search correctly', () => {
     const renderer = TestUtils.createRenderer();
-    renderer.render(<Search />);
+    const props = {
+      routes: [{}, {
+        childRoutes: []
+      }]
+    };
+    renderer.render(<Search {...props}/>);
     let box = renderer.getRenderOutput();
     expect(box.type).toEqual(Box);
 
