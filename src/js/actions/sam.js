@@ -1,10 +1,10 @@
 import * as aql from './aql';
 // import db from './explorer';
 
-export function vendorWithBrand(callback) {
+export function vendorWithBrand() {
   let aqlVendorWithBrand = "SELECT Brand.Company, COUNTDISTINCT(Brand.Name) FROM amSoftLicCounter WHERE (bType = 0) AND (bLicUpgrade = 0) AND (dSoftInstallCount > 0) AND Brand.PK<>0 GROUP BY Brand.Company";
 
-  aql.queryAQL(aqlVendorWithBrand, (aqlData) => {
+  return aql.queryAQL(aqlVendorWithBrand).then((aqlData) => {
     if (aqlData.rows) {
       let vendors = aqlData.rows.map((vendor) => {
         return {
@@ -13,15 +13,15 @@ export function vendorWithBrand(callback) {
         };
       });
 
-      vendorWithNonCompliance(vendors, callback);
+      return vendorWithNonCompliance(vendors);
     }
   });
 }
 
-export function vendorWithNonCompliance(vendors, callback) {
+function vendorWithNonCompliance(vendors) {
   let aqlVendorWithNonCompliance = "SELECT Brand.Company, COUNTDISTINCT(Brand.Name) FROM amSoftLicCounter WHERE (bType = 0) AND (bLicUpgrade = 0) AND (dCompliancyUpg < 0)  AND Brand.PK<>0 GROUP BY Brand.Company";
 
-  aql.queryAQL(aqlVendorWithNonCompliance, (aqlData) => {
+  return aql.queryAQL(aqlVendorWithNonCompliance).then((aqlData) => {
     if (aqlData.rows) {
       aqlData.rows.forEach((vendor) => {
         vendors.forEach((v) => {
@@ -30,15 +30,15 @@ export function vendorWithNonCompliance(vendors, callback) {
         });
       });
 
-      vendorWithOverCompliance(vendors, callback);
+      return vendorWithOverCompliance(vendors);
     }
   });
 }
 
-export function vendorWithOverCompliance(vendors, callback) {
+function vendorWithOverCompliance(vendors) {
   let aqlVendorWithNonCompliance = "SELECT Brand.Company, COUNTDISTINCT(Brand.Name) FROM amSoftLicCounter WHERE (bType = 0) AND (bLicUpgrade = 0) AND (dCompliancyUpg > 0)  AND Brand.PK<>0 GROUP BY Brand.Company";
 
-  aql.queryAQL(aqlVendorWithNonCompliance, (aqlData) => {
+  return aql.queryAQL(aqlVendorWithNonCompliance).then((aqlData) => {
     if (aqlData.rows) {
       aqlData.rows.forEach((vendor) => {
         vendors.forEach((v) => {
@@ -47,15 +47,15 @@ export function vendorWithOverCompliance(vendors, callback) {
         });
       });
 
-      callback(vendors);
+      return vendors;
     }
   });
 }
 
-export function productInVendor(vendorName, callback) {
+export function productInVendor(vendorName) {
   let aqlVendorWithNonCompliance = `SELECT Brand.Name, sum(dUnusedInstall), sum(dEntitled), count(*) FROM amSoftLicCounter WHERE (bType = 0) AND (bLicUpgrade = 0) AND (dSoftInstallCount> 0)  AND Brand.PK<>0 AND Brand.Company.Name = '${vendorName}' GROUP BY Brand.Name`;
 
-  aql.queryAQL(aqlVendorWithNonCompliance, (aqlData) => {
+  return aql.queryAQL(aqlVendorWithNonCompliance).then((aqlData) => {
     if (aqlData.rows) {
       let products = aqlData.rows.map((product) => {
         return {
@@ -66,7 +66,7 @@ export function productInVendor(vendorName, callback) {
         };
       });
 
-      callback(products);
+      return products;
     }
   });
 }
