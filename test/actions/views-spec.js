@@ -97,8 +97,7 @@ describe('views - actions/views-spec.js', () => {
     const expectedActions = [{
       type: types.SAVE_VIEW_DEF,
       selectedViewId: fakeId,
-      selectedView: mockView,
-      editing: false
+      selectedView: mockView
     }, {
       type: types.RECEIVE_INFO,
       msg: "View definition saved successfully."
@@ -178,9 +177,7 @@ describe('views - actions/views-spec.js', () => {
 
     const expectedActions = [{
       type: types.DELETE_VIEW_DEF,
-      selectedViewId: "",
-      selectedView: {},
-      views: [mockResponse[1], mockResponse[2]]
+      selectedViewId: selectedView._id
     }, {
       type: types.RECEIVE_INFO,
       msg: `View definition '${selectedView.name}' deleted.`

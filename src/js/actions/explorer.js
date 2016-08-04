@@ -5,7 +5,7 @@ export function loadViews() {
   return Rest.get(VIEW_DEF_URL).then((res) => {
     return res.body;
   }, (err) => {
-    console.log(err.response ? err.response.text : err);
+    //console.log(err.response ? err.response.text : err);
   });
 }
 
