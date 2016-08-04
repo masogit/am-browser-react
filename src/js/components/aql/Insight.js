@@ -99,7 +99,7 @@ export default class Insight extends Component {
 
   _queryData(aql) {
     const data = this.state.data;
-    AQLActions.queryAQL(aql.str, (result) => {
+    AQLActions.queryAQL(aql.str).then(result => {
       if (result) {
         data[aql._id] = {
           aql: aql,

@@ -118,9 +118,8 @@ export function updateSelectedView(selectedView, path, newValue) {
 }
 
 export function deleteTableRow(selectedView, path) {
-  return (dispatch, getState) => {
-    let editing = getState().views.views.editing;
-    let clonedView = editing ? selectedView : _.cloneDeep(selectedView);
+  return (dispatch) => {
+    let clonedView = _.cloneDeep(selectedView);
     let bodyPath = path.substring(0, path.lastIndexOf("body") + 4);
 
     // check and remove orderby, groupby and sum
@@ -152,7 +151,7 @@ export function deleteTableRow(selectedView, path) {
 }
 
 export function moveRow(selectedView, path, up) {
-  return (dispatch, getState) => {
+  return (dispatch) => {
     let clonedView = _.cloneDeep(selectedView);
     let lastIndexOfDot = path.lastIndexOf(".");
     let arrayPath = path.substring(0, lastIndexOfDot);
