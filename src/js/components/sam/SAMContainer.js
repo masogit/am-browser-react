@@ -12,8 +12,7 @@ export default class SAMContainer extends Component {
     super();
     this.state = {
       vendors: [],
-      products: [],
-      versionQuery: ''
+      products: []
     };
     this.renderProduct = this.renderProduct.bind(this);
     this.renderVersion = this.renderVersion.bind(this);
@@ -22,7 +21,8 @@ export default class SAMContainer extends Component {
   componentWillMount() {
     SAMActions.vendorWithBrand().then((vendors) => {
       this.setState({
-        vendors: vendors
+        vendors: vendors,
+        version: null
       });
     });
   }
@@ -32,7 +32,8 @@ export default class SAMContainer extends Component {
 
     SAMActions.productInVendor(name).then((products) => {
       this.setState({
-        products: products
+        products: products,
+        version: null
       });
     });
   }
@@ -42,27 +43,32 @@ export default class SAMContainer extends Component {
       sqlname: 'amSoftLicCounter',
       groupby: 'Brand.Name',
       fields: [{
-        sqlname: 'dCompliancy',
-        alias: 'Compliancy'
+        sqlname: 'LicType.Name',
+        alias: 'License Metric'
+      }, {
+        sqlname: 'dLicUseRights',
+        alias: 'License Rights'
       }, {
         sqlname: 'dSoftInstallCount',
-        alias: 'Installed'
-      }, {
-        sqlname: 'dUnusedInstall',
-        alias: 'Un-Installed'
+        alias: 'Consumption'
       }, {
         sqlname: 'dEntitled',
         alias: 'Entitled'
+      }, {
+        sqlname: 'dCompliancy',
+        alias: 'Compliancy'
+      }, {
+        sqlname: 'dUnusedInstall',
+        alias: 'Unused Installation'
       }],
       filter: `dSoftInstallCount> 0 AND Brand.Name='${this.state.products[selected].name}'`
     };
 
     this.setState({
-      versionQuery: body,
       version: null
     }, () => {
       this.setState({
-        version: <RecordList body={body} title="Version" root={true}/>
+        version: <RecordList body={body} title="Version"/>
       });
     });
 
@@ -70,7 +76,7 @@ export default class SAMContainer extends Component {
 
   render() {
     return (
-      <Box flex={true} direction="row">
+      <Box flex={true} direction="row" align={this.state.products.length > 0 && "start"}>
         <Box flex={true} align="center" justify="center" style={this.state.products.length > 0 && {'width': '500px'}}>
           <Header>
             <Title>Vendor</Title>
@@ -79,7 +85,7 @@ export default class SAMContainer extends Component {
         </Box>
         {
           this.state.products.length > 0 &&
-          <Box flex={true} align="stretch" justify="center">
+          <Box flex={true}>
             <Header>
               <Title>Product</Title>
             </Header>
