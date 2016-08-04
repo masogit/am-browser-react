@@ -9,7 +9,7 @@ export default class Product extends Component {
   render() {
     let tiles = this.props.data.map((product, index) => {
       return (
-        <Tile key={index} separator="top" colorIndex="light-1" pad="small">
+        <Tile key={`${product.name}-${index}`} separator="top" colorIndex="light-1" pad="small">
           <Header>{product.name}</Header>
           <Box flex={true}>{product.unused} Unused</Box>
           <Box flex={true}>{product.entitled} Entitled</Box>
@@ -21,7 +21,7 @@ export default class Product extends Component {
     });
 
     return (
-      <Tiles flush={false} justify="center" colorIndex="light-2" full="horizontal" selectable={true} onSelect={this.props.onSelect}>
+      <Tiles flush={false} justify="start" colorIndex="light-2" selectable={true} onSelect={this.props.onSelect}>
         {tiles}
       </Tiles>
     );

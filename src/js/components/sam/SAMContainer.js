@@ -32,8 +32,12 @@ export default class SAMContainer extends Component {
 
     SAMActions.productInVendor(name).then((products) => {
       this.setState({
-        products: products,
+        products: [],
         version: null
+      }, () => {
+        this.setState({
+          products: products
+        });
       });
     });
   }
@@ -52,9 +56,6 @@ export default class SAMContainer extends Component {
         sqlname: 'dSoftInstallCount',
         alias: 'Consumption'
       }, {
-        sqlname: 'dEntitled',
-        alias: 'Entitled'
-      }, {
         sqlname: 'dCompliancy',
         alias: 'Compliancy'
       }, {
@@ -68,7 +69,7 @@ export default class SAMContainer extends Component {
       version: null
     }, () => {
       this.setState({
-        version: <RecordList body={body} title="Version"/>
+        version: <Box flex={true}><RecordList body={body} title="Version"/></Box>
       });
     });
 
@@ -76,8 +77,8 @@ export default class SAMContainer extends Component {
 
   render() {
     return (
-      <Box flex={true} direction="row" align={this.state.products.length > 0 && "start"}>
-        <Box flex={true} align="center" justify="center" style={this.state.products.length > 0 && {'width': '500px'}}>
+      <Box flex={true} direction="row" pad="small">
+        <Box flex={this.state.products.length == 0} align="center" justify="center" style={this.state.products.length > 0 && {'width': '500px'}}>
           <Header>
             <Title>Vendor</Title>
           </Header>
