@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
 import * as SAMActions from '../../actions/sam';
 import {Box, Header, Title} from 'grommet';
-import RecordList from '../explorer/RecordList';
 import Vendor from './Vendor';
 import Product from './Product';
-// import Version from './Version';
+import Version from './Version';
 
 
 export default class SAMContainer extends Component {
@@ -69,7 +68,7 @@ export default class SAMContainer extends Component {
       version: null
     }, () => {
       this.setState({
-        version: <Box flex={true}><RecordList body={body} title="Version"/></Box>
+        version: body
       });
     });
 
@@ -91,7 +90,7 @@ export default class SAMContainer extends Component {
               <Title>Product</Title>
             </Header>
             <Product data={this.state.products} onSelect={this.renderVersion}/>
-            {this.state.version}
+            <Version data={this.state.version} />
           </Box>
         }
       </Box>
