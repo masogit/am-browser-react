@@ -11,8 +11,8 @@ export default class Product extends Component {
       return (
         <Tile key={index} separator="top" colorIndex="light-1" pad="small">
           <Header>{product.name}</Header>
-          <Box flex={true}>Unused: {product.unused}</Box>
-          <Box flex={true}>Entitled: {product.entitled}</Box>
+          <Box flex={true}>{product.unused} Unused</Box>
+          <Box flex={true}>{product.entitled} Entitled</Box>
           <Footer justify="between">
             <Box>Versions: {product.versions}</Box>
           </Footer>

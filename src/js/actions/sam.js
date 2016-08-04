@@ -2,9 +2,9 @@ import * as aql from './aql';
 // import db from './explorer';
 
 export function vendorWithBrand() {
-  let aqlVendorWithBrand = "SELECT Brand.Company, COUNTDISTINCT(Brand.Name) FROM amSoftLicCounter WHERE (bType = 0) AND (bLicUpgrade = 0) AND (dSoftInstallCount > 0) AND Brand.PK<>0 GROUP BY Brand.Company";
+  let aqlStr = "SELECT Brand.Company, COUNTDISTINCT(Brand.Name) FROM amSoftLicCounter WHERE (bType = 0) AND (bLicUpgrade = 0) AND (dSoftInstallCount > 0) AND Brand.PK<>0 GROUP BY Brand.Company";
 
-  return aql.queryAQL(aqlVendorWithBrand).then((aqlData) => {
+  return aql.queryAQL(aqlStr).then((aqlData) => {
     if (aqlData.rows) {
       let vendors = aqlData.rows.map((vendor) => {
         return {
@@ -19,9 +19,9 @@ export function vendorWithBrand() {
 }
 
 function vendorWithNonCompliance(vendors) {
-  let aqlVendorWithNonCompliance = "SELECT Brand.Company, COUNTDISTINCT(Brand.Name) FROM amSoftLicCounter WHERE (bType = 0) AND (bLicUpgrade = 0) AND (dCompliancyUpg < 0)  AND Brand.PK<>0 GROUP BY Brand.Company";
+  let aqlStr = "SELECT Brand.Company, COUNTDISTINCT(Brand.Name) FROM amSoftLicCounter WHERE (bType = 0) AND (bLicUpgrade = 0) AND (dCompliancyUpg < 0)  AND Brand.PK<>0 GROUP BY Brand.Company";
 
-  return aql.queryAQL(aqlVendorWithNonCompliance).then((aqlData) => {
+  return aql.queryAQL(aqlStr).then((aqlData) => {
     if (aqlData.rows) {
       aqlData.rows.forEach((vendor) => {
         vendors.forEach((v) => {
@@ -36,9 +36,9 @@ function vendorWithNonCompliance(vendors) {
 }
 
 function vendorWithOverCompliance(vendors) {
-  let aqlVendorWithNonCompliance = "SELECT Brand.Company, COUNTDISTINCT(Brand.Name) FROM amSoftLicCounter WHERE (bType = 0) AND (bLicUpgrade = 0) AND (dCompliancyUpg > 0)  AND Brand.PK<>0 GROUP BY Brand.Company";
+  let aqlStr = "SELECT Brand.Company, COUNTDISTINCT(Brand.Name) FROM amSoftLicCounter WHERE (bType = 0) AND (bLicUpgrade = 0) AND (dCompliancyUpg > 0)  AND Brand.PK<>0 GROUP BY Brand.Company";
 
-  return aql.queryAQL(aqlVendorWithNonCompliance).then((aqlData) => {
+  return aql.queryAQL(aqlStr).then((aqlData) => {
     if (aqlData.rows) {
       aqlData.rows.forEach((vendor) => {
         vendors.forEach((v) => {
@@ -53,9 +53,9 @@ function vendorWithOverCompliance(vendors) {
 }
 
 export function productInVendor(vendorName) {
-  let aqlVendorWithNonCompliance = `SELECT Brand.Name, sum(dUnusedInstall), sum(dEntitled), count(*) FROM amSoftLicCounter WHERE (bType = 0) AND (bLicUpgrade = 0) AND (dSoftInstallCount> 0)  AND Brand.PK<>0 AND Brand.Company.Name = '${vendorName}' GROUP BY Brand.Name`;
+  let aqlStr = `SELECT Brand.Name, sum(dUnusedInstall), sum(dEntitled), count(*) FROM amSoftLicCounter WHERE (bType = 0) AND (bLicUpgrade = 0) AND (dSoftInstallCount> 0)  AND Brand.PK<>0 AND Brand.Company.Name = '${vendorName}' GROUP BY Brand.Name`;
 
-  return aql.queryAQL(aqlVendorWithNonCompliance).then((aqlData) => {
+  return aql.queryAQL(aqlStr).then((aqlData) => {
     if (aqlData.rows) {
       let products = aqlData.rows.map((product) => {
         return {
