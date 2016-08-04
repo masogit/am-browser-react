@@ -88,10 +88,9 @@ export default class RecordList extends Component {
         groupby: groupby
       });
     }
-
     if (body.groupby)
-      AQLActions.queryAQL(ExplorerActions.getGroupByAql(body), (data)=> {
-        if (data.rows.length > 0) {
+      AQLActions.queryAQL(ExplorerActions.getGroupByAql(body)).then((data)=> {
+        if (data && data.rows.length > 0) {
           this.setState({
             graphData: data
           });
@@ -252,7 +251,6 @@ export default class RecordList extends Component {
         });
 
       }
-
       if (param.filters.indexOf(searchValue) == -1)
         param.filters.push(searchValue);
       this.refs.search.value = "";

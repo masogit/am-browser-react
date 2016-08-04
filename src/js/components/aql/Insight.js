@@ -99,7 +99,7 @@ export default class Insight extends Component {
 
   _queryData(aql) {
     const data = this.state.data;
-    AQLActions.queryAQL(aql.str, (result) => {
+    AQLActions.queryAQL(aql.str).then(result => {
       if (result) {
         data[aql._id] = {
           aql: aql,
@@ -113,18 +113,20 @@ export default class Insight extends Component {
   _loadWall() {
     this.setState({data: {}});
     AQLActions.loadWalls().then(walls => {
-      if (walls[0])
-        this.setState({
-          wall: walls[0],
-          tabs: walls[0].tabs,
-          focusTab: walls[0].tabs[0]
-        }, this._findTabAqls(walls[0].tabs));
-      else
-        this.setState({
-          wall: {
-            tabs: this.state.tabs
-          }
-        });
+      if (walls) {
+        if (walls[0])
+          this.setState({
+            wall: walls[0],
+            tabs: walls[0].tabs,
+            focusTab: walls[0].tabs[0]
+          }, this._findTabAqls(walls[0].tabs));
+        else
+          this.setState({
+            wall: {
+              tabs: this.state.tabs
+            }
+          });
+      }
     });
   }
 
@@ -488,7 +490,10 @@ export default class Insight extends Component {
     this.setState({
       tabs: leftTabs,
       focusTab
-    }, () => this.refs[focusTab.name].props.onRequestForActive());
+    }, () => {
+      if (focusTab)
+        this.refs[focusTab.name].props.onRequestForActive();
+    });
   }
 
   render() {

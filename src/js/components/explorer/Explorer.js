@@ -9,40 +9,34 @@ export default class Explorer extends Component {
   constructor() {
     super();
     this.state = {
-      view: null
+      view: null,
+      navigation: null
     };
   }
 
-  componentDidMount() {
-    if (this.props.params.id)
-      ExplorerActions.loadView(this.props.params.id).then(view => {
-        if (view) {
-          this.setState({
-            view: view
-          });
+  componentWillMount() {
+    const id = this.props.params.id;
+    if (id) {
+      ExplorerActions.loadView(id).then((view) => {
+        this.setState({view: view});
+      });
+    } else {
+      ExplorerActions.loadViews().then(views => {
+        if (views) {
+          const content = views.map((view, key) => ({
+            key: view._id,
+            groupby: view.category,
+            onClick: this.queryView.bind(this, view),
+            search: view.name,
+            child: view.name
+          }));
+          this.setState({navigation: content});
         }
       });
-    else
-      ExplorerActions.loadViews().then(views => {
-        this.setState({
-          viewNavigation: this._getViewNavigation(views)
-        });
-      });
+    }
   }
 
-  _getViewNavigation(views) {
-    const contents = views.map((view, key) => ({
-      key: view._id,
-      groupby: view.category,
-      onClick: this._queryView.bind(this, view),
-      search: view.name,
-      child: view.name
-    }));
-
-    return <SideBar title={`Views Navigation (${views.length})`} contents={contents}/>;
-  }
-
-  _queryView(view) {
+  queryView(view) {
     this.setState({
       view: null
     }, ()=> {
@@ -50,27 +44,19 @@ export default class Explorer extends Component {
         view: view
       });
     });
-
   }
 
   render() {
-    let content;
-    if (this.state.view) {
-      content = <RecordList body={this.state.view.body} title={this.state.view.name} root={true}/>;
-    } else {
-      content = (
-        <Box pad={{horizontal: 'medium'}} flex={true} justify='center' align="center">
-          <Box size="medium" colorIndex="light-2" pad={{horizontal: 'large', vertical: 'medium'}} align='center'>
-            Select an item to query.
-          </Box>
-        </Box>
-      );
-    }
-
     return (
       <Box direction="row" flex={true}>
-        {this.state.viewNavigation}
-        {content}
+        {this.state.navigation && <SideBar title={`Views Navigation (${this.state.navigation.length})`} contents={this.state.navigation}/>}
+        {this.state.view ? <RecordList body={this.state.view.body} title={this.state.view.name} root={true}/> :
+          <Box pad={{horizontal: 'medium'}} flex={true} justify='center' align="center">
+            <Box size="medium" colorIndex="light-2" pad={{horizontal: 'large', vertical: 'medium'}} align='center'>
+              Select an item to query.
+            </Box>
+          </Box>
+        }
       </Box>
     );
   }

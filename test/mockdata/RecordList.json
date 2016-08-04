@@ -1,0 +1,152 @@
+{
+  "name": "Expense Line",
+  "desc": "test",
+  "category": "IT Spending",
+  "body": {
+    "orderby": "sePurpose desc",
+    "filter": "",
+    "label": "Expense lines",
+    "sqlname": "amExpenseLine",
+    "fields": [
+      {
+        "ref-link": "schema/amExpenseLine/field/mDebit",
+        "user_type": "Money",
+        "size": 8,
+        "user_type_format": "",
+        "label": "Debit",
+        "sqlname": "mDebit",
+        "type": "Double",
+        "is_calc": false,
+        "long_desc": "Debit",
+        "searchable": true
+      },
+      {
+        "ref-link": "schema/amExpenseLine/field/DebitCur",
+        "user_type": "",
+        "size": 6,
+        "user_type_format": "",
+        "label": "Debit (currency)",
+        "sqlname": "DebitCur",
+        "type": "String",
+        "is_calc": false,
+        "long_desc": "Debit (currency)",
+        "searchable": false
+      },
+      {
+        "ref-link": "schema/amExpenseLine/field/dBilling",
+        "user_type": "",
+        "size": 4,
+        "user_type_format": "",
+        "label": "Expense date",
+        "sqlname": "dBilling",
+        "type": "Date",
+        "is_calc": false,
+        "long_desc": "Date of corresponding expense"
+      },
+      {
+        "ref-link": "schema/amExpenseLine/field/sePurpose",
+        "user_type": "System Itemized List",
+        "size": 2,
+        "user_type_format": "Purchase (Asset)|0|Training|1|Contract|2|Work order|3|Consumption|4|Purchase (Consumable)|5|Initial payment (Asset)|7|Initial payment (Contract)|8|Rent|9|License extension|10|Adjustment|11|Free|6|Project|12|Internal labor (Work order)|51|Internal labor (Ticket)|52|Subscription|55",
+        "label": "Purpose",
+        "sqlname": "sePurpose",
+        "type": "Short",
+        "is_calc": false,
+        "long_desc": "Purpose linked to line"
+      },
+      {
+        "ref-link": "schema/amExpenseLine/field/seStatus",
+        "user_type": "System Itemized List",
+        "size": 2,
+        "user_type_format": "Projected|2|Incurred|0|Incurred and locked|1",
+        "label": "Status",
+        "sqlname": "seStatus",
+        "type": "Short",
+        "is_calc": false,
+        "long_desc": "Status",
+        "searchable": true
+      }
+    ],
+    "links": [
+      {
+        "sqlname": "Portfolio.ItemsReceived",
+        "label": "Items received",
+        "src_field": {
+          "ref-link": "schema/amPortfolio/field/lPortfolioItemId",
+          "sqlname": "lPortfolioItemId",
+          "relative_path": "Portfolio"
+        },
+        "dest_field": {
+          "ref-link": "schema/amItemReceived/field/lCrtdPItemId",
+          "sqlname": "lCrtdPItemId"
+        },
+        "body": {
+          "sqlname": "amItemReceived",
+          "label": "Items received",
+          "fields": [
+            {
+              "ref-link": "schema/amItemReceived/field/ItemNo",
+              "user_type": "",
+              "size": 12,
+              "user_type_format": "",
+              "label": "Item number",
+              "sqlname": "ItemNo",
+              "type": "String",
+              "is_calc": false,
+              "long_desc": "Item number"
+            },
+            {
+              "ref-link": "schema/amItemReceived/field/fQty",
+              "user_type": "",
+              "size": 8,
+              "user_type_format": "",
+              "label": "Quantity received",
+              "sqlname": "fQty",
+              "type": "Double",
+              "is_calc": false,
+              "long_desc": "Quantity received"
+            },
+            {
+              "ref-link": "schema/amItemReceived/field/seMgtConstraint",
+              "user_type": "System Itemized List",
+              "size": 2,
+              "user_type_format": "Free|0|Asset tag|1|Unique asset tag|2",
+              "label": "Management constraint forced",
+              "sqlname": "seMgtConstraint",
+              "type": "Short",
+              "is_calc": false,
+              "long_desc": "Management constraint forced"
+            },
+            {
+              "ref-link": "schema/amItemReceived/field/seProcessLocation",
+              "user_type": "System Itemized List",
+              "size": 2,
+              "user_type_format": "Default|0|Local|1|Server|2",
+              "label": "Action",
+              "sqlname": "seProcessLocation",
+              "type": "Short",
+              "is_calc": false,
+              "long_desc": "Action"
+            },
+            {
+              "ref-link": "schema/amItemReceived/field/seStatus",
+              "user_type": "System Itemized List",
+              "size": 2,
+              "user_type_format": "Default|0|Received|1|Deleted|2",
+              "label": "Status",
+              "sqlname": "seStatus",
+              "type": "Short",
+              "is_calc": false,
+              "long_desc": "Status"
+            }
+          ],
+          "links": []
+        },
+        "count": 20
+      }
+    ],
+    "groupby": "DebitCur",
+    "sum": "mDebit"
+  },
+  "_id": "e7jyjxj38fr"
+}

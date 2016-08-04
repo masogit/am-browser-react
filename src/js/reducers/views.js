@@ -2,6 +2,7 @@
 import objectPath from 'object-path';
 import * as Types from '../constants/ActionTypes';
 import _ from 'lodash';
+import emptyViewDef from './EmptyViewDef.json';
 
 const initialState = {
   isFetchingViewList: false,
@@ -11,7 +12,6 @@ const initialState = {
   selectedViewId: '',
   templateTable: {},
   err: '',
-  editing: false,
   preview: false,
   alertForm: null,
   elements: [],
@@ -39,27 +39,20 @@ const handlers = {
     };
   },
   [Types.UPDATE_SELECTED_VIEW]: (state, action) => {
-    let editing = state.editing;
-    let clonedView = action.selectedView;
-    if (!editing) {
-      clonedView = _.cloneDeep(action.selectedView);
-    }
+    const clonedView = _.cloneDeep(action.selectedView);
     objectPath.set(clonedView, action.path, action.newValue);
     return {
-      selectedView: clonedView,
-      editing: true
+      selectedView: clonedView
     };
   },
   [Types.DELETE_TABLE_ROW]: (state, action) => {
     return {
-      selectedView: action.selectedView,
-      editing: true
+      selectedView: action.selectedView
     };
   },
   [Types.DUPLICATE_VIEW_DEF]: (state, action) => {
     return {
-      selectedView: action.selectedView,
-      editing: true
+      selectedView: action.selectedView
     };
   },
   [Types.SYNC_SELECTED_VIEW]: (state, action) => {
@@ -70,8 +63,12 @@ const handlers = {
   [Types.SAVE_VIEW_DEF]: (state, action) => {
     return {
       selectedViewId: action.selectedViewId,
-      selectedView: action.selectedView,
-      editing: false
+      selectedView: action.selectedView
+    };
+  },
+  [Types.NEW_SELECTED_VIEW]: (state, action) => {
+    return {
+      selectedView: _.cloneDeep(emptyViewDef)
     };
   },
   [Types.DELETE_VIEW_DEF]: (state, action) => {

@@ -5,7 +5,7 @@ import * as Types from '../constants/ActionTypes';
 import _ from 'lodash';
 
 export function saveWall(wall) {
-  return Rest.get(INSIGHT_DEF_URL).query(wall).then((res) => {
+  return Rest.post(INSIGHT_DEF_URL, wall).then((res) => {
     if (res.text) {
       store.default.dispatch({type: Types.RECEIVE_INFO, msg: "Insight saved successfully"});
       return res.text;
