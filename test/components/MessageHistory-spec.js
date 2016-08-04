@@ -29,7 +29,7 @@ describe('components - components/MessageHistory-spec.js', () => {
     const header = TestUtils.findRenderedComponentWithType(sessionMenu, Header);
     expect(header).toExist();
 
-    const table = TestUtils.scryRenderedComponentsWithType(sessionMenu, Table);
+    const table = TestUtils.findRenderedComponentWithType(sessionMenu, Table);
     expect(table).toExist();
 
     const status = TestUtils.findRenderedComponentWithType(sessionMenu, Status);
