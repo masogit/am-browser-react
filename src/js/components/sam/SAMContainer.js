@@ -15,7 +15,7 @@ export default class SAMContainer extends Component {
   }
 
   componentWillMount() {
-    SAMActions.vendorWithBrand((vendors) => {
+    SAMActions.vendorWithBrand().then((vendors) => {
       this.setState({
         vendors: vendors
       });
@@ -25,7 +25,7 @@ export default class SAMContainer extends Component {
   renderProduct(selectedVendor) {
     let vendorName = this.state.vendors[selectedVendor].name;
 
-    SAMActions.productInVendor(vendorName, (products) => {
+    SAMActions.productInVendor(vendorName).then((products) => {
       this.setState({
         products: products
       });
