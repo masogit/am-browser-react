@@ -130,7 +130,7 @@ export default class AQL extends Component {
   }
 
   _onQuery() {
-    AQLActions.queryAQL(this.state.aql.str, (data) => {
+    AQLActions.queryAQL(this.state.aql.str).then((data) => {
       const aql = this.state.aql;
       aql.form = 'init';
       this.setState({
@@ -294,7 +294,7 @@ export default class AQL extends Component {
 
   _showViewRecords(filter, viewInAQL) {
     if (viewInAQL && viewInAQL._id)
-      ExplorerActions.loadView(viewInAQL._id, (view) => {
+      ExplorerActions.loadView(viewInAQL._id).then((view) => {
         var body = view.body;
         var newFilter = Format.getFilterFromField(view.body.fields, filter);
         body.filter = (body.filter) ? `(${body.filter} AND ${newFilter})` : newFilter;
