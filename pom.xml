@@ -14,8 +14,10 @@
     <sonar.jdbc.password>sonar</sonar.jdbc.password>
     <sonar.jdbc.driver>org.postgresql.Driver</sonar.jdbc.driver>
     <sonar.projectName>am-browser :: Javascript</sonar.projectName>
-    <sonar.sources>src,app</sonar.sources>
+    <sonar.sources>src</sonar.sources>
     <sonar.language>js</sonar.language>
+	<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+	<sonar.javascript.lcov.reportPath>coverage/lcov.info</sonar.javascript.lcov.reportPath>
   </properties>
 
   <build>
