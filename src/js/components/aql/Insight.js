@@ -492,7 +492,7 @@ export default class Insight extends Component {
       focusTab
     }, () => {
       if (focusTab)
-        this.refs[focusTab.name].props.onRequestForActive()
+        this.refs[focusTab.name].props.onRequestForActive();
     });
   }
 
