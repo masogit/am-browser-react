@@ -41,7 +41,7 @@ export default class Vendor extends Component {
     });
 
     return (
-      <Tiles flush={false} justify="center" colorIndex="light-2" full="horizontal" selectable={true} onSelect={this.props.onSelect}>
+      <Tiles flush={false} justify="center" colorIndex="light-2" full="horizontal" selectable={true} onSelect={this.props.onSelect} className="autoScroll">
         {tiles}
       </Tiles>
     );
