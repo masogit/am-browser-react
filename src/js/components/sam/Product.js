@@ -21,7 +21,7 @@ export default class Product extends Component {
     });
 
     return (
-      <Tiles flush={false} justify="start" colorIndex="light-2" selectable={true} onSelect={this.props.onSelect}>
+      <Tiles flex={false} flush={false} justify="start" colorIndex="light-2" selectable={true} onSelect={this.props.onSelect}>
         {tiles}
       </Tiles>
     );
