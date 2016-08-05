@@ -43,6 +43,7 @@ export default class SAMContainer extends Component {
 
   renderVersion(selected) {
     let body = {
+      label: 'Software Counters',
       sqlname: 'amSoftLicCounter',
       groupby: 'LicType.Name',
       fields: [{
