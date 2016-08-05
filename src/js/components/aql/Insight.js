@@ -344,7 +344,7 @@ export default class Insight extends Component {
 
   _showViewRecords(filter, viewInAQL) {
     if (viewInAQL && viewInAQL._id)
-      ExplorerActions.loadView(viewInAQL._id, (view) => {
+      ExplorerActions.loadView(viewInAQL._id).then((view) => {
         var body = view.body;
         var newFitler = Format.getFilterFromField(view.body.fields, filter);
         body.filter = (body.filter) ? `(${body.filter} AND ${newFitler})` : newFitler;
