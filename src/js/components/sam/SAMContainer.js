@@ -76,19 +76,13 @@ export default class SAMContainer extends Component {
 
   render() {
     return (
-      <Box flex={true} direction="row" pad="small">
-        <Box flex={this.state.products.length == 0} align="center" justify="center" style={this.state.products.length > 0 && {'width': '500px'}}>
-          <Header>
-            <Title>Vendor</Title>
-          </Header>
+      <Box flex={true} direction="row">
+        <Box flex={this.state.products.length == 0} style={this.state.products.length > 0 && {'width': '500px'}} pad={{horizontal: "small"}}>
           <Vendor data={this.state.vendors} onSelect={this.renderProduct}/>
         </Box>
         {
           this.state.products.length > 0 &&
           <Box flex={true}>
-            <Header>
-              <Title>Product</Title>
-            </Header>
             <Product data={this.state.products} onSelect={this.renderVersion}/>
             <Version data={this.state.version} />
           </Box>
