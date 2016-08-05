@@ -4,7 +4,6 @@ import Anchor from 'grommet/components/Anchor';
 import Box from 'grommet/components/Box';
 import Tabs from 'grommet/components/Tabs';
 import Tab from 'grommet/components/Tab';
-import List from 'grommet/components/List';
 import ListItem from 'grommet/components/ListItem';
 import SearchInput from 'grommet/components/SearchInput';
 import Notes from 'grommet/components/icons/base/Notes';
@@ -218,24 +217,6 @@ class MetaData extends ComponentBase {
     }
   }
 
-  linkSort(links) {
-    return links.sort(sortSqlName).map((row, index) => {
-      let newRow = {
-        label: row.label,
-        sqlname: row.sqlname,
-        url: row.dest_table["ref-link"],
-        card11: row.card11,
-        src_field: row.src_field,
-        dest_field: row.dest_field
-      };
-      return (
-        <ListItem separator="none" key={index} pad="none">
-          <Anchor href="#" key={index} primary={true} onClick={this._onClick.bind(this, newRow)} label={row.sqlname}/>
-        </ListItem>
-      );
-    });
-  }
-
   getLink(nameList, rows, elements) {
     let items = findItem(rows.links, nameList[0]);
     if (items.length > 0) {
@@ -333,8 +314,26 @@ class MetaData extends ComponentBase {
       );
     };
 
-    let linksComponents = this.linkSort(links.filter((obj) => obj.card11 == true));
-    let m2mLinksComponents = this.linkSort(links.filter((obj) => obj.card11 != true));
+    let one2onelinks = links.filter((obj) => obj.card11 == true).sort(sortSqlName);
+
+    let m2mLinks = links.filter((obj) => obj.card11 != true).sort(sortSqlName);
+
+    let renderLinks = (index, key, links) => {
+      let row = links[index];
+      let newRow = {
+        label: row.label,
+        sqlname: row.sqlname,
+        url: row.dest_table["ref-link"],
+        card11: row.card11,
+        src_field: row.src_field,
+        dest_field: row.dest_field
+      };
+      return (
+        <ListItem separator="none" key={key} pad="none">
+          <Anchor href="#" primary={true} onClick={this._onClick.bind(this, newRow)} label={row.sqlname}/>
+        </ListItem>
+      );
+    };
     //let fieldsComponents = fields.sort().map((row, index) => {
     //  return <TableRow key={index}><td><CheckBox key={index} id={`checkbox_${row.sqlname}`} checked={row.checked} onChange={this._onChange.bind(this, row)}/><Notes/>{row.sqlname}</td></TableRow>;
     //});
@@ -362,19 +361,22 @@ class MetaData extends ComponentBase {
           }
           {entities.length == 0 && !rows.entities &&
           <Tabs justify="start" style={{border:"1px solid #000"}}>
-            <Tab title={`1-M Links (${m2mLinksComponents.length})`}>
-              <List className='fields'>
-                {m2mLinksComponents}
-              </List>
+            <Tab title={`1-M Links (${m2mLinks.length})`}>
+              <ReactList itemRenderer={(index, key) => renderLinks(index, key, m2mLinks)}
+                         length={m2mLinks.length}
+                         pageSize={10}
+                         type='simple'
+                />
             </Tab>
-            <Tab title={`1-1 Links (${linksComponents.length})`}>
-              <List className='fields'>
-                {linksComponents}
-              </List>
+            <Tab title={`1-1 Links (${one2onelinks.length})`}>
+              <ReactList itemRenderer={(index, key) => renderLinks(index, key, one2onelinks)}
+                         length={one2onelinks.length}
+                         pageSize={10}
+                         type='simple'
+                />
             </Tab>
             <Tab title={`Fields (${fields.length})`}>
-              <ReactList className='fields'
-                         itemRenderer={renderFieldItem}
+              <ReactList itemRenderer={renderFieldItem}
                          length={fields.length}
                          pageSize={10}
                          type='simple'

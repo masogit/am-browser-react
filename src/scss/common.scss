@@ -105,9 +105,6 @@ table {
     & ul {
       flex-shrink: 0;
     }
-    & ul[class=fields] {
-      overflow-y: auto;
-    }
   }
 
   & div[role=tabpanel] {
