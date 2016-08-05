@@ -31,7 +31,7 @@ export const getJobList = () => {
         }
 
         if (point.pushSupported) {
-          const url = `${POINT_DEF_URL}${point.name}/populationJobs`;
+          const url = `${POINT_DEF_URL}${point.name}/pushJobs`;
           promiseList.push(Rest.get(url).then((res) => {
             pushJobs = pushJobs.concat(res.body || []);
           }));

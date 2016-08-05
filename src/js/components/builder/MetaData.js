@@ -211,7 +211,7 @@ class MetaData extends ComponentBase {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.linkNames.join('') != this.props.linkNames.join('')) {
+    if (nextProps.linkNames && nextProps.linkNames.join('') != this.props.linkNames.join('')) {
       this.generateSidebar(nextProps.linkNames);
     }
   }
