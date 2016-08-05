@@ -4,6 +4,7 @@ import Anchor from 'grommet/components/Anchor';
 import Box from 'grommet/components/Box';
 import Tabs from 'grommet/components/Tabs';
 import Tab from 'grommet/components/Tab';
+import List from 'grommet/components/List';
 import ListItem from 'grommet/components/ListItem';
 import SearchInput from 'grommet/components/SearchInput';
 import Notes from 'grommet/components/icons/base/Notes';
@@ -13,6 +14,7 @@ import {metadataLoadDetail, metadataLoad, loadAllMetadataSuccess, loadMetadataDe
 import {syncSelectedView} from '../../actions/views';
 import _ from 'lodash';
 import {connect} from 'react-redux';
+import ReactList from 'react-list';
 
 const createReverse = (reverse) => {
   var obj = {
@@ -320,45 +322,65 @@ class MetaData extends ComponentBase {
     let links = rowsState.links ? rowsState.links : [];
     let fields = rowsState.fields ? rowsState.fields : [];
 
-    let entitiesComponents = entities.sort(sortSqlName).map((row, index) => {
+    entities = entities.sort(sortSqlName);
+    let renderEntityItem = (index, key) => {
+      let row = entities[index];
       return (
-        <ListItem separator="none" key={index} pad="none" flex={false}>
-          <Anchor href="#" key={index} primary={true} label={row.sqlname}
+        <ListItem separator="none" key={key} pad="none" flex={false}>
+          <Anchor href="#" primary={true} label={row.sqlname}
                   onClick={this._onClick.bind(this, {label: row.label, sqlname: row.sqlname, url: row["ref-link"]})}/>
         </ListItem>
       );
-    });
+    };
 
     let linksComponents = this.linkSort(links.filter((obj) => obj.card11 == true));
     let m2mLinksComponents = this.linkSort(links.filter((obj) => obj.card11 != true));
     //let fieldsComponents = fields.sort().map((row, index) => {
     //  return <TableRow key={index}><td><CheckBox key={index} id={`checkbox_${row.sqlname}`} checked={row.checked} onChange={this._onChange.bind(this, row)}/><Notes/>{row.sqlname}</td></TableRow>;
     //});
-    let fieldsComponents = fields.sort(sortSqlName).map((row, index) => {
+    fields = fields.sort(sortSqlName);
+    let renderFieldItem = (index, key) => {
+      let row = fields[index];
       return (
-        <ListItem separator="none" key={index} pad="none">
-          <Anchor href="#" key={index} icon={<Notes />} onClick={this._onChange.bind(this, row)} label={row.sqlname}/>
+        <ListItem separator="none" key={key} pad="none">
+          <Anchor href="#" icon={<Notes />} onClick={this._onChange.bind(this, row)} label={row.sqlname}/>
         </ListItem>
       );
-    });
+    };
     return (
       <Box flex={true} className='fixMinSizing fixIEScrollBar'>
         <SearchInput value={this.state.searchText} placeHolder="Search fields and links..."
                      onDOMChange={this._onSearch}/>
         <Box pad={{vertical: 'small'}} className='fixMinSizing autoScroll'>
-          {entitiesComponents}
-          {entitiesComponents.length == 0 && !rows.entities &&
-            <Tabs justify="start" flex={true}>
-              <Tab title={`1-M Links (${m2mLinksComponents.length})`}>
+          {entities.length > 0 &&
+          <ReactList
+            itemRenderer={renderEntityItem}
+            length={entities.length}
+            pageSize={10}
+            type='uniform'
+            />
+          }
+          {entities.length == 0 && !rows.entities &&
+          <Tabs justify="start" style={{border:"1px solid #000"}}>
+            <Tab title={`1-M Links (${m2mLinksComponents.length})`}>
+              <List className='fields'>
                 {m2mLinksComponents}
-              </Tab>
-              <Tab title={`1-1 Links (${linksComponents.length})`}>
+              </List>
+            </Tab>
+            <Tab title={`1-1 Links (${linksComponents.length})`}>
+              <List className='fields'>
                 {linksComponents}
-              </Tab>
-              <Tab title={`Fields (${fieldsComponents.length})`}>
-                {fieldsComponents}
-              </Tab>
-            </Tabs>
+              </List>
+            </Tab>
+            <Tab title={`Fields (${fields.length})`}>
+              <ReactList className='fields'
+                         itemRenderer={renderFieldItem}
+                         length={fields.length}
+                         pageSize={10}
+                         type='simple'
+                />
+            </Tab>
+          </Tabs>
           }
         </Box>
       </Box>

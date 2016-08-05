@@ -100,9 +100,13 @@ table {
   & div[role=tablist] {
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
 
     & ul {
       flex-shrink: 0;
+    }
+    & ul[class=fields] {
+      overflow-y: auto;
     }
   }
 
@@ -118,6 +122,9 @@ table {
 
 .flex .grommetux-tabs__content {
   flex-grow: 1;
+  & div {
+    padding-bottom: 8px;
+  }
 }
 
 .anchor.small .grommetux-anchor__icon {
