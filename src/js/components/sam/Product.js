@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Box, Header, Footer, Tiles, Tile} from 'grommet';
+import {Box, Header, Title, Footer, Tiles, Tile} from 'grommet';
 
 export default class Product extends Component {
   constructor() {
@@ -21,9 +21,14 @@ export default class Product extends Component {
     });
 
     return (
-      <Tiles flex={false} flush={false} justify="start" colorIndex="light-2" selectable={true} onSelect={this.props.onSelect}>
-        {tiles}
-      </Tiles>
+      <Box flex={false}>
+        <Header>
+          <Title>Product</Title>
+        </Header>
+        <Tiles flush={false} justify="start" colorIndex="light-2" selectable={true} onSelect={this.props.onSelect}>
+          {tiles}
+        </Tiles>
+      </Box>
     );
   }
 }

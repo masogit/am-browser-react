@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Box, Header, Footer, Tiles, Tile} from 'grommet';
+import {Box, Header, Title, Footer, Tiles, Tile} from 'grommet';
 
 export default class Vendor extends Component {
   constructor() {
@@ -41,9 +41,14 @@ export default class Vendor extends Component {
     });
 
     return (
-      <Tiles flush={false} justify="center" colorIndex="light-2" full="horizontal" selectable={true} onSelect={this.props.onSelect} className="autoScroll">
-        {tiles}
-      </Tiles>
+      <Box flex={true} align="center" justify="center">
+        <Header>
+          <Title>Vendor</Title>
+        </Header>
+        <Tiles flush={false} justify="center" colorIndex="light-2" full="horizontal" selectable={true} onSelect={this.props.onSelect} className="autoScroll">
+          {tiles}
+        </Tiles>
+      </Box>
     );
   }
 }
