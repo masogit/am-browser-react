@@ -3,7 +3,7 @@ import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
 import * as Format from '../../util/RecordFormat';
 import history from '../../RouteHistory';
-import RecordList from '../explorer/RecordList';
+import RecordListLayer from '../explorer/RecordListLayer';
 import AlertForm from '../commons/AlertForm';
 import EmptyIcon from '../commons/EmptyIcon';
 import Add from 'grommet/components/icons/base/Add';
@@ -49,7 +49,6 @@ export default class Insight extends Component {
     this._deleteBox.bind(this);
     this._toggleDirection.bind(this);
     this._attachAQL.bind(this);
-    this._selectAQL.bind(this);
   }
 
   componentDidMount() {
@@ -194,19 +193,13 @@ export default class Insight extends Component {
     });
   }
 
-  _selectAQL(box, parent) {
-    this.setState({
-      layer: this._getLayer(box, parent)
-    });
-  }
-
   _onClose() {
     this.setState({
       layer: null
     });
   }
 
-  _getLayer(box, parent) {
+  _getAQLLayer(box, parent) {
     return (
       <Layer onClose={this._onClose.bind(this)} closer={true} align="left">
         <Box full="vertical" justify="center">
@@ -271,7 +264,12 @@ export default class Insight extends Component {
       child = (
         <Box direction="row" justify="center" pad="large">
           <Anchor href="#" icon={<Attachment />} label="Attach a Graph"
-                  onClick={this._selectAQL.bind(this, box, parent)}/>
+                  onClick={() => this.setState({
+                    layer: {
+                      name: 'AQL',
+                      args: [box, parent]
+                    }
+                  })}/>
         </Box>
       );
     }
@@ -342,23 +340,21 @@ export default class Insight extends Component {
     );
   }
 
+  _getViewLayer(body, title) {
+    return <RecordListLayer onClose={this._onClose.bind(this)} body={body} title={title}/>;
+  }
+
   _showViewRecords(filter, viewInAQL) {
     if (viewInAQL && viewInAQL._id)
       ExplorerActions.loadView(viewInAQL._id).then((view) => {
         var body = view.body;
         var newFitler = Format.getFilterFromField(view.body.fields, filter);
         body.filter = (body.filter) ? `(${body.filter} AND ${newFitler})` : newFitler;
-        var layer = (
-          <Layer onClose={this._onClose.bind(this)} closer={true} flush={true} align="center">
-            <Box full={true} pad="large" style={{minHeight: 'inherit'}}>
-              <RecordList body={body} title={view.name}/>
-            </Box>
-          </Layer>
-        );
-
         this.setState({
-          layer: layer
-        });
+          layer: {
+            name: 'View',
+            args: [body, view.name]
+          }});
       });
   }
 
@@ -546,7 +542,7 @@ export default class Insight extends Component {
         </Header>
         <Box className={edit || carousel ? '' : 'autoScroll'} flex={true}>
           {content}
-          {layer}
+          {layer && this[`_get${layer.name}Layer`](...layer.args)}
           {alert}
         </Box>
       </Box>
