@@ -56,12 +56,15 @@ export function login(username, password, retry) {
         }
       }, err => {
         if (err) {
-          const res = err.response;
-          let message = res.text, retrying = false;
+          let message = err.response ? err.response.text : '', retrying = false;
+          const CANNOT_CONNECT_REST = 'Can not connect to rest server.';
+          const CANNOT_CONNECT_NODE = 'Can not connect to node server.';
           if (err.status) {
-            if (err.status == 500 && res.text.indexOf('ECONNREFUSED') > -1) {
-              message = 'Can not connect to rest server.';
-            } else if (err.status == 403 && res.text.indexOf('invalid csrf token') > -1) {
+            if (err.status == 500 && message.indexOf('ECONNREFUSED') > -1) {
+              message = CANNOT_CONNECT_REST;
+            } else if(err.status == 502) {
+              message = CANNOT_CONNECT_NODE;
+            } else if (err.status == 403 && message.indexOf('invalid csrf token') > -1) {
               message = 'Invalid csrf token';
               if (!retry) {
                 login(username, password, true)(dispatch);
@@ -69,7 +72,7 @@ export function login(username, password, retry) {
               }
             }
           } else {
-            message = err.message.indexOf('network is offline') > -1 ? 'Can not connect to node server.' : err.message;
+            message = err.message.indexOf('network is offline') > -1 ? CANNOT_CONNECT_NODE : err.message;
           }
 
           if (!retrying) {
