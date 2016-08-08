@@ -350,7 +350,7 @@ export default class Insight extends Component {
         body.filter = (body.filter) ? `(${body.filter} AND ${newFitler})` : newFitler;
         var layer = (
           <Layer onClose={this._onClose.bind(this)} closer={true} flush={true} align="center">
-            <Box full={true} pad="large">
+            <Box full={true} pad="large" style={{minHeight: 'inherit'}}>
               <RecordList body={body} title={view.name}/>
             </Box>
           </Layer>

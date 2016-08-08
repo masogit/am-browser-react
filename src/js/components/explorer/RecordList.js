@@ -107,7 +107,6 @@ export default class RecordList extends Component {
     if (this.state.numTotal > this.state.records.length) {
       var param = Object.assign({}, this.state.param);
       param.offset = this.state.records.length;
-      this.refs.search.value = "";
       this._getRecords(param, true);  // sync pass param to query, then records append
     } else {
       return null;
@@ -190,6 +189,7 @@ export default class RecordList extends Component {
     // press enter to build AQL filter
     if (event.keyCode === 13 && event.target.value.trim()) {
       if (this.state.aqlInput) {
+        this.refs.search.value = "";
         this._aqlFilterAdd();
       } else {
         var param = this.state.param;
@@ -261,7 +261,6 @@ export default class RecordList extends Component {
       }
       if (param.filters.indexOf(searchValue) == -1)
         param.filters.push(searchValue);
-      this.refs.search.value = "";
       this.setState({
         param: param
       }, () => {
