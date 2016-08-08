@@ -186,8 +186,8 @@ export default class RecordSearch extends ComponentBase {
               <thead>
                 <tr>
                   <th>View</th>
-                  <th>Time (ms) </th>
-                  <th>Count</th>
+                  <th><Box align="end">Time</Box></th>
+                  <th><Box align="end">Count</Box></th>
                 </tr>
               </thead>
               <tbody>
@@ -195,12 +195,17 @@ export default class RecordSearch extends ComponentBase {
                   messages.map((msg) => {
                     return (<TableRow key={msg._id} justify="between">
                       <td>{msg.view.name}</td>
-                      <td>{msg.timeEnd ? (msg.timeEnd - msg.timeStart) : ''}</td>
                       <td>
-                        {
-                          msg.num > 0 ?
+                        <Box align="end">
+                          {`${msg.timeEnd ? (msg.timeEnd - msg.timeStart) + 'ms' : ''}`}
+                        </Box>
+                      </td>
+                      <td>
+                        <Box align="end">
+                        {msg.num > 0 ?
                             <Anchor onClick={this._showViewRecords.bind(this, msg.view)} label={msg.num}/> : msg.num
                         }
+                        </Box>
                       </td>
                     </TableRow>);
                   })
