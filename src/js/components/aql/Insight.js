@@ -447,6 +447,7 @@ export default class Insight extends Component {
   }
 
   _onUpdateTitle(tab, name) {
+    name = name.trim();
     if (name) {
       const sameNameTabs = this.state.tabs.filter(tab => tab.name == name);
       if (sameNameTabs.length > 0) {
