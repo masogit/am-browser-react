@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import * as SAMActions from '../../actions/sam';
-import {Box, Header, Title} from 'grommet';
+import {Box} from 'grommet';
 import Vendor from './Vendor';
 import Product from './Product';
 import Version from './Version';
