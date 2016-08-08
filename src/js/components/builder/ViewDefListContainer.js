@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import ViewDefDetail from './ViewDefDetail';
 import ViewDefList from './ViewDefList';
-import ViewDefPreview from './ViewDefPreview';
+import RecordListLayer from '../explorer/RecordListLayer';
 import * as ViewDefActions from '../../actions/views';
 import * as MetadataActions from '../../actions/system';
 import store from '../../store';
@@ -145,8 +145,8 @@ class ViewDefListContainer extends Component {
                        onDeleteViewDef={this._onDeleteViewDef}
                        onClickTableTitle={this._onClickTableTitle}
                        {...boundActionCreators}/>
-
-        <ViewDefPreview active={preview} selectedView={selectedView} {...boundActionCreators}/>
+        {preview && selectedView && selectedView.body &&
+        <RecordListLayer onClose={boundActionCreators.closePreview.bind(this)} body={selectedView.body} title={selectedView.name}/>}
       </Box>
     );
   }

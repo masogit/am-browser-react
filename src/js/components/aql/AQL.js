@@ -9,7 +9,7 @@ import GroupList from './../commons/GroupList';
 import GroupListItem from './../commons/GroupListItem';
 import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
-import RecordList from '../explorer/RecordList';
+import RecordListLayer from '../explorer/RecordListLayer';
 import ActionTab from '../commons/ActionTab';
 import SideBar from '../commons/SideBar';
 import EmptyIcon from '../commons/EmptyIcon';
@@ -371,13 +371,7 @@ export default class AQL extends Component {
         </Layer>
       );
     } else if (typeof type == 'object' && type.type == 'records') {
-      return (
-        <Layer onClose={this._onClose} closer={true} flush={true} align="center">
-          <Box full={true} pad="large">
-            <RecordList body={type.args.body} title={type.args.name}/>
-          </Box>
-        </Layer>
-      );
+      return <RecordListLayer body={type.args.body} title={type.args.name} onClose={this._onClose.bind(this)}/>;
     }
   }
 
