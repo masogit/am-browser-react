@@ -235,7 +235,7 @@ export default class Search extends Component {
           Asset Manager Browser
         </Headline>
         <Box direction="row" pad={{vertical: 'medium'}} flex={false}>
-          <input type="search" className="flex" placeholder="Global Record search..."
+          <input type="search" className="flex" placeholder="Global Record Search..."
                  onKeyDown={this._onEnter.bind(this)} onChange={this._onSearch.bind(this)} size="120"
                  maxLength={50}/>
         </Box>
