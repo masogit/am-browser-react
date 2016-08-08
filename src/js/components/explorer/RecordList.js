@@ -40,7 +40,8 @@ export default class RecordList extends Component {
       aqlInput: false,
       allFields: false,
       session: null,
-      onMoreLock: false
+      onMoreLock: false,
+      locked: false
     };
   }
 
@@ -103,37 +104,40 @@ export default class RecordList extends Component {
   }
 
   _getMoreRecords() {
-    console.log('get more record');
     if (this.state.numTotal > this.state.records.length) {
       var param = Object.assign({}, this.state.param);
       param.offset = this.state.records.length;
       this.refs.search.value = "";
       this._getRecords(param, true);  // sync pass param to query, then records append
     } else {
-      console.log('no more record');
       return null;
     }
   }
 
   _getRecords(param, onMore) {
-    if ((onMore && this.state.onMoreLock === false) || !onMore) {
-      this.setState({onMoreLock: true});
+    if (!this.state.locked && !(onMore && this.state.onMoreLock)) {
+      this.setState({
+        locked: true,
+        onMoreLock: true});
       var body = Object.assign({}, this.props.body, {param: param || this.state.param});
       var timeStart = Date.now();
       this.setState({
         loading: true
       });
       ExplorerActions.loadRecordsByBody(body).then((data) => {
-        var records = this.state.records;
+        const records = this.state.records;
         this.setState({
           loading: false,
           timeQuery: Date.now() - timeStart,
           numTotal: data.count,
           records: param ? records.concat(data.entities) : data.entities, // if sync pass param to query, then records append
-          filtered: null
-        }, ()=> {
+          filtered: null,
+          locked: false
+        }, () => {
           if (this.state.records.length < this.state.numTotal) {
-            this.setState({onMoreLock: false});
+            this.setState({
+              onMoreLock: false
+            });
           }
         });
       });
@@ -141,6 +145,10 @@ export default class RecordList extends Component {
   }
 
   _orderBy(sqlname) {
+    if (this.state.locked) {
+      return;
+    }
+
     var param = Object.assign({}, this.state.param);
     if (param.orderby == (sqlname + ' desc'))
       param.orderby = "";
@@ -324,11 +332,11 @@ export default class RecordList extends Component {
 
   renderFieldsHeader() {
     return this.getDisplayFields().map((field, index) => (
-      <th key={index}>
-        <Anchor href="#" reverse={true} icon={this._showOrderByIcon(field.sqlname)}
-                label={Format.getDisplayLabel(field)} key={`fieldsheader_${index}`}
-                onClick={this._orderBy.bind(this, field.sqlname)}/>
-      </th>
+        <th key={index} className={this.state.locked ? 'disabled' : ''}>
+          <Anchor href="#" reverse={true} icon={this._showOrderByIcon(field.sqlname)}
+                  label={Format.getDisplayLabel(field)} key={`fieldsheader_${index}`}
+                  onClick={this._orderBy.bind(this, field.sqlname)}/>
+        </th>
     ));
   }
 
@@ -439,7 +447,8 @@ export default class RecordList extends Component {
              onMore={this.state.onMoreLock || this.state.filtered ? null : this._getMoreRecords.bind(this)}>
         <thead>
         <tr>
-          <th><Anchor href="#" reverse={true} icon={this._showOrderByIcon('self')} label="Self"
+          <th className={this.state.locked ? 'disabled' : ''}>
+            <Anchor href="#" reverse={true} icon={this._showOrderByIcon('self')} label="Self"
                       onClick={this._orderBy.bind(this, 'self')}/></th>
           {this.renderFieldsHeader()}
         </tr>
@@ -470,10 +479,14 @@ export default class RecordList extends Component {
     };
     return (
       <Graph type={this.state.graphType} data={this.state.graphData} config={config}
-             onClick={(filter) => this._aqlFilterAdd(Format.getFilterFromField(this.props.body.fields, filter))}/>
+             className={this.state.locked ? 'disabled' : ''}
+             onClick={(filter) => {
+               if (!this.state.locked) {
+                 this._aqlFilterAdd(Format.getFilterFromField(this.props.body.fields, filter));
+               }
+             }}/>
     );
   }
-
   render() {
     return (
       <Box pad={{horizontal: 'medium'}} flex={true}>
