@@ -440,7 +440,7 @@ export default class AQL extends Component {
             </Menu>
           </Header>
           <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'medium'}}>
-            <Box justify="between" direction="row" className='header'>
+            <Box justify="between" direction="row" className='header' flex={false}>
               <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_Box">
                   <textarea id="AQL_Box" name="str" value={this.state.aql.str} rows="3"
                             onChange={this._setFormValues.bind(this)}/>
@@ -469,8 +469,10 @@ export default class AQL extends Component {
             <Split flex="left" fixed={false} className='fixMinSizing'>
               <Box pad={{vertical: 'small'}}>
                 {validData && this.state.aql.form && this.state.aql.form != 'init' && this.state.aql.type &&
-                <Graph type={this.state.aql.type} data={this.state.data} config={this.state.aql.form}
-                       onClick={(filter) => this._showViewRecords(filter, this.state.aql.view)}/>}
+                  <Box flex={false}>
+                    <Graph type={this.state.aql.type} data={this.state.data} config={this.state.aql.form}
+                       onClick={(filter) => this._showViewRecords(filter, this.state.aql.view)} />
+                  </Box>}
                 <Table>
                   <thead>
                   <tr>{header}</tr>

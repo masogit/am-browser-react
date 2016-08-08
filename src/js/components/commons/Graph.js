@@ -253,6 +253,8 @@ export default class Graph extends Component {
           case 'chart':
             return <Chart {...graph} />;
           case 'meter':
+            delete graph.series_col;
+            delete graph.col_unit;
             return <Meter {...graph} />;
           case 'distribution':
             return <Distribution {...graph} />;

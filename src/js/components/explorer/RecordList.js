@@ -480,13 +480,16 @@ export default class RecordList extends Component {
         {this.renderToolBox()}
         {this.renderAQLFilter()}
         {
-          this.state.graphType=='legend'&&this.state.graphData?
+          this.state.graphType=='legend'&&this.state.graphData ?
             <Box flex={true} direction="row" className={`fixMinSizing ${this.props.root?'fixIEScrollBar':''}`}>
-            <Box pad={{vertical: 'large'}}>{this.renderGraph()}</Box>
-            <Box flex={true}>{this.renderList()}</Box>
-          </Box>
+              <Box pad={{vertical: 'large'}}>{this.renderGraph()}</Box>
+              <Box flex={true}>{this.renderList()}</Box>
+            </Box>
           :
-            <Box className={`fixMinSizing ${this.props.root?'fixIEScrollBar':''}`}>{this.renderGraph()}{this.renderList()}</Box>
+            <Box className={`fixMinSizing ${this.props.root?'fixIEScrollBar':''}`}>
+              {this.renderGraph()}
+              {this.renderList()}
+            </Box>
         }
         {this.renderDetail()}
       </Box>

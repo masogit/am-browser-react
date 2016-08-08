@@ -242,7 +242,7 @@ export default class Insight extends Component {
     if (box.child) {
       if (box.child instanceof Array) {
         child = (
-          <Box justify="center" {...box} flex={false}>{
+          <Box justify="center" direction={box.direction} flex={false}>{
             box.child.map((child, i) => {
               child.key = i;
               return this._buildBox(child, parent, tabName);
@@ -257,7 +257,7 @@ export default class Insight extends Component {
 
         tabIdMap[tabName].dataIds.push(box.child._id);
         child = (
-          <Box justify="center" {...box} direction="column" pad="medium" flex={true} className='box-graph'>
+          <Box justify="center" pad="medium" flex={true} className='box-graph'>
             <Header>
               <Anchor icon={<Search />} label={dataMap.aql.name}
                       onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
@@ -379,8 +379,7 @@ export default class Insight extends Component {
     return (
       <Box pad="large" colorIndex="light-2" flex={false}>
         <Header>{aql.name}</Header>
-        {
-          aql.form instanceof Object &&
+        {aql.form instanceof Object &&
           <Box key={aql._id} pad="large" align={(aql.type=='meter')?'center':null}>
             <Graph type={aql.type} data={data} config={aql.form}
                   onClick={(filter) => this._showViewRecords(filter, aql.view)}/>
