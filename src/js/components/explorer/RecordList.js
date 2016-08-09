@@ -50,6 +50,9 @@ export default class RecordList extends Component {
     this._getRecords();
     if (this.props.body.groupby)
       this._getGroupByData();
+    this.setState({
+      allFields: this.props.allFields
+    });
   }
 
   _getSearchableFields() {

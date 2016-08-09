@@ -13,7 +13,7 @@ export default class Product extends Component {
       <Box flex={true}>
       {
         this.props.data &&
-        <RecordList body={this.props.data} title="Version"/>
+        <RecordList body={this.props.data} title="Version" allFields={true}/>
       }
       </Box>
     );
