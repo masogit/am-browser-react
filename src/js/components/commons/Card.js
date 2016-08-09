@@ -49,12 +49,12 @@ export default class Card extends Component {
     });
 
     return (
-      <Box flex={false}>
+      <Box>
         <Header justify="between">
           <Title>{this.props.title}</Title>
           <SortMenu data={this.props.conf.body} onSort={this.sort} />
         </Header>
-        <Tiles flush={false} justify="start" colorIndex="light-2" selectable={true} onSelect={this.props.onSelect}>
+        <Tiles flush={false} colorIndex="light-2" selectable={true} onSelect={this.props.onSelect}>
           {tiles}
         </Tiles>
       </Box>
