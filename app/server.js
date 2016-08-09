@@ -15,12 +15,12 @@ var config = require('./config.js');
 
 
 // initial AM node server
-var server = process.env.AMB_NODE_SERVER || config.node_server;
-var port = process.env.AMB_NODE_PORT || config.node_port; // set the port
-var https_port = process.env.AMB_REST_HTTPS_PORT || config.node_https_port;     // set the https port
+var server = config.node_server;
+var port = config.node_port; // set the port
+var https_port = config.node_https_port;     // set the https port
 
-var isDebug = process.env.AMB_NODE_DEBUG || config.isDebug;
-var enable_csrf = process.env.AMB_NODE_CSRF || config.enable_csrf;
+var isDebug = config.isDebug;
+var enable_csrf = config.enable_csrf;
 
 app.use(compression());
 //app.use(morgan('dev')); // log every request to the console
