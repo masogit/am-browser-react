@@ -19,9 +19,9 @@ export default class SortMenu extends Component {
     return (
       <Menu icon={<Sort />} label={this.state.selectedLabel} dropAlign={{ right: 'right', top: 'top' }}>
       {
-        this.props.data.map((data) => {
+        this.props.data.map((data, index) => {
           return (
-            <Anchor label={data.label} onClick={() => {
+            <Anchor key={index} label={data.label} onClick={() => {
               this.setState({
                 selectedLabel: data.label
               });
