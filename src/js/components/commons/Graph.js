@@ -240,7 +240,7 @@ export default class Graph extends Component {
   }
 
   render() {
-    const {type, config, onClick, data} = this.props;
+    const {type, config, onClick, data, className} = this.props;
 
     if (config == 'init') {
       return this._gen_table(data);
@@ -251,13 +251,15 @@ export default class Graph extends Component {
       if (graph.series.length > 0) {
         switch (type) {
           case 'chart':
-            return <Chart {...graph} />;
+            return <Chart {...graph} className={className}/>;
           case 'meter':
-            return <Meter {...graph} />;
+            delete graph.series_col;
+            delete graph.col_unit;
+            return <Meter {...graph} className={className}/>;
           case 'distribution':
-            return <Distribution {...graph} />;
+            return <Distribution {...graph} className={className}/>;
           case 'legend':
-            return <Legend {...graph} />;
+            return <Legend {...graph} className={className}/>;
         }
       } else {
         return <div></div>;

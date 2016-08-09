@@ -9,7 +9,7 @@ import GroupList from './../commons/GroupList';
 import GroupListItem from './../commons/GroupListItem';
 import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
-import RecordList from '../explorer/RecordList';
+import RecordListLayer from '../explorer/RecordListLayer';
 import ActionTab from '../commons/ActionTab';
 import SideBar from '../commons/SideBar';
 import EmptyIcon from '../commons/EmptyIcon';
@@ -371,13 +371,7 @@ export default class AQL extends Component {
         </Layer>
       );
     } else if (typeof type == 'object' && type.type == 'records') {
-      return (
-        <Layer onClose={this._onClose} closer={true} flush={true} align="center">
-          <Box full={true} pad="large">
-            <RecordList body={type.args.body} title={type.args.name}/>
-          </Box>
-        </Layer>
-      );
+      return <RecordListLayer body={type.args.body} title={type.args.name} onClose={this._onClose.bind(this)}/>;
     }
   }
 
@@ -440,7 +434,7 @@ export default class AQL extends Component {
             </Menu>
           </Header>
           <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'medium'}}>
-            <Box justify="between" direction="row" className='header'>
+            <Box justify="between" direction="row" className='header' flex={false}>
               <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_Box">
                   <textarea id="AQL_Box" name="str" value={this.state.aql.str} rows="3"
                             onChange={this._setFormValues.bind(this)}/>
@@ -469,8 +463,10 @@ export default class AQL extends Component {
             <Split flex="left" fixed={false} className='fixMinSizing'>
               <Box pad={{vertical: 'small'}}>
                 {validData && this.state.aql.form && this.state.aql.form != 'init' && this.state.aql.type &&
-                <Graph type={this.state.aql.type} data={this.state.data} config={this.state.aql.form}
-                       onClick={(filter) => this._showViewRecords(filter, this.state.aql.view)}/>}
+                  <Box flex={false}>
+                    <Graph type={this.state.aql.type} data={this.state.data} config={this.state.aql.form}
+                       onClick={(filter) => this._showViewRecords(filter, this.state.aql.view)} />
+                  </Box>}
                 <Table>
                   <thead>
                   <tr>{header}</tr>

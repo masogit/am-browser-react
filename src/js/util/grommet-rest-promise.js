@@ -48,19 +48,22 @@ Request.prototype.promise = function () {
       if (err) {
         if (err.status == 401 || err.status == 403) {
           store.default.dispatch(init('', ''));
+        } else {
+          let msg = err.response && err.response.text || err.message;
+          if (msg) {
+            if (err.status == 400) {
+              store.default.dispatch({type: Types.RECEIVE_ERROR, msg: msg});
+            } else if (err.status == 500) {
+              store.default.dispatch({type: Types.RECEIVE_ERROR, msg: "Server error."});
+            } else if (err.status == 502 || typeof err.status == 'undefined') {
+              store.default.dispatch({type: Types.LOGOUT});
+            }
+          }
         }
-        let msg = err.response && err.response.text || err.message;
-        if (msg && err.status == 400) {
-          store.default.dispatch({type: Types.RECEIVE_ERROR, msg: msg});
-        }
-        if (msg && err.status == 500) {
-          store.default.dispatch({type: Types.RECEIVE_ERROR, msg: "Server error."});
-        }
+        reject(err);
       }
       if (typeof res !== "undefined" && res.status > 400) {
         err.message = 'cannot ' + req.method + ' ' + req.url + ' (' + res.status + ')';
-        reject(err);
-      } else if (err) {
         reject(err);
       } else {
         resolve(res);

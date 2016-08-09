@@ -3,7 +3,7 @@ import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
 import * as Format from '../../util/RecordFormat';
 import history from '../../RouteHistory';
-import RecordList from '../explorer/RecordList';
+import RecordListLayer from '../explorer/RecordListLayer';
 import AlertForm from '../commons/AlertForm';
 import EmptyIcon from '../commons/EmptyIcon';
 import Add from 'grommet/components/icons/base/Add';
@@ -49,7 +49,6 @@ export default class Insight extends Component {
     this._deleteBox.bind(this);
     this._toggleDirection.bind(this);
     this._attachAQL.bind(this);
-    this._selectAQL.bind(this);
   }
 
   componentDidMount() {
@@ -194,19 +193,13 @@ export default class Insight extends Component {
     });
   }
 
-  _selectAQL(box, parent) {
-    this.setState({
-      layer: this._getLayer(box, parent)
-    });
-  }
-
   _onClose() {
     this.setState({
       layer: null
     });
   }
 
-  _getLayer(box, parent) {
+  _getAQLLayer(box, parent) {
     return (
       <Layer onClose={this._onClose.bind(this)} closer={true} align="left">
         <Box full="vertical" justify="center">
@@ -242,7 +235,7 @@ export default class Insight extends Component {
     if (box.child) {
       if (box.child instanceof Array) {
         child = (
-          <Box justify="center" {...box} flex={false}>{
+          <Box justify="center" direction={box.direction} flex={false}>{
             box.child.map((child, i) => {
               child.key = i;
               return this._buildBox(child, parent, tabName);
@@ -257,7 +250,7 @@ export default class Insight extends Component {
 
         tabIdMap[tabName].dataIds.push(box.child._id);
         child = (
-          <Box justify="center" {...box} direction="column" pad="medium" flex={true} className='box-graph'>
+          <Box justify="center" pad="medium" flex={true} className='box-graph'>
             <Header>
               <Anchor icon={<Search />} label={dataMap.aql.name}
                       onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
@@ -271,7 +264,12 @@ export default class Insight extends Component {
       child = (
         <Box direction="row" justify="center" pad="large">
           <Anchor href="#" icon={<Attachment />} label="Attach a Graph"
-                  onClick={this._selectAQL.bind(this, box, parent)}/>
+                  onClick={() => this.setState({
+                    layer: {
+                      name: 'AQL',
+                      args: [box, parent]
+                    }
+                  })}/>
         </Box>
       );
     }
@@ -342,23 +340,21 @@ export default class Insight extends Component {
     );
   }
 
+  _getViewLayer(body, title) {
+    return <RecordListLayer onClose={this._onClose.bind(this)} body={body} title={title}/>;
+  }
+
   _showViewRecords(filter, viewInAQL) {
     if (viewInAQL && viewInAQL._id)
       ExplorerActions.loadView(viewInAQL._id).then((view) => {
         var body = view.body;
         var newFitler = Format.getFilterFromField(view.body.fields, filter);
         body.filter = (body.filter) ? `(${body.filter} AND ${newFitler})` : newFitler;
-        var layer = (
-          <Layer onClose={this._onClose.bind(this)} closer={true} flush={true} align="center">
-            <Box full={true} pad="large">
-              <RecordList body={body} title={view.name}/>
-            </Box>
-          </Layer>
-        );
-
         this.setState({
-          layer: layer
-        });
+          layer: {
+            name: 'View',
+            args: [body, view.name]
+          }});
       });
   }
 
@@ -379,8 +375,7 @@ export default class Insight extends Component {
     return (
       <Box pad="large" colorIndex="light-2" flex={false}>
         <Header>{aql.name}</Header>
-        {
-          aql.form instanceof Object &&
+        {aql.form instanceof Object &&
           <Box key={aql._id} pad="large" align={(aql.type=='meter')?'center':null}>
             <Graph type={aql.type} data={data} config={aql.form}
                   onClick={(filter) => this._showViewRecords(filter, aql.view)}/>
@@ -452,6 +447,7 @@ export default class Insight extends Component {
   }
 
   _onUpdateTitle(tab, name) {
+    name = name.trim();
     if (name) {
       const sameNameTabs = this.state.tabs.filter(tab => tab.name == name);
       if (sameNameTabs.length > 0) {
@@ -547,7 +543,7 @@ export default class Insight extends Component {
         </Header>
         <Box className={edit || carousel ? '' : 'autoScroll'} flex={true}>
           {content}
-          {layer}
+          {layer && this[`_get${layer.name}Layer`](...layer.args)}
           {alert}
         </Box>
       </Box>

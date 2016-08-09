@@ -56,7 +56,7 @@ export default class ActionTab extends Tab {
       this._toggleEdit();
     } else {
       this.setState({
-        title: event.target.value.trim()
+        title: event.target.value
       });
     }
   }

@@ -1,7 +1,7 @@
 import React from 'react';
 import * as ExplorerAction from '../../actions/explorer';
 import RecordDetail from './RecordDetail';
-import RecordList from './RecordList';
+import RecordListLayer from './RecordListLayer';
 import ComponentBase from '../commons/ComponentBase';
 import history from '../../RouteHistory';
 import {
@@ -95,7 +95,7 @@ export default class RecordSearch extends ComponentBase {
   }
 
   _getContent(view, record) {
-    return view.body.fields.map((field, index) => {
+    return view.body.fields.map((field) => {
       if (field.searchable) {
         var index = record[field.sqlname].toLocaleLowerCase().indexOf(this.state.keyword.toLocaleLowerCase().trim());
         if (index > -1) {
@@ -152,13 +152,7 @@ export default class RecordSearch extends ComponentBase {
   }
 
   _showViewRecords(view) {
-    var layer = (
-      <Layer onClose={this._onClose.bind(this)} closer={true} flush={true} align="center">
-        <Box full={true} pad="large">
-          <RecordList body={view.body} title={view.name}/>
-        </Box>
-      </Layer>
-    );
+    var layer = <RecordListLayer onClose={this._onClose.bind(this)} body={view.body} title={view.name}/>;
 
     this.setState({
       layer: layer
@@ -192,8 +186,8 @@ export default class RecordSearch extends ComponentBase {
               <thead>
                 <tr>
                   <th>View</th>
-                  <th>Time (ms) </th>
-                  <th>Count</th>
+                  <th><Box align="end">Time</Box></th>
+                  <th><Box align="end">Count</Box></th>
                 </tr>
               </thead>
               <tbody>
@@ -201,12 +195,17 @@ export default class RecordSearch extends ComponentBase {
                   messages.map((msg) => {
                     return (<TableRow key={msg._id} justify="between">
                       <td>{msg.view.name}</td>
-                      <td>{msg.timeEnd ? (msg.timeEnd - msg.timeStart) : ''}</td>
                       <td>
-                        {
-                          msg.num > 0 ?
+                        <Box align="end">
+                          {`${msg.timeEnd ? (msg.timeEnd - msg.timeStart) + 'ms' : ''}`}
+                        </Box>
+                      </td>
+                      <td>
+                        <Box align="end">
+                        {msg.num > 0 ?
                             <Anchor onClick={this._showViewRecords.bind(this, msg.view)} label={msg.num}/> : msg.num
                         }
+                        </Box>
                       </td>
                     </TableRow>);
                   })
