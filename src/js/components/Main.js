@@ -37,10 +37,12 @@ class Indexer extends Component {
         clearTimeout(timeout);
       }
       alert = (
-        <AlertForm onClose={this._newMsgRead} status={message.status} title={"Message alert"}
-                   desc={message.msg} onConfirm={this._newMsgRead}/>
+        <AlertForm onClose={this._newMsgRead} status={message.status} title={message.title || "Message alert"}
+                   desc={message.msg} onConfirm={message.onConfirm || this._newMsgRead}/>
       );
-      timeout = setTimeout(this._newMsgRead, 5000);
+      if (message.status) {
+        timeout = setTimeout(this._newMsgRead, 5000);
+      }
     }
     return (
       <App >
@@ -54,14 +56,10 @@ class Indexer extends Component {
   }
 }
 
-let select = (state) => {
-  return Object.assign(
-    {},
-    state.nav,
-    {headerNavs: state.session.headerNavs},
-    {message: state.message},
-    {path: state.router.location.pathname}
-  );
-};
+let select = (state) => ({...state.nav,
+    headerNavs: state.session.headerNavs,
+    message: state.message,
+    path: state.router.location.pathname
+});
 
 export default connect(select)(Indexer);

@@ -18,6 +18,7 @@ export const RECEIVE_ERROR = 'RECEIVE_ERROR';
 export const RECEIVE_INFO = 'RECEIVE_INFO';
 export const RECEIVE_WARNING = 'RECEIVE_WARNING';
 export const MESSAGE_READ = 'MESSAGE_READ';
+export const ALERT = 'ALERT';
 
 export const LOAD_METADATA_DETAIL_SUCCESS = 'LOAD_METADATA_DETAIL_SUCCESS';
 export const LOAD_ALL_METADATA_SUCCESS = 'LOAD_ALL_METADATA_SUCCESS';
@@ -27,6 +28,8 @@ export const INIT = 'INIT';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAILURE = 'LOGIN_FAILURE';
 export const LOGOUT = 'LOGOUT';
+export const STOP_MONITOR_EDIT = 'STOP_MONITOR_EDIT';
+export const MONITOR_EDIT = 'MONITOR_EDIT';
 
 // route
 export const ROUTE_CHANGED = 'ROUTE_CHANGED';

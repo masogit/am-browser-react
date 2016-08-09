@@ -3,6 +3,7 @@
 import Rest from '../util/grommet-rest-promise';
 import cookies from 'js-cookie';
 import * as Types from '../constants/ActionTypes';
+import store from '../store';
 import {
   CSRF_DEF_URL,
   ABOUT_DEF_URL,
@@ -164,4 +165,26 @@ export function loadAllMetadataSuccess(rows) {
   return {type: Types.LOAD_ALL_METADATA_SUCCESS, rows};
 }
 
+export function showError(msg) {
+  store.dispatch({type: Types.RECEIVE_ERROR, msg});
+}
 
+export function showWarning(errorMessage) {
+  store.dispatch({type: Types.RECEIVE_WARNING, msg});
+}
+
+export function showInfo(errorMessage) {
+  store.dispatch({type: Types.RECEIVE_INFO, msg});
+}
+
+export function monitorEdit(origin, now) {
+  store.dispatch({type: Types.MONITOR_EDIT, edit: {origin, now}});
+}
+
+export function stopMonitorEdit() {
+  store.dispatch({type: Types.STOP_MONITOR_EDIT});
+}
+
+export function alert(alertInfo) {
+  store.dispatch({type: Types.ALERT, msg: alertInfo.msg, onConfirm: alertInfo.onConfirm, title: alertInfo.title});
+}

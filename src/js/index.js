@@ -20,37 +20,8 @@ import history from './RouteHistory';
 import {init, initToken, routeChanged} from './actions/system';
 import {ReduxRouter} from 'redux-router';
 
-// The port number needs to align with devServerProxy and websocketHost in gulpfile.js
-//let hostName = NODE_ENV === 'development' ? 'localhost:8010' : window.location.host;
-
-//RestWatch.initialize('ws://' + hostName + '/rest/ws');
-
-
 Rest.setHeader('Accept', 'application/json');
 Rest.setHeader('X-API-Version', 200);
-
-// From a comment in https://github.com/rackt/redux/issues/637
-// this factory returns a history implementation which reads the current state
-// from the redux store and delegates push state to a different history.
-//let createStoreHistory = () => {
-//  return {
-//    listen: (callback) => {
-//      // subscribe to the redux store. when `route` changes, notify the listener
-//      let notify = () => {
-//        const route = store.getState().route;
-//        if (route) {
-//          callback(route);
-//        }
-//      };
-//      const unsubscribe = store.subscribe(notify);
-//
-//      return unsubscribe;
-//    },
-//    createHref: history.createHref,
-//    pushState: history.pushState,
-//    push: history.push
-//  };
-//};
 
 let element = document.getElementById('content');
 
@@ -134,3 +105,18 @@ store.subscribe(sessionWatcher);
 history.listen(function (location) {
   store.dispatch(routeChanged(location, Routes.prefix));
 });
+
+window.onbeforeunload = () => {
+  const state = store.getState();
+  if (state.session.edit) {
+    let now = state.session.edit.now;
+    if (typeof now == 'string') {
+      const params = now.split('.');
+      now = params.reduce((state, next) => state[next], state);
+    }
+    if (!_.isEqual(state.session.edit.origin, now)) {
+      return true;
+    }
+  }
+};
+

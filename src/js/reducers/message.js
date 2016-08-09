@@ -1,11 +1,13 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import {RECEIVE_ERROR, RECEIVE_INFO, RECEIVE_WARNING, MESSAGE_READ} from '../constants/ActionTypes';
+import {RECEIVE_ERROR, RECEIVE_INFO, RECEIVE_WARNING, MESSAGE_READ, ALERT } from '../constants/ActionTypes';
 
 const initialState = {
   msgs: [],
   status: null,
-  msg: null
+  msg: null,
+  onConfirm: null,
+  title: ''
 };
 
 const handlers = {
@@ -52,7 +54,8 @@ const handlers = {
     return {
       msg: null
     };
-  }
+  },
+  [ALERT]: (_, action) => ({msg: action.msg, onConfirm: action.onConfirm, title: action.title, status: null})
 };
 
 export default function sessionReducer(state = initialState, action) {

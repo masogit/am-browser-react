@@ -4,6 +4,7 @@ import * as types from '../constants/ActionTypes';
 import {VIEW_DEF_URL} from '../constants/ServiceConfig';
 import Rest from '../util/grommet-rest-promise';
 import objectPath from 'object-path';
+import {stopMonitorEdit} from './system';
 
 function requestViews() {
   return {
@@ -59,6 +60,7 @@ export function saveViewDef(selectedView) {
       .send(JSON.stringify(selectedView))
       .then(function (res) {
         let _id = res.text;
+        stopMonitorEdit();
         dispatch({
           type: types.SAVE_VIEW_DEF,
           selectedViewId: _id,
@@ -108,9 +110,11 @@ export function newSelectedView() {
 
 export function updateSelectedView(selectedView, path, newValue) {
   return dispatch => {
+    const clonedView = _.cloneDeep(selectedView);
+    objectPath.set(clonedView, path, newValue);
     dispatch({
       type: types.UPDATE_SELECTED_VIEW,
-      selectedView: selectedView,
+      selectedView: clonedView,
       path: path,
       newValue: newValue
     });

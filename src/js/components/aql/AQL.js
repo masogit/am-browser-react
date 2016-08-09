@@ -19,6 +19,7 @@ import More from 'grommet/components/icons/base/More';
 import Mail from 'grommet/components/icons/base/Mail';
 import Trash from 'grommet/components/icons/base/Trash';
 import {saveAs} from 'file-saver';
+import {monitorEdit, stopMonitorEdit, alert} from '../../actions/system';
 
 import {
   Anchor, Box, Split, SearchInput, Form, FormField, FormFields, Layer, Tabs, Table, TableRow, Title, Header, Menu
@@ -48,10 +49,17 @@ export default class AQL extends Component {
       graphData: {}
     };
     this._onClose = this._onClose.bind(this);
+    this.initAQL = {
+      str: '',
+      name: '',
+      category: '',
+      type: 'chart',
+      form: 'init'
+    };
   }
 
   componentDidMount() {
-    this._initAQL();
+    this._initAQL(() => monitorEdit(_.cloneDeep(this.state.aql), this.state.aql));
     this._loadViews();
     this._loadAQLs();
     this._loadInToolReport();
@@ -64,13 +72,7 @@ export default class AQL extends Component {
 
   _initAQL(callback) {
     this.setState({
-      aql: {
-        str: '',
-        name: '',
-        category: '',
-        type: 'chart',
-        form: 'init'
-      },
+      aql: _.cloneDeep(this.initAQL),
       data: {
         header: [],
         rows: []
@@ -112,6 +114,7 @@ export default class AQL extends Component {
       },
       graphData: graphData
     }, () => {
+      monitorEdit(_.cloneDeep(this.state.aql), this.state.aql);
       if (window.event && this.refs && this.refs[aql.type]) {
         this.refs[aql.type]._onClickTab(event);
       }
@@ -132,7 +135,7 @@ export default class AQL extends Component {
   _onQuery() {
     AQLActions.queryAQL(this.state.aql.str).then((data) => {
       const aql = this.state.aql;
-      aql.form = 'init';
+      //aql.form = 'init';
       this.setState({
         aql,
         data
@@ -143,6 +146,7 @@ export default class AQL extends Component {
   _onSaveAQL() {
     AQLActions.saveAQL(this.state.aql).then(id => {
       if (id) {
+        stopMonitorEdit();
         this._loadAQLs(this);
         var aql = this.state.aql;
         aql._id = id;
@@ -160,16 +164,7 @@ export default class AQL extends Component {
   }
 
   _onNew() {
-    if (this.state.aql.str.trim() !== '') {
-      this.setState({
-        alertLayer: <AlertForm onClose={this._removeAlertLayer.bind(this)}
-                               title={'Create a new AQL?'}
-                               desc={'You have not saved AQL string: ' + this.state.aql.str}
-                               onConfirm={this._initAQL.bind(this)}/>
-      });
-    } else {
-      this._initAQL();
-    }
+    this.dropCurrentPop('Create a new AQL?', this._initAQL.bind(this));
   }
 
   _onDelete() {
@@ -375,6 +370,26 @@ export default class AQL extends Component {
     }
   }
 
+  dropCurrentPop(title, onConfirm) {
+    const originAQL = this.state.aqls.filter(aql => aql._id == this.state.aql._id)[0];
+    const currentAQL = _.cloneDeep(this.state.aql);
+
+    delete currentAQL.data;
+    delete currentAQL.meter;
+    delete currentAQL.distribution;
+    delete currentAQL.chart;
+    if(this.state.aql._id ? !_.isEqual(originAQL, currentAQL) : !_.isEqual(this.initAQL, currentAQL)) {
+      const alertInfo = {
+        onConfirm: onConfirm,
+        msg: 'Your current change are not saved, click confirm to drop the change',
+        title
+      };
+      alert(alertInfo);
+    } else {
+      onConfirm();
+    }
+  }
+
   render() {
     const header = this.state.data.header.map((col) => <th key={col.Index}>{col.Name}</th>);
 
@@ -395,7 +410,7 @@ export default class AQL extends Component {
     const contents = this.state.aqls.map((aql) => ({
       key: aql._id,
       groupby: aql.category,
-      onClick: this._loadAQL.bind(this, aql),
+      onClick: this.dropCurrentPop.bind(this, `Open ${aql.name}`, this._loadAQL.bind(this, aql)),
       search: aql.name,
       child: aql.name
     }));
@@ -414,8 +429,8 @@ export default class AQL extends Component {
               <Anchor link="#" icon={<Play />} onClick={() => this.state.aql.str && this._onQuery()} label="Query"
                       disabled={!this.state.aql.str}/>
               <Anchor link="#" icon={<Add />} onClick={this._onNew.bind(this)} label="New"/>
-              <Anchor link="#" icon={<Checkmark />} onClick={() => this.state.aql.str && this._onSave()} label="Save"
-                      disabled={!this.state.aql.str}/>
+              <Anchor link="#" icon={<Checkmark />} onClick={() => this.state.aql.str && this.state.aql.name && this.state.aql.category && this._onSave()} label="Save"
+                      disabled={!this.state.aql.str || !this.state.aql.name || !this.state.aql.category}/>
               <Anchor link="#" icon={<Close />} onClick={() => this.state.aql._id && this._onDelete()} label="Delete"
                       disabled={!this.state.aql._id}/>
               <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }}>

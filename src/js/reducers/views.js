@@ -1,5 +1,4 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
-import objectPath from 'object-path';
 import * as Types from '../constants/ActionTypes';
 import _ from 'lodash';
 import emptyViewDef from './EmptyViewDef.json';
@@ -38,13 +37,7 @@ const handlers = {
       selectedView: action.selectedView
     };
   },
-  [Types.UPDATE_SELECTED_VIEW]: (state, action) => {
-    const clonedView = _.cloneDeep(action.selectedView);
-    objectPath.set(clonedView, action.path, action.newValue);
-    return {
-      selectedView: clonedView
-    };
-  },
+  [Types.UPDATE_SELECTED_VIEW]: (state, action) => ({ selectedView: action.selectedView}),
   [Types.DELETE_TABLE_ROW]: (state, action) => {
     return {
       selectedView: action.selectedView

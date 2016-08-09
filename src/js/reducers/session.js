@@ -1,12 +1,16 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import { INIT, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT } from '../constants/ActionTypes';
+import { INIT, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT, STOP_MONITOR_EDIT, MONITOR_EDIT  } from '../constants/ActionTypes';
 
 const initialState = {
   email: null,
   error: null,
   headerNavs: null,
-  loggedout: false
+  loggedout: false,
+  edit: {
+    origin: {},
+    now: {}
+  }
 };
 
 const handlers = {
@@ -22,7 +26,9 @@ const handlers = {
     error: null,
     headerNavs: null,
     loggedout: true
-  })
+  }),
+  [MONITOR_EDIT]: (_, action) => ({edit: action.edit}),
+  [STOP_MONITOR_EDIT]: (_, action) => ({edit: null})
 };
 
 export default function sessionReducer (state = initialState, action) {

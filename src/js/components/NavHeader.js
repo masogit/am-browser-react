@@ -6,16 +6,12 @@ import Header from 'grommet/components/Header';
 import Title from 'grommet/components/Title';
 import Menu from 'grommet/components/Menu';
 import SessionMenu from './SessionMenu';
+import {alert, stopMonitorEdit} from '../actions/system';
+import history from '../RouteHistory';
+import _ from 'lodash';
+import store from '../store';
 
-class NavHeader extends Component {
-
-  constructor() {
-    super();
-  }
-
-  componentDidMount() {
-  }
-
+export default class NavHeader extends Component {
   getActive(to) {
     return this.props.path.indexOf(to) > -1 ? 'active' : '';
   }
@@ -49,7 +45,38 @@ class NavHeader extends Component {
         </Title>
         <Menu direction="row" align="center" responsive={true}>
           {
-            links.map((link, index) => <Link key={index} to={link.to} className={`${this.getActive(link.to)}`} style={{textDecoration: 'none'}}>{link.text}</Link>)
+            links.map((link, index) => (
+              <Link key={index} to={link.to}
+                    className={`${this.getActive(link.to)}`}
+                    onClick={e => {
+                      const state = store.getState();
+                      if(state.session.edit) {
+                        let now = state.session.edit.now;
+                        if (typeof now == 'string') {
+                          const params = now.split('.');
+                          now = params.reduce((state, next) => state[next], state);
+                        }
+                        if(!_.isEqual(state.session.edit.origin, now)) {
+                          e.preventDefault();
+                          const goLink = defaultLinks.filter(linkObj => linkObj.to == link.to)[0];
+                          const alertInfo = {
+                            onConfirm: () => {
+                              stopMonitorEdit();
+                              history.push(link.to);
+                            },
+                            msg: 'Your current change will lost, still want go?',
+                            title: `Go to ${goLink.text}`
+                          };
+
+                          alert(alertInfo);
+                        } else {
+                          stopMonitorEdit();
+                        }
+                      } else {
+                        stopMonitorEdit();
+                      }
+                    }}
+                    style={{textDecoration: 'none'}}>{link.text}</Link>))
           }
           <SessionMenu />
         </Menu>
@@ -58,4 +85,3 @@ class NavHeader extends Component {
   }
 }
 
-export default NavHeader;

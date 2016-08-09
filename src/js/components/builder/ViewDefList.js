@@ -7,6 +7,8 @@ import Builder from './Builder';
 import Add from 'grommet/components/icons/base/Add';
 import Close from 'grommet/components/icons/base/Close';
 import Edit from 'grommet/components/icons/base/Edit';
+import {alert, monitorEdit} from '../../actions/system';
+import emptyViewDef from '../../reducers/EmptyViewDef.json';
 
 export default class ViewsDefList extends Component {
   constructor(props) {
@@ -32,20 +34,35 @@ export default class ViewsDefList extends Component {
     });
     this.props.newSelectedView();
     history.push(`/views/`);
+    monitorEdit(_.cloneDeep(emptyViewDef), 'views.selectedView');
   }
 
   _closeEdit() {
-    this.props.clearSelectedView();
-    this.setState({
-      editView: null,
-      schema: '',
-      linkNames: []
+    this.dropCurrentPop('Back to view list', () => {
+      this.props.clearSelectedView();
+      this.setState({
+        editView: null,
+        schema: '',
+        linkNames: []
+      });
+      history.push(`/views/`);
     });
-    history.push(`/views/`);
   }
 
-  _goView(id) {
-    history.push(`/views/${id}`);
+  dropCurrentPop(title, onConfirm) {
+    const selectedView = this.props.selectedView;
+    const originView = this.props.views.filter(view => selectedView._id == view._id)[0];
+
+    if(selectedView._id ? !_.isEqual(originView, selectedView) : !_.isEmpty(selectedView) && !_.isEqual(emptyViewDef, selectedView)) {
+      const alertInfo = {
+        onConfirm: onConfirm,
+        msg: 'Your current change are not saved, do you want to drop the change?',
+        title
+      };
+      alert(alertInfo);
+    } else {
+      onConfirm();
+    }
   }
 
   render() {
@@ -53,20 +70,32 @@ export default class ViewsDefList extends Component {
     let toolbar, contents, focus;
 
     if (this.state.editView) {
-      toolbar =
-        <Anchor href="#" icon={<Close />} label="Close" onClick={this._closeEdit.bind(this)} className='fontNormal'/>;
+      toolbar = <Anchor href="#" icon={<Close />} label="Close" onClick={this._closeEdit.bind(this)} className='fontNormal'/>;
       contents = this.state.editView &&
         <Builder schemaToLoad={this.state.schema} linkNames={this.state.linkNames} ref='builder'/>;
     } else {
-      toolbar = <Anchor href="#" icon={<Add />} label="New" onClick={this._newView.bind(this)} className='fontNormal'/>;
+      toolbar = <Anchor href="#" icon={<Add />} label="New" onClick={this.dropCurrentPop.bind(this, 'Create a view?', this._newView.bind(this))} className='fontNormal'/>;
       contents = views.map((view, key) => ({
         key: view._id,
         groupby: view.category,
-        onClick: this._goView.bind(this, view._id),
+        onClick: () => {
+          if (!selectedView._id) {
+            history.push(`/views/${view._id}`);
+          } else if (view._id != selectedView._id) {
+            this.dropCurrentPop(`Open ${view.name}`, () => history.push(`/views/${view._id}`));
+          }
+        },
         search: view.name,
         child: view.name,
         icon: (
-          <span onClick={this._editView.bind(this, view.body.sqlname)}>
+          <span onClick={(event) => {
+            event.stopPropagation();
+            if (view._id == selectedView._id) {
+              this._editView(view.body.sqlname);
+            } else {
+              this.dropCurrentPop(`Edit ${view.name}`, this._editView.bind(this, view.body.sqlname));
+            }
+          }}>
             <Edit />
           </span>
         )

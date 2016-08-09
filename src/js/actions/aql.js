@@ -1,13 +1,13 @@
 import {GRAPH_DEF_URL, INSIGHT_DEF_URL, AM_DB_DEF_URL, AM_AQL_DEF_URL} from '../constants/ServiceConfig';
 import Rest from '../util/grommet-rest-promise';
-const store = require('../store');
+import store from '../store';
 import * as Types from '../constants/ActionTypes';
 import _ from 'lodash';
 
 export function saveWall(wall) {
   return Rest.post(INSIGHT_DEF_URL, wall).then((res) => {
     if (res.text) {
-      store.default.dispatch({type: Types.RECEIVE_INFO, msg: "Insight saved successfully"});
+      store.dispatch({type: Types.RECEIVE_INFO, msg: "Insight saved successfully"});
       return res.text;
     }
   }, (err) => {
@@ -48,7 +48,7 @@ export function saveAQL(aql) {
   delete clonedAql.chart;
   return Rest.post(GRAPH_DEF_URL, clonedAql).then((res) => {
     if (res.text) {
-      store.default.dispatch({type: Types.RECEIVE_INFO, msg: "Graph saved successfully"});
+      store.dispatch({type: Types.RECEIVE_INFO, msg: "Graph saved successfully"});
       return res.text;
     }
   }, (err) => {
@@ -59,7 +59,7 @@ export function saveAQL(aql) {
 export function removeAQL(id) {
   return Rest.del(GRAPH_DEF_URL + id).then((res) => {
     if (res.text) {
-      store.default.dispatch({type: Types.RECEIVE_INFO, msg: "Graph removed successfully"});
+      store.dispatch({type: Types.RECEIVE_INFO, msg: "Graph removed successfully"});
       return res.text;
     }
   }, (err) => {
@@ -89,7 +89,7 @@ export function queryAQL(str) {
   var idx_WHERE = str.toLowerCase().indexOf("where");
 
   if (idx_SELECT < 0 || idx_FROM < 0) {
-    store.default.dispatch({type: Types.RECEIVE_ERROR, msg: "AQL is invalid! Can not query data for Graph"});
+    store.dispatch({type: Types.RECEIVE_ERROR, msg: "AQL is invalid! Can not query data for Graph"});
   } else {
     // get fields from SELECT .. FROM
     aql.fields = str.substring(idx_SELECT + 6, idx_FROM).trim();
@@ -109,7 +109,7 @@ export function queryAQL(str) {
       return simpleAQLResult(res.body.Query);
     }, (err) => {
       const errorMessage = err.rawResponse || (err.response && err.response.text || err.toString());
-      store.default.dispatch({type: Types.RECEIVE_ERROR, msg: errorMessage});
+      store.dispatch({type: Types.RECEIVE_ERROR, msg: errorMessage});
     });
   }
 }
@@ -170,14 +170,10 @@ function simpleAQLResult(Query) {
   }
 
   if (data.rows[0] && data.header.length !== data.rows[0].length) {
-    store.default.dispatch({
+    store.dispatch({
       type: Types.RECEIVE_WARNING,
       msg: 'AQL str is invalid: query columns is inconsistent with return columns.'
     });
   }
   return data;
-}
-
-export function popWarningMessage(msg) {
-  store.default.dispatch({type: Types.RECEIVE_WARNING, msg});
 }

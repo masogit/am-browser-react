@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
+import {showWarning, monitorEdit} from '../../actions/system';
 import * as Format from '../../util/RecordFormat';
 import history from '../../RouteHistory';
 import RecordListLayer from '../explorer/RecordListLayer';
@@ -19,6 +20,7 @@ import ActionTab from './../commons/ActionTab';
 import {Anchor, Box, Button, CheckBox, Header, Menu, Title, Table, TableRow, Layer, Carousel, RadioButton, Tabs} from 'grommet';
 import GroupList from '../commons/GroupList';
 import GroupListItem from '../commons/GroupListItem';
+import _ from 'lodash';
 
 let tabIdMap = {};
 export default class Insight extends Component {
@@ -113,18 +115,19 @@ export default class Insight extends Component {
     this.setState({data: {}});
     AQLActions.loadWalls().then(walls => {
       if (walls) {
-        if (walls[0])
+        if (walls[0]) {
           this.setState({
             wall: walls[0],
             tabs: walls[0].tabs,
             focusTab: walls[0].tabs[0]
           }, this._findTabAqls(walls[0].tabs));
-        else
-          this.setState({
-            wall: {
-              tabs: this.state.tabs
-            }
-          });
+          this.wall = _.cloneDeep(walls[0]);
+        } else {
+          const wall =  { tabs: this.state.tabs };
+          this.setState({ wall });
+          this.wall = _.cloneDeep(wall);
+        }
+        monitorEdit(this.wall, this.state.wall);
       }
     });
   }
@@ -451,14 +454,14 @@ export default class Insight extends Component {
     if (name) {
       const sameNameTabs = this.state.tabs.filter(tab => tab.name == name);
       if (sameNameTabs.length > 0) {
-        AQLActions.popWarningMessage('Tab name already exists');
+        showWarning('Tab name already exists');
         return false;
       } else {
         tab.name = name;
         return true;
       }
     } else {
-      AQLActions.popWarningMessage('Tab name can not be empty');
+      showWarning('Tab name can not be empty');
     }
   }
 

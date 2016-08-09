@@ -121,12 +121,8 @@ export default class GroupList extends Component {
                 </List>
                 {
                   expand === key &&
-                  <List {...this.props} selected={selected}>
-                    {
-                      grouped[key].map((child) => {
-                        return child;
-                      })
-                    }
+                  <List selected={selected}>
+                    {grouped[key]}
                   </List>
                 }
               </Box>
