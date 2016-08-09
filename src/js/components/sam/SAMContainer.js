@@ -1,17 +1,14 @@
 import React, {Component} from 'react';
 import * as SAMActions from '../../actions/sam';
 import {Box} from 'grommet';
-import Vendor from './Vendor';
-import Product from './Product';
-import Version from './Version';
-
+import Card from '../commons/Card';
+import RecordList from '../explorer/RecordList';
 
 export default class SAMContainer extends Component {
   constructor() {
     super();
     this.state = {
-      vendors: [],
-      products: []
+      product: null
     };
     this.renderProduct = this.renderProduct.bind(this);
     this.renderVersion = this.renderVersion.bind(this);
@@ -20,22 +17,56 @@ export default class SAMContainer extends Component {
   componentWillMount() {
     SAMActions.vendorWithBrand().then((vendors) => {
       this.setState({
-        vendors: vendors,
+        vendor: {
+          title: 'Vendor',
+          data: vendors,
+          onSelect: this.renderProduct,
+          conf: {
+            header: 'name',
+            body: [
+              {label: 'Non-Compliance', value: 'nonCompliance'},
+              {label: 'Over-Compliance', value: 'overCompliance'}
+            ],
+            footer: 'products'
+          },
+          sortStyle: {
+            color: '#DC2878',
+            fontWeight: 'bold',
+            fontSize: '120%'
+          }
+        },
         version: null
       });
     });
   }
 
   renderProduct(selected) {
-    let name = this.state.vendors[selected].name;
+    let name = this.state.vendor.data[selected].name;
 
     SAMActions.productInVendor(name).then((products) => {
       this.setState({
-        products: [],
+        product: null,
         version: null
       }, () => {
         this.setState({
-          products: products
+          product: {
+            title: 'Product',
+            data: products,
+            onSelect: this.renderVersion,
+            conf: {
+              header: 'name',
+              body: [
+                {label: 'Unused', value: 'unused'},
+                {label: 'Entitled', value: 'entitled'}
+              ],
+              footer: 'versions'
+            },
+            sortStyle: {
+              color: '#0A64A0',
+              fontWeight: 'bold',
+              fontSize: '120%'
+            }
+          }
         });
       });
     });
@@ -62,7 +93,7 @@ export default class SAMContainer extends Component {
         sqlname: 'dUnusedInstall',
         alias: 'Unused Installation'
       }],
-      filter: `dSoftInstallCount> 0 AND Brand.Name='${this.state.products[selected].name}'`
+      filter: `dSoftInstallCount> 0 AND Brand.Name='${this.state.product.data[selected].name}'`
     };
 
     this.setState({
@@ -77,15 +108,21 @@ export default class SAMContainer extends Component {
 
   render() {
     return (
-      <Box flex={true} direction="row" align={this.state.products.length == 0 ? 'center' : 'start'} justify={this.state.products.length == 0 ? 'center' : 'start'}>
-        <Box flex={this.state.products.length == 0} style={this.state.products.length > 0 && {'width': '500px'}} pad={{horizontal: "small"}}>
-          <Vendor data={this.state.vendors} onSelect={this.renderProduct}/>
+      <Box flex={true} direction="row" align={!this.state.product ? 'center' : 'start'} justify={!this.state.product ? 'center' : 'start'}>
+        <Box flex={!this.state.product} style={this.state.product && {'width': '500px'}} pad={{horizontal: "small"}}>
+          {
+            this.state.vendor &&
+            <Card {...this.state.vendor}/>
+          }
         </Box>
         {
-          this.state.products.length > 0 &&
+          this.state.product &&
           <Box flex={true}>
-            <Product data={this.state.products} onSelect={this.renderVersion}/>
-            <Version data={this.state.version} />
+            <Card {...this.state.product}/>
+            {
+              this.state.version &&
+              <RecordList body={this.state.version} title="Version" allFields={true}/>
+            }
           </Box>
         }
       </Box>
