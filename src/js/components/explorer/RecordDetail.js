@@ -86,10 +86,6 @@ export default class RecordDetail extends Component {
               </tr>
               </thead>
               <tbody>
-              <TableRow>
-                <td>Self</td>
-                <td>{this.props.record.self}</td>
-              </TableRow>
               {
                 this.props.body.fields.map((field, index) => {
                   return (
