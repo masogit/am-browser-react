@@ -244,7 +244,7 @@ export default class RecordList extends Component {
   }
 
   getObjectString(obj) {
-    return this.getDisplayFields().map((field, index) => Format.getFieldStrVal(obj, field)).concat(obj.self || '');
+    return this.getDisplayFields().map((field, index) => Format.getFieldStrVal(obj, field));
   }
 
   _aqlFilterAdd(filter) {
@@ -348,7 +348,6 @@ export default class RecordList extends Component {
       records.map((record, index) => {
         return (
           <TableRow key={index} onClick={this._viewDetailShow.bind(this, record)}>
-            <td>{record.self}</td>
             {
               this.getDisplayFields().map((field, tdindex) => (
                 <td key={tdindex}>
@@ -449,9 +448,6 @@ export default class RecordList extends Component {
              onMore={this.state.onMoreLock || this.state.filtered ? null : this._getMoreRecords.bind(this)}>
         <thead>
         <tr>
-          <th className={this.state.locked ? 'disabled' : ''}>
-            <Anchor href="#" reverse={true} icon={this._showOrderByIcon('self')} label="Self"
-                      onClick={this._orderBy.bind(this, 'self')}/></th>
           {this.renderFieldsHeader()}
         </tr>
         </thead>

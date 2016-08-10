@@ -5,7 +5,7 @@ import RecordListLayer from './RecordListLayer';
 import ComponentBase from '../commons/ComponentBase';
 import history from '../../RouteHistory';
 import {
-  Anchor, Box, Button, Header, Footer, Layer, Split, Table, TableRow, Tiles, Title, Tile, Form
+  Anchor, Box, Button, Header, Footer, Split, Table, TableRow, Tiles, Title, Tile, Form
 } from 'grommet';
 
 export default class RecordSearch extends ComponentBase {
