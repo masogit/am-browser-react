@@ -20,6 +20,7 @@ import Mail from 'grommet/components/icons/base/Mail';
 import Trash from 'grommet/components/icons/base/Trash';
 import {saveAs} from 'file-saver';
 import {monitorEdit, stopMonitorEdit, alert} from '../../actions/system';
+import Textarea from '../commons/Textarea';
 
 import {
   Anchor, Box, Split, SearchInput, Form, FormField, FormFields, Layer, Tabs, Table, TableRow, Title, Header, Menu
@@ -451,7 +452,8 @@ export default class AQL extends Component {
           <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'medium'}}>
             <Box justify="between" direction="row" className='header' flex={false}>
               <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_Box">
-                  <textarea id="AQL_Box" name="str" value={this.state.aql.str} rows="3"
+                  <Textarea id="AQL_Box" name="str" value={this.state.aql.str} rows="3"
+                            resize={!!this.state.aql.view && !!this.state.aql.view.name}
                             onChange={this._setFormValues.bind(this)}/>
               </FormField>
               <Form pad={{horizontal: 'small'}}>
