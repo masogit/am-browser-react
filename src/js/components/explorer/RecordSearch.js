@@ -4,12 +4,12 @@ import RecordDetail from './RecordDetail';
 import RecordListLayer from './RecordListLayer';
 import ComponentBase from '../commons/ComponentBase';
 import history from '../../RouteHistory';
+import Spinning from 'grommet/components/icons/Spinning';
 import {
   Anchor, Box, Button, Header, Footer, Split, Table, TableRow, Tiles, Title, Tile, Form
 } from 'grommet';
 
 export default class RecordSearch extends ComponentBase {
-
   constructor() {
     super();
     this.state = {
@@ -19,33 +19,19 @@ export default class RecordSearch extends ComponentBase {
       view: null,
       warning: null
     };
-    this._setMessage.bind(this);
+    this.lastSearchTime = {};
   }
 
   componentDidMount() {
     this._search(this.props.params.keyword);
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-  }
-
-  componentWillReceiveProps(nextProps) {
-  }
-
-  _setMessage(view, time, num) {
-    var messages = this.state.messages;
-    if (messages[view._id]) {
-      messages[view._id].timeEnd = time;
-      messages[view._id].num = num;
-    } else {
-      messages[view._id] = { view: view, timeStart: time, num: num };
-    }
-    this.setState({
-      messages: messages
-    });
+    this.loadViews = ExplorerAction.loadViews();
   }
 
   _search(keyword) {
+    if (!this.acquireLock()) {
+      return;
+    }
+
     if (keyword.length <= 2) {
       this.setState({
         warning: 'Please type at least 3 words to search'
@@ -66,28 +52,36 @@ export default class RecordSearch extends ComponentBase {
       keyword: keyword
     }, () => {
       if (keyword)
-        ExplorerAction.loadViews().then(views => {
+        this.loadViews.then(views => {
           if (views instanceof Array) {
+            const promiseList = [];
             views.forEach((view) => {
               // check searchable
               var aql = view.body.fields.filter((field) => {
                 return field.searchable;
               });
               if (aql.length > 0) {
+                view.body.filter = "";
                 ExplorerAction.getBodyByKeyword(view.body, keyword);
-                this._setMessage(view, Date.now(), 0);
-                ExplorerAction.loadRecordsByBody(view.body).then((data) => {
-                  this._setMessage(view, Date.now(), data.count);
+                let messages = this.state.messages;
+                ExplorerAction.setMessage(messages, view, Date.now(), 0);
+                promiseList.push(ExplorerAction.loadRecordsByBody(view.body).then((data) => {
+                  ExplorerAction.setMessage(messages, view, Date.now(), data.count);
+                  var results = this.state.results;
                   if (data && data.entities.length > 0) {
-                    var results = this.state.results;
-                    results.push({ view: view, records: data.entities });
-                    this.setState({
-                      results: [...results]
-                    });
-                    this.releaseLock();
+                    results.push({view: view, records: data.entities});
                   }
-                });
+                  this.setState({
+                    results,
+                    messages
+                  });
+                }));
               }
+            });
+
+            Promise.all(promiseList).then(() => this.lastSearchTime[location.pathname] = {
+              end: new Date(),
+              searching: false
             });
           }
         });
@@ -134,11 +128,22 @@ export default class RecordSearch extends ComponentBase {
     });
   }
 
+  doNotNeedSearch(key) {
+    return this.lastSearchTime[key] && (this.lastSearchTime[key].searching || (new Date() - this.lastSearchTime[key].end < 2000));
+  }
+
   _onSearch(keyword) {
-    if (!this.acquireLock()) {
+    const pathname = `/search/${encodeURI(keyword)}`;
+    if (location.pathname == decodeURI(pathname) && this.doNotNeedSearch(location.pathname)) {
       return;
     }
-    history.push(`/search/${encodeURI(keyword)}`);
+
+    this.lastSearchTime[location.pathname] = {
+      searching:true,
+      end: 0
+    };
+
+    history.push(pathname);
     this.setState({
       keyword: keyword
     });
@@ -221,9 +226,9 @@ export default class RecordSearch extends ComponentBase {
                 </Box>
               </Box>
               :
-              <Tiles flush={false} size="large" className='autoScroll' justify="around">
+              <Tiles flush={false} size="large" className='autoScroll' className='justify-around'>
                 {
-                  this.state.results.map((result, i) => {
+                  this.locked ? <Spinning /> : this.state.results.map((result, i) => {
                     return result.records.map((record, j) => {
                       // var id = record['ref-link'].split('/')[2];
                       return (
