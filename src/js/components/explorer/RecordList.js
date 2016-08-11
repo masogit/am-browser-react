@@ -484,7 +484,7 @@ export default class RecordList extends Component {
   }
   render() {
     return (
-      <Box pad={{horizontal: 'medium'}} flex={true}>
+      <Box pad={{horizontal: 'medium'}} flex={true} className='fixIEScrollBar'>
         {this.renderToolBox()}
         {this.renderAQLFilter()}
         {
