@@ -79,7 +79,7 @@ export default class ViewsDefList extends Component {
         key: view._id,
         groupby: view.category,
         onClick: () => {
-          if (!selectedView._id) {
+          if (!selectedView) {
             history.push(`/views/${view._id}`);
           } else if (view._id != selectedView._id) {
             this.dropCurrentPop(`Open ${view.name}`, () => history.push(`/views/${view._id}`));

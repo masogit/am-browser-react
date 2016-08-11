@@ -219,6 +219,7 @@ export function confirmDeleteViewDef(selectedView) {
   return function (dispatch) {
     return Rest.del(VIEW_DEF_URL + selectedView._id)
       .then((res) => {
+        stopMonitorEdit();
         dispatch({
           type: types.DELETE_VIEW_DEF,
           selectedViewId: selectedView._id
