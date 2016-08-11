@@ -1,6 +1,6 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import { INIT, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT, STOP_MONITOR_EDIT, MONITOR_EDIT  } from '../constants/ActionTypes';
+import { INIT, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT, STOP_MONITOR_EDIT, MONITOR_EDIT, FORCE_LOGOUT  } from '../constants/ActionTypes';
 
 const initialState = {
   email: null,
@@ -24,6 +24,12 @@ const handlers = {
   [LOGOUT]: () => ({
     email: null,
     error: null,
+    headerNavs: null,
+    loggedout: true
+  }),
+  [FORCE_LOGOUT]: (_, action) => ({
+    email: null,
+    error: {message: action.error},
     headerNavs: null,
     loggedout: true
   }),

@@ -28,6 +28,7 @@ export const INIT = 'INIT';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAILURE = 'LOGIN_FAILURE';
 export const LOGOUT = 'LOGOUT';
+export const FORCE_LOGOUT = 'FORCE_LOGOUT';
 export const STOP_MONITOR_EDIT = 'STOP_MONITOR_EDIT';
 export const MONITOR_EDIT = 'MONITOR_EDIT';
 
