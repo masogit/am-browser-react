@@ -21,9 +21,10 @@ import Trash from 'grommet/components/icons/base/Trash';
 import {saveAs} from 'file-saver';
 import {monitorEdit, stopMonitorEdit, alert} from '../../actions/system';
 import Textarea from '../commons/Textarea';
+import SearchInput from '../commons/SearchInput';
 
 import {
-  Anchor, Box, Split, SearchInput, Form, FormField, FormFields, Layer, Tabs, Table, TableRow, Title, Header, Menu
+  Anchor, Box, Split, Form, FormField, FormFields, Layer, Tabs, Table, TableRow, Title, Header, Menu
 } from 'grommet';
 import Play from 'grommet/components/icons/base/Play';
 import Checkmark from 'grommet/components/icons/base/Checkmark';

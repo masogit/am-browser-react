@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import ComponentBase from '../commons/ComponentBase';
-import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Title, Split, SearchInput} from 'grommet';
+import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Title, Split} from 'grommet';
 import Close from 'grommet/components/icons/base/Close';
 import Up from 'grommet/components/icons/base/LinkUp';
 import Down from 'grommet/components/icons/base/LinkDown';
@@ -17,6 +17,7 @@ import _ from 'lodash';
 import AlertForm from '../../components/commons/AlertForm';
 import FieldTypes from '../../constants/FieldTypes';
 import {saveAs} from 'file-saver';
+import SearchInput from '../commons/SearchInput';
 
 const _onMail = (view) => {
   if (view._id) {

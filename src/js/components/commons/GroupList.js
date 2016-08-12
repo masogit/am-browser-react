@@ -3,13 +3,13 @@ import {
   Anchor,
   Box,
   List,
-  ListItem,
-  SearchInput
+  ListItem
 } from 'grommet';
 import Next from 'grommet/components/icons/base/Next';
 import Down from 'grommet/components/icons/base/Down';
 import Spinning from 'grommet/components/icons/Spinning';
 import _ from 'lodash';
+import SearchInput from '../commons/SearchInput';
 
 export default class GroupList extends Component {
 
@@ -94,15 +94,15 @@ export default class GroupList extends Component {
   render() {
     var children = this.state.filtered || this.props.children;
     var grouped = this._getGroupedChildren(children);
-    var suggestions = this._getSuggestions(children);
+
     const expand = this.state.expand;
     return (
       <Box direction="column" className='fixMinSizing' flex={true}>
         {
           this.props.searchable &&
           <Box pad='small' flex={false}>
-            <SearchInput ref="search" placeHolder="Search..."  suggestions={suggestions}
-                         onSelect={this._selectSuggestion.bind(this)} onDOMChange={this._onSearch.bind(this)}/>
+            <SearchInput placeHolder="Search..."  suggestions={this._getSuggestions(children)}
+                         onSelect={this._selectSuggestion.bind(this)}/>
           </Box>
         }
         <Box className='autoScroll fixIEScrollBar'>

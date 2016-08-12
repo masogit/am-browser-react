@@ -5,7 +5,7 @@ import Box from 'grommet/components/Box';
 import Tabs from 'grommet/components/Tabs';
 import Tab from 'grommet/components/Tab';
 import ListItem from 'grommet/components/ListItem';
-import SearchInput from 'grommet/components/SearchInput';
+import SearchInput from '../commons/SearchInput';
 import Notes from 'grommet/components/icons/base/Notes';
 import Spinning from 'grommet/components/icons/Spinning';
 

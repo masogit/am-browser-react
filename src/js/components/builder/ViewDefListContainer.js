@@ -50,6 +50,10 @@ class ViewDefListContainer extends Component {
         SystemActions.monitorEdit(selectedView, 'views.selectedView');
         this.props.actions.setSelectedView(nextId, selectedView);
       }
+
+      if(!this.categories) {
+        this.categories = _.uniq(views.map((view) => view.category));
+      }
     }
   }
 
@@ -117,9 +121,6 @@ class ViewDefListContainer extends Component {
 
   render() {
     const {views, isFetchingViewList, selectedView, preview} = this.props;
-    let categories = _.uniq(views.map((view) => {
-      return view.category;
-    }));
     let {dispatch} = store;
     let boundActionCreators = bindActionCreators(ViewDefActions, dispatch);
     let boundActionCreators2 = bindActionCreators(SystemActions, dispatch);
@@ -128,7 +129,7 @@ class ViewDefListContainer extends Component {
         <ViewDefList views={views} isFetchingViewList={isFetchingViewList} ref='viewDefList'
                      selectedView={selectedView} {...boundActionCreators} {...boundActionCreators2}/>
 
-        <ViewDefDetail selectedView={selectedView} categories={categories} compact={true}
+        <ViewDefDetail selectedView={selectedView} categories={this.categories} compact={true}
                        onValueChange={this._onValueChange}
                        onSubmit={this._onSubmit}
                        onSaveSuccess={this._onSaveSuccess}
