@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
 import {showWarning, monitorEdit} from '../../actions/system';
@@ -15,15 +15,16 @@ import Search from 'grommet/components/icons/base/Search';
 import Previous from 'grommet/components/icons/base/Previous';
 import Shift from 'grommet/components/icons/base/Shift';
 import More from 'grommet/components/icons/base/More';
-import Graph from './../commons/Graph';
-import ActionTab from './../commons/ActionTab';
+import Graph from '../commons/Graph';
+import ComponentBase  from '../commons/ComponentBase';
+import ActionTab from '../commons/ActionTab';
 import {Anchor, Box, Button, CheckBox, Header, Menu, Title, Table, TableRow, Layer, Carousel, RadioButton, Tabs} from 'grommet';
 import GroupList from '../commons/GroupList';
 import GroupListItem from '../commons/GroupListItem';
 import _ from 'lodash';
 
 let tabIdMap = {};
-export default class Insight extends Component {
+export default class Insight extends ComponentBase {
 
   constructor() {
     super();
@@ -55,9 +56,9 @@ export default class Insight extends Component {
 
   componentDidMount() {
     if (this.props.params.id) {
-      AQLActions.loadAQL(this.props.params.id).then((aql)=> {
+      this.addPromise(AQLActions.loadAQL(this.props.params.id).then((aql)=> {
         this._queryData(aql);
-      });
+      }));
     } else {
       this._loadAQLs();
       this._loadWall();
@@ -72,11 +73,11 @@ export default class Insight extends Component {
 
   _findAqls(box) {
     if (box.child && box.child._id) {
-      AQLActions.loadAQL(box.child._id).then((aql)=> {
+      this.addPromise(AQLActions.loadAQL(box.child._id).then((aql)=> {
         if (!this.state.data[aql._id]) {
           this._queryData(aql);
         }
-      });
+      }));
     } else if (box.child && box.child instanceof Array) {
       box.child.forEach((child)=> {
         this._findAqls(child);
@@ -91,16 +92,16 @@ export default class Insight extends Component {
   }
 
   _loadAQLs() {
-    AQLActions.loadAQLs().then((data) => {
+    this.addPromise(AQLActions.loadAQLs().then((data) => {
       this.setState({
         aqls: data
       });
-    });
+    }));
   }
 
   _queryData(aql) {
     const data = this.state.data;
-    AQLActions.queryAQL(aql.str).then(result => {
+    this.addPromise(AQLActions.queryAQL(aql.str).then(result => {
       if (result) {
         data[aql._id] = {
           aql: aql,
@@ -108,28 +109,32 @@ export default class Insight extends Component {
         };
         this.setState({data});
       }
-    });
+    }));
   }
 
   _loadWall() {
     this.setState({data: {}});
-    AQLActions.loadWalls().then(walls => {
+    this.addPromise(AQLActions.loadWalls().then(walls => {
       if (walls) {
         if (walls[0]) {
+          this.wall = _.cloneDeep(walls[0]);
           this.setState({
             wall: walls[0],
             tabs: walls[0].tabs,
             focusTab: walls[0].tabs[0]
-          }, this._findTabAqls(walls[0].tabs));
-          this.wall = _.cloneDeep(walls[0]);
+          }, () => {
+            this._findTabAqls(walls[0].tabs);
+            monitorEdit(this.wall, this.state.wall);
+          });
         } else {
           const wall =  { tabs: this.state.tabs };
-          this.setState({ wall });
           this.wall = _.cloneDeep(wall);
+          this.setState({ wall }, () => {
+            monitorEdit(this.wall, this.state.wall);
+          });
         }
-        monitorEdit(this.wall, this.state.wall);
       }
-    });
+    }));
   }
 
   _toggleEdit() {

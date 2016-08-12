@@ -54,7 +54,7 @@ export default class RecordSearch extends ComponentBase {
       if (keyword)
         this.loadViews.then(views => {
           if (views instanceof Array) {
-            this.promiseList = [];
+            this.clearPromiseList();
             views.forEach((view) => {
               // check searchable
               var aql = view.body.fields.filter((field) => {
@@ -65,7 +65,7 @@ export default class RecordSearch extends ComponentBase {
                 ExplorerAction.getBodyByKeyword(view.body, keyword);
                 let messages = this.state.messages;
                 ExplorerAction.setMessage(messages, view, Date.now(), 0);
-                this.promiseList.push(ExplorerAction.loadRecordsByBody(view.body).then((data) => {
+                this.addPromise(ExplorerAction.loadRecordsByBody(view.body).then((data) => {
                   ExplorerAction.setMessage(messages, view, Date.now(), data.count);
                   var results = this.state.results;
                   if (data && data.entities.length > 0) {
@@ -138,9 +138,7 @@ export default class RecordSearch extends ComponentBase {
       return;
     }
 
-    if (this.promiseList.length > 0) {
-      this.promiseList.forEach(promise => promise.cancel());
-    }
+    this.cancelPromises();
 
     this.lastSearchTime[location.pathname] = {
       searching:true,
