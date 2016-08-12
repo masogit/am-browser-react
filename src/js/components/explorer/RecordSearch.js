@@ -54,7 +54,7 @@ export default class RecordSearch extends ComponentBase {
       if (keyword)
         this.loadViews.then(views => {
           if (views instanceof Array) {
-            const promiseList = [];
+            this.promiseList = [];
             views.forEach((view) => {
               // check searchable
               var aql = view.body.fields.filter((field) => {
@@ -65,7 +65,7 @@ export default class RecordSearch extends ComponentBase {
                 ExplorerAction.getBodyByKeyword(view.body, keyword);
                 let messages = this.state.messages;
                 ExplorerAction.setMessage(messages, view, Date.now(), 0);
-                promiseList.push(ExplorerAction.loadRecordsByBody(view.body).then((data) => {
+                this.promiseList.push(ExplorerAction.loadRecordsByBody(view.body).then((data) => {
                   ExplorerAction.setMessage(messages, view, Date.now(), data.count);
                   var results = this.state.results;
                   if (data && data.entities.length > 0) {
@@ -79,7 +79,7 @@ export default class RecordSearch extends ComponentBase {
               }
             });
 
-            Promise.all(promiseList).then(() => this.lastSearchTime[location.pathname] = {
+            Promise.all(this.promiseList).then(() => this.lastSearchTime[location.pathname] = {
               end: new Date(),
               searching: false
             });
@@ -136,6 +136,10 @@ export default class RecordSearch extends ComponentBase {
     const pathname = `/search/${encodeURI(keyword)}`;
     if (location.pathname == decodeURI(pathname) && this.doNotNeedSearch(location.pathname)) {
       return;
+    }
+
+    if (this.promiseList.length > 0) {
+      this.promiseList.forEach(promise => promise.cancel());
     }
 
     this.lastSearchTime[location.pathname] = {
@@ -226,7 +230,7 @@ export default class RecordSearch extends ComponentBase {
                 </Box>
               </Box>
               :
-              <Tiles flush={false} size="large" className='autoScroll' className='justify-around'>
+              <Tiles flush={false} size="large" className='autoScroll justify-around'>
                 {
                   this.locked ? <Spinning /> : this.state.results.map((result, i) => {
                     return result.records.map((record, j) => {
