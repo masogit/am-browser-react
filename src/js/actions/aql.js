@@ -43,9 +43,6 @@ export function saveAQL(aql) {
   let clonedAql = _.cloneDeep(aql);
   // TODO: delete the following 4 lines after aql templates are cleaned up.
   delete clonedAql.data;
-  delete clonedAql.meter;
-  delete clonedAql.distribution;
-  delete clonedAql.chart;
   return Rest.post(GRAPH_DEF_URL, clonedAql).then((res) => {
     if (res.text) {
       store.dispatch({type: Types.RECEIVE_INFO, msg: "Graph saved successfully"});

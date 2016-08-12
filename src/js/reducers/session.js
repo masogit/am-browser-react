@@ -18,7 +18,11 @@ const handlers = {
   [LOGIN_SUCCESS]: (_, action) => ({
     email: action.email,
     error: null,
-    headerNavs: action.headerNavs
+    headerNavs: action.headerNavs,
+    edit: {
+      origin: {},
+      now: {}
+    }
   }),
   [LOGIN_FAILURE]: (_, action) => ({error: action.error}),
   [LOGOUT]: () => ({

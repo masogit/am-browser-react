@@ -56,7 +56,7 @@ export default class AQL extends Component {
       name: '',
       category: '',
       type: 'chart',
-      form: 'init'
+      form: {}
     };
   }
 
@@ -137,7 +137,6 @@ export default class AQL extends Component {
   _onQuery() {
     AQLActions.queryAQL(this.state.aql.str).then((data) => {
       const aql = this.state.aql;
-      //aql.form = 'init';
       this.setState({
         aql,
         data
@@ -233,7 +232,7 @@ export default class AQL extends Component {
     let graphData = this.state.graphData;
     let data = this.state.data;
     obj[path] = val;
-    if (path === 'str' && obj.form !== 'init') {
+    if (path === 'str' && !_.isEmpty(obj.form)) {
       // when AQL change, reset data, form and graphData
       obj.form = null;
       data = {
@@ -256,7 +255,7 @@ export default class AQL extends Component {
       aql.form = form;
       graphData[type] = form;
     } else {
-      aql.form = graphData[type] || 'init';
+      aql.form = graphData[type] || {};
     }
 
     this.setState({aql, graphData});
@@ -377,9 +376,6 @@ export default class AQL extends Component {
     const currentAQL = _.cloneDeep(this.state.aql);
 
     delete currentAQL.data;
-    delete currentAQL.meter;
-    delete currentAQL.distribution;
-    delete currentAQL.chart;
     if(this.state.aql._id ? !_.isEqual(originAQL, currentAQL) : !_.isEqual(this.initAQL, currentAQL)) {
       const alertInfo = {
         onConfirm: onConfirm,
@@ -412,7 +408,11 @@ export default class AQL extends Component {
     const contents = this.state.aqls.map((aql) => ({
       key: aql._id,
       groupby: aql.category,
-      onClick: this.dropCurrentPop.bind(this, `Open ${aql.name}`, this._loadAQL.bind(this, aql)),
+      onClick: () => {
+        if (aql._id != this.state.aql._id) {
+          this.dropCurrentPop(`Open ${aql.name}`, this._loadAQL.bind(this, aql));
+        }
+      },
       search: aql.name,
       child: aql.name
     }));
@@ -480,7 +480,7 @@ export default class AQL extends Component {
             </Box>
             <Split flex="left" fixed={false} className='fixMinSizing'>
               <Box pad={{vertical: 'small'}}>
-                {validData && this.state.aql.form && this.state.aql.form != 'init' && this.state.aql.type &&
+                {validData && this.state.aql.form && !_.isEmpty(this.state.aql.form) && this.state.aql.type &&
                   <Box flex={false}>
                     <Graph type={this.state.aql.type} data={this.state.data} config={this.state.aql.form}
                        onClick={(filter) => this._showViewRecords(filter, this.state.aql.view)} />
