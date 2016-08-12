@@ -503,7 +503,7 @@ export default class Insight extends Component {
       content = data && data[id] && this._renderSingleAQL(data[id]);
     } else {
       content = (
-        <Tabs justify='center' className='flex'>{
+        <Tabs justify='center' className='flex' initialIndex={this.state.focusTab || 0}>{
           tabs.map((tab) => (
             <ActionTab ref={tab.name} title={tab.name} key={tab.name} onClick={this._setFocusTab.bind(this, tab)}
                        onEdit={edit}
