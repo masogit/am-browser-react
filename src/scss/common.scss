@@ -150,3 +150,8 @@ table {
 .grommetux-tiles:focus {
   outline: none;
 }
+
+.grommet.grommetux-drop:not([class*="background-color-index-"]) {
+  background: #fff;
+  box-shadow: 0 4px 4px #eee;
+}
