@@ -1,5 +1,5 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
-import React, {PropTypes} from 'react';
+import React from 'react';
 import {SearchInput} from 'grommet';
 
 export default class Input extends SearchInput {
@@ -46,33 +46,3 @@ export default class Input extends SearchInput {
   }
 }
 
-Input.propTypes = {
-  defaultValue: PropTypes.oneOfType([
-    PropTypes.shape({
-      label: PropTypes.string,
-      value: PropTypes.string
-    }),
-    PropTypes.string
-  ]),
-  id: PropTypes.string,
-  name: PropTypes.string,
-  onDOMChange: PropTypes.func,
-  onSelect: PropTypes.func,
-  placeHolder: PropTypes.string,
-  suggestions: PropTypes.arrayOf(
-    PropTypes.oneOfType([
-      PropTypes.shape({
-        label: PropTypes.node,
-        value: PropTypes.any
-      }),
-      PropTypes.string
-    ])
-  ),
-  value: PropTypes.oneOfType([
-    PropTypes.shape({
-      label: PropTypes.string,
-      value: PropTypes.string
-    }),
-    PropTypes.string
-  ])
-};
