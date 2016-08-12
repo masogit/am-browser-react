@@ -159,26 +159,35 @@ export default class Insight extends ComponentBase {
     });
   }
 
+  _getID() {
+    return (Math.random() + 1).toString(36).substring(7);
+  }
+
   _addBox(box, parent) {
     if (!box.child)
       box.child = [{
+        key: this._getID(),
         direction: 'row',
         child: null
       }, {
+        key: this._getID(),
         direction: 'row',
         child: null
       }];
     else if (box.child instanceof Array)
       box.child.push({
+        key: this._getID(),
         direction: 'row',
         child: null
       });
     else {
       var child = box.child;
       box.child = [{
+        key: this._getID(),
         direction: 'row',
         child: child
       }, {
+        key: this._getID(),
         direction: 'row',
         child: null
       }];
@@ -189,16 +198,31 @@ export default class Insight extends ComponentBase {
   }
 
   _deleteBox(box, parent) {
-    if (box.child instanceof Array && box.child.length > 0) {
-      box.child.splice(box.child.length - 1, 1);
-      if (box.child.length === 0)
-        box.child = null;
-    } else
+    if (box.child) {
       box.child = null;
-
+    } else if (parent.key != box.key) {
+      this._removeFromParent(box.key, parent, parent);
+    }
+    // For render parent
     this.setState({
       box: parent
     });
+  }
+
+  _removeFromParent(key, box, parent) {
+    if (box.child && box.child instanceof Array) {
+      let removed = _.remove(box.child, child => {
+        return child.key == key;
+      });
+
+      if (box.child.length == 0)
+        box.child = null;
+
+      if (removed.length == 0)
+        box.child.forEach(child => {
+          this._removeFromParent(key, child, parent);
+        });
+    }
   }
 
   _onClose() {
@@ -240,14 +264,16 @@ export default class Insight extends ComponentBase {
 
   _buildBox(box, parent, tabName) {
     let child;
+
+    // Handle old box no key or number key
+    if (!box.key || isNaN(box.key))
+      box.key = this._getID();
+
     if (box.child) {
       if (box.child instanceof Array) {
         child = (
           <Box justify="center" direction={box.direction} flex={false}>{
-            box.child.map((child, i) => {
-              child.key = i;
-              return this._buildBox(child, parent, tabName);
-            })
+            box.child.map((child) => this._buildBox(child, parent, tabName))
           }</Box>
         );
       } else if (box.child._id && this.state.data[box.child._id]) {
@@ -291,17 +317,16 @@ export default class Insight extends ComponentBase {
   }
 
   _buildActions(box, parent) {
-    var id = (Math.random() + 1).toString(36).substring(7);
     if (this.state.edit)
       return (
         <Header justify="center">
           <Menu icon={<More />} closeOnClick={false} inline={true} direction="row">
-            <CheckBox id={id} label={box.direction==='row'?'Column':'Row'} checked={box.direction!=='column'}
+            <CheckBox id={box.key} label={box.direction==='row'?'Column':'Row'} checked={box.direction!=='column'}
                       onChange={this._toggleDirection.bind(this, box, parent)} toggle={true}/>
             <Button icon={<Shift className={box.direction==='column'?'icon_rotate90':''}/>}
                     onClick={this._addBox.bind(this, box, parent)}/>
             {
-              box.child &&
+              !(box.child instanceof Array && box.child.length > 0) &&
               <Button icon={<Close />} onClick={this._deleteBox.bind(this, box, parent)}/>
             }
           </Menu>
