@@ -420,7 +420,7 @@ export default class RecordList extends Component {
         <Menu icon={<Filter />} dropAlign={{ right: 'right', top: 'top' }}>
           {this.renderGroupBy()}
         </Menu>
-        <Menu icon={<MenuIcon />} closeOnClick={false} dropAlign={{ right: 'right', top: 'top' }}>
+        <Menu icon={<MenuIcon />} dropAlign={{ right: 'right', top: 'top' }}>
           <Anchor icon={this.state.graphType=='legend'?<CheckboxSelected />:<Checkbox />} label="Vertical Graph"
                   onClick={this._toggleGraphType.bind(this)}/>
           <Anchor icon={this.state.aqlInput?<CheckboxSelected />:<Checkbox />} label="Input AQL"
