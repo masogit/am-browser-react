@@ -28,14 +28,16 @@ export default class RecordDetail extends Component {
     if (this.props.body.links)
       this.props.body.links.forEach((link) => {
         var body = this._getLinkBody(link, this.props.record);
-        ExplorerActions.getCount(body).then(records => {
-          link.count = records.count;
-          var links = this.state.links;
-          links.push(link);
-          this.setState({
-            links: links
+        if (body.filter) {
+          ExplorerActions.getCount(body).then(records => {
+            link.count = records.count;
+            var links = this.state.links;
+            links.push(link);
+            this.setState({
+              links: links
+            });
           });
-        });
+        }
       });
   }
 
@@ -50,10 +52,12 @@ export default class RecordDetail extends Component {
     if (link.src_field) {
       var relative_path = link.src_field.relative_path;
       var src_field = relative_path ? relative_path + '.' + link.src_field.sqlname : link.src_field.sqlname;
-      AQL = link.dest_field.sqlname + '=' + record[src_field];
+      if (record[src_field]) {
+        AQL = `${link.dest_field.sqlname}=${record[src_field]}`;
+      }
     }
 
-    body.filter = body.filter ? '(' + body.filter + ') AND ' + AQL : AQL;
+    body.filter = body.filter ? `(${body.filter}) AND ${AQL}` : AQL;
     return body;
   }
 
