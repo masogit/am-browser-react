@@ -15,7 +15,10 @@ import * as AQLActions from '../../actions/aql';
 import Graph from '../commons/Graph';
 import EmptyIcon from '../commons/EmptyIcon';
 import * as Format from '../../util/RecordFormat';
+import {hash} from '../../util/util';
 import cookies from 'js-cookie';
+const storageName = 'AMB_Views_Settings';
+import _ from 'lodash';
 
 export default class RecordList extends Component {
   constructor(props) {
@@ -28,18 +31,17 @@ export default class RecordList extends Component {
       filtered: null,
       record: null,
       searchFields: null,
-      groupby: props.body.groupby,
-      graphType: "distribution",
       graphData: null,
-      param: {
+      param: this.loadSetting(props.body) || {
+        graphType: "distribution",
+        allFields: false,
+        groupby: props.body.groupby || '',
+        aqlInput: false,
         orderby: "",
         offset: 0,
         limit: 30,
         filters: []
       },
-      aqlInput: false,
-      allFields: false,
-      session: null,
       onMoreLock: false,
       locked: false
     };
@@ -47,9 +49,36 @@ export default class RecordList extends Component {
 
   componentWillMount() {
     this._getSearchableFields();
-    this._getRecords();
-    if (this.props.body.groupby)
-      this._getGroupByData(this.props.body.groupby);
+    this._getRecords(this.state.param);
+    if (this.state.param.groupby)
+      this._getGroupByData(this.state.param.groupby);
+  }
+
+  componentWillUnmount() {
+    this.saveSetting();
+  }
+
+  loadSetting(obj) {
+    if (localStorage && localStorage.getItem(storageName)) {
+      let settings = JSON.parse(localStorage.getItem(storageName));
+      const hashBody = hash(obj);
+      let param = _.remove(settings, setting => {
+        return setting.key == hashBody;
+      });
+      if (param.length > 0)
+        return JSON.parse(param[0].value);
+    }
+  }
+
+  saveSetting() {
+    const len = 100; // Store 100 settings
+    if (localStorage) {
+      let settings = localStorage.getItem(storageName) ? JSON.parse(localStorage.getItem(storageName)) : [];
+      const hashBody = hash(this.props.body);
+      settings.unshift({key: hashBody, value: JSON.stringify(this.state.param)});
+      settings.splice(len, (settings.length > len) ? (settings.length - len) : 1);
+      localStorage.setItem(storageName, JSON.stringify(settings));
+    }
   }
 
   _getSearchableFields() {
@@ -66,11 +95,12 @@ export default class RecordList extends Component {
   }
 
   _clearGroupBy(groupby) {
-    if (this.state.groupby == groupby)
-      this.setState({
-        graphData: null,
-        groupby: ''
-      });
+    let param = this.state.param;
+    param.groupby = '';
+    this.setState({
+      graphData: null,
+      param: param
+    });
   }
 
   _getGroupByData(groupby) {
@@ -86,9 +116,11 @@ export default class RecordList extends Component {
     body.groupby = groupby;
     AQLActions.queryAQL(ExplorerActions.getGroupByAql(body)).then((data)=> {
       if (data && data.rows.length > 0) {
+        let param = this.state.param;
+        param.groupby = groupby;
         this.setState({
           graphData: data,
-          groupby: groupby
+          param: param
         });
       }
     });
@@ -139,7 +171,7 @@ export default class RecordList extends Component {
       return;
     }
 
-    var param = Object.assign({}, this.state.param);
+    let param = this.state.param;
     if (param.orderby == (sqlname + ' desc'))
       param.orderby = "";
     else if (param.orderby == sqlname)
@@ -179,8 +211,7 @@ export default class RecordList extends Component {
 
     // press enter to build AQL filter
     if (event.keyCode === 13 && event.target.value.trim()) {
-      if (this.state.aqlInput) {
-        this.refs.search.value = "";
+      if (this.state.param.aqlInput) {
         this._aqlFilterAdd();
       } else {
         var param = this.state.param;
@@ -200,14 +231,13 @@ export default class RecordList extends Component {
               this._getRecords();
 
               // re-groupby
-              let groupby = this.state.groupby || this.props.body.groupby;
-              this._getGroupByData(groupby);
+              this._getGroupByData(this.state.param.groupby);
             });
           }
         }
       }
     } else {
-      if (!this.state.aqlInput) {
+      if (!this.state.param.aqlInput) {
         if (event.target.value.trim() == "")
           this.setState({
             filtered: null
@@ -223,7 +253,7 @@ export default class RecordList extends Component {
   }
 
   getDisplayFields() {
-    const displayNum = this.state.allFields ? this.props.body.fields.length : this.state.numColumn;
+    const displayNum = this.state.param.allFields ? this.props.body.fields.length : this.state.numColumn;
     return this.props.body.fields.filter((field, index) => {
       if (index < displayNum) {
         return field;
@@ -259,8 +289,7 @@ export default class RecordList extends Component {
 
         // re-groupby when user manually input AQL where clause
         if (!filter) {
-          let groupby = this.state.groupby || this.props.body.groupby;
-          this._getGroupByData(groupby);
+          this._getGroupByData(this.state.param.groupby);
         }
       });
     }
@@ -276,13 +305,14 @@ export default class RecordList extends Component {
       this._getRecords();
 
       // re-groupby
-      let groupby = this.state.groupby || this.props.body.groupby;
-      this._getGroupByData(groupby);
+      this._getGroupByData(this.state.param.groupby);
     });
   }
 
   _filterReuse(filter) {
-    this.setState({aqlInput: true});
+    let param = this.state.param;
+    param.aqlInput = true;
+    this.setState({param: param});
     var search = this.refs.search.value.trim();
     if (search && search !== filter)
       this.refs.search.value += ' AND ' + filter;
@@ -303,20 +333,26 @@ export default class RecordList extends Component {
   }
 
   _toggleAQLInput() {
+    let param = this.state.param;
+    param.aqlInput = !param.aqlInput;
     this.setState({
-      aqlInput: !this.state.aqlInput
+      param: param
     });
   }
 
   _toggleGraphType() {
+    let param = this.state.param;
+    param.graphType = (param.graphType == 'legend') ? 'distribution' : 'legend';
     this.setState({
-      graphType: this.state.graphType=='legend' ? 'distribution' : 'legend'
+      param: param
     });
   }
 
   _toggleAllFields() {
+    let param = this.state.param;
+    param.allFields = !param.allFields;
     this.setState({
-      allFields: !this.state.allFields
+      param: param
     });
   }
 
@@ -366,7 +402,7 @@ export default class RecordList extends Component {
   renderGroupBy() {
     let type = this.props.body.sum ? `SUM ${this.props.body.sum}` : `COUNT *`;
     let menus = this.props.body.fields.map((field, index) => {
-      let selected = field.sqlname == this.state.groupby;
+      let selected = (field.sqlname == this.state.param.groupby);
       let label = Format.getDisplayLabel(field);
       return (
         <Anchor key={`a_groupby_${index}`} icon={selected?<CheckboxSelected />:<Checkbox />}
@@ -391,12 +427,12 @@ export default class RecordList extends Component {
 
     const aqlWhere = "press / input AQL where statement";
     const quickSearch = this.state.searchFields ? `press Enter to quick search in ${this.state.searchFields}; ${aqlWhere}` : aqlWhere;
-    const placeholder = this.state.aqlInput ? "input AQL where statement…" : quickSearch;
+    const placeholder = this.state.param.aqlInput ? "input AQL where statement…" : quickSearch;
 
     return (
       <Header justify="between">
         <Title>{this.props.title}</Title>
-        <input type="text" className="flex" ref="search" style={this.state.aqlInput?aqlStyle:{}}
+        <input type="text" className="flex" ref="search" style={this.state.param.aqlInput ? aqlStyle : {}}
                placeholder={placeholder} onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
         <Box direction="column">
           <Anchor onClick={this._getMoreRecords.bind(this)} disabled={this.state.loading}>
@@ -412,11 +448,11 @@ export default class RecordList extends Component {
           {this.renderGroupBy()}
         </Menu>
         <Menu icon={<MenuIcon />} dropAlign={{ right: 'right', top: 'top' }}>
-          <Anchor icon={this.state.graphType=='legend'?<CheckboxSelected />:<Checkbox />} label="Vertical Graph"
+          <Anchor icon={this.state.param.graphType=='legend'?<CheckboxSelected />:<Checkbox />} label="Vertical Graph"
                   onClick={this._toggleGraphType.bind(this)}/>
-          <Anchor icon={this.state.aqlInput?<CheckboxSelected />:<Checkbox />} label="Input AQL"
+          <Anchor icon={this.state.param.aqlInput?<CheckboxSelected />:<Checkbox />} label="Input AQL"
                   onClick={this._toggleAQLInput.bind(this)}/>
-          <Anchor icon={this.state.allFields?<CheckboxSelected />:<Checkbox />} label="Full columns"
+          <Anchor icon={this.state.param.allFields?<CheckboxSelected />:<Checkbox />} label="Full columns"
                   onClick={() => (this.props.body.fields.length > this.state.numColumn) && this._toggleAllFields()}
                   disabled={this.props.body.fields.length <= this.state.numColumn}/>
           <Anchor icon={<Download />} label="Download CSV" onClick={this._download.bind(this)}/>
@@ -432,7 +468,7 @@ export default class RecordList extends Component {
 
   renderList() {
     return (
-      <Table selectable={true} className='autoScroll'
+      <Table selectable={true} className={this.props.root ? 'autoScroll' : ''}
              onMore={this.state.onMoreLock || this.state.filtered ? null : this._getMoreRecords.bind(this)}>
         <thead>
         <tr>
@@ -464,7 +500,7 @@ export default class RecordList extends Component {
       total: true
     };
     return (
-      <Graph type={this.state.graphType} data={this.state.graphData} config={config}
+      <Graph type={this.state.param.graphType} data={this.state.graphData} config={config}
              className={this.state.locked ? 'disabled' : ''}
              onClick={(filter) => {
                if (!this.state.locked) {
@@ -479,7 +515,7 @@ export default class RecordList extends Component {
         {this.renderToolBox()}
         {this.renderAQLFilter()}
         {
-          this.state.graphType=='legend'&&this.state.graphData ?
+          this.state.param.graphType=='legend' && this.state.graphData ?
             <Box flex={true} direction="row" className={`fixMinSizing ${this.props.root?'fixIEScrollBar':''}`}>
               <Box pad={{vertical: 'large'}}>{this.renderGraph()}</Box>
               <Box flex={true}>{this.renderList()}</Box>
