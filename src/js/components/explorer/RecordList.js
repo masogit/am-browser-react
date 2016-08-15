@@ -18,7 +18,7 @@ import * as Format from '../../util/RecordFormat';
 import cookies from 'js-cookie';
 
 export default class RecordList extends Component {
-  constructor() {
+  constructor(props) {
     super();
     this.state = {
       numColumn: 5,
@@ -28,7 +28,7 @@ export default class RecordList extends Component {
       filtered: null,
       record: null,
       searchFields: null,
-      groupby: "",
+      groupby: props.body.groupby,
       graphType: "distribution",
       graphData: null,
       param: {
@@ -49,7 +49,7 @@ export default class RecordList extends Component {
     this._getSearchableFields();
     this._getRecords();
     if (this.props.body.groupby)
-      this._getGroupByData();
+      this._getGroupByData(this.props.body.groupby);
   }
 
   _getSearchableFields() {
@@ -68,8 +68,9 @@ export default class RecordList extends Component {
   _clearGroupBy(groupby) {
     if (this.state.groupby == groupby)
       this.setState({
+        graphData: null,
         groupby: ''
-      }, this._getGroupByData());
+      });
   }
 
   _getGroupByData(groupby) {
@@ -82,25 +83,15 @@ export default class RecordList extends Component {
       }).join(" AND ");
       body.filter = body.filter ? body.filter + ' AND (' + userFilters + ')' : userFilters;
     }
-
-    if (groupby) {
-      body.groupby = groupby;
-      this.setState({
-        groupby: groupby
-      });
-    }
-    if (body.groupby)
-      AQLActions.queryAQL(ExplorerActions.getGroupByAql(body)).then((data)=> {
-        if (data && data.rows.length > 0) {
-          this.setState({
-            graphData: data
-          });
-        }
-      });
-    else
-      this.setState({
-        graphData: null
-      });
+    body.groupby = groupby;
+    AQLActions.queryAQL(ExplorerActions.getGroupByAql(body)).then((data)=> {
+      if (data && data.rows.length > 0) {
+        this.setState({
+          graphData: data,
+          groupby: groupby
+        });
+      }
+    });
   }
 
   _getMoreRecords() {
@@ -375,15 +366,15 @@ export default class RecordList extends Component {
   renderGroupBy() {
     let type = this.props.body.sum ? `SUM ${this.props.body.sum}` : `COUNT *`;
     let menus = this.props.body.fields.map((field, index) => {
-      let selected = (field.sqlname == (this.state.groupby || this.props.body.groupby));
-      let disabled = this.props.body.groupby == field.sqlname;
+      let selected = field.sqlname == this.state.groupby;
       let label = Format.getDisplayLabel(field);
       return (
-        <Anchor key={`a_groupby_${index}`} icon={selected?<CheckboxSelected />:<Checkbox />} disabled={disabled}
+        <Anchor key={`a_groupby_${index}`} icon={selected?<CheckboxSelected />:<Checkbox />}
                 label={label} primary={this.props.body.groupby == field.sqlname}
-                onClick={() => !disabled && (selected ? this._clearGroupBy(field.sqlname) : this._getGroupByData(field.sqlname))}/>
+                onClick={() => selected ? this._clearGroupBy(field.sqlname) : this._getGroupByData(field.sqlname)}/>
       );
     });
+
     menus.unshift(<Anchor key={`a_groupby_${this.props.body.fields.length}`} label={type} icon={<Aggregate />} disabled={true}/>);
 
     return menus;
@@ -417,7 +408,7 @@ export default class RecordList extends Component {
             {`${this.state.timeQuery}ms`}
           </Box>
         </Box>
-        <Menu icon={<Filter />} dropAlign={{ right: 'right', top: 'top' }}>
+        <Menu icon={<Filter />} dropAlign={{ right: 'right', top: 'top' }} >
           {this.renderGroupBy()}
         </Menu>
         <Menu icon={<MenuIcon />} dropAlign={{ right: 'right', top: 'top' }}>
