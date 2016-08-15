@@ -131,8 +131,8 @@ export function getGroupByAql(body) {
   //   aql += ` AND ${fieldsWhere}`;
   if (body.groupby)
     aql += ` group by ${body.groupby}`;
-  if (body.orderby && body.orderby.indexOf(body.groupby) > -1)
-    aql += ` order by ${body.orderby}`;
+  // order by
+  aql += ` order by ${aggregate} desc`;
 
   return aql;
 }
