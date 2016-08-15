@@ -127,8 +127,9 @@ function simpleAQLResult(Query) {
   }
 
 
-  if (Query.Result.Row instanceof Array) {
-    Query.Result.Row.forEach((row) => {
+  if (Query.Result.Row instanceof Array) {  // Multiple rows
+    for (let index in Query.Result.Row) {
+      let row = Query.Result.Row[index];
       var cols = [];
       if (row.Column instanceof Array) {
         row.Column.forEach((col) => {
@@ -145,9 +146,17 @@ function simpleAQLResult(Query) {
       }
       if (cols.length > 0)
         data.rows.push(cols);
-    });
 
-  } else if (Query.Result.Row && Query.Result.Row.Column instanceof Array) {
+      // Truncate for Font End performance
+      if (index > 100) {
+        store.dispatch({
+          type: Types.RECEIVE_WARNING,
+          msg: 'Truncate returned query rows if over 100.'
+        });
+        break;
+      }
+    }
+  } else if (Query.Result.Row && Query.Result.Row.Column instanceof Array) {  // Only one row
     var cols = [];
     Query.Result.Row.Column.forEach((col) => {
       if (col.content)
@@ -158,7 +167,7 @@ function simpleAQLResult(Query) {
     if (cols.length > 0)
       data.rows.push(cols);
 
-  } else {
+  } else {  // Only one row and one column
     var cols = [];
     if (Query.Result.Row && Query.Result.Row.Column.content)
       cols.push(Query.Result.Row.Column.content);
