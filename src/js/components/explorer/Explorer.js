@@ -49,7 +49,10 @@ export default class Explorer extends Component {
   render() {
     return (
       <Box direction="row" flex={true}>
-        {this.state.navigation && <SideBar title={`Views Navigation (${this.state.navigation.length})`} contents={this.state.navigation}/>}
+        {this.state.navigation &&
+          <SideBar title={`Views Navigation (${this.state.navigation.length})`}
+                   contents={this.state.navigation}
+                   focus ={{expand: this.state.view ? this.state.view.category : false, selected: this.state.view ? this.state.view._id: ""}}/>}
         {this.state.view ? <RecordList body={this.state.view.body} title={this.state.view.name} root={true}/> :
           <Box pad={{horizontal: 'medium'}} flex={true} justify='center' align="center">
             <Box size="medium" colorIndex="light-2" pad={{horizontal: 'large', vertical: 'medium'}} align='center'>
