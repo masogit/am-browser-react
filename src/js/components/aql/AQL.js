@@ -136,11 +136,13 @@ export default class AQL extends Component {
 
   _onQuery() {
     AQLActions.queryAQL(this.state.aql.str).then((data) => {
-      const aql = this.state.aql;
-      this.setState({
-        aql,
-        data
-      });
+      if (data) {
+        const aql = this.state.aql;
+        this.setState({
+          aql,
+          data
+        });
+      }
     });
   }
 

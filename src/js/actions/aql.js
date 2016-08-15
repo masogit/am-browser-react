@@ -105,7 +105,12 @@ export function queryAQL(str) {
     return Rest.get(query).then((res) => {
       return simpleAQLResult(res.body.Query);
     }, (err) => {
-      const errorMessage = err.rawResponse || (err.response && err.response.text || err.toString());
+      let errorMessage;
+      if (err.status == 404) {
+        errorMessage = 'Can not get response from rest server, please check your AQL string';
+      } else {
+        errorMessage = err.rawResponse || (err.response && err.response.text || err.toString());
+      }
       store.dispatch({type: Types.RECEIVE_ERROR, msg: errorMessage});
     });
   }
