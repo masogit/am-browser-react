@@ -96,9 +96,9 @@ export default class IntegrationJobContainer extends Component {
       } = this.props;
 
     const jobTable = loading && integrationJobData.length == 0 ? <Spinning/> : (integrationJobDataError ? <Box>{integrationJobDataError}</Box> : this.getJobTable());
-
+    const activeIndex = tabName === 'populationJobs' ? 0: 1;
     return (
-      <Tabs justify="start" activeIndex={tabName === 'populationJobs' ? 0: 1}>
+      <Tabs justify="start" activeIndex={activeIndex} initialIndex={activeIndex}>
         <ActionTab title="Population" onClick={() => {
           clearJobSelection();
           clearJobItemSelection();

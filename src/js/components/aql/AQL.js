@@ -421,7 +421,7 @@ export default class AQL extends Component {
 
     const focus = this.state.aql && {expand: this.state.aql.category, selected: this.state.aql._id};
     const validData = this.state.data.rows.length > 0 && this.state.data.header.length === this.state.data.rows[0].length;
-
+    const activeIndex = validData ? getIndex(this.state.aql.type) : 0;
     return (
       <Box direction="row" flex={true}>
         <SideBar title={`Graphs (${this.state.aqls.length})`} toolbar={toolbar} contents={contents} focus={focus}/>
@@ -499,7 +499,7 @@ export default class AQL extends Component {
               {
                 validData && this.state.aql.form &&
                 <Box pad={{horizontal: 'small'}}>
-                  <Tabs activeIndex={getIndex(this.state.aql.type)} justify='end'>
+                  <Tabs activeIndex={activeIndex} initialIndex={activeIndex} justify='end'>
                     <ActionTab title="Chart" onClick={this._genGraph.bind(this, null, 'chart')} ref='chart'>
                       <ChartForm {...this.state.aql} {...this.state.graphData} genGraph={this._genGraph.bind(this)}
                                                                                data={this.state.data}/>
