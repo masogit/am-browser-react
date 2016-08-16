@@ -47,7 +47,7 @@ export default class NavHeader extends Component {
           {
             links.map((link, index) => (
               <Link key={index} to={link.to}
-                    className={`${this.getActive(link.to)}`}
+                    className={`grommetux-anchor ${this.getActive(link.to)}`}
                     onClick={e => {
                       const state = store.getState();
                       if(state.session.edit) {
@@ -76,7 +76,7 @@ export default class NavHeader extends Component {
                         stopMonitorEdit();
                       }
                     }}
-                    style={{textDecoration: 'none'}}>{link.text}</Link>))
+                    style={{backgroundColor: 'transparent'}}>{link.text}</Link>))
           }
           <SessionMenu />
         </Menu>

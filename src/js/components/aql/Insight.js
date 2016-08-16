@@ -12,7 +12,6 @@ import Close from 'grommet/components/icons/base/Close';
 import Attachment from 'grommet/components/icons/base/Attachment';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
 import Search from 'grommet/components/icons/base/Search';
-import Previous from 'grommet/components/icons/base/Previous';
 import Shift from 'grommet/components/icons/base/Shift';
 import More from 'grommet/components/icons/base/More';
 import Graph from '../commons/Graph';
@@ -30,6 +29,7 @@ export default class Insight extends ComponentBase {
     super();
     this.state = {
       focusTab: null,
+      focusIndex: 0,
       wall: {},
       edit: false,
       carousel: false,
@@ -65,8 +65,9 @@ export default class Insight extends ComponentBase {
     }
   }
 
-  _setFocusTab(tab) {
+  _setFocusTab(tab, index) {
     this.setState({
+      focusIndex: index,
       focusTab: tab
     });
   }
@@ -533,9 +534,9 @@ export default class Insight extends ComponentBase {
       content = data && data[id] && this._renderSingleAQL(data[id]);
     } else {
       content = (
-        <Tabs justify='center' className='flex' initialIndex={this.state.focusTab || 0}>{
-          tabs.map((tab) => (
-            <ActionTab ref={tab.name} title={tab.name} key={tab.name} onClick={this._setFocusTab.bind(this, tab)}
+        <Tabs justify='center' className='flex' activeIndex={this.state.focusIndex}>{
+          tabs.map((tab, index) => (
+            <ActionTab ref={tab.name} title={tab.name} key={tab.name} onClick={this._setFocusTab.bind(this, tab, index)}
                        onEdit={edit}
                        onDoubleClick={this.state.edit ? this._onUpdateTitle.bind(this, tab) : null}>
               {carousel && !edit ? this._buildCarousel(tab) : this._buildBox(tab.box, tab.box, tab.name)}
@@ -569,7 +570,7 @@ export default class Insight extends ComponentBase {
             </Menu>
           }
           {
-            id && this.showBack() && <Anchor icon={<Previous />} label="Back" onClick={() => {
+            id && this.showBack() && <Anchor icon={<Close />} label="Close" onClick={() => {
               history.go(-1);
             }}/>
           }

@@ -499,7 +499,7 @@ export default class AQL extends Component {
               {
                 validData && this.state.aql.form &&
                 <Box pad={{horizontal: 'small'}}>
-                  <Tabs initialIndex={getIndex(this.state.aql.type)} justify='end'>
+                  <Tabs activeIndex={getIndex(this.state.aql.type)} justify='end'>
                     <ActionTab title="Chart" onClick={this._genGraph.bind(this, null, 'chart')} ref='chart'>
                       <ChartForm {...this.state.aql} {...this.state.graphData} genGraph={this._genGraph.bind(this)}
                                                                                data={this.state.data}/>

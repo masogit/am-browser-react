@@ -45,7 +45,7 @@ class Indexer extends Component {
       }
     }
     return (
-      <App >
+      <App centered={false}>
         <Box className='main-container'>
           {header}
           {alert}

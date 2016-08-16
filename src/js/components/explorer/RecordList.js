@@ -517,7 +517,7 @@ export default class RecordList extends Component {
         {
           this.state.param.graphType=='legend' && this.state.graphData ?
             <Box flex={true} direction="row" className={`fixMinSizing ${this.props.root?'fixIEScrollBar':''}`}>
-              <Box pad={{vertical: 'large'}}>{this.renderGraph()}</Box>
+              <Box pad={{vertical: 'large', horizontal: 'small'}}>{this.renderGraph()}</Box>
               <Box flex={true}>{this.renderList()}</Box>
             </Box>
           :

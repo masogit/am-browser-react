@@ -80,7 +80,7 @@ export default class RecordDetail extends Component {
 
     return (
       <Layer closer={true} align="right" onClose={this.props.onClose}>
-        <Tabs justify="start" initialIndex={0}>
+        <Tabs justify="start" activeIndex={0}>
           <ActionTab title={this.props.body.label}>
             <Table>
               <thead>
