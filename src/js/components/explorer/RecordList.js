@@ -404,14 +404,19 @@ export default class RecordList extends Component {
     let menus = this.props.body.fields.map((field, index) => {
       let selected = (field.sqlname == this.state.param.groupby);
       let label = Format.getDisplayLabel(field);
+      if (this.props.body.groupby == field.sqlname)
+        label += ' [Default Group By]';
+      if (field.searchable)
+        label += ' [Quick Searchable]';
+      let isPrimary = (this.props.body.groupby == field.sqlname) || field.searchable;
       return (
         <Anchor key={`a_groupby_${index}`} icon={selected?<CheckboxSelected />:<Checkbox />}
-                label={label} primary={this.props.body.groupby == field.sqlname}
+                label={label} primary={isPrimary}
                 onClick={() => selected ? this._clearGroupBy(field.sqlname) : this._getGroupByData(field.sqlname)}/>
       );
     });
 
-    menus.unshift(<Anchor key={`a_groupby_${this.props.body.fields.length}`} label={type} icon={<Aggregate />} disabled={true}/>);
+    menus.unshift(<Anchor key={`a_groupby_${this.props.body.fields.length}`} label={`${type} FROM ${this.props.body.sqlname}`} icon={<Aggregate />} disabled={true}/>);
 
     return menus;
   }
