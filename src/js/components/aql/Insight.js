@@ -267,7 +267,7 @@ export default class Insight extends ComponentBase {
     let child;
 
     // Handle old box no key or number key
-    if (!box.key || isNaN(box.key))
+    if (!box.key || !isNaN(box.key))
       box.key = this._getID();
 
     if (box.child) {
