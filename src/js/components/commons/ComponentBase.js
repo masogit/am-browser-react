@@ -18,12 +18,12 @@ export default class ComponentBase extends Component {
     this._unmount = false;
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    this.releaseLock();
-  }
-
   shouldComponentUpdate() {
     return !this._unmount;
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    this.releaseLock();
   }
 
   componentWillUnmount() {
