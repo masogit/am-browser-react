@@ -14,6 +14,7 @@ import dateformat from 'dateformat';
 import jeditor from 'gulp-json-editor';
 import gunzip from 'gulp-gunzip';
 import untar from 'gulp-untar';
+import chmod from 'gulp-chmod';
 import version from './version.json';
 import config from './rest/conf/config.json';
 import linuxConfig from './rest/conf/linux-config.json';
@@ -346,6 +347,14 @@ gulp.task('copy-temp-linux', ['dist', 'clean-gen-linux'], function () {
       .pipe(jeditor({'timestamp': version.stage ? timestamp : ''}))
       .pipe(gulp.dest('./gen/temp'));
   return merge(unzip_node, copy_cmd, copy_file, gen_timestamp);
+});
+
+gulp.task('chmod-linux', function () {
+  console.log('chmod 755 for node/npm in linux');
+  // chmod 755 for node/npm in linux
+  return gulp.src('./gen/temp/node/bin/**')
+      .pipe(chmod(755))
+      .pipe(gulp.dest('./gen/temp/node/bin'));
 });
 
 gulp.task('gen-linux', ['copy-temp-linux'], function () {
