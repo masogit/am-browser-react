@@ -1,0 +1,12 @@
+{
+  "Nexus": "http://svs-spm-nexus.hpeswlab.net/nexus/content/repositories/local-assetmanager-snapshot/",
+  "Nexus3rd": "http://svs-spm-nexus.hpeswlab.net/nexus/content/repositories/am3rdtest/",
+  "Classifier": "LINUX-en",
+  "DSN": "AMBrowser",
+  "Description": "AMBrowser",
+  "SERVER": "(local)",
+  "Database": "AMDemo96en",
+  "Tomcat": "8.0.36",
+  "Release_WS": "",
+  "Release_CPP": ""
+}
