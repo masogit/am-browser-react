@@ -15,10 +15,8 @@ import * as AQLActions from '../../actions/aql';
 import Graph from '../commons/Graph';
 import EmptyIcon from '../commons/EmptyIcon';
 import * as Format from '../../util/RecordFormat';
-import {hash} from '../../util/util';
+import {hash, loadSetting, saveSetting} from '../../util/util';
 import cookies from 'js-cookie';
-const storageName = 'AMB_Views_Settings';
-import _ from 'lodash';
 
 export default class RecordList extends Component {
   constructor(props) {
@@ -32,7 +30,7 @@ export default class RecordList extends Component {
       record: null,
       searchFields: null,
       graphData: null,
-      param: this.loadSetting(props.body) || {
+      param: loadSetting(hash({...props.body, filter: ''})) || {
         graphType: "distribution",
         allFields: false,
         groupby: props.body.groupby || '',
@@ -55,30 +53,7 @@ export default class RecordList extends Component {
   }
 
   componentWillUnmount() {
-    this.saveSetting();
-  }
-
-  loadSetting(obj) {
-    if (localStorage && localStorage.getItem(storageName)) {
-      let settings = JSON.parse(localStorage.getItem(storageName));
-      const hashBody = hash(obj);
-      let param = _.remove(settings, setting => {
-        return setting.key == hashBody;
-      });
-      if (param.length > 0)
-        return JSON.parse(param[0].value);
-    }
-  }
-
-  saveSetting() {
-    const len = 100; // Store 100 settings
-    if (localStorage) {
-      let settings = localStorage.getItem(storageName) ? JSON.parse(localStorage.getItem(storageName)) : [];
-      const hashBody = hash(this.props.body);
-      settings.unshift({key: hashBody, value: JSON.stringify(this.state.param)});
-      settings.splice(len, (settings.length > len) ? (settings.length - len) : 1);
-      localStorage.setItem(storageName, JSON.stringify(settings));
-    }
+    saveSetting(hash({...this.props.body, filter: ''}), this.state.param);
   }
 
   _getSearchableFields() {
