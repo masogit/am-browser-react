@@ -1,5 +1,8 @@
 #!/bin/bash
-declare SCRIPTPATH=`dirname "$0"`
+SCRIPTPATH=`dirname "$0"`
+NODE_PATH="`cd $SCRIPTPATH; pwd`/node/bin"
+export PATH=$NODE_PATH:$PATH
+echo $SCRIPTPATH
 if [ ! -d "$SCRIPTPATH/db" ]; then
   mkdir db
   cp -R "$SCRIPTPATH/demo/db" "$SCRIPTPATH"
@@ -13,6 +16,6 @@ if [ ! -f "$SCRIPTPATH/am-browser-config.properties" ]; then
   echo Not found custom am-browser-config.properties, please generate it from am-browser-config.properties.default
   echo ##########################################################
 else
-  "$SCRIPTPATH/node/bin/node" "$SCRIPTPATH/app/server.js"
+  node "$SCRIPTPATH/app/server.js"
 fi
 echo ""
