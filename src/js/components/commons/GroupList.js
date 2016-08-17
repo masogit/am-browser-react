@@ -108,7 +108,7 @@ export default class GroupList extends Component {
         <Box className='autoScroll fixIEScrollBar'>
         {this.props.loading ? <ListItem separator="none"><Spinning /></ListItem>
           :
-          Object.keys(grouped).map((key, i) => {
+          Object.keys(grouped).sort().map((key, i) => {
             const selected = this.props.focus && _.findIndex(grouped[key], (item => this.props.focus.selected == item.key));
             return (
               <Box key={i} direction="column" flex={false}>

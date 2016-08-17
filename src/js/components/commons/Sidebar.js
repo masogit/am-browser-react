@@ -27,7 +27,16 @@ export default class SideBar extends Component {
                   {listItem.icon}
                 </Box>
               </GroupListItem>
-            ))
+            )).sort((a, b) => {
+              if (a.props.child > b.props.child) {
+                return 1;
+              }
+              if (a.props.child < b.props.child) {
+                return -1;
+              }
+              // a must be equal to b
+              return 0;
+            })
           }
         </GroupList>
       );
