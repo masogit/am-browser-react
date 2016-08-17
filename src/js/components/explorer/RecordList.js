@@ -263,10 +263,8 @@ export default class RecordList extends Component {
       }, () => {
         this._getRecords();
 
-        // re-groupby when user manually input AQL where clause
-        if (!filter) {
-          this._getGroupByData(this.state.param.groupby);
-        }
+        // re-groupby
+        this._getGroupByData(this.state.param.groupby);
       });
     }
 
