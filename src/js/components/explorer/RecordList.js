@@ -48,8 +48,7 @@ export default class RecordList extends Component {
   componentWillMount() {
     this._getSearchableFields();
     this._getRecords(this.state.param);
-    if (this.state.param.groupby)
-      this._getGroupByData(this.state.param.groupby);
+    this._getGroupByData(this.state.param.groupby);
   }
 
   componentWillUnmount() {
@@ -79,26 +78,28 @@ export default class RecordList extends Component {
   }
 
   _getGroupByData(groupby) {
-    let body = Object.assign({}, this.props.body);
+    if (groupby) {
+      let body = Object.assign({}, this.props.body);
 
-    // Filter then groupby
-    if (this.state.param.filters.length > 0) {
-      let userFilters = this.state.param.filters.map((filter) => {
-        return '(' + filter + ')';
-      }).join(" AND ");
-      body.filter = body.filter ? body.filter + ' AND (' + userFilters + ')' : userFilters;
-    }
-    body.groupby = groupby;
-    AQLActions.queryAQL(ExplorerActions.getGroupByAql(body)).then((data)=> {
-      if (data && data.rows.length > 0) {
-        let param = this.state.param;
-        param.groupby = groupby;
-        this.setState({
-          graphData: data,
-          param: param
-        });
+      // Filter then groupby
+      if (this.state.param.filters.length > 0) {
+        let userFilters = this.state.param.filters.map((filter) => {
+          return '(' + filter + ')';
+        }).join(" AND ");
+        body.filter = body.filter ? body.filter + ' AND (' + userFilters + ')' : userFilters;
       }
-    });
+      body.groupby = groupby;
+      AQLActions.queryAQL(ExplorerActions.getGroupByAql(body)).then((data)=> {
+        if (data && data.rows.length > 0) {
+          let param = this.state.param;
+          param.groupby = groupby;
+          this.setState({
+            graphData: data,
+            param: param
+          });
+        }
+      });
+    }
   }
 
   _getMoreRecords() {
