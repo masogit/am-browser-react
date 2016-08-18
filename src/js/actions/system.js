@@ -1,7 +1,7 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
 import Rest from '../util/grommet-rest-promise';
-import cookies from 'js-cookie';
+//import cookies from 'js-cookie';
 import * as Types from '../constants/ActionTypes';
 import store from '../store';
 import {
