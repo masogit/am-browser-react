@@ -332,21 +332,30 @@ gulp.task('clean-gen-linux', function () {
   return gulp.src('./gen').pipe(clean({force: true}));
 });
 
-gulp.task('copy-temp-linux', ['dist', 'clean-gen-linux'], function () {
+gulp.task('unzip-node-linux', ['dist', 'clean-gen-linux'], function () {
+  console.log('Unzip node package');
+  // unzip node package
+  var unzip_node = gulp.src('./build/node/node-v4.4.7-darwin-x64.tar.gz', {base : '.'})
+      .pipe(gunzip())
+      .pipe(untar())
+      .pipe(gulp.dest('.'));
+  return unzip_node;
+});
+
+gulp.task('copy-temp-linux', ['unzip-node-linux'], function () {
   console.log('Copy all neccessary files into the gen temp folder');
-  // copy node installation folder and cmd to gen temp
-  var unzip_node = gulp.src('./build/node/node-v4.4.7-linux-x64.zip', {base : '.'})
-      .pipe(unzip())
+  // copy node installation folder and shell to gen temp
+  var copy_node = gulp.src('./build/node/node-v4.4.7-darwin-x64/**')
       .pipe(gulp.dest('./gen/temp/node'));
   var copy_cmd = gulp.src('./build/*.sh')
       .pipe(gulp.dest('./gen/temp'));
   // copy files to gen temp
-  var copy_file = gulp.src(['./app/**', './demo/**', './dist/**', './node_modules/**', './am-browser-config.properties.default'], {base : '.'})
+  var copy_file = gulp.src(['./app/**', './demo/**', './dist/**', './am-browser-config.properties.default'], {base : '.'})
       .pipe(gulp.dest('./gen/temp'));
   var gen_timestamp = gulp.src('./version.json', {base : '.'})
       .pipe(jeditor({'timestamp': version.stage ? timestamp : ''}))
       .pipe(gulp.dest('./gen/temp'));
-  return merge(unzip_node, copy_cmd, copy_file, gen_timestamp);
+  return merge(copy_node, copy_cmd, copy_file, gen_timestamp);
 });
 
 gulp.task('chmod-linux', function () {
