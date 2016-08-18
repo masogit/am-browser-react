@@ -1,5 +1,4 @@
 import React, {Component/*, PropTypes*/} from 'react';
-// import {Link} from 'react-router';
 import history from '../../RouteHistory';
 import Anchor from 'grommet/components/Anchor';
 import SideBar from '../commons/SideBar';
@@ -95,6 +94,9 @@ export default class ViewsDefList extends Component {
               this._editView(view.body.sqlname);
             } else {
               this.dropCurrentPop(`Edit ${view.name}`, this._editView.bind(this, view.body.sqlname));
+            }
+            if (!selectedView._id) {
+              this.props.setSelectedView(view._id, view);
             }
           }}>
             <Edit />
