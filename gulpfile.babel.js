@@ -345,15 +345,7 @@ gulp.task('unzip-node-linux', ['dist', 'clean-gen-linux'], function () {
   return unzip_node;
 });
 
-gulp.task('chmod-linux', ['unzip-node-linux'], function () {
-  console.log('chmod 755 for node/npm in linux');
-  // chmod 755 for node/npm in linux
-  return gulp.src('./build/node-v4.4.7-darwin-x64/node/bin/**')
-      .pipe(chmod(755))
-      .pipe(gulp.dest('./build/node-v4.4.7-darwin-x64/node/bin'));
-});
-
-gulp.task('copy-temp-linux', ['chmod-linux'], function () {
+gulp.task('copy-temp-linux', ['unzip-node-linux'], function () {
   console.log('Copy all neccessary files into the gen temp folder');
   // copy node installation folder and shell to gen temp
   var copy_node = gulp.src('./build/node/node-v4.4.7-darwin-x64/**')
@@ -369,7 +361,15 @@ gulp.task('copy-temp-linux', ['chmod-linux'], function () {
   return merge(copy_node, copy_cmd, copy_file, gen_timestamp);
 });
 
-gulp.task('gen-linux', ['copy-temp-linux'], function () {
+gulp.task('chmod-linux', ['copy-temp-linux'], function () {
+  console.log('chmod 755 for node/npm in linux');
+  // chmod 755 for node/npm in linux
+  return gulp.src('./gen/temp/node/bin/**')
+      .pipe(chmod(755))
+      .pipe(gulp.dest('./gen/temp/node/bin'));
+});
+
+gulp.task('gen-linux', ['chmod-linux'], function () {
   console.log('Generate am-browser.zip from temp folder');
   //var timestamp = Math.floor(new Date().getTime()/1000);
   var build = version.stage ? '-' + timestamp + '_' + version.stage : '';
