@@ -350,7 +350,7 @@ gulp.task('copy-temp-linux', ['unzip-node-linux'], function () {
   var copy_cmd = gulp.src('./build/*.sh')
       .pipe(gulp.dest('./gen/temp'));
   // copy files to gen temp
-  var copy_file = gulp.src(['./app/**', './demo/**', './dist/**', './am-browser-config.properties.default'], {base : '.'})
+  var copy_file = gulp.src(['./app/**', './demo/**', './dist/**', './node_modules/**', './am-browser-config.properties.default'], {base : '.'})
       .pipe(gulp.dest('./gen/temp'));
   var gen_timestamp = gulp.src('./version.json', {base : '.'})
       .pipe(jeditor({'timestamp': version.stage ? timestamp : ''}))
