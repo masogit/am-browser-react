@@ -113,7 +113,7 @@ gulp.task('copy-temp', ['dist', 'clean-gen'], function () {
   var unzip_node = gulp.src('./build/node/nssm-2.24.zip', {base : '.'})
       .pipe(unzip())
       .pipe(gulp.dest('./gen/temp/node'));
-  var copy_cmd = gulp.src('./build/*.bat')
+  var copy_bat = gulp.src('./build/*.bat')
       .pipe(gulp.dest('./gen/temp'));
   // copy files to gen temp
   var copy_file = gulp.src(['./app/**', './demo/**', './dist/**', './node_modules/**', './am-browser-config.properties.default'], {base : '.'})
@@ -121,7 +121,7 @@ gulp.task('copy-temp', ['dist', 'clean-gen'], function () {
   var gen_timestamp = gulp.src('./version.json', {base : '.'})
       .pipe(jeditor({'timestamp': version.stage ? timestamp : ''}))
       .pipe(gulp.dest('./gen/temp'));
-  return merge(unzip_node, copy_cmd, copy_file, gen_timestamp);
+  return merge(unzip_node, copy_bat, copy_file, gen_timestamp);
 });
 
 gulp.task('gen', ['copy-temp'], function () {
@@ -352,7 +352,7 @@ gulp.task('copy-temp-linux', ['unzip-node-linux'], function () {
   // copy node installation folder and shell to gen temp
   var copy_node = gulp.src('./build/node/node-v4.4.7-darwin-x64/**')
       .pipe(gulp.dest('./gen/temp/node'));
-  var copy_cmd = gulp.src('./build/*.sh')
+  var copy_sh = gulp.src('./build/*.sh')
       .pipe(gulp.dest('./gen/temp'));
   // copy files to gen temp
   var copy_file = gulp.src(['./app/**', './demo/**', './dist/**', './node_modules/**', './am-browser-config.properties.default'], {base : '.'})
@@ -360,7 +360,7 @@ gulp.task('copy-temp-linux', ['unzip-node-linux'], function () {
   var gen_timestamp = gulp.src('./version.json', {base : '.'})
       .pipe(jeditor({'timestamp': version.stage ? timestamp : ''}))
       .pipe(gulp.dest('./gen/temp'));
-  return merge(copy_node, copy_cmd, copy_file, gen_timestamp);
+  return merge(copy_node, copy_sh, copy_file, gen_timestamp);
 });
 
 gulp.task('chmod-linux', ['copy-temp-linux'], function () {
@@ -511,7 +511,7 @@ gulp.task('gen-ws-base-linux', ['clean-gen-ws-linux', 'download-ws-linux'], func
   // copy folder and files
   var copy_properties= gulp.src('./rest/conf/package.properties.default')
       .pipe(gulp.dest('./rest/gen/temp/websvc'));
-  var copy_bat = gulp.src('./rest/bin/*.bat')
+  var copy_sh = gulp.src('./rest/bin/*.sh')
       .pipe(gulp.dest('./rest/gen/temp/bin'));
   // copy x64 folder
   var copy_x64 = gulp.src('./rest/x64/**')
@@ -529,7 +529,7 @@ gulp.task('gen-ws-base-linux', ['clean-gen-ws-linux', 'download-ws-linux'], func
   var unzip_download = gulp.src('./rest/downloads/*.zip', {base : '.'})
       .pipe(unzip())
 	  .pipe(gulp.dest('./rest/downloads/temp'));
-  return merge(copy_properties, copy_bat, copy_x64, copy_deploy, rename_war, copy_tomcat, unzip_download);
+  return merge(copy_properties, copy_sh, copy_x64, copy_deploy, rename_war, copy_tomcat, unzip_download);
 });
 
 gulp.task('gen-ws-conf-linux', ['gen-ws-base-linux'], function () {
