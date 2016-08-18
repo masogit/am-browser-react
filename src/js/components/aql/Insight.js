@@ -522,10 +522,12 @@ export default class Insight extends ComponentBase {
         focusIndex = index;
       }
     });
-    let focusTab = tabs[(focusIndex + 1) % tabs.length];
+    focusIndex = (focusIndex + 1) % tabs.length;
+    let focusTab = tabs[focusIndex];
     this.setState({
       tabs: leftTabs,
-      focusTab
+      focusTab,
+      focusIndex
     }, () => {
       if (focusTab)
         this.refs[focusTab.name].props.onRequestForActive();
