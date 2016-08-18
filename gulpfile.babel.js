@@ -12,6 +12,8 @@ import xml2json from 'gulp-xml2json';
 import rename from 'gulp-rename';
 import dateformat from 'dateformat';
 import jeditor from 'gulp-json-editor';
+import gzip from 'gulp-gzip';
+import tar from 'gulp-tar';
 import gunzip from 'gulp-gunzip';
 import untar from 'gulp-untar';
 import chmod from 'gulp-chmod';
@@ -373,10 +375,11 @@ gulp.task('gen-linux', ['chmod-linux'], function () {
   console.log('Generate am-browser.zip from temp folder');
   //var timestamp = Math.floor(new Date().getTime()/1000);
   var build = version.stage ? '-' + timestamp + '_' + version.stage : '';
-  var name = 'am-browser' + '-' + version.number + build + '.zip';
+  var name = 'am-browser' + '-' + version.number + build + '.tar';
   // generate am-browser.zip from temp folder
   return gulp.src('./gen/temp/**')
-      .pipe(zip(name))
+      .pipe(tar(name))
+	  .pipe(gzip())
       .pipe(gulp.dest('./gen'));
 });
 // ========================= AM Browser Rest build script =========================
