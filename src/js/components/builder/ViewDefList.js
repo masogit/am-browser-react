@@ -7,7 +7,7 @@ import Builder from './Builder';
 import Add from 'grommet/components/icons/base/Add';
 import Close from 'grommet/components/icons/base/Close';
 import Edit from 'grommet/components/icons/base/Edit';
-import {alert, monitorEdit} from '../../actions/system';
+import {alert, monitorEdit, stopMonitorEdit} from '../../actions/system';
 import emptyViewDef from '../../reducers/EmptyViewDef.json';
 
 export default class ViewsDefList extends Component {
@@ -40,6 +40,7 @@ export default class ViewsDefList extends Component {
   _closeEdit() {
     this.dropCurrentPop('Back to view list', () => {
       this.props.clearSelectedView();
+      stopMonitorEdit();
       this.setState({
         editView: null,
         schema: '',
