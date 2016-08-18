@@ -469,17 +469,21 @@ export default class Insight extends ComponentBase {
     });
 
     const name = `${namePrefix}${maxIndex + 1}`;
-    this.state.tabs = [...this.state.tabs, {
+    const focusTab = {
       name: name,
       box: {
         direction: 'row',
         child: null
       }
-    }];
-
+    };
+    this.state.tabs.push(focusTab);
     this.state.wall.tabs = this.state.tabs;
+    this.state.focusTab = focusTab;
+    this.state.focusIndex = this.state.tabs.length - 1;
 
-    this.setState(this.state);
+    this.setState(this.state, () => {
+      this.refs[focusTab.name].props.onRequestForActive();
+    });
   }
 
   _onUpdateTitle(tab, name) {
