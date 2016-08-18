@@ -79,6 +79,12 @@ export default class RecordList extends Component {
 
   _getGroupByData(groupby) {
     if (groupby) {
+      if (this.state.records.length == 0) {
+        let param = this.state.param;
+        param.groupby = groupby;
+        this.setState({param});
+        return;
+      }
       let body = Object.assign({}, this.props.body);
 
       // Filter then groupby
