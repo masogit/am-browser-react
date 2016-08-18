@@ -329,7 +329,10 @@ gulp.task('register-odbc', function () {
 gulp.task('clean-gen-linux', function () {
   console.log('Clean gen folder');
   // clean gen folder
-  return gulp.src('./gen').pipe(clean({force: true}));
+  var clean_gen = gulp.src('./gen').pipe(clean({force: true}));
+  // clean lib/download folder
+  var clean_build = gulp.src('./build/node/node-v4.4.7-darwin-x64').pipe(clean({force: true}));
+  return merge(clean_gen, clean_build);
 });
 
 gulp.task('unzip-node-linux', ['dist', 'clean-gen-linux'], function () {
@@ -342,7 +345,15 @@ gulp.task('unzip-node-linux', ['dist', 'clean-gen-linux'], function () {
   return unzip_node;
 });
 
-gulp.task('copy-temp-linux', ['unzip-node-linux'], function () {
+gulp.task('chmod-linux', ['unzip-node-linux'], function () {
+  console.log('chmod 755 for node/npm in linux');
+  // chmod 755 for node/npm in linux
+  return gulp.src('./build/node-v4.4.7-darwin-x64/node/bin/**')
+      .pipe(chmod(755))
+      .pipe(gulp.dest('./build/node-v4.4.7-darwin-x64/node/bin'));
+});
+
+gulp.task('copy-temp-linux', ['chmod-linux'], function () {
   console.log('Copy all neccessary files into the gen temp folder');
   // copy node installation folder and shell to gen temp
   var copy_node = gulp.src('./build/node/node-v4.4.7-darwin-x64/**')
@@ -356,14 +367,6 @@ gulp.task('copy-temp-linux', ['unzip-node-linux'], function () {
       .pipe(jeditor({'timestamp': version.stage ? timestamp : ''}))
       .pipe(gulp.dest('./gen/temp'));
   return merge(copy_node, copy_cmd, copy_file, gen_timestamp);
-});
-
-gulp.task('chmod-linux', function () {
-  console.log('chmod 755 for node/npm in linux');
-  // chmod 755 for node/npm in linux
-  return gulp.src('./gen/temp/node/bin/**')
-      .pipe(chmod(755))
-      .pipe(gulp.dest('./gen/temp/node/bin'));
 });
 
 gulp.task('gen-linux', ['copy-temp-linux'], function () {
