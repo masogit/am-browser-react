@@ -30,7 +30,7 @@ export default class RecordList extends Component {
       record: null,
       searchFields: null,
       graphData: null,
-      param: loadSetting(hash({...props.body, filter: ''})) || {
+      param: loadSetting(hash(Object.assign({},props.body, {filter: ''}))) || {
         graphType: "distribution",
         allFields: false,
         groupby: props.body.groupby || '',
@@ -52,7 +52,7 @@ export default class RecordList extends Component {
   }
 
   componentWillUnmount() {
-    saveSetting(hash({...this.props.body, filter: ''}), this.state.param);
+    saveSetting(hash(Object.assign({}, this.props.body, {filter: ''})), this.state.param);
   }
 
   _getSearchableFields() {
@@ -68,7 +68,7 @@ export default class RecordList extends Component {
       });
   }
 
-  _clearGroupBy(groupby) {
+  _clearGroupBy() {
     let param = this.state.param;
     param.groupby = '';
     this.setState({
@@ -447,7 +447,7 @@ export default class RecordList extends Component {
 
   renderList() {
     return (
-      <Table selectable={true} className={this.props.root ? 'autoScroll' : ''}
+      <Table selectable={true} className='autoScroll'
              onMore={this.state.onMoreLock || this.state.filtered ? null : this._getMoreRecords.bind(this)}>
         <thead>
         <tr>
@@ -489,18 +489,19 @@ export default class RecordList extends Component {
     );
   }
   render() {
+    const fixIEScrollBar = this.props.root ? 'fixIEScrollBar' : '';
     return (
-      <Box pad={{horizontal: 'medium'}} flex={true} className='fixIEScrollBar'>
+      <Box pad={{horizontal: 'medium'}} flex={true} className={fixIEScrollBar}>
         {this.renderToolBox()}
         {this.renderAQLFilter()}
         {
           this.state.param.graphType=='legend' && this.state.graphData ?
-            <Box flex={true} direction="row" className={`fixMinSizing ${this.props.root?'fixIEScrollBar':''}`}>
+            <Box flex={true} direction="row" className={`fixMinSizing ${fixIEScrollBar}`}>
               <Box pad={{vertical: 'large', horizontal: 'small'}}>{this.renderGraph()}</Box>
               <Box flex={true}>{this.renderList()}</Box>
             </Box>
           :
-            <Box className={`fixMinSizing ${this.props.root?'fixIEScrollBar':''}`}>
+            <Box className={`fixMinSizing ${fixIEScrollBar}`}>
               {this.renderGraph()}
               {this.renderList()}
             </Box>

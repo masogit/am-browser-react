@@ -242,6 +242,12 @@ export default class Graph extends Component {
   render() {
     const {type, config, onClick, data, className} = this.props;
 
+    let classes = ['hiddenScroll', 'no-flex'];
+    if (className) {
+      classes.push(className);
+    }
+    classes = classes.join(' ');
+
     if (config == 'init') {
       return this._gen_table(data);
     }
@@ -251,15 +257,15 @@ export default class Graph extends Component {
       if (graph.series.length > 0) {
         switch (type) {
           case 'chart':
-            return <Chart {...graph} className={className}/>;
+            return <Chart {...graph} className={classes}/>;
           case 'meter':
             delete graph.series_col;
             delete graph.col_unit;
-            return <Meter {...graph} className={className}/>;
+            return <Meter {...graph} className={classes}/>;
           case 'distribution':
-            return <Distribution {...graph} className={className}/>;
+            return <Distribution {...graph} className={classes}/>;
           case 'legend':
-            return <Legend {...graph} className={className}/>;
+            return <Legend {...graph} className={classes}/>;
         }
       } else {
         return <div></div>;
