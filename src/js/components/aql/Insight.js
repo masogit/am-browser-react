@@ -469,15 +469,17 @@ export default class Insight extends ComponentBase {
     });
 
     const name = `${namePrefix}${maxIndex + 1}`;
-    this.setState({
-      tabs: [...this.state.tabs, {
-        name: name,
-        box: {
-          direction: 'row',
-          child: null
-        }
-      }]
-    });
+    this.state.tabs = [...this.state.tabs, {
+      name: name,
+      box: {
+        direction: 'row',
+        child: null
+      }
+    }];
+
+    this.state.wall.tabs = this.state.tabs;
+
+    this.setState(this.state);
   }
 
   _onUpdateTitle(tab, name) {
