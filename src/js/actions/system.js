@@ -169,11 +169,11 @@ export function showError(msg) {
   store.dispatch({type: Types.RECEIVE_ERROR, msg});
 }
 
-export function showWarning(errorMessage) {
+export function showWarning(msg) {
   store.dispatch({type: Types.RECEIVE_WARNING, msg});
 }
 
-export function showInfo(errorMessage) {
+export function showInfo(msg) {
   store.dispatch({type: Types.RECEIVE_INFO, msg});
 }
 

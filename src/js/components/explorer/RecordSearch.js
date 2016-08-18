@@ -17,32 +17,24 @@ export default class RecordSearch extends ComponentBase {
       results: [],
       record: null,
       view: null,
-      warning: null
+      warning: null,
+      searchText: '',
+      buttonDisabled: true
     };
     this.lastSearchTime = {};
   }
 
   componentDidMount() {
-    this._search(this.props.params.keyword);
+    this.checkSearchTextLength(this.props.params.keyword, this._search);
     this.loadViews = ExplorerAction.loadViews();
   }
 
-  _search(keyword) {
+  _search() {
     if (!this.acquireLock()) {
       return;
     }
 
-    if (keyword.length <= 2) {
-      this.setState({
-        warning: 'Please type at least 3 words to search'
-      });
-      return;
-    }
-
-    this.setState({
-      warning: ''
-    });
-
+    let keyword = this.state.searchText;
     //  Escaped for SQL. e.g. org.apache.commons.lang.StringEscapeUtils.escapeSql(String str).
     keyword = keyword.replace(/[']/g, '\'\'');
     keyword = encodeURI(keyword);
@@ -79,9 +71,15 @@ export default class RecordSearch extends ComponentBase {
               }
             });
 
-            Promise.all(this.promiseList).then(() => this.lastSearchTime[location.pathname] = {
-              end: new Date(),
-              searching: false
+            Promise.all(this.promiseList).then(() => {
+              this.lastSearchTime[location.pathname] = {
+                end: new Date(),
+                searching: false
+              };
+
+              this.setState({
+                buttonDisabled: false
+              });
             });
           }
         });
@@ -132,7 +130,8 @@ export default class RecordSearch extends ComponentBase {
     return this.lastSearchTime[key] && (this.lastSearchTime[key].searching || (new Date() - this.lastSearchTime[key].end < 2000));
   }
 
-  _onSearch(keyword) {
+  _onSearch() {
+    const keyword = this.state.searchText;
     const pathname = `/search/${encodeURI(keyword)}`;
     if (location.pathname == decodeURI(pathname) && this.doNotNeedSearch(location.pathname)) {
       return;
@@ -147,14 +146,34 @@ export default class RecordSearch extends ComponentBase {
 
     history.push(pathname);
     this.setState({
-      keyword: keyword
+      keyword: keyword,
+      buttonDisabled: true
     });
     this._search(keyword);
   }
 
+  checkSearchTextLength(searchText, callback) {
+    if (searchText.length <= 2) {
+      this.setState({
+        warning: 'Please type at least 3 words to search',
+        searchText,
+        buttonDisabled: true
+      });
+    } else {
+      this.setState({
+        warning: '',
+        searchText,
+        buttonDisabled: false
+      }, callback);
+    }
+  }
+
   _onEnter(event) {
     if (event.keyCode === 13) {
-      this._onSearch(event.target.value.trim());
+      this._onSearch();
+    } else {
+      const searchText = event.target.value.trim();
+      this.checkSearchTextLength(searchText);
     }
   }
 
@@ -184,8 +203,8 @@ export default class RecordSearch extends ComponentBase {
         <Header justify="between" pad={{'horizontal': 'medium'}}>
           <Title>Global Search</Title>
           <input type="search" className="flex" placeholder="Global Record search..." ref="search" style={{marginLeft: '20px', marginRight: '20px'}}
-            onKeyDown={this._onEnter.bind(this)} defaultValue={this.props.params.keyword} maxLength={50}/>
-          <Button label="Search" onClick={()=>this._onSearch(this.refs.search.value)} />
+            value={this.state.searchText} onChange={this._onEnter.bind(this)} onKeyDown={this._onEnter.bind(this)} maxLength={50}/>
+          <Button label="Search" onClick={()=>this._onSearch()} className={this.state.buttonDisabled ? 'grommetux-button--disabled' : ''}/>
         </Header>
         <Split flex="right" fixed={false} className={this.state.warning?'flex':''}>
           <Box pad="medium" flex={true}>
