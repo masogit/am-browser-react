@@ -183,7 +183,8 @@ class MetaData extends ComponentBase {
 
   _onSearch(event) {
     let rows = this.props.rows;
-    const searchText = event.target.value.toLowerCase().trim();
+    const originText = event.target.value;
+    const searchText = originText.toLowerCase().trim();
 
     const filter = (obj) => obj.sqlname.toLowerCase().indexOf(searchText) !== -1;
     const entities = rows.entities ? rows.entities.filter(filter) : [];
@@ -191,7 +192,7 @@ class MetaData extends ComponentBase {
     const fields = rows.fields ? rows.fields.filter(filter) : [];
 
     this.setState({
-      filtered: {entities, links, fields}, searchText
+      filtered: {entities, links, fields}, searchText: originText
     });
   }
 
