@@ -57,7 +57,7 @@ checkForAMInstallation() {
   # The libaamapi*.so exists in the bin subdirectory of an installation, so we check that
   # to verify that we are indeed working from the installed copy. Otherwise we warn of
   # possible changes that may be required for the script to operate properly
-  if [ ! -f "$AM_INSTALL_PATH"/bin/libaamapi*.so ] && (( $WARN_ON_FOREIGN_DIR )); then
+  if [ ! -f "$AM_INSTALL_PATH"/x64/libaamapi*.so ] && (( $WARN_ON_FOREIGN_DIR )); then
     echo ""
     echo "WARNING! The script you are using is not located in the Asset Manager"
     echo "installation directory. This usage is NOT supported and will likely fail!"

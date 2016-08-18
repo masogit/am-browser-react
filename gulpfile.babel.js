@@ -405,10 +405,10 @@ gulp.task('download-metadata-xml-linux', ['clean-download-ws-linux'], function (
   // download openldap metadata xml
   var download_openldap_metadata = download(linuxConfig.Nexus3rd + 'com/hp/am/3rd/openldap/maven-metadata.xml')
 	  .pipe(gulp.dest('./rest/downloads/openldap'));
-  // download libcurl metadata xml
-  var download_libcurl_metadata = download(linuxConfig.Nexus3rd + 'com/hp/am/3rd/libcurl/maven-metadata.xml')
-	  .pipe(gulp.dest('./rest/downloads/libcurl'));
-  return merge(download_ws_metadata, download_x64_metadata, download_openssl_metadata, download_openldap_metadata, download_libcurl_metadata);
+  // download gcc metadata xml
+  var download_gcc_metadata = download(linuxConfig.Nexus3rd + 'com/hp/am/3rd/gcc/maven-metadata.xml')
+	  .pipe(gulp.dest('./rest/downloads/gcc'));
+  return merge(download_ws_metadata, download_x64_metadata, download_openssl_metadata, download_openldap_metadata, download_gcc_metadata);
 });
 
 gulp.task('parse-metadata-xml-linux', ['download-metadata-xml-linux'], function () {
@@ -433,12 +433,12 @@ gulp.task('parse-metadata-xml-linux', ['download-metadata-xml-linux'], function 
       .pipe(xml2json())
 	  .pipe(rename({extname: '.json'}))
 	  .pipe(gulp.dest('./rest/downloads/openldap/json'));
-  // parse libcurl metadata xml
-  var parse_libcurl = gulp.src('./rest/downloads/libcurl/maven-metadata.xml')
+  // parse gcc metadata xml
+  var parse_gcc = gulp.src('./rest/downloads/gcc/maven-metadata.xml')
       .pipe(xml2json())
 	  .pipe(rename({extname: '.json'}))
-	  .pipe(gulp.dest('./rest/downloads/libcurl/json'));
-  return merge(parse_ws, parse_x64, parse_openssl, parse_openldap, parse_libcurl);
+	  .pipe(gulp.dest('./rest/downloads/gcc/json'));
+  return merge(parse_ws, parse_x64, parse_openssl, parse_openldap, parse_gcc);
 });
 
 gulp.task('download-ws-linux', ['parse-metadata-xml-linux'], function () {
@@ -473,10 +473,10 @@ gulp.task('download-ws-linux', ['parse-metadata-xml-linux'], function () {
   var openldap_url = linuxConfig.Nexus3rd + 'com/hp/am/3rd/openldap/'
       + openldap_json.metadata.versioning[0].release[0] + '/openldap-' + openldap_json.metadata.versioning[0].release[0] + '.zip';
   console.log('openldap url is : ' + openldap_url);
-  var libcurl_json = require('./rest/downloads/libcurl/json/maven-metadata.json');
-  var libcurl_url = linuxConfig.Nexus3rd + 'com/hp/am/3rd/libcurl/'
-      + libcurl_json.metadata.versioning[0].release[0] + '/libcurl-' + libcurl_json.metadata.versioning[0].release[0] + '.zip';
-  console.log('libcurl url is : ' + libcurl_url);
+  var gcc_json = require('./rest/downloads/gcc/json/maven-metadata.json');
+  var gcc_url = linuxConfig.Nexus3rd + 'com/hp/am/3rd/gcc/'
+      + gcc_json.metadata.versioning[0].release[0] + '/gcc-' + gcc_json.metadata.versioning[0].release[0] + '.zip';
+  console.log('gcc url is : ' + gcc_url);
   // download ws
   var download_ws = download(ws_url)
 	  .pipe(gulp.dest('./rest/downloads'));
@@ -489,15 +489,15 @@ gulp.task('download-ws-linux', ['parse-metadata-xml-linux'], function () {
   // download openldap
   var download_openldap = download(openldap_url)
 	  .pipe(gulp.dest('./rest/downloads'));
-  // download libcurl
-  var download_libcurl = download(libcurl_url)
+  // download gcc
+  var download_gcc = download(gcc_url)
 	  .pipe(gulp.dest('./rest/downloads'));
   // unzip tomcat instance
   var unzip_tomcat = gulp.src('./rest/lib/apache-tomcat-' + linuxConfig.Tomcat + '.tar.gz', {base : '.'})
       .pipe(gunzip())
 	  .pipe(untar())
 	  .pipe(gulp.dest('.'));
-  return merge(download_ws, download_x64, download_openssl, download_openldap, download_libcurl, unzip_tomcat);
+  return merge(download_ws, download_x64, download_openssl, download_openldap, download_gcc, unzip_tomcat);
 });
 
 gulp.task('clean-gen-ws-linux', function () {
@@ -546,22 +546,22 @@ gulp.task('gen-ws-conf-linux', ['gen-ws-base-linux'], function () {
       .pipe(unzip())
       .pipe(gulp.dest('./rest/gen/temp/deploy'));
   // copy x64 files
-  var copy_dll = gulp.src('./rest/downloads/temp/en/aamapi96_X64.dll')
-      .pipe(rename({basename: 'aamapi96'}))
+  var copy_dll = gulp.src('./rest/downloads/temp/en/libaamapi96_X64.so')
+      .pipe(rename({basename: 'libaamapi96'}))
 	  .pipe(gulp.dest('./rest/gen/temp/x64'));
-  var copy_jni = gulp.src('./rest/downloads/temp/en/amjni96_X64.dll')
-      .pipe(rename({basename: 'amjni96'}))
+  var copy_jni = gulp.src('./rest/downloads/temp/en/libamjni96_X64.so')
+      .pipe(rename({basename: 'libamjni96'}))
 	  .pipe(gulp.dest('./rest/gen/temp/x64'));
-  var copy_res = gulp.src('./rest/downloads/temp/en/aamapi96_X64.res')
-      .pipe(rename({basename: 'aamapi96'}))
+  var copy_res = gulp.src('./rest/downloads/temp/en/libaamapi96_X64.res')
+      .pipe(rename({basename: 'libaamapi96'}))
 	  .pipe(gulp.dest('./rest/gen/temp/x64'));
-  var copy_libcurl= gulp.src('./rest/downloads/temp/libcurl/7.21.6/X64/lib/libcurl64.dll')
+  var copy_gcc= gulp.src(['./rest/downloads/temp/gcc/4.4.5/lib/LINUX/X86_64/libgcc_s.so.1', './rest/downloads/temp/gcc/4.4.5/lib/LINUX/X86_64/libstdc++.so.6'])
 	  .pipe(gulp.dest('./rest/gen/temp/x64'));
-  var copy_openldap= gulp.src('./rest/downloads/temp/openldap/openldap-2.4.44/lib/win/X64/oldap.dll')
+  var copy_openldap= gulp.src(['./rest/downloads/temp/openldap/openldap-2.4.44/lib/LINUX/X86_64/liblber-2.4.so.2', './rest/downloads/temp/openldap/openldap-2.4.44/lib/LINUX/X86_64/liboldap.so'])
 	  .pipe(gulp.dest('./rest/gen/temp/x64'));
-  var copy_openssl= gulp.src(['./rest/downloads/temp/openssl/openssl-1.0.2h/lib/win/X64/libeay64-10.dll', './rest/downloads/temp/openssl/openssl-1.0.2h/lib/win/X64/ssleay64-10.dll'])
+  var copy_openssl= gulp.src(['./rest/downloads/temp/openssl/openssl-1.0.2h/lib/LINUX/X86_64/libcrypto-10.so', './rest/downloads/temp/openssl/openssl-1.0.2h/lib/LINUX/X86_64/libssl-10.so'])
 	  .pipe(gulp.dest('./rest/gen/temp/x64'));
-  return merge(copy_conf, copy_server, copy_product, unzip_ant, copy_dll, copy_jni, copy_res, copy_libcurl, copy_openldap, copy_openssl);
+  return merge(copy_conf, copy_server, copy_product, unzip_ant, copy_dll, copy_jni, copy_res, copy_gcc, copy_openldap, copy_openssl);
 });
 
 gulp.task('gen-ws-linux', ['gen-ws-conf-linux'], function () {
@@ -569,9 +569,10 @@ gulp.task('gen-ws-linux', ['gen-ws-conf-linux'], function () {
   // generate am-browser-rest.zip from temp folder
   //var timestamp = Math.floor(new Date().getTime()/1000);
   var build = version.stage ? '-' + timestamp + '_' + version.stage : '';
-  var name = 'am-browser-rest' + '-' + version.number + build + '.zip';
+  var name = 'am-browser-rest' + '-' + version.number + build + '.tar';
   return gulp.src('./rest/gen/temp/**')
-      .pipe(zip(name))
+      .pipe(tar(name))
+	  .pipe(gzip())
       .pipe(gulp.dest('./rest/gen'));
 });
 grommetToolbox(gulp, opts);
