@@ -25,7 +25,7 @@ export function init(email, headerString) {
 
 export function initToken() {
   return Rest.get(CSRF_DEF_URL).then(res => {
-    console.log('CSRF: ' + cookies.get('csrf-token'));
+    //console.log('CSRF: ' + cookies.get('csrf-token'));
   }, err => {
     if (err) {
       console.log('Get CSRF failed');
