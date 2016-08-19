@@ -27,25 +27,24 @@ export default class Insight extends ComponentBase {
 
   constructor() {
     super();
+    const tabs = [{
+      name: 'default',
+      box: {
+        direction: 'row',
+        child: null
+      }
+    }];
     this.state = {
       focusTab: null,
       focusIndex: 0,
-      wall: {},
+      wall: {tabs},
       edit: false,
       carousel: false,
       aqls: [],
-      tabs: [
-        {
-          name: 'default',
-          box: {
-            direction: 'row',
-            child: null
-          }
-        }
-      ],
-
+      tabs,
       data: {}
     };
+
     this._buildBox.bind(this);
     this._buildActions.bind(this);
     this._addBox.bind(this);
@@ -481,9 +480,7 @@ export default class Insight extends ComponentBase {
     this.state.focusTab = focusTab;
     this.state.focusIndex = this.state.tabs.length - 1;
 
-    this.setState(this.state, () => {
-      this.refs[focusTab.name].props.onRequestForActive();
-    });
+    this.setState(this.state);
   }
 
   _onUpdateTitle(tab, name) {
@@ -524,14 +521,11 @@ export default class Insight extends ComponentBase {
     });
     focusIndex = (focusIndex + 1) % tabs.length;
     let focusTab = tabs[focusIndex];
-    this.setState({
-      tabs: leftTabs,
-      focusTab,
-      focusIndex
-    }, () => {
-      if (focusTab)
-        this.refs[focusTab.name].props.onRequestForActive();
-    });
+    this.state.tabs = leftTabs;
+    this.state.wall.tabs = leftTabs;
+    this.state.focusIndex = focusIndex > 0 ? focusIndex -1 : focusIndex;
+    this.state.focusTab = focusTab;
+    this.setState(this.state);
   }
 
   render() {
@@ -572,7 +566,7 @@ export default class Insight extends ComponentBase {
               {edit && <Anchor icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>}
               {edit && <Anchor icon={<Add />} onClick={this._addTab.bind(this)} label="Add Tab"/>}
               {edit &&
-              <Anchor icon={<Close />} onClick={this._onRemove.bind(this, this.state.focusTab)} label="Delete Tab"/>}
+              <Anchor icon={<Close />} onClick={() => this.state.tabs.length > 1 && this._onRemove(this.state.focusTab)} label="Delete Tab" disabled={this.state.tabs.length <= 1}/>}
               <CheckBox id="edit" label="Edit" checked={edit} onChange={this._toggleEdit.bind(this)}
                         toggle={true}/>
             </Menu>
