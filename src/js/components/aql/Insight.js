@@ -35,7 +35,7 @@ export default class Insight extends ComponentBase {
       }
     }];
     this.state = {
-      focusTab: null,
+      focusTab: tabs[0],
       focusIndex: 0,
       wall: {tabs},
       edit: false,
@@ -120,8 +120,7 @@ export default class Insight extends ComponentBase {
           this.wall = _.cloneDeep(walls[0]);
           this.setState({
             wall: walls[0],
-            tabs: walls[0].tabs,
-            focusTab: walls[0].tabs[0]
+            tabs: walls[0].tabs
           }, () => {
             this._findTabAqls(walls[0].tabs);
             monitorEdit(this.wall, this.state.wall);
