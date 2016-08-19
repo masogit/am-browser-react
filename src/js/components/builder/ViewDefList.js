@@ -6,7 +6,7 @@ import Builder from './Builder';
 import Add from 'grommet/components/icons/base/Add';
 import Close from 'grommet/components/icons/base/Close';
 import Edit from 'grommet/components/icons/base/Edit';
-import {alert, stopMonitorEdit} from '../../actions/system';
+import {alert, monitorEdit, stopMonitorEdit} from '../../actions/system';
 import emptyViewDef from '../../reducers/EmptyViewDef.json';
 
 export default class ViewsDefList extends Component {
@@ -33,6 +33,7 @@ export default class ViewsDefList extends Component {
     });
     this.props.newSelectedView();
     history.push(`/views/`);
+    monitorEdit(_.cloneDeep(emptyViewDef), 'views.selectedView');
   }
 
   _closeEdit() {
