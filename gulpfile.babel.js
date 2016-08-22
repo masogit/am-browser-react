@@ -532,7 +532,15 @@ gulp.task('gen-ws-base-linux', ['clean-gen-ws-linux', 'download-ws-linux'], func
   return merge(copy_properties, copy_sh, copy_x64, copy_deploy, rename_war, copy_tomcat, unzip_download);
 });
 
-gulp.task('gen-ws-conf-linux', ['gen-ws-base-linux'], function () {
+gulp.task('gen-ws-chmod-linux', ['gen-ws-base-linux'], function () {
+  console.log('chmod 755 for shell in linux');
+  // chmod 755 for shell in linux
+  return gulp.src('./rest/gen/temp/bin/**')
+      .pipe(chmod(755))
+      .pipe(gulp.dest('./rest/gen/temp/bin'));
+});
+
+gulp.task('gen-ws-conf-linux', ['gen-ws-chmod-linux'], function () {
   console.log('Copy ws conf');
   // generate ws package
   var copy_conf = gulp.src('./rest/conf/Catalina/**')
