@@ -541,7 +541,10 @@ gulp.task('gen-ws-chmod-linux', ['gen-ws-base-linux'], function () {
   var chmod_deploy = gulp.src('./rest/gen/temp/deploy/**')
       .pipe(chmod(755))
       .pipe(gulp.dest('./rest/gen/temp/deploy'));
-  return merge(chmod_bin, chmod_deploy);
+  var chmod_ant = gulp.src('./rest/gen/temp/deploy/ant/bin/**')
+      .pipe(chmod(755))
+      .pipe(gulp.dest('./rest/gen/temp/deploy/ant/bin'));
+  return merge(chmod_bin, chmod_deploy, chmod_ant);
 });
 
 gulp.task('gen-ws-conf-linux', ['gen-ws-chmod-linux'], function () {
