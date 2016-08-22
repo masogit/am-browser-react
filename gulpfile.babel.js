@@ -535,9 +535,13 @@ gulp.task('gen-ws-base-linux', ['clean-gen-ws-linux', 'download-ws-linux'], func
 gulp.task('gen-ws-chmod-linux', ['gen-ws-base-linux'], function () {
   console.log('chmod 755 for shell in linux');
   // chmod 755 for shell in linux
-  return gulp.src('./rest/gen/temp/bin/**')
+  var chmod_bin = gulp.src('./rest/gen/temp/bin/**')
       .pipe(chmod(755))
       .pipe(gulp.dest('./rest/gen/temp/bin'));
+  var chmod_deploy = gulp.src('./rest/gen/temp/deploy/*.sh')
+      .pipe(chmod(755))
+      .pipe(gulp.dest('./rest/gen/temp/deploy'));
+  return merge(chmod_bin, chmod_deploy);
 });
 
 gulp.task('gen-ws-conf-linux', ['gen-ws-chmod-linux'], function () {
