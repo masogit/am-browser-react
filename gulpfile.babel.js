@@ -532,22 +532,7 @@ gulp.task('gen-ws-base-linux', ['clean-gen-ws-linux', 'download-ws-linux'], func
   return merge(copy_properties, copy_sh, copy_x64, copy_deploy, rename_war, copy_tomcat, unzip_download);
 });
 
-gulp.task('gen-ws-chmod-linux', ['gen-ws-base-linux'], function () {
-  console.log('chmod 755 for shell in linux');
-  // chmod 755 for shell in linux
-  var chmod_bin = gulp.src('./rest/gen/temp/bin/**')
-      .pipe(chmod(755))
-      .pipe(gulp.dest('./rest/gen/temp/bin'));
-  var chmod_deploy = gulp.src('./rest/gen/temp/deploy/**')
-      .pipe(chmod(755))
-      .pipe(gulp.dest('./rest/gen/temp/deploy'));
-  var chmod_ant = gulp.src('./rest/gen/temp/deploy/ant/bin/**')
-      .pipe(chmod(755))
-      .pipe(gulp.dest('./rest/gen/temp/deploy/ant/bin'));
-  return merge(chmod_bin, chmod_deploy, chmod_ant);
-});
-
-gulp.task('gen-ws-conf-linux', ['gen-ws-chmod-linux'], function () {
+gulp.task('gen-ws-conf-linux', ['gen-ws-base-linux'], function () {
   console.log('Copy ws conf');
   // generate ws package
   var copy_conf = gulp.src('./rest/conf/Catalina/**')
@@ -579,7 +564,19 @@ gulp.task('gen-ws-conf-linux', ['gen-ws-chmod-linux'], function () {
   return merge(copy_conf, copy_server, copy_product, unzip_ant, copy_dll, copy_jni, copy_res, copy_gcc, copy_openldap, copy_openssl);
 });
 
-gulp.task('gen-ws-linux', ['gen-ws-conf-linux'], function () {
+gulp.task('gen-ws-chmod-linux', ['gen-ws-conf-linux'], function () {
+  console.log('chmod 755 for shell in linux');
+  // chmod 755 for shell in linux
+  var chmod_bin = gulp.src('./rest/gen/temp/bin/**')
+      .pipe(chmod(755))
+      .pipe(gulp.dest('./rest/gen/temp/bin'));
+  var chmod_deploy = gulp.src('./rest/gen/temp/deploy/**')
+      .pipe(chmod(755))
+      .pipe(gulp.dest('./rest/gen/temp/deploy'));
+  return merge(chmod_bin, chmod_deploy);
+});
+
+gulp.task('gen-ws-linux', ['gen-ws-chmod-linux'], function () {
   console.log('Generate am-browser-rest.zip from temp folder');
   // generate am-browser-rest.zip from temp folder
   //var timestamp = Math.floor(new Date().getTime()/1000);
