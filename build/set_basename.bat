@@ -51,7 +51,9 @@ if exist %originFullPath% (
       set key=%%a
       call :TRIM key
       if '!key!' equ 'window.amb_basename' (
+        echo ####### INFO: SET BASE NAME #########
         echo base name is set to %basename%
+        echo ##########################################################
         echo window.amb_basename='%basename%'; >> %htmlFullPath%
       ) else (
         echo %%i >> %htmlFullPath%
