@@ -30,5 +30,4 @@ echo Cannot install am-browser-service, please check if this service has already
 echo ##########################################################
 echo.
 :end
-call set_basename.bat
 pause
