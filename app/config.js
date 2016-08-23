@@ -15,10 +15,13 @@ module.exports = {
   rest_protocol: process.env.AMB_REST_PROTOCOL || properties.get('rest.protocol'),
   rest_server: process.env.AMB_REST_SERVER || properties.get('rest.server'),
   rest_port: process.env.AMB_REST_PORT || properties.get('rest.port'),
+  base: properties.get('rest.base'),
+  version: properties.get('rest.version'),
 
   node_server: process.env.AMB_NODE_SERVER || properties.get('node.server'),
   node_port: process.env.AMB_NODE_PORT || properties.get('node.port'),
-  node_https_port: process.env.AMB_REST_HTTPS_PORT || properties.get('node.https_port'),
+  node_https_port: process.env.AMB_NODE_HTTPS_PORT || properties.get('node.https_port'),
+  node_base: process.env.AMB_NODE_BASE_NAME || properties.get('node.base') || '/',
 
   isDebug: process.env.AMB_NODE_DEBUG || properties.get('node.is_debug'),
   enable_csrf: process.env.AMB_NODE_CSRF || properties.get('node.enable_csrf'),
@@ -28,8 +31,6 @@ module.exports = {
   ucmdb_browser_port: process.env.UCMDB_BROWSER_PORT || properties.get('ucmdb.browser_port'),
   ucmdb_browser_param: properties.get('ucmdb.browser_param'),
 
-  base: properties.get('rest.base'),
-  version: properties.get('rest.version'),
   db_folder: properties.get('db.folder'),
 
   slack_url: properties.get('slack.url'),
