@@ -573,7 +573,10 @@ gulp.task('gen-ws-chmod-linux', ['gen-ws-conf-linux'], function () {
   var chmod_deploy = gulp.src('./rest/gen/temp/deploy/**')
       .pipe(chmod(755))
       .pipe(gulp.dest('./rest/gen/temp/deploy'));
-  return merge(chmod_bin, chmod_deploy);
+  var chmod_tomcat = gulp.src('./rest/gen/temp/apache-tomcat-' + linuxConfig.Tomcat + '/bin/**')
+      .pipe(chmod(755))
+      .pipe(gulp.dest('./rest/gen/temp/apache-tomcat-' + linuxConfig.Tomcat + '/bin'));
+  return merge(chmod_bin, chmod_deploy, chmod_tomcat);
 });
 
 gulp.task('gen-ws-linux', ['gen-ws-chmod-linux'], function () {
