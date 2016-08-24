@@ -40,6 +40,9 @@ const opts = {
   mainJs: 'src/js/index.js',
   mainScss: 'src/scss/index.scss',
   webpack: {
+    output: {
+      publicPath: '/'
+    },
     resolve: {
       root: [
         path.resolve(__dirname, 'src/js'),
