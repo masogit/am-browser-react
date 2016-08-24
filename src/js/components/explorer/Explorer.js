@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import * as ExplorerActions from '../../actions/explorer';
 import RecordList from './RecordList';
 import Box from 'grommet/components/Box';
-import SideBar from '../commons/SideBar';
+import SideBar from '../commons/Sidebar';
 
 export default class Explorer extends Component {
 

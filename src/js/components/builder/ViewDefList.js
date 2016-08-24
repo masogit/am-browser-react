@@ -1,7 +1,7 @@
 import React, {Component/*, PropTypes*/} from 'react';
 import history from '../../RouteHistory';
 import Anchor from 'grommet/components/Anchor';
-import SideBar from '../commons/SideBar';
+import SideBar from '../commons/Sidebar';
 import Builder from './Builder';
 import Add from 'grommet/components/icons/base/Add';
 import Close from 'grommet/components/icons/base/Close';

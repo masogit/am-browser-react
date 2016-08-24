@@ -11,7 +11,7 @@ import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
 import RecordListLayer from '../explorer/RecordListLayer';
 import ActionTab from '../commons/ActionTab';
-import SideBar from '../commons/SideBar';
+import SideBar from '../commons/Sidebar';
 import EmptyIcon from '../commons/EmptyIcon';
 import * as Format from '../../util/RecordFormat';
 import Download from 'grommet/components/icons/base/Download';
