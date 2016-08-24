@@ -6,7 +6,7 @@ import Builder from './Builder';
 import Add from 'grommet/components/icons/base/Add';
 import Close from 'grommet/components/icons/base/Close';
 import Edit from 'grommet/components/icons/base/Edit';
-import {alert, monitorEdit, stopMonitorEdit} from '../../actions/system';
+import {dropCurrentPop, monitorEdit, stopMonitorEdit} from '../../actions/system';
 import emptyViewDef from '../../reducers/EmptyViewDef.json';
 
 export default class ViewsDefList extends Component {
@@ -53,16 +53,7 @@ export default class ViewsDefList extends Component {
     const selectedView = this.props.selectedView;
     const originView = this.props.views.filter(view => selectedView._id == view._id)[0];
 
-    if(selectedView._id ? !_.isEqual(originView, selectedView) : !_.isEmpty(selectedView) && !_.isEqual(emptyViewDef, selectedView)) {
-      const alertInfo = {
-        onConfirm: onConfirm,
-        msg: 'Your current change are not saved, do you want to drop the change?',
-        title
-      };
-      alert(alertInfo);
-    } else {
-      onConfirm();
-    }
+    dropCurrentPop(originView, selectedView, emptyViewDef, title, onConfirm);
   }
 
   render() {

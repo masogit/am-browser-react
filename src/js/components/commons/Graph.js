@@ -277,7 +277,7 @@ export default class Graph extends Component {
 
 Graph.propTypes = {
   type: PropTypes.string.isRequired,
-  config: PropTypes.object.isRequired,
+  config: PropTypes.oneOfType([PropTypes.object, PropTypes.string]).isRequired,
   data: PropTypes.shape({
     header: PropTypes.array,
     rows: PropTypes.array

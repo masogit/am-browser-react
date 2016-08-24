@@ -188,3 +188,45 @@ export function stopMonitorEdit() {
 export function alert(alertInfo) {
   store.dispatch({type: Types.ALERT, msg: alertInfo.msg, onConfirm: alertInfo.onConfirm, title: alertInfo.title});
 }
+
+export function dropCurrentPop(origin, current, initState, title, onConfirm) {
+  if(current._id ? !_.isEqual(origin, current) : !_.isEmpty(current) && !_.isEqual(initState, current)) {
+    const alertInfo = {
+      onConfirm,
+      title,
+      msg: 'Your current change are not saved, click confirm to drop the change'
+    };
+    alert(alertInfo);
+  } else {
+    onConfirm();
+  }
+}
+
+export function dropCurrentPop_stopMonitor(title, onConfirm) {
+  const state = store.getState();
+  if(state.session.edit) {
+    let now = state.session.edit.now;
+    if (typeof now == 'string') {
+      const params = now.split('.');
+      now = params.reduce((state, next) => state[next], state);
+    }
+    if(!_.isEqual(state.session.edit.origin, now)) {
+      const alertInfo = {
+        onConfirm: () => {
+          stopMonitorEdit();
+          onConfirm();
+        },
+        msg: 'Your current change are not saved, click confirm to drop the change',
+        title
+      };
+
+      alert(alertInfo);
+    } else {
+      stopMonitorEdit();
+      onConfirm();
+    }
+  } else {
+    stopMonitorEdit();
+    onConfirm();
+  }
+}

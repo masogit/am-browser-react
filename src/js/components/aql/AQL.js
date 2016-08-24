@@ -19,7 +19,7 @@ import More from 'grommet/components/icons/base/More';
 import Mail from 'grommet/components/icons/base/Mail';
 import Trash from 'grommet/components/icons/base/Trash';
 import {saveAs} from 'file-saver';
-import {monitorEdit, stopMonitorEdit, alert} from '../../actions/system';
+import {monitorEdit, stopMonitorEdit, dropCurrentPop} from '../../actions/system';
 import Textarea from '../commons/Textarea';
 import SearchInput from '../commons/SearchInput';
 
@@ -378,16 +378,7 @@ export default class AQL extends Component {
     const currentAQL = _.cloneDeep(this.state.aql);
 
     delete currentAQL.data;
-    if(this.state.aql._id ? !_.isEqual(originAQL, currentAQL) : !_.isEqual(this.initAQL, currentAQL)) {
-      const alertInfo = {
-        onConfirm: onConfirm,
-        msg: 'Your current change are not saved, click confirm to drop the change',
-        title
-      };
-      alert(alertInfo);
-    } else {
-      onConfirm();
-    }
+    dropCurrentPop(originAQL, currentAQL, this.initAQL, title, onConfirm);
   }
 
   render() {
