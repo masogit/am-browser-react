@@ -56,7 +56,9 @@ if exist %originFullPath% (
         echo ##########################################################
         echo window.amb_basename='%basename%'; >> %htmlFullPath%
       ) else (
-        EndLocal & echo %%i >> %htmlFullPath%
+        SetLocal DISABLEDELAYEDEXPANSION
+        echo %%i >> %htmlFullPath%
+        EndLocal
       )
     )
   )
