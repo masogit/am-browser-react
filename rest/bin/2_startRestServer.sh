@@ -23,6 +23,7 @@ if [[ -n "$JAVA_HOME" ]] && [[ -x "$JAVA_HOME/bin/java" ]];  then
     *)
     echo Java is not 64 bit
     ;;
+  esac
 else
   echo The JAVA_HOME environment variable is not defined correctly
   echo This environment variable is needed to run this program
