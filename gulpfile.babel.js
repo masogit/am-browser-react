@@ -52,7 +52,7 @@ const opts = {
   devServerPort: 8001,
   // The 8010 port number needs to align with hostName in index.js
   devServerProxy: {
-    '/*': `http://${amb_config.node_server=='0.0.0.0'?'localhost':amb_config.node_server}:${amb_config.node_port}`
+    '/': `http://${amb_config.node_server=='0.0.0.0'?'localhost':amb_config.node_server}:${amb_config.node_port}`
   },
   websocketHost: 'localhost:8010',
   alias: {
