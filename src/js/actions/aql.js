@@ -4,6 +4,10 @@ import store from '../store';
 import * as Types from '../constants/ActionTypes';
 import _ from 'lodash';
 
+const dummy_promise = {
+  then: () => {}
+};
+
 export function saveWall(wall) {
   return Rest.post(INSIGHT_DEF_URL, wall).then((res) => {
     if (res.text) {
@@ -79,6 +83,7 @@ export function queryAQL(str) {
     fields: ""
   };
 
+  let errorMessage;
   // get key word position
   // todo: check if AQL can contain multipule key words
   var idx_SELECT = str.toLowerCase().indexOf("select");
@@ -86,7 +91,9 @@ export function queryAQL(str) {
   var idx_WHERE = str.toLowerCase().indexOf("where");
 
   if (idx_SELECT < 0 || idx_FROM < 0) {
-    store.dispatch({type: Types.RECEIVE_ERROR, msg: "AQL is invalid! Can not query data for Graph"});
+    errorMessage =  "AQL is invalid! Can not query data for Graph";
+    store.dispatch({type: Types.RECEIVE_ERROR, msg: errorMessage});
+    return dummy_promise;
   } else {
     // get fields from SELECT .. FROM
     aql.fields = str.substring(idx_SELECT + 6, idx_FROM).trim();
@@ -105,7 +112,6 @@ export function queryAQL(str) {
     return Rest.get(query).then((res) => {
       return simpleAQLResult(res.body.Query);
     }, (err) => {
-      let errorMessage;
       if (err.status == 404) {
         errorMessage = 'Can not get response from rest server, please check your AQL string';
       } else {
