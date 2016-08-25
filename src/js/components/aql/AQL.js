@@ -19,7 +19,7 @@ import More from 'grommet/components/icons/base/More';
 import Mail from 'grommet/components/icons/base/Mail';
 import Trash from 'grommet/components/icons/base/Trash';
 import {saveAs} from 'file-saver';
-import {monitorEdit, stopMonitorEdit, dropCurrentPop} from '../../actions/system';
+import {monitorEdit, stopMonitorEdit, dropCurrentPop, showInfo} from '../../actions/system';
 import Textarea from '../commons/Textarea';
 import SearchInput from '../commons/SearchInput';
 
@@ -137,11 +137,14 @@ export default class AQL extends Component {
   _onQuery() {
     AQLActions.queryAQL(this.state.aql.str).then((data) => {
       if (data) {
-        const aql = this.state.aql;
-        this.setState({
-          aql,
-          data
-        });
+        if (data.rows.length == 0) {
+          showInfo('No records found for this AQL');
+        } else {
+          this.setState({
+            aql: this.state.aql,
+            data
+          });
+        }
       }
     });
   }
