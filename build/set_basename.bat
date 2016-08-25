@@ -14,15 +14,23 @@ echo. > %htmlFullPath%
 
 SetLocal EnableDelayedExpansion
 if exist %properties_default% (
+  set node=0
   for /f "eol=# tokens=*" %%i in (%properties_default%) do (
     for /f "delims== tokens=1,2" %%a in ("%%i") do (
       set key=%%a
       call :TRIM key
-      if '!key!' equ 'base' (
-        set value=%%b
-        call :TRIM value
-        set basename=!value!
-        goto check_properties
+      if !node! equ 1 (
+        if "!key:~0,1!" equ "[" goto check_properties
+      )
+
+      if "!key!" equ "[node]" set node=1
+      if "!key!" equ "base" (
+        if !node! equ 1 (
+          set value=%%b
+          call :TRIM value
+          set basename=!value!
+          goto check_properties
+        )
       )
     )
   )
@@ -30,15 +38,24 @@ if exist %properties_default% (
 
 :check_properties
 if exist %properties% (
+  set node=0
   for /f "eol=# tokens=*" %%i in (%properties%) do (
     for /f "delims== tokens=1,*" %%a in ("%%i") do (
       set key=%%a
       call :TRIM key
-      if '!key!' equ 'base' (
-        set value=%%b
-        call :TRIM value
-        set basename=!value!
-        goto :udpate_html
+      if !node! equ 1 (
+        if "!key:~0,1!" equ "[" goto udpate_html
+      )
+
+      if "!key!" equ "[node]" set node=1
+
+      if "!key!" equ "base" (
+        if !node! equ 1 (
+          set value=%%b
+          call :TRIM value
+          set basename=!value!
+          goto udpate_html
+        )
       )
     )
   )
