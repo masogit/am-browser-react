@@ -3,6 +3,7 @@ SCRIPTPATH=`dirname "$0"`
 JAVA_LIB_PATH=$SCRIPTPATH/../x64
 CATALINA_HOME=$SCRIPTPATH/../apache-tomcat-8.0.36
 CATALINA_BASE=$SCRIPTPATH/../apache-tomcat-8.0.36
+export LD_LIBRARY_PATH=$JAVA_LIB_PATH:$LD_LIBRARY_PATH
 if [[ -n "$JAVA_HOME" ]] && [[ -x "$JAVA_HOME/bin/java" ]];  then
   BIT=`"$JAVA_HOME/bin/java" -version 2>&1`
   case "$BIT" in
