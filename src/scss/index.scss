@@ -98,3 +98,7 @@ $hpe-fonts-path: './fonts';
     width: $sidebar-width;
   }
 }
+
+html {
+  overflow: auto;
+}
