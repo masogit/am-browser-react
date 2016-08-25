@@ -26,6 +26,3 @@ export const ADAPTER_DEF_URL = "/ucmdbAdapter/";
 
 // CHATOPS
 export const SLACK_DEF_URL = "/slack";
-
-export const BASE_NAME = window.amb_basename || '/AMB';
-

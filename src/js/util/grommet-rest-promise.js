@@ -1,7 +1,5 @@
 'use strict';
 import * as Types from '../constants/ActionTypes';
-import {BASE_NAME} from '../constants/ServiceConfig';
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -140,7 +138,7 @@ exports.default = {
   get: function get(uri, params) {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
-    var op = _superagent2.default.get(BASE_NAME + uri);
+    var op = _superagent2.default.get(uri);
     if (!isProduction) {
       op.withCredentials();
     }
@@ -152,7 +150,7 @@ exports.default = {
   patch: function patch(uri, data) {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
-    var op = _superagent2.default.patch(BASE_NAME + uri);
+    var op = _superagent2.default.patch(uri);
     if (!isProduction) {
       op.withCredentials();
     }
@@ -164,7 +162,7 @@ exports.default = {
   post: function post(uri, data) {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
-    var op = _superagent2.default.post(BASE_NAME + uri);
+    var op = _superagent2.default.post(uri);
     if (!isProduction) {
       op.withCredentials();
     }
@@ -176,7 +174,7 @@ exports.default = {
   put: function put(uri, data) {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
-    var op = _superagent2.default.put(BASE_NAME + uri);
+    var op = _superagent2.default.put(uri);
     if (!isProduction) {
       op.withCredentials();
     }
@@ -188,7 +186,7 @@ exports.default = {
   del: function del(uri) {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
-    var op = _superagent2.default.del(BASE_NAME + uri);
+    var op = _superagent2.default.del(uri);
     if (!isProduction) {
       op.withCredentials();
     }
