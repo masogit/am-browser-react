@@ -366,9 +366,13 @@ gulp.task('copy-temp-linux', ['unzip-node-linux'], function () {
 gulp.task('chmod-linux', ['copy-temp-linux'], function () {
   console.log('chmod 755 for node/npm in linux');
   // chmod 755 for node/npm in linux
-  return gulp.src('./gen/temp/node/bin/**')
+  var chmod_node = gulp.src('./gen/temp/node/bin/**')
       .pipe(chmod(755))
       .pipe(gulp.dest('./gen/temp/node/bin'));
+  var chmod_bin = gulp.src('./gen/temp/*.sh')
+      .pipe(chmod(755))
+      .pipe(gulp.dest('./gen/temp'));
+  return merge(chmod_node, chmod_bin);
 });
 
 gulp.task('gen-linux', ['chmod-linux'], function () {
