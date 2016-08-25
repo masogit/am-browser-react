@@ -2,13 +2,18 @@
 
 import {RECEIVE_ERROR, RECEIVE_INFO, RECEIVE_WARNING, MESSAGE_READ, ALERT } from '../constants/ActionTypes';
 
+const getId = () => new Date() - new Date('2016-01-01');
+
 const initialState = {
   msgs: [],
   status: null,
   msg: null,
   onConfirm: null,
-  title: ''
+  title: '',
+  id: getId()
 };
+
+
 
 const handlers = {
   [RECEIVE_ERROR]: (state, action) => {
@@ -16,7 +21,8 @@ const handlers = {
     let msg = {
       time: date.toLocaleString(),
       status: 'critical',
-      msg: action.msg
+      msg: action.msg,
+      id: getId()
     };
     return {
       msgs: [...state.msgs, msg],
@@ -29,7 +35,8 @@ const handlers = {
     let msg = {
       time: date.toLocaleString(),
       status: 'ok',
-      msg: action.msg
+      msg: action.msg,
+      id: getId()
     };
     return {
       msgs: [...state.msgs, msg],
@@ -42,7 +49,8 @@ const handlers = {
     let msg = {
       time: date.toLocaleString(),
       status: 'warning',
-      msg: action.msg
+      msg: action.msg,
+      id: getId()
     };
     return {
       msgs: [...state.msgs, msg],
