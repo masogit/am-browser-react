@@ -170,7 +170,7 @@ module.exports = function (am) {
                   Object.assign(user_rights, rights.admin);
                   break;
                 } else if (config.rights_power.indexOf(am_rights[i]) > -1) {
-                  Object.assign(user_rights, rights.rights_power);
+                  Object.assign(user_rights, rights.power);
                 }
               }
 
