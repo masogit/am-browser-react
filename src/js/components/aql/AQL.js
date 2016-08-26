@@ -20,7 +20,7 @@ import {monitorEdit, stopMonitorEdit, dropCurrentPop, showInfo} from '../../acti
 import Textarea from '../commons/Textarea';
 import SearchInput from '../commons/SearchInput';
 import {
-  Anchor, Box, Split, Form, FormField, FormFields, Layer, Tabs, Table, TableRow, Title, Header, Menu, Label
+  Anchor, Box, Split, Form, FormField, FormFields, Layer, Tabs, Table, TableRow, Title, Header, Menu
 } from 'grommet';
 import Play from 'grommet/components/icons/base/Play';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
