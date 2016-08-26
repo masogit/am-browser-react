@@ -572,7 +572,9 @@ export default class Insight extends ComponentBase {
           }
           {
             id && this.showBack() && <Anchor icon={<Close />} label="Close" onClick={() => {
-              history.go(-1);
+              history.push('/insight');
+              this._loadAQLs();
+              this._loadWall();
             }}/>
           }
         </Header>
