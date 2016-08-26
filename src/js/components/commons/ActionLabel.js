@@ -9,7 +9,7 @@ const ActionLabel = ({label, icon, onClick}) => {
   return (
     <div className='grommetux-action-label'>
       <Label>{label}</Label>
-      <Button className='grommetux-label_control' icon={icon} onClick={onClick}/>
+      <Button className='grommetux-label_control' icon={icon} onClick={onClick}></Button>
     </div>
   );
 };
