@@ -102,6 +102,7 @@ export default class GroupList extends Component {
           this.props.searchable &&
           <Box pad='small' flex={false}>
             <SearchInput placeHolder="Search..."  suggestions={this._getSuggestions(children)}
+                         onDOMChange={this._onSearch.bind(this)}
                          onSelect={this._selectSuggestion.bind(this)}/>
           </Box>
         }
