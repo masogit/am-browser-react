@@ -8,7 +8,7 @@ import IntegrationJobItemContainer from './IntegrationJobItem.js';
 
 import statusAdapter from '../../constants/StatusAdapter';
 import Status from 'grommet/components/icons/Status';
-import SideBar from '../commons/Sidebar';
+import SideBar from '../commons/AMSideBar';
 import Box from 'grommet/components/Box';
 import {bindActionCreators} from 'redux';
 
