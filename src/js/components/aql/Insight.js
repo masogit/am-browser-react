@@ -551,7 +551,7 @@ export default class Insight extends ComponentBase {
     return (
       <Box full="horizontal">
         <Header justify="between" pad={{'horizontal': 'medium'}}>
-          <Title>AM Insight</Title>
+          <Title>Insight</Title>
           {
             !id &&
             <Menu direction="row" align="center" responsive={true}>
