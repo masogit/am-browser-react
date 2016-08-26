@@ -5,11 +5,14 @@ import MeterForm from './MeterForm';
 import DistributionForm from './DistributionForm';
 import Graph from './../commons/Graph';
 import AlertForm from './../commons/AlertForm';
+import GroupList from './../commons/GroupList';
+import GroupListItem from './../commons/GroupListItem';
 import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
 import RecordListLayer from '../explorer/RecordListLayer';
 import ActionTab from '../commons/ActionTab';
-import SideBar from '../commons/AMSideBar';
+import SideBar from '../commons/Sidebar';
+import EmptyIcon from '../commons/EmptyIcon';
 import * as Format from '../../util/RecordFormat';
 import Download from 'grommet/components/icons/base/Download';
 import More from 'grommet/components/icons/base/More';
@@ -19,15 +22,15 @@ import {saveAs} from 'file-saver';
 import {monitorEdit, stopMonitorEdit, dropCurrentPop, showInfo} from '../../actions/system';
 import Textarea from '../commons/Textarea';
 import SearchInput from '../commons/SearchInput';
+
 import {
-  Anchor, Box, Split, Form, FormField, FormFields, Layer, Tabs, Table, TableRow, Title, Header, Menu, Label
+  Anchor, Box, Split, Form, FormField, FormFields, Layer, Tabs, Table, TableRow, Title, Header, Menu
 } from 'grommet';
 import Play from 'grommet/components/icons/base/Play';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
 import Close from 'grommet/components/icons/base/Close';
 import Add from 'grommet/components/icons/base/Add';
 import Attachment from 'grommet/components/icons/base/Attachment';
-import ActionLabel from '../commons/ActionLabel';
 
 export default class AQL extends Component {
 
@@ -327,33 +330,45 @@ export default class AQL extends Component {
   }
 
   popupLayer(type) {
-    const {reports, views} = this.state;
     if (type == 'reports') {
-      const contents = reports.entities && reports.entities.map((report) => ({
-        key: report['ref-link'],
-        groupby: this._getFieldStrVal(report.seType),
-        onClick: this._loadOOBAQL.bind(this, report),
-        search: report.Name,
-        child: report.Name
-      }));
-
       return (
         <Layer onClose={this._onClose} closer={true} align="left">
-          <SideBar title='AQL Selector' contents={contents} separator={'none'} colorIndex='light-1'/>
+          <Box full="vertical" justify="center">
+            <Box
+              pad={{vertical: 'medium'}}><Title>{`AQL Selector (${this.state.reports.entities.length})`}</Title></Box>
+            <GroupList pad={{vertical: 'small'}} searchable={true}>
+              {
+                this.state.reports.entities &&
+                this.state.reports.entities.map((report) => (
+                  <GroupListItem key={report['ref-link']} groupby={this._getFieldStrVal(report.seType)}
+                                 search={report.Name} pad="small" onClick={this._loadOOBAQL.bind(this, report)}>
+                    <EmptyIcon />{report.Name}
+                  </GroupListItem>
+                ))
+              }
+            </GroupList>
+          </Box>
         </Layer>
       );
     } else if (type == 'view') {
-      const contents = views.map((view) => ({
-        key: view._id,
-        groupby: view.category,
-        onClick: this._attachView.bind(this, view),
-        search: view.name,
-        child: view.name
-      }));
-
       return (
         <Layer onClose={this._onClose} closer={true} align="left">
-          <SideBar title='Views Selector' contents={contents} separator={'none'} colorIndex='light-1'/>
+          <Box full="vertical" justify="center">
+            <Box pad={{vertical: 'medium'}}>
+              <Title>{`Views Selector (${this.state.views && this.state.views.length})`}</Title>
+            </Box>
+            <GroupList pad={{vertical: 'small'}} searchable={true}>
+              {
+                this.state.views.map((view) => (
+                  <GroupListItem key={view._id} groupby={view.category} search={view.name}
+                                 pad={{horizontal: 'medium', vertical: 'small'}}
+                                 onClick={this._attachView.bind(this, view)}>
+                    <EmptyIcon />{view.name}
+                  </GroupListItem>
+                ))
+              }
+            </GroupList>
+          </Box>
         </Layer>
       );
     } else if (typeof type == 'object' && type.type == 'records') {
@@ -403,7 +418,7 @@ export default class AQL extends Component {
     const activeIndex = validData ? getIndex(this.state.aql.type) : 0;
     return (
       <Box direction="row" flex={true}>
-        <SideBar title='Graphs' toolbar={toolbar} contents={contents} focus={focus}/>
+        <SideBar title={`Graphs (${this.state.aqls.length})`} toolbar={toolbar} contents={contents} focus={focus}/>
         <Box flex={true}>
           {this.state.alertLayer}
           <Header justify="between" pad={{'horizontal': 'medium'}}>
@@ -440,7 +455,7 @@ export default class AQL extends Component {
               </FormField>
               <Form pad={{horizontal: 'small'}}>
                 <FormFields className='short-form'>
-                  <FormField label="AQL Name" htmlFor="AQL_Name">
+                  <FormField label="AQL Name" htmlFor="AQL_Box">
                     <input id="AQL_Name" type="text" name="name" value={this.state.aql.name}
                            onChange={this._setFormValues.bind(this)}/>
                   </FormField>
@@ -452,8 +467,8 @@ export default class AQL extends Component {
                   {
                     this.state.aql.view &&
                     <FormField label="Link to" htmlFor="AQL_LinkTo">
-                      <ActionLabel label={`View: ${this.state.aql.view.name}`}
-                                   icon={<Trash />} onClick={this._removeView.bind(this)}/>
+                      <Anchor link="#" icon={<Trash />} onClick={this._removeView.bind(this)}
+                              label={'View: ' + this.state.aql.view.name}/>
                     </FormField>
                   }
                 </FormFields>

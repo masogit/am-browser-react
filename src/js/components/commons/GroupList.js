@@ -77,27 +77,23 @@ export default class GroupList extends Component {
 
   _onSearch(event) {
     var keyword = event.target.value.toLowerCase().trim();
-    let filtered = null;
     if (keyword) {
-      filtered = this.props.children.filter((child) => {
+      var filtered = this.props.children.filter((child) => {
         return child.props.groupby.toLowerCase().indexOf(keyword) > -1 ||
           child.props.search.toLowerCase().indexOf(keyword) > -1;
       });
-    }
-
-    this.setState({
-      filtered: filtered
-    });
-
-    if (this.props.updateTitle) {
-      const children = filtered || this.props.children;
-      this.props.updateTitle(children.length);
-    }
+      this.setState({
+        filtered: filtered
+      });
+    } else
+      this.setState({
+        filtered: null
+      });
   }
 
   render() {
-    const children = this.state.filtered || this.props.children;
-    const grouped = this._getGroupedChildren(children);
+    var children = this.state.filtered || this.props.children;
+    var grouped = this._getGroupedChildren(children);
 
     const expand = this.state.expand;
     return (
