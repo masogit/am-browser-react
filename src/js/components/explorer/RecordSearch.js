@@ -134,6 +134,11 @@ export default class RecordSearch extends ComponentBase {
     const keyword = this.state.searchText;
     const pathname = `/search/${encodeURI(keyword)}`;
     if (location.pathname == decodeURI(pathname) && this.doNotNeedSearch(location.pathname)) {
+      if (!this.state.buttonDisabled) {
+        this.setState({
+          buttonDisabled: true
+        });
+      }
       return;
     }
 
