@@ -48,7 +48,6 @@ export default class RecordList extends Component {
   componentWillMount() {
     this._getSearchableFields();
     this._getRecords(this.state.param);
-    this._getGroupByData(this.state.param.groupby);
   }
 
   componentWillUnmount() {
@@ -82,7 +81,7 @@ export default class RecordList extends Component {
       if (this.state.records.length == 0) {
         let param = this.state.param;
         param.groupby = groupby;
-        this.setState({param});
+        this.setState({param, graphData : null});
         return;
       }
       let body = Object.assign({}, this.props.body);
@@ -96,14 +95,12 @@ export default class RecordList extends Component {
       }
       body.groupby = groupby;
       AQLActions.queryAQL(ExplorerActions.getGroupByAql(body)).then((data)=> {
-        if (data && data.rows.length > 0) {
-          let param = this.state.param;
-          param.groupby = groupby;
-          this.setState({
-            graphData: data,
-            param: param
-          });
-        }
+        let param = this.state.param;
+        param.groupby = groupby;
+        this.setState({
+          graphData: (data && data.rows.length > 0) ? data : null,
+          param: param
+        });
       });
     }
   }
@@ -143,6 +140,10 @@ export default class RecordList extends Component {
               onMoreLock: false
             });
           }
+
+          // re-groupby
+          if (this.state.param.groupby && !onMore)
+            this._getGroupByData(this.state.param.groupby);
         });
       });
     }
@@ -209,12 +210,7 @@ export default class RecordList extends Component {
             event.target.value = "";
             this.setState({
               param: param
-            }, () => {
-              this._getRecords();
-
-              // re-groupby
-              this._getGroupByData(this.state.param.groupby);
-            });
+            }, this._getRecords);
           }
         }
       }
@@ -266,12 +262,7 @@ export default class RecordList extends Component {
         param.filters.push(searchValue);
       this.setState({
         param: param
-      }, () => {
-        this._getRecords();
-
-        // re-groupby
-        this._getGroupByData(this.state.param.groupby);
-      });
+      }, this._getRecords);
     }
 
   }
@@ -281,12 +272,7 @@ export default class RecordList extends Component {
     param.filters.splice(index, 1);
     this.setState({
       param: param
-    }, () => {
-      this._getRecords();
-
-      // re-groupby
-      this._getGroupByData(this.state.param.groupby);
-    });
+    }, this._getRecords);
   }
 
   _filterReuse(filter) {
