@@ -1,5 +1,7 @@
 'use strict';
 import * as Types from '../constants/ActionTypes';
+import {BASE_NAME} from '../constants/ServiceConfig';
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -113,6 +115,7 @@ function buildQueryParams(params) {
   return result.join('&');
 }
 
+const basename = BASE_NAME == '/' ? '' : BASE_NAME;
 exports.default = {
   setTimeout: function setTimeout(timeout) {
     _timeout = timeout;
@@ -126,7 +129,7 @@ exports.default = {
   head: function head(uri, params) {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
-    var op = _superagent2.default.head(uri);
+    var op = _superagent2.default.head(basename + uri);
     if (!isProduction) {
       op.withCredentials();
     }
@@ -138,7 +141,7 @@ exports.default = {
   get: function get(uri, params) {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
-    var op = _superagent2.default.get(uri);
+    var op = _superagent2.default.get(basename + uri);
     if (!isProduction) {
       op.withCredentials();
     }
@@ -150,7 +153,7 @@ exports.default = {
   patch: function patch(uri, data) {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
-    var op = _superagent2.default.patch(uri);
+    var op = _superagent2.default.patch(basename + uri);
     if (!isProduction) {
       op.withCredentials();
     }
@@ -162,7 +165,7 @@ exports.default = {
   post: function post(uri, data) {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
-    var op = _superagent2.default.post(uri);
+    var op = _superagent2.default.post(basename + uri);
     if (!isProduction) {
       op.withCredentials();
     }
@@ -174,7 +177,7 @@ exports.default = {
   put: function put(uri, data) {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
-    var op = _superagent2.default.put(uri);
+    var op = _superagent2.default.put(basename + uri);
     if (!isProduction) {
       op.withCredentials();
     }
@@ -186,7 +189,7 @@ exports.default = {
   del: function del(uri) {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
-    var op = _superagent2.default.del(uri);
+    var op = _superagent2.default.del(basename + uri);
     if (!isProduction) {
       op.withCredentials();
     }

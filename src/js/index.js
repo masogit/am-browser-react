@@ -85,17 +85,14 @@ const sessionWatcher = () => {
   }
 
   if (route) {
-    if (session.headerNavs) {
-      Routes.routes[0].childRoutes = getRoutes(session.headerNavs);
-      if (route.pathname === '/login') {
-        history.pushState(null, Routes.path(getPostLoginPath()));
-      }
-    } else {
-      Routes.routes[0].childRoutes = getRoutes(null);
-      if (route.pathname !== Routes.path('/login')) {
-        setPostLoginPath(route.pathname);
-        history.pushState(null, Routes.path('/login'));
-      }
+    Routes.routes[0].childRoutes = getRoutes(session.headerNavs);
+    const isAuthorized = !!session.headerNavs;
+    const isLoginUrl = route.pathname === Routes.path('/login');
+    if (isAuthorized && isLoginUrl) {
+      history.pushState(null, Routes.path(getPostLoginPath()));
+    } else if (!isAuthorized && !isLoginUrl) {
+      setPostLoginPath(route.pathname);
+      history.pushState(null, Routes.path('/login'));
     }
   }
 };
