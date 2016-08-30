@@ -5,7 +5,7 @@ import {Link} from 'react-router';
 import Header from 'grommet/components/Header';
 import Title from 'grommet/components/Title';
 import Menu from 'grommet/components/Menu';
-import SessionMenu from './SessionMenu';
+import SessionMenu from './SessionMenu/MenuContainer';
 import {dropCurrentPop_stopMonitor} from '../actions/system';
 import history from '../RouteHistory';
 

@@ -29,5 +29,5 @@ export const ADAPTER_DEF_URL = "/ucmdbAdapter/";
 // CHATOPS
 export const SLACK_DEF_URL = "/slack";
 
-
-
+//LIVE Net WORK
+export const LNW_DEF_URL = "/live-network";

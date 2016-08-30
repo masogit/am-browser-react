@@ -1,7 +1,6 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
 import Rest from '../util/grommet-rest-promise';
-//import cookies from 'js-cookie';
 import * as Types from '../constants/ActionTypes';
 import store from '../store';
 import {
@@ -9,7 +8,6 @@ import {
   ABOUT_DEF_URL,
   LOGIN_DEF_URL,
   LOGOUT_DEF_URL,
-  SLACK_DEF_URL,
   AM_SCHEMA_DEF_URL,
   AM_DEF_URL
 } from '../constants/ServiceConfig';
@@ -91,25 +89,6 @@ export function logout() {
     }, err => {
       if (err) {
         throw err;
-      }
-    });
-  };
-}
-
-export function sendMessageToSlack(messages) {
-  return function (dispatch) {
-    return Rest.post(SLACK_DEF_URL, {messages}).then(res => {
-      if (res.text) {
-        dispatch({type: Types.RECEIVE_WARNING, msg: res.text});
-      } else {
-        dispatch({type: Types.RECEIVE_INFO, msg: `Message sent to Slack:"${messages}"`});
-      }
-    }, err => {
-      if (err && err.status == 500) {
-        dispatch({
-          type: Types.RECEIVE_WARNING,
-          msg: 'Can not initialize rest client, please check your proxy setting.'
-        });
       }
     });
   };

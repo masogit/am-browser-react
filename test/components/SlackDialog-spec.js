@@ -4,7 +4,7 @@
 import expect from 'expect';
 import React from 'react';
 import TestUtils from 'react-addons-test-utils';
-import SlackDialog from '../../src/js/components/SlackDialog';
+import SlackDialog from '../../src/js/components/SessionMenu/SlackDialog';
 import {Box, Form} from 'grommet';
 
 describe('components - components/SlackDialog-spec.js', () => {
