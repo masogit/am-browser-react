@@ -42,11 +42,11 @@ export function getBodyByKeyword(body, keyword) {
   var aql = body.fields.filter((field) => {
     return field.searchable;
   }).map((field) => {
-    return field.sqlname + " like '%" + keyword + "%'";
+    return `${field.sqlname} like '%${keyword}%'`;
   }).join(' OR ');
 
   if (aql) {
-    body.filter = (body.filter) ? body.filter + ' AND (' + aql + ')' : aql;
+    body.filter = body.filter ? `body.filter AND (${aql})` : aql;
   }
   return body;
 }
@@ -131,8 +131,8 @@ export function getGroupByAql(body) {
   //   aql += ` AND ${fieldsWhere}`;
   if (body.groupby)
     aql += ` group by ${body.groupby}`;
-  if (body.orderby && body.orderby.indexOf(body.groupby) > -1)
-    aql += ` order by ${body.orderby}`;
+  // order by
+  aql += ` order by ${aggregate} desc`;
 
   return aql;
 }
@@ -141,15 +141,12 @@ export function getDownloadQuery(sqlname) {
   return DOWNLOAD_DEF_URL + '/' + sqlname;
 }
 
-/*function getWhereFromFields(fields) {
-  let links = [];
-  fields.forEach((field) => {
-    let paths = field.sqlname.split('.');
-    if (paths.length > 1) {
-      paths.pop();
-      links.push(paths.join('.') + '.PK <> 0');
-    }
-  });
+export const setMessage = (messages, view, time, num) => {
+  if (messages[view._id]) {
+    messages[view._id].timeEnd = time;
+    messages[view._id].num = num;
+  } else {
+    messages[view._id] = { view: view, timeStart: time, num: num };
+  }
+};
 
-  return _.uniq(links).join(' AND ');
-}*/

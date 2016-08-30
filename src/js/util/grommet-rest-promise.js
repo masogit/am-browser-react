@@ -20,7 +20,7 @@ function _interopRequireDefault(obj) {
 
 var _headers = {'Accept': 'application/json'}; // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-var _timeout = 60000; // 10s
+var _timeout = 60000; // 60s
 var Promise = require("bluebird");
 var Request = _superagent2.default.Request;
 Promise.config({
@@ -50,13 +50,14 @@ Request.prototype.promise = function () {
           store.default.dispatch(init('', ''));
         } else {
           let msg = err.response && err.response.text || err.message;
+          const CANNOT_CONNECT_NODE = 'Can not connect to node server.';
           if (msg) {
-            if (err.status == 400) {
+            if (err.status == 400 || (typeof err.status == 'undefined' && msg.indexOf('network is offline') > -1)) {
               store.default.dispatch({type: Types.RECEIVE_ERROR, msg: msg});
             } else if (err.status == 500) {
               store.default.dispatch({type: Types.RECEIVE_ERROR, msg: "Server error."});
-            } else if (err.status == 502 || typeof err.status == 'undefined') {
-              store.default.dispatch({type: Types.LOGOUT});
+            } else if (err.status == 502) {
+              store.default.dispatch({type: Types.FORCE_LOGOUT, error: CANNOT_CONNECT_NODE});
             }
           }
         }

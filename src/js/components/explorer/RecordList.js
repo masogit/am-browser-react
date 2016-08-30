@@ -15,10 +15,11 @@ import * as AQLActions from '../../actions/aql';
 import Graph from '../commons/Graph';
 import EmptyIcon from '../commons/EmptyIcon';
 import * as Format from '../../util/RecordFormat';
+import {hash, loadSetting, saveSetting} from '../../util/util';
 import cookies from 'js-cookie';
 
 export default class RecordList extends Component {
-  constructor() {
+  constructor(props) {
     super();
     this.state = {
       numColumn: 5,
@@ -28,18 +29,17 @@ export default class RecordList extends Component {
       filtered: null,
       record: null,
       searchFields: null,
-      groupby: "",
-      graphType: "distribution",
       graphData: null,
-      param: {
+      param: loadSetting(hash(Object.assign({},props.body, {filter: ''}))) || {
+        graphType: "distribution",
+        allFields: props.allFields || false,
+        groupby: props.body.groupby || '',
+        aqlInput: false,
         orderby: "",
         offset: 0,
         limit: 30,
         filters: []
       },
-      aqlInput: false,
-      allFields: false,
-      session: null,
       onMoreLock: false,
       locked: false
     };
@@ -47,12 +47,11 @@ export default class RecordList extends Component {
 
   componentWillMount() {
     this._getSearchableFields();
-    this._getRecords();
-    if (this.props.body.groupby)
-      this._getGroupByData();
-    this.setState({
-      allFields: this.props.allFields
-    });
+    this._getRecords(this.state.param);
+  }
+
+  componentWillUnmount() {
+    saveSetting(hash(Object.assign({}, this.props.body, {filter: ''})), this.state.param);
   }
 
   _getSearchableFields() {
@@ -68,42 +67,42 @@ export default class RecordList extends Component {
       });
   }
 
-  _clearGroupBy(groupby) {
-    if (this.state.groupby == groupby)
-      this.setState({
-        groupby: ''
-      }, this._getGroupByData());
+  _clearGroupBy() {
+    let param = this.state.param;
+    param.groupby = '';
+    this.setState({
+      graphData: null,
+      param: param
+    });
   }
 
   _getGroupByData(groupby) {
-    let body = Object.assign({}, this.props.body);
-
-    // Filter then groupby
-    if (this.state.param.filters.length > 0) {
-      let userFilters = this.state.param.filters.map((filter) => {
-        return '(' + filter + ')';
-      }).join(" AND ");
-      body.filter = body.filter ? body.filter + ' AND (' + userFilters + ')' : userFilters;
-    }
-
     if (groupby) {
+      if (this.state.records.length == 0) {
+        let param = this.state.param;
+        param.groupby = groupby;
+        this.setState({param, graphData : null});
+        return;
+      }
+      let body = Object.assign({}, this.props.body);
+
+      // Filter then groupby
+      if (this.state.param.filters.length > 0) {
+        let userFilters = this.state.param.filters.map((filter) => {
+          return '(' + filter + ')';
+        }).join(" AND ");
+        body.filter = body.filter ? body.filter + ' AND (' + userFilters + ')' : userFilters;
+      }
       body.groupby = groupby;
-      this.setState({
-        groupby: groupby
+      AQLActions.queryAQL(ExplorerActions.getGroupByAql(body)).then((data)=> {
+        let param = this.state.param;
+        param.groupby = groupby;
+        this.setState({
+          graphData: (data && data.rows.length > 0) ? data : null,
+          param: param
+        });
       });
     }
-    if (body.groupby)
-      AQLActions.queryAQL(ExplorerActions.getGroupByAql(body)).then((data)=> {
-        if (data && data.rows.length > 0) {
-          this.setState({
-            graphData: data
-          });
-        }
-      });
-    else
-      this.setState({
-        graphData: null
-      });
   }
 
   _getMoreRecords() {
@@ -141,6 +140,10 @@ export default class RecordList extends Component {
               onMoreLock: false
             });
           }
+
+          // re-groupby
+          if (this.state.param.groupby && !onMore)
+            this._getGroupByData(this.state.param.groupby);
         });
       });
     }
@@ -151,7 +154,7 @@ export default class RecordList extends Component {
       return;
     }
 
-    var param = Object.assign({}, this.state.param);
+    let param = this.state.param;
     if (param.orderby == (sqlname + ' desc'))
       param.orderby = "";
     else if (param.orderby == sqlname)
@@ -191,8 +194,7 @@ export default class RecordList extends Component {
 
     // press enter to build AQL filter
     if (event.keyCode === 13 && event.target.value.trim()) {
-      if (this.state.aqlInput) {
-        this.refs.search.value = "";
+      if (this.state.param.aqlInput) {
         this._aqlFilterAdd();
       } else {
         var param = this.state.param;
@@ -208,18 +210,12 @@ export default class RecordList extends Component {
             event.target.value = "";
             this.setState({
               param: param
-            }, () => {
-              this._getRecords();
-
-              // re-groupby
-              let groupby = this.state.groupby || this.props.body.groupby;
-              this._getGroupByData(groupby);
-            });
+            }, this._getRecords);
           }
         }
       }
     } else {
-      if (!this.state.aqlInput) {
+      if (!this.state.param.aqlInput) {
         if (event.target.value.trim() == "")
           this.setState({
             filtered: null
@@ -235,7 +231,7 @@ export default class RecordList extends Component {
   }
 
   getDisplayFields() {
-    const displayNum = this.state.allFields ? this.props.body.fields.length : this.state.numColumn;
+    const displayNum = this.state.param.allFields ? this.props.body.fields.length : this.state.numColumn;
     return this.props.body.fields.filter((field, index) => {
       if (index < displayNum) {
         return field;
@@ -266,15 +262,7 @@ export default class RecordList extends Component {
         param.filters.push(searchValue);
       this.setState({
         param: param
-      }, () => {
-        this._getRecords();
-
-        // re-groupby when user manually input AQL where clause
-        if (!filter) {
-          let groupby = this.state.groupby || this.props.body.groupby;
-          this._getGroupByData(groupby);
-        }
-      });
+      }, this._getRecords);
     }
 
   }
@@ -284,17 +272,13 @@ export default class RecordList extends Component {
     param.filters.splice(index, 1);
     this.setState({
       param: param
-    }, () => {
-      this._getRecords();
-
-      // re-groupby
-      let groupby = this.state.groupby || this.props.body.groupby;
-      this._getGroupByData(groupby);
-    });
+    }, this._getRecords);
   }
 
   _filterReuse(filter) {
-    this.setState({aqlInput: true});
+    let param = this.state.param;
+    param.aqlInput = true;
+    this.setState({param: param});
     var search = this.refs.search.value.trim();
     if (search && search !== filter)
       this.refs.search.value += ' AND ' + filter;
@@ -315,20 +299,26 @@ export default class RecordList extends Component {
   }
 
   _toggleAQLInput() {
+    let param = this.state.param;
+    param.aqlInput = !param.aqlInput;
     this.setState({
-      aqlInput: !this.state.aqlInput
+      param: param
     });
   }
 
   _toggleGraphType() {
+    let param = this.state.param;
+    param.graphType = (param.graphType == 'legend') ? 'distribution' : 'legend';
     this.setState({
-      graphType: this.state.graphType=='legend' ? 'distribution' : 'legend'
+      param: param
     });
   }
 
   _toggleAllFields() {
+    let param = this.state.param;
+    param.allFields = !param.allFields;
     this.setState({
-      allFields: !this.state.allFields
+      param: param
     });
   }
 
@@ -378,16 +368,21 @@ export default class RecordList extends Component {
   renderGroupBy() {
     let type = this.props.body.sum ? `SUM ${this.props.body.sum}` : `COUNT *`;
     let menus = this.props.body.fields.map((field, index) => {
-      let selected = (field.sqlname == (this.state.groupby || this.props.body.groupby));
-      let disabled = this.props.body.groupby == field.sqlname;
+      let selected = (field.sqlname == this.state.param.groupby);
       let label = Format.getDisplayLabel(field);
+      if (this.props.body.groupby == field.sqlname)
+        label += ' [Default Group By]';
+      if (field.searchable)
+        label += ' [Quick Searchable]';
+      let isPrimary = (this.props.body.groupby == field.sqlname) || field.searchable;
       return (
-        <Anchor key={`a_groupby_${index}`} icon={selected?<CheckboxSelected />:<Checkbox />} disabled={disabled}
-                label={label} primary={this.props.body.groupby == field.sqlname}
-                onClick={() => !disabled && (selected ? this._clearGroupBy(field.sqlname) : this._getGroupByData(field.sqlname))}/>
+        <Anchor key={`a_groupby_${index}`} icon={selected?<CheckboxSelected />:<Checkbox />}
+                label={label} primary={isPrimary}
+                onClick={() => selected ? this._clearGroupBy(field.sqlname) : this._getGroupByData(field.sqlname)}/>
       );
     });
-    menus.unshift(<Anchor key={`a_groupby_${this.props.body.fields.length}`} label={type} icon={<Aggregate />} disabled={true}/>);
+
+    menus.unshift(<Anchor key={`a_groupby_${this.props.body.fields.length}`} label={`${type} FROM ${this.props.body.sqlname}`} icon={<Aggregate />} disabled={true}/>);
 
     return menus;
   }
@@ -403,12 +398,12 @@ export default class RecordList extends Component {
 
     const aqlWhere = "press / input AQL where statement";
     const quickSearch = this.state.searchFields ? `press Enter to quick search in ${this.state.searchFields}; ${aqlWhere}` : aqlWhere;
-    const placeholder = this.state.aqlInput ? "input AQL where statement…" : quickSearch;
+    const placeholder = this.state.param.aqlInput ? "input AQL where statement…" : quickSearch;
 
     return (
       <Header justify="between">
         <Title>{this.props.title}</Title>
-        <input type="text" className="flex" ref="search" style={this.state.aqlInput?aqlStyle:{}}
+        <input type="text" className="flex" ref="search" style={this.state.param.aqlInput ? aqlStyle : {}}
                placeholder={placeholder} onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
         <Box direction="column">
           <Anchor onClick={this._getMoreRecords.bind(this)} disabled={this.state.loading}>
@@ -420,15 +415,15 @@ export default class RecordList extends Component {
             {`${this.state.timeQuery}ms`}
           </Box>
         </Box>
-        <Menu icon={<Filter />} dropAlign={{ right: 'right', top: 'top' }}>
+        <Menu icon={<Filter />} dropAlign={{ right: 'right', top: 'top' }} >
           {this.renderGroupBy()}
         </Menu>
-        <Menu icon={<MenuIcon />} closeOnClick={false} dropAlign={{ right: 'right', top: 'top' }}>
-          <Anchor icon={this.state.graphType=='legend'?<CheckboxSelected />:<Checkbox />} label="Vertical Graph"
+        <Menu icon={<MenuIcon />} dropAlign={{ right: 'right', top: 'top' }}>
+          <Anchor icon={this.state.param.graphType=='legend'?<CheckboxSelected />:<Checkbox />} label="Vertical Graph"
                   onClick={this._toggleGraphType.bind(this)}/>
-          <Anchor icon={this.state.aqlInput?<CheckboxSelected />:<Checkbox />} label="Input AQL"
+          <Anchor icon={this.state.param.aqlInput?<CheckboxSelected />:<Checkbox />} label="Input AQL"
                   onClick={this._toggleAQLInput.bind(this)}/>
-          <Anchor icon={this.state.allFields?<CheckboxSelected />:<Checkbox />} label="Full columns"
+          <Anchor icon={this.state.param.allFields?<CheckboxSelected />:<Checkbox />} label="Full columns"
                   onClick={() => (this.props.body.fields.length > this.state.numColumn) && this._toggleAllFields()}
                   disabled={this.props.body.fields.length <= this.state.numColumn}/>
           <Anchor icon={<Download />} label="Download CSV" onClick={this._download.bind(this)}/>
@@ -476,7 +471,7 @@ export default class RecordList extends Component {
       total: true
     };
     return (
-      <Graph type={this.state.graphType} data={this.state.graphData} config={config}
+      <Graph type={this.state.param.graphType} data={this.state.graphData} config={config}
              className={this.state.locked ? 'disabled' : ''}
              onClick={(filter) => {
                if (!this.state.locked) {
@@ -486,18 +481,19 @@ export default class RecordList extends Component {
     );
   }
   render() {
+    const fixIEScrollBar = this.props.root ? 'fixIEScrollBar' : '';
     return (
-      <Box pad={{horizontal: 'medium'}} flex={true}>
+      <Box pad={{horizontal: 'medium'}} flex={true} className={fixIEScrollBar}>
         {this.renderToolBox()}
         {this.renderAQLFilter()}
         {
-          this.state.graphType=='legend'&&this.state.graphData ?
-            <Box flex={true} direction="row" className={`fixMinSizing ${this.props.root?'fixIEScrollBar':''}`}>
-              <Box pad={{vertical: 'large'}}>{this.renderGraph()}</Box>
+          this.state.param.graphType=='legend' && this.state.graphData ?
+            <Box flex={true} direction="row" className={`fixMinSizing ${fixIEScrollBar}`}>
+              <Box pad={{vertical: 'large', horizontal: 'small'}}>{this.renderGraph()}</Box>
               <Box flex={true}>{this.renderList()}</Box>
             </Box>
           :
-            <Box className={`fixMinSizing ${this.props.root?'fixIEScrollBar':''}`}>
+            <Box className={`fixMinSizing ${fixIEScrollBar}`}>
               {this.renderGraph()}
               {this.renderList()}
             </Box>

@@ -116,6 +116,7 @@ module.exports = function (am) {
       };
 
       client.get(url, args, (data, response) => {
+        var user_rights = Object.assign({}, rights.guest);
         if (!data.entities || !data.entities[0]) {
           var message = response.statusMessage;
           logger.warn(`[user] [${req.sessionID || '-'}]`, message, username);
@@ -126,10 +127,11 @@ module.exports = function (am) {
           var empId = data.entities[0].lEmplDeptId;
           if (isAdmin) {
             am_rights.push('@admin');
+            user_rights.ucmdbAdapter = true;
           }
 
           if (config.rights_power.indexOf('@anyone') > -1 || isAdmin && config.rights_power.indexOf('@admin') > -1) {
-            loginSuccess(req, res, username, password, email, rights.admin, am);
+            loginSuccess(req, res, username, password, email, Object.assign(user_rights, rights.admin), am);
             res.end();
           } else {
             // get detail rights
@@ -162,13 +164,13 @@ module.exports = function (am) {
               }
 
               // match am_rights and amb rights
-              var user_rights = rights.guest;
+
               for (var i = 0; i < am_rights.length; i++) {
                 if (config.rights_admin.indexOf(am_rights[i]) > -1) {
-                  user_rights = rights.admin;
+                  Object.assign(user_rights, rights.admin);
                   break;
                 } else if (config.rights_power.indexOf(am_rights[i]) > -1) {
-                  user_rights = rights.power;
+                  Object.assign(user_rights, rights.power);
                 }
               }
 
@@ -312,8 +314,8 @@ function getHeadNav(rights) {
     explorer: rights.index < 2,
     'explorer/:id': rights.index < 3,
     tbd: rights.index < 2,
-    ucmdbAdapter: config.ucmdb_adapter_enabled && rights.index < 1,
-    'ucmdbAdapter(/:pointName)(/:tabName)(/:integrationJobName)': config.ucmdb_adapter_enabled && rights.index < 1,
+    ucmdbAdapter: config.ucmdb_adapter_enabled && rights.index < 1 && rights.ucmdbAdapter,
+    'ucmdbAdapter(/:pointName)(/:tabName)(/:integrationJobName)': config.ucmdb_adapter_enabled && rights.index < 1 && rights.ucmdbAdapter,
     aql: rights.index < 1,
     views: rights.index < 1,
     'views/:id': rights.index < 1

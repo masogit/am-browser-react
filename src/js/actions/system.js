@@ -1,8 +1,9 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
 import Rest from '../util/grommet-rest-promise';
-import cookies from 'js-cookie';
+//import cookies from 'js-cookie';
 import * as Types from '../constants/ActionTypes';
+import store from '../store';
 import {
   CSRF_DEF_URL,
   ABOUT_DEF_URL,
@@ -24,7 +25,7 @@ export function init(email, headerString) {
 
 export function initToken() {
   return Rest.get(CSRF_DEF_URL).then(res => {
-    console.log('CSRF: ' + cookies.get('csrf-token'));
+    //console.log('CSRF: ' + cookies.get('csrf-token'));
   }, err => {
     if (err) {
       console.log('Get CSRF failed');
@@ -164,4 +165,68 @@ export function loadAllMetadataSuccess(rows) {
   return {type: Types.LOAD_ALL_METADATA_SUCCESS, rows};
 }
 
+export function showError(msg) {
+  store.dispatch({type: Types.RECEIVE_ERROR, msg});
+}
 
+export function showWarning(msg) {
+  store.dispatch({type: Types.RECEIVE_WARNING, msg});
+}
+
+export function showInfo(msg) {
+  store.dispatch({type: Types.RECEIVE_INFO, msg});
+}
+
+export function monitorEdit(origin, now) {
+  store.dispatch({type: Types.MONITOR_EDIT, edit: {origin, now}});
+}
+
+export function stopMonitorEdit() {
+  store.dispatch({type: Types.STOP_MONITOR_EDIT});
+}
+
+export function alert(alertInfo) {
+  store.dispatch({type: Types.ALERT, msg: alertInfo.msg, onConfirm: alertInfo.onConfirm, title: alertInfo.title});
+}
+
+export function dropCurrentPop(origin, current, initState, title, onConfirm) {
+  if(current._id ? !_.isEqual(origin, current) : !_.isEmpty(current) && !_.isEqual(initState, current)) {
+    const alertInfo = {
+      onConfirm,
+      title,
+      msg: 'Your current change are not saved, click confirm to drop the change'
+    };
+    alert(alertInfo);
+  } else {
+    onConfirm();
+  }
+}
+
+export function dropCurrentPop_stopMonitor(title, onConfirm) {
+  const state = store.getState();
+  if(state.session.edit) {
+    let now = state.session.edit.now;
+    if (typeof now == 'string') {
+      const params = now.split('.');
+      now = params.reduce((state, next) => state[next], state);
+    }
+    if(!_.isEqual(state.session.edit.origin, now)) {
+      const alertInfo = {
+        onConfirm: () => {
+          stopMonitorEdit();
+          onConfirm();
+        },
+        msg: 'Your current change are not saved, click confirm to drop the change',
+        title
+      };
+
+      alert(alertInfo);
+    } else {
+      stopMonitorEdit();
+      onConfirm();
+    }
+  } else {
+    stopMonitorEdit();
+    onConfirm();
+  }
+}

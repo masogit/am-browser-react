@@ -11,7 +11,7 @@ import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
 import RecordListLayer from '../explorer/RecordListLayer';
 import ActionTab from '../commons/ActionTab';
-import SideBar from '../commons/SideBar';
+import SideBar from '../commons/Sidebar';
 import EmptyIcon from '../commons/EmptyIcon';
 import * as Format from '../../util/RecordFormat';
 import Download from 'grommet/components/icons/base/Download';
@@ -19,9 +19,12 @@ import More from 'grommet/components/icons/base/More';
 import Mail from 'grommet/components/icons/base/Mail';
 import Trash from 'grommet/components/icons/base/Trash';
 import {saveAs} from 'file-saver';
+import {monitorEdit, stopMonitorEdit, dropCurrentPop, showInfo} from '../../actions/system';
+import Textarea from '../commons/Textarea';
+import SearchInput from '../commons/SearchInput';
 
 import {
-  Anchor, Box, Split, SearchInput, Form, FormField, FormFields, Layer, Tabs, Table, TableRow, Title, Header, Menu
+  Anchor, Box, Split, Form, FormField, FormFields, Layer, Tabs, Table, TableRow, Title, Header, Menu
 } from 'grommet';
 import Play from 'grommet/components/icons/base/Play';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
@@ -48,10 +51,17 @@ export default class AQL extends Component {
       graphData: {}
     };
     this._onClose = this._onClose.bind(this);
+    this.initAQL = {
+      str: '',
+      name: '',
+      category: '',
+      type: 'chart',
+      form: {}
+    };
   }
 
   componentDidMount() {
-    this._initAQL();
+    this._initAQL(() => monitorEdit(_.cloneDeep(this.state.aql), this.state.aql));
     this._loadViews();
     this._loadAQLs();
     this._loadInToolReport();
@@ -64,13 +74,7 @@ export default class AQL extends Component {
 
   _initAQL(callback) {
     this.setState({
-      aql: {
-        str: '',
-        name: '',
-        category: '',
-        type: 'chart',
-        form: 'init'
-      },
+      aql: _.cloneDeep(this.initAQL),
       data: {
         header: [],
         rows: []
@@ -112,6 +116,7 @@ export default class AQL extends Component {
       },
       graphData: graphData
     }, () => {
+      monitorEdit(_.cloneDeep(this.state.aql), this.state.aql);
       if (window.event && this.refs && this.refs[aql.type]) {
         this.refs[aql.type]._onClickTab(event);
       }
@@ -131,18 +136,23 @@ export default class AQL extends Component {
 
   _onQuery() {
     AQLActions.queryAQL(this.state.aql.str).then((data) => {
-      const aql = this.state.aql;
-      aql.form = 'init';
-      this.setState({
-        aql,
-        data
-      });
+      if (data) {
+        if (data.rows.length == 0) {
+          showInfo('No records found for this AQL');
+        } else {
+          this.setState({
+            aql: this.state.aql,
+            data
+          });
+        }
+      }
     });
   }
 
   _onSaveAQL() {
     AQLActions.saveAQL(this.state.aql).then(id => {
       if (id) {
+        stopMonitorEdit();
         this._loadAQLs(this);
         var aql = this.state.aql;
         aql._id = id;
@@ -160,16 +170,7 @@ export default class AQL extends Component {
   }
 
   _onNew() {
-    if (this.state.aql.str.trim() !== '') {
-      this.setState({
-        alertLayer: <AlertForm onClose={this._removeAlertLayer.bind(this)}
-                               title={'Create a new AQL?'}
-                               desc={'You have not saved AQL string: ' + this.state.aql.str}
-                               onConfirm={this._initAQL.bind(this)}/>
-      });
-    } else {
-      this._initAQL();
-    }
+    this.dropCurrentPop('Create a new AQL?', this._initAQL.bind(this));
   }
 
   _onDelete() {
@@ -236,7 +237,7 @@ export default class AQL extends Component {
     let graphData = this.state.graphData;
     let data = this.state.data;
     obj[path] = val;
-    if (path === 'str' && obj.form !== 'init') {
+    if (path === 'str' && !_.isEmpty(obj.form)) {
       // when AQL change, reset data, form and graphData
       obj.form = null;
       data = {
@@ -259,7 +260,7 @@ export default class AQL extends Component {
       aql.form = form;
       graphData[type] = form;
     } else {
-      aql.form = graphData[type] || 'init';
+      aql.form = graphData[type] || {};
     }
 
     this.setState({aql, graphData});
@@ -375,6 +376,14 @@ export default class AQL extends Component {
     }
   }
 
+  dropCurrentPop(title, onConfirm) {
+    const originAQL = this.state.aqls.filter(aql => aql._id == this.state.aql._id)[0];
+    const currentAQL = _.cloneDeep(this.state.aql);
+
+    delete currentAQL.data;
+    dropCurrentPop(originAQL, currentAQL, this.initAQL, title, onConfirm);
+  }
+
   render() {
     const header = this.state.data.header.map((col) => <th key={col.Index}>{col.Name}</th>);
 
@@ -395,14 +404,18 @@ export default class AQL extends Component {
     const contents = this.state.aqls.map((aql) => ({
       key: aql._id,
       groupby: aql.category,
-      onClick: this._loadAQL.bind(this, aql),
+      onClick: () => {
+        if (aql._id != this.state.aql._id) {
+          this.dropCurrentPop(`Open ${aql.name}`, this._loadAQL.bind(this, aql));
+        }
+      },
       search: aql.name,
       child: aql.name
     }));
 
     const focus = this.state.aql && {expand: this.state.aql.category, selected: this.state.aql._id};
     const validData = this.state.data.rows.length > 0 && this.state.data.header.length === this.state.data.rows[0].length;
-
+    const activeIndex = validData ? getIndex(this.state.aql.type) : 0;
     return (
       <Box direction="row" flex={true}>
         <SideBar title={`Graphs (${this.state.aqls.length})`} toolbar={toolbar} contents={contents} focus={focus}/>
@@ -414,8 +427,8 @@ export default class AQL extends Component {
               <Anchor link="#" icon={<Play />} onClick={() => this.state.aql.str && this._onQuery()} label="Query"
                       disabled={!this.state.aql.str}/>
               <Anchor link="#" icon={<Add />} onClick={this._onNew.bind(this)} label="New"/>
-              <Anchor link="#" icon={<Checkmark />} onClick={() => this.state.aql.str && this._onSave()} label="Save"
-                      disabled={!this.state.aql.str}/>
+              <Anchor link="#" icon={<Checkmark />} onClick={() => this.state.aql.str && this.state.aql.name && this.state.aql.category && this._onSave()} label="Save"
+                      disabled={!this.state.aql.str || !this.state.aql.name || !this.state.aql.category}/>
               <Anchor link="#" icon={<Close />} onClick={() => this.state.aql._id && this._onDelete()} label="Delete"
                       disabled={!this.state.aql._id}/>
               <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }}>
@@ -436,7 +449,8 @@ export default class AQL extends Component {
           <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'medium'}}>
             <Box justify="between" direction="row" className='header' flex={false}>
               <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_Box">
-                  <textarea id="AQL_Box" name="str" value={this.state.aql.str} rows="3"
+                  <Textarea id="AQL_Box" name="str" value={this.state.aql.str} rows="3"
+                            resize={!!this.state.aql.view && !!this.state.aql.view.name}
                             onChange={this._setFormValues.bind(this)}/>
               </FormField>
               <Form pad={{horizontal: 'small'}}>
@@ -462,7 +476,7 @@ export default class AQL extends Component {
             </Box>
             <Split flex="left" fixed={false} className='fixMinSizing'>
               <Box pad={{vertical: 'small'}}>
-                {validData && this.state.aql.form && this.state.aql.form != 'init' && this.state.aql.type &&
+                {validData && this.state.aql.form && !_.isEmpty(this.state.aql.form) && this.state.aql.type &&
                   <Box flex={false}>
                     <Graph type={this.state.aql.type} data={this.state.data} config={this.state.aql.form}
                        onClick={(filter) => this._showViewRecords(filter, this.state.aql.view)} />
@@ -479,7 +493,7 @@ export default class AQL extends Component {
               {
                 validData && this.state.aql.form &&
                 <Box pad={{horizontal: 'small'}}>
-                  <Tabs initialIndex={getIndex(this.state.aql.type)} justify='end'>
+                  <Tabs activeIndex={activeIndex} initialIndex={activeIndex} justify='end'>
                     <ActionTab title="Chart" onClick={this._genGraph.bind(this, null, 'chart')} ref='chart'>
                       <ChartForm {...this.state.aql} {...this.state.graphData} genGraph={this._genGraph.bind(this)}
                                                                                data={this.state.data}/>

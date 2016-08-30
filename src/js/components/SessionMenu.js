@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {logout, sendMessageToSlack } from '../actions/system';
+import {logout, sendMessageToSlack, dropCurrentPop_stopMonitor } from '../actions/system';
 import User from 'grommet/components/icons/base/User';
 import { Menu, Anchor, Layer, Box } from 'grommet';
 import MessageHistory from './MessageHistory';
@@ -29,7 +29,7 @@ class SessionMenu extends Component {
 
   _onLogout(event) {
     event.preventDefault();
-    this.props.dispatch(logout());
+    dropCurrentPop_stopMonitor('Log out', () => this.props.dispatch(logout()));
   }
 
   closeDialog() {
@@ -79,6 +79,6 @@ class SessionMenu extends Component {
   }
 }
 
-let select = (state) => ({session: state.session});
+let select = (state) => state;
 
 export default connect(select)(SessionMenu);

@@ -4,12 +4,12 @@ import RecordDetail from './RecordDetail';
 import RecordListLayer from './RecordListLayer';
 import ComponentBase from '../commons/ComponentBase';
 import history from '../../RouteHistory';
+import Spinning from 'grommet/components/icons/Spinning';
 import {
   Anchor, Box, Button, Header, Footer, Split, Table, TableRow, Tiles, Title, Tile, Form
 } from 'grommet';
 
 export default class RecordSearch extends ComponentBase {
-
   constructor() {
     super();
     this.state = {
@@ -17,46 +17,24 @@ export default class RecordSearch extends ComponentBase {
       results: [],
       record: null,
       view: null,
-      warning: null
+      warning: null,
+      searchText: '',
+      buttonDisabled: true
     };
-    this._setMessage.bind(this);
+    this.lastSearchTime = {};
   }
 
   componentDidMount() {
-    this._search(this.props.params.keyword);
+    this.checkSearchTextLength(this.props.params.keyword, this._search);
+    this.loadViews = ExplorerAction.loadViews();
   }
 
-  componentDidUpdate(prevProps, prevState) {
-  }
-
-  componentWillReceiveProps(nextProps) {
-  }
-
-  _setMessage(view, time, num) {
-    var messages = this.state.messages;
-    if (messages[view._id]) {
-      messages[view._id].timeEnd = time;
-      messages[view._id].num = num;
-    } else {
-      messages[view._id] = { view: view, timeStart: time, num: num };
-    }
-    this.setState({
-      messages: messages
-    });
-  }
-
-  _search(keyword) {
-    if (keyword.length <= 2) {
-      this.setState({
-        warning: 'Please type at least 3 words to search'
-      });
+  _search() {
+    if (!this.acquireLock()) {
       return;
     }
 
-    this.setState({
-      warning: ''
-    });
-
+    let keyword = this.state.searchText;
     //  Escaped for SQL. e.g. org.apache.commons.lang.StringEscapeUtils.escapeSql(String str).
     keyword = keyword.replace(/[']/g, '\'\'');
     keyword = encodeURI(keyword);
@@ -66,28 +44,42 @@ export default class RecordSearch extends ComponentBase {
       keyword: keyword
     }, () => {
       if (keyword)
-        ExplorerAction.loadViews().then(views => {
+        this.loadViews.then(views => {
           if (views instanceof Array) {
+            this.clearPromiseList();
             views.forEach((view) => {
               // check searchable
               var aql = view.body.fields.filter((field) => {
                 return field.searchable;
               });
               if (aql.length > 0) {
+                view.body.filter = "";
                 ExplorerAction.getBodyByKeyword(view.body, keyword);
-                this._setMessage(view, Date.now(), 0);
-                ExplorerAction.loadRecordsByBody(view.body).then((data) => {
-                  this._setMessage(view, Date.now(), data.count);
+                let messages = this.state.messages;
+                ExplorerAction.setMessage(messages, view, Date.now(), 0);
+                this.addPromise(ExplorerAction.loadRecordsByBody(view.body).then((data) => {
+                  ExplorerAction.setMessage(messages, view, Date.now(), data.count);
+                  var results = this.state.results;
                   if (data && data.entities.length > 0) {
-                    var results = this.state.results;
-                    results.push({ view: view, records: data.entities });
-                    this.setState({
-                      results: [...results]
-                    });
-                    this.releaseLock();
+                    results.push({view: view, records: data.entities});
                   }
-                });
+                  this.setState({
+                    results,
+                    messages
+                  });
+                }));
               }
+            });
+
+            Promise.all(this.promiseList).then(() => {
+              this.lastSearchTime[location.pathname] = {
+                end: new Date(),
+                searching: false
+              };
+
+              this.setState({
+                buttonDisabled: false
+              });
             });
           }
         });
@@ -134,20 +126,59 @@ export default class RecordSearch extends ComponentBase {
     });
   }
 
-  _onSearch(keyword) {
-    if (!this.acquireLock()) {
+  doNotNeedSearch(key) {
+    return this.lastSearchTime[key] && (this.lastSearchTime[key].searching || (new Date() - this.lastSearchTime[key].end < 2000));
+  }
+
+  _onSearch() {
+    const keyword = this.state.searchText;
+    const pathname = `/search/${encodeURI(keyword)}`;
+    if (location.pathname == decodeURI(pathname) && this.doNotNeedSearch(location.pathname)) {
+      if (!this.state.buttonDisabled) {
+        this.setState({
+          buttonDisabled: true
+        });
+      }
       return;
     }
-    history.push(`/search/${encodeURI(keyword)}`);
+
+    this.cancelPromises();
+
+    this.lastSearchTime[location.pathname] = {
+      searching:true,
+      end: 0
+    };
+
+    history.push(pathname);
     this.setState({
-      keyword: keyword
+      keyword: keyword,
+      buttonDisabled: true
     });
     this._search(keyword);
   }
 
+  checkSearchTextLength(searchText, callback) {
+    if (searchText.length <= 2) {
+      this.setState({
+        warning: 'Please type at least 3 words to search',
+        searchText,
+        buttonDisabled: true
+      });
+    } else {
+      this.setState({
+        warning: '',
+        searchText,
+        buttonDisabled: false
+      }, callback);
+    }
+  }
+
   _onEnter(event) {
     if (event.keyCode === 13) {
-      this._onSearch(event.target.value.trim());
+      this._onSearch();
+    } else {
+      const searchText = event.target.value.trim();
+      this.checkSearchTextLength(searchText);
     }
   }
 
@@ -177,8 +208,8 @@ export default class RecordSearch extends ComponentBase {
         <Header justify="between" pad={{'horizontal': 'medium'}}>
           <Title>Global Search</Title>
           <input type="search" className="flex" placeholder="Global Record search..." ref="search" style={{marginLeft: '20px', marginRight: '20px'}}
-            onKeyDown={this._onEnter.bind(this)} defaultValue={this.props.params.keyword} maxLength={50}/>
-          <Button label="Search" onClick={()=>this._onSearch(this.refs.search.value)} />
+            value={this.state.searchText} onChange={this._onEnter.bind(this)} onKeyDown={this._onEnter.bind(this)} maxLength={50}/>
+          <Button label="Search" onClick={()=>this._onSearch()} className={this.state.buttonDisabled ? 'grommetux-button--disabled' : ''}/>
         </Header>
         <Split flex="right" fixed={false} className={this.state.warning?'flex':''}>
           <Box pad="medium" flex={true}>
@@ -197,7 +228,7 @@ export default class RecordSearch extends ComponentBase {
                       <td>{msg.view.name}</td>
                       <td>
                         <Box align="end">
-                          {`${msg.timeEnd ? (msg.timeEnd - msg.timeStart) + 'ms' : ''}`}
+                          {`${msg.timeEnd ? (msg.timeEnd - msg.timeStart) + ' ms' : ''}`}
                         </Box>
                       </td>
                       <td>
@@ -221,9 +252,9 @@ export default class RecordSearch extends ComponentBase {
                 </Box>
               </Box>
               :
-              <Tiles flush={false} size="large" className='autoScroll' justify="around">
+              <Tiles flush={false} size="large" className='autoScroll justify-around'>
                 {
-                  this.state.results.map((result, i) => {
+                  this.locked ? <Spinning /> : this.state.results.map((result, i) => {
                     return result.records.map((record, j) => {
                       // var id = record['ref-link'].split('/')[2];
                       return (

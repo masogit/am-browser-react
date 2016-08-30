@@ -6,13 +6,12 @@ import ViewDefDetail from './ViewDefDetail';
 import ViewDefList from './ViewDefList';
 import RecordListLayer from '../explorer/RecordListLayer';
 import * as ViewDefActions from '../../actions/views';
-import * as MetadataActions from '../../actions/system';
+import * as SystemActions from '../../actions/system';
 import store from '../../store';
 import history from '../../RouteHistory';
 import Box from 'grommet/components/Box';
 
 class ViewDefListContainer extends Component {
-
   constructor(props) {
     super(props);
     this._onValueChange = this._onValueChange.bind(this);
@@ -47,7 +46,13 @@ class ViewDefListContainer extends Component {
     if (views && views.length > 0) {
       if (nextId && nextId != currentId) { // Click item in the list, with link like '/views/2', '2' is the id param.
         let selectedView = views.filter(view => view._id == nextId)[0];
+
+        SystemActions.monitorEdit(selectedView, 'views.selectedView');
         this.props.actions.setSelectedView(nextId, selectedView);
+      }
+
+      if(!this.categories) {
+        this.categories = _.uniq(views.map((view) => view.category));
       }
     }
   }
@@ -56,22 +61,15 @@ class ViewDefListContainer extends Component {
   }
 
   componentWillUnmount() {
-    this.props.actions.setSelectedView(null, {});
+    this.props.actions.clearSelectedView();
   }
 
   _onValueChange(path, newValue) {
-    //console.log("ViewDefListContainer - onValueChange - path: ");
-    //console.log(path);
-    //console.log("ViewDefListContainer - onValueChange - newValue: ");
-    //console.log(newValue);
     this.props.actions.updateSelectedView(this.props.selectedView, path, newValue);
   }
 
   _onSubmit() {
     this.props.actions.saveViewDef(this.props.selectedView).then((id) => {
-      //this.props.actions.updateViewDefList(updatedView);
-      //history.push("/views/" + id);
-      //this.props.actions.loadViews(id, this.props.location.pathname);
       this._onSaveSuccess();
     }, (err) => console.log("onSubmit - err: " + err));
   }
@@ -123,18 +121,15 @@ class ViewDefListContainer extends Component {
 
   render() {
     const {views, isFetchingViewList, selectedView, preview} = this.props;
-    let categories = _.uniq(views.map((view) => {
-      return view.category;
-    }));
     let {dispatch} = store;
     let boundActionCreators = bindActionCreators(ViewDefActions, dispatch);
-    let boundActionCreators2 = bindActionCreators(MetadataActions, dispatch);
+    let boundActionCreators2 = bindActionCreators(SystemActions, dispatch);
     return (
       <Box direction="row" flex={true}>
         <ViewDefList views={views} isFetchingViewList={isFetchingViewList} ref='viewDefList'
                      selectedView={selectedView} {...boundActionCreators} {...boundActionCreators2}/>
 
-        <ViewDefDetail selectedView={selectedView} categories={categories} compact={true}
+        <ViewDefDetail selectedView={selectedView} categories={this.categories} compact={true}
                        onValueChange={this._onValueChange}
                        onSubmit={this._onSubmit}
                        onSaveSuccess={this._onSaveSuccess}

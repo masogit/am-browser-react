@@ -9,7 +9,7 @@ import NavHeader from './NavHeader';
 import store from '../store';
 import * as Types from '../constants/ActionTypes';
 let timeout;
-
+let msgRemainTime = 5000;
 class Indexer extends Component {
 
   constructor() {
@@ -25,6 +25,16 @@ class Indexer extends Component {
     store.dispatch({type: Types.MESSAGE_READ});
   }
 
+  isNewMessage() {
+    const length = this.props.message.msgs.length;
+    if (length > 1) {
+      const lastMessage = this.props.message.msgs[length - 1];
+      const newMessage = this.props.message;
+      return lastMessage.id != newMessage.id;
+    }
+    return length != 1;
+  }
+
   render() {
     const {message, headerNavs, path} = this.props;
     let header;
@@ -33,17 +43,19 @@ class Indexer extends Component {
     }
     let alert;
     if (headerNavs && message.msg) { // not display in login page
-      if (timeout) {
+      if (timeout && this.isNewMessage()) {
         clearTimeout(timeout);
       }
       alert = (
-        <AlertForm onClose={this._newMsgRead} status={message.status} title={"Message alert"}
-                   desc={message.msg} onConfirm={this._newMsgRead}/>
+        <AlertForm onClose={this._newMsgRead} status={message.status} title={message.title || "Message alert"}
+                   desc={message.msg} onConfirm={message.onConfirm || this._newMsgRead}/>
       );
-      timeout = setTimeout(this._newMsgRead, 5000);
+      if (message.status) {
+        timeout = setTimeout(this._newMsgRead, msgRemainTime);
+      }
     }
     return (
-      <App >
+      <App centered={false}>
         <Box className='main-container'>
           {header}
           {alert}
@@ -54,14 +66,10 @@ class Indexer extends Component {
   }
 }
 
-let select = (state) => {
-  return Object.assign(
-    {},
-    state.nav,
-    {headerNavs: state.session.headerNavs},
-    {message: state.message},
-    {path: state.router.location.pathname}
-  );
-};
+let select = (state) => ({...state.nav,
+    headerNavs: state.session.headerNavs,
+    message: state.message,
+    path: state.router.location.pathname
+});
 
 export default connect(select)(Indexer);

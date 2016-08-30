@@ -6,16 +6,10 @@ import Header from 'grommet/components/Header';
 import Title from 'grommet/components/Title';
 import Menu from 'grommet/components/Menu';
 import SessionMenu from './SessionMenu';
+import {dropCurrentPop_stopMonitor} from '../actions/system';
+import history from '../RouteHistory';
 
-class NavHeader extends Component {
-
-  constructor() {
-    super();
-  }
-
-  componentDidMount() {
-  }
-
+export default class NavHeader extends Component {
   getActive(to) {
     return this.props.path.indexOf(to) > -1 ? 'active' : '';
   }
@@ -50,7 +44,15 @@ class NavHeader extends Component {
         </Title>
         <Menu direction="row" align="center" responsive={true}>
           {
-            links.map((link, index) => <Link key={index} to={link.to} className={`${this.getActive(link.to)}`} style={{textDecoration: 'none'}}>{link.text}</Link>)
+            links.map((link, index) => (
+              <Link key={index} to={link.to}
+                    className={`grommetux-anchor ${this.getActive(link.to)}`}
+                    onClick={e => {
+                      e.preventDefault();
+                      const goLink = defaultLinks.filter(linkObj => linkObj.to == link.to)[0];
+                      dropCurrentPop_stopMonitor(`Go to ${goLink.text}`, () => history.push(link.to));
+                    }}
+                    style={{backgroundColor: 'transparent'}}>{link.text}</Link>))
           }
           <SessionMenu />
         </Menu>
@@ -59,4 +61,3 @@ class NavHeader extends Component {
   }
 }
 
-export default NavHeader;
