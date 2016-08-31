@@ -4,7 +4,7 @@
 import expect from 'expect';
 import React from 'react';
 import TestUtils from 'react-addons-test-utils';
-import SideBar from '../../../src/js/components/commons/Sidebar';
+import SideBar from '../../../src/js/components/commons/AMSideBar';
 import {Sidebar, Header, Footer} from 'grommet';
 
 describe('commons - components/explorer/Sidebar-spec.js', () => {

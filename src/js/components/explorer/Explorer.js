@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import * as ExplorerActions from '../../actions/explorer';
 import RecordList from './RecordList';
 import Box from 'grommet/components/Box';
-import SideBar from '../commons/Sidebar';
+import SideBar from '../commons/AMSideBar';
 
 export default class Explorer extends Component {
 
@@ -50,7 +50,7 @@ export default class Explorer extends Component {
     return (
       <Box direction="row" flex={true}>
         {this.state.navigation &&
-          <SideBar title={`Views Navigation (${this.state.navigation.length})`}
+          <SideBar title='Views Navigation'
                    contents={this.state.navigation}
                    focus ={{expand: this.state.view ? this.state.view.category : false, selected: this.state.view ? this.state.view._id: ""}}/>}
         {this.state.view ? <RecordList body={this.state.view.body} title={this.state.view.name} root={true}/> :
