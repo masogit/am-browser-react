@@ -55,7 +55,7 @@ const opts = {
   devServerPort: 8001,
   // The 8010 port number needs to align with hostName in index.js
   devServerProxy: {
-    // if you need a prefix for dev server, please add it here
+    // if you need a prefix for dev server, you must add it here
     // eg: `http://${amb_config.node_server=='0.0.0.0'?'localhost':amb_config.node_server}:${amb_config.node_port}/AMB`
     '**': `http://${amb_config.node_server=='0.0.0.0'?'localhost':amb_config.node_server}:${amb_config.node_port}`
   },
