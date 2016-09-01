@@ -36,7 +36,8 @@ export default class MeterForm extends GraphForm {
     const col_unit_options = [{value: '', text: ''}];
     if (this.props.data.header) {
       this.props.data.header.map((header, index) => {
-        const option = {value: header.Index, text: `${header.Type}: ${header.Name}`};
+        //const option = {value: header.Index, text: `${header.Type}: ${header.Name}`};
+        const option = {value: header.Index, text: header.Name};
         if (_.includes(['Long', 'Short', 'Int', 'Double', 'Byte'], header.Type)) {
           col_options.push(option);
         }

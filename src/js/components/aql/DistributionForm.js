@@ -26,10 +26,12 @@ export default class DistributionForm extends GraphForm {
     const label_options = [{value: '', text: ''}];
     if (this.props.data.header) {
       this.props.data.header.map((header, index) => {
-        label_options.push({value:header.Index, text:`${header.Type}: ${header.Name}`});
+        //label_options.push({value:header.Index, text:`${header.Type}: ${header.Name}`});
+        label_options.push({value:header.Index, text: header.Name});
 
         if (_.includes(['Long', 'Short', 'Int', 'Double', 'Byte'], header.Type)) {
-          col_options.push({value: header.Index, text: `${header.Type}: ${header.Name}`});
+          //col_options.push({value: header.Index, text: `${header.Type}: ${header.Name}`});
+          col_options.push({value: header.Index, text: header.Name});
         }
       });
     }

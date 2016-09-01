@@ -2,15 +2,7 @@ import React, {Component} from 'react';
 import Next from'grommet/components/icons/base/Next';
 import Previous from 'grommet/components/icons/base/Previous';
 import {
-  CheckBox,
-  // Split,
-  Form,
-  FormFields,
-  FormField,
-  NumberInput,
-  Box,
-  Footer,
-  Anchor
+  CheckBox, Form, FormField, NumberInput, Box, Footer, Anchor
 } from 'grommet';
 import _ from 'lodash';
 import objectPath from 'object-path';
@@ -34,8 +26,8 @@ const InputField = ({label, name, value, onChange}) => (
 );
 
 const SwitchField = ({label, checked, name, onChange}) => (
-  <FormField key={name}>
-    <CheckBox checked={checked} label={label} toggle={true} id={name} name={name} onChange={onChange}/>
+  <FormField key={name} label={label}>
+    <CheckBox checked={checked} toggle={true} id={name} name={name} onChange={onChange}/>
   </FormField>
 );
 
@@ -45,7 +37,7 @@ const MultiCheckField = ({label, options}) => {
                 label={option.label} checked={option.checked} onChange={option.onChange}/>
     ));
   return (
-    <FormField label={label}>
+    <FormField label={label} className='multi-check'>
       {optionsComp}
     </FormField>
   );
@@ -163,32 +155,20 @@ export default class GraphForm extends Component {
 
   render(basicOptions, advanceOptions, selections) {
     const showAdvance = this.state.showAdvance;
-    let label, icon, formFields;
     const advance = genOptions(advanceOptions, this, this.state.type, selections);
     const basic = genOptions(basicOptions, this, this.state.type, selections);
-    formFields = basic;
-    if (!showAdvance) {
-      label = 'Advance';
-      icon = <Next />;
-      formFields = basic;
-    } else {
-      label = 'Basic';
-      icon = <Previous />;
-      formFields = advance;
-    }
 
     return (
       <Box>
-        <Form className='short-form'>
-          <FormFields>
-            {formFields}
-          </FormFields>
+        {
+          this.state.type == 'chart' && basic[0]
+        }
+        <Form className='vertical-form'>
+          {showAdvance ? advance : (this.state.type == 'chart' ? basic.slice(1) : basic)}
         </Form>
         {advance.length > 0 &&
-        <Footer justify="end">
-          <Anchor icon={icon} label={label} reverse={!showAdvance}
-                  onClick={() => this.setState({showAdvance: !showAdvance})} className='fontNormal'/>
-        </Footer>
+          <CheckBox label={showAdvance ? 'Basic' : 'Advance'} toggle={true} className='toggle'
+                    onChange={() => this.setState({showAdvance: !showAdvance})}/>
         }
       </Box>
     );
