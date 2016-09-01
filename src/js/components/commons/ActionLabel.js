@@ -3,13 +3,13 @@
  */
 
 import React from 'react';
-import {Label, Button} from 'grommet';
+import {Button} from 'grommet';
 
-const ActionLabel = ({label, icon, onClick}) => {
+const ActionLabel = ({label, icon, onClick, onLabelClick}) => {
   return (
     <div className='grommetux-action-label'>
-      <Label>{label}</Label>
-      <Button className='grommetux-label_control' icon={icon} onClick={onClick}/>
+      <p style={{margin: '12px 0', cursor: onLabelClick ? 'pointer' : 'default', minHeight: '1.375em'}} onClick={onLabelClick}>{label || ' '}</p>
+      {!onLabelClick && <Button className='grommetux-label_control' icon={icon} onClick={onClick}/>}
     </div>
   );
 };

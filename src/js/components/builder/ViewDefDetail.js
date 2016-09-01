@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import ComponentBase from '../commons/ComponentBase';
-import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Title, Split, Map} from 'grommet';
+import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Title, Split, Map, Layer} from 'grommet';
 import Close from 'grommet/components/icons/base/Close';
 import Up from 'grommet/components/icons/base/LinkUp';
 import Down from 'grommet/components/icons/base/LinkDown';
@@ -19,6 +19,7 @@ import FieldTypes from '../../constants/FieldTypes';
 import {saveAs} from 'file-saver';
 import SearchInput from '../commons/SearchInput';
 import {bodyToMapData} from '../../util/util';
+import ActionLabel from '../commons/ActionLabel';
 
 const _onMail = (view) => {
   if (view._id) {
@@ -304,19 +305,52 @@ export default class ViewDefDetail extends ComponentBase {
     this.props.onClickTableTitle(nameList.split('.'));
   }
 
+  _onClose() {
+    this.setState({
+      layer: null
+    });
+  }
+
+  getLayer(type) {
+    if (type == 'description') {
+      return (
+        <Layer onClose={this._onClose.bind(this)} closer={true}>
+          <Box flex={true} pad={{vertical: 'large'}} size='large'>
+            <FormField label="Description" htmlFor='desc'>
+              <textarea id='desc' name="v.desc" value={this.props.selectedView.desc}
+                        onChange={this._onChange}></textarea>
+            </FormField>
+          </Box>
+        </Layer>
+      );
+    }
+  }
+
+  getAlertLayer(type) {
+    let title, onConfirm;
+    switch (type) {
+      case 'save': {
+        title = `Save '${selectedView.name}'?`;
+        onConfirm = this._onSubmit;
+        break;
+      }
+      case 'duplicate': {
+        title = `Duplicate view definition '${selectedView.name}'?"`;
+        onConfirm = this._onDuplicate;
+        break;
+      }
+      case 'delete': {
+        title = `You're about to delete '${selectedView.name}', continue?`;
+        onConfirm = this._onDelete;
+        break;
+      }
+    }
+
+    return title && <AlertForm onClose={this.closeAlertForm} title={title} onConfirm={onConfirm}/>;
+  }
+
   render() {
     let {selectedView} = this.props;
-    let alertForms = selectedView && selectedView.name ? {
-      save: <AlertForm onClose={this.closeAlertForm}
-                       title={"Save '" + selectedView.name + "'?"}
-                       onConfirm={this._onSubmit}/>,
-      duplicate: <AlertForm onClose={this.closeAlertForm}
-                            title={"Duplicate view definition '" + selectedView.name + "'?"}
-                            onConfirm={this._onDuplicate}/>,
-      delete: <AlertForm onClose={this.closeAlertForm}
-                         title={"You're about to delete '" + selectedView.name + "', continue?"}
-                         onConfirm={this._onDelete}/>
-    } : null;
 
     let p = "input", table;
 
@@ -340,6 +374,7 @@ export default class ViewDefDetail extends ComponentBase {
     return (
       !_.isEmpty(selectedView) ?
         <Box flex={true}>
+          {this.getLayer(this.state.layer)}
           <Header justify="between" pad={{horizontal: 'medium'}}>
             <Title>View Builder</Title>
             <Menu direction="row" align="center" responsive={true}>
@@ -382,18 +417,17 @@ export default class ViewDefDetail extends ComponentBase {
                     <input id="v.name" name="v.name" type="text" onChange={this._onChange}
                            value={selectedView.name}/>
                   </FormField>
-                  <FormField label="Description" htmlFor={p + "item2"}>
-                    <textarea id="v.desc" name="v.desc" value={selectedView.desc}
-                              onChange={this._onChange}></textarea>
-                  </FormField>
                   <FormField label="Category" htmlFor={p + "item3"}>
                     <SearchInput id="v.category" name="v.category" value={selectedView.category}
                                  suggestions={this.props.categories} onDOMChange={this._onChange}
                                  onSelect={this._setCategory}/>
                   </FormField>
+                  <FormField label="Description">
+                    <ActionLabel label={selectedView.desc} onLabelClick={() => this.setState({layer: 'description'})}/>
+                  </FormField>
                 </Form>
               </Box>
-              {alertForms && alertForms[this.state.alertForm]}
+              {selectedView && selectedView.name && this.getAlertLayer(this.state.alertForm)}
             </Split>
           </Box>
         </Box>

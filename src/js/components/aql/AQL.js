@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import _ from 'lodash';
 import ChartForm from './ChartForm';
 import MeterForm from './MeterForm';
@@ -17,10 +17,10 @@ import Mail from 'grommet/components/icons/base/Mail';
 import Trash from 'grommet/components/icons/base/Trash';
 import {saveAs} from 'file-saver';
 import {monitorEdit, stopMonitorEdit, dropCurrentPop, showInfo} from '../../actions/system';
-import Textarea from '../commons/Textarea';
 import SearchInput from '../commons/SearchInput';
+import ComponentBase from '../commons/ComponentBase';
 import {
-  Anchor, Box, Split, Form, FormField, FormFields, Layer, Tabs, Table, TableRow, Title, Header, Menu
+  Anchor, Box, Form, FormField, Layer, Tabs, Table, TableRow, Title, Header, Menu
 } from 'grommet';
 import Play from 'grommet/components/icons/base/Play';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
@@ -29,7 +29,7 @@ import Add from 'grommet/components/icons/base/Add';
 import Attachment from 'grommet/components/icons/base/Attachment';
 import ActionLabel from '../commons/ActionLabel';
 
-export default class AQL extends Component {
+export default class AQL extends ComponentBase {
 
   constructor() {
     super();
@@ -37,10 +37,7 @@ export default class AQL extends Component {
       reports: {},
       aqls: [],
       categories: [],
-      aql: {
-        name: '',
-        category: ''
-      },
+      aql: {},
       data: {
         header: [],
         rows: []
@@ -58,7 +55,6 @@ export default class AQL extends Component {
   }
 
   componentDidMount() {
-    this._initAQL(() => monitorEdit(_.cloneDeep(this.state.aql), this.state.aql));
     this._loadViews();
     this._loadAQLs();
     this._loadInToolReport();
@@ -89,7 +85,7 @@ export default class AQL extends Component {
   }
 
   _loadAQLs() {
-    AQLActions.loadAQLs().then((data) => {
+    this.addPromise(AQLActions.loadAQLs().then((data) => {
       let categories = _.uniq(data.map((aql) => {
         return aql.category;
       }));
@@ -97,7 +93,7 @@ export default class AQL extends Component {
         aqls: data,
         categories: categories
       });
-    });
+    }));
   }
 
   _loadAQL(aql) {
@@ -122,17 +118,17 @@ export default class AQL extends Component {
   }
 
   _loadInToolReport() {
-    AQLActions.loadReports().then(data => {
+    this.addPromise(AQLActions.loadReports().then(data => {
       if (data) {
         this.setState({
           reports: data
         });
       }
-    });
+    }));
   }
 
   _onQuery() {
-    AQLActions.queryAQL(this.state.aql.str).then((data) => {
+    this.addPromise(AQLActions.queryAQL(this.state.aql.str).then((data) => {
       if (data) {
         if (data.rows.length == 0) {
           showInfo('No records found for this AQL');
@@ -143,7 +139,7 @@ export default class AQL extends Component {
           });
         }
       }
-    });
+    }));
   }
 
   _onSaveAQL() {
@@ -158,23 +154,9 @@ export default class AQL extends Component {
     });
   }
 
-  _onSave() {
-    this.setState({
-      alertLayer: <AlertForm onClose={this._removeAlertLayer.bind(this)}
-                             title={'Save AQL: ' + this.state.aql.name + '?'}
-                             desc={'AQL string: ' + this.state.aql.str} onConfirm={this._onSaveAQL.bind(this)}/>
-    });
-  }
-
   _onNew() {
-    this.dropCurrentPop('Create a new AQL?', this._initAQL.bind(this));
-  }
-
-  _onDelete() {
-    this.setState({
-      alertLayer: <AlertForm onClose={this._removeAlertLayer.bind(this)}
-                             title={'Delete AQL: ' + this.state.aql.name}
-                             desc={'AQL string: ' + this.state.aql.str} onConfirm={this._removeAQL.bind(this)}/>
+    this.dropCurrentPop('Create a new AQL?', () => {
+      this._initAQL(() => monitorEdit(_.cloneDeep(this.state.aql), this.state.aql));
     });
   }
 
@@ -206,14 +188,41 @@ export default class AQL extends Component {
   }
 
   _removeView() {
-    this.setState({
-      alertLayer: <AlertForm onClose={this._removeAlertLayer.bind(this)}
-                             title={'Remove attached view?'}
-                             desc={'View name: ' + this.state.aql.view.name}
-                             onConfirm={()=>{
-                               this.state.aql.view=null;
-                             }}/>
-    });
+    this.setState({ alertLayer: 'remove_view' });
+  }
+
+  _onDelete() {
+    this.setState({alertLayer: 'delete'});
+  }
+
+  _onSave() {
+    this.setState({alertLayer: 'save'});
+  }
+
+  getAlertLayer(type) {
+    let title, desc, onConfirm;
+    switch (type) {
+      case 'remove_view' : {
+        title = 'Remove attached view?';
+        desc = 'View name: ' + this.state.aql.view.name;
+        onConfirm = ()=> this.state.aql.view=null;
+        break;
+      }
+      case 'delete': {
+        title = 'Delete AQL: ' + this.state.aql.name;
+        desc = 'AQL string: ' +this.state.aql.str;
+        onConfirm = this._removeAQL.bind(this);
+        break;
+      }
+      case 'save': {
+        title = 'Save AQL: ' + this.state.aql.name + '?';
+        desc = 'AQL string: ' + this.state.aql.str;
+        onConfirm = this._onSaveAQL.bind(this);
+        break;
+      }
+    }
+
+    return title && <AlertForm title={title} desc={desc} onConfirm={onConfirm} onClose={this._removeAlertLayer.bind(this)}/>;
   }
 
   _loadOOBAQL(report) {
@@ -326,6 +335,10 @@ export default class AQL extends Component {
     });
   }
 
+  _updateAQLStr() {
+    this.setState({layer: 'aql_str'});
+  }
+
   popupLayer(type) {
     const {reports, views} = this.state;
     if (type == 'reports') {
@@ -358,6 +371,17 @@ export default class AQL extends Component {
       );
     } else if (typeof type == 'object' && type.type == 'records') {
       return <RecordListLayer body={type.args.body} title={type.args.name} onClose={this._onClose.bind(this)}/>;
+    } else if (type == 'aql_str') {
+      return (
+        <Layer onClose={this._onClose} closer={true}>
+          <Box flex={true} pad={{vertical: 'large'}} size='large'>
+            <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_Box">
+                  <textarea id="AQL_Box" name="str" value={this.state.aql.str} rows="5"
+                            onChange={this._setFormValues.bind(this)}/>
+            </FormField>
+          </Box>
+        </Layer>
+      );
     }
   }
 
@@ -385,7 +409,7 @@ export default class AQL extends Component {
       return 0;
     };
 
-    const toolbar = <Anchor href="#" icon={<Add />} label="Widgets" onClick={this._selectReports.bind(this)}/>;
+    const toolbar = <Anchor icon={<Add />} onClick={this._onNew.bind(this)} label="New"/>;
     const contents = this.state.aqls.map((aql) => ({
       key: aql._id,
       groupby: aql.category,
@@ -404,68 +428,43 @@ export default class AQL extends Component {
     return (
       <Box direction="row" flex={true}>
         <SideBar title='Graphs' toolbar={toolbar} contents={contents} focus={focus}/>
-        <Box flex={true}>
-          {this.state.alertLayer}
+        {!_.isEmpty(this.state.aql) ? <Box flex={true}>
+          {this.getAlertLayer(this.state.alertLayer)}
           <Header justify="between" pad={{'horizontal': 'medium'}}>
             <Title>AQL and Graph</Title>
             <Menu direction="row" align="center" responsive={true}>
               <Anchor link="#" icon={<Play />} onClick={() => this.state.aql.str && this._onQuery()} label="Query"
                       disabled={!this.state.aql.str}/>
-              <Anchor link="#" icon={<Add />} onClick={this._onNew.bind(this)} label="New"/>
-              <Anchor link="#" icon={<Checkmark />} onClick={() => this.state.aql.str && this.state.aql.name && this.state.aql.category && this._onSave()} label="Save"
+              <Anchor link="#" icon={<Checkmark />}
+                      onClick={() => this.state.aql.str && this.state.aql.name && this.state.aql.category && this._onSave()}
+                      label="Save"
                       disabled={!this.state.aql.str || !this.state.aql.name || !this.state.aql.category}/>
               <Anchor link="#" icon={<Close />} onClick={() => this.state.aql._id && this._onDelete()} label="Delete"
                       disabled={!this.state.aql._id}/>
               <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }}>
                 {
                   this.state.aql._id &&
-                  <Anchor link="#" icon={<Mail />} onClick={() => this.state.aql._id && this._onMail(this.state.aql)}
+                  <Anchor icon={<Mail />} onClick={() => this.state.aql._id && this._onMail(this.state.aql)}
                           label="Mail" disabled={!this.state.aql._id}/>
                 }
-                <Anchor link="#" icon={<Download />}
+                <Anchor icon={<Download />}
                         onClick={() => this.state.aql._id && this._onDownload(this.state.aql)}
                         label="Download" disabled={!this.state.aql._id}/>
-                <Anchor link="#" icon={<Attachment />} onClick={() => this.state.aql.str && this._selectView()}
+                <Anchor icon={<Attachment />} onClick={() => this.state.aql.str && this._selectView()}
                         disabled={!this.state.aql.str}
                         label={this.state.aql.view ? 'Attached view: ' + this.state.aql.view.name : 'Attach View'}/>
+                <Anchor icon={<Add />} label="Widgets" onClick={this._selectReports.bind(this)}/>
               </Menu>
             </Menu>
           </Header>
           <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'medium'}}>
-            <Box justify="between" direction="row" className='header' flex={false}>
-              <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_Box">
-                  <Textarea id="AQL_Box" name="str" value={this.state.aql.str} rows="3"
-                            resize={!!this.state.aql.view && !!this.state.aql.view.name}
-                            onChange={this._setFormValues.bind(this)}/>
-              </FormField>
-              <Form pad={{horizontal: 'small'}}>
-                <FormFields className='short-form'>
-                  <FormField label="AQL Name" htmlFor="AQL_Name">
-                    <input id="AQL_Name" type="text" name="name" value={this.state.aql.name}
-                           onChange={this._setFormValues.bind(this)}/>
-                  </FormField>
-                  <FormField label="Category" htmlFor="AQL_Category">
-                    <SearchInput id="AQL_Category" type="text" name="category" value={this.state.aql.category}
-                                 onDOMChange={this._setFormValues.bind(this)} suggestions={this.state.categories}
-                                 onSelect={this._setCategory.bind(this)} />
-                  </FormField>
-                  {
-                    this.state.aql.view &&
-                    <FormField label="Link to" htmlFor="AQL_LinkTo">
-                      <ActionLabel label={`View: ${this.state.aql.view.name}`}
-                                   icon={<Trash />} onClick={this._removeView.bind(this)}/>
-                    </FormField>
-                  }
-                </FormFields>
-              </Form>
-            </Box>
-            <Split flex="left" fixed={false} className='fixMinSizing'>
-              <Box pad={{vertical: 'small'}}>
+            <Box direction='row' className='fixMinSizing'>
+              <Box pad={{vertical: 'small'}} flex={true}>
                 {validData && this.state.aql.form && !_.isEmpty(this.state.aql.form) && this.state.aql.type &&
-                  <Box flex={false}>
-                    <Graph type={this.state.aql.type} data={this.state.data} config={this.state.aql.form}
-                       onClick={(filter) => this._showViewRecords(filter, this.state.aql.view)} />
-                  </Box>}
+                <Box flex={false}>
+                  <Graph type={this.state.aql.type} data={this.state.data} config={this.state.aql.form}
+                         onClick={(filter) => this._showViewRecords(filter, this.state.aql.view)}/>
+                </Box>}
                 <Table>
                   <thead>
                   <tr>{header}</tr>
@@ -501,9 +500,40 @@ export default class AQL extends Component {
                 </Box>
               }
               {this.state.layer && this.popupLayer(this.state.layer)}
-            </Split>
+              <Box justify="between" className='header'>
+                <Form pad='none' compact={true}>
+                  <FormField label="AQL Name" htmlFor="AQL_Name">
+                    <input id="AQL_Name" type="text" name="name" value={this.state.aql.name}
+                           onChange={this._setFormValues.bind(this)}/>
+                  </FormField>
+                  <FormField label="Category" htmlFor="AQL_Category">
+                    <SearchInput id="AQL_Category" type="text" name="category" value={this.state.aql.category}
+                                 onDOMChange={this._setFormValues.bind(this)} suggestions={this.state.categories}
+                                 onSelect={this._setCategory.bind(this)}/>
+                  </FormField>
+                  <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_STR">
+                    <ActionLabel id="AQL_STR" label={this.state.aql.str}
+                                 onLabelClick={this._updateAQLStr.bind(this)}/>
+                  </FormField>
+                  {
+                    this.state.aql.view &&
+                    <FormField label="Linked to" htmlFor="AQL_LinkTo">
+                      <ActionLabel label={`View: ${this.state.aql.view.name}`}
+                                   icon={<Trash/>} onClick={this._removeView.bind(this)}/>
+                    </FormField>
+                  }
+                </Form>
+              </Box>
+            </Box>
           </Box>
         </Box>
+          :
+          <Box pad={{horizontal: 'medium'}} flex={true} justify='center' align="center">
+            <Box size="medium" colorIndex="light-2" pad={{horizontal: 'large', vertical: 'medium'}} align='center'>
+              Select an item or create a new one.
+            </Box>
+          </Box>
+        }
       </Box>
     );
   }
