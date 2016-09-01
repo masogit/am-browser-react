@@ -26,7 +26,7 @@ export function getVersionFromLiveNetWork() {
   return Rest.get(LNW_DEF_URL)
     .then(res => ({
       list: res.body || [],
-      err: res.text
+      err: !res.body && res.text
     }));
 }
 
