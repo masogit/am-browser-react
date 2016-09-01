@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import ComponentBase from '../commons/ComponentBase';
-import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Title, Split} from 'grommet';
+import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Title, Split, Map} from 'grommet';
 import Close from 'grommet/components/icons/base/Close';
 import Up from 'grommet/components/icons/base/LinkUp';
 import Down from 'grommet/components/icons/base/LinkDown';
@@ -18,6 +18,7 @@ import AlertForm from '../../components/commons/AlertForm';
 import FieldTypes from '../../constants/FieldTypes';
 import {saveAs} from 'file-saver';
 import SearchInput from '../commons/SearchInput';
+import {bodyToMapData} from '../../util/util';
 
 const _onMail = (view) => {
   if (view._id) {
@@ -370,6 +371,9 @@ export default class ViewDefDetail extends ComponentBase {
           <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'medium'}}>
             <Split flex="left" fixed={false} className='fixMinSizing'>
               <Box flex={true}>
+                {
+                  selectedView.body.sqlname && <Map vertical={true} data={bodyToMapData(selectedView.body)} />
+                }
                 {table}
               </Box>
               <Box pad={table ? 'small' : 'none'}>
