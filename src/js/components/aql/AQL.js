@@ -28,6 +28,8 @@ import Close from 'grommet/components/icons/base/Close';
 import Add from 'grommet/components/icons/base/Add';
 import Attachment from 'grommet/components/icons/base/Attachment';
 import ActionLabel from '../commons/ActionLabel';
+import EditLayer from '../../components/commons/EditLayer';
+import ContentPlaceHolder from '../../components/commons/ContentPlaceHolder';
 
 export default class AQL extends ComponentBase {
 
@@ -373,14 +375,10 @@ export default class AQL extends ComponentBase {
       return <RecordListLayer body={type.args.body} title={type.args.name} onClose={this._onClose.bind(this)}/>;
     } else if (type == 'aql_str') {
       return (
-        <Layer onClose={this._onClose} closer={true}>
-          <Box flex={true} pad={{vertical: 'large'}} size='large'>
-            <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_Box">
-                  <textarea id="AQL_Box" name="str" value={this.state.aql.str} rows="5"
-                            onChange={this._setFormValues.bind(this)}/>
-            </FormField>
-          </Box>
-        </Layer>
+        <EditLayer onChange={this._setFormValues.bind(this)}
+                  label='Input AM Query Language (AQL)'
+                  value={this.state.aql.str}
+                  onClose={this._onClose} />
       );
     }
   }
@@ -506,14 +504,14 @@ export default class AQL extends ComponentBase {
                     <input id="AQL_Name" type="text" name="name" value={this.state.aql.name}
                            onChange={this._setFormValues.bind(this)}/>
                   </FormField>
+                  <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_STR">
+                    <textarea id="AQL_STR" value={this.state.aql.str} onChange={this._updateAQLStr.bind(this)}
+                              onClick={this._updateAQLStr.bind(this)}/>
+                  </FormField>
                   <FormField label="Category" htmlFor="AQL_Category">
                     <SearchInput id="AQL_Category" type="text" name="category" value={this.state.aql.category}
                                  onDOMChange={this._setFormValues.bind(this)} suggestions={this.state.categories}
                                  onSelect={this._setCategory.bind(this)}/>
-                  </FormField>
-                  <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_STR">
-                    <ActionLabel id="AQL_STR" label={this.state.aql.str}
-                                 onLabelClick={this._updateAQLStr.bind(this)}/>
                   </FormField>
                   {
                     this.state.aql.view &&
@@ -527,12 +525,7 @@ export default class AQL extends ComponentBase {
             </Box>
           </Box>
         </Box>
-          :
-          <Box pad={{horizontal: 'medium'}} flex={true} justify='center' align="center">
-            <Box size="medium" colorIndex="light-2" pad={{horizontal: 'large', vertical: 'medium'}} align='center'>
-              Select an item or create a new one.
-            </Box>
-          </Box>
+          : <ContentPlaceHolder/>
         }
       </Box>
     );

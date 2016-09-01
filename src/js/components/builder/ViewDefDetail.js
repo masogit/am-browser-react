@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import ComponentBase from '../commons/ComponentBase';
-import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Title, Split, Map, Layer} from 'grommet';
+import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Title, Split, Map} from 'grommet';
 import Close from 'grommet/components/icons/base/Close';
 import Up from 'grommet/components/icons/base/LinkUp';
 import Down from 'grommet/components/icons/base/LinkDown';
@@ -15,11 +15,12 @@ import More from 'grommet/components/icons/base/More';
 import Mail from 'grommet/components/icons/base/Mail';
 import _ from 'lodash';
 import AlertForm from '../../components/commons/AlertForm';
+import EditLayer from '../../components/commons/EditLayer';
+import ContentPlaceHolder from '../../components/commons/ContentPlaceHolder';
 import FieldTypes from '../../constants/FieldTypes';
 import {saveAs} from 'file-saver';
 import SearchInput from '../commons/SearchInput';
 import {bodyToMapData} from '../../util/util';
-import ActionLabel from '../commons/ActionLabel';
 
 const _onMail = (view) => {
   if (view._id) {
@@ -314,14 +315,11 @@ export default class ViewDefDetail extends ComponentBase {
   getLayer(type) {
     if (type == 'description') {
       return (
-        <Layer onClose={this._onClose.bind(this)} closer={true}>
-          <Box flex={true} pad={{vertical: 'large'}} size='large'>
-            <FormField label="Description" htmlFor='desc'>
-              <textarea id='desc' name="v.desc" value={this.props.selectedView.desc}
-                        onChange={this._onChange}></textarea>
-            </FormField>
-          </Box>
-        </Layer>
+        <EditLayer
+          onChange={this._onChange.bind(this)}
+          value={this.props.selectedView.desc}
+          label='Description'
+          onClose={this._onClose.bind(this)} />
       );
     }
   }
@@ -417,13 +415,14 @@ export default class ViewDefDetail extends ComponentBase {
                     <input id="v.name" name="v.name" type="text" onChange={this._onChange}
                            value={selectedView.name}/>
                   </FormField>
+                  <FormField label="Description">
+                    <textarea value={selectedView.desc} onClick={() => this.setState({layer: 'description'})}
+                              onChange={() => this.setState({layer: 'description'})}/>
+                  </FormField>
                   <FormField label="Category" htmlFor={p + "item3"}>
                     <SearchInput id="v.category" name="v.category" value={selectedView.category}
                                  suggestions={this.props.categories} onDOMChange={this._onChange}
                                  onSelect={this._setCategory}/>
-                  </FormField>
-                  <FormField label="Description">
-                    <ActionLabel label={selectedView.desc} onLabelClick={() => this.setState({layer: 'description'})}/>
                   </FormField>
                 </Form>
               </Box>
@@ -431,13 +430,7 @@ export default class ViewDefDetail extends ComponentBase {
             </Split>
           </Box>
         </Box>
-        :
-        <Box pad={{horizontal: 'medium'}} flex={true} justify='center' align="center">
-          <Box size="medium" colorIndex="light-2" pad={{horizontal: 'large', vertical: 'medium'}} align='center'>
-            Select an item or create a new one.
-          </Box>
-        </Box>
-
+        : <ContentPlaceHolder/>
     );
   }
 }
