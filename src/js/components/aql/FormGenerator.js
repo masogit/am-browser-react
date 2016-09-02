@@ -138,8 +138,8 @@ export default class GraphForm extends Component {
   }
 
   initState(state = {}) {
-    state.showBasic = true;
-    state.showAdvance = false;
+    state.showBasic = this.state.showBasic == undefined ? true : this.state.showBasic;
+    state.showAdvance = this.state.showAdvance == undefined ? false : this.state.showAdvance;
     return state;
   }
 

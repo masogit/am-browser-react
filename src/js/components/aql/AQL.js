@@ -354,7 +354,7 @@ export default class AQL extends ComponentBase {
 
       return (
         <Layer onClose={this._onClose} closer={true} align="left">
-          <SideBar title='AQL Selector' contents={contents} separator={'none'} colorIndex='light-1'/>
+          <SideBar title='AQL Selector' contents={contents} separator={'none'} colorIndex='light-1' toggle={false}/>
         </Layer>
       );
     } else if (type == 'view') {
@@ -368,7 +368,7 @@ export default class AQL extends ComponentBase {
 
       return (
         <Layer onClose={this._onClose} closer={true} align="left">
-          <SideBar title='Views Selector' contents={contents} separator={'none'} colorIndex='light-1'/>
+          <SideBar title='Views Selector' contents={contents} separator={'none'} colorIndex='light-1' toggle={false}/>
         </Layer>
       );
     } else if (typeof type == 'object' && type.type == 'records') {
@@ -378,7 +378,10 @@ export default class AQL extends ComponentBase {
         <EditLayer onChange={this._setFormValues.bind(this)}
                   label='Input AM Query Language (AQL)' name='str'
                   value={this.state.aql.str}
-                  onClose={this._onClose} />
+                  onClose={() => {
+                    this._onClose();
+                    this._onQuery();
+                  }} />
       );
     }
   }

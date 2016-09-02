@@ -3,7 +3,7 @@
  */
 
 import React, {Component} from 'react';
-import { Header, Sidebar, Menu, Box, Footer, Anchor } from 'grommet';
+import { Header, Sidebar, Menu, Box, Footer, Anchor, Title } from 'grommet';
 import GroupList from './GroupList';
 import GroupListItem from './GroupListItem';
 import EmptyIcon from './EmptyIcon';
@@ -40,7 +40,7 @@ export default class AMSideBar extends Component {
   }
 
   render() {
-    const {toolbar, contents, focus, footer, loading, separator, colorIndex, showSidebar} = this.props;
+    const {toolbar, contents, focus, footer, loading, separator, colorIndex, showSidebar, toggle} = this.props;
     if (!showSidebar) {
       return (
         <Sidebar fixed={true} separator={separator || 'right'} full={false} style={{minHeight: '100%', width: '50px'}}
@@ -89,7 +89,10 @@ export default class AMSideBar extends Component {
       <Sidebar fixed={true} separator={separator || 'right'} full={false} style={{minHeight: '100%'}} colorIndex={colorIndex || 'light-2'}>
         <Box style={{overflow: 'visible'}} className='fixMinSizing'>
           <Header justify="between" pad='small'>
-            <Anchor icon={<ChapterPrevious/>} onClick={toggleSidebar} label={this.state.title} className='grommetux-title'/>
+            {toggle == false ? <Title>{this.state.title}</Title>
+              : (<Anchor icon={<ChapterPrevious/>} onClick={toggleSidebar} label={this.state.title}
+                      className='grommetux-title'/>)
+            }
             {toolbar &&
             <Menu direction="row" align="center" responsive={false}>
               {toolbar}
