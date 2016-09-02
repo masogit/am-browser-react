@@ -83,6 +83,10 @@ export default class RecordList extends Component {
         param.groupby = groupby;
         this.setState({param, graphData : null});
         return;
+      } else {
+        this.setState({
+          locked: true
+        });
       }
       let body = Object.assign({}, this.props.body);
 
@@ -99,7 +103,8 @@ export default class RecordList extends Component {
         param.groupby = groupby;
         this.setState({
           graphData: (data && data.rows.length > 0) ? data : null,
-          param: param
+          param: param,
+          locked: false
         });
       });
     }
@@ -377,8 +382,16 @@ export default class RecordList extends Component {
       let isPrimary = (this.props.body.groupby == field.sqlname) || field.searchable;
       return (
         <Anchor key={`a_groupby_${index}`} icon={selected?<CheckboxSelected />:<Checkbox />}
-                label={label} primary={isPrimary}
-                onClick={() => selected ? this._clearGroupBy(field.sqlname) : this._getGroupByData(field.sqlname)}/>
+                label={label} primary={isPrimary} disabled={this.state.locked}
+                onClick={() => {
+                  if (!this.state.locked) {
+                    if (selected) {
+                      this._clearGroupBy(field.sqlname);
+                    } else {
+                      this._getGroupByData(field.sqlname);
+                    }
+                  }
+                }}/>
       );
     });
 
@@ -388,12 +401,6 @@ export default class RecordList extends Component {
   }
 
   renderToolBox() {
-
-    const aqlStyle = {
-      'fontWeight': 'bold',
-      'color': '#767676',
-      'borderColor': '#FFD144'
-    };
     const resultRecords = this.state.filtered ? this.state.filtered : this.state.records;
 
     const aqlWhere = "press / input AQL where statement";
@@ -403,8 +410,8 @@ export default class RecordList extends Component {
     return (
       <Header justify="between">
         <Title>{this.props.title}</Title>
-        <input type="text" className="flex" ref="search" style={this.state.param.aqlInput ? aqlStyle : {}}
-               placeholder={placeholder} onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
+        <input type="text" className={this.state.param.aqlInput ? 'aql flex' : 'flex'} ref="search"
+               placeholder={placeholder} disabled={this.state.locked} onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
         <Box direction="column">
           <Anchor onClick={this._getMoreRecords.bind(this)} disabled={this.state.loading}>
             <Box style={{fontSize: '70%', fontWeight: 'bold'}}>
