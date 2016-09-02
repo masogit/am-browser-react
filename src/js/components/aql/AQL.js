@@ -407,7 +407,7 @@ export default class AQL extends ComponentBase {
       return 0;
     };
 
-    const toolbar = <Anchor icon={<Add />} onClick={this._onNew.bind(this)} label="New"/>;
+    const toolbar = <Anchor icon={<Add />} onClick={this._onNew.bind(this)} label="New" className='fontNormal'/>;
     const contents = this.state.aqls.map((aql) => ({
       key: aql._id,
       groupby: aql.category,

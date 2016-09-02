@@ -6,7 +6,7 @@ import Header from 'grommet/components/Header';
 import Title from 'grommet/components/Title';
 import Menu from 'grommet/components/Menu';
 import SessionMenu from './SessionMenu/MenuContainer';
-import {dropCurrentPop_stopMonitor} from '../actions/system';
+import {dropCurrentPop_stopMonitor, toggleSidebar} from '../actions/system';
 import history from '../RouteHistory';
 
 export default class NavHeader extends Component {
@@ -39,7 +39,7 @@ export default class NavHeader extends Component {
       <Header fixed={true} size="small" full="horizontal" direction="row" justify="between" colorIndex="neutral-1"
               pad={{vertical: 'small'}} responsive={false}>
         <Title>
-          <img src="../../img/favicon.png" className='logo'/> AM Browser
+          <img src="../../img/favicon.png" className='logo' onClick={toggleSidebar}/> AM Browser
         </Title>
         <Menu direction="row" align="center" responsive={true}>
           {

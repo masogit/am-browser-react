@@ -3,12 +3,16 @@
  */
 
 import React, {Component} from 'react';
-import { Title, Header, Sidebar, Menu, Box, Footer } from 'grommet';
+import { Header, Sidebar, Menu, Box, Footer, Anchor } from 'grommet';
 import GroupList from './GroupList';
 import GroupListItem from './GroupListItem';
 import EmptyIcon from './EmptyIcon';
+import {connect} from 'react-redux';
+import ChapterPrevious from 'grommet/components/icons/base/ChapterPrevious';
+import ChapterNext from 'grommet/components/icons/base/ChapterNext';
+import {toggleSidebar} from '../../actions/system';
 
-export default class SideBar extends Component {
+export default class AMSideBar extends Component {
   componentWillMount() {
     this.state = {
       title: this.props.title
@@ -36,7 +40,19 @@ export default class SideBar extends Component {
   }
 
   render() {
-    const {toolbar, contents, focus, footer, loading, separator, colorIndex} = this.props;
+    const {toolbar, contents, focus, footer, loading, separator, colorIndex, showSidebar} = this.props;
+    if (!showSidebar) {
+      return (
+        <Sidebar fixed={true} separator={separator || 'right'} full={false} style={{minHeight: '100%', width: '50px'}}
+                 colorIndex={colorIndex || 'light-2'}>
+          <Box style={{overflow: 'visible'}} className='fixMinSizing'>
+            <Header justify="between" pad='small' onClick={toggleSidebar}>
+              <ChapterNext />
+            </Header>
+          </Box>
+        </Sidebar>
+      );
+    }
     // 1) Show group list
     // 2) Show table schema
     let sidebarContent;
@@ -73,7 +89,7 @@ export default class SideBar extends Component {
       <Sidebar fixed={true} separator={separator || 'right'} full={false} style={{minHeight: '100%'}} colorIndex={colorIndex || 'light-2'}>
         <Box style={{overflow: 'visible'}} className='fixMinSizing'>
           <Header justify="between" pad='small'>
-            <Title>{this.state.title}</Title>
+            <Anchor icon={<ChapterPrevious/>} onClick={toggleSidebar} label={this.state.title} className='grommetux-title'/>
             {toolbar &&
             <Menu direction="row" align="center" responsive={false}>
               {toolbar}
@@ -89,3 +105,12 @@ export default class SideBar extends Component {
     );
   }
 }
+
+
+let select = (state) => {
+  return {
+    showSidebar: state.session.showSidebar
+  };
+};
+
+export default connect(select)(AMSideBar);

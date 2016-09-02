@@ -209,3 +209,7 @@ export function dropCurrentPop_stopMonitor(title, onConfirm) {
     onConfirm();
   }
 }
+
+export function toggleSidebar() {
+  store.dispatch({type: Types.TOGGLE_SIDEBAR});
+}
