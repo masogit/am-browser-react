@@ -318,7 +318,7 @@ export default class ViewDefDetail extends ComponentBase {
         <EditLayer
           onChange={this._onChange.bind(this)}
           value={this.props.selectedView.desc}
-          label='Description'
+          label='Description' name='v.desc'
           onClose={this._onClose.bind(this)} />
       );
     }

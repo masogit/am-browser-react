@@ -376,7 +376,7 @@ export default class AQL extends ComponentBase {
     } else if (type == 'aql_str') {
       return (
         <EditLayer onChange={this._setFormValues.bind(this)}
-                  label='Input AM Query Language (AQL)'
+                  label='Input AM Query Language (AQL)' name='str'
                   value={this.state.aql.str}
                   onClose={this._onClose} />
       );
@@ -506,7 +506,7 @@ export default class AQL extends ComponentBase {
                          onChange={this._setFormValues.bind(this)}/>
                 </FormField>
                 <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_STR">
-                    <textarea id="AQL_STR" value={this.state.aql.str} onChange={this._updateAQLStr.bind(this)}
+                    <textarea id="AQL_STR" value={this.state.aql.str} rows={10} onChange={this._updateAQLStr.bind(this)}
                               onClick={this._updateAQLStr.bind(this)}/>
                 </FormField>
                 <FormField label="Category" htmlFor="AQL_Category">

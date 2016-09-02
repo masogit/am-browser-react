@@ -4,12 +4,12 @@
 import React from 'react';
 import {Box, FormField, Header, Title, Layer, Button, Footer} from 'grommet';
 
-const EditLayer = ({onChange, value, label, onClose}) => (
+const EditLayer = ({onChange, value, label, onClose, name}) => (
   <Layer closer={true}>
     <Box flex={true} size='large'>
       <Header><Title>Edit</Title></Header>
-      <FormField label={label} htmlFor='desc'>
-            <textarea id='desc' rows='5' name='desc' value={value} onChange={onChange}></textarea>
+      <FormField label={label} htmlFor={name}>
+            <textarea id={name} rows='5' name={name} value={value} onChange={onChange}></textarea>
       </FormField>
       <Footer justify='end' pad={{vertical: 'medium'}}>
         <Button label="Confirm" primary={true} strong={true} onClick={onClose}/>
