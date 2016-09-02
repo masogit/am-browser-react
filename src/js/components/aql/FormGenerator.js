@@ -1,8 +1,6 @@
 import React, {Component} from 'react';
-import Next from'grommet/components/icons/base/Next';
-import Previous from 'grommet/components/icons/base/Previous';
 import {
-  CheckBox, Form, FormField, NumberInput, Box, Footer, Anchor
+  CheckBox, Form, FormField, NumberInput, Box, RadioButton
 } from 'grommet';
 import _ from 'lodash';
 import objectPath from 'object-path';
@@ -33,9 +31,21 @@ const SwitchField = ({label, checked, name, onChange}) => (
 
 const MultiCheckField = ({label, options}) => {
   const optionsComp = options.map(option=> (
-      <CheckBox key={option.id} id={option.id} name={option.name}
-                label={option.label} checked={option.checked} onChange={option.onChange}/>
-    ));
+    <CheckBox key={option.id} id={option.id} name={option.name}
+              label={option.label} checked={option.checked} onChange={option.onChange}/>
+  ));
+  return (
+    <FormField label={label} className='multi-check'>
+      {optionsComp}
+    </FormField>
+  );
+};
+
+const SingleCheckField = ({label, options}) => {
+  const optionsComp = options.map(option=> (
+    <RadioButton key={option.id} id={option.id} name={option.name}
+              label={option.label} checked={option.checked} onChange={option.onChange}/>
+  ));
   return (
     <FormField label={label} className='multi-check'>
       {optionsComp}
@@ -91,15 +101,14 @@ const genOptions = (optionsArray, form, fromType, selections) => {
         <NumberField key={name} label={label} name={name} value={value} onChange={form._setFormValues.bind(form)}/>
       );
     } else if (type === 'MultiCheckField') {
-      return (
-        <MultiCheckField key={name} label={label} options={options}/>
-      );
+      return <MultiCheckField key={name} label={label} options={options}/>;
+    } else if (type == 'SingleCheckField') {
+      return <SingleCheckField key={name} label={label} options={options} onChange={form._setFormValues.bind(form)}/>;
     }
   });
 };
 
 export default class GraphForm extends Component {
-
   componentWillMount() {
     const type = this.state.type;
 
@@ -110,11 +119,16 @@ export default class GraphForm extends Component {
       this._init();
       form = this.state[type];
     }
-    const newState = {};
+    const newState = this.initState();
     newState[type] = form;
-    if (type === 'chart' ? form.series_col.length > 0 : form.series_col) {
-      this.setState(newState, this.props.genGraph(form, this.state.type));
-    }
+    //if (type === 'chart' ? form.series_col.length > 0 : form.series_col) {
+    //  this.setState(newState, this.props.genGraph(form, this.state.type));
+    //}
+    this.setState(newState, () => {
+      if (type === 'chart' ? form.series_col.length > 0 : form.series_col) {
+        this.props.genGraph(form, this.state.type);
+      }
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -123,14 +137,20 @@ export default class GraphForm extends Component {
     }
   }
 
+  initState(state = {}) {
+    state.showBasic = true;
+    state.showAdvance = false;
+    return state;
+  }
+
   _setFormValues(event) {
     let val;
     const type = this.state.type;
     const path = event.target.name;
     const obj = this.state[type];
-    const newState = {};
+    const newState = this.initState();
 
-    if (event.target.type === 'checkbox') {
+    if (event.target.type === 'checkbox' || event.target.type === 'radio') {
       val = event.target.checked;
     } else if (event.target.type === 'number') {
       val = event.target.value / 1;
@@ -138,11 +158,17 @@ export default class GraphForm extends Component {
       val = event.target.value;
     }
 
-    if (type === 'chart' && path === 'series_col') {
-      if (event.target.checked === true) {
-        obj.series_col.push(event.target.id);
+    if (path === 'series_col') {
+      if (type === 'chart') {
+        if (event.target.checked === true) {
+          obj.series_col.push(event.target.id);
+        } else {
+          obj.series_col = obj.series_col.filter((item) => item != event.target.id);
+        }
       } else {
-        obj.series_col = obj.series_col.filter((item) => item != event.target.id);
+        if (event.target.checked === true) {
+          obj.series_col = event.target.id;
+        }
       }
       val = obj.series_col;
     }
@@ -154,23 +180,30 @@ export default class GraphForm extends Component {
   }
 
   render(basicOptions, advanceOptions, selections) {
+    const showBasic = this.state.showBasic;
     const showAdvance = this.state.showAdvance;
     const advance = genOptions(advanceOptions, this, this.state.type, selections);
     const basic = genOptions(basicOptions, this, this.state.type, selections);
 
     return (
       <Box>
-        {
-          this.state.type == 'chart' && basic[0]
-        }
+        {showBasic && basic[0]}
         <Form className='vertical-form'>
-          {showAdvance ? advance : (this.state.type == 'chart' ? basic.slice(1) : basic)}
+          {showBasic && basic.slice(1)}
         </Form>
-        {advance.length > 0 &&
-          <CheckBox label={showAdvance ? 'Basic' : 'Advance'} toggle={true} className='toggle'
-                    onChange={() => this.setState({showAdvance: !showAdvance})}/>
-        }
+        <Form className='vertical-form'>
+          {showAdvance && advance}
+        </Form>
+        <Box className='toggle' direction='row'>
+          <CheckBox label='Basic' checked={this.state.showBasic} value={this.state.showBasic}
+                    onChange={() => this.setState({showBasic: !showBasic})}/>
+          {advance.length > 0 &&
+            <CheckBox label='Advance' checked={this.state.showAdvance} value={this.state.showAdvance}
+                      onChange={() => this.setState({showAdvance: !showAdvance})}/>
+          }
+        </Box>
       </Box>
     );
   }
 }
+

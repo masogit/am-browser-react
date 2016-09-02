@@ -22,7 +22,7 @@ export default class DistributionForm extends GraphForm {
   }
 
   render() {
-    const col_options = [{value: '', text: ''}];
+    const col_options = [];
     const label_options = [{value: '', text: ''}];
     if (this.props.data.header) {
       this.props.data.header.map((header, index) => {
@@ -31,7 +31,14 @@ export default class DistributionForm extends GraphForm {
 
         if (_.includes(['Long', 'Short', 'Int', 'Double', 'Byte'], header.Type)) {
           //col_options.push({value: header.Index, text: `${header.Type}: ${header.Name}`});
-          col_options.push({value: header.Index, text: header.Name});
+          col_options.push({
+            id: header.Index,
+            name: 'series_col',
+            //label: `${header.Type} : ${header.Name}`,
+            label: header.Name,
+            checked: this.state.distribution.series_col == header.Index,
+            onChange: this._setFormValues.bind(this)
+          });
         }
       });
     }
@@ -58,7 +65,7 @@ export default class DistributionForm extends GraphForm {
     const basicOptions = [{
       label: 'Column',
       name: 'series_col',
-      type: 'SelectField'
+      type: 'SingleCheckField'
     }, {
       name: 'label',
       type: 'SelectField'

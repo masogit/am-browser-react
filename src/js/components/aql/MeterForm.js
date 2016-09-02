@@ -32,14 +32,21 @@ export default class MeterForm extends GraphForm {
   }
 
   render() {
-    const col_options = [{value: '', text: ''}];
+    const col_options = [];
     const col_unit_options = [{value: '', text: ''}];
     if (this.props.data.header) {
       this.props.data.header.map((header, index) => {
         //const option = {value: header.Index, text: `${header.Type}: ${header.Name}`};
         const option = {value: header.Index, text: header.Name};
         if (_.includes(['Long', 'Short', 'Int', 'Double', 'Byte'], header.Type)) {
-          col_options.push(option);
+          col_options.push({
+            id: header.Index,
+            name: 'series_col',
+            //label: `${header.Type} : ${header.Name}`,
+            label: header.Name,
+            checked: this.state.meter.series_col == header.Index,
+            onChange: this._setFormValues.bind(this)
+          });
         }
         col_unit_options.push(option);
       });
@@ -74,7 +81,7 @@ export default class MeterForm extends GraphForm {
     const basicOptions = [{
       label: 'Column',
       name: 'series_col',
-      type: 'SelectField'
+      type: 'SingleCheckField'
     }, {
       label: 'Column units',
       name: 'col_unit',
