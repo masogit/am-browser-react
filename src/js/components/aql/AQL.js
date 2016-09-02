@@ -458,7 +458,7 @@ export default class AQL extends ComponentBase {
           <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'medium'}} direction='row'>
             <Box className='fixMinSizing' flex={true}>
               {
-                validData && this.state.aql.form &&
+                validData &&
                 <Box style={{position: 'relative'}} flex={false}>
                   <Tabs activeIndex={activeIndex} initialIndex={activeIndex} justify='start'>
                     <ActionTab title="Chart" onClick={this._genGraph.bind(this, null, 'chart')} ref='chart'>
