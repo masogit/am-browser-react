@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import RecordDetail from './RecordDetail';
-import {Title, Table, TableRow, Box, Anchor, Header, Menu}from 'grommet';
+import {Title, Table, TableRow, Box, Anchor, Header, Menu, Map}from 'grommet';
 import Close from 'grommet/components/icons/base/Close';
 import Ascend from 'grommet/components/icons/base/Ascend';
 import Descend from 'grommet/components/icons/base/Descend';
@@ -17,6 +17,7 @@ import EmptyIcon from '../commons/EmptyIcon';
 import * as Format from '../../util/RecordFormat';
 import {hash, loadSetting, saveSetting} from '../../util/util';
 import cookies from 'js-cookie';
+import {bodyToMapData} from '../../util/util';
 
 export default class RecordList extends Component {
   constructor(props) {
@@ -31,6 +32,7 @@ export default class RecordList extends Component {
       searchFields: null,
       graphData: null,
       param: loadSetting(hash(Object.assign({},props.body, {filter: ''}))) || {
+        showMap: props.body.links && props.body.links.length > 0,
         graphType: "distribution",
         allFields: false,
         groupby: props.body.groupby || '',
@@ -311,6 +313,14 @@ export default class RecordList extends Component {
     });
   }
 
+  _toggleShowMap() {
+    let param = this.state.param;
+    param.showMap = !param.showMap;
+    this.setState({
+      param: param
+    });
+  }
+
   _toggleGraphType() {
     let param = this.state.param;
     param.graphType = (param.graphType == 'legend') ? 'distribution' : 'legend';
@@ -402,7 +412,7 @@ export default class RecordList extends Component {
 
   renderToolBox() {
     const resultRecords = this.state.filtered ? this.state.filtered : this.state.records;
-
+    const noLinks = (this.props.body.links && this.props.body.links.length > 0) ? `${this.props.body.links.length} sub link(s)` : 'no sub link';
     const aqlWhere = "press / input AQL where statement";
     const quickSearch = this.state.searchFields ? `press Enter to quick search in ${this.state.searchFields}; ${aqlWhere}` : aqlWhere;
     const placeholder = this.state.param.aqlInput ? "input AQL where statement…" : quickSearch;
@@ -426,6 +436,8 @@ export default class RecordList extends Component {
           {this.renderGroupBy()}
         </Menu>
         <Menu icon={<MenuIcon />} dropAlign={{ right: 'right', top: 'top' }}>
+          <Anchor icon={this.state.param.showMap?<CheckboxSelected />:<Checkbox />} label={`View Map [${noLinks}]`}
+                  onClick={this._toggleShowMap.bind(this)}/>
           <Anchor icon={this.state.param.graphType=='legend'?<CheckboxSelected />:<Checkbox />} label="Vertical Graph"
                   onClick={this._toggleGraphType.bind(this)}/>
           <Anchor icon={this.state.param.aqlInput?<CheckboxSelected />:<Checkbox />} label="Input AQL"
@@ -493,6 +505,10 @@ export default class RecordList extends Component {
       <Box pad={{horizontal: 'medium'}} flex={true} className={fixIEScrollBar}>
         {this.renderToolBox()}
         {this.renderAQLFilter()}
+        {
+          this.state.param.showMap &&
+          <Map vertical={true} data={bodyToMapData(this.props.body)} />
+        }
         {
           this.state.param.graphType=='legend' && this.state.graphData ?
             <Box flex={true} direction="row" className={`fixMinSizing ${fixIEScrollBar}`}>
