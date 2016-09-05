@@ -4,7 +4,7 @@
 import expect from 'expect';
 import React from 'react';
 import TestUtils from 'react-addons-test-utils';
-import AboutDialog from '../../src/js/components/AboutDialog';
+import AboutDialog from '../../src/js/components/SessionMenu/AboutDialog';
 import {Box, Header, Table, Label, TableRow} from 'grommet';
 
 describe('components - components/AboutDialog-spec.js', () => {

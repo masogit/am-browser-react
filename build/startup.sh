@@ -15,6 +15,7 @@ if [ ! -f "$SCRIPTPATH/am-browser-config.properties" ]; then
   echo Not found custom am-browser-config.properties, please generate it from am-browser-config.properties.default
   echo ##########################################################
 else
+  sh set_basename.sh
   #node "$SCRIPTPATH/app/server.js"
   "$SCRIPTPATH/node/bin/node" "$SCRIPTPATH/app/server.js"
 fi

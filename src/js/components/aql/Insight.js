@@ -6,7 +6,6 @@ import * as Format from '../../util/RecordFormat';
 import history from '../../RouteHistory';
 import RecordListLayer from '../explorer/RecordListLayer';
 import AlertForm from '../commons/AlertForm';
-import EmptyIcon from '../commons/EmptyIcon';
 import Add from 'grommet/components/icons/base/Add';
 import Close from 'grommet/components/icons/base/Close';
 import Attachment from 'grommet/components/icons/base/Attachment';
@@ -18,8 +17,7 @@ import Graph from '../commons/Graph';
 import ComponentBase  from '../commons/ComponentBase';
 import ActionTab from '../commons/ActionTab';
 import {Anchor, Box, Button, CheckBox, Header, Menu, Title, Table, TableRow, Layer, Carousel, RadioButton, Tabs} from 'grommet';
-import GroupList from '../commons/GroupList';
-import GroupListItem from '../commons/GroupListItem';
+import SideBar from '../commons/AMSideBar';
 import _ from 'lodash';
 
 let tabIdMap = {};
@@ -231,24 +229,17 @@ export default class Insight extends ComponentBase {
   }
 
   _getAQLLayer(box, parent) {
+    const contents = this.state.aqls.map((aql) => ({
+      key: aql._id,
+      groupby: aql.category,
+      onClick: this._attachAQL.bind(this, aql, box, parent),
+      search: aql.name,
+      child: aql.name
+    }));
+
     return (
-      <Layer onClose={this._onClose.bind(this)} closer={true} align="left">
-        <Box full="vertical" justify="center">
-          <Box pad={{vertical: 'medium'}}><Title>Graph Selector ({this.state.aqls.length})</Title></Box>
-          <GroupList pad={{vertical: 'small'}} searchable={true}>
-            {
-              this.state.aqls.map((aql) => {
-                return (
-                  <GroupListItem key={aql._id} groupby={aql.category} search={aql.name}
-                                 pad={{horizontal: 'medium', vertical: 'small'}}
-                                 onClick={this._attachAQL.bind(this, aql, box, parent)}>
-                    <EmptyIcon />{aql.name}
-                  </GroupListItem>
-                );
-              })
-            }
-          </GroupList>
-        </Box>
+      <Layer onClose={this._onClose.bind(this)} closer={true} align="left" flush={true}>
+        <SideBar title='Graph Selector' contents={contents} separator='none' colorIndex='light-1' toggle={false}/>
       </Layer>
     );
   }

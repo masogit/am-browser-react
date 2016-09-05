@@ -213,6 +213,7 @@ module.exports = function (am) {
   };
 
   this.slack = slack;
+  this.live_net_work = live_net_work;
 };
 
 var slackProcess;
@@ -320,4 +321,30 @@ function getHeadNav(rights) {
     views: rights.index < 1,
     'views/:id': rights.index < 1
   };
+}
+
+function live_net_work(req, res) {
+  var url = 'https://hpln.hpe.com/rest/contentofferings/1712/contentpackages';
+  var proxyClient = client;
+  if (config.proxy_host && config.proxy_port) {
+    var options_proxy = {
+      proxy: {
+        host: config.proxy_host,
+        port: config.proxy_port,
+        tunnel: true
+      }
+    };
+    proxyClient = new Client(options_proxy);
+  }
+
+  proxyClient.get(url, (data) => {
+    res.json(data).end();
+  }).on('error', function (err) {
+    var errMsg = err.message;
+    if (err.code == 'ECONNRESET') {
+      errMsg = 'Can not connect to live net work(https://hpln.hpe.com)';
+    }
+    logger.error(`[live net work] [${req.sessionID || '-'}]`, errMsg);
+    res.end(errMsg);
+  });
 }

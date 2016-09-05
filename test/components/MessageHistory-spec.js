@@ -4,7 +4,7 @@
 import expect from 'expect';
 import React from 'react';
 import TestUtils from 'react-addons-test-utils';
-import MessageHistory from '../../src/js/components/MessageHistory';
+import MessageHistory from '../../src/js/components/SessionMenu/MessageHistory';
 import {Header, Table, TableRow} from 'grommet';
 import store from '../store';
 import { Provider } from 'react-redux';

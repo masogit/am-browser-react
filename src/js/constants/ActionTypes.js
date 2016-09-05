@@ -37,6 +37,7 @@ export const ROUTE_CHANGED = 'ROUTE_CHANGED';
 
 // nav
 export const NAV_RESPONSIVE = 'NAV_RESPONSIVE';
+export const TOGGLE_SIDEBAR = 'TOGGLE_SIDEBAR';
 
 // ucmdb Adapter
 export const ADAPTER_DATA_SUCCESS = 'ADAPTER_DATA_SUCCESS';

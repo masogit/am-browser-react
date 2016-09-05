@@ -4,7 +4,7 @@
 import expect from 'expect';
 import React from 'react';
 import TestUtils from 'react-addons-test-utils';
-import SessionMenu from '../../src/js/components/SessionMenu';
+import SessionMenu from '../../src/js/components/SessionMenu/MenuContainer';
 import {Anchor, Menu} from 'grommet';
 import store from '../store';
 import { Provider } from 'react-redux';

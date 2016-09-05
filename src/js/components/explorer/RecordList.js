@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import RecordDetail from './RecordDetail';
-import {Title, Table, TableRow, Box, Anchor, Header, Menu}from 'grommet';
+import {Title, Table, TableRow, Box, Anchor, Header, Menu, Map}from 'grommet';
 import Close from 'grommet/components/icons/base/Close';
 import Ascend from 'grommet/components/icons/base/Ascend';
 import Descend from 'grommet/components/icons/base/Descend';
@@ -17,6 +17,7 @@ import EmptyIcon from '../commons/EmptyIcon';
 import * as Format from '../../util/RecordFormat';
 import {hash, loadSetting, saveSetting} from '../../util/util';
 import cookies from 'js-cookie';
+import {bodyToMapData} from '../../util/util';
 
 export default class RecordList extends Component {
   constructor(props) {
@@ -31,6 +32,7 @@ export default class RecordList extends Component {
       searchFields: null,
       graphData: null,
       param: loadSetting(hash(Object.assign({},props.body, {filter: ''}))) || {
+        showMap: props.body.links && props.body.links.length > 0,
         graphType: "distribution",
         allFields: props.allFields || false,
         groupby: props.body.groupby || '',
@@ -83,6 +85,10 @@ export default class RecordList extends Component {
         param.groupby = groupby;
         this.setState({param, graphData : null});
         return;
+      } else {
+        this.setState({
+          locked: true
+        });
       }
       let body = Object.assign({}, this.props.body);
 
@@ -99,7 +105,8 @@ export default class RecordList extends Component {
         param.groupby = groupby;
         this.setState({
           graphData: (data && data.rows.length > 0) ? data : null,
-          param: param
+          param: param,
+          locked: false
         });
       });
     }
@@ -306,6 +313,14 @@ export default class RecordList extends Component {
     });
   }
 
+  _toggleShowMap() {
+    let param = this.state.param;
+    param.showMap = !param.showMap;
+    this.setState({
+      param: param
+    });
+  }
+
   _toggleGraphType() {
     let param = this.state.param;
     param.graphType = (param.graphType == 'legend') ? 'distribution' : 'legend';
@@ -377,8 +392,16 @@ export default class RecordList extends Component {
       let isPrimary = (this.props.body.groupby == field.sqlname) || field.searchable;
       return (
         <Anchor key={`a_groupby_${index}`} icon={selected?<CheckboxSelected />:<Checkbox />}
-                label={label} primary={isPrimary}
-                onClick={() => selected ? this._clearGroupBy(field.sqlname) : this._getGroupByData(field.sqlname)}/>
+                label={label} primary={isPrimary} disabled={this.state.locked}
+                onClick={() => {
+                  if (!this.state.locked) {
+                    if (selected) {
+                      this._clearGroupBy(field.sqlname);
+                    } else {
+                      this._getGroupByData(field.sqlname);
+                    }
+                  }
+                }}/>
       );
     });
 
@@ -388,14 +411,8 @@ export default class RecordList extends Component {
   }
 
   renderToolBox() {
-
-    const aqlStyle = {
-      'fontWeight': 'bold',
-      'color': '#767676',
-      'borderColor': '#FFD144'
-    };
     const resultRecords = this.state.filtered ? this.state.filtered : this.state.records;
-
+    const noLinks = (this.props.body.links && this.props.body.links.length > 0) ? `${this.props.body.links.length} sub link(s)` : 'no sub link';
     const aqlWhere = "press / input AQL where statement";
     const quickSearch = this.state.searchFields ? `press Enter to quick search in ${this.state.searchFields}; ${aqlWhere}` : aqlWhere;
     const placeholder = this.state.param.aqlInput ? "input AQL where statement…" : quickSearch;
@@ -403,8 +420,8 @@ export default class RecordList extends Component {
     return (
       <Header justify="between">
         <Title>{this.props.title}</Title>
-        <input type="text" className="flex" ref="search" style={this.state.param.aqlInput ? aqlStyle : {}}
-               placeholder={placeholder} onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
+        <input type="text" className={this.state.param.aqlInput ? 'aql flex' : 'flex'} ref="search"
+               placeholder={placeholder} disabled={this.state.locked} onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
         <Box direction="column">
           <Anchor onClick={this._getMoreRecords.bind(this)} disabled={this.state.loading}>
             <Box style={{fontSize: '70%', fontWeight: 'bold'}}>
@@ -419,6 +436,8 @@ export default class RecordList extends Component {
           {this.renderGroupBy()}
         </Menu>
         <Menu icon={<MenuIcon />} dropAlign={{ right: 'right', top: 'top' }}>
+          <Anchor icon={this.state.param.showMap?<CheckboxSelected />:<Checkbox />} label={`View Map [${noLinks}]`}
+                  onClick={this._toggleShowMap.bind(this)}/>
           <Anchor icon={this.state.param.graphType=='legend'?<CheckboxSelected />:<Checkbox />} label="Vertical Graph"
                   onClick={this._toggleGraphType.bind(this)}/>
           <Anchor icon={this.state.param.aqlInput?<CheckboxSelected />:<Checkbox />} label="Input AQL"
@@ -486,6 +505,10 @@ export default class RecordList extends Component {
       <Box pad={{horizontal: 'medium'}} flex={true} className={fixIEScrollBar}>
         {this.renderToolBox()}
         {this.renderAQLFilter()}
+        {
+          this.state.param.showMap &&
+          <Map vertical={true} data={bodyToMapData(this.props.body)} />
+        }
         {
           this.state.param.graphType=='legend' && this.state.graphData ?
             <Box flex={true} direction="row" className={`fixMinSizing ${fixIEScrollBar}`}>

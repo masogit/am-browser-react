@@ -1,13 +1,13 @@
 import React, {Component} from 'react';
-import {initAbout} from '../actions/system';
+import {initAbout} from '../../actions/system';
 import {
   Box,
   Header,
   Title,
   Table,
-  TableRow
+  TableRow,
+  Label
 } from 'grommet';
-import Label from 'grommet/components/Label';
 
 export default class About extends Component {
 

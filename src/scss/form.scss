@@ -1,0 +1,31 @@
+.vertical-form {
+  flex-direction: row;
+  display: flex;
+  width: 100%;
+
+  .grommetux-check-box--toggle {
+    display: flex;
+    flex-direction: column;
+  }
+
+  & + .toggle {
+    position: absolute;
+    right: 0;
+    top: 20px;
+  }
+}
+
+.multi-check {
+  .grommetux-form-field__contents {
+    flex-direction: row;
+    display: flex;
+  }
+}
+
+.short-form {
+  width: 350px;
+}
+
+.long-form {
+  width: 700px;
+}

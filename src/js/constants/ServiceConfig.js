@@ -1,6 +1,8 @@
 // only for unit test
 export const HOST_NAME_DEV = 'http://localhost:80';
 
+export const BASE_NAME = window.amb_basename || '/';
+
 // DB SERVICE
 export const VIEW_DEF_URL = "/coll/view/";
 export const GRAPH_DEF_URL = "/coll/aql/";
@@ -17,7 +19,7 @@ export const CSRF_DEF_URL = "/am/csrf";
 export const ABOUT_DEF_URL = "/am/about";
 export const LOGIN_DEF_URL = "/am/login";
 export const LOGOUT_DEF_URL = "/am/logout";
-export const DOWNLOAD_DEF_URL = "/am/download";
+export const DOWNLOAD_DEF_URL = `${BASE_NAME}/am/download`.replace('//', '/'); // base name can be '/' or '/amb' or '/amb/'
 
 // UCMDB SERVICE
 export const UCMDB_DEF_URL = "/ucmdb-browser/";
@@ -26,3 +28,6 @@ export const ADAPTER_DEF_URL = "/ucmdbAdapter/";
 
 // CHATOPS
 export const SLACK_DEF_URL = "/slack";
+
+//LIVE Net WORK
+export const LNW_DEF_URL = "/live-network";

@@ -1,12 +1,14 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import { INIT, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT, STOP_MONITOR_EDIT, MONITOR_EDIT, FORCE_LOGOUT  } from '../constants/ActionTypes';
+import { INIT, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT,
+  STOP_MONITOR_EDIT, MONITOR_EDIT, FORCE_LOGOUT, TOGGLE_SIDEBAR } from '../constants/ActionTypes';
 
 const initialState = {
   email: null,
   error: null,
   headerNavs: null,
   loggedout: false,
+  showSidebar: true,
   edit: {
     origin: {},
     now: {}
@@ -38,7 +40,8 @@ const handlers = {
     loggedout: true
   }),
   [MONITOR_EDIT]: (_, action) => ({edit: action.edit}),
-  [STOP_MONITOR_EDIT]: (_, action) => ({edit: null})
+  [STOP_MONITOR_EDIT]: (_, action) => ({edit: null}),
+  [TOGGLE_SIDEBAR]: (state, action) => ({showSidebar: !state.showSidebar})
 };
 
 export default function sessionReducer (state = initialState, action) {

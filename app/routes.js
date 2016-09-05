@@ -175,4 +175,8 @@ module.exports = function (app) {
       }
     });
   });
+
+  app.get('/live-network', function(req, res) {
+    rest.live_net_work(req, res);
+  });
 };

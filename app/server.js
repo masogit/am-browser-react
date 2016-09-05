@@ -12,7 +12,12 @@ var csrf = require('csurf');
 var fs = require('fs'), https = require('https'), http = require('http');
 var cors = require('cors');
 var config = require('./config.js');
-
+var AMBRouter = express.Router();
+if (config.node_base == '/') {
+  AMBRouter = app;
+} else {
+  app.use(config.node_base, AMBRouter);
+}
 
 // initial AM node server
 var server = config.node_server;
@@ -22,25 +27,25 @@ var https_port = config.node_https_port;     // set the https port
 var isDebug = config.isDebug;
 var enable_csrf = config.enable_csrf;
 
-app.use(compression());
+AMBRouter.use(compression());
 //app.use(morgan('dev')); // log every request to the console
-app.use(bodyParser.urlencoded({'extended': 'true'})); // parse application/x-www-form-urlencoded
-app.use(bodyParser.json()); // parse application/json
-app.use(bodyParser.json({type: 'application/vnd.api+json'})); // parse application/vnd.api+json as json
-app.use(methodOverride('X-HTTP-Method-Override')); // override with the X-HTTP-Method-Override header in the request
-app.use(session({
+AMBRouter.use(bodyParser.urlencoded({'extended': 'true'})); // parse application/x-www-form-urlencoded
+AMBRouter.use(bodyParser.json()); // parse application/json
+AMBRouter.use(bodyParser.json({type: 'application/vnd.api+json'})); // parse application/vnd.api+json as json
+AMBRouter.use(methodOverride('X-HTTP-Method-Override')); // override with the X-HTTP-Method-Override header in the request
+AMBRouter.use(session({
   resave: true,
   saveUninitialized: true,
   secret: config.session_secret
 }));
 if (isDebug) {
-  app.use(cors({origin: true, credentials: true}));
+  AMBRouter.use(cors({origin: true, credentials: true}));
 } else {
-  app.use(cors());
+  AMBRouter.use(cors());
 }
 
 if (enable_csrf) {
-  app.use(csrf());
+  AMBRouter.use(csrf());
 }
 
 app.use('/', express.static(path.join(__dirname, '/../dist')));
@@ -53,9 +58,9 @@ var indexHtml = function (req, res) {
 };
 
 // routes ======================================================================
-require('./routes.js')(app);
+require('./routes.js')(AMBRouter);
 
-app.get('/*', indexHtml);
+AMBRouter.get('/*', indexHtml);
 
 // redirect morgan log to winston
 morgan.token('sessionId', function getSessionId (req) {
