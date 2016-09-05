@@ -401,13 +401,15 @@ export default class ViewDefDetail extends ComponentBase {
              </form>
              */}
           </Header>
-          <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'medium'}}>
+          <Box className='hiddenScroll fixIEScrollBar' pad={{horizontal: 'medium'}}>
             <Split flex="left" fixed={false} className='fixMinSizing'>
               <Box flex={true}>
                 {
                   selectedView.body.sqlname && <Map vertical={true} data={bodyToMapData(selectedView.body)} />
                 }
+                <Box className='autoScroll'>
                 {table}
+                </Box>
               </Box>
               <Box pad={table ? 'small' : 'none'}>
                 <Form onSubmit={this.props.onSubmit} compact={this.props.compact}>
