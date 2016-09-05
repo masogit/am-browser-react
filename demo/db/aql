@@ -109,3 +109,9 @@
 {"k":"0000000099","o":"0000000407","v":"001"}
 {"_id":"20vgekekd6ullnubx1or","_uid":1,"_dt":1472532100473,"_s":"19512412c96ce9baa4fde8614ef65e98"}
 {"str":"select Portfolio.User.Name, count(*) from amComputer where Portfolio.User.Supervisor=currentuser group by Portfolio.User.Name","name":"My Org PC By User","category":"Asset","type":"distribution","form":{"series_col":"1","series":[],"size":"medium","legendTotal":false,"full":true,"units":"","label":"0"},"view":{"_id":"kjfn6h0kie5usvc2fbt9","name":"My Organization PC"},"_id":"20vgekekd6ullnubx1or"}
+{"k":"0000000100","o":"0000000341","v":"001"}
+{"_id":"w6e1e5980sq14vfquayvi","_uid":1,"_dt":1473041327478,"_s":"b6b0efc6a07689eebb4c6d840044f229"}
+{"str":"select Model.Brand.Company.Name, count(*) from amSoftInstall where ParentPortfolio.User=CurrentUser group by Model.Brand.Company.Name","name":"My Softs","category":"Asset","type":"distribution","form":{"series_col":"1","series":[],"size":"medium","legendTotal":false,"full":true,"units":"","label":"0"},"_id":"w6e1e5980sq14vfquayvi"}
+{"k":"0000000100","o":"0000000722","v":"001"}
+{"_id":"w6e1e5980sq14vfquayvi","_uid":1,"_dt":1473041383892,"_s":"179dfc827437adebd98f3250e8768163"}
+{"str":"select Model.Brand.Company.Name, count(*) from amSoftInstall where ParentPortfolio.User=CurrentUser group by Model.Brand.Company.Name","name":"My Softs","category":"Asset","type":"chart","form":{"series_col":["1"],"series":[],"xAxis":{"placement":"bottom","data":[{"label":"IBM Corp.","value":0},{"label":"Symantec","value":1},{"label":"","value":2},{"label":"TIBCO","value":3},{"label":"Lotus Devt Corp.","value":4},{"label":"IntraNet","value":5},{"label":"Microsoft","value":6}],"label":""},"xAxis_col":"0","type":"bar","size":"medium","legend":{"position":"","units":"","total":false},"important":0,"threshold":0,"max":0,"min":0,"points":false,"segmented":false,"sparkline":false},"_id":"w6e1e5980sq14vfquayvi"}
