@@ -33,7 +33,7 @@ export default class RecordList extends Component {
       graphData: null,
       param: loadSetting(hash(Object.assign({},props.body, {filter: ''}))) || {
         showMap: props.body.links && props.body.links.length > 0,
-        graphType: "distribution",
+        graphType: "legend",
         allFields: false,
         groupby: props.body.groupby || '',
         aqlInput: false,
