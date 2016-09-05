@@ -324,21 +324,21 @@ export default class ViewDefDetail extends ComponentBase {
     }
   }
 
-  getAlertLayer(type) {
+  getAlertLayer(type, viewName) {
     let title, onConfirm;
     switch (type) {
       case 'save': {
-        title = `Save '${selectedView.name}'?`;
+        title = `Save '${viewName}'?`;
         onConfirm = this._onSubmit;
         break;
       }
       case 'duplicate': {
-        title = `Duplicate view definition '${selectedView.name}'?"`;
+        title = `Duplicate view definition '${viewName}'?"`;
         onConfirm = this._onDuplicate;
         break;
       }
       case 'delete': {
-        title = `You're about to delete '${selectedView.name}', continue?`;
+        title = `You're about to delete '${viewName}', continue?`;
         onConfirm = this._onDelete;
         break;
       }
@@ -426,7 +426,7 @@ export default class ViewDefDetail extends ComponentBase {
                   </FormField>
                 </Form>
               </Box>
-              {selectedView && selectedView.name && this.getAlertLayer(this.state.alertForm)}
+              {selectedView && selectedView.name && this.getAlertLayer(this.state.alertForm, selectedView.name)}
             </Split>
           </Box>
         </Box>
