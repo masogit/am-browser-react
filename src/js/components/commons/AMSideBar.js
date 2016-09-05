@@ -12,7 +12,7 @@ import ChapterPrevious from 'grommet/components/icons/base/ChapterPrevious';
 import ChapterNext from 'grommet/components/icons/base/ChapterNext';
 import {toggleSidebar} from '../../actions/system';
 
-export default class AMSideBar extends Component {
+class AMSideBar extends Component {
   componentWillMount() {
     this.state = {
       title: this.props.title
