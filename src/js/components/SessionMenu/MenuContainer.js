@@ -3,19 +3,17 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {logout, dropCurrentPop_stopMonitor } from '../../actions/system';
-import {sendMessageToSlack, getVersionFromLiveNetWork} from '../../actions/sessionMenu';
+import {sendMessageToSlack} from '../../actions/sessionMenu';
 import { Menu, Anchor, Layer, Box } from 'grommet';
 import MessageHistory from './MessageHistory';
 import SlackDialog from './SlackDialog';
 import AboutDialog from './AboutDialog';
-import Versions from './Versions';
 import Close from 'grommet/components/icons/base/Close';
 import Slack from 'grommet/components/icons/base/SocialSlack';
 import Logout from 'grommet/components/icons/base/Logout';
 import History from 'grommet/components/icons/base/History';
 import About from 'grommet/components/icons/base/Information';
 import Help from 'grommet/components/icons/base/Help';
-import New from 'grommet/components/icons/base/New';
 import User from 'grommet/components/icons/base/User';
 
 import cookies from 'js-cookie';
@@ -32,12 +30,6 @@ class SessionMenu extends Component {
         err: ''
       }
     };
-  }
-
-  componentWillMount() {
-    getVersionFromLiveNetWork().then((versions) => {
-      this.setState({versions});
-    });
   }
 
   _onLogout(event) {
@@ -63,10 +55,9 @@ class SessionMenu extends Component {
 
   getDialog(dialog) {
     switch(dialog) {
-      case 'about': return <AboutDialog />;
+      case 'about': return <AboutDialog versions={this.state.versions}/>;
       case 'history': return <MessageHistory />;
       case 'slack': return <SlackDialog onClick={this._sendMessage.bind(this)} onClose={this.closeDialog}/>;
-      case 'versions': return <Versions versions={this.state.versions}/>;
     }
   }
   render() {
@@ -84,7 +75,6 @@ class SessionMenu extends Component {
           <Anchor icon={<History />} onClick={() => this.showDialog("history")} label="Message History"
                   className="fontNormal"/>
           <Anchor icon={<Slack />} onClick={() => this.showDialog("slack")} label="Slack" className="fontNormal"/>
-          <Anchor icon={<New />} onClick={() => this.showDialog("versions")} label="Versions" className="fontNormal"/>
           <Anchor icon={<Logout />} onClick={this._onLogout.bind(this)} label="Logout" className="fontNormal"/>
         </Menu>
         {dialog &&
