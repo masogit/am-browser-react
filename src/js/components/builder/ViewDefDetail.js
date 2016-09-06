@@ -77,6 +77,24 @@ export default class ViewDefDetail extends ComponentBase {
     }
   }
 
+  _onGroupby(event, field, groupby) {
+    let path = event.target.name;
+    let fields = groupby ? groupby.split('|') : [];
+    let pos = fields.indexOf(field);
+
+    if (pos > -1)
+      fields.splice(pos, 1);
+    else
+      fields.push(field);
+
+    this.props.onValueChange(path.substring(2), fields.join('|'));
+  }
+
+  _posGroupby(groupby, field) {
+    if (groupby && groupby.split('|').indexOf(field) > -1)
+      return groupby.split('|').indexOf(field) + 1;
+  }
+
   _setCategory(event) {
     this.props.onValueChange(event.target.name.substring(2), event.suggestion);
   }
@@ -196,12 +214,12 @@ export default class ViewDefDetail extends ComponentBase {
           </td>
           <td>
             <CheckBox id={`v.${currentPath}body.groupby`} name={`v.${currentPath}body.groupby`}
-                      value={field.sqlname} checked={selfView.body.groupby==field.sqlname}
-                      disabled={(!!selfView.body.groupby&&selfView.body.groupby!=field.sqlname)}
+                      value={field.sqlname} checked={this._posGroupby(selfView.body.groupby, field.sqlname) > 0}
                       onChange={
                         (event) => {
-                          this._onChange(event, field.sqlname);
+                          this._onGroupby(event, field.sqlname, selfView.body.groupby);
                         }}/>
+            {this._posGroupby(selfView.body.groupby, field.sqlname)}
           </td>
           <td>
             <CheckBox id={`v.${currentPath}body.sum`} name={`v.${currentPath}body.sum`}

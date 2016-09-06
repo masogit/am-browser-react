@@ -35,7 +35,7 @@ export default class RecordList extends Component {
         showMap: props.body.links && props.body.links.length > 0,
         graphType: "legend",
         allFields: false,
-        groupby: props.body.groupby || '',
+        groupby: this._getFirstGroupby(props.body.groupby),
         aqlInput: false,
         orderby: "",
         offset: 0,
@@ -54,6 +54,13 @@ export default class RecordList extends Component {
 
   componentWillUnmount() {
     saveSetting(hash(Object.assign({}, this.props.body, {filter: ''})), this.state.param);
+  }
+
+  _getFirstGroupby(groupby) {
+    if (groupby && groupby.split('|').length > 0)
+      return groupby.split('|')[0];
+    else
+      return '';
   }
 
   _getSearchableFields() {
@@ -267,6 +274,15 @@ export default class RecordList extends Component {
       }
       if (param.filters.indexOf(searchValue) == -1)
         param.filters.push(searchValue);
+
+      // Find next groupby from pre-defined body
+      let groupby = param.groupby || '';
+      let groups = this.props.body.groupby ? this.props.body.groupby.split('|') : [];
+      let pos = groups.indexOf(groupby);
+      if (pos > -1 && pos < groups.length - 1)
+        groupby = groups[pos + 1];
+
+      param.groupby = groupby;
       this.setState({
         param: param
       }, this._getRecords);
@@ -385,11 +401,12 @@ export default class RecordList extends Component {
     let menus = this.props.body.fields.map((field, index) => {
       let selected = (field.sqlname == this.state.param.groupby);
       let label = Format.getDisplayLabel(field);
-      if (this.props.body.groupby == field.sqlname)
-        label += ' [Default Group By]';
+      let pos = this.props.body.groupby ? this.props.body.groupby.split('|').indexOf(field.sqlname) : -1;
+      if (pos > -1)
+        label = `[G${pos + 1}] ` + label;
       if (field.searchable)
-        label += ' [Quick Searchable]';
-      let isPrimary = (this.props.body.groupby == field.sqlname) || field.searchable;
+        label = '[S] ' + label;
+      let isPrimary = (pos > -1) || field.searchable;
       return (
         <Anchor key={`a_groupby_${index}`} icon={selected?<CheckboxSelected />:<Checkbox />}
                 label={label} primary={isPrimary} disabled={this.state.locked}
