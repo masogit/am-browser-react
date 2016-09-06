@@ -293,6 +293,15 @@ export default class RecordList extends Component {
   _filterClear(index) {
     var param = this.state.param;
     param.filters.splice(index, 1);
+
+    // Find previous groupby from pre-defined body
+    let groupby = param.groupby || '';
+    let groups = this.props.body.groupby ? this.props.body.groupby.split('|') : [];
+    let pos = groups.indexOf(groupby);
+    if (pos > 0)
+      groupby = groups[pos - 1];
+
+    param.groupby = groupby;
     this.setState({
       param: param
     }, this._getRecords);
