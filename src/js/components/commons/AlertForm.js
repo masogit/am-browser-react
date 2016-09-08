@@ -28,8 +28,7 @@ export default class AlertForm extends Component {
     return (
       <Box flex={false}>
         {status ?
-          <Notification status={status} message={desc} pad={{vertical: 'small'}} wrap={false}
-                        onClick={onClose}/>
+          <Notification status={status} message={desc} onClose={onClose} closer={true}/>
         :
           <Layer onClose={onClose} closer={true} {...this.props}>
             <Box full={full} justify="center">
