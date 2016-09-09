@@ -31,16 +31,16 @@ export default class RecordList extends Component {
       record: null,
       searchFields: null,
       graphData: null,
-      param: loadSetting(hash(Object.assign({},props.body, {filter: ''}))) || {
-        showMap: props.body.links && props.body.links.length > 0,
-        graphType: "legend",
-        allFields: false,
-        groupby: this._getFirstGroupby(props.body.groupby),
-        aqlInput: false,
-        orderby: "",
-        offset: 0,
-        limit: 30,
-        filters: []
+      param: (!props.noCache && loadSetting(hash(Object.assign({},props.body, {filter: ''})))) || {
+        showMap: props.showMap || (props.body.links && props.body.links.length > 0),
+        graphType: props.graphType || "legend",
+        allFields: props.allField || false,
+        groupby: props.groupby || this._getFirstGroupby(props.body.groupby),
+        aqlInput: props.aqlInput || false,
+        orderby: props.orderby || "",
+        offset: props.offset || 0,
+        limit: props.limit || 30,
+        filters: props.filters || []
       },
       onMoreLock: false,
       locked: false
@@ -377,7 +377,7 @@ export default class RecordList extends Component {
     return (
       records.map((record, index) => {
         return (
-          <TableRow key={index} onClick={this._viewDetailShow.bind(this, record)}>
+          <TableRow key={index} onClick={this.props.onClick ? this.props.onClick.bind(this, record) : this._viewDetailShow.bind(this, record)}>
             {
               this.getDisplayFields().map((field, tdindex) => (
                 <td key={tdindex}>
