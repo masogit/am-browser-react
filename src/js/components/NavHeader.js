@@ -2,9 +2,7 @@
 
 import React, {Component} from 'react';
 import {Link} from 'react-router';
-import Header from 'grommet/components/Header';
-import Title from 'grommet/components/Title';
-import Menu from 'grommet/components/Menu';
+import {Header, Title, Menu } from 'grommet';
 import SessionMenu from './SessionMenu/MenuContainer';
 import {dropCurrentPop_stopMonitor, toggleSidebar} from '../actions/system';
 import history from '../RouteHistory';
@@ -37,8 +35,7 @@ export default class NavHeader extends Component {
     }
 
     return (
-      <Header fixed={true} size="small" full="horizontal" direction="row" justify="between" colorIndex="neutral-1"
-              pad={{vertical: 'small'}} responsive={false}>
+      <Header fixed={true} size="medium" full="horizontal" direction="row" justify="between" colorIndex="neutral-1" responsive={false}>
         <Title>
           <img src="../../img/favicon.png" className='logo' onClick={toggleSidebar}/> AM Browser
         </Title>
