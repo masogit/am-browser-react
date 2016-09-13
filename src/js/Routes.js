@@ -38,7 +38,8 @@ export const getRoutes = (headerNavs) => {
       {path: 'aql', component: AQL},
       {path: 'views', component: ViewDefListContainer},
       {path: 'views/:id', component: ViewDefListContainer},
-      {path: 'sam', component: SAM}
+      {path: 'sam', component: SAM},
+      {path: 'sam/:id', component: SAM}
     ];
 
     allRoutes.map(route => {
