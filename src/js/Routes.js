@@ -40,7 +40,8 @@ export const getRoutes = (headerNavs) => {
       {path: 'views', component: ViewDefListContainer},
       {path: 'views/:id', component: ViewDefListContainer},
       {path: 'my', component: MyAssets},
-      {path: 'sam', component: SAM}
+      {path: 'sam', component: SAM},
+      {path: 'sam/:id', component: SAM}
     ];
 
     allRoutes.map(route => {

@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import * as SAMActions from '../../actions/sam';
-import {Box} from 'grommet';
+import {Box, Split} from 'grommet';
 import Card from '../commons/Card';
 import RecordList from '../explorer/RecordList';
+import history from '../../RouteHistory';
 
 export default class SAMContainer extends Component {
   constructor() {
@@ -46,8 +47,11 @@ export default class SAMContainer extends Component {
     SAMActions.productInVendor(name).then((products) => {
       this.setState({
         product: null,
-        version: null
+        version: null,
+        license: null,
+        software: null
       }, () => {
+        history.push(`/sam/${name}`);
         this.setState({
           product: {
             title: 'Product',
@@ -73,16 +77,16 @@ export default class SAMContainer extends Component {
   }
 
   renderVersion(selected) {
-    let body = {
+    let body_license = {
       label: 'Software Counters',
       sqlname: 'amSoftLicCounter',
-      groupby: 'LicType.Name',
+      // groupby: 'LicType.Name',
       fields: [{
-        sqlname: 'LicType.Name',
-        alias: 'License Metric'
+        sqlname: 'Name',
+        alias: 'Version'
       }, {
         sqlname: 'dLicUseRights',
-        alias: 'License Rights'
+        alias: 'License'
       }, {
         sqlname: 'dSoftInstallCount',
         alias: 'Consumption'
@@ -91,25 +95,94 @@ export default class SAMContainer extends Component {
         alias: 'Compliancy'
       }, {
         sqlname: 'dUnusedInstall',
-        alias: 'Unused Installation'
+        alias: 'Unused'
+      }, {
+        sqlname: 'SoftInstQuery.TableName',
+        alias: 'Table'
+      }, {
+        sqlname: 'SoftInstQuery.memQueryText',
+        alias: 'Query'
       }],
       filter: `dSoftInstallCount> 0 AND Brand.Name='${this.state.product.data[selected].name}'`
     };
 
     this.setState({
-      version: null
+      license: null,
+      software: null
     }, () => {
       this.setState({
-        version: body
+        license: body_license
       });
     });
 
   }
 
+  renderSoftware(record) {
+    let filter = record['SoftInstQuery.memQueryText'];
+    let table = record['SoftInstQuery.TableName'];
+    let parent = '';
+
+    switch(record['SoftInstQuery.TableName']) {
+      case 'amSoftInstall':
+        parent = 'ParentPortfolio';
+        break;
+      case 'amMonitoredApp':
+        parent = 'MonParentPortfolio';
+        break;
+      case 'amMonSWComp':
+        parent = 'MonApp.MonParentPortfolio';
+        break;
+      default:
+        filter = `seType=0 AND bMissing=0 AND seType=0 AND Model.Name='${record.Name}'`;
+    }
+
+    let body_software = {
+      "orderby": "",
+      "filter": filter,
+      "sqlname": table,
+      "label": "Computer",
+      "fields": [
+        {
+          "alias": "Computer",
+          "sqlname": parent + ".Computer.TcpIpHostName"
+        },
+        {
+          "alias": "IPAddress",
+          "sqlname": parent + ".Computer.TcpIpAddress"
+        },
+        {
+          "alias": "Model",
+          "sqlname": parent + ".Computer.Portfolio.Model.Name"
+        },
+        // {
+        //   "alias": "User",
+        //   "sqlname": "ParentPortfolio.Computer.Portfolio.User.Name"
+        // },
+        {
+          "alias": "Type",
+          "sqlname": parent + ".Computer.ComputerType"
+        },
+        {
+          "alias": "Assignment",
+          "sqlname": parent + ".Computer.Portfolio.seAssignment"
+        }
+      ],
+      "groupby": `${parent}.Computer.ComputerType|${parent}.Computer.Portfolio.Model.Name`
+    };
+
+    this.setState({
+      software: null
+    }, () => {
+      this.setState({
+        software: body_software
+      });
+    });
+  }
+
   render() {
     return (
-      <Box flex={true} direction="row" align={!this.state.product ? 'center' : 'start'} justify={!this.state.product ? 'center' : 'start'}>
-        <Box flex={!this.state.product} style={this.state.product && {'width': '500px'}} pad={{horizontal: "small"}}>
+      <Box flex={true} direction="row" align={!this.state.product ? 'center' : 'start'} justify={!this.state.product ? 'center' : 'start'} className='autoScroll'>
+        <Box flex={!this.state.product} style={this.state.product && {'width': '260px'}} pad={{horizontal: "small"}}>
           {
             this.state.vendor &&
             <Card {...this.state.vendor}/>
@@ -120,8 +193,14 @@ export default class SAMContainer extends Component {
           <Box flex={true}>
             <Card {...this.state.product}/>
             {
-              this.state.version &&
-              <RecordList body={this.state.version} title="Version" allFields={true}/>
+              this.state.license &&
+              <Split>
+                <RecordList body={this.state.license} title="Version" allFields={true} onClick={(record) => this.renderSoftware(record)} noCache={true}/>
+                {
+                  this.state.software &&
+                  <RecordList body={this.state.software} title="Computer" allFields={true} noCache={true} graphType='distribution'/>
+                }
+              </Split>
             }
           </Box>
         }
