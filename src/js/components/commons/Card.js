@@ -42,7 +42,7 @@ export default class Card extends Component {
             })
           }
           <Footer justify="between">
-            <Box>Versions: {record[this.props.conf.footer]}</Box>
+            <Box>{this.props.conf.footer}: {record[this.props.conf.footer]}</Box>
           </Footer>
         </Tile>
       );
