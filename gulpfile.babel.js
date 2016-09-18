@@ -72,7 +72,9 @@ const opts = {
 };
 
 var express;
-var timestamp = dateformat(new Date(), 'yyyymmddHHMM');
+//var timestamp = dateformat(new Date(), 'yyyymmddHHMM');
+var currentId = (parseInt(version.id)+1).toString();
+console.log("currentId is " + currentId)
 
 gulp.task('set-webpack-alias', () => {
   if (opts.alias && argv.useAlias) {
@@ -121,19 +123,20 @@ gulp.task('copy-temp', ['dist', 'clean-gen'], function () {
   var copy_bat = gulp.src('./build/*.bat')
       .pipe(gulp.dest('./gen/temp'));
   // copy files to gen temp
+  var gen_version = gulp.src('./version.json', {base : '.'})
+      .pipe(jeditor({'id': currentId}))
+      .pipe(gulp.dest('./gen/temp'));
   var copy_file = gulp.src(['./*.swidtag', './app/**', './demo/**', './dist/**', './node_modules/**', './am-browser-config.properties.default'], {base : '.'})
       .pipe(gulp.dest('./gen/temp'));
-  var gen_timestamp = gulp.src('./version.json', {base : '.'})
-      .pipe(jeditor({'timestamp': version.stage ? timestamp : ''}))
-      .pipe(gulp.dest('./gen/temp'));
-  return merge(unzip_node, copy_bat, copy_file, gen_timestamp);
+
+  return merge(unzip_node, copy_bat, gen_version, copy_file);
 });
 
 gulp.task('gen', ['copy-temp'], function () {
   console.log('Generate am-browser.zip from temp folder');
   //var timestamp = Math.floor(new Date().getTime()/1000);
-  var build = version.stage ? '-' + timestamp + '_' + version.stage : '';
-  var name = 'am-browser' + '-' + version.number + build + '.zip';
+  //var build = version.stage ? '-' + timestamp + '_' + version.stage : '';
+  var name = 'am-browser' + '-' + version.number + '-' + currentId + '.zip';
   // generate am-browser.zip from temp folder
   return gulp.src('./gen/temp/**')
       .pipe(zip(name))
@@ -263,6 +266,9 @@ gulp.task('gen-ws-base', ['clean-gen-ws', 'download-ws'], function () {
       .pipe(gulp.dest('./rest/gen/temp/websvc'));
   var copy_swidtag= gulp.src('./*.swidtag')
       .pipe(gulp.dest('./rest/gen/temp/'));
+  var copy_version = gulp.src('./version.json', {base : '.'})
+      .pipe(jeditor({'id': currentId}))
+      .pipe(gulp.dest('./rest/gen/temp/version.json'));
   var copy_bat = gulp.src('./rest/bin/*.bat')
       .pipe(gulp.dest('./rest/gen/temp/bin'));
   // copy x64 folder
@@ -282,7 +288,7 @@ gulp.task('gen-ws-base', ['clean-gen-ws', 'download-ws'], function () {
   var unzip_download = gulp.src('./rest/downloads/*.zip', {base : '.'})
       .pipe(unzip())
 	  .pipe(gulp.dest('./rest/downloads/temp'));
-  return merge(copy_properties, copy_swidtag, copy_bat, copy_x64, copy_deploy, rename_war, unzip_tomcat, unzip_download);
+  return merge(copy_properties, copy_swidtag, copy_version, copy_bat, copy_x64, copy_deploy, rename_war, unzip_tomcat, unzip_download);
 });
 
 gulp.task('gen-ws-conf', ['gen-ws-base'], function () {
@@ -321,8 +327,8 @@ gulp.task('gen-ws', ['gen-ws-conf'], function () {
   console.log('Generate am-browser-rest.zip from temp folder');
   // generate am-browser-rest.zip from temp folder
   //var timestamp = Math.floor(new Date().getTime()/1000);
-  var build = version.stage ? '-' + timestamp + '_' + version.stage : '';
-  var name = 'am-browser-rest' + '-' + version.number + build + '.zip';
+  //var build = version.stage ? '-' + timestamp + '_' + version.stage : '';
+  var name = 'am-browser-rest' + '-' + version.number + '-' + currentId + '.zip';
   return gulp.src('./rest/gen/temp/**')
       .pipe(zip(name))
       .pipe(gulp.dest('./rest/gen'));
@@ -362,12 +368,12 @@ gulp.task('copy-temp-linux', ['unzip-node-linux'], function () {
   var copy_sh = gulp.src('./build/*.sh')
       .pipe(gulp.dest('./gen/temp'));
   // copy files to gen temp
-  var copy_file = gulp.src(['./app/**', './demo/**', './dist/**', './node_modules/**', './am-browser-config.properties.default'], {base : '.'})
+  var gen_version = gulp.src('./version.json', {base : '.'})
+      .pipe(jeditor({'id': currentId}))
       .pipe(gulp.dest('./gen/temp'));
-  var gen_timestamp = gulp.src('./version.json', {base : '.'})
-      .pipe(jeditor({'timestamp': version.stage ? timestamp : ''}))
+  var copy_file = gulp.src(['./*.swidtag', './app/**', './demo/**', './dist/**', './node_modules/**', './am-browser-config.properties.default'], {base : '.'})
       .pipe(gulp.dest('./gen/temp'));
-  return merge(copy_node, copy_sh, copy_file, gen_timestamp);
+  return merge(copy_node, copy_sh, gen_version, copy_file);
 });
 
 gulp.task('chmod-linux', ['copy-temp-linux'], function () {
@@ -385,8 +391,8 @@ gulp.task('chmod-linux', ['copy-temp-linux'], function () {
 gulp.task('gen-linux', ['chmod-linux'], function () {
   console.log('Generate am-browser.zip from temp folder');
   //var timestamp = Math.floor(new Date().getTime()/1000);
-  var build = version.stage ? '-' + timestamp + '_' + version.stage : '';
-  var name = 'am-browser' + '-' + version.number + build + '.tar';
+  //var build = version.stage ? '-' + timestamp + '_' + version.stage : '';
+  var name = 'am-browser' + '-' + version.number + '-' + currentId + '.tar';
   // generate am-browser.zip from temp folder
   return gulp.src('./gen/temp/**')
       .pipe(tar(name))
@@ -522,6 +528,11 @@ gulp.task('gen-ws-base-linux', ['clean-gen-ws-linux', 'download-ws-linux'], func
   // copy folder and files
   var copy_properties= gulp.src('./rest/conf/package.properties.default')
       .pipe(gulp.dest('./rest/gen/temp/websvc'));
+  var gen_version = gulp.src('./version.json', {base : '.'})
+      .pipe(jeditor({'id': currentId}))
+      .pipe(gulp.dest('./rest/gen/temp/'));      
+  var copy_swidtag= gulp.src('./*.swidtag')
+      .pipe(gulp.dest('./rest/gen/temp/'));
   var copy_sh = gulp.src('./rest/bin/*.sh')
       .pipe(gulp.dest('./rest/gen/temp/bin'));
   // copy x64 folder
@@ -540,7 +551,7 @@ gulp.task('gen-ws-base-linux', ['clean-gen-ws-linux', 'download-ws-linux'], func
   var unzip_download = gulp.src('./rest/downloads/*.zip', {base : '.'})
       .pipe(unzip())
 	  .pipe(gulp.dest('./rest/downloads/temp'));
-  return merge(copy_properties, copy_sh, copy_x64, copy_deploy, rename_war, copy_tomcat, unzip_download);
+  return merge(copy_properties, copy_version, copy_swidtag, copy_sh, copy_x64, copy_deploy, rename_war, copy_tomcat, unzip_download);
 });
 
 gulp.task('gen-ws-conf-linux', ['gen-ws-base-linux'], function () {
@@ -594,8 +605,8 @@ gulp.task('gen-ws-linux', ['gen-ws-chmod-linux'], function () {
   console.log('Generate am-browser-rest.zip from temp folder');
   // generate am-browser-rest.zip from temp folder
   //var timestamp = Math.floor(new Date().getTime()/1000);
-  var build = version.stage ? '-' + timestamp + '_' + version.stage : '';
-  var name = 'am-browser-rest' + '-' + version.number + build + '.tar';
+  //var build = version.stage ? '-' + timestamp + '_' + version.stage : '';
+  var name = 'am-browser-rest' + '-' + version.number + '-' + currentId + '.tar';
   return gulp.src('./rest/gen/temp/**')
       .pipe(tar(name))
 	  .pipe(gzip())
