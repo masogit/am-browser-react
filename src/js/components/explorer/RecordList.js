@@ -471,7 +471,9 @@ export default class RecordList extends Component {
           <Anchor icon={this.state.param.allFields?<CheckboxSelected />:<Checkbox />} label="Full columns"
                   onClick={() => (this.props.body.fields.length > this.state.numColumn) && this._toggleAllFields()}
                   disabled={this.props.body.fields.length <= this.state.numColumn}/>
-          <Anchor icon={<Download />} label="Download CSV" onClick={this._download.bind(this)}/>
+          <Anchor icon={<Download />} label="Download CSV"
+                  disabled={this.state.numTotal < 1}
+                  onClick={() => (this.state.numTotal > 0) && this._download()}/>
         </Menu>
         <form name="Download" ref="downloadForm" method="post" action={ExplorerActions.getDownloadQuery(this.props.body.sqlname)}>
           <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
