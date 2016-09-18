@@ -528,7 +528,7 @@ gulp.task('gen-ws-base-linux', ['clean-gen-ws-linux', 'download-ws-linux'], func
   // copy folder and files
   var copy_properties= gulp.src('./rest/conf/package.properties.default')
       .pipe(gulp.dest('./rest/gen/temp/websvc'));
-  var gen_version = gulp.src('./version.json', {base : '.'})
+  var copy_version = gulp.src('./version.json', {base : '.'})
       .pipe(jeditor({'id': currentId}))
       .pipe(gulp.dest('./rest/gen/temp/'));      
   var copy_swidtag= gulp.src('./*.swidtag')
