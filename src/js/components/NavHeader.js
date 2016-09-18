@@ -2,20 +2,12 @@
 
 import React, {Component} from 'react';
 import {Link} from 'react-router';
-import Header from 'grommet/components/Header';
-import Title from 'grommet/components/Title';
-import Menu from 'grommet/components/Menu';
-import SessionMenu from './SessionMenu';
+import {Header, Title, Menu } from 'grommet';
+import SessionMenu from './SessionMenu/MenuContainer';
+import {dropCurrentPop_stopMonitor, toggleSidebar} from '../actions/system';
+import history from '../RouteHistory';
 
-class NavHeader extends Component {
-
-  constructor() {
-    super();
-  }
-
-  componentDidMount() {
-  }
-
+export default class NavHeader extends Component {
   getActive(to) {
     return this.props.path.indexOf(to) > -1 ? 'active' : '';
   }
@@ -42,14 +34,21 @@ class NavHeader extends Component {
     }
 
     return (
-      <Header fixed={true} size="small" full="horizontal" direction="row" justify="between" colorIndex="neutral-1"
-              pad={{vertical: 'small'}} responsive={false}>
+      <Header fixed={true} size="medium" full="horizontal" direction="row" justify="between" colorIndex="neutral-1" responsive={false}>
         <Title>
-          <img src="../../img/favicon.png" className='logo'/> AM Browser
+          <img src="../../img/favicon.png" className='logo' onClick={toggleSidebar}/> AM Browser
         </Title>
         <Menu direction="row" align="center" responsive={true}>
           {
-            links.map((link, index) => <Link key={index} to={link.to} className={`${this.getActive(link.to)}`} style={{textDecoration: 'none'}}>{link.text}</Link>)
+            links.map((link, index) => (
+              <Link key={index} to={link.to}
+                    className={`grommetux-anchor ${this.getActive(link.to)}`}
+                    onClick={e => {
+                      e.preventDefault();
+                      const goLink = defaultLinks.filter(linkObj => linkObj.to == link.to)[0];
+                      dropCurrentPop_stopMonitor(`Go to ${goLink.text}`, () => history.push(link.to));
+                    }}
+                    style={{backgroundColor: 'transparent'}}>{link.text}</Link>))
           }
           <SessionMenu />
         </Menu>
@@ -58,4 +57,3 @@ class NavHeader extends Component {
   }
 }
 
-export default NavHeader;

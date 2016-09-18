@@ -1,12 +1,19 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import {RECEIVE_ERROR, RECEIVE_INFO, RECEIVE_WARNING, MESSAGE_READ} from '../constants/ActionTypes';
+import {RECEIVE_ERROR, RECEIVE_INFO, RECEIVE_WARNING, MESSAGE_READ, ALERT } from '../constants/ActionTypes';
+
+const getId = () => new Date() - new Date('2016-01-01');
 
 const initialState = {
   msgs: [],
   status: null,
-  msg: null
+  msg: null,
+  onConfirm: null,
+  title: '',
+  id: getId()
 };
+
+
 
 const handlers = {
   [RECEIVE_ERROR]: (state, action) => {
@@ -14,7 +21,8 @@ const handlers = {
     let msg = {
       time: date.toLocaleString(),
       status: 'critical',
-      msg: action.msg
+      msg: action.msg,
+      id: getId()
     };
     return {
       msgs: [...state.msgs, msg],
@@ -27,7 +35,8 @@ const handlers = {
     let msg = {
       time: date.toLocaleString(),
       status: 'ok',
-      msg: action.msg
+      msg: action.msg,
+      id: getId()
     };
     return {
       msgs: [...state.msgs, msg],
@@ -40,7 +49,8 @@ const handlers = {
     let msg = {
       time: date.toLocaleString(),
       status: 'warning',
-      msg: action.msg
+      msg: action.msg,
+      id: getId()
     };
     return {
       msgs: [...state.msgs, msg],
@@ -52,7 +62,8 @@ const handlers = {
     return {
       msg: null
     };
-  }
+  },
+  [ALERT]: (_, action) => ({msg: action.msg, onConfirm: action.onConfirm, title: action.title, status: null})
 };
 
 export default function sessionReducer(state = initialState, action) {

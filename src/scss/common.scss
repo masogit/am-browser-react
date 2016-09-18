@@ -11,27 +11,11 @@
   font-weight: 400;
 }
 
-.short-form {
-  width: 350px;
-}
-
-.long-form {
-  width: 700px;
-}
-
 .autoScroll {
   overflow: auto;
 }
 
 /** Grommet: */
-.grommet.grommetux-app {
-  display: flex;
-}
-
-.grommet.grommetux-app > .grommetux-box {
-  flex-grow: 1;
-}
-
 .grommetux-tabs__content {
   flex-grow: 1;
 }
@@ -72,6 +56,11 @@ table {
     margin: 0;
     padding: 0;
   }
+  tbody {
+    tr:nth-child(odd) {
+      background: #f5f5f5;
+    }
+  }
 }
 
 .table {
@@ -95,6 +84,7 @@ table {
   & div[role=tablist] {
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
 
     & ul {
       flex-shrink: 0;
@@ -113,6 +103,9 @@ table {
 
 .flex .grommetux-tabs__content {
   flex-grow: 1;
+  & div {
+    padding-bottom: 8px;
+  }
 }
 
 .anchor.small .grommetux-anchor__icon {
@@ -127,3 +120,22 @@ table {
   margin-left: 20px;
   margin-right: 20px;
 }
+
+.disabled,
+.disabled:hover {
+  opacity: 0.3;
+  pointer-events:none;
+}
+
+.justify-around {
+  justify-content: space-around;
+}
+
+.grommetux-tiles:focus {
+  outline: none;
+}
+
+.hiddenScroll {
+  overflow: hidden;
+}
+

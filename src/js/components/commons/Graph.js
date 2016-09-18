@@ -240,7 +240,13 @@ export default class Graph extends Component {
   }
 
   render() {
-    const {type, config, onClick, data} = this.props;
+    const {type, config, onClick, data, className} = this.props;
+
+    let classes = ['hiddenScroll', 'no-flex'];
+    if (className) {
+      classes.push(className);
+    }
+    classes = classes.join(' ');
 
     if (config == 'init') {
       return this._gen_table(data);
@@ -251,13 +257,15 @@ export default class Graph extends Component {
       if (graph.series.length > 0) {
         switch (type) {
           case 'chart':
-            return <Chart {...graph} />;
+            return <Chart {...graph} className={classes}/>;
           case 'meter':
-            return <Meter {...graph} />;
+            delete graph.series_col;
+            delete graph.col_unit;
+            return <Meter {...graph} className={classes}/>;
           case 'distribution':
-            return <Distribution {...graph} />;
+            return <Distribution {...graph} className={classes}/>;
           case 'legend':
-            return <Legend {...graph} />;
+            return <Legend {...graph} className={classes}/>;
         }
       } else {
         return <div></div>;
@@ -269,7 +277,7 @@ export default class Graph extends Component {
 
 Graph.propTypes = {
   type: PropTypes.string.isRequired,
-  config: PropTypes.object.isRequired,
+  config: PropTypes.oneOfType([PropTypes.object, PropTypes.string]).isRequired,
   data: PropTypes.shape({
     header: PropTypes.array,
     rows: PropTypes.array

@@ -1,0 +1,207 @@
+[
+  {
+    "table": "amExpenseLine",
+    "header": [
+      {
+        "Name": "Asset.PortfolioItem.Computer.ComputerType",
+        "Type": "String",
+        "Content": "Asset.PortfolioItem.Computer.ComputerType",
+        "Index": "0"
+      },
+      {
+        "Name": "number of asset",
+        "Type": "Long",
+        "Content": "count(0)",
+        "Index": "1"
+      },
+      {
+        "Name": "US$",
+        "Type": "Double",
+        "Content": "SUM(mDebit)",
+        "Index": "2"
+      }
+    ],
+    "rows": [
+      [
+        "",
+        "6",
+        "1897.8"
+      ],
+      [
+        "Computer servers",
+        "25",
+        "177155.88"
+      ],
+      [
+        "Desktop computers",
+        "47",
+        "247799.55"
+      ],
+      [
+        "Laptop",
+        "27",
+        "188713"
+      ],
+      [
+        "VMware ESX Server",
+        "2",
+        "25671.91"
+      ],
+      [
+        "VMware VirtualCenter",
+        "2",
+        "26911.2"
+      ]
+    ]
+  },
+  {
+    "Query": {
+      "Schema": {
+        "Content": "amExpenseLine",
+        "Column": [
+          {
+            "Name": "Asset.PortfolioItem.Computer.ComputerType",
+            "Type": "String",
+            "Content": "Asset.PortfolioItem.Computer.ComputerType",
+            "Index": "0"
+          },
+          {
+            "Name": "number of asset",
+            "Type": "Long",
+            "Content": "count(0)",
+            "Index": "1"
+          },
+          {
+            "Name": "US$",
+            "Type": "Double",
+            "Content": "SUM(mDebit)",
+            "Index": "2"
+          }
+        ]
+      },
+      "Result": {
+        "Row": [
+          {
+            "Index": "0",
+            "Column": [
+              {
+                "Readable": "1",
+                "Index": "0"
+              },
+              {
+                "content": "6",
+                "Readable": "1",
+                "Index": "1"
+              },
+              {
+                "content": "1897.8",
+                "Readable": "1",
+                "Index": "2"
+              }
+            ]
+          },
+          {
+            "Index": "1",
+            "Column": [
+              {
+                "content": "Computer servers",
+                "Readable": "1",
+                "Index": "0"
+              },
+              {
+                "content": "25",
+                "Readable": "1",
+                "Index": "1"
+              },
+              {
+                "content": "177155.88",
+                "Readable": "1",
+                "Index": "2"
+              }
+            ]
+          },
+          {
+            "Index": "2",
+            "Column": [
+              {
+                "content": "Desktop computers",
+                "Readable": "1",
+                "Index": "0"
+              },
+              {
+                "content": "47",
+                "Readable": "1",
+                "Index": "1"
+              },
+              {
+                "content": "247799.55",
+                "Readable": "1",
+                "Index": "2"
+              }
+            ]
+          },
+          {
+            "Index": "3",
+            "Column": [
+              {
+                "content": "Laptop",
+                "Readable": "1",
+                "Index": "0"
+              },
+              {
+                "content": "27",
+                "Readable": "1",
+                "Index": "1"
+              },
+              {
+                "content": "188713",
+                "Readable": "1",
+                "Index": "2"
+              }
+            ]
+          },
+          {
+            "Index": "4",
+            "Column": [
+              {
+                "content": "VMware ESX Server",
+                "Readable": "1",
+                "Index": "0"
+              },
+              {
+                "content": "2",
+                "Readable": "1",
+                "Index": "1"
+              },
+              {
+                "content": "25671.91",
+                "Readable": "1",
+                "Index": "2"
+              }
+            ]
+          },
+          {
+            "Index": "5",
+            "Column": [
+              {
+                "content": "VMware VirtualCenter",
+                "Readable": "1",
+                "Index": "0"
+              },
+              {
+                "content": "2",
+                "Readable": "1",
+                "Index": "1"
+              },
+              {
+                "content": "26911.2",
+                "Readable": "1",
+                "Index": "2"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+]

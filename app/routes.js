@@ -2,6 +2,7 @@ var util = require('util');
 var db = require('./db.js');
 var logger = require('./logger.js');
 var REST = require('./rest.js');
+var CSV = require('./csv.js');
 var sessionUtil = require('./sessionUtil.js');
 var config = require('./config.js');
 var version = require('../version.json');
@@ -12,14 +13,14 @@ var isAuthenticated = require('./authentication').isAuthenticated;
 var path = require('path');
 
 module.exports = function (app) {
-  var rest_protocol = process.env.AMB_REST_PROTOCOL || config.rest_protocol;
-  var rest_server = process.env.AMB_REST_SERVER || config.rest_server;
-  var rest_port = process.env.AMB_REST_PORT || config.rest_port;
-  var ucmdb_browser_server = process.env.UCMDB_BROWSER_SERVER || config.ucmdb_browser_server;
-  var ucmdb_browser_port = process.env.UCMDB_BROWSER_PORT || config.ucmdb_browser_port;
-  var session_max_age = process.env.AMB_SESSION_MAX_AGE || config.session_max_age;
-  var enable_csrf = process.env.AMB_NODE_CSRF || config.enable_csrf;
-  var jwt_max_age = process.env.AMB_JWT_MAX_AGE || config.jwt_max_age;
+  var rest_protocol = config.rest_protocol;
+  var rest_server = config.rest_server;
+  var rest_port = config.rest_port;
+  var ucmdb_browser_server = config.ucmdb_browser_server;
+  var ucmdb_browser_port = config.ucmdb_browser_port;
+  var session_max_age = config.session_max_age;
+  var enable_csrf = config.enable_csrf;
+  var jwt_max_age = config.jwt_max_age;
 
   db.init(config.db_folder);
 
@@ -38,13 +39,16 @@ module.exports = function (app) {
     }
   });
 
-  var rest = new REST({
+  let conn = {
     server: rest_server + ":" + rest_port,
     session_max_age: session_max_age,
     jwt_max_age: jwt_max_age,
     enable_csrf: enable_csrf,
     context: config.base + config.version
-  });
+  };
+
+  var rest = new REST(conn);
+  var csv = new CSV(conn);
 
   apiProxy.on('error', function (e, req, res) {
     logger.error(`[proxy] [${req.sessionID}] [error] ${req.method} ${req.originalUrl}`, util.inspect(e));
@@ -130,7 +134,7 @@ module.exports = function (app) {
   app.delete('/coll/:collection/:id', isAuthenticated, db.delete);
 
   // Download CSV in server side
-  app.use('/am/download/:tableName', rest.csv);
+  app.use('/am/download/:tableName', csv.download);
 
   // Proxy the backend rest service /rs/db -> /am/db
   app.use('/am/db', function (req, res) {
@@ -174,5 +178,9 @@ module.exports = function (app) {
         res.status(500).end();
       }
     });
+  });
+
+  app.get('/live-network', function(req, res) {
+    rest.live_net_work(req, res);
   });
 };

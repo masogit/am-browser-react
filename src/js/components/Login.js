@@ -1,18 +1,15 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import React, { Component, PropTypes } from 'react';
+import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { login, initAbout, loginFailure } from '../actions/system';
 import Split from 'grommet/components/Split';
-import Section from 'grommet/components/Section';
-import Sidebar from 'grommet/components/Sidebar';
-import LoginForm from 'grommet/components/LoginForm';
-import Footer from 'grommet/components/Footer';
-import Label from 'grommet/components/Label';
+import {Section, Label, Sidebar, LoginForm, Footer} from 'grommet';
+import ComponentBase from './commons/ComponentBase';
 import HPELogo from './HPELogo';
 import cookies from 'js-cookie';
 
-class IndexerLogin extends Component {
+class IndexerLogin extends ComponentBase {
 
   constructor() {
     super();
@@ -41,7 +38,12 @@ class IndexerLogin extends Component {
   }
 
   _onSubmit(fields) {
+    if (this.locked) {
+      return;
+    }
+    
     if (fields.username) {
+      this.acquireLock();
       this.props.dispatch(login(fields.username, fields.password));
     } else {
       this.props.dispatch(loginFailure({message: 'Please type your user name'}));
@@ -53,7 +55,7 @@ class IndexerLogin extends Component {
 
     var image;
     if ('multiple' === this.state.responsive) {
-      image = <Section pad="none" texture="url(img/login.jpg)"/>;
+      image = <Section pad="none" texture="url(../img/login.jpg)"/>;
     }
 
     var loginError = session.error;

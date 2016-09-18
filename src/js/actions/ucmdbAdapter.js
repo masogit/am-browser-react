@@ -4,101 +4,116 @@
 import Rest from '../util/grommet-rest-promise';
 import history from '../RouteHistory';
 import {POINT_DEF_URL, ADAPTER_DEF_URL} from '../constants/ServiceConfig';
-
-export const ADAPTER_DATA_SUCCESS = 'ADAPTER_DATA_SUCCESS';
-export const INTEGRATION_JOB_DATA_SUCCESS = 'INTEGRATION_JOB_DATA_SUCCESS';
-export const INTEGRATION_JOB_ITEM_DATA_SUCCESS = 'INTEGRATION_JOB_ITEM_DATA_SUCCESS';
-export const JOB_SELECT_SUCCESS = 'JOB_SELECT_SUCCESS';
-export const TAB_SWITCH_SUCCESS = 'TAB_SWITCH_SUCCESS';
-export const ADAPTER_SIDEBAR_CLICK = 'ADAPTER_SIDEBAR_CLICK';
+import * as Types from '../constants/ActionTypes';
 
 const dateFormatter = (date) => date === 0 ? '' : new Date(date).toUTCString();
 
-export const adapterDataFetch = (data, error) => ({
-  type: ADAPTER_DATA_SUCCESS,
+const adapterDataFetch = (data, error) => ({
+  type: Types.ADAPTER_DATA_SUCCESS,
   data,
   error
 });
 
-export const getIntegrationPoint = (callback) => {
-  Rest.get(POINT_DEF_URL).then((res) => {
-    const data = res && res.ok && res.body || [];
-    if (callback) {
-      callback(data, null);
-    }
-  }, (err) => {
-    const error = err.rawResponse || err.message;
-    if (callback) {
-      callback([], error);
-    }
-  });
+export const getJobList = () => {
+  let promiseList = [], pushJobs = [], popJobs = [];
+  return Rest.get(POINT_DEF_URL)
+    .then((res) => res.body || [],
+    (err) => {
+      throw new Error(err.response ? err.response.text : err.message);
+    })
+    .then(points => {
+      points.map((point) => {
+        if (point.populationSupported) {
+          const url = `${POINT_DEF_URL}${point.name}/populationJobs`;
+          promiseList.push(Rest.get(url).then((res) => {
+            popJobs = popJobs.concat(res.body || []);
+          }));
+        }
+
+        if (point.pushSupported) {
+          const url = `${POINT_DEF_URL}${point.name}/pushJobs`;
+          promiseList.push(Rest.get(url).then((res) => {
+            pushJobs = pushJobs.concat(res.body || []);
+          }));
+        }
+      });
+      return Promise.all(promiseList).then(() => ({pushJobs, popJobs}));
+    });
 };
 
-export const integrationJobDataSuccess = (integrationJobData, error) =>({
-  type: INTEGRATION_JOB_DATA_SUCCESS,
+export const getIntegrationPoint = () => {
+  return dispatch => {
+    return Rest.get(POINT_DEF_URL).then((res) => {
+      const data = res.body || [];
+      dispatch(adapterDataFetch(data, null));
+    }, (err) => {
+      const error = err.response ? err.response.text : err.message;
+      dispatch(adapterDataFetch([], error));
+    });
+  };
+};
+
+const integrationJobDataSuccess = (integrationJobData, error) =>({
+  type: Types.INTEGRATION_JOB_DATA_SUCCESS,
   integrationJobData,
   error
 });
 
-export const getIntegrationJob = (pointName, jobType, callback) => {
+export const getIntegrationJob = (pointName, jobType) => {
   const url = `${POINT_DEF_URL}${pointName}/${jobType}`;
-  Rest.get(url).then((res) => {
-    const data = res && res.ok && res.body || [];
-    const points = data.map((point)=> {
-      if (point.startTime !== undefined) point.startTime = dateFormatter(point.startTime);
-      if (point.stopTime !== undefined) point.stopTime = dateFormatter(point.stopTime);
-      return point;
+  return dispatch => {
+    return Rest.get(url).then((res) => {
+      const data = res.body || [];
+      const points = data.map((point)=> {
+        if (point.startTime !== undefined) point.startTime = dateFormatter(point.startTime);
+        if (point.stopTime !== undefined) point.stopTime = dateFormatter(point.stopTime);
+        return point;
+      });
+      dispatch(integrationJobDataSuccess(points, null));
+    }, (err) => {
+      const error = err.response ? err.response.text : err.message;
+      dispatch(integrationJobDataSuccess([], error));
     });
-    if (callback) {
-      callback(points, null);
-    }
-  }, (err) => {
-    const error = err && (err.rawResponse || err.message);
-    if (callback) {
-      callback([], error);
-    }
-  });
+  };
 };
 
-export const integrationJobItemDataSuccess = (integrationJobItemData, error) =>({
-  type: INTEGRATION_JOB_ITEM_DATA_SUCCESS,
+const integrationJobItemDataSuccess = (integrationJobItemData, error) =>({
+  type: Types.INTEGRATION_JOB_ITEM_DATA_SUCCESS,
   integrationJobItemData,
   error
 });
 
-export const getIntegrationJobItem = (pointName, jobType, jobName, callback) => {
+export const getIntegrationJobItem = (pointName, jobType, jobName) => {
   const url = `${POINT_DEF_URL}${pointName}/${jobType}/${jobName}`;
-  Rest.get(url).then((res) => {
-    const data = res && res.ok && res.body && res.body.jobStatuses || [];
-    const jobStatuses = data.map((jobStatus)=> {
-      if (jobStatus.startTime !== undefined) jobStatus.startTime = dateFormatter(jobStatus.startTime);
-      if (jobStatus.stopTime !== undefined) jobStatus.stopTime = dateFormatter(jobStatus.stopTime);
-      return jobStatus;
+  return dispatch => {
+    return Rest.get(url).then((res) => {
+      const data = res.body && res.body.jobStatuses || [];
+      const jobStatuses = data.map((jobStatus)=> {
+        if (jobStatus.startTime !== undefined) jobStatus.startTime = dateFormatter(jobStatus.startTime);
+        if (jobStatus.stopTime !== undefined) jobStatus.stopTime = dateFormatter(jobStatus.stopTime);
+        return jobStatus;
+      });
+      dispatch(integrationJobItemDataSuccess(jobStatuses, null));
+    }, (err) => {
+      const error = err.response ? err.response.text : err.message;
+      dispatch(integrationJobItemDataSuccess([], error));
     });
-    if (callback) {
-      callback(jobStatuses, null);
-    }
-  }, (err) => {
-    const error = err && (err.rawResponse || err.message);
-    if (callback) {
-      callback([], error);
-    }
-  });
+  };
+};
+
+export const clearJobSelection = () => {
+  return {type: Types.CLEAR_JOB_SELECTION};
+};
+
+export const clearJobItemSelection = () => {
+  return {type: Types.CLEAR_JOB_ITEM_SELECTION};
 };
 
 export const adapterSideBarClick = (pointName, tabName) => {
   history.pushState(null, ADAPTER_DEF_URL + pointName + '/' + tabName);
-  return {type: ADAPTER_SIDEBAR_CLICK, pointName, tabName};
+  return {type: Types.ADAPTER_SIDEBAR_CLICK, pointName, tabName};
 };
 
 export const integrationJobSelect = (tabName, pointName, integrationJobName) => {
-  return {type: JOB_SELECT_SUCCESS, integrationJobName};
-};
-
-export const integrationJobTabSwitch = (tabName, pointName) => {
-  history.pushState(null, ADAPTER_DEF_URL + pointName + '/' + tabName);
-  return {
-    type: TAB_SWITCH_SUCCESS,
-    tabName
-  };
+  return {type: Types.JOB_SELECT_SUCCESS, integrationJobName};
 };

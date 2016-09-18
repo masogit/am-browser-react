@@ -28,14 +28,16 @@ export default class RecordDetail extends Component {
     if (this.props.body.links)
       this.props.body.links.forEach((link) => {
         var body = this._getLinkBody(link, this.props.record);
-        ExplorerActions.getCount(body, (records) => {
-          link.count = records.count;
-          var links = this.state.links;
-          links.push(link);
-          this.setState({
-            links: links
+        if (body.filter) {
+          ExplorerActions.getCount(body).then(records => {
+            link.count = records.count;
+            var links = this.state.links;
+            links.push(link);
+            this.setState({
+              links: links
+            });
           });
-        });
+        }
       });
   }
 
@@ -50,10 +52,12 @@ export default class RecordDetail extends Component {
     if (link.src_field) {
       var relative_path = link.src_field.relative_path;
       var src_field = relative_path ? relative_path + '.' + link.src_field.sqlname : link.src_field.sqlname;
-      AQL = link.dest_field.sqlname + '=' + record[src_field];
+      if (record[src_field]) {
+        AQL = `${link.dest_field.sqlname}=${record[src_field]}`;
+      }
     }
 
-    body.filter = body.filter ? '(' + body.filter + ') AND ' + AQL : AQL;
+    body.filter = body.filter ? `(${body.filter}) AND ${AQL}` : AQL;
     return body;
   }
 
@@ -63,10 +67,12 @@ export default class RecordDetail extends Component {
     });
 
     if (globalIds.length > 0)
-      ExplorerActions.getUCMDB((url) => {
-        this.setState({
-          ucmdb: url
-        });
+      ExplorerActions.getUCMDB().then(url=> {
+        if (url) {
+          this.setState({
+            ucmdb: url
+          });
+        }
       });
   }
 
@@ -74,7 +80,7 @@ export default class RecordDetail extends Component {
 
     return (
       <Layer closer={true} align="right" onClose={this.props.onClose}>
-        <Tabs justify="start" initialIndex={0}>
+        <Tabs justify="start" activeIndex={0}>
           <ActionTab title={this.props.body.label}>
             <Table>
               <thead>
@@ -84,10 +90,6 @@ export default class RecordDetail extends Component {
               </tr>
               </thead>
               <tbody>
-              <TableRow>
-                <td>Self</td>
-                <td>{this.props.record.self}</td>
-              </TableRow>
               {
                 this.props.body.fields.map((field, index) => {
                   return (

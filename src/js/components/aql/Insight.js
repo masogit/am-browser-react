@@ -1,81 +1,81 @@
-import React, {Component} from 'react';
+import React from 'react';
 import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
+import {showWarning, monitorEdit} from '../../actions/system';
 import * as Format from '../../util/RecordFormat';
 import history from '../../RouteHistory';
-import RecordList from '../explorer/RecordList';
+import RecordListLayer from '../explorer/RecordListLayer';
 import AlertForm from '../commons/AlertForm';
-import EmptyIcon from '../commons/EmptyIcon';
 import Add from 'grommet/components/icons/base/Add';
 import Close from 'grommet/components/icons/base/Close';
 import Attachment from 'grommet/components/icons/base/Attachment';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
 import Search from 'grommet/components/icons/base/Search';
-import Previous from 'grommet/components/icons/base/Previous';
 import Shift from 'grommet/components/icons/base/Shift';
 import More from 'grommet/components/icons/base/More';
-import Graph from './../commons/Graph';
-import ActionTab from './../commons/ActionTab';
+import Graph from '../commons/Graph';
+import ComponentBase  from '../commons/ComponentBase';
+import ActionTab from '../commons/ActionTab';
 import {Anchor, Box, Button, CheckBox, Header, Menu, Title, Table, TableRow, Layer, Carousel, RadioButton, Tabs} from 'grommet';
-import GroupList from '../commons/GroupList';
-import GroupListItem from '../commons/GroupListItem';
+import SideBar from '../commons/AMSideBar';
+import _ from 'lodash';
 
 let tabIdMap = {};
-export default class Insight extends Component {
+export default class Insight extends ComponentBase {
 
   constructor() {
     super();
+    const tabs = [{
+      name: 'default',
+      box: {
+        direction: 'row',
+        child: null
+      }
+    }];
     this.state = {
-      focusTab: null,
-      wall: {},
+      focusTab: tabs[0],
+      focusIndex: 0,
+      wall: {tabs},
       edit: false,
       carousel: false,
       aqls: [],
-      tabs: [
-        {
-          name: 'default',
-          box: {
-            direction: 'row',
-            child: null
-          }
-        }
-      ],
-
+      tabs,
       data: {}
     };
+
     this._buildBox.bind(this);
     this._buildActions.bind(this);
     this._addBox.bind(this);
     this._deleteBox.bind(this);
     this._toggleDirection.bind(this);
     this._attachAQL.bind(this);
-    this._selectAQL.bind(this);
   }
 
   componentDidMount() {
     if (this.props.params.id) {
-      AQLActions.loadAQL(this.props.params.id, (aql)=> {
+      this.addPromise(AQLActions.loadAQL(this.props.params.id).then((aql)=> {
         this._queryData(aql);
-      });
+      }));
     } else {
       this._loadAQLs();
       this._loadWall();
     }
   }
 
-  _setFocusTab(tab) {
+  _setFocusTab(tab, index) {
     this.setState({
+      focusIndex: index,
       focusTab: tab
     });
   }
 
   _findAqls(box) {
     if (box.child && box.child._id) {
-      AQLActions.loadAQL(box.child._id, (aql)=> {
+      this.addPromise(AQLActions.loadAQL(box.child._id).then((aql)=> {
         if (!this.state.data[aql._id]) {
           this._queryData(aql);
         }
-      });
+      }));
     } else if (box.child && box.child instanceof Array) {
       box.child.forEach((child)=> {
         this._findAqls(child);
@@ -90,16 +90,16 @@ export default class Insight extends Component {
   }
 
   _loadAQLs() {
-    AQLActions.loadAQLs((data) => {
+    this.addPromise(AQLActions.loadAQLs().then((data) => {
       this.setState({
         aqls: data
       });
-    });
+    }));
   }
 
   _queryData(aql) {
     const data = this.state.data;
-    AQLActions.queryAQL(aql.str, (result) => {
+    this.addPromise(AQLActions.queryAQL(aql.str).then(result => {
       if (result) {
         data[aql._id] = {
           aql: aql,
@@ -107,25 +107,31 @@ export default class Insight extends Component {
         };
         this.setState({data});
       }
-    });
+    }));
   }
 
   _loadWall() {
     this.setState({data: {}});
-    AQLActions.loadWalls((walls) => {
-      if (walls[0])
-        this.setState({
-          wall: walls[0],
-          tabs: walls[0].tabs,
-          focusTab: walls[0].tabs[0]
-        }, this._findTabAqls(walls[0].tabs));
-      else
-        this.setState({
-          wall: {
-            tabs: this.state.tabs
-          }
-        });
-    });
+    this.addPromise(AQLActions.loadWalls().then(walls => {
+      if (walls) {
+        if (walls[0]) {
+          this.wall = _.cloneDeep(walls[0]);
+          this.setState({
+            wall: walls[0],
+            tabs: walls[0].tabs
+          }, () => {
+            this._findTabAqls(walls[0].tabs);
+            monitorEdit(this.wall, this.state.wall);
+          });
+        } else {
+          const wall =  { tabs: this.state.tabs };
+          this.wall = _.cloneDeep(wall);
+          this.setState({ wall }, () => {
+            monitorEdit(this.wall, this.state.wall);
+          });
+        }
+      }
+    }));
   }
 
   _toggleEdit() {
@@ -150,26 +156,35 @@ export default class Insight extends Component {
     });
   }
 
+  _getID() {
+    return (Math.random() + 1).toString(36).substring(7);
+  }
+
   _addBox(box, parent) {
     if (!box.child)
       box.child = [{
+        key: this._getID(),
         direction: 'row',
         child: null
       }, {
+        key: this._getID(),
         direction: 'row',
         child: null
       }];
     else if (box.child instanceof Array)
       box.child.push({
+        key: this._getID(),
         direction: 'row',
         child: null
       });
     else {
       var child = box.child;
       box.child = [{
+        key: this._getID(),
         direction: 'row',
         child: child
       }, {
+        key: this._getID(),
         direction: 'row',
         child: null
       }];
@@ -180,22 +195,31 @@ export default class Insight extends Component {
   }
 
   _deleteBox(box, parent) {
-    if (box.child instanceof Array && box.child.length > 0) {
-      box.child.splice(box.child.length - 1, 1);
-      if (box.child.length === 0)
-        box.child = null;
-    } else
+    if (box.child) {
       box.child = null;
-
+    } else if (parent.key != box.key) {
+      this._removeFromParent(box.key, parent, parent);
+    }
+    // For render parent
     this.setState({
       box: parent
     });
   }
 
-  _selectAQL(box, parent) {
-    this.setState({
-      layer: this._getLayer(box, parent)
-    });
+  _removeFromParent(key, box, parent) {
+    if (box.child && box.child instanceof Array) {
+      let removed = _.remove(box.child, child => {
+        return child.key == key;
+      });
+
+      if (box.child.length == 0)
+        box.child = null;
+
+      if (removed.length == 0)
+        box.child.forEach(child => {
+          this._removeFromParent(key, child, parent);
+        });
+    }
   }
 
   _onClose() {
@@ -204,25 +228,18 @@ export default class Insight extends Component {
     });
   }
 
-  _getLayer(box, parent) {
+  _getAQLLayer(box, parent) {
+    const contents = this.state.aqls.map((aql) => ({
+      key: aql._id,
+      groupby: aql.category,
+      onClick: this._attachAQL.bind(this, aql, box, parent),
+      search: aql.name,
+      child: aql.name
+    }));
+
     return (
-      <Layer onClose={this._onClose.bind(this)} closer={true} align="left">
-        <Box full="vertical" justify="center">
-          <Box pad={{vertical: 'medium'}}><Title>Graph Selector ({this.state.aqls.length})</Title></Box>
-          <GroupList pad={{vertical: 'small'}} searchable={true}>
-            {
-              this.state.aqls.map((aql) => {
-                return (
-                  <GroupListItem key={aql._id} groupby={aql.category} search={aql.name}
-                                 pad={{horizontal: 'medium', vertical: 'small'}}
-                                 onClick={this._attachAQL.bind(this, aql, box, parent)}>
-                    <EmptyIcon />{aql.name}
-                  </GroupListItem>
-                );
-              })
-            }
-          </GroupList>
-        </Box>
+      <Layer onClose={this._onClose.bind(this)} closer={true} align="left" flush={true}>
+        <SideBar title='Graph Selector' contents={contents} separator='none' colorIndex='light-1' toggle={false}/>
       </Layer>
     );
   }
@@ -237,14 +254,16 @@ export default class Insight extends Component {
 
   _buildBox(box, parent, tabName) {
     let child;
+
+    // Handle old box no key or number key
+    if (!box.key || !isNaN(box.key))
+      box.key = this._getID();
+
     if (box.child) {
       if (box.child instanceof Array) {
         child = (
-          <Box justify="center" {...box} flex={false}>{
-            box.child.map((child, i) => {
-              child.key = i;
-              return this._buildBox(child, parent, tabName);
-            })
+          <Box justify="center" direction={box.direction} flex={false}>{
+            box.child.map((child) => this._buildBox(child, parent, tabName))
           }</Box>
         );
       } else if (box.child._id && this.state.data[box.child._id]) {
@@ -255,7 +274,7 @@ export default class Insight extends Component {
 
         tabIdMap[tabName].dataIds.push(box.child._id);
         child = (
-          <Box justify="center" {...box} direction="column" pad="medium" flex={true} className='box-graph'>
+          <Box justify="center" pad="medium" flex={true} className='box-graph'>
             <Header>
               <Anchor icon={<Search />} label={dataMap.aql.name}
                       onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
@@ -269,7 +288,12 @@ export default class Insight extends Component {
       child = (
         <Box direction="row" justify="center" pad="large">
           <Anchor href="#" icon={<Attachment />} label="Attach a Graph"
-                  onClick={this._selectAQL.bind(this, box, parent)}/>
+                  onClick={() => this.setState({
+                    layer: {
+                      name: 'AQL',
+                      args: [box, parent]
+                    }
+                  })}/>
         </Box>
       );
     }
@@ -283,17 +307,16 @@ export default class Insight extends Component {
   }
 
   _buildActions(box, parent) {
-    var id = (Math.random() + 1).toString(36).substring(7);
     if (this.state.edit)
       return (
         <Header justify="center">
           <Menu icon={<More />} closeOnClick={false} inline={true} direction="row">
-            <CheckBox id={id} label={box.direction==='row'?'Column':'Row'} checked={box.direction!=='column'}
+            <CheckBox id={box.key} label={box.direction==='row'?'Column':'Row'} checked={box.direction!=='column'}
                       onChange={this._toggleDirection.bind(this, box, parent)} toggle={true}/>
             <Button icon={<Shift className={box.direction==='column'?'icon_rotate90':''}/>}
                     onClick={this._addBox.bind(this, box, parent)}/>
             {
-              box.child &&
+              !(box.child instanceof Array && box.child.length > 0) &&
               <Button icon={<Close />} onClick={this._deleteBox.bind(this, box, parent)}/>
             }
           </Menu>
@@ -340,23 +363,21 @@ export default class Insight extends Component {
     );
   }
 
+  _getViewLayer(body, title) {
+    return <RecordListLayer onClose={this._onClose.bind(this)} body={body} title={title}/>;
+  }
+
   _showViewRecords(filter, viewInAQL) {
     if (viewInAQL && viewInAQL._id)
-      ExplorerActions.loadView(viewInAQL._id, (view) => {
+      ExplorerActions.loadView(viewInAQL._id).then((view) => {
         var body = view.body;
         var newFitler = Format.getFilterFromField(view.body.fields, filter);
         body.filter = (body.filter) ? `(${body.filter} AND ${newFitler})` : newFitler;
-        var layer = (
-          <Layer onClose={this._onClose.bind(this)} closer={true} flush={true} align="center">
-            <Box full={true} pad="large">
-              <RecordList body={body} title={view.name}/>
-            </Box>
-          </Layer>
-        );
-
         this.setState({
-          layer: layer
-        });
+          layer: {
+            name: 'View',
+            args: [body, view.name]
+          }});
       });
   }
 
@@ -377,8 +398,7 @@ export default class Insight extends Component {
     return (
       <Box pad="large" colorIndex="light-2" flex={false}>
         <Header>{aql.name}</Header>
-        {
-          aql.form instanceof Object &&
+        {aql.form instanceof Object &&
           <Box key={aql._id} pad="large" align={(aql.type=='meter')?'center':null}>
             <Graph type={aql.type} data={data} config={aql.form}
                   onClick={(filter) => this._showViewRecords(filter, aql.view)}/>
@@ -409,7 +429,7 @@ export default class Insight extends Component {
   _onSaveWall() {
     var wall = this.state.wall;
     wall.tabs = this.state.tabs;
-    AQLActions.saveWall(wall, (data) => {
+    AQLActions.saveWall(wall).then(data => {
       if (data)
         this._loadWall();
     });
@@ -438,29 +458,34 @@ export default class Insight extends Component {
     });
 
     const name = `${namePrefix}${maxIndex + 1}`;
-    this.setState({
-      tabs: [...this.state.tabs, {
-        name: name,
-        box: {
-          direction: 'row',
-          child: null
-        }
-      }]
-    });
+    const focusTab = {
+      name: name,
+      box: {
+        direction: 'row',
+        child: null
+      }
+    };
+    this.state.tabs.push(focusTab);
+    this.state.wall.tabs = this.state.tabs;
+    this.state.focusTab = focusTab;
+    this.state.focusIndex = this.state.tabs.length - 1;
+
+    this.setState(this.state);
   }
 
   _onUpdateTitle(tab, name) {
+    name = name.trim();
     if (name) {
       const sameNameTabs = this.state.tabs.filter(tab => tab.name == name);
       if (sameNameTabs.length > 0) {
-        AQLActions.popWarningMessage('Tab name already exists');
+        showWarning('Tab name already exists');
         return false;
       } else {
         tab.name = name;
         return true;
       }
     } else {
-      AQLActions.popWarningMessage('Tab name can not be empty');
+      showWarning('Tab name can not be empty');
     }
   }
 
@@ -484,11 +509,13 @@ export default class Insight extends Component {
         focusIndex = index;
       }
     });
-    let focusTab = tabs[(focusIndex + 1) % tabs.length];
-    this.setState({
-      tabs: leftTabs,
-      focusTab
-    }, () => this.refs[focusTab.name].props.onRequestForActive());
+    focusIndex = (focusIndex + 1) % tabs.length;
+    let focusTab = tabs[focusIndex];
+    this.state.tabs = leftTabs;
+    this.state.wall.tabs = leftTabs;
+    this.state.focusIndex = focusIndex > 0 ? focusIndex -1 : focusIndex;
+    this.state.focusTab = focusTab;
+    this.setState(this.state);
   }
 
   render() {
@@ -499,9 +526,9 @@ export default class Insight extends Component {
       content = data && data[id] && this._renderSingleAQL(data[id]);
     } else {
       content = (
-        <Tabs justify='center' className='flex'>{
-          tabs.map((tab) => (
-            <ActionTab ref={tab.name} title={tab.name} key={tab.name} onClick={this._setFocusTab.bind(this, tab)}
+        <Tabs justify='center' className='flex' activeIndex={this.state.focusIndex} initialIndex={this.state.focusIndex}>{
+          tabs.map((tab, index) => (
+            <ActionTab ref={tab.name} title={tab.name} key={tab.name} onClick={this._setFocusTab.bind(this, tab, index)}
                        onEdit={edit}
                        onDoubleClick={this.state.edit ? this._onUpdateTitle.bind(this, tab) : null}>
               {carousel && !edit ? this._buildCarousel(tab) : this._buildBox(tab.box, tab.box, tab.name)}
@@ -515,7 +542,7 @@ export default class Insight extends Component {
     return (
       <Box full="horizontal">
         <Header justify="between" pad={{'horizontal': 'medium'}}>
-          <Title>AM Insight</Title>
+          <Title>Insight</Title>
           {
             !id &&
             <Menu direction="row" align="center" responsive={true}>
@@ -529,20 +556,22 @@ export default class Insight extends Component {
               {edit && <Anchor icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>}
               {edit && <Anchor icon={<Add />} onClick={this._addTab.bind(this)} label="Add Tab"/>}
               {edit &&
-              <Anchor icon={<Close />} onClick={this._onRemove.bind(this, this.state.focusTab)} label="Delete Tab"/>}
+              <Anchor icon={<Close />} onClick={() => this.state.tabs.length > 1 && this._onRemove(this.state.focusTab)} label="Delete Tab" disabled={this.state.tabs.length <= 1}/>}
               <CheckBox id="edit" label="Edit" checked={edit} onChange={this._toggleEdit.bind(this)}
                         toggle={true}/>
             </Menu>
           }
           {
-            id && this.showBack() && <Anchor icon={<Previous />} label="Back" onClick={() => {
-              history.go(-1);
+            id && this.showBack() && <Anchor icon={<Close />} label="Close" onClick={() => {
+              history.push('/insight');
+              this._loadAQLs();
+              this._loadWall();
             }}/>
           }
         </Header>
         <Box className={edit || carousel ? '' : 'autoScroll'} flex={true}>
           {content}
-          {layer}
+          {layer && this[`_get${layer.name}Layer`](...layer.args)}
           {alert}
         </Box>
       </Box>

@@ -1,0 +1,150 @@
+{
+  "data": {
+    "table": "amExpenseLine",
+    "header": [
+      {
+        "Name": "CostCenter.Title",
+        "Type": "String",
+        "Content": "CostCenter.Title",
+        "Index": "0"
+      },
+      {
+        "Name": "US$",
+        "Type": "Double",
+        "Content": "sum(mDebit)",
+        "Index": "1"
+      }
+    ],
+    "rows": [
+      [
+        "Production",
+        "29.97"
+      ],
+      [
+        "IT",
+        "175.88"
+      ],
+      [
+        "Finance",
+        "35.97"
+      ],
+      [
+        "Development",
+        "92"
+      ],
+      [
+        "Common Line",
+        "18"
+      ],
+      [
+        "Burbank operations",
+        "31.97"
+      ]
+    ]
+  },
+  "config": {
+    "chart": {
+      "series_col": [
+        "1"
+      ],
+      "series": [],
+      "xAxis": {
+        "placement": "bottom",
+        "data": [
+          {
+            "label": "Production",
+            "value": 0
+          },
+          {
+            "label": "Operations",
+            "value": 1
+          },
+          {
+            "label": "Los Angeles operations",
+            "value": 2
+          },
+          {
+            "label": "IT",
+            "value": 3
+          },
+          {
+            "label": "Finance",
+            "value": 4
+          },
+          {
+            "label": "Development",
+            "value": 5
+          },
+          {
+            "label": "Corporate services",
+            "value": 6
+          },
+          {
+            "label": "Common Line",
+            "value": 7
+          },
+          {
+            "label": "Burbank operations",
+            "value": 8
+          },
+          {
+            "label": "Administrative",
+            "value": 9
+          }
+        ],
+        "label": ""
+      },
+      "xAxis_col": "0",
+      "type": "bar",
+      "size": "medium",
+      "legend": {
+        "position": "",
+        "units": "",
+        "total": false
+      },
+      "important": 0,
+      "threshold": 0,
+      "max": 0,
+      "min": 0,
+      "points": false,
+      "segmented": false,
+      "sparkline": false,
+      "units": "US$"
+    },
+    "meter": {
+      "series_col": "1",
+      "series": [],
+      "type": "bar",
+      "size": "medium",
+      "legend": {
+        "position": "",
+        "units": "",
+        "total": false
+      },
+      "important": 0,
+      "threshold": 0,
+      "max": 0,
+      "min": 0,
+      "vertical": false,
+      "stacked": false,
+      "value": 0
+    },
+    "distribution": {
+      "series_col": "1",
+      "series": [],
+      "size": "medium",
+      "legendTotal": false,
+      "full": true,
+      "units": ""
+    },
+    "legend": {
+      "series_col": "1",
+      "label": "0",
+      "size": "small",
+      "legendTotal": false,
+      "full": true,
+      "units": "",
+      "total": true
+    }
+  }
+}

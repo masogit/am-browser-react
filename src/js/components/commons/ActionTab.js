@@ -3,18 +3,11 @@ import React, {PropTypes} from 'react';
 import {Box, Tab} from 'grommet';
 
 export default class ActionTab extends Tab {
-  constructor() {
-    super();
+  componentWillMount() {
     this.state = {
       editing: false,
-      title: ''
-    };
-  }
-
-  componentDidMount() {
-    this.setState({
       title: this.props.title
-    });
+    };
   }
 
   componentWillReceiveProps(nextProps) {
@@ -33,6 +26,11 @@ export default class ActionTab extends Tab {
           };
         }
       }
+    }
+    if (nextProps.title && nextProps.title != this.state.title) {
+      this.setState({
+        title: nextProps.title
+      });
     }
   }
 
@@ -56,7 +54,7 @@ export default class ActionTab extends Tab {
       this._toggleEdit();
     } else {
       this.setState({
-        title: event.target.value.trim()
+        title: event.target.value
       });
     }
   }

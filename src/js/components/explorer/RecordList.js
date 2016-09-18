@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import RecordDetail from './RecordDetail';
-import {Title, Table, TableRow, Box, Anchor, Header, Menu}from 'grommet';
+import {Title, Table, TableRow, Box, Anchor, Header, Menu, Map}from 'grommet';
 import Close from 'grommet/components/icons/base/Close';
 import Ascend from 'grommet/components/icons/base/Ascend';
 import Descend from 'grommet/components/icons/base/Descend';
@@ -15,10 +15,12 @@ import * as AQLActions from '../../actions/aql';
 import Graph from '../commons/Graph';
 import EmptyIcon from '../commons/EmptyIcon';
 import * as Format from '../../util/RecordFormat';
+import {hash, loadSetting, saveSetting} from '../../util/util';
 import cookies from 'js-cookie';
+import {bodyToMapData} from '../../util/util';
 
 export default class RecordList extends Component {
-  constructor() {
+  constructor(props) {
     super();
     this.state = {
       numColumn: 5,
@@ -27,103 +29,146 @@ export default class RecordList extends Component {
       records: [],
       filtered: null,
       record: null,
-      groupby: "",
-      graphType: "distribution",
+      searchFields: null,
       graphData: null,
-      param: {
-        orderby: "",
-        offset: 0,
-        limit: 30,
-        filters: []
+      param: (!props.noCache && loadSetting(hash(Object.assign({},props.body, {filter: ''})))) || {
+        showMap: props.showMap || (props.body.links && props.body.links.length > 0),
+        graphType: props.graphType || "legend",
+        allFields: props.allField || false,
+        groupby: props.groupby || this._getFirstGroupby(props.body.groupby),
+        aqlInput: props.aqlInput || false,
+        orderby: props.orderby || "",
+        offset: props.offset || 0,
+        limit: props.limit || 30,
+        filters: props.filters || []
       },
-      aqlInput: false,
-      allFields: false,
-      session: null,
-      onMoreLock: false
+      onMoreLock: false,
+      locked: false
     };
   }
 
   componentWillMount() {
-    this._getRecords();
-    if (this.props.body.groupby)
-      this._getGroupByData();
+    this._getSearchableFields();
+    this._getRecords(this.state.param);
   }
 
-  _clearGroupBy(groupby) {
-    if (this.state.groupby == groupby)
+  componentWillUnmount() {
+    saveSetting(hash(Object.assign({}, this.props.body, {filter: ''})), this.state.param);
+  }
+
+  _getFirstGroupby(groupby) {
+    if (groupby && groupby.split('|').length > 0)
+      return groupby.split('|')[0];
+    else
+      return '';
+  }
+
+  _getSearchableFields() {
+    let searchFields = this.props.body.fields.filter((field) => {
+      return field.searchable;
+    }).map((field) => {
+      return Format.getDisplayLabel(field);
+    }).join(', ');
+
+    if (searchFields)
       this.setState({
-        groupby: ''
-      }, this._getGroupByData());
+        searchFields: searchFields
+      });
+  }
+
+  _clearGroupBy() {
+    let param = this.state.param;
+    param.groupby = '';
+    this.setState({
+      graphData: null,
+      param: param
+    });
   }
 
   _getGroupByData(groupby) {
-    let body = Object.assign({}, this.props.body);
-
-    // Filter then groupby
-    if (this.state.param.filters.length > 0) {
-      let userFilters = this.state.param.filters.map((filter) => {
-        return '(' + filter + ')';
-      }).join(" AND ");
-      body.filter = body.filter ? body.filter + ' AND (' + userFilters + ')' : userFilters;
-    }
-
     if (groupby) {
+      if (this.state.records.length == 0) {
+        let param = this.state.param;
+        param.groupby = groupby;
+        this.setState({param, graphData : null});
+        return;
+      } else {
+        this.setState({
+          locked: true
+        });
+      }
+      let body = Object.assign({}, this.props.body);
+
+      // Filter then groupby
+      if (this.state.param.filters.length > 0) {
+        let userFilters = this.state.param.filters.map((filter) => {
+          return '(' + filter + ')';
+        }).join(" AND ");
+        body.filter = body.filter ? body.filter + ' AND (' + userFilters + ')' : userFilters;
+      }
       body.groupby = groupby;
-      this.setState({
-        groupby: groupby
+      AQLActions.queryAQL(ExplorerActions.getGroupByAql(body)).then((data)=> {
+        let param = this.state.param;
+        param.groupby = groupby;
+        this.setState({
+          graphData: (data && data.rows.length > 0) ? data : null,
+          param: param,
+          locked: false
+        });
       });
     }
-
-    if (body.groupby)
-      AQLActions.queryAQL(ExplorerActions.getGroupByAql(body), (data)=> {
-        if (data.rows.length > 0) {
-          this.setState({
-            graphData: data
-          });
-        }
-      });
   }
 
   _getMoreRecords() {
-    console.log('get more record');
     if (this.state.numTotal > this.state.records.length) {
       var param = Object.assign({}, this.state.param);
       param.offset = this.state.records.length;
-      this.refs.search.value = "";
       this._getRecords(param, true);  // sync pass param to query, then records append
     } else {
-      console.log('no more record');
       return null;
     }
   }
 
   _getRecords(param, onMore) {
-    if ((onMore && this.state.onMoreLock === false) || !onMore) {
-      this.setState({onMoreLock: true});
+    if (!this.state.locked && !(onMore && this.state.onMoreLock)) {
+      this.setState({
+        locked: true,
+        onMoreLock: true});
       var body = Object.assign({}, this.props.body, {param: param || this.state.param});
       var timeStart = Date.now();
       this.setState({
         loading: true
       });
-      ExplorerActions.loadRecordsByBody(body, (data) => {
-        var records = this.state.records;
+      ExplorerActions.loadRecordsByBody(body).then((data) => {
+        const records = this.state.records;
         this.setState({
           loading: false,
           timeQuery: Date.now() - timeStart,
           numTotal: data.count,
           records: param ? records.concat(data.entities) : data.entities, // if sync pass param to query, then records append
-          filtered: null
-        }, ()=> {
+          filtered: null,
+          locked: false
+        }, () => {
           if (this.state.records.length < this.state.numTotal) {
-            this.setState({onMoreLock: false});
+            this.setState({
+              onMoreLock: false
+            });
           }
+
+          // re-groupby
+          if (this.state.param.groupby && !onMore)
+            this._getGroupByData(this.state.param.groupby);
         });
       });
     }
   }
 
   _orderBy(sqlname) {
-    var param = Object.assign({}, this.state.param);
+    if (this.state.locked) {
+      return;
+    }
+
+    let param = this.state.param;
     if (param.orderby == (sqlname + ' desc'))
       param.orderby = "";
     else if (param.orderby == sqlname)
@@ -163,7 +208,7 @@ export default class RecordList extends Component {
 
     // press enter to build AQL filter
     if (event.keyCode === 13 && event.target.value.trim()) {
-      if (this.state.aqlInput) {
+      if (this.state.param.aqlInput) {
         this._aqlFilterAdd();
       } else {
         var param = this.state.param;
@@ -184,7 +229,7 @@ export default class RecordList extends Component {
         }
       }
     } else {
-      if (!this.state.aqlInput) {
+      if (!this.state.param.aqlInput) {
         if (event.target.value.trim() == "")
           this.setState({
             filtered: null
@@ -200,7 +245,7 @@ export default class RecordList extends Component {
   }
 
   getDisplayFields() {
-    const displayNum = this.state.allFields ? this.props.body.fields.length : this.state.numColumn;
+    const displayNum = this.state.param.allFields ? this.props.body.fields.length : this.state.numColumn;
     return this.props.body.fields.filter((field, index) => {
       if (index < displayNum) {
         return field;
@@ -209,7 +254,7 @@ export default class RecordList extends Component {
   }
 
   getObjectString(obj) {
-    return this.getDisplayFields().map((field, index) => Format.getFieldStrVal(obj, field)).concat(obj.self || '');
+    return this.getDisplayFields().map((field, index) => Format.getFieldStrVal(obj, field));
   }
 
   _aqlFilterAdd(filter) {
@@ -227,10 +272,17 @@ export default class RecordList extends Component {
         });
 
       }
-
       if (param.filters.indexOf(searchValue) == -1)
         param.filters.push(searchValue);
-      this.refs.search.value = "";
+
+      // Find next groupby from pre-defined body
+      let groupby = param.groupby || '';
+      let groups = this.props.body.groupby ? this.props.body.groupby.split('|') : [];
+      let pos = groups.indexOf(groupby);
+      if (pos > -1 && pos < groups.length - 1)
+        groupby = groups[pos + 1];
+
+      param.groupby = groupby;
       this.setState({
         param: param
       }, this._getRecords);
@@ -241,13 +293,24 @@ export default class RecordList extends Component {
   _filterClear(index) {
     var param = this.state.param;
     param.filters.splice(index, 1);
+
+    // Find previous groupby from pre-defined body
+    let groupby = param.groupby || '';
+    let groups = this.props.body.groupby ? this.props.body.groupby.split('|') : [];
+    let pos = groups.indexOf(groupby);
+    if (pos > 0)
+      groupby = groups[pos - 1];
+
+    param.groupby = groupby;
     this.setState({
       param: param
     }, this._getRecords);
   }
 
   _filterReuse(filter) {
-    this.setState({aqlInput: true});
+    let param = this.state.param;
+    param.aqlInput = true;
+    this.setState({param: param});
     var search = this.refs.search.value.trim();
     if (search && search !== filter)
       this.refs.search.value += ' AND ' + filter;
@@ -268,30 +331,44 @@ export default class RecordList extends Component {
   }
 
   _toggleAQLInput() {
+    let param = this.state.param;
+    param.aqlInput = !param.aqlInput;
     this.setState({
-      aqlInput: !this.state.aqlInput
+      param: param
+    });
+  }
+
+  _toggleShowMap() {
+    let param = this.state.param;
+    param.showMap = !param.showMap;
+    this.setState({
+      param: param
     });
   }
 
   _toggleGraphType() {
+    let param = this.state.param;
+    param.graphType = (param.graphType == 'legend') ? 'distribution' : 'legend';
     this.setState({
-      graphType: this.state.graphType=='legend' ? 'distribution' : 'legend'
+      param: param
     });
   }
 
   _toggleAllFields() {
+    let param = this.state.param;
+    param.allFields = !param.allFields;
     this.setState({
-      allFields: !this.state.allFields
+      param: param
     });
   }
 
   renderFieldsHeader() {
     return this.getDisplayFields().map((field, index) => (
-      <th key={index}>
-        <Anchor href="#" reverse={true} icon={this._showOrderByIcon(field.sqlname)}
-                label={Format.getDisplayLabel(field)} key={`fieldsheader_${index}`}
-                onClick={this._orderBy.bind(this, field.sqlname)}/>
-      </th>
+        <th key={index} className={this.state.locked ? 'disabled' : ''}>
+          <Anchor href="#" reverse={true} icon={this._showOrderByIcon(field.sqlname)}
+                  label={Format.getDisplayLabel(field)} key={`fieldsheader_${index}`}
+                  onClick={this._orderBy.bind(this, field.sqlname)}/>
+        </th>
     ));
   }
 
@@ -300,8 +377,7 @@ export default class RecordList extends Component {
     return (
       records.map((record, index) => {
         return (
-          <TableRow key={index} onClick={this._viewDetailShow.bind(this, record)}>
-            <td>{record.self}</td>
+          <TableRow key={index} onClick={this.props.onClick ? this.props.onClick.bind(this, record) : this._viewDetailShow.bind(this, record)}>
             {
               this.getDisplayFields().map((field, tdindex) => (
                 <td key={tdindex}>
@@ -332,34 +408,46 @@ export default class RecordList extends Component {
   renderGroupBy() {
     let type = this.props.body.sum ? `SUM ${this.props.body.sum}` : `COUNT *`;
     let menus = this.props.body.fields.map((field, index) => {
-      let selected = (field.sqlname == (this.state.groupby || this.props.body.groupby));
+      let selected = (field.sqlname == this.state.param.groupby);
       let label = Format.getDisplayLabel(field);
+      let pos = this.props.body.groupby ? this.props.body.groupby.split('|').indexOf(field.sqlname) : -1;
+      if (pos > -1)
+        label = `[G${pos + 1}] ` + label;
+      if (field.searchable)
+        label = '[S] ' + label;
+      let isPrimary = (pos > -1) || field.searchable;
       return (
-        <Anchor key={`a_groupby_${index}`} icon={selected?<CheckboxSelected />:<Checkbox />} disabled={this.props.body.groupby == field.sqlname}
-                label={label} primary={this.props.body.groupby == field.sqlname}
-                onClick={selected?this._clearGroupBy.bind(this, field.sqlname):this._getGroupByData.bind(this, field.sqlname)}/>
+        <Anchor key={`a_groupby_${index}`} icon={selected?<CheckboxSelected />:<Checkbox />}
+                label={label} primary={isPrimary} disabled={this.state.locked}
+                onClick={() => {
+                  if (!this.state.locked) {
+                    if (selected) {
+                      this._clearGroupBy(field.sqlname);
+                    } else {
+                      this._getGroupByData(field.sqlname);
+                    }
+                  }
+                }}/>
       );
     });
-    menus.unshift(<Anchor key={`a_groupby_${this.props.body.fields.length}`} label={type} icon={<Aggregate />} disabled={true}/>);
+
+    menus.unshift(<Anchor key={`a_groupby_${this.props.body.fields.length}`} label={`${type} FROM ${this.props.body.sqlname}`} icon={<Aggregate />} disabled={true}/>);
 
     return menus;
   }
 
   renderToolBox() {
-
-    const aqlStyle = {
-      'font-weight': 'bold',
-      'color': '#767676',
-      'border-color': '#FFD144'
-    };
     const resultRecords = this.state.filtered ? this.state.filtered : this.state.records;
+    const noLinks = (this.props.body.links && this.props.body.links.length > 0) ? `${this.props.body.links.length} sub link(s)` : 'no sub link';
+    const aqlWhere = "press / input AQL where statement";
+    const quickSearch = this.state.searchFields ? `press Enter to quick search in ${this.state.searchFields}; ${aqlWhere}` : aqlWhere;
+    const placeholder = this.state.param.aqlInput ? "input AQL where statement…" : quickSearch;
 
     return (
       <Header justify="between">
         <Title>{this.props.title}</Title>
-        <input type="text" className="flex" ref="search" style={this.state.aqlInput?aqlStyle:{}}
-               placeholder={this.state.aqlInput?`Input AQL...`:`Quick search, press / input AQL`}
-               onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
+        <input type="text" className={this.state.param.aqlInput ? 'aql flex' : 'flex'} ref="search"
+               placeholder={placeholder} disabled={this.state.locked} onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
         <Box direction="column">
           <Anchor onClick={this._getMoreRecords.bind(this)} disabled={this.state.loading}>
             <Box style={{fontSize: '70%', fontWeight: 'bold'}}>
@@ -370,18 +458,22 @@ export default class RecordList extends Component {
             {`${this.state.timeQuery}ms`}
           </Box>
         </Box>
-        <Menu icon={<Filter />} dropAlign={{ right: 'right', top: 'top' }}>
+        <Menu icon={<Filter />} dropAlign={{ right: 'right', top: 'top' }} >
           {this.renderGroupBy()}
         </Menu>
-        <Menu icon={<MenuIcon />} closeOnClick={false} dropAlign={{ right: 'right', top: 'top' }}>
-          <Anchor icon={this.state.graphType=='legend'?<CheckboxSelected />:<Checkbox />} label="Vertical Graph"
+        <Menu icon={<MenuIcon />} dropAlign={{ right: 'right', top: 'top' }}>
+          <Anchor icon={this.state.param.showMap?<CheckboxSelected />:<Checkbox />} label={`View Map [${noLinks}]`}
+                  onClick={this._toggleShowMap.bind(this)}/>
+          <Anchor icon={this.state.param.graphType=='legend'?<CheckboxSelected />:<Checkbox />} label="Vertical Graph"
                   onClick={this._toggleGraphType.bind(this)}/>
-          <Anchor icon={this.state.aqlInput?<CheckboxSelected />:<Checkbox />} label="Input AQL"
+          <Anchor icon={this.state.param.aqlInput?<CheckboxSelected />:<Checkbox />} label="Input AQL"
                   onClick={this._toggleAQLInput.bind(this)}/>
-          <Anchor icon={this.state.allFields?<CheckboxSelected />:<Checkbox />} label="Full columns"
-                  onClick={this._toggleAllFields.bind(this)}
+          <Anchor icon={this.state.param.allFields?<CheckboxSelected />:<Checkbox />} label="Full columns"
+                  onClick={() => (this.props.body.fields.length > this.state.numColumn) && this._toggleAllFields()}
                   disabled={this.props.body.fields.length <= this.state.numColumn}/>
-          <Anchor icon={<Download />} label="Download CSV" onClick={this._download.bind(this)}/>
+          <Anchor icon={<Download />} label="Download CSV"
+                  disabled={this.state.numTotal < 1}
+                  onClick={() => (this.state.numTotal > 0) && this._download()}/>
         </Menu>
         <form name="Download" ref="downloadForm" method="post" action={ExplorerActions.getDownloadQuery(this.props.body.sqlname)}>
           <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
@@ -398,8 +490,6 @@ export default class RecordList extends Component {
              onMore={this.state.onMoreLock || this.state.filtered ? null : this._getMoreRecords.bind(this)}>
         <thead>
         <tr>
-          <th><Anchor href="#" reverse={true} icon={this._showOrderByIcon('self')} label="Self"
-                      onClick={this._orderBy.bind(this, 'self')}/></th>
           {this.renderFieldsHeader()}
         </tr>
         </thead>
@@ -428,24 +518,36 @@ export default class RecordList extends Component {
       total: true
     };
     return (
-      <Graph type={this.state.graphType} data={this.state.graphData} config={config}
-             onClick={(filter) => this._aqlFilterAdd(Format.getFilterFromField(this.props.body.fields, filter))}/>
+      <Graph type={this.state.param.graphType} data={this.state.graphData} config={config}
+             className={this.state.locked ? 'disabled' : ''}
+             onClick={(filter) => {
+               if (!this.state.locked) {
+                 this._aqlFilterAdd(Format.getFilterFromField(this.props.body.fields, filter));
+               }
+             }}/>
     );
   }
-
   render() {
+    const fixIEScrollBar = this.props.root ? 'fixIEScrollBar' : '';
     return (
-      <Box pad={{horizontal: 'medium'}} flex={true}>
+      <Box pad={{horizontal: 'medium'}} flex={true} className={fixIEScrollBar}>
         {this.renderToolBox()}
         {this.renderAQLFilter()}
         {
-          this.state.graphType=='legend'&&this.state.graphData?
-            <Box flex={true} direction="row" className={`fixMinSizing ${this.props.root?'fixIEScrollBar':''}`}>
-            <Box pad={{vertical: 'large'}}>{this.renderGraph()}</Box>
-            <Box flex={true}>{this.renderList()}</Box>
-          </Box>
+          this.state.param.showMap &&
+          <Map vertical={true} data={bodyToMapData(this.props.body)} />
+        }
+        {
+          this.state.param.graphType=='legend' && this.state.graphData ?
+            <Box flex={true} direction="row" className={`fixMinSizing ${fixIEScrollBar}`}>
+              <Box pad={{vertical: 'large', horizontal: 'small'}}>{this.renderGraph()}</Box>
+              <Box flex={true}>{this.renderList()}</Box>
+            </Box>
           :
-            <Box className={`fixMinSizing ${this.props.root?'fixIEScrollBar':''}`}>{this.renderGraph()}{this.renderList()}</Box>
+            <Box className={`fixMinSizing ${fixIEScrollBar}`}>
+              {this.renderGraph()}
+              {this.renderList()}
+            </Box>
         }
         {this.renderDetail()}
       </Box>

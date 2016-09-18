@@ -1,21 +1,30 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import { INIT, LOGIN, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT, GET_SETTINGS_SUCCESS } from '../actions/system';
+import { INIT, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT,
+  STOP_MONITOR_EDIT, MONITOR_EDIT, FORCE_LOGOUT, TOGGLE_SIDEBAR } from '../constants/ActionTypes';
 
 const initialState = {
   email: null,
   error: null,
   headerNavs: null,
-  loggedout: false
+  loggedout: false,
+  showSidebar: true,
+  edit: {
+    origin: {},
+    now: {}
+  }
 };
 
 const handlers = {
   [INIT]: (_, action) => ({email: action.email, headerNavs: action.headerNavs}),
-  [LOGIN]: (_, action) => ({email: action.email, error: null}),
   [LOGIN_SUCCESS]: (_, action) => ({
     email: action.email,
     error: null,
-    headerNavs: action.headerNavs
+    headerNavs: action.headerNavs,
+    edit: {
+      origin: {},
+      now: {}
+    }
   }),
   [LOGIN_FAILURE]: (_, action) => ({error: action.error}),
   [LOGOUT]: () => ({
@@ -24,7 +33,15 @@ const handlers = {
     headerNavs: null,
     loggedout: true
   }),
-  [GET_SETTINGS_SUCCESS]: (_, action) => ({headerNavs: action.headerNavs})
+  [FORCE_LOGOUT]: (_, action) => ({
+    email: null,
+    error: {message: action.error},
+    headerNavs: null,
+    loggedout: true
+  }),
+  [MONITOR_EDIT]: (_, action) => ({edit: action.edit}),
+  [STOP_MONITOR_EDIT]: (_, action) => ({edit: null}),
+  [TOGGLE_SIDEBAR]: (state, action) => ({showSidebar: !state.showSidebar})
 };
 
 export default function sessionReducer (state = initialState, action) {

@@ -1,87 +1,89 @@
 import {GRAPH_DEF_URL, INSIGHT_DEF_URL, AM_DB_DEF_URL, AM_AQL_DEF_URL} from '../constants/ServiceConfig';
 import Rest from '../util/grommet-rest-promise';
-const store = require('../store');
+import store from '../store';
 import * as Types from '../constants/ActionTypes';
 import _ from 'lodash';
 
-export function saveWall(wall, callback) {
-  Rest.post(INSIGHT_DEF_URL, wall).then((res) => {
+const dummy_promise = {
+  then: () => {}
+};
+
+export function saveWall(wall) {
+  return Rest.post(INSIGHT_DEF_URL, wall).then((res) => {
     if (res.text) {
-      store.default.dispatch({type: Types.RECEIVE_INFO, msg: "Insight saved successfully"});
-      callback(res.text);
+      store.dispatch({type: Types.RECEIVE_INFO, msg: "Insight saved successfully"});
+      return res.text;
     }
   }, (err) => {
     console.log(err.response ? err.response.text : err);
   });
 }
 
-export function loadWalls(callback) {
-  Rest.get(INSIGHT_DEF_URL).then((res) => {
-    callback(res.body);
+export function loadWalls() {
+  return Rest.get(INSIGHT_DEF_URL).then((res) => {
+    return res.body;
   }, (err) => {
     console.log(err.response ? err.response.text : err);
   });
 }
 
-export function loadAQL(id, callback) {
-  Rest.get(GRAPH_DEF_URL + id).then((res) => {
-    callback(res.body);
+export function loadAQL(id) {
+  return Rest.get(GRAPH_DEF_URL + id).then((res) => {
+    return res.body;
   }, (err) => {
     console.log(err.response ? err.response.text : err);
   });
 }
 
-export function loadAQLs(callback) {
-  Rest.get(GRAPH_DEF_URL).then((res) => {
-    callback(res.body);
+export function loadAQLs() {
+  return Rest.get(GRAPH_DEF_URL).then((res) => {
+    return res.body;
   }, (err) => {
     console.log(err.response ? err.response.text : err);
   });
 }
 
-export function saveAQL(aql, callback) {
+export function saveAQL(aql) {
   let clonedAql = _.cloneDeep(aql);
   // TODO: delete the following 4 lines after aql templates are cleaned up.
   delete clonedAql.data;
-  delete clonedAql.meter;
-  delete clonedAql.distribution;
-  delete clonedAql.chart;
-  Rest.post(GRAPH_DEF_URL, clonedAql).then((res) => {
+  return Rest.post(GRAPH_DEF_URL, clonedAql).then((res) => {
     if (res.text) {
-      store.default.dispatch({type: Types.RECEIVE_INFO, msg: "Graph saved successfully"});
-      callback(res.text);
+      store.dispatch({type: Types.RECEIVE_INFO, msg: "Graph saved successfully"});
+      return res.text;
     }
   }, (err) => {
     console.log(err.response ? err.response.text : err);
   });
 }
 
-export function removeAQL(id, callback) {
-  Rest.del(GRAPH_DEF_URL + id).then((res) => {
+export function removeAQL(id) {
+  return Rest.del(GRAPH_DEF_URL + id).then((res) => {
     if (res.text) {
-      store.default.dispatch({type: Types.RECEIVE_INFO, msg: "Graph removed successfully"});
-      callback(res.text);
+      store.dispatch({type: Types.RECEIVE_INFO, msg: "Graph removed successfully"});
+      return res.text;
     }
   }, (err) => {
     console.log(err.response ? err.response.text : err);
   });
 }
 
-export function loadReports(callback) {
-  Rest.get(AM_DB_DEF_URL + 'amInToolReport').then((res) => {
-    callback(res.body);
+export function loadReports() {
+  return Rest.get(AM_DB_DEF_URL + 'amInToolReport').then((res) => {
+    return res.body;
   }, (err) => {
     console.log(err.response ? err.response.text : err);
   });
 }
 
-export function queryAQL(str, callback) {
+export function queryAQL(str) {
   var aql = {
     tableName: "",
     where: "",
     fields: ""
   };
 
+  let errorMessage;
   // get key word position
   // todo: check if AQL can contain multipule key words
   var idx_SELECT = str.toLowerCase().indexOf("select");
@@ -89,8 +91,9 @@ export function queryAQL(str, callback) {
   var idx_WHERE = str.toLowerCase().indexOf("where");
 
   if (idx_SELECT < 0 || idx_FROM < 0) {
-    // callback(null);
-    store.default.dispatch({type: Types.RECEIVE_ERROR, msg: "AQL is invalid! Can not query data for Graph"});
+    errorMessage =  "AQL is invalid! Can not query data for Graph";
+    store.dispatch({type: Types.RECEIVE_ERROR, msg: errorMessage});
+    return dummy_promise;
   } else {
     // get fields from SELECT .. FROM
     aql.fields = str.substring(idx_SELECT + 6, idx_FROM).trim();
@@ -106,11 +109,15 @@ export function queryAQL(str, callback) {
       query += " " + encodeURI(aql.where);
     }
 
-    Rest.get(query).then((res) => {
-      callback(simpleAQLResult(res.body.Query));
+    return Rest.get(query).then((res) => {
+      return simpleAQLResult(res.body.Query);
     }, (err) => {
-      const errorMessage = err.rawResponse || (err.response && err.response.text || err.toString());
-      store.default.dispatch({type: Types.RECEIVE_ERROR, msg: errorMessage});
+      if (err.status == 404) {
+        errorMessage = 'Can not get response from rest server, please check your AQL string';
+      } else {
+        errorMessage = err.rawResponse || (err.response && err.response.text || err.toString());
+      }
+      store.dispatch({type: Types.RECEIVE_ERROR, msg: errorMessage});
     });
   }
 }
@@ -131,8 +138,9 @@ function simpleAQLResult(Query) {
   }
 
 
-  if (Query.Result.Row instanceof Array) {
-    Query.Result.Row.forEach((row) => {
+  if (Query.Result.Row instanceof Array) {  // Multiple rows
+    for (let index in Query.Result.Row) {
+      let row = Query.Result.Row[index];
       var cols = [];
       if (row.Column instanceof Array) {
         row.Column.forEach((col) => {
@@ -149,9 +157,17 @@ function simpleAQLResult(Query) {
       }
       if (cols.length > 0)
         data.rows.push(cols);
-    });
 
-  } else if (Query.Result.Row && Query.Result.Row.Column instanceof Array) {
+      // Truncate for Font End performance
+      if (index > 100) {
+        store.dispatch({
+          type: Types.RECEIVE_WARNING,
+          msg: 'Truncate returned query rows if over 100.'
+        });
+        break;
+      }
+    }
+  } else if (Query.Result.Row && Query.Result.Row.Column instanceof Array) {  // Only one row
     var cols = [];
     Query.Result.Row.Column.forEach((col) => {
       if (col.content)
@@ -162,7 +178,7 @@ function simpleAQLResult(Query) {
     if (cols.length > 0)
       data.rows.push(cols);
 
-  } else {
+  } else {  // Only one row and one column
     var cols = [];
     if (Query.Result.Row && Query.Result.Row.Column.content)
       cols.push(Query.Result.Row.Column.content);
@@ -171,14 +187,10 @@ function simpleAQLResult(Query) {
   }
 
   if (data.rows[0] && data.header.length !== data.rows[0].length) {
-    store.default.dispatch({
+    store.dispatch({
       type: Types.RECEIVE_WARNING,
       msg: 'AQL str is invalid: query columns is inconsistent with return columns.'
     });
   }
   return data;
-}
-
-export function popWarningMessage(msg) {
-  store.default.dispatch({type: Types.RECEIVE_WARNING, msg});
 }

@@ -6,6 +6,9 @@
 @import './common';
 @import './insight';
 @import './about';
+@import './action_label';
+@import './form';
+@import './input';
 
 $hpe-fonts-path: './fonts';
 
@@ -97,4 +100,8 @@ $hpe-fonts-path: './fonts';
   100% {
     width: $sidebar-width;
   }
+}
+
+html {
+  overflow: auto;
 }

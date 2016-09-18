@@ -196,13 +196,12 @@ if ""%_DEPLOY_TC6%""==""true"" (
 )
 
 if ""%_DEPLOY_WS8%""==""true"" (
-  set _DEPLOY_OPTS=!_DEPLOY_OPTS! -Dws8=true -Dremove.files=true -Dremove.war.files="WEB-INF/lib/cdi-api-1.1.jar,WEB-INF/lib/javax.inject-1.jar,WEB-INF/lib/jsf-api-2.1.20.jar,WEB-INF/lib/jsf-impl-2.1.20.jar,WEB-INF/lib/weld-api-2.0.Final.jar,WEB-INF/lib/weld-core-2.0.0.Final.jar,WEB-INF/lib/weld-servlet-core-2.0.0.Final.jar,WEB-INF/lib/weld-spi-2.0.Final.jar"
+  set _DEPLOY_OPTS=!_DEPLOY_OPTS! -Dws8=true -Dremove.files=true -Dremove.war.files="WEB-INF/lib/cdi-api-1.1.jar,WEB-INF/lib/javax.inject-1.jar,WEB-INF/lib/jsf-api-2.1.20.jar,WEB-INF/lib/jsf-impl-2.1.20.jar,WEB-INF/lib/weld-api-2.0.Final.jar,WEB-INF/lib/weld-core-2.0.0.Final.jar,WEB-INF/lib/weld-servlet-core-2.0.0.Final.jar,WEB-INF/lib/weld-spi-2.0.Final.jar,WEB-INF/lib/cdi-api-1.2.jar,WEB-INF/lib/javax.inject-1.jar,WEB-INF/lib/jboss-el-api_3.0_spec-1.0.0.Final.jar,WEB-INF/lib/jboss-logging-3.2.1.Final.jar,WEB-INF/lib/weld-api-2.3.SP2.jar,WEB-INF/lib/weld-core-2.3.4.Final.jar,WEB-INF/lib/weld-core-impl-2.3.4.Final.jar,WEB-INF/lib/weld-environment-common-2.3.4.Final.jar,WEB-INF/lib/weld-probe-core-2.3.4.Final.jar,WEB-INF/lib/weld-servlet-core-2.3.4.Final.jar,WEB-INF/lib/weld-spi-2.3.SP2.jar"
 )
 
 if ""%_DEPLOY_WLS12C%""==""true"" (
-  set _DEPLOY_OPTS=!_DEPLOY_OPTS! -Dwls12c=true -Dremove.files=true -Dremove.war.files="WEB-INF/lib/cdi-api-1.1.jar,WEB-INF/lib/javax.inject-1.jar,WEB-INF/lib/weld-api-2.0.Final.jar,WEB-INF/lib/weld-core-2.0.0.Final.jar,WEB-INF/lib/weld-servlet-core-2.0.0.Final.jar,WEB-INF/lib/weld-spi-2.0.Final.jar"
+  set _DEPLOY_OPTS=!_DEPLOY_OPTS! -Dwls12c=true -Dremove.files=true -Dremove.war.files="WEB-INF/lib/cdi-api-1.1.jar,WEB-INF/lib/javax.inject-1.jar,WEB-INF/lib/weld-api-2.0.Final.jar,WEB-INF/lib/weld-core-2.0.0.Final.jar,WEB-INF/lib/weld-servlet-core-2.0.0.Final.jar,WEB-INF/lib/weld-spi-2.0.Final.jar,WEB-INF/lib/cdi-api-1.2.jar,WEB-INF/lib/javax.inject-1.jar,WEB-INF/lib/jboss-el-api_3.0_spec-1.0.0.Final.jar,WEB-INF/lib/jboss-logging-3.2.1.Final.jar,WEB-INF/lib/weld-api-2.3.SP2.jar,WEB-INF/lib/weld-core-2.3.4.Final.jar,WEB-INF/lib/weld-core-impl-2.3.4.Final.jar,WEB-INF/lib/weld-environment-common-2.3.4.Final.jar,WEB-INF/lib/weld-probe-core-2.3.4.Final.jar,WEB-INF/lib/weld-servlet-core-2.3.4.Final.jar,WEB-INF/lib/weld-spi-2.3.SP2.jar"
 )
-
 :checkJava
 if not exist "%JAVA_HOME%\bin\java.exe" goto noJavaHome
 

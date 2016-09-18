@@ -1,21 +1,16 @@
 export function getFieldStrVal(record, field) {
-  var val = record[field.sqlname];
-  if (field.user_type && field.user_type == 'System Itemized List')
-    val = val[Object.keys(val)[0]];
-  else if (field.type && field.type == 'Date+Time') {
-    if (val) {
-      var d = new Date(val * 1000);
-      val = d.toLocaleString();
+  var val = record[field.sqlname] || '';
+  if (val) {
+    if (field.user_type == 'System Itemized List' || val instanceof Object) {
+      val = val[Object.keys(val)[0]];
+    } else if (field.type && field.type == 'Date+Time') {
+      val = new Date(val * 1000).toLocaleString();
+    } else if (field.type && field.type == 'Date') {
+      val = new Date(val * 1000).toLocaleDateString();
     }
-  } else if (field.type && field.type == 'Date') {
-    if (val) {
-      var d = new Date(val * 1000);
-      val = d.toLocaleDateString();
-    }
-  } else if (val instanceof Object)
-    val = val[Object.keys(val)[0]];
+  }
 
-  return val || '';
+  return val;
 }
 
 export function getDisplayLabel(field) {

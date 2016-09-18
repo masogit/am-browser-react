@@ -1,0 +1,11 @@
+input {
+  .grommet &.aql {
+    font-weight: bold;
+    color: #767676;
+    border-color: #FFD144;
+  }
+
+  &[disabled] {
+    border-color: $disabled-icon-color;
+  }
+}

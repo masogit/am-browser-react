@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import ComponentBase from '../commons/ComponentBase';
-import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Title, Split, SearchInput} from 'grommet';
+import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Title, Split, Map} from 'grommet';
 import Close from 'grommet/components/icons/base/Close';
 import Up from 'grommet/components/icons/base/LinkUp';
 import Down from 'grommet/components/icons/base/LinkDown';
@@ -15,11 +15,15 @@ import More from 'grommet/components/icons/base/More';
 import Mail from 'grommet/components/icons/base/Mail';
 import _ from 'lodash';
 import AlertForm from '../../components/commons/AlertForm';
+import EditLayer from '../../components/commons/EditLayer';
+import ContentPlaceHolder from '../../components/commons/ContentPlaceHolder';
 import FieldTypes from '../../constants/FieldTypes';
 import {saveAs} from 'file-saver';
+import SearchInput from '../commons/SearchInput';
+import {bodyToMapData} from '../../util/util';
 
 const _onMail = (view) => {
-  if (view.id) {
+  if (view._id) {
     let br = "%0D%0A";
     let subject = `AM Browser View: ${view.name}`;
     if (!window.location.origin) {
@@ -32,7 +36,7 @@ const _onMail = (view) => {
 };
 
 const _onDownload = (view) => {
-  if (view.id) {
+  if (view._id) {
     let blob = new Blob([JSON.stringify(view)], {type: "data:application/json;charset=utf-8"});
     saveAs(blob, (view.name || view.body.sqlname || 'view') + ".json");
   }
@@ -71,6 +75,24 @@ export default class ViewDefDetail extends ComponentBase {
     } else {
       this.props.onValueChange(path.substring(2), event.target.value);
     }
+  }
+
+  _onGroupby(event, field, groupby) {
+    let path = event.target.name;
+    let fields = groupby ? groupby.split('|') : [];
+    let pos = fields.indexOf(field);
+
+    if (pos > -1)
+      fields.splice(pos, 1);
+    else
+      fields.push(field);
+
+    this.props.onValueChange(path.substring(2), fields.join('|'));
+  }
+
+  _posGroupby(groupby, field) {
+    if (groupby && groupby.split('|').indexOf(field) > -1)
+      return groupby.split('|').indexOf(field) + 1;
   }
 
   _setCategory(event) {
@@ -192,12 +214,12 @@ export default class ViewDefDetail extends ComponentBase {
           </td>
           <td>
             <CheckBox id={`v.${currentPath}body.groupby`} name={`v.${currentPath}body.groupby`}
-                      value={field.sqlname} checked={selfView.body.groupby==field.sqlname}
-                      disabled={(!!selfView.body.groupby&&selfView.body.groupby!=field.sqlname)}
+                      value={field.sqlname} checked={this._posGroupby(selfView.body.groupby, field.sqlname) > 0}
                       onChange={
                         (event) => {
-                          this._onChange(event, field.sqlname);
+                          this._onGroupby(event, field.sqlname, selfView.body.groupby);
                         }}/>
+            {this._posGroupby(selfView.body.groupby, field.sqlname)}
           </td>
           <td>
             <CheckBox id={`v.${currentPath}body.sum`} name={`v.${currentPath}body.sum`}
@@ -302,19 +324,49 @@ export default class ViewDefDetail extends ComponentBase {
     this.props.onClickTableTitle(nameList.split('.'));
   }
 
+  _onClose() {
+    this.setState({
+      layer: null
+    });
+  }
+
+  getLayer(type) {
+    if (type == 'description') {
+      return (
+        <EditLayer
+          onChange={this._onChange.bind(this)}
+          value={this.props.selectedView.desc}
+          label='Description' name='v.desc'
+          onClose={this._onClose.bind(this)} />
+      );
+    }
+  }
+
+  getAlertLayer(type, viewName) {
+    let title, onConfirm;
+    switch (type) {
+      case 'save': {
+        title = `Save '${viewName}'?`;
+        onConfirm = this._onSubmit;
+        break;
+      }
+      case 'duplicate': {
+        title = `Duplicate view definition '${viewName}'?"`;
+        onConfirm = this._onDuplicate;
+        break;
+      }
+      case 'delete': {
+        title = `You're about to delete '${viewName}', continue?`;
+        onConfirm = this._onDelete;
+        break;
+      }
+    }
+
+    return title && <AlertForm onClose={this.closeAlertForm} title={title} onConfirm={onConfirm}/>;
+  }
+
   render() {
     let {selectedView} = this.props;
-    let alertForms = selectedView && selectedView.name ? {
-      save: <AlertForm onClose={this.closeAlertForm}
-                       title={"Save '" + selectedView.name + "'?"}
-                       onConfirm={this._onSubmit}/>,
-      duplicate: <AlertForm onClose={this.closeAlertForm}
-                            title={"Duplicate view definition '" + selectedView.name + "'?"}
-                            onConfirm={this._onDuplicate}/>,
-      delete: <AlertForm onClose={this.closeAlertForm}
-                         title={"You're about to delete '" + selectedView.name + "', continue?"}
-                         onConfirm={this._onDelete}/>
-    } : null;
 
     let p = "input", table;
 
@@ -338,10 +390,11 @@ export default class ViewDefDetail extends ComponentBase {
     return (
       !_.isEmpty(selectedView) ?
         <Box flex={true}>
+          {this.getLayer(this.state.layer)}
           <Header justify="between" pad={{horizontal: 'medium'}}>
             <Title>View Builder</Title>
             <Menu direction="row" align="center" responsive={true}>
-              <Anchor icon={<Play />} onClick={this.props.openPreview} label="Query" disabled={!table}/>
+              <Anchor icon={<Play />} onClick={() => table && this.props.openPreview()} label="Query" disabled={!table}/>
               <Anchor icon={<Checkmark />}
                       onClick={() => selectedView.name && selectedView.category && this.openAlert("save")} label="Save"
                       disabled={!selectedView.name || !selectedView.category}/>
@@ -352,9 +405,9 @@ export default class ViewDefDetail extends ComponentBase {
                         label="Duplicate"
                         disabled={!selectedView._id}/>
                 {selectedView._id &&
-                <Anchor icon={<Mail />} onClick={(selectedView) => _onMail(selectedView)} label="Mail"
+                <Anchor icon={<Mail />} onClick={() => _onMail(selectedView)} label="Mail"
                         disabled={!selectedView._id}/>}
-                <Anchor icon={<Download />} onClick={(selectedView) => _onDownload(selectedView)} label="Download"
+                <Anchor icon={<Download />} onClick={() => _onDownload(selectedView)} label="Download"
                         disabled={!selectedView._id}/>
               </Menu>
             </Menu>
@@ -369,6 +422,9 @@ export default class ViewDefDetail extends ComponentBase {
           <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'medium'}}>
             <Split flex="left" fixed={false} className='fixMinSizing'>
               <Box flex={true}>
+                {
+                  selectedView.body.sqlname && <Map vertical={true} data={bodyToMapData(selectedView.body)} />
+                }
                 {table}
               </Box>
               <Box pad={table ? 'small' : 'none'}>
@@ -377,9 +433,9 @@ export default class ViewDefDetail extends ComponentBase {
                     <input id="v.name" name="v.name" type="text" onChange={this._onChange}
                            value={selectedView.name}/>
                   </FormField>
-                  <FormField label="Description" htmlFor={p + "item2"}>
-                    <textarea id="v.desc" name="v.desc" value={selectedView.desc}
-                              onChange={this._onChange}></textarea>
+                  <FormField label="Description">
+                    <textarea value={selectedView.desc} onClick={() => this.setState({layer: 'description'})}
+                              onChange={() => this.setState({layer: 'description'})}/>
                   </FormField>
                   <FormField label="Category" htmlFor={p + "item3"}>
                     <SearchInput id="v.category" name="v.category" value={selectedView.category}
@@ -388,17 +444,11 @@ export default class ViewDefDetail extends ComponentBase {
                   </FormField>
                 </Form>
               </Box>
-              {alertForms && alertForms[this.state.alertForm]}
+              {selectedView && selectedView.name && this.getAlertLayer(this.state.alertForm, selectedView.name)}
             </Split>
           </Box>
         </Box>
-        :
-        <Box pad={{horizontal: 'medium'}} flex={true} justify='center' align="center">
-          <Box size="medium" colorIndex="light-2" pad={{horizontal: 'large', vertical: 'medium'}} align='center'>
-            Select an item or create a new one.
-          </Box>
-        </Box>
-
+        : <ContentPlaceHolder/>
     );
   }
 }

@@ -1,0 +1,1218 @@
+[
+  {
+    "name": "Expense Line",
+    "desc": "",
+    "category": "IT Spending",
+    "body": {
+      "orderby": "sePurpose desc",
+      "filter": "",
+      "label": "Expense lines",
+      "sqlname": "amExpenseLine",
+      "fields": [
+        {
+          "ref-link": "schema/amExpenseLine/field/mDebit",
+          "user_type": "Money",
+          "size": 8,
+          "user_type_format": "",
+          "label": "Debit",
+          "sqlname": "mDebit",
+          "type": "Double",
+          "is_calc": false,
+          "long_desc": "Debit"
+        },
+        {
+          "ref-link": "schema/amExpenseLine/field/DebitCur",
+          "user_type": "",
+          "size": 6,
+          "user_type_format": "",
+          "label": "Debit (currency)",
+          "sqlname": "DebitCur",
+          "type": "String",
+          "is_calc": false,
+          "long_desc": "Debit (currency)"
+        },
+        {
+          "ref-link": "schema/amExpenseLine/field/dBilling",
+          "user_type": "",
+          "size": 4,
+          "user_type_format": "",
+          "label": "Expense date",
+          "sqlname": "dBilling",
+          "type": "Date",
+          "is_calc": false,
+          "long_desc": "Date of corresponding expense"
+        },
+        {
+          "ref-link": "schema/amExpenseLine/field/sePurpose",
+          "user_type": "System Itemized List",
+          "size": 2,
+          "user_type_format": "Purchase (Asset)|0|Training|1|Contract|2|Work order|3|Consumption|4|Purchase (Consumable)|5|Initial payment (Asset)|7|Initial payment (Contract)|8|Rent|9|License extension|10|Adjustment|11|Free|6|Project|12|Internal labor (Work order)|51|Internal labor (Ticket)|52|Subscription|55",
+          "label": "Purpose",
+          "sqlname": "sePurpose",
+          "type": "Short",
+          "is_calc": false,
+          "long_desc": "Purpose linked to line"
+        },
+        {
+          "ref-link": "schema/amExpenseLine/field/seStatus",
+          "user_type": "System Itemized List",
+          "size": 2,
+          "user_type_format": "Projected|2|Incurred|0|Incurred and locked|1",
+          "label": "Status",
+          "sqlname": "seStatus",
+          "type": "Short",
+          "is_calc": false,
+          "long_desc": "Status"
+        }
+      ],
+      "links": [
+        {
+          "sqlname": "Portfolio.ItemsReceived",
+          "label": "Items received",
+          "src_field": {
+            "ref-link": "schema/amPortfolio/field/lPortfolioItemId",
+            "sqlname": "lPortfolioItemId",
+            "relative_path": "Portfolio"
+          },
+          "dest_field": {
+            "ref-link": "schema/amItemReceived/field/lCrtdPItemId",
+            "sqlname": "lCrtdPItemId"
+          },
+          "body": {
+            "sqlname": "amItemReceived",
+            "label": "Items received",
+            "fields": [
+              {
+                "ref-link": "schema/amItemReceived/field/ItemNo",
+                "user_type": "",
+                "size": 12,
+                "user_type_format": "",
+                "label": "Item number",
+                "sqlname": "ItemNo",
+                "type": "String",
+                "is_calc": false,
+                "long_desc": "Item number"
+              },
+              {
+                "ref-link": "schema/amItemReceived/field/fQty",
+                "user_type": "",
+                "size": 8,
+                "user_type_format": "",
+                "label": "Quantity received",
+                "sqlname": "fQty",
+                "type": "Double",
+                "is_calc": false,
+                "long_desc": "Quantity received"
+              },
+              {
+                "ref-link": "schema/amItemReceived/field/seMgtConstraint",
+                "user_type": "System Itemized List",
+                "size": 2,
+                "user_type_format": "Free|0|Asset tag|1|Unique asset tag|2",
+                "label": "Management constraint forced",
+                "sqlname": "seMgtConstraint",
+                "type": "Short",
+                "is_calc": false,
+                "long_desc": "Management constraint forced"
+              },
+              {
+                "ref-link": "schema/amItemReceived/field/seProcessLocation",
+                "user_type": "System Itemized List",
+                "size": 2,
+                "user_type_format": "Default|0|Local|1|Server|2",
+                "label": "Action",
+                "sqlname": "seProcessLocation",
+                "type": "Short",
+                "is_calc": false,
+                "long_desc": "Action"
+              },
+              {
+                "ref-link": "schema/amItemReceived/field/seStatus",
+                "user_type": "System Itemized List",
+                "size": 2,
+                "user_type_format": "Default|0|Received|1|Deleted|2",
+                "label": "Status",
+                "sqlname": "seStatus",
+                "type": "Short",
+                "is_calc": false,
+                "long_desc": "Status"
+              }
+            ],
+            "links": []
+          },
+          "count": 20
+        }
+      ],
+      "groupby": "",
+      "sum": "mDebit"
+    },
+    "_id": "e7jyjxj38fr"
+  },
+  {
+    "name": "Contracts",
+    "desc": "",
+    "category": "Contracts",
+    "body": {
+      "orderby": "",
+      "filter": "",
+      "label": "Contracts",
+      "sqlname": "amContract",
+      "fields": [
+        {
+          "ref-link": "schema/amContract/field/Ref",
+          "user_type": "",
+          "size": 21,
+          "user_type_format": "",
+          "label": "Reference",
+          "sqlname": "Ref",
+          "type": "String",
+          "is_calc": false,
+          "long_desc": "Contract reference",
+          "searchable": true
+        },
+        {
+          "ref-link": "schema/amContract/field/dStart",
+          "user_type": "",
+          "size": 4,
+          "user_type_format": "",
+          "label": "Start",
+          "sqlname": "dStart",
+          "type": "Date",
+          "is_calc": false,
+          "long_desc": "Start date of contract"
+        },
+        {
+          "ref-link": "schema/amContract/field/dEnd",
+          "user_type": "",
+          "size": 4,
+          "user_type_format": "",
+          "label": "End",
+          "sqlname": "dEnd",
+          "type": "Date",
+          "is_calc": false,
+          "long_desc": "Date of end of term"
+        },
+        {
+          "ref-link": "schema/amContract/field/seType",
+          "user_type": "System Itemized List",
+          "size": 2,
+          "user_type_format": "Other|0|Leasing (master lease)|1|Lease schedule|2|Insurance|3|Maintenance|4|License|5|Blanket PO|6|Service level package|7|Service level target|8|Internal Cloud Services|9|External Cloud Services|10|Mobile communication service|11",
+          "label": "Type",
+          "sqlname": "seType",
+          "type": "Short",
+          "is_calc": false,
+          "long_desc": "Type"
+        },
+        {
+          "ref-link": "schema/amContract/field/seStatus",
+          "user_type": "System Itemized List",
+          "size": 2,
+          "user_type_format": "In preparation|0|Standard contract|1|Quote requested|11|Quoted|12|Awaiting approval|13|Validated|14|Denied|15|Active|31|Awaiting approval for renewal|33|Suspended|39|Finished|41|Cancelled|-1",
+          "label": "Contract status",
+          "sqlname": "seStatus",
+          "type": "Short",
+          "is_calc": false,
+          "long_desc": "Status of the contract"
+        },
+        {
+          "ref-link": "schema/amContract/field/AgreementNo",
+          "user_type": "",
+          "size": 65,
+          "user_type_format": "",
+          "label": "Agreement number",
+          "sqlname": "AgreementNo",
+          "type": "String",
+          "is_calc": false,
+          "long_desc": "Agreement number"
+        },
+        {
+          "ref-link": "schema/amContract/field/ContractNo",
+          "user_type": "",
+          "size": 21,
+          "user_type_format": "",
+          "label": "Contract number",
+          "sqlname": "ContractNo",
+          "type": "String",
+          "is_calc": false,
+          "long_desc": "Contract number",
+          "searchable": true
+        },
+        {
+          "ref-link": "schema/amContract/field/EnrollmentNo",
+          "user_type": "",
+          "size": 65,
+          "user_type_format": "",
+          "label": "Enrollment number",
+          "sqlname": "EnrollmentNo",
+          "type": "String",
+          "is_calc": false,
+          "long_desc": "Enrollment number"
+        },
+        {
+          "ref-link": "schema/amContract/field/mIntPay",
+          "user_type": "Money",
+          "size": 8,
+          "user_type_format": "",
+          "label": "Init. payment",
+          "sqlname": "mIntPay",
+          "type": "Double",
+          "is_calc": false,
+          "long_desc": "Initial payment (initial payment or interim rent)"
+        },
+        {
+          "ref-link": "schema/amEmplDept/field/Name",
+          "user_type": "",
+          "size": 51,
+          "user_type_format": "",
+          "label": "Name",
+          "sqlname": "Supervisor.Name",
+          "type": "String",
+          "is_calc": false,
+          "long_desc": "Name of employee or department"
+        }
+      ],
+      "links": [
+        {
+          "sqlname": "Licences",
+          "label": "Licenses",
+          "src_field": {
+            "ref-link": "schema/amContract/field/lCntrId",
+            "sqlname": "lCntrId",
+            "relative_path": ""
+          },
+          "dest_field": {
+            "ref-link": "schema/amAsset/field/lLicCntrId",
+            "sqlname": "lLicCntrId"
+          },
+          "body": {
+            "sqlname": "amAsset",
+            "label": "Assets",
+            "fields": [
+              {
+                "ref-link": "schema/amAsset/field/PriceCur",
+                "user_type": "",
+                "size": 6,
+                "user_type_format": "",
+                "label": "Purchase price (currency)",
+                "sqlname": "PriceCur",
+                "type": "String",
+                "is_calc": false,
+                "long_desc": "Purchase price (currency)"
+              },
+              {
+                "ref-link": "schema/amAsset/field/SerialNo",
+                "user_type": "",
+                "size": 129,
+                "user_type_format": "",
+                "label": "Serial #",
+                "sqlname": "SerialNo",
+                "type": "String",
+                "is_calc": false,
+                "long_desc": "Serial number"
+              },
+              {
+                "ref-link": "schema/amAsset/field/SoftMedia",
+                "user_type": "Custom Itemized List",
+                "size": 81,
+                "user_type_format": "amSoftMedia",
+                "label": "Media",
+                "sqlname": "SoftMedia",
+                "type": "String",
+                "is_calc": false,
+                "long_desc": "Software distribution media"
+              }
+            ],
+            "links": [
+              {
+                "sqlname": "AstCntrDescs",
+                "label": "Contracts",
+                "src_field": {
+                  "ref-link": "schema/amAsset/field/lAstId",
+                  "sqlname": "lAstId",
+                  "relative_path": ""
+                },
+                "dest_field": {
+                  "ref-link": "schema/amAstCntrDesc/field/lAstId",
+                  "sqlname": "lAstId"
+                },
+                "body": {
+                  "sqlname": "amAstCntrDesc",
+                  "label": "Assets covered by contracts",
+                  "fields": [
+                    {
+                      "ref-link": "schema/amAstCntrDesc/field/seAuthorization",
+                      "user_type": "System Itemized List",
+                      "size": 2,
+                      "user_type_format": "Authorized|1|Non authorized|2|Unknown|0",
+                      "label": "Authorization",
+                      "sqlname": "seAuthorization",
+                      "type": "Short",
+                      "is_calc": false,
+                      "long_desc": "Authorization"
+                    },
+                    {
+                      "ref-link": "schema/amAsset/field/AssetTag",
+                      "user_type": "",
+                      "size": 81,
+                      "user_type_format": "",
+                      "label": "Asset tag",
+                      "sqlname": "Asset.AssetTag",
+                      "type": "String",
+                      "is_calc": false,
+                      "long_desc": "Asset tag"
+                    }
+                  ],
+                  "links": []
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "groupby": ""
+    },
+    "_id": "kz51eqrrudi"
+  },
+  {
+    "name": "Hardware Inventory",
+    "desc": "",
+    "category": "Inventory",
+    "body": {
+      "orderby": "",
+      "filter": "",
+      "label": "IT equipment",
+      "sqlname": "amComputer",
+      "fields": [
+        {
+          "ref-link": "schema/amComputer/field/CPUType",
+          "user_type": "Custom Itemized List",
+          "size": 81,
+          "user_type_format": "amCPUType",
+          "label": "CPU type",
+          "sqlname": "CPUType",
+          "type": "String",
+          "is_calc": false,
+          "long_desc": "CPU type"
+        },
+        {
+          "ref-link": "schema/amComputer/field/fCPUNumber",
+          "user_type": "",
+          "size": 4,
+          "user_type_format": "",
+          "label": "Physical CPU count",
+          "sqlname": "fCPUNumber",
+          "type": "Float",
+          "is_calc": false,
+          "long_desc": "This field stores the total number of physical processors for the physical machine."
+        },
+        {
+          "ref-link": "schema/amComputer/field/TcpIpAddress",
+          "user_type": "",
+          "size": 65,
+          "user_type_format": "",
+          "label": "IP address",
+          "sqlname": "TcpIpAddress",
+          "type": "String",
+          "is_calc": false,
+          "long_desc": "IP address"
+        },
+        {
+          "ref-link": "schema/amComputer/field/TcpIpHostName",
+          "user_type": "",
+          "size": 256,
+          "user_type_format": "",
+          "label": "IP name",
+          "sqlname": "TcpIpHostName",
+          "type": "String",
+          "is_calc": false,
+          "long_desc": "IP name (unresolved IP address)",
+          "searchable": true
+        },
+        {
+          "ref-link": "schema/amComputer/field/ComputerType",
+          "user_type": "Custom Itemized List",
+          "size": 81,
+          "user_type_format": "amComputerType",
+          "label": "IT equipment type",
+          "sqlname": "ComputerType",
+          "type": "String",
+          "is_calc": false,
+          "long_desc": "IT equipment type"
+        },
+        {
+          "ref-link": "schema/amEmplDept/field/Name",
+          "user_type": "",
+          "size": 51,
+          "user_type_format": "",
+          "label": "Name",
+          "sqlname": "Portfolio.User.Name",
+          "type": "String",
+          "is_calc": false,
+          "long_desc": "Name of employee or department",
+          "alias": "Username"
+        },
+        {
+          "ref-link": "schema/amComputer/field/AssetTag",
+          "user_type": "",
+          "size": 81,
+          "user_type_format": "",
+          "label": "Asset tag",
+          "sqlname": "AssetTag",
+          "type": "String",
+          "is_calc": false,
+          "long_desc": "Asset tag",
+          "searchable": true
+        },
+        {
+          "ref-link": "schema/amPortfolio/field/seAssignment",
+          "user_type": "System Itemized List",
+          "size": 2,
+          "user_type_format": "In use|0|In stock|1|Retired (or consumed)|2|Awaiting receipt|3|Return for maintenance|4|Return to supplier|5|Missing|6",
+          "label": "Assignment",
+          "sqlname": "Portfolio.seAssignment",
+          "type": "Short",
+          "is_calc": false,
+          "long_desc": "Current assignment"
+        },
+        {
+          "ref-link": "schema/amModel/field/Name",
+          "user_type": "",
+          "size": 129,
+          "user_type_format": "",
+          "label": "Name",
+          "sqlname": "Portfolio.Model.Name",
+          "type": "String",
+          "is_calc": false,
+          "long_desc": "Name of the model",
+          "alias": "Model"
+        },
+        {
+          "ref-link": "schema/amBrand/field/Name",
+          "user_type": "",
+          "size": 129,
+          "user_type_format": "",
+          "label": "Name",
+          "sqlname": "Portfolio.Model.Brand.Name",
+          "type": "String",
+          "is_calc": false,
+          "long_desc": "Brand name",
+          "alias": "Brand"
+        },
+        {
+          "ref-link": "schema/amComputer/field/OperatingSystem",
+          "user_type": "Custom Itemized List",
+          "size": 81,
+          "user_type_format": "amOS",
+          "label": "Oper. System",
+          "sqlname": "OperatingSystem",
+          "type": "String",
+          "is_calc": false,
+          "long_desc": "Operating system"
+        }
+      ],
+      "links": [
+        {
+          "sqlname": "Portfolio.AddOn",
+          "label": "Components",
+          "src_field": {
+            "ref-link": "schema/amPortfolio/field/lPortfolioItemId",
+            "sqlname": "lPortfolioItemId",
+            "relative_path": "Portfolio"
+          },
+          "dest_field": {
+            "ref-link": "schema/amPortfolio/field/lParentId",
+            "sqlname": "lParentId"
+          },
+          "body": {
+            "sqlname": "amPortfolio",
+            "label": "Portfolio items",
+            "fields": [
+              {
+                "ref-link": "schema/amComputer/field/VmMode",
+                "user_type": "Custom Itemized List",
+                "size": 81,
+                "user_type_format": "amVmMode",
+                "label": "VM Mode",
+                "sqlname": "Computer.VmMode",
+                "type": "String",
+                "is_calc": false,
+                "long_desc": "VM Mode"
+              },
+              {
+                "ref-link": "schema/amComputer/field/VmType",
+                "user_type": "Custom Itemized List",
+                "size": 81,
+                "user_type_format": "amVmType",
+                "label": "Virtualization technology",
+                "sqlname": "Computer.VmType",
+                "type": "String",
+                "is_calc": false,
+                "long_desc": "Technology used to virtualize the IT equipment"
+              },
+              {
+                "ref-link": "schema/amPortfolio/field/seAssignment",
+                "user_type": "System Itemized List",
+                "size": 2,
+                "user_type_format": "In use|0|In stock|1|Retired (or consumed)|2|Awaiting receipt|3|Return for maintenance|4|Return to supplier|5|Missing|6",
+                "label": "Assignment",
+                "sqlname": "Computer.Portfolio.seAssignment",
+                "type": "Short",
+                "is_calc": false,
+                "long_desc": "Current assignment"
+              },
+              {
+                "ref-link": "schema/amComputer/field/TcpIpAddress",
+                "user_type": "",
+                "size": 65,
+                "user_type_format": "",
+                "label": "IP address",
+                "sqlname": "Computer.TcpIpAddress",
+                "type": "String",
+                "is_calc": false,
+                "long_desc": "IP address"
+              },
+              {
+                "ref-link": "schema/amComputer/field/TcpIpHostName",
+                "user_type": "",
+                "size": 256,
+                "user_type_format": "",
+                "label": "IP name",
+                "sqlname": "Computer.TcpIpHostName",
+                "type": "String",
+                "is_calc": false,
+                "long_desc": "IP name (unresolved IP address)"
+              },
+              {
+                "ref-link": "schema/amComputer/field/TcpIpDomain",
+                "user_type": "",
+                "size": 41,
+                "user_type_format": "",
+                "label": "IP domain",
+                "sqlname": "Computer.TcpIpDomain",
+                "type": "String",
+                "is_calc": false,
+                "long_desc": "IP domain"
+              }
+            ],
+            "links": [
+              {
+                "sqlname": "Softs",
+                "label": "Software installation",
+                "src_field": {
+                  "ref-link": "schema/amPortfolio/field/lPortfolioItemId",
+                  "sqlname": "lPortfolioItemId",
+                  "relative_path": ""
+                },
+                "dest_field": {
+                  "ref-link": "schema/amSoftInstall/field/lParentPortfolioId",
+                  "sqlname": "lParentPortfolioId"
+                },
+                "body": {
+                  "sqlname": "amSoftInstall",
+                  "label": "Software installations or utilizations",
+                  "fields": [
+                    {
+                      "ref-link": "schema/amModel/field/Name",
+                      "user_type": "",
+                      "size": 129,
+                      "user_type_format": "",
+                      "label": "Name",
+                      "sqlname": "Model.Name",
+                      "type": "String",
+                      "is_calc": false,
+                      "long_desc": "Name of the model"
+                    },
+                    {
+                      "ref-link": "schema/amSoftInstall/field/ServicePack",
+                      "user_type": "Custom Itemized List",
+                      "size": 81,
+                      "user_type_format": "amSoftInstallServicePack",
+                      "label": "ServicePack",
+                      "sqlname": "ServicePack",
+                      "type": "String",
+                      "is_calc": false,
+                      "long_desc": "ServicePack Level"
+                    },
+                    {
+                      "ref-link": "schema/amSoftInstall/field/Status",
+                      "user_type": "Custom Itemized List",
+                      "size": 81,
+                      "user_type_format": "amSoftInstStatus",
+                      "label": "Status",
+                      "sqlname": "Status",
+                      "type": "String",
+                      "is_calc": false,
+                      "long_desc": "Installation status"
+                    },
+                    {
+                      "ref-link": "schema/amSoftInstall/field/SoftOS",
+                      "user_type": "Custom Itemized List",
+                      "size": 81,
+                      "user_type_format": "amOS",
+                      "label": "Operating system",
+                      "sqlname": "SoftOS",
+                      "type": "String",
+                      "is_calc": false,
+                      "long_desc": "Operating system that the software was installed on"
+                    },
+                    {
+                      "ref-link": "schema/amSoftInstall/field/TechnicalInfo",
+                      "user_type": "",
+                      "size": 257,
+                      "user_type_format": "",
+                      "label": "Tech. info.",
+                      "sqlname": "TechnicalInfo",
+                      "type": "String",
+                      "is_calc": false,
+                      "long_desc": "Additional technical information about the installed software"
+                    },
+                    {
+                      "ref-link": "schema/amSoftInstall/field/VersionLevel",
+                      "user_type": "",
+                      "size": 65,
+                      "user_type_format": "",
+                      "label": "Version level",
+                      "sqlname": "VersionLevel",
+                      "type": "String",
+                      "is_calc": false,
+                      "long_desc": "Version number of the installed software"
+                    }
+                  ],
+                  "links": [],
+                  "groupby": "",
+                  "filter": "seType=0"
+                }
+              }
+            ],
+            "filter": "Computer.PK<>0"
+          },
+          "count": 8
+        },
+        {
+          "sqlname": "Portfolio.Softs",
+          "label": "Software installation",
+          "src_field": {
+            "ref-link": "schema/amPortfolio/field/lPortfolioItemId",
+            "sqlname": "lPortfolioItemId",
+            "relative_path": "Portfolio"
+          },
+          "dest_field": {
+            "ref-link": "schema/amSoftInstall/field/lParentPortfolioId",
+            "sqlname": "lParentPortfolioId"
+          },
+          "body": {
+            "sqlname": "amSoftInstall",
+            "label": "Software installations or utilizations",
+            "fields": [
+              {
+                "ref-link": "schema/amModel/field/Name",
+                "user_type": "",
+                "size": 129,
+                "user_type_format": "",
+                "label": "Name",
+                "sqlname": "Model.Name",
+                "type": "String",
+                "is_calc": false,
+                "long_desc": "Name of the model"
+              },
+              {
+                "ref-link": "schema/amSoftInstall/field/Folder",
+                "user_type": "",
+                "size": 257,
+                "user_type_format": "",
+                "label": "Installation folder",
+                "sqlname": "Folder",
+                "type": "String",
+                "is_calc": false,
+                "long_desc": "Software installation folder"
+              },
+              {
+                "ref-link": "schema/amSoftInstall/field/VersionLevel",
+                "user_type": "",
+                "size": 65,
+                "user_type_format": "",
+                "label": "Version level",
+                "sqlname": "VersionLevel",
+                "type": "String",
+                "is_calc": false,
+                "long_desc": "Version number of the installed software"
+              },
+              {
+                "ref-link": "schema/amBrand/field/Name",
+                "user_type": "",
+                "size": 129,
+                "user_type_format": "",
+                "label": "Name",
+                "sqlname": "Model.Brand.Name",
+                "type": "String",
+                "is_calc": false,
+                "long_desc": "Brand name"
+              }
+            ],
+            "links": [],
+            "filter": "seType=0",
+            "groupby": "Model.Brand.Name"
+          }
+        }
+      ],
+      "groupby": ""
+    },
+    "_id": "xc265u92j4i"
+  },
+  {
+    "description": "This is load Expense line record list result",
+    "count": 897,
+    "entities": [
+      {
+        "lExpLineId": 139273,
+        "ref-link": "db/amExpenseLine/139273",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1433116800,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-001)"
+      },
+      {
+        "lExpLineId": 139274,
+        "ref-link": "db/amExpenseLine/139274",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1435708800,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-001)"
+      },
+      {
+        "lExpLineId": 139275,
+        "ref-link": "db/amExpenseLine/139275",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1438387200,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-001)"
+      },
+      {
+        "lExpLineId": 139276,
+        "ref-link": "db/amExpenseLine/139276",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1441065600,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-001)"
+      },
+      {
+        "lExpLineId": 139277,
+        "ref-link": "db/amExpenseLine/139277",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1443657600,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-001)"
+      },
+      {
+        "lExpLineId": 139278,
+        "ref-link": "db/amExpenseLine/139278",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1446336000,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-001)"
+      },
+      {
+        "lExpLineId": 139279,
+        "ref-link": "db/amExpenseLine/139279",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1448928000,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-001)"
+      },
+      {
+        "lExpLineId": 139280,
+        "ref-link": "db/amExpenseLine/139280",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1451606400,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-001)"
+      },
+      {
+        "lExpLineId": 139281,
+        "ref-link": "db/amExpenseLine/139281",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1454284800,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-001)"
+      },
+      {
+        "lExpLineId": 139282,
+        "ref-link": "db/amExpenseLine/139282",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1456790400,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-001)"
+      },
+      {
+        "lExpLineId": 139283,
+        "ref-link": "db/amExpenseLine/139283",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1459468800,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-001)"
+      },
+      {
+        "lExpLineId": 139284,
+        "ref-link": "db/amExpenseLine/139284",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1462060800,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-001)"
+      },
+      {
+        "lExpLineId": 139285,
+        "ref-link": "db/amExpenseLine/139285",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1433116800,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-002)"
+      },
+      {
+        "lExpLineId": 139286,
+        "ref-link": "db/amExpenseLine/139286",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1435708800,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-002)"
+      },
+      {
+        "lExpLineId": 139287,
+        "ref-link": "db/amExpenseLine/139287",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1438387200,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-002)"
+      },
+      {
+        "lExpLineId": 139288,
+        "ref-link": "db/amExpenseLine/139288",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1441065600,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-002)"
+      },
+      {
+        "lExpLineId": 139289,
+        "ref-link": "db/amExpenseLine/139289",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1443657600,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-002)"
+      },
+      {
+        "lExpLineId": 139290,
+        "ref-link": "db/amExpenseLine/139290",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1446336000,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-002)"
+      },
+      {
+        "lExpLineId": 139291,
+        "ref-link": "db/amExpenseLine/139291",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1448928000,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-002)"
+      },
+      {
+        "lExpLineId": 139292,
+        "ref-link": "db/amExpenseLine/139292",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1451606400,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-002)"
+      },
+      {
+        "lExpLineId": 139293,
+        "ref-link": "db/amExpenseLine/139293",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1454284800,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-002)"
+      },
+      {
+        "lExpLineId": 139294,
+        "ref-link": "db/amExpenseLine/139294",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1456790400,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-002)"
+      },
+      {
+        "lExpLineId": 139295,
+        "ref-link": "db/amExpenseLine/139295",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1459468800,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-002)"
+      },
+      {
+        "lExpLineId": 139296,
+        "ref-link": "db/amExpenseLine/139296",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1462060800,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-002)"
+      },
+      {
+        "lExpLineId": 139297,
+        "ref-link": "db/amExpenseLine/139297",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1433116800,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-003)"
+      },
+      {
+        "lExpLineId": 139298,
+        "ref-link": "db/amExpenseLine/139298",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1435708800,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-003)"
+      },
+      {
+        "lExpLineId": 139299,
+        "ref-link": "db/amExpenseLine/139299",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1438387200,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-003)"
+      },
+      {
+        "lExpLineId": 139300,
+        "ref-link": "db/amExpenseLine/139300",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1441065600,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-003)"
+      },
+      {
+        "lExpLineId": 139301,
+        "ref-link": "db/amExpenseLine/139301",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1443657600,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-003)"
+      },
+      {
+        "lExpLineId": 139302,
+        "ref-link": "db/amExpenseLine/139302",
+        "mDebit": "288",
+        "DebitCur": "CNY",
+        "dBilling": 1446336000,
+        "sePurpose": {
+          "9": "Rent"
+        },
+        "seStatus": {
+          "0": "Incurred"
+        },
+        "Portfolio.lPortfolioItemId": 0,
+        "self": "2015 - SIM card (DEMO-EXT-SIM-003)"
+      }
+    ]
+  }
+]

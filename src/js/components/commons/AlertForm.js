@@ -27,13 +27,9 @@ export default class AlertForm extends Component {
     const {desc, title, status, onClose, onConfirm, full} = this.props;
     return (
       <Box flex={false}>
-        {
-          this.props.status &&
-          <Notification status={status} message={desc} pad={{vertical: 'small'}} wrap={false}
-                        onClick={onClose}/>
-        }
-        {
-          !this.props.status &&
+        {status ?
+          <Notification status={status} message={desc} onClose={onClose} closer={true}/>
+        :
           <Layer onClose={onClose} closer={true} {...this.props}>
             <Box full={full} justify="center">
               <Form pad={{vertical: 'large'}}>
@@ -46,8 +42,7 @@ export default class AlertForm extends Component {
                   {desc}
                 </p>
                 <Footer>
-                  {
-                    onConfirm &&
+                  {onConfirm &&
                     <Button label="Confirm" primary={true} strong={true} onClick={this._onClick.bind(this)}/>
                   }
                 </Footer>

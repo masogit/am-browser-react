@@ -53,8 +53,7 @@ rem Make sure prerequisite environment variables are set
 if not "%JAVA_HOME%" == "" goto gotJdkHome
 if not "%JRE_HOME%" == "" goto gotJreHome
 echo Neither the JAVA_HOME nor the JRE_HOME environment variable is defined
-echo Service will try to guess them from the registry.
-goto okJavaHome
+goto end
 :gotJreHome
 if not exist "%JRE_HOME%\bin\java.exe" goto noJavaHome
 if not exist "%JRE_HOME%\bin\javaw.exe" goto noJavaHome
@@ -101,7 +100,6 @@ if %Minor% EQU 7 (
 ) else (
   set PERMGEN_OPTS=-XX:MetaspaceSize=128M
 )
-echo %PERMGEN_OPTS%
 if not "%CATALINA_BASE%" == "" goto gotBase
 set "CATALINA_BASE=%CATALINA_HOME%"
 :gotBase

@@ -2,11 +2,12 @@ import React, {Component} from 'react';
 import history from '../../RouteHistory';
 import * as ExplorerActions from '../../actions/explorer';
 import * as AQLActions from '../../actions/aql';
-import * as UCMDBAdapterActions from '../../actions/ucmdbAdapter';
+import {getJobList} from '../../actions/ucmdbAdapter';
 import {Title, Box, Tiles, Headline, Meter, Tile} from 'grommet';
 import Graph from '../commons/Graph';
 import UCMDBAdapterContainer from '../ucmdbAdapter/UCMDBAdapterPoint';
 import AQL from '../aql/AQL';
+import Spinning from 'grommet/components/icons/Spinning';
 
 export default class Search extends Component {
 
@@ -17,7 +18,8 @@ export default class Search extends Component {
       ucmdbAdapter: {
         ready: false,
         popJobs: [],
-        pushJobs: []
+        pushJobs: [],
+        errorMsg: ''
       }
     };
     this._isUnmount = false;
@@ -25,70 +27,46 @@ export default class Search extends Component {
 
   componentDidMount() {
     this._isUnmount = false;
-    ExplorerActions.loadViews((views)=> {
+    ExplorerActions.loadViews().then(views=> {
       if (!this._isUnmount) {
         this.setState({
-          viewSeries: this._filter(this._getSeries(views, 'category'), 5)
+          viewSeries: this.filter(this.getSeries(views, 'category'), 5)
         });
       }
     });
     if (this.isAQLSupported()) {
-      AQLActions.loadAQLs((aqls)=> {
+      AQLActions.loadAQLs().then((aqls)=> {
         if (!this._isUnmount) {
           this.setState({
-            aqlSeries: this._filter(this._getSeries(aqls, 'category'), 7)
+            aqlSeries: this.filter(this.getSeries(aqls, 'category'), 7)
           });
         }
       });
     }
 
     if (this.isUCMDBAdpaterSupported()) {
-      UCMDBAdapterActions.getIntegrationPoint((points) => {
-        if (points.length > 0) {
-          let count = 1;
-          points.map((point) => {
-            if (point.populationSupported) {
-              UCMDBAdapterActions.getIntegrationJob(point.name, 'populationJobs', (popJobs) => {
-                if (point.pushSupported) {
-                  UCMDBAdapterActions.getIntegrationJob(point.name, 'pushJobs', (pushJobs) => {
-                    if (!this._isUnmount) {
-                      this.setState({
-                        ucmdbAdapter: {
-                          ready: count++ === points.length,
-                          pushJobs: this.state.ucmdbAdapter.pushJobs.concat(pushJobs),
-                          popJobs: this.state.ucmdbAdapter.popJobs.concat(popJobs)
-                        }
-                      });
-                    }
-                  });
-                } else {
-                  if (!this._isUnmount) {
-                    this.setState({
-                      ucmdbAdapter: {
-                        ready: count++ === points.length,
-                        pushJobs: this.state.ucmdbAdapter.pushJobs,
-                        popJobs: this.state.ucmdbAdapter.popJobs.concat(popJobs)
-                      }
-                    });
-                  }
-                }
-              });
-            } else if (point.pushSupported) {
-              UCMDBAdapterActions.getIntegrationJob(point.name, 'pushJobs', (pushJobs) => {
-                if (!this._isUnmount) {
-                  this.setState({
-                    ucmdbAdapter: {
-                      ready: count++ === points.length,
-                      pushJobs: this.state.ucmdbAdapter.pushJobs.concat(pushJobs),
-                      popJobs: this.state.ucmdbAdapter.popJobs
-                    }
-                  });
-                }
-              });
-            }
-          });
-        }
-      });
+      getJobList()
+        .then(({pushJobs, popJobs}) => {
+          if (!this._isUnmount) {
+            this.setState({
+              ucmdbAdapter: {
+                ready: true,
+                pushJobs: pushJobs,
+                popJobs: popJobs
+              }
+            });
+          }
+        })
+        .catch((error) => {
+          if (!this._isUnmount) {
+            this.setState({
+              ucmdbAdapter: {
+                ready: true,
+                errorMsg: error.message
+              }
+            });
+          }
+        });
     }
   }
 
@@ -112,13 +90,13 @@ export default class Search extends Component {
     return this.state.ucmdbAdapter.supported;
   }
 
-  _filter(objs, num) {
+  filter(objs, num) {
     return objs.length > num ? objs.filter((item, index) => index < num) : objs;
   }
 
   _onEnter(event) {
     if ((event.keyCode === 13))
-      this._goRecordSearch(event.target.value.trim());
+      this.goRecordSearch(event.target.value.trim());
   }
 
   _onSearch(event) {
@@ -128,7 +106,7 @@ export default class Search extends Component {
       });
   }
 
-  _getSeries(children, groupby) {
+  getSeries(children, groupby) {
     const grouped = {};
     children.forEach((child) => {
       if (grouped[child[groupby]]) {
@@ -143,7 +121,7 @@ export default class Search extends Component {
     }));
   }
 
-  _getChartValues(children, groupby) {
+  getChartValues(children, groupby) {
     const grouped = {};
     children.forEach((child) => {
       if (grouped[child[groupby]]) {
@@ -158,7 +136,7 @@ export default class Search extends Component {
     });
   }
 
-  _fillData(rows, ...children) {
+  fillData(rows, ...children) {
     children.map((child, index) => {
       child.map(data => {
         let exists = false;
@@ -185,12 +163,12 @@ export default class Search extends Component {
     });
   }
 
-  _getUcmdbGraph() {
+  getUcmdbGraph() {
     let pushJobs, popJobs, rows;
-    popJobs = this._getChartValues(this.state.ucmdbAdapter.popJobs, 'status');
-    pushJobs = this._getChartValues(this.state.ucmdbAdapter.pushJobs, 'status');
+    popJobs = this.getChartValues(this.state.ucmdbAdapter.popJobs, 'status');
+    pushJobs = this.getChartValues(this.state.ucmdbAdapter.pushJobs, 'status');
     rows = [];
-    this._fillData(rows, pushJobs, popJobs);
+    this.fillData(rows, pushJobs, popJobs);
 
     const data = {
       header: [{Name: 'status'}, {Name: 'pushJobs'}, {Name: 'popJobs'}],
@@ -206,33 +184,33 @@ export default class Search extends Component {
     return <Graph type="chart" data={data} config={config}/>;
   }
 
-  _goExplorer() {
+  goExplorer() {
     history.push(`/explorer`);
   }
 
-  _goAQL() {
+  goAQL() {
     history.push(`/aql`);
   }
 
-  _goUCMDB() {
+  goUCMDB() {
     history.push(`/ucmdbAdapter`);
   }
 
-  _goRecordSearch(keyword) {
+  goRecordSearch(keyword) {
     history.push(`/search/${encodeURI(keyword)}`);
   }
 
   render() {
     const tiles = [{
       title: 'Browser Views',
-      onClick: this._goExplorer,
+      onClick: this.goExplorer,
       graph: this.state.viewSeries && <Meter legend={{"total": true}} series={this.state.viewSeries} vertical={true}/>
     }];
 
     if (this.isAQLSupported()) {
       tiles.push({
         title: 'AQL Graphs',
-        onClick: this._goAQL,
+        onClick: this.goAQL,
         graph: this.state.aqlSeries &&
         <Meter legend={{"placement": "inline"}} series={this.state.aqlSeries} a11yTitle="meter-title-12"/>
       });
@@ -241,12 +219,13 @@ export default class Search extends Component {
     if (this.isUCMDBAdpaterSupported()) {
       tiles.push({
         title: 'UCMDB Adapter Jobs Status',
-        onClick: this._goUCMDB,
-        graph: this.state.ucmdbAdapter.ready && (
+        onClick: this.goUCMDB,
+        graph: this.state.ucmdbAdapter.ready ? (
+        this.state.ucmdbAdapter.errorMsg || (
           <Meter
-            series={this._getSeries(this.state.ucmdbAdapter.popJobs.concat(this.state.ucmdbAdapter.pushJobs), 'status')}
+            series={this.getSeries(this.state.ucmdbAdapter.popJobs.concat(this.state.ucmdbAdapter.pushJobs), 'status')}
             max={8} legend={{"placement": "inline"}}/>
-        )
+        )) : <Spinning />
       });
     }
 
@@ -256,7 +235,7 @@ export default class Search extends Component {
           Asset Manager Browser
         </Headline>
         <Box direction="row" pad={{vertical: 'medium'}} flex={false}>
-          <input type="search" className="flex" placeholder="Global Record search..."
+          <input type="search" className="flex" placeholder="Global Record Search..."
                  onKeyDown={this._onEnter.bind(this)} onChange={this._onSearch.bind(this)} size="120"
                  maxLength={50}/>
         </Box>

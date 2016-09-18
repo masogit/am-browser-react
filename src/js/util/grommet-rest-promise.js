@@ -1,5 +1,7 @@
 'use strict';
 import * as Types from '../constants/ActionTypes';
+import {BASE_NAME} from '../constants/ServiceConfig';
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -20,7 +22,7 @@ function _interopRequireDefault(obj) {
 
 var _headers = {'Accept': 'application/json'}; // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-var _timeout = 10000; // 10s
+var _timeout = 60000; // 60s
 var Promise = require("bluebird");
 var Request = _superagent2.default.Request;
 Promise.config({
@@ -48,20 +50,23 @@ Request.prototype.promise = function () {
       if (err) {
         if (err.status == 401 || err.status == 403) {
           store.default.dispatch(init('', ''));
+        } else {
+          let msg = err.response && err.response.text || err.message;
+          const CANNOT_CONNECT_NODE = 'Can not connect to node server.';
+          if (msg) {
+            if (err.status == 400 || (typeof err.status == 'undefined' && msg.indexOf('network is offline') > -1)) {
+              store.default.dispatch({type: Types.RECEIVE_ERROR, msg: msg});
+            } else if (err.status == 500) {
+              store.default.dispatch({type: Types.RECEIVE_ERROR, msg: "Server error."});
+            } else if (err.status == 502) {
+              store.default.dispatch({type: Types.FORCE_LOGOUT, error: CANNOT_CONNECT_NODE});
+            }
+          }
         }
-        let msg = err.response && err.response.text || err.message;
-        if (msg && err.status == 400) {
-          store.default.dispatch({type: Types.RECEIVE_ERROR, msg: msg});
-        }
-        if (msg && err.status == 500) {
-          store.default.dispatch({type: Types.RECEIVE_ERROR, msg: "Server error."});
-          console.log(msg);
-        }
+        reject(err);
       }
       if (typeof res !== "undefined" && res.status > 400) {
         err.message = 'cannot ' + req.method + ' ' + req.url + ' (' + res.status + ')';
-        reject(err);
-      } else if (err) {
         reject(err);
       } else {
         resolve(res);
@@ -110,6 +115,7 @@ function buildQueryParams(params) {
   return result.join('&');
 }
 
+const basename = BASE_NAME == '/' ? '' : BASE_NAME;
 exports.default = {
   setTimeout: function setTimeout(timeout) {
     _timeout = timeout;
@@ -123,7 +129,7 @@ exports.default = {
   head: function head(uri, params) {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
-    var op = _superagent2.default.head(uri);
+    var op = _superagent2.default.head(basename + uri);
     if (!isProduction) {
       op.withCredentials();
     }
@@ -135,7 +141,7 @@ exports.default = {
   get: function get(uri, params) {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
-    var op = _superagent2.default.get(uri);
+    var op = _superagent2.default.get(basename + uri);
     if (!isProduction) {
       op.withCredentials();
     }
@@ -147,7 +153,7 @@ exports.default = {
   patch: function patch(uri, data) {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
-    var op = _superagent2.default.patch(uri);
+    var op = _superagent2.default.patch(basename + uri);
     if (!isProduction) {
       op.withCredentials();
     }
@@ -159,7 +165,7 @@ exports.default = {
   post: function post(uri, data) {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
-    var op = _superagent2.default.post(uri);
+    var op = _superagent2.default.post(basename + uri);
     if (!isProduction) {
       op.withCredentials();
     }
@@ -171,7 +177,7 @@ exports.default = {
   put: function put(uri, data) {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
-    var op = _superagent2.default.put(uri);
+    var op = _superagent2.default.put(basename + uri);
     if (!isProduction) {
       op.withCredentials();
     }
@@ -183,7 +189,7 @@ exports.default = {
   del: function del(uri) {
     _headers['csrf-token'] = cookies.get('csrf-token');
 
-    var op = _superagent2.default.del(uri);
+    var op = _superagent2.default.del(basename + uri);
     if (!isProduction) {
       op.withCredentials();
     }

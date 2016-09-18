@@ -4,6 +4,7 @@ import * as types from '../constants/ActionTypes';
 import {VIEW_DEF_URL} from '../constants/ServiceConfig';
 import Rest from '../util/grommet-rest-promise';
 import objectPath from 'object-path';
+import {stopMonitorEdit} from './system';
 
 function requestViews() {
   return {
@@ -25,7 +26,7 @@ function receiveViewsFailure(err) {
   };
 }
 
-export function loadViews(selectedViewId, currentPathName, callback) {
+export function loadViews(selectedViewId, currentPathName) {
   return dispatch => {
     dispatch(requestViews());
     return Rest.get(VIEW_DEF_URL).then(function (res) {
@@ -52,43 +53,35 @@ export function loadViews(selectedViewId, currentPathName, callback) {
   };
 }
 
-export function saveViewDef(selectedView, callback) {
-  //console.log(selectedView);
+export function saveViewDef(selectedView) {
   return function (dispatch) {
     return Rest.post(VIEW_DEF_URL)
       .set("Content-Type", "application/json")
       .send(JSON.stringify(selectedView))
       .then(function (res) {
-        console.log("save successfully.");
         let _id = res.text;
+        stopMonitorEdit();
         dispatch({
           type: types.SAVE_VIEW_DEF,
           selectedViewId: _id,
-          selectedView: selectedView,
-          editing: false
+          selectedView: selectedView
         });
         dispatch({
           type: types.RECEIVE_INFO,
           msg: "View definition saved successfully."
         });
         return _id;
-        //if (callback) {
-        //  callback(_id);
-        //}
       }, function (err) {
         if (err) {
-          console.log("cannot save: " + err);
           throw err;
         }
       }
-    )
-      ;
+    );
   };
 }
 
 export function setSelectedView(selectedViewId, selectedView) {
   return dispatch => {
-    //console.log("setSelectedView: " + selectedViewId);
     dispatch({
       type: types.SET_SELECTED_VIEW,
       selectedViewId: selectedViewId,
@@ -117,9 +110,11 @@ export function newSelectedView() {
 
 export function updateSelectedView(selectedView, path, newValue) {
   return dispatch => {
+    const clonedView = _.cloneDeep(selectedView);
+    objectPath.set(clonedView, path, newValue);
     dispatch({
       type: types.UPDATE_SELECTED_VIEW,
-      selectedView: selectedView,
+      selectedView: clonedView,
       path: path,
       newValue: newValue
     });
@@ -127,9 +122,8 @@ export function updateSelectedView(selectedView, path, newValue) {
 }
 
 export function deleteTableRow(selectedView, path) {
-  return (dispatch, getState) => {
-    let editing = getState().views.views.editing;
-    let clonedView = editing ? selectedView : _.cloneDeep(selectedView);
+  return (dispatch) => {
+    let clonedView = _.cloneDeep(selectedView);
     let bodyPath = path.substring(0, path.lastIndexOf("body") + 4);
 
     // check and remove orderby, groupby and sum
@@ -161,7 +155,7 @@ export function deleteTableRow(selectedView, path) {
 }
 
 export function moveRow(selectedView, path, up) {
-  return (dispatch, getState) => {
+  return (dispatch) => {
     let clonedView = _.cloneDeep(selectedView);
     let lastIndexOfDot = path.lastIndexOf(".");
     let arrayPath = path.substring(0, lastIndexOfDot);
@@ -221,30 +215,19 @@ export function duplicateViewDef(selectedView) {
   };
 }
 
-export function confirmDeleteViewDef(selectedView, callback) {
-  return function (dispatch, getState) {
-    Rest.del(VIEW_DEF_URL + selectedView._id)
+export function confirmDeleteViewDef(selectedView) {
+  return function (dispatch) {
+    return Rest.del(VIEW_DEF_URL + selectedView._id)
       .then((res) => {
-        console.log("delete successfully - " + selectedView._id);
-        let views = getState().views.views;
-        let idx = selectedView._id ? _.findIndex(views, {_id: selectedView._id}) : -1;
+        stopMonitorEdit();
         dispatch({
           type: types.DELETE_VIEW_DEF,
-          selectedViewId: "",
-          selectedView: {},
-          views: idx < 0 ? views : [...views.slice(0, idx), ...views.slice(idx + 1)]
+          selectedViewId: selectedView._id
         });
         dispatch({
           type: types.RECEIVE_INFO,
           msg: `View definition '${selectedView.name}' deleted.`
         });
-        //dispatch({
-        //  type: types.UPDATE_VIEW_DEF_LIST,
-        //  selectedView: selectedView
-        //});
-        if (callback) {
-          callback(selectedView._id);
-        }
       }, (err) => {
         console.log("cannot delete - ");
         console.log(err.response ? err.response.text : err);
@@ -271,8 +254,7 @@ export function syncSelectedView(selectedView) {
 export function openPreview() {
   return dispatch => {
     dispatch({
-      type: types.OPEN_PREVIEW,
-      preview: true
+      type: types.OPEN_PREVIEW
     });
   };
 }
@@ -280,8 +262,7 @@ export function openPreview() {
 export function closePreview() {
   return dispatch => {
     dispatch({
-      type: types.CLOSE_PREVIEW,
-      preview: false
+      type: types.CLOSE_PREVIEW
     });
   };
 }

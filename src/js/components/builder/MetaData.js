@@ -5,7 +5,7 @@ import Box from 'grommet/components/Box';
 import Tabs from 'grommet/components/Tabs';
 import Tab from 'grommet/components/Tab';
 import ListItem from 'grommet/components/ListItem';
-import SearchInput from 'grommet/components/SearchInput';
+import SearchInput from '../commons/SearchInput';
 import Notes from 'grommet/components/icons/base/Notes';
 import Spinning from 'grommet/components/icons/Spinning';
 
@@ -13,6 +13,7 @@ import {metadataLoadDetail, metadataLoad, loadAllMetadataSuccess, loadMetadataDe
 import {syncSelectedView} from '../../actions/views';
 import _ from 'lodash';
 import {connect} from 'react-redux';
+import ReactList from 'react-list';
 
 const createReverse = (reverse) => {
   var obj = {
@@ -102,7 +103,7 @@ const updateView = (elements, row, selectedView) => {
   // temp logic only for function works
   // will refactor later
   var clonedView = _.cloneDeep(selectedView);
-
+  clonedView.body = clonedView.body || {};
   var body = clonedView.body;
   var elemLength = elements.length;
   // 1) create a new view: body.sqlname is empty
@@ -182,7 +183,8 @@ class MetaData extends ComponentBase {
 
   _onSearch(event) {
     let rows = this.props.rows;
-    const searchText = event.target.value.toLowerCase().trim();
+    const originText = event.target.value;
+    const searchText = originText.toLowerCase().trim();
 
     const filter = (obj) => obj.sqlname.toLowerCase().indexOf(searchText) !== -1;
     const entities = rows.entities ? rows.entities.filter(filter) : [];
@@ -190,7 +192,7 @@ class MetaData extends ComponentBase {
     const fields = rows.fields ? rows.fields.filter(filter) : [];
 
     this.setState({
-      filtered: {entities, links, fields}, searchText
+      filtered: {entities, links, fields}, searchText: originText
     });
   }
 
@@ -211,27 +213,9 @@ class MetaData extends ComponentBase {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.linkNames.join('') != this.props.linkNames.join('')) {
+    if (nextProps.linkNames && nextProps.linkNames.join('') != this.props.linkNames.join('')) {
       this.generateSidebar(nextProps.linkNames);
     }
-  }
-
-  linkSort(links) {
-    return links.sort(sortSqlName).map((row, index) => {
-      let newRow = {
-        label: row.label,
-        sqlname: row.sqlname,
-        url: row.dest_table["ref-link"],
-        card11: row.card11,
-        src_field: row.src_field,
-        dest_field: row.dest_field
-      };
-      return (
-        <ListItem separator="none" key={index} pad="none">
-          <Anchor href="#" key={index} primary={true} onClick={this._onClick.bind(this, newRow)} label={row.sqlname}/>
-        </ListItem>
-      );
-    });
   }
 
   getLink(nameList, rows, elements) {
@@ -320,45 +304,88 @@ class MetaData extends ComponentBase {
     let links = rowsState.links ? rowsState.links : [];
     let fields = rowsState.fields ? rowsState.fields : [];
 
-    let entitiesComponents = entities.sort(sortSqlName).map((row, index) => {
+    entities = entities.sort(sortSqlName);
+    let renderEntityItem = (index, key) => {
+      let row = entities[index];
       return (
-        <ListItem separator="none" key={index} pad="none" flex={false}>
-          <Anchor href="#" key={index} primary={true} label={row.sqlname}
+        <ListItem separator="none" key={key} pad="none" flex={false}>
+          <Anchor href="#" primary={true} label={row.sqlname}
                   onClick={this._onClick.bind(this, {label: row.label, sqlname: row.sqlname, url: row["ref-link"]})}/>
         </ListItem>
       );
-    });
+    };
 
-    let linksComponents = this.linkSort(links.filter((obj) => obj.card11 == true));
-    let m2mLinksComponents = this.linkSort(links.filter((obj) => obj.card11 != true));
+    let one2onelinks = links.filter((obj) => obj.card11 == true).sort(sortSqlName);
+
+    let m2mLinks = links.filter((obj) => obj.card11 != true).sort(sortSqlName);
+
+    let renderLinks = (index, key, links) => {
+      let row = links[index];
+      let newRow = {
+        label: row.label,
+        sqlname: row.sqlname,
+        url: row.dest_table["ref-link"],
+        card11: row.card11,
+        src_field: row.src_field,
+        dest_field: row.dest_field
+      };
+      return (
+        <ListItem separator="none" key={key} pad="none">
+          <Anchor href="#" primary={true} onClick={this._onClick.bind(this, newRow)} label={row.sqlname}/>
+        </ListItem>
+      );
+    };
     //let fieldsComponents = fields.sort().map((row, index) => {
     //  return <TableRow key={index}><td><CheckBox key={index} id={`checkbox_${row.sqlname}`} checked={row.checked} onChange={this._onChange.bind(this, row)}/><Notes/>{row.sqlname}</td></TableRow>;
     //});
-    let fieldsComponents = fields.sort(sortSqlName).map((row, index) => {
+    fields = fields.sort(sortSqlName);
+    let renderFieldItem = (index, key) => {
+      let row = fields[index];
       return (
-        <ListItem separator="none" key={index} pad="none">
-          <Anchor href="#" key={index} icon={<Notes />} onClick={this._onChange.bind(this, row)} label={row.sqlname}/>
+        <ListItem separator="none" key={key} pad="none">
+          <Anchor href="#" icon={<Notes />} onClick={this._onChange.bind(this, row)} label={row.sqlname}/>
         </ListItem>
       );
-    });
+    };
     return (
       <Box flex={true} className='fixMinSizing fixIEScrollBar'>
         <SearchInput value={this.state.searchText} placeHolder="Search fields and links..."
                      onDOMChange={this._onSearch}/>
         <Box pad={{vertical: 'small'}} className='fixMinSizing autoScroll'>
-          {entitiesComponents}
-          {entitiesComponents.length == 0 && !rows.entities &&
-            <Tabs justify="start" flex={true}>
-              <Tab title={`1-M Links (${m2mLinksComponents.length})`}>
-                {m2mLinksComponents}
-              </Tab>
-              <Tab title={`1-1 Links (${linksComponents.length})`}>
-                {linksComponents}
-              </Tab>
-              <Tab title={`Fields (${fieldsComponents.length})`}>
-                {fieldsComponents}
-              </Tab>
-            </Tabs>
+          {entities.length > 0 &&
+          <ReactList
+            itemRenderer={renderEntityItem}
+            length={entities.length}
+            pageSize={10}
+            type='uniform'
+            />
+          }
+          {entities.length == 0 && !rows.entities &&
+            // ref='tabs' activeIndex={this.refs.tabs && this.refs.tabs.state.activeInde
+            // this can be deleted, if we use grommet build which later then 8.18/2016
+          <Tabs justify="start" style={{border:"1px solid #000"}} ref='tabs' activeIndex={this.refs.tabs && this.refs.tabs.state.activeIndex}>
+            <Tab title={`1-M Links (${m2mLinks.length})`}>
+              <ReactList itemRenderer={(index, key) => renderLinks(index, key, m2mLinks)}
+                         length={m2mLinks.length}
+                         pageSize={10}
+                         type='simple'
+                />
+            </Tab>
+            <Tab title={`1-1 Links (${one2onelinks.length})`}>
+              <ReactList itemRenderer={(index, key) => renderLinks(index, key, one2onelinks)}
+                         length={one2onelinks.length}
+                         pageSize={10}
+                         type='simple'
+                />
+            </Tab>
+            <Tab title={`Fields (${fields.length})`}>
+              <ReactList itemRenderer={renderFieldItem}
+                         length={fields.length}
+                         pageSize={10}
+                         type='simple'
+                />
+            </Tab>
+          </Tabs>
           }
         </Box>
       </Box>
