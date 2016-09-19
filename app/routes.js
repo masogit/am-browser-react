@@ -39,7 +39,7 @@ module.exports = function (app) {
     }
   });
 
-  let conn = {
+  var conn = {
     server: rest_server + ":" + rest_port,
     session_max_age: session_max_age,
     jwt_max_age: jwt_max_age,
