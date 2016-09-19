@@ -9,6 +9,7 @@ import Explorer from './components/explorer/Explorer';
 import ViewDefListContainer from './components/builder/ViewDefListContainer';
 import AQL from './components/aql/AQL';
 import TBD from 'grommet/components/TBD';
+import MyAssets from './components/MyAssets/MyAssets';
 import UnAuthorized from './components/error/UnAuthorized';
 import UCMDBAdapterContainer from './components/ucmdbAdapter/UCMDBAdapterPoint';
 var rootPath = "/";
@@ -36,7 +37,8 @@ export const getRoutes = (headerNavs) => {
       {path: 'ucmdbAdapter(/:pointName)(/:tabName)(/:integrationJobName)', component: UCMDBAdapterContainer},
       {path: 'aql', component: AQL},
       {path: 'views', component: ViewDefListContainer},
-      {path: 'views/:id', component: ViewDefListContainer}
+      {path: 'views/:id', component: ViewDefListContainer},
+      {path: 'my', component: MyAssets}
     ];
 
     allRoutes.map(route => {

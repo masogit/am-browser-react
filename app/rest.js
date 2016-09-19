@@ -208,7 +208,8 @@ function getHeadNav(rights) {
     'ucmdbAdapter(/:pointName)(/:tabName)(/:integrationJobName)': config.ucmdb_adapter_enabled && rights.index < 1 && rights.ucmdbAdapter,
     aql: rights.index < 1,
     views: rights.index < 1,
-    'views/:id': rights.index < 1
+    'views/:id': rights.index < 1,
+    my: rights.index < 3
   };
 }
 

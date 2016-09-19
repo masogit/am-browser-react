@@ -1,0 +1,356 @@
+{
+  "orderby": "Portfolio.Parent.Computer.Name desc",
+  "filter": "Portfolio.User=currentuser",
+  "label": "IT equipment",
+  "sqlname": "amComputer",
+  "fields": [
+    {
+      "ref-link": "schema/amComputer/field/TcpIpHostName",
+      "user_type": "",
+      "size": 256,
+      "user_type_format": "",
+      "label": "IP name",
+      "sqlname": "TcpIpHostName",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "IP name (unresolved IP address)",
+      "searchable": true
+    },
+    {
+      "ref-link": "schema/amComputer/field/Name",
+      "user_type": "",
+      "size": 256,
+      "user_type_format": "",
+      "label": "Name",
+      "sqlname": "Portfolio.Parent.Computer.Name",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "IT equipment name",
+      "alias": "Parent Name"
+    },
+    {
+      "ref-link": "schema/amAsset/field/SerialNo",
+      "user_type": "",
+      "size": 129,
+      "user_type_format": "",
+      "label": "Serial #",
+      "sqlname": "Portfolio.Asset.SerialNo",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "Serial number",
+      "searchable": true,
+      "alias": "Serial No."
+    },
+    {
+      "ref-link": "schema/amModel/field/Name",
+      "user_type": "",
+      "size": 129,
+      "user_type_format": "",
+      "label": "Name",
+      "sqlname": "Portfolio.Model.Name",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "Name of the model",
+      "alias": "Model"
+    },
+    {
+      "ref-link": "schema/amComputer/field/ComputerType",
+      "user_type": "Custom Itemized List",
+      "size": 81,
+      "user_type_format": "amComputerType",
+      "label": "IT equipment type",
+      "sqlname": "ComputerType",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "IT equipment type",
+      "alias": "Computer Type"
+    },
+    {
+      "ref-link": "schema/amPortfolio/field/seAssignment",
+      "user_type": "System Itemized List",
+      "size": 2,
+      "user_type_format": "In use|0|In stock|1|Retired (or consumed)|2|Awaiting receipt|3|Return for maintenance|4|Return to supplier|5|Missing|6",
+      "label": "Assignment",
+      "sqlname": "Portfolio.seAssignment",
+      "type": "Short",
+      "is_calc": false,
+      "long_desc": "Current assignment"
+    },
+    {
+      "ref-link": "schema/amComputer/field/TcpIpDomain",
+      "user_type": "",
+      "size": 41,
+      "user_type_format": "",
+      "label": "IP domain",
+      "sqlname": "TcpIpDomain",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "IP domain"
+    },
+    {
+      "ref-link": "schema/amComputer/field/OperatingSystem",
+      "user_type": "Custom Itemized List",
+      "size": 81,
+      "user_type_format": "amOS",
+      "label": "Oper. System",
+      "sqlname": "OperatingSystem",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "Operating system",
+      "alias": "Operating System"
+    },
+    {
+      "ref-link": "schema/amComputer/field/CPUType",
+      "user_type": "Custom Itemized List",
+      "size": 81,
+      "user_type_format": "amCPUType",
+      "label": "CPU type",
+      "sqlname": "CPUType",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "CPU type"
+    },
+    {
+      "ref-link": "schema/amComputer/field/lCPUSpeedMHz",
+      "user_type": "",
+      "size": 4,
+      "user_type_format": "",
+      "label": "CPU speed",
+      "sqlname": "lCPUSpeedMHz",
+      "type": "Long",
+      "is_calc": false,
+      "long_desc": "CPU speed"
+    },
+    {
+      "ref-link": "schema/amComputer/field/lDiskSizeMb",
+      "user_type": "",
+      "size": 4,
+      "user_type_format": "",
+      "label": "Disk size",
+      "sqlname": "lDiskSizeMb",
+      "type": "Long",
+      "is_calc": false,
+      "long_desc": "Disk size"
+    },
+    {
+      "ref-link": "schema/amComputer/field/lMemorySizeMb",
+      "user_type": "",
+      "size": 4,
+      "user_type_format": "",
+      "label": "Memory",
+      "sqlname": "lMemorySizeMb",
+      "type": "Long",
+      "is_calc": false,
+      "long_desc": "Memory"
+    },
+    {
+      "ref-link": "schema/amComputer/field/dtLastScan",
+      "user_type": "",
+      "size": 8,
+      "user_type_format": "",
+      "label": "Last scan",
+      "sqlname": "dtLastScan",
+      "type": "Date+Time",
+      "is_calc": false,
+      "long_desc": "Last scan"
+    },
+    {
+      "ref-link": "schema/amComputer/field/dtNextScan",
+      "user_type": "",
+      "size": 8,
+      "user_type_format": "",
+      "label": "Next scan",
+      "sqlname": "dtNextScan",
+      "type": "Date+Time",
+      "is_calc": false,
+      "long_desc": "Next scan"
+    }
+  ],
+  "links": [
+    {
+      "sqlname": "Portfolio.Softs",
+      "label": "Software installation",
+      "src_field": {
+        "ref-link": "schema/amPortfolio/field/lPortfolioItemId",
+        "sqlname": "lPortfolioItemId",
+        "relative_path": "Portfolio"
+      },
+      "dest_field": {
+        "ref-link": "schema/amSoftInstall/field/lParentPortfolioId",
+        "sqlname": "lParentPortfolioId"
+      },
+      "body": {
+        "sqlname": "amSoftInstall",
+        "label": "Software installations or utilizations",
+        "fields": [
+          {
+            "ref-link": "schema/amModel/field/Name",
+            "user_type": "",
+            "size": 129,
+            "user_type_format": "",
+            "label": "Name",
+            "sqlname": "Model.Name",
+            "type": "String",
+            "is_calc": false,
+            "long_desc": "Name of the model"
+          },
+          {
+            "ref-link": "schema/amSoftInstall/field/Folder",
+            "user_type": "",
+            "size": 257,
+            "user_type_format": "",
+            "label": "Installation folder",
+            "sqlname": "Folder",
+            "type": "String",
+            "is_calc": false,
+            "long_desc": "Software installation folder"
+          },
+          {
+            "ref-link": "schema/amSoftInstall/field/pUsage",
+            "user_type": "Percentage",
+            "size": 8,
+            "user_type_format": "",
+            "label": "Usage rate",
+            "sqlname": "pUsage",
+            "type": "Double",
+            "is_calc": false,
+            "long_desc": "Percentage of time during which the application is used"
+          },
+          {
+            "ref-link": "schema/amSoftInstall/field/Status",
+            "user_type": "Custom Itemized List",
+            "size": 81,
+            "user_type_format": "amSoftInstStatus",
+            "label": "Status",
+            "sqlname": "Status",
+            "type": "String",
+            "is_calc": false,
+            "long_desc": "Installation status"
+          },
+          {
+            "ref-link": "schema/amSoftInstall/field/SoftOS",
+            "user_type": "Custom Itemized List",
+            "size": 81,
+            "user_type_format": "amOS",
+            "label": "Operating system",
+            "sqlname": "SoftOS",
+            "type": "String",
+            "is_calc": false,
+            "long_desc": "Operating system that the software was installed on"
+          },
+          {
+            "ref-link": "schema/amSoftInstall/field/VersionLevel",
+            "user_type": "",
+            "size": 65,
+            "user_type_format": "",
+            "label": "Version level",
+            "sqlname": "VersionLevel",
+            "type": "String",
+            "is_calc": false,
+            "long_desc": "Version number of the installed software"
+          },
+          {
+            "ref-link": "schema/amSoftInstall/field/seType",
+            "user_type": "System Itemized List",
+            "size": 2,
+            "user_type_format": "Installation|0|Utilization|1|OEM installation|2",
+            "label": "Installation type",
+            "sqlname": "seType",
+            "type": "Short",
+            "is_calc": false,
+            "long_desc": "Installation type"
+          }
+        ],
+        "links": [
+          {
+            "sqlname": "ReqlineSofts",
+            "label": "Requested in",
+            "src_field": {
+              "ref-link": "schema/amSoftInstall/field/lSoftInstId",
+              "sqlname": "lSoftInstId",
+              "relative_path": ""
+            },
+            "dest_field": {
+              "ref-link": "schema/amReqLine/field/lReqLineId",
+              "sqlname": "lReqLineId"
+            },
+            "body": {
+              "sqlname": "amReqLine",
+              "label": "Request lines",
+              "fields": [
+                {
+                  "ref-link": "schema/amReqLine/field/FullName",
+                  "user_type": "",
+                  "size": 512,
+                  "user_type_format": "",
+                  "label": "Full name",
+                  "sqlname": "FullName",
+                  "type": "String",
+                  "is_calc": false,
+                  "long_desc": "Full name"
+                },
+                {
+                  "ref-link": "schema/amModel/field/Name",
+                  "user_type": "",
+                  "size": 129,
+                  "user_type_format": "",
+                  "label": "Name",
+                  "sqlname": "Model.Name",
+                  "type": "String",
+                  "is_calc": false,
+                  "long_desc": "Name of the model"
+                }
+              ],
+              "links": []
+            }
+          }
+        ]
+      },
+      "count": 0
+    },
+    {
+      "sqlname": "LogicalDrives",
+      "label": "Logical drives",
+      "src_field": {
+        "ref-link": "schema/amComputer/field/lComputerId",
+        "sqlname": "lComputerId",
+        "relative_path": ""
+      },
+      "dest_field": {
+        "ref-link": "schema/amLogicalDrive/field/lCompId",
+        "sqlname": "lCompId"
+      },
+      "body": {
+        "sqlname": "amLogicalDrive",
+        "label": "Logical drives",
+        "fields": [
+          {
+            "ref-link": "schema/amLogicalDrive/field/Name",
+            "user_type": "",
+            "size": 256,
+            "user_type_format": "",
+            "label": "Internal name",
+            "sqlname": "Name",
+            "type": "String",
+            "is_calc": false,
+            "long_desc": "Internal name"
+          },
+          {
+            "ref-link": "schema/amLogicalDrive/field/Type",
+            "user_type": "Custom Itemized List",
+            "size": 81,
+            "user_type_format": "amDriveType",
+            "label": "Partition type",
+            "sqlname": "Type",
+            "type": "String",
+            "is_calc": false,
+            "long_desc": "Partition type"
+          }
+        ],
+        "links": []
+      },
+      "count": 0
+    }
+  ],
+  "groupby": "Portfolio.Model.Name"
+}
