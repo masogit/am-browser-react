@@ -8,6 +8,7 @@ import Download from 'grommet/components/icons/base/Download';
 import MenuIcon from 'grommet/components/icons/base/Menu';
 import Checkbox from 'grommet/components/icons/base/Checkbox';
 import Filter from 'grommet/components/icons/base/Filter';
+import Next from 'grommet/components/icons/base/Next';
 import Aggregate from 'grommet/components/icons/base/Aggregate';
 import CheckboxSelected from 'grommet/components/icons/base/CheckboxSelected';
 import * as ExplorerActions from '../../actions/explorer';
@@ -253,6 +254,14 @@ export default class RecordList extends Component {
     });
   }
 
+  getGroupbyDisplayLabel(sqlname) {
+    let groupby = this.props.body.fields.filter((field) => {
+      return field.sqlname == sqlname;
+    })[0];
+
+    return Format.getDisplayLabel(groupby);
+  }
+
   getObjectString(obj) {
     return this.getDisplayFields().map((field, index) => Format.getFieldStrVal(obj, field));
   }
@@ -410,12 +419,9 @@ export default class RecordList extends Component {
     let menus = this.props.body.fields.map((field, index) => {
       let selected = (field.sqlname == this.state.param.groupby);
       let label = Format.getDisplayLabel(field);
-      let pos = this.props.body.groupby ? this.props.body.groupby.split('|').indexOf(field.sqlname) : -1;
-      if (pos > -1)
-        label = `[G${pos + 1}] ` + label;
       if (field.searchable)
-        label = '[S] ' + label;
-      let isPrimary = (pos > -1) || field.searchable;
+        label = label + ' [Quick search]';
+      let isPrimary = field.searchable;
       return (
         <Anchor key={`a_groupby_${index}`} icon={selected?<CheckboxSelected />:<Checkbox />}
                 label={label} primary={isPrimary} disabled={this.state.locked}
@@ -434,6 +440,22 @@ export default class RecordList extends Component {
     menus.unshift(<Anchor key={`a_groupby_${this.props.body.fields.length}`} label={`${type} FROM ${this.props.body.sqlname}`} icon={<Aggregate />} disabled={true}/>);
 
     return menus;
+  }
+
+  renderGroupByHeader(sqlname) {
+    let groupbys = this.props.body.groupby.split('|');
+    let header = groupbys.map((groupby, index) => {
+      return (<Anchor key={`b_groupby_${index}`} label={this.getGroupbyDisplayLabel(groupby)}
+                      icon={(groupby == sqlname)?<Next />:<EmptyIcon />}
+                      disabled={this.state.locked || groupby == sqlname}
+                      onClick={() => !(this.state.locked || groupby == sqlname) && this._getGroupByData(groupby)} />);
+    });
+    header.unshift(<Header key='b_groupby_header'>Aggregation</Header>);
+    if (groupbys.indexOf(sqlname) < 0) {
+      header.push(<Anchor key='b_groupby_last' label={this.getGroupbyDisplayLabel(sqlname)} icon={<Next />} disabled={true} />);
+    }
+
+    return header;
   }
 
   renderToolBox() {
@@ -540,7 +562,10 @@ export default class RecordList extends Component {
         {
           this.state.param.graphType=='legend' && this.state.graphData ?
             <Box flex={true} direction="row" className={`fixMinSizing ${fixIEScrollBar}`}>
-              <Box pad={{vertical: 'large', horizontal: 'small'}}>{this.renderGraph()}</Box>
+              <Box pad={{horizontal: 'small'}}>
+                {this.renderGroupByHeader(this.state.param.groupby)}
+                {this.renderGraph()}
+              </Box>
               <Box flex={true}>{this.renderList()}</Box>
             </Box>
           :
