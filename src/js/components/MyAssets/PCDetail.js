@@ -32,6 +32,27 @@ const getLinkBody = (link, record) => {
 let usedIds = {'item-1-0': true};
 export default class PCDetail extends Component {
   componentWillMount() {
+
+    this.state = {
+      record: this.props.record,
+      body: this.props.body,
+      links: [],
+      linkMap: {}
+    };
+
+    this.state.data = this.getData();
+    this.getLinks = this.getLinks.bind(this);
+  }
+
+  componentDidMount() {
+    this.getLinks(2, 0, this.state.data, this.state.body.links, this.state.record);
+  }
+
+  componentWillUnmount() {
+    usedIds = {'item-1-0': true};
+  }
+
+  getData(record = this.state.record) {
     const data = {
       categories: [
         {
@@ -43,8 +64,12 @@ export default class PCDetail extends Component {
             {
               id: "item-1-0",
               demarcate: true,
-              label: this.props.record.self + (this.props.body.links ? ` (${this.props.body.links.length})` : ''),
-              onClick: () => {}
+              label: record.self + (this.state.body.links ? ` (${this.state.body.links.length})` : ''),
+              onClick: () => {
+                if (this.props.onClick) {
+                  this.props.onClick(this.state.body, record);
+                }
+              }
             }
           ]
         }
@@ -53,37 +78,33 @@ export default class PCDetail extends Component {
     };
 
     let index = 0;
-    this.props.body.fields.map(field => {
-      if (field.sqlname.indexOf('Parent') > -1) {
+    this.state.body.fields.map(field => {
+      if (field.sqlname.indexOf('Parent') > -1 && record[field.sqlname]) {
         const id = 'item-0-' + index++;
         data.categories[0].items.push({
           id: id,
-          label: this.props.record[field.sqlname],
+          label: record[field.sqlname],
           noLeadingStatus: true,
           iconB: <LinkPrevious />,
-          onClick: () => {}
+          onClick: () => {
+            const body = Object.assign({}, this.state.body);
+            body.filter = `TcpIpHostName='${record['Portfolio.Parent.Computer.Name']}'`;
+            ExplorerActions.loadRecordsByBody(body).then((data) => {
+              usedIds = {'item-1-0': true};
+              record = data.entities[0];
+              this.setState({
+                record,
+                data: this.getData(record)
+              }, () => this.getLinks(2, 0, this.state.data, this.state.body.links, record));
+            });
+          }
         });
 
         data.links.push({parentId: id, childId: 'item-1-0'});
       }
     });
 
-    this.state = {
-      record: null,
-      body: null,
-      links: [],
-      linkMap: {},
-      data: data
-    };
-    this.getLinks = this.getLinks.bind(this);
-  }
-
-  componentDidMount() {
-    this.getLinks(2, 0, this.state.data, this.props.body.links, this.props.record);
-  }
-
-  componentWillUnmount() {
-    usedIds = {'item-1-0': true};
+    return data;
   }
 
   getLinks(childLayer, parentIndex, data, links, record) {
@@ -156,6 +177,9 @@ export default class PCDetail extends Component {
               onClick = () => {
                 this.getLinks(childLayer + 1, index, data, link.body.links, record);
                 this.setState({data});
+                if (this.props.onClick) {
+                  this.props.onClick(link.body, record);
+                }
               };
             }
           } else {
@@ -185,6 +209,9 @@ export default class PCDetail extends Component {
                 limit: 5
               };
               this.getChildLink(childLayer, parentIndex, body, link);
+              if (this.props.onClick) {
+                this.props.onClick(body, link);
+              }
             }
           });
           data.links.push({parentId: `item-${childLayer - 1}-${parentIndex}`, childId: moreId});
@@ -198,13 +225,6 @@ export default class PCDetail extends Component {
         });
       });
     }
-  }
-
-  renderDetail() {
-    return (
-      this.state.record &&
-      <RecordDetail body={this.state.body} record={this.state.record} onClose={() => this.setState({record: null})}/>
-    );
   }
 
   getItems(items, idMap, categoryMap, index) {
@@ -262,7 +282,6 @@ export default class PCDetail extends Component {
             }
           </Part>
         </Part>
-        {this.renderDetail()}
       </Topology>
     );
   }
@@ -270,14 +289,16 @@ export default class PCDetail extends Component {
 
 const getParts = ({id, label, icon, iconA, iconB, onClick, showDetail, noLeadingStatus, demarcate}) => {
   return (
-    <Part className='margin30' key={id} demarcate={demarcate || false}>
+    <Part className='margin30' key={id} demarcate={false}>
       <Part id={id + 'A'} demarcate={false} status={iconA == 'dot' ? 'ok' : ''} align='center'>
         {iconA != 'dot' && iconA}
       </Part>
-      <Box direction='row' onClick={onClick}>
-        {icon || <ComputerPersonal/>}
-        <Label>{label}</Label>
-      </Box>
+      <Part demarcate={demarcate || false}>
+        <Box direction='row' onClick={onClick}>
+          {icon || <ComputerPersonal/>}
+          <Label>{label}</Label>
+        </Box>
+      </Part>
       {onClick &&
       <Part id={id + 'B'} demarcate={false} align='start'>
         <Box onClick={onClick}>
@@ -290,5 +311,6 @@ const getParts = ({id, label, icon, iconA, iconB, onClick, showDetail, noLeading
 
 PCDetail.propTypes = {
   body: PropTypes.object.isRequired,
-  record: PropTypes.object.isRequired
+  record: PropTypes.object.isRequired,
+  onClick: PropTypes.func
 };

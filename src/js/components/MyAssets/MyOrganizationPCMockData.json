@@ -1,0 +1,166 @@
+{
+  "orderby": "",
+  "filter": "Portfolio.User.Supervisor=currentuser",
+  "label": "IT equipment",
+  "sqlname": "amComputer",
+  "fields": [
+    {
+      "ref-link": "schema/amEmplDept/field/Name",
+      "user_type": "",
+      "size": 51,
+      "user_type_format": "",
+      "label": "Name",
+      "sqlname": "Portfolio.User.Name",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "Name of employee or department"
+    },
+    {
+      "ref-link": "schema/amComputer/field/TcpIpHostName",
+      "user_type": "",
+      "size": 256,
+      "user_type_format": "",
+      "label": "IP name",
+      "sqlname": "TcpIpHostName",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "IP name (unresolved IP address)",
+      "searchable": true
+    },
+    {
+      "ref-link": "schema/amAsset/field/SerialNo",
+      "user_type": "",
+      "size": 129,
+      "user_type_format": "",
+      "label": "Serial #",
+      "sqlname": "Portfolio.Asset.SerialNo",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "Serial number",
+      "searchable": true
+    },
+    {
+      "ref-link": "schema/amModel/field/Name",
+      "user_type": "",
+      "size": 129,
+      "user_type_format": "",
+      "label": "Name",
+      "sqlname": "Portfolio.Model.Name",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "Name of the model"
+    },
+    {
+      "ref-link": "schema/amComputer/field/ComputerType",
+      "user_type": "Custom Itemized List",
+      "size": 81,
+      "user_type_format": "amComputerType",
+      "label": "IT equipment type",
+      "sqlname": "ComputerType",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "IT equipment type"
+    },
+    {
+      "ref-link": "schema/amPortfolio/field/seAssignment",
+      "user_type": "System Itemized List",
+      "size": 2,
+      "user_type_format": "In use|0|In stock|1|Retired (or consumed)|2|Awaiting receipt|3|Return for maintenance|4|Return to supplier|5|Missing|6",
+      "label": "Assignment",
+      "sqlname": "Portfolio.seAssignment",
+      "type": "Short",
+      "is_calc": false,
+      "long_desc": "Current assignment"
+    },
+    {
+      "ref-link": "schema/amComputer/field/TcpIpDomain",
+      "user_type": "",
+      "size": 41,
+      "user_type_format": "",
+      "label": "IP domain",
+      "sqlname": "TcpIpDomain",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "IP domain"
+    },
+    {
+      "ref-link": "schema/amComputer/field/OperatingSystem",
+      "user_type": "Custom Itemized List",
+      "size": 81,
+      "user_type_format": "amOS",
+      "label": "Oper. System",
+      "sqlname": "OperatingSystem",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "Operating system"
+    },
+    {
+      "ref-link": "schema/amComputer/field/CPUType",
+      "user_type": "Custom Itemized List",
+      "size": 81,
+      "user_type_format": "amCPUType",
+      "label": "CPU type",
+      "sqlname": "CPUType",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "CPU type"
+    },
+    {
+      "ref-link": "schema/amComputer/field/lCPUSpeedMHz",
+      "user_type": "",
+      "size": 4,
+      "user_type_format": "",
+      "label": "CPU speed",
+      "sqlname": "lCPUSpeedMHz",
+      "type": "Long",
+      "is_calc": false,
+      "long_desc": "CPU speed"
+    },
+    {
+      "ref-link": "schema/amComputer/field/lDiskSizeMb",
+      "user_type": "",
+      "size": 4,
+      "user_type_format": "",
+      "label": "Disk size",
+      "sqlname": "lDiskSizeMb",
+      "type": "Long",
+      "is_calc": false,
+      "long_desc": "Disk size"
+    },
+    {
+      "ref-link": "schema/amComputer/field/lMemorySizeMb",
+      "user_type": "",
+      "size": 4,
+      "user_type_format": "",
+      "label": "Memory",
+      "sqlname": "lMemorySizeMb",
+      "type": "Long",
+      "is_calc": false,
+      "long_desc": "Memory"
+    },
+    {
+      "ref-link": "schema/amComputer/field/dtLastScan",
+      "user_type": "",
+      "size": 8,
+      "user_type_format": "",
+      "label": "Last scan",
+      "sqlname": "dtLastScan",
+      "type": "Date+Time",
+      "is_calc": false,
+      "long_desc": "Last scan"
+    },
+    {
+      "ref-link": "schema/amComputer/field/dtNextScan",
+      "user_type": "",
+      "size": 8,
+      "user_type_format": "",
+      "label": "Next scan",
+      "sqlname": "dtNextScan",
+      "type": "Date+Time",
+      "is_calc": false,
+      "long_desc": "Next scan"
+    }
+  ],
+  "links": [],
+  "groupby": "Portfolio.User.Name"
+}

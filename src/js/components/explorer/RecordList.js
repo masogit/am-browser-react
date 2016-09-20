@@ -33,7 +33,8 @@ export default class RecordList extends Component {
       searchFields: null,
       graphData: null,
       param: (!props.noCache && loadSetting(hash(Object.assign({},props.body, {filter: ''})))) || {
-        showMap: props.showMap || (props.body.links && props.body.links.length > 0),
+        showMap: props.showMap != undefined ? props.showMap : (props.body.links && props.body.links.length > 0),
+        showHeader: props.showHeader != undefined ? props.showHeader : true,
         graphType: props.graphType || "legend",
         allFields: props.allField || false,
         groupby: props.groupby || this._getFirstGroupby(props.body.groupby),
@@ -463,6 +464,9 @@ export default class RecordList extends Component {
   }
 
   renderToolBox() {
+    if (!this.state.showHeader) {
+      return;
+    }
     const resultRecords = this.state.filtered ? this.state.filtered : this.state.records;
     const noLinks = (this.props.body.links && this.props.body.links.length > 0) ? `${this.props.body.links.length} sub link(s)` : 'no sub link';
     const aqlWhere = "press / input AQL where statement";
