@@ -64,7 +64,7 @@ module.exports = function (am) {
       var isOffset = !param.offset || param.offset === 0 || param.offset === "0";
       if (isOffset) {
         param.offset = 0;
-        res.setHeader('Content-disposition', 'attachment; filename=' + req.params.tableName + '.' + type);
+        res.setHeader('Content-disposition', 'attachment; filename=' + req.body.label + '.' + type);
         res.setHeader('Content-type', (type=='csv')?'text/csv':'application/pdf');
       }
 
@@ -104,7 +104,7 @@ module.exports = function (am) {
           } else {
             var pdfDoc = printer.createPdfKitDocument(recordsToPdfDoc(JSON.parse(req.body.fields),
                                                                       records,
-                                                                      req.params.tableName,
+                                                                      req.body.label,
                                                                       JSON.parse(req.body.param),
                                                                       JSON.parse(req.body.graphData)));
             pdfDoc.pipe(res);
