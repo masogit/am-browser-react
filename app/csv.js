@@ -189,7 +189,7 @@ module.exports = function (am) {
         'Below report is generated from AM Browser.',
         { text: 'Conditions', style: 'subheader'},
         param.filter ? param.filter : '',
-        data ? { text: 'Statistics by ' + data.header[0].Content, style: 'subheader'} : '',
+        data ? { text: 'Statistics by ' + getGroupbyDisplayLabel(fields, data.header[0].Content), style: 'subheader'} : '',
         groupby.length > 0 ? {
           table: {
             body: groupby
@@ -215,6 +215,16 @@ module.exports = function (am) {
     }
 
     return pdf_data;
+  }
+
+  function getGroupbyDisplayLabel(fields, sqlname) {
+    if (sqlname) {
+      let groupby = fields.filter((field) => {
+        return field.sqlname == sqlname;
+      })[0];
+
+      return getDisplayLabel(groupby);
+    }
   }
 
   // Util functions for exporting csv
