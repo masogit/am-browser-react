@@ -157,14 +157,19 @@ module.exports = function (am) {
     var groupTables = [];
     if (data && data.rows) {
       data.rows.forEach((row) => {
-        groupby.push([(row[0] ? row[0] : '<empty>'), row[1]]);
+        groupby.push([{ul: [(row[0] ? row[0] : '<empty>')]}, row[1]]);
         var sub_records = records.filter((record) => {
           var val = record[data.header[0].Content];
           if (val instanceof Object)
             val = val[Object.keys(val)[0]];
           return val == row[0];
         });
-        var sub_tbody = genTbody(sub_records, fields);
+
+        // fields remove the groupby
+        var newFields = fields.filter((field) => {
+          return field.sqlname != data.header[0].Content;
+        });
+        var sub_tbody = genTbody(sub_records, newFields);
         groupTables.push([
           {text: (row[0] ? row[0] : '<empty>') + ' (' + row[1] + ')', style: 'subheader'},
           {
@@ -189,8 +194,7 @@ module.exports = function (am) {
           table: {
             body: groupby
           },
-          layout: 'noBorders',
-          margin: [30, 0, 0, 0]
+          layout: 'noBorders'
         } : ''
       ],
       styles: pdf_styles
