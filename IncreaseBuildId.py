@@ -31,7 +31,7 @@ if version['id']:
 		json.dump({"number":version['number'], "id":currentId}, f)
 	subprocess.call(["git", "add", versionConfig])
 	subprocess.call(["git", "commit", "-m", commitComment])
-#    subprocess.call(["git", "push", "--tags"])
+	subprocess.call(["git", "push", "--tags"])
 else:
 	print "can not fetch version id, exit"
 	sys.exit(1)
