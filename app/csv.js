@@ -102,7 +102,11 @@ module.exports = function (am) {
             req.body.records = records;
             csv.download(req, res);
           } else {
-            var pdfDoc = printer.createPdfKitDocument(recordsToPdfDoc(JSON.parse(req.body.fields), records, req.params.tableName, JSON.parse(req.body.param)));
+            var pdfDoc = printer.createPdfKitDocument(recordsToPdfDoc(JSON.parse(req.body.fields),
+                                                                      records,
+                                                                      req.params.tableName,
+                                                                      JSON.parse(req.body.param),
+                                                                      JSON.parse(req.body.graphData)));
             pdfDoc.pipe(res);
             pdfDoc.end();
           }
@@ -122,8 +126,7 @@ module.exports = function (am) {
 
   };
 
-  // Generate pdf content from records
-  function recordsToPdfDoc(fields, records, tableName, param) {
+  function genTbody(records, fields) {
     var tbody = [];
     var header = [];
     fields.forEach((field) => {
@@ -140,24 +143,71 @@ module.exports = function (am) {
       });
       tbody.push(row);
     });
-    var content = {
+
+    return tbody;
+  }
+
+  // Generate pdf content from records
+  function recordsToPdfDoc(fields, records, tableName, param, data) {
+    var tbody = [];
+    tbody = genTbody(records, fields);
+
+    // Groupby
+    var groupby = [];
+    var groupTables = [];
+    if (data && data.rows) {
+      data.rows.forEach((row) => {
+        groupby.push([(row[0] ? row[0] : '<empty>'), row[1]]);
+        var sub_records = records.filter((record) => {
+          return record[data.header[0].Content] == row[0];
+        });
+        var sub_tbody = genTbody(sub_records, fields);
+        groupTables.push([
+          {text: (row[0] ? row[0] : '<empty>') + ' (' + row[1] + ')', style: 'subheader'},
+          {
+            style: 'tableExample',
+            table: {
+              headerRows: 1,
+              body: sub_tbody
+            }
+          }
+        ]);
+      });
+    }
+
+    var pdf_data = {
       content: [
         { text: 'Reports: ' + tableName, style: 'header'},
         'Below report is generated from AM Browser.',
         { text: 'Conditions', style: 'subheader'},
-        { text: param.filter, italics: true},
-        {
-          style: 'tableExample',
+        param.filter ? param.filter : '',
+        data ? { text: 'Aggregation by ' + data.header[0].Content, style: 'subheader'} : '',
+        groupby.length > 0 ? {
           table: {
-            headerRows: 1,
-            body: tbody
-          }
-        }
+            body: groupby
+          },
+          layout: 'noBorders',
+          margin: [30, 0, 0, 0]
+        } : ''
       ],
       styles: pdf_styles
     };
 
-    return content;
+    if (data && groupTables.length > 0) {
+      groupTables.forEach((table) => {
+        pdf_data.content.push(table);
+      });
+    } else {
+      pdf_data.content.push({
+        style: 'tableExample',
+        table: {
+          headerRows: 1,
+          body: tbody
+        }
+      });
+    }
+
+    return pdf_data;
   }
 
   // Util functions for exporting csv

@@ -510,6 +510,7 @@ export default class RecordList extends Component {
           <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
           <input type="hidden" name="param" value={JSON.stringify(ExplorerActions.getQueryByBody(Object.assign({}, this.props.body, {param: this.state.param})))}/>
           <input type="hidden" name="fields" value={JSON.stringify(this.props.body.fields)}/>
+          <input type="hidden" name="graphData" value={JSON.stringify(this.state.graphData)} />
         </form>
       </Header>
     );
