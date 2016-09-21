@@ -14,8 +14,10 @@ if currentId:
 	with open(versionConfig, 'w') as f:
 		json.dump({"number":version['number'], "id":currentId}, f)
 tagName = version['number'] + "-" + currentId
-print "current build tag is " + tagName
-subprocess.call(["git", "commit", "-a", "-m", tagName]) 
+commitComment = "current build tag is " + tagName
+print commitComment
+subprocess.call(["git", "add", versionConfig]) 
+subprocess.call(["git", "commit", "-m", commitComment]) 
 
 # tag or re-tag current build number 
 isTagExist = subprocess.check_output(["git", "tag", "-l", tagName])
