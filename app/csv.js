@@ -106,7 +106,8 @@ module.exports = function (am) {
                                                                       records,
                                                                       req.body.label,
                                                                       JSON.parse(req.body.param),
-                                                                      JSON.parse(req.body.graphData)));
+                                                                      JSON.parse(req.body.graphData)),
+                                                                      req.body.orientation);
             pdfDoc.pipe(res);
             pdfDoc.end();
           }
@@ -148,7 +149,7 @@ module.exports = function (am) {
   }
 
   // Generate pdf content from records
-  function recordsToPdfDoc(fields, records, tableName, param, data) {
+  function recordsToPdfDoc(fields, records, tableName, param, data, orientation) {
     var tbody = [];
     tbody = genTbody(records, fields);
 
@@ -185,6 +186,7 @@ module.exports = function (am) {
     }
 
     var pdf_data = {
+      pageOrientation: orientation ? orientation : 'portrait',
       content: [
         { text: 'Reports: ' + tableName, style: 'header'},
         'Below report is generated from AM Browser.',
