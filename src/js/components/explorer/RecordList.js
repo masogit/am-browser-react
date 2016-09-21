@@ -4,13 +4,14 @@ import {Title, Table, TableRow, Box, Anchor, Header, Menu, Map}from 'grommet';
 import Close from 'grommet/components/icons/base/Close';
 import Ascend from 'grommet/components/icons/base/Ascend';
 import Descend from 'grommet/components/icons/base/Descend';
-import Download from 'grommet/components/icons/base/Download';
 import MenuIcon from 'grommet/components/icons/base/Menu';
 import Checkbox from 'grommet/components/icons/base/Checkbox';
 import Filter from 'grommet/components/icons/base/Filter';
 import Next from 'grommet/components/icons/base/Next';
 import Aggregate from 'grommet/components/icons/base/Aggregate';
 import CheckboxSelected from 'grommet/components/icons/base/CheckboxSelected';
+import Pdf from 'grommet/components/icons/base/DocumentPdf';
+import Csv from 'grommet/components/icons/base/DocumentCsv';
 import * as ExplorerActions from '../../actions/explorer';
 import * as AQLActions from '../../actions/aql';
 import Graph from '../commons/Graph';
@@ -335,7 +336,8 @@ export default class RecordList extends Component {
     return true;
   }
 
-  _download() {
+  _download(type) {
+    this.refs.downloadForm.action = ExplorerActions.getDownloadQuery(this.props.body.sqlname) + `?type=${type}`;
     this.refs.downloadForm.submit();
   }
 
@@ -493,11 +495,14 @@ export default class RecordList extends Component {
           <Anchor icon={this.state.param.allFields?<CheckboxSelected />:<Checkbox />} label="Full columns"
                   onClick={() => (this.props.body.fields.length > this.state.numColumn) && this._toggleAllFields()}
                   disabled={this.props.body.fields.length <= this.state.numColumn}/>
-          <Anchor icon={<Download />} label="Download CSV"
+          <Anchor icon={<Csv />} label="Download CSV"
                   disabled={this.state.numTotal < 1}
-                  onClick={() => (this.state.numTotal > 0) && this._download()}/>
+                  onClick={() => (this.state.numTotal > 0) && this._download('csv')}/>
+          <Anchor icon={<Pdf />} label="PDF Report"
+                  disabled={this.state.numTotal < 1}
+                  onClick={() => (this.state.numTotal > 0) && this._download('pdf')}/>
         </Menu>
-        <form name="Download" ref="downloadForm" method="post" action={ExplorerActions.getDownloadQuery(this.props.body.sqlname)}>
+        <form name="Download" ref="downloadForm" method="post">
           <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
           <input type="hidden" name="param" value={JSON.stringify(ExplorerActions.getQueryByBody(Object.assign({}, this.props.body, {param: this.state.param})))}/>
           <input type="hidden" name="fields" value={JSON.stringify(this.props.body.fields)}/>

@@ -2,6 +2,36 @@ var Client = require('node-rest-client').Client;
 var client = new Client();
 var Convertor = require('json-2-csv');
 var logger = require('./logger');
+var PdfPrinter = require('pdfmake/src/printer');
+var fonts = {
+  Roboto: {
+    normal: './app/fonts/Roboto-Regular.ttf',
+    bold: './app/fonts/Roboto-Bold.ttf',
+    italics: './app/fonts/Roboto-Regular.ttf',
+    bolditalics: './app/fonts/Roboto-Regular.ttf'
+  }
+};
+var printer = new PdfPrinter(fonts);
+var pdf_styles = {
+  header: {
+    fontSize: 18,
+    bold: true,
+    margin: [0, 0, 0, 10]
+  },
+  subheader: {
+    fontSize: 16,
+    bold: true,
+    margin: [0, 10, 0, 5]
+  },
+  tableExample: {
+    margin: [0, 5, 0, 15]
+  },
+  tableHeader: {
+    bold: true,
+    fontSize: 13,
+    color: 'black'
+  }
+};
 
 module.exports = function (am) {
 
@@ -29,11 +59,13 @@ module.exports = function (am) {
     };
 
     request = client.get(url, args, (data, response) => {
+      // type: 'csv' or 'pdf'
+      var type = req.query.type;
       var isOffset = !param.offset || param.offset === 0 || param.offset === "0";
       if (isOffset) {
         param.offset = 0;
-        res.setHeader('Content-disposition', 'attachment; filename=' + req.params.tableName + '.csv');
-        res.setHeader('Content-type', 'text/csv');
+        res.setHeader('Content-disposition', 'attachment; filename=' + req.params.tableName + '.' + type);
+        res.setHeader('Content-type', (type=='csv')?'text/csv':'application/pdf');
       }
 
       if (data.count >= 10000)
@@ -43,22 +75,39 @@ module.exports = function (am) {
       else
         param.limit = 100;
 
-      if (data.entities && data.entities.length > 0)
-        Convertor.json2csv(getFormattedRecords(JSON.parse(req.body.fields), data.entities), (err, csv) => {
-          res.write(csv, 'binary');
+      if (data.entities && data.entities.length > 0) {
+        if (type == 'csv')
+          Convertor.json2csv(getFormattedRecords(JSON.parse(req.body.fields), data.entities), (err, csv) => {
+            res.write(csv, 'binary');
+
+            if (data.count > data.entities.length + param.offset) {
+              param.offset += data.entities.length;
+              var CSV = require('./csv.js');
+              var csv = new CSV(am);
+              req.body.param = JSON.stringify(param);
+              csv.download(req, res);
+            } else
+              res.end();
+
+          }, {delimiter: {field: ',', array: ';', wrap: '', eol: '\n'}, prependHeader: isOffset});
+        else {
+          var records = req.body.records || [];
+          records = records.concat(data.entities);
 
           if (data.count > data.entities.length + param.offset) {
             param.offset += data.entities.length;
             var CSV = require('./csv.js');
             var csv = new CSV(am);
             req.body.param = JSON.stringify(param);
+            req.body.records = records;
             csv.download(req, res);
-          } else
-            res.end();
-
-        }, {delimiter: {field: ',', array: ';', wrap: '', eol: '\n'}, prependHeader: isOffset});
-
-      else
+          } else {
+            var pdfDoc = printer.createPdfKitDocument(recordsToPdfDoc(JSON.parse(req.body.fields), records, req.params.tableName, JSON.parse(req.body.param)));
+            pdfDoc.pipe(res);
+            pdfDoc.end();
+          }
+        }
+      } else
         res.end();
 
     }).on('error', function (err) {
@@ -73,6 +122,44 @@ module.exports = function (am) {
 
   };
 
+  // Generate pdf content from records
+  function recordsToPdfDoc(fields, records, tableName, param) {
+    var tbody = [];
+    var header = [];
+    fields.forEach((field) => {
+      header.push({
+        text: getDisplayLabel(field),
+        style: 'tableHeader'
+      });
+    });
+    tbody.push(header);
+    records.forEach((record) => {
+      var row = [];
+      fields.forEach((field) => {
+        row.push(getFieldStrVal(record, field, true));
+      });
+      tbody.push(row);
+    });
+    var content = {
+      content: [
+        { text: 'Reports: ' + tableName, style: 'header'},
+        'Below report is generated from AM Browser.',
+        { text: 'Conditions', style: 'subheader'},
+        { text: param.filter, italics: true},
+        {
+          style: 'tableExample',
+          table: {
+            headerRows: 1,
+            body: tbody
+          }
+        }
+      ],
+      styles: pdf_styles
+    };
+
+    return content;
+  }
+
   // Util functions for exporting csv
   function getFormattedRecords(fields, rawRecords) {
     var records = [];
@@ -86,7 +173,7 @@ module.exports = function (am) {
     return records;
   }
 
-  function getFieldStrVal(record, field) {
+  function getFieldStrVal(record, field, noEscape) {
     var val = record[field.sqlname];
     if (field.user_type && field.user_type == 'System Itemized List')
       val = val[Object.keys(val)[0]];
@@ -103,7 +190,7 @@ module.exports = function (am) {
     } else if (val instanceof Object)
       val = val[Object.keys(val)[0]];
 
-    return escapeStr(val);
+    return noEscape ? val : escapeStr(val);
   }
 
   function escapeStr(val) {
