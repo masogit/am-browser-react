@@ -15,7 +15,7 @@ if currentId:
 		json.dump({"number":version['number'], "id":currentId}, f)
 tagName = version['number'] + "-" + currentId
 print "current build tag is " + tagName
-subprocess.call(["git", "commit", "-a", "-m" "\"update version.id currentId\""]) 
+subprocess.call(["git", "commit", "-a", "-m", tagName]) 
 
 # tag or re-tag current build number 
 isTagExist = subprocess.check_output(["git", "tag", "-l", tagName])
