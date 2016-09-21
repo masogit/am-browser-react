@@ -159,7 +159,10 @@ module.exports = function (am) {
       data.rows.forEach((row) => {
         groupby.push([(row[0] ? row[0] : '<empty>'), row[1]]);
         var sub_records = records.filter((record) => {
-          return record[data.header[0].Content] == row[0];
+          var val = record[data.header[0].Content];
+          if (val instanceof Object)
+            val = val[Object.keys(val)[0]];
+          return val == row[0];
         });
         var sub_tbody = genTbody(sub_records, fields);
         groupTables.push([
@@ -181,7 +184,7 @@ module.exports = function (am) {
         'Below report is generated from AM Browser.',
         { text: 'Conditions', style: 'subheader'},
         param.filter ? param.filter : '',
-        data ? { text: 'Aggregation by ' + data.header[0].Content, style: 'subheader'} : '',
+        data ? { text: 'Statistics by ' + data.header[0].Content, style: 'subheader'} : '',
         groupby.length > 0 ? {
           table: {
             body: groupby

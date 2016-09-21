@@ -448,14 +448,14 @@ export default class RecordList extends Component {
 
   renderGroupByHeader(sqlname) {
     if (sqlname) {
-      let groupbys = this.props.body.groupby.split('|');
+      let groupbys = this.props.body.groupby ? this.props.body.groupby.split('|') : [];
       let header = groupbys.map((groupby, index) => {
         return (groupby && <Anchor key={`b_groupby_${index}`} label={this.getGroupbyDisplayLabel(groupby)}
                         icon={(groupby == sqlname)?<Next />:<EmptyIcon />}
                         disabled={this.state.locked || groupby == sqlname}
                         onClick={() => !(this.state.locked || groupby == sqlname) && this._getGroupByData(groupby)} />);
       });
-      header.unshift(<Header key='b_groupby_header'>Aggregation</Header>);
+      header.unshift(<Header key='b_groupby_header'>Statistics</Header>);
       if (groupbys.indexOf(sqlname) < 0) {
         header.push(<Anchor key='b_groupby_last' label={this.getGroupbyDisplayLabel(sqlname)} icon={<Next />} disabled={true} />);
       }
