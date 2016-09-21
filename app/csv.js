@@ -177,7 +177,8 @@ module.exports = function (am) {
             table: {
               headerRows: 1,
               body: sub_tbody
-            }
+            },
+            layout: 'lightHorizontalLines'
           }
         ]);
       });
@@ -210,7 +211,8 @@ module.exports = function (am) {
         table: {
           headerRows: 1,
           body: tbody
-        }
+        },
+        layout: 'lightHorizontalLines'
       });
     }
 
