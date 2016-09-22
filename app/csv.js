@@ -7,8 +7,8 @@ var fonts = {
   Roboto: {
     normal: './app/fonts/Roboto-Regular.ttf',
     bold: './app/fonts/Roboto-Bold.ttf',
-    italics: './app/fonts/Roboto-Regular.ttf',
-    bolditalics: './app/fonts/Roboto-Regular.ttf'
+    italics: './app/fonts/Roboto-Italic.ttf',
+    bolditalics: './app/fonts/Roboto-Italic.ttf'
   }
 };
 var printer = new PdfPrinter(fonts);
@@ -149,7 +149,7 @@ module.exports = function (am) {
   }
 
   // Generate pdf content from records
-  function recordsToPdfDoc(fields, records, tableName, param, data, orientation) {
+  function recordsToPdfDoc(fields, records, reportLabel, param, data, orientation) {
     var tbody = [];
     tbody = genTbody(records, fields);
 
@@ -188,7 +188,7 @@ module.exports = function (am) {
     var pdf_data = {
       pageOrientation: orientation ? orientation : 'portrait',
       content: [
-        { text: 'Reports: ' + tableName, style: 'header'},
+        { text: 'Reports: ' + reportLabel, style: 'header'},
         'Below report is generated from AM Browser.',
         { text: 'Conditions', style: 'subheader'},
         param.filter ? param.filter : '',
