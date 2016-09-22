@@ -6,6 +6,8 @@ import {Box, Tiles, Tile, Title, Header} from 'grommet';
 import MyPC from './MyPC';
 import MyPCData from './MyPCMockData.json';
 import MyOrganizationPCData from './MyOrganizationPCMockData.json';
+import MyRequest from './MyRequestMockData.json';
+import MySoftware from './MySoftwareMockData.json';
 
 
 export default class MyAsset extends Component {
@@ -57,11 +59,15 @@ export default class MyAsset extends Component {
   }
 
   getSoftware() {
-    return <div>Software</div>;
+    return <MyPC body={MySoftware}/>;
   }
 
   getOrganization() {
     return <MyPC body={MyOrganizationPCData}/>;
+  }
+
+  getRequest() {
+    return <MyPC body={MyRequest}/>;
   }
 
   render() {
@@ -69,7 +75,8 @@ export default class MyAsset extends Component {
       {key: 'Summary'},
       {key: 'PC'},
       {key: 'Software'},
-      {key: 'Organization'}
+      {key: 'Organization'},
+      {key: 'Request'}
     ];
 
     return (

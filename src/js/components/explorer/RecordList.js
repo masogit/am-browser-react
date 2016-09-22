@@ -55,7 +55,9 @@ export default class RecordList extends Component {
   }
 
   componentWillUnmount() {
-    saveSetting(hash(Object.assign({}, this.props.body, {filter: ''})), this.state.param);
+    if (!this.props.noCache) {
+      saveSetting(hash(Object.assign({}, this.props.body, {filter: ''})), this.state.param);
+    }
   }
 
   _getFirstGroupby(groupby) {
@@ -464,7 +466,7 @@ export default class RecordList extends Component {
   }
 
   renderToolBox() {
-    if (!this.state.showHeader) {
+    if (!this.state.param.showHeader) {
       return;
     }
     const resultRecords = this.state.filtered ? this.state.filtered : this.state.records;

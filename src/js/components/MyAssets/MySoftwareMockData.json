@@ -1,0 +1,45 @@
+{
+  "orderby": "Model.Brand.Name desc",
+  "filter": "User=currentuser",
+  "label": "Software installations or utilizations",
+  "sqlname": "amSoftInstall",
+  "fields": [
+    {
+      "ref-link": "schema/amModel/field/Name",
+      "user_type": "",
+      "size": 129,
+      "user_type_format": "",
+      "label": "Name",
+      "sqlname": "Model.Name",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "Name of the model"
+    },
+    {
+      "ref-link": "schema/amCompany/field/Name",
+      "user_type": "",
+      "size": 129,
+      "user_type_format": "",
+      "label": "Name",
+      "sqlname": "Model.Brand.Company.Name",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "Supplier name",
+      "alias": "Company Name"
+    },
+    {
+      "ref-link": "schema/amBrand/field/Name",
+      "user_type": "",
+      "size": 129,
+      "user_type_format": "",
+      "label": "Name",
+      "sqlname": "Model.Brand.Name",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "Brand name",
+      "alias": "Brand Name"
+    }
+  ],
+  "links": [],
+  "groupby": "Model.Brand.Company.Name|Model.Brand.Name"
+}

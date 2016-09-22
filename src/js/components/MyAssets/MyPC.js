@@ -6,6 +6,7 @@ const Parts = Topology.Parts;
 const Part = Topology.Part;
 const Label = Topology.Label;
 import More from 'grommet/components/icons/base/More';
+import Close from 'grommet/components/icons/base/Close';
 import Cluster from 'grommet/components/icons/base/Cluster';
 import Previous from 'grommet/components/icons/base/Previous';
 import ComputerPersonal from 'grommet/components/icons/base/ComputerPersonal';
@@ -26,22 +27,28 @@ export default class MyPC extends Component {
       graphData: null,
       param: {
         offset: 0,
-        limit: 30
+        limit: 30,
+        groupby: '',
+        filters: []
       }
     };
     this._getRecords(this.state.param);
-    this._getGroupByData();
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      body: null
+      body: null,
+      param: {
+        offset: 0,
+        limit: 30,
+        groupby: '',
+        filters: []
+      }
     }, () => {
       this.setState({
         body: nextProps.body
       });
       this._getRecords();
-      this._getGroupByData();
     });
   }
 
@@ -69,7 +76,7 @@ export default class MyPC extends Component {
     if (this.state.numTotal > this.state.records.length) {
       var param = Object.assign({}, this.state.param);
       param.offset = this.state.records.length;
-      this._getRecords(param, true);  // sync pass param to query, then records append
+      this._getRecords(param);  // sync pass param to query, then records append
     } else {
       return null;
     }
@@ -87,12 +94,60 @@ export default class MyPC extends Component {
           locked: false
         });
       });
+      this._getGroupByData();
     }
   }
 
-  _getGroupByData() {
-    AQLActions.queryAQL(ExplorerActions.getGroupByAql(this.props.body)).then((data)=> {
+  renderAQLFilter() {
+    if (this.props.body.groupby.indexOf('|') > -1) {
+      const filterClear = (index) => {
+        var param = this.state.param;
+        param.filters.splice(index, 1);
+
+        // Find previous groupby from pre-defined body
+        let groupby = param.groupby || '';
+        let groups = this.props.body.groupby ? this.props.body.groupby.split('|') : [];
+        let pos = groups.indexOf(groupby);
+        if (pos > 0)
+          groupby = groups[pos - 1];
+
+        param.groupby = groupby;
+        this.setState({
+          param: param
+        }, this._getRecords);
+      };
+
+      return (
+        <span>
+        {this.state.param.filters.map((filter, index) => {
+          return (
+            <span key={index}>
+              <Anchor href="#" icon={<Close />} onClick={() => filterClear(index)} label={filter}/>
+            </span>
+          );
+        })}
+      </span>
+      );
+    }
+  }
+
+  _getGroupByData(groupby = this.state.param.groupby) {
+    const bodyGroupBy = this.props.body.groupby;
+    let body = this.props.body;
+    if (bodyGroupBy.indexOf('|') > -1) {
+      const groups = bodyGroupBy.split('|');
+      const pos = groups.indexOf(groupby);
+      if (pos < groups.length - 1) {
+        groupby = groups[pos + 1];
+      }
+
+      body = Object.assign({}, this.props.body);
+      body.groupby = groupby;
+    }
+    AQLActions.queryAQL(ExplorerActions.getGroupByAql(body)).then((data)=> {
+      this.state.param.groupby = groupby;
       this.setState({
+        param: this.state.param,
         graphData: (data && data.rows.length > 0) ? data : null
       });
     });
@@ -114,7 +169,7 @@ export default class MyPC extends Component {
              onClick={(filter) => {
                if (!this.state.locked) {
                  const param = this.state.param;
-                 param.filters = [getFilterFromField(this.props.body.fields, filter)];
+                 param.filters.push(getFilterFromField(this.props.body.fields, filter));
                  this.setState({
                    record: null,
                    param: param
@@ -211,6 +266,7 @@ export default class MyPC extends Component {
         content = (
           <Box direction='row' flex={true} pad='small'>
             <Box flex={false} pad={{horizontal: 'medium'}}>
+              {this.renderAQLFilter()}
               {this.renderGraph()}
             </Box>
             <Box flex={true} pad='medium' separator='all'>
@@ -234,9 +290,11 @@ export default class MyPC extends Component {
                   label={showTopology ? 'List' : 'Topology'}
                   onClick={() => {
                     if (showTopology) {
+                      this.state.param.groupby = '';
                       this.setState({
                         showTopology: false,
-                        record: null
+                        record: null,
+                        param: this.state.param
                       });
                     } else {
                       this.setState({showTopology: true});
