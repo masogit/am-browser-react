@@ -15,7 +15,7 @@ with open(versionConfig, 'r') as f1:
 if version['id']:
 	currentId = str(int(version['id']) + 1)
 	tagName = version['number'] + "-" + currentId
-	commitComment = "current build id is " + tagName
+	commitComment = "[Auto build]:current build id is " + tagName
 	print "--------------" + commitComment + "--------------"
 
 	# tag or re-tag current build number
