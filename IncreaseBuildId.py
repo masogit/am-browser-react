@@ -7,10 +7,9 @@ import subprocess
 versionConfig = './version.json'
 gitBranch = 'master'
 
-# read version config file
-
-with open(versionConfig, 'r') as f:
-	version = json.load(f)
+print "--------------read version config file--------------"
+with open(versionConfig, 'r') as f1:
+	version = json.load(f1)
 	print "--------------last build id is " +  version['id'] + "--------------"
 
 if version['id']:
@@ -28,11 +27,11 @@ if version['id']:
 	
 	# checkout branch and modify version config file
 	subprocess.call(["git", "checkout", gitBranch])
-	with open(versionConfig, 'w') as f:
-		json.dump({"number":version['number'], "id":currentId}, f)
+	with open(versionConfig, 'w') as f2:
+		json.dump({"number":version['number'], "id":currentId}, f2)
 	subprocess.call(["git", "add", versionConfig])
 	subprocess.call(["git", "commit", "-m", commitComment])
 	subprocess.call(["git", "push", "origin", gitBranch, tagName])
 else:
-	print "can not fetch version id, exit"
+	print "-------------can not fetch version id, exit--------------"
 	sys.exit(1)
