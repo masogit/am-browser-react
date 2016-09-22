@@ -27,7 +27,7 @@ var pdf_styles = {
     margin: [0, 5, 0, 15]
   },
   tableHeader: {
-    bold: true,
+    italics: true,
     fontSize: 13,
     color: 'black'
   }
@@ -106,8 +106,7 @@ module.exports = function (am) {
                                                                       records,
                                                                       req.body.label,
                                                                       JSON.parse(req.body.param),
-                                                                      JSON.parse(req.body.graphData)),
-                                                                      req.body.orientation);
+                                                                      JSON.parse(req.body.graphData)));
             pdfDoc.pipe(res);
             pdfDoc.end();
           }
@@ -127,7 +126,7 @@ module.exports = function (am) {
 
   };
 
-  function genTbody(records, fields) {
+  function genTbody(records, fields, max) {
     var tbody = [];
     var header = [];
     fields.forEach((field) => {
@@ -139,19 +138,25 @@ module.exports = function (am) {
     tbody.push(header);
     records.forEach((record) => {
       var row = [];
+      var length = 0;
       fields.forEach((field) => {
-        row.push(getFieldStrVal(record, field, true));
+        var val = getFieldStrVal(record, field, true) || '';
+        row.push(val);
+        length += val.length;
       });
       tbody.push(row);
+      if (length > max.length)
+        max.length = length;
     });
 
     return tbody;
   }
 
   // Generate pdf content from records
-  function recordsToPdfDoc(fields, records, reportLabel, param, data, orientation) {
+  function recordsToPdfDoc(fields, records, reportLabel, param, data) {
+    var max = { length: 0 };
     var tbody = [];
-    tbody = genTbody(records, fields);
+    tbody = genTbody(records, fields, max);
 
     // Groupby
     var groupby = [];
@@ -170,7 +175,7 @@ module.exports = function (am) {
         var newFields = fields.filter((field) => {
           return field.sqlname != data.header[0].Content;
         });
-        var sub_tbody = genTbody(sub_records, newFields);
+        var sub_tbody = genTbody(sub_records, newFields, max);
         groupTables.push([
           {text: (row[0] ? row[0] : '<empty>') + ' (' + row[1] + ')', style: 'subheader'},
           {
@@ -186,7 +191,7 @@ module.exports = function (am) {
     }
 
     var pdf_data = {
-      pageOrientation: orientation ? orientation : 'portrait',
+      pageOrientation: max.length > 80 ? 'landscape' : 'portrait',
       content: [
         { text: 'Reports: ' + reportLabel, style: 'header'},
         'Below report is generated from AM Browser.',
