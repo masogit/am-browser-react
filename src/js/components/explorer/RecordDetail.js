@@ -2,14 +2,11 @@ import React, {Component, PropTypes} from 'react';
 import RecordList from './RecordList';
 import ActionTab from '../commons/ActionTab';
 import * as ExplorerActions from '../../actions/explorer';
-import {
-  Anchor,
-  Layer,
-  Tabs,
-  Table,
-  TableRow
-} from 'grommet';
+import { Anchor, Layer, Tabs, Table, TableRow, Header, Menu } from 'grommet';
+import MenuIcon from 'grommet/components/icons/base/Menu';
+import Pdf from 'grommet/components/icons/base/DocumentPdf';
 import * as Format from '../../util/RecordFormat';
+import cookies from 'js-cookie';
 
 export default class RecordDetail extends Component {
 
@@ -76,12 +73,33 @@ export default class RecordDetail extends Component {
       });
   }
 
+  _download(type) {
+    this.refs.downloadForm.action = ExplorerActions.getDownloadQuery(this.props.body.sqlname) + `?type=${type}`;
+    this.refs.downloadForm.submit();
+  }
+
   render() {
 
     return (
       <Layer closer={true} align="right" onClose={this.props.onClose}>
         <Tabs justify="start" activeIndex={0}>
           <ActionTab title={this.props.body.label}>
+            <Header justify="end">
+              <Menu icon={<MenuIcon />} dropAlign={{ right: 'right', top: 'top' }}>
+              <Anchor icon={<Pdf />} label="PDF Report" onClick={() => this._download('1vM')}/>
+                <Anchor label="Acknowledge this PC" />
+                <Anchor label="Retire this PC" />
+                <Anchor label="Move to ..." />
+                <Anchor label="Transfer Owner to ..." />
+              </Menu>
+              <form name="Download" ref="downloadForm" method="post">
+                <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
+                <input type="hidden" name="record" value={JSON.stringify(this.props.record)} />
+                <input type="hidden" name="links" value={JSON.stringify(this.state.links)} />
+                <input type="hidden" name="fields" value={JSON.stringify(this.props.body.fields)}/>
+                <input type="hidden" name="label" value={this.props.title || this.props.body.label} />
+              </form>
+            </Header>
             <Table>
               <thead>
               <tr>

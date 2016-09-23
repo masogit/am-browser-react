@@ -23,6 +23,9 @@ var pdf_styles = {
     bold: true,
     margin: [0, 10, 0, 5]
   },
+  tableFields: {
+    margin: [0, 20, 20, 15]
+  },
   tableExample: {
     margin: [0, 5, 0, 15]
   },
@@ -36,7 +39,14 @@ var pdf_styles = {
 module.exports = function (am) {
 
   this.download = function (req, res) {
+    // type: 'csv' or 'pdf' or '1vM'
+    if (req.query.type == '1vM')
+      report(req, res);
+    else
+      list(req, res);
+  };
 
+  function list (req, res) {
     if (!req.body.param || !req.body.fields || !req.body.fields instanceof Array || req.body.fields.length < 1) {
       res.status(400).send('Bad parameters for exporting csv!');
     }
@@ -68,12 +78,7 @@ module.exports = function (am) {
         res.setHeader('Content-type', (type=='csv')?'text/csv':'application/pdf');
       }
 
-      if (data.count >= 10000)
-        param.limit = 1000;
-      else if (data.count < 10000 && data.count >= 1000)
-        param.limit = parseInt(data.count / 10);
-      else
-        param.limit = 100;
+      param.limit = 1000;
 
       if (data.entities && data.entities.length > 0) {
         if (type == 'csv')
@@ -125,6 +130,55 @@ module.exports = function (am) {
     });
 
   };
+
+  function report(req, res) {
+    res.setHeader('Content-disposition', 'attachment; filename=' + req.body.label + '.pdf');
+    res.setHeader('Content-type', 'application/pdf');
+    var pdf_data = {
+      pageOrientation: 'landscape',
+      content: [
+        {
+          text: [
+            { text: 'Reports: ' + req.body.label + ' ', style: 'header'},
+            { text: '(' + JSON.parse(req.body.record).self + ')', italics: true}
+          ]
+        },
+        'Below report is generated from AM Browser.',
+        {
+          alignment: 'justify',
+          columns: genHeader(JSON.parse(req.body.record), JSON.parse(req.body.fields))
+        }
+      ],
+      styles: pdf_styles
+    };
+    var pdfDoc = printer.createPdfKitDocument(pdf_data);
+    pdfDoc.pipe(res);
+    pdfDoc.end();
+  };
+
+  function genHeader(record, fields) {
+    var pdf_header = [{}, {}];
+
+    fields.forEach((field, index) => {
+      var column = !(index % 2) ? pdf_header[0] : pdf_header[1];
+      if (!column.table)
+        Object.assign(column, {
+          layout: 'noBorders',
+          style: 'tableFields',
+          table: {
+            widths: ['auto', '*'],
+            body:[]
+          }
+        });
+
+      column.table.body.push([
+        {text: getDisplayLabel(field), bold: true},
+        getFieldStrVal(record, field, true)
+      ]);
+    });
+
+    return pdf_header;
+  }
 
   function genTbody(records, fields, max) {
     var tbody = [];
