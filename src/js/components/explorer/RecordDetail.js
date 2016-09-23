@@ -28,6 +28,7 @@ export default class RecordDetail extends Component {
         if (body.filter) {
           ExplorerActions.getCount(body).then(records => {
             link.count = records.count;
+            link.body = body;
             var links = this.state.links;
             links.push(link);
             this.setState({
@@ -132,7 +133,7 @@ export default class RecordDetail extends Component {
           {
             this.state.links.map((link, index) => {
               return (<ActionTab title={`${link.label} (${link.count})`} key={index}>
-                <RecordList key={link.sqlname} body={this._getLinkBody(link, this.props.record)}/>
+                <RecordList key={link.sqlname} body={link.body}/>
               </ActionTab>);
             })
           }
