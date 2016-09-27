@@ -18,13 +18,14 @@ class BreadCrumb extends Component {
     let elements = this.props.elements;
     let breadcrumbs = elements.map((element, index) => {
       if (index == 0) {
-        return (<Anchor key={index} icon={<Home />} onClick={this._onDetailClick.bind(this, index)}
+        return (<Anchor key={index} icon={<Home />} className='fontNormal'
+                        onClick={this._onDetailClick.bind(this, index)}
                         label={`${element.label}(${element.sqlname})`}/>);
       } else if (index == elements.length - 1) {
-        return <Anchor key={index} icon={<Next />} label={element.sqlname} disabled={true}/>;
+        return <Anchor key={index} icon={<Next />} className='fontNormal' label={element.sqlname} disabled={true}/>;
       } else {
-        return (<Anchor key={index} icon={<Next />} onClick={this._onDetailClick.bind(this, index)}
-                        label={element.sqlname}/>);
+        return (<Anchor key={index} icon={<Next />} className='fontNormal' label={element.sqlname}
+                        onClick={this._onDetailClick.bind(this, index)} />);
       }
     });
 

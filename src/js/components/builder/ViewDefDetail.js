@@ -174,11 +174,22 @@ export default class ViewDefDetail extends ComponentBase {
     return links;
   }
 
-  renderTemplateTable(selectedView, root, path) {
+  renderTemplateTable(selectedView, root, path, key) {
     let currentPath = root ? "" : path + ".";
     let selfView = selectedView;
     // map, then filter out null elements, the index is correct; filter out PK fields, then map, the index is wrong.
     return selfView.body.fields.map((field, index) => {
+      let fieldName = field.sqlname;
+      const pointIndex = fieldName.lastIndexOf('.');
+      if (pointIndex > 0) {
+        const link = fieldName.substr(0, pointIndex);
+        fieldName = (
+          <Box direction='row'>
+            <Anchor onClick={this._onClickTableTitle.bind(this, key + '.' + link)} label={link}/>
+            {fieldName.substr(pointIndex)}
+          </Box>
+      );
+      }
       return (
         <tr id={`${currentPath}_${selfView.body.sqlname}_${field.sqlname}_${index}_row`}
             key={`${currentPath}_${selfView.body.sqlname}_${field.sqlname}_${index}_row`}>
@@ -195,7 +206,7 @@ export default class ViewDefDetail extends ComponentBase {
                onClick={this.props.onMoveRowDown}><Down size="small" type="status" style={{color: "#666"}}/></a>
             }
           </td>
-          <td>{field.sqlname}</td>
+          <td>{fieldName}</td>
           <td>
             <input id={`v.${currentPath}body.fields.${index}.alias`}
                    name={`v.${currentPath}body.fields.${index}.alias`}
@@ -298,7 +309,7 @@ export default class ViewDefDetail extends ComponentBase {
 
     return (
       <Box className='table' key={key} style={style} flex={false}>
-        <Anchor icon={<CaretPrevious />} onClick={this._onClickTableTitle.bind(this, key)} label={title.label}/>
+        <Anchor icon={<CaretPrevious />} className='fontNormal' onClick={this._onClickTableTitle.bind(this, key)} label={title.label}/>
         <Table>
           {header}
           <tbody>
@@ -312,7 +323,7 @@ export default class ViewDefDetail extends ComponentBase {
             </td>
           </tr>
           }
-          {this.renderTemplateTable(selectedView, root, path)}
+          {this.renderTemplateTable(selectedView, root, path, key)}
           </tbody>
         </Table>
         {selectedView.body.links && selectedView.body.links.length > 0 && this.renderLinks([], selectedView, currentPath + "body.links", key)}
