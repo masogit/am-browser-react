@@ -101,6 +101,18 @@ table {
   }
 }
 
+th {
+  white-space: nowrap;
+  a {
+    display: flex;
+    align-items: baseline;
+    &.grommetux-anchor svg.grommetux-control-icon {
+      margin-left: 0;
+      margin-right: 12px;
+    }
+  }
+}
+
 .flex .grommetux-tabs__content {
   flex-grow: 1;
   & div {

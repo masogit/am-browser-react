@@ -1,6 +1,6 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import { INIT, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT,
+import { INIT, LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT, ADD_TOOL, REMOVE_TOOL,
   STOP_MONITOR_EDIT, MONITOR_EDIT, FORCE_LOGOUT, TOGGLE_SIDEBAR } from '../constants/ActionTypes';
 
 const initialState = {
@@ -9,6 +9,7 @@ const initialState = {
   headerNavs: null,
   loggedout: false,
   showSidebar: true,
+  tools: [],
   edit: {
     origin: {},
     now: {}
@@ -41,7 +42,17 @@ const handlers = {
   }),
   [MONITOR_EDIT]: (_, action) => ({edit: action.edit}),
   [STOP_MONITOR_EDIT]: (_, action) => ({edit: null}),
-  [TOGGLE_SIDEBAR]: (state, action) => ({showSidebar: !state.showSidebar})
+  [TOGGLE_SIDEBAR]: (state, action) => ({showSidebar: !state.showSidebar}),
+  [ADD_TOOL]: (state, action) => {
+    const tools = state.tools, tool = action.tool;
+    if (tools.filter(item => item.id == tool.id).length == 0) {
+      return {tools: [...tools, tool]};
+    }
+  },
+  [REMOVE_TOOL]: (state, action) => {
+    const tools = state.tools, toolId = action.toolId;
+    return {tools: tools.filter(tool => tool.id != toolId)};
+  }
 };
 
 export default function sessionReducer (state = initialState, action) {

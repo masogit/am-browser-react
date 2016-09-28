@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import RecordDetail from './RecordDetail';
-import {Title, Table, TableRow, Box, Anchor, Header, Menu, Map}from 'grommet';
+import RecordTopology from './RecordTopology';
+import {Title, Table, TableRow, Box, Anchor, Header, Menu, List, ListItem}from 'grommet';
 import Close from 'grommet/components/icons/base/Close';
 import Ascend from 'grommet/components/icons/base/Ascend';
 import Descend from 'grommet/components/icons/base/Descend';
@@ -8,7 +9,7 @@ import Download from 'grommet/components/icons/base/Download';
 import MenuIcon from 'grommet/components/icons/base/Menu';
 import Checkbox from 'grommet/components/icons/base/Checkbox';
 import Filter from 'grommet/components/icons/base/Filter';
-import Next from 'grommet/components/icons/base/Next';
+import Next from 'grommet/components/icons/base/LinkNext';
 import Aggregate from 'grommet/components/icons/base/Aggregate';
 import CheckboxSelected from 'grommet/components/icons/base/CheckboxSelected';
 import * as ExplorerActions from '../../actions/explorer';
@@ -18,7 +19,15 @@ import EmptyIcon from '../commons/EmptyIcon';
 import * as Format from '../../util/RecordFormat';
 import {hash, loadSetting, saveSetting} from '../../util/util';
 import cookies from 'js-cookie';
-import {bodyToMapData} from '../../util/util';
+import {addTool, removeTool} from '../../actions/system';
+import Cluster from 'grommet/components/icons/base/Cluster';
+
+const getFirstGroupby = (groupby) => {
+  if (groupby && groupby.split('|').length > 0)
+    return groupby.split('|')[0];
+  else
+    return '';
+};
 
 export default class RecordList extends Component {
   constructor(props) {
@@ -34,10 +43,11 @@ export default class RecordList extends Component {
       graphData: null,
       param: (!props.noCache && loadSetting(hash(Object.assign({},props.body, {filter: ''})))) || {
         showMap: props.showMap != undefined ? props.showMap : (props.body.links && props.body.links.length > 0),
+        showTopology: props.showTopology != undefined ? props.showTopology : false,
         showHeader: props.showHeader != undefined ? props.showHeader : true,
         graphType: props.graphType || "legend",
         allFields: props.allField || false,
-        groupby: props.groupby || this._getFirstGroupby(props.body.groupby),
+        groupby: props.groupby || getFirstGroupby(props.body.groupby),
         aqlInput: props.aqlInput || false,
         orderby: props.orderby || "",
         offset: props.offset || 0,
@@ -45,48 +55,44 @@ export default class RecordList extends Component {
         filters: props.filters || []
       },
       onMoreLock: false,
-      locked: false
+      locked: false,
+      showGraph: true
     };
   }
 
   componentWillMount() {
-    this._getSearchableFields();
+    const getSearchableFields = () => {
+      let searchFields = this.props.body.fields.filter((field) => {
+        return field.searchable;
+      }).map((field) => {
+        return Format.getDisplayLabel(field);
+      }).join(', ');
+
+      if (searchFields)
+        this.setState({
+          searchFields: searchFields
+        });
+    };
+
+    getSearchableFields();
     this._getRecords(this.state.param);
+  }
+
+  componentDidMount() {
+    addTool({
+      icon: <Aggregate />,
+      id: 'groupby',
+      isActive: () => this.state.showGraph,
+      disable: !this.state.param.groupby || !this.state.showGraph,
+      onClick: this.state.param.groupby ? () => this.setState({showGraph: !this.state.showGraph}) : null
+    });
   }
 
   componentWillUnmount() {
     if (!this.props.noCache) {
       saveSetting(hash(Object.assign({}, this.props.body, {filter: ''})), this.state.param);
     }
-  }
-
-  _getFirstGroupby(groupby) {
-    if (groupby && groupby.split('|').length > 0)
-      return groupby.split('|')[0];
-    else
-      return '';
-  }
-
-  _getSearchableFields() {
-    let searchFields = this.props.body.fields.filter((field) => {
-      return field.searchable;
-    }).map((field) => {
-      return Format.getDisplayLabel(field);
-    }).join(', ');
-
-    if (searchFields)
-      this.setState({
-        searchFields: searchFields
-      });
-  }
-
-  _clearGroupBy() {
-    let param = this.state.param;
-    param.groupby = '';
-    this.setState({
-      graphData: null,
-      param: param
-    });
+    removeTool('groupby');
   }
 
   _getGroupByData(groupby) {
@@ -114,8 +120,10 @@ export default class RecordList extends Component {
       AQLActions.queryAQL(ExplorerActions.getGroupByAql(body)).then((data)=> {
         let param = this.state.param;
         param.groupby = groupby;
+        let graphData = (data && data.rows.length > 0) ? data : null;
+
         this.setState({
-          graphData: (data && data.rows.length > 0) ? data : null,
+          graphData: graphData,
           param: param,
           locked: false
         });
@@ -257,16 +265,6 @@ export default class RecordList extends Component {
     });
   }
 
-  getGroupbyDisplayLabel(sqlname) {
-    if (sqlname) {
-      let groupby = this.props.body.fields.filter((field) => {
-        return field.sqlname == sqlname;
-      })[0];
-
-      return Format.getDisplayLabel(groupby);
-    }
-  }
-
   getObjectString(obj) {
     return this.getDisplayFields().map((field, index) => Format.getFieldStrVal(obj, field));
   }
@@ -298,6 +296,7 @@ export default class RecordList extends Component {
 
       param.groupby = groupby;
       this.setState({
+        record: this.state.param.showTopology ? null : this.state.record,
         param: param
       }, this._getRecords);
     }
@@ -352,11 +351,13 @@ export default class RecordList extends Component {
     });
   }
 
-  _toggleShowMap() {
+  _toggleShowTopology() {
     let param = this.state.param;
-    param.showMap = !param.showMap;
+    param.showTopology = !param.showTopology;
+
     this.setState({
-      param: param
+      param: param,
+      record: null
     });
   }
 
@@ -376,50 +377,16 @@ export default class RecordList extends Component {
     });
   }
 
-  renderFieldsHeader() {
-    return this.getDisplayFields().map((field, index) => (
-        <th key={index} className={this.state.locked ? 'disabled' : ''}>
-          <Anchor href="#" reverse={true} icon={this._showOrderByIcon(field.sqlname)}
-                  label={Format.getDisplayLabel(field)} key={`fieldsheader_${index}`}
-                  onClick={this._orderBy.bind(this, field.sqlname)}/>
-        </th>
-    ));
-  }
-
-  renderRecords() {
-    var records = (this.state.filtered) ? this.state.filtered : this.state.records;
-    return (
-      records.map((record, index) => {
-        return (
-          <TableRow key={index} onClick={this.props.onClick ? this.props.onClick.bind(this, record) : this._viewDetailShow.bind(this, record)}>
-            {
-              this.getDisplayFields().map((field, tdindex) => (
-                <td key={tdindex}>
-                  {Format.getFieldStrVal(record, field)}
-                </td>
-              ))
-            }</TableRow>
-        );
-      })
-    );
-  }
-
-  renderAQLFilter() {
-    return (
-      <span>
-        {this.state.param.filters.map((filter, index) => {
-          return (
-            <span key={`aqlfilter_${index}`}>
-              <Anchor href="#" icon={<Close />} onClick={this._filterClear.bind(this, index)}/>
-              <Anchor href="#" onClick={this._filterReuse.bind(this, filter)} label={filter}/>
-            </span>
-          );
-        })}
-      </span>
-    );
-  }
-
   renderGroupBy() {
+    const clearGroupBy = () => {
+      let param = this.state.param;
+      param.groupby = '';
+      this.setState({
+        graphData: null,
+        param: param
+      });
+    };
+
     let type = this.props.body.sum ? `SUM ${this.props.body.sum}` : `COUNT *`;
     let menus = this.props.body.fields.map((field, index) => {
       let selected = (field.sqlname == this.state.param.groupby);
@@ -433,7 +400,7 @@ export default class RecordList extends Component {
                 onClick={() => {
                   if (!this.state.locked) {
                     if (selected) {
-                      this._clearGroupBy(field.sqlname);
+                      clearGroupBy(field.sqlname);
                     } else {
                       this._getGroupByData(field.sqlname);
                     }
@@ -447,30 +414,11 @@ export default class RecordList extends Component {
     return menus;
   }
 
-  renderGroupByHeader(sqlname) {
-    if (sqlname) {
-      let groupbys = this.props.body.groupby ? this.props.body.groupby.split('|') : [];
-      let header = groupbys.map((groupby, index) => {
-        return (groupby && <Anchor key={`b_groupby_${index}`} label={this.getGroupbyDisplayLabel(groupby)}
-                        icon={(groupby == sqlname)?<Next />:<EmptyIcon />}
-                        disabled={this.state.locked || groupby == sqlname}
-                        onClick={() => !(this.state.locked || groupby == sqlname) && this._getGroupByData(groupby)} />);
-      });
-      header.unshift(<Header key='b_groupby_header'>Statistics</Header>);
-      if (groupbys.indexOf(sqlname) < 0) {
-        header.push(<Anchor key='b_groupby_last' label={this.getGroupbyDisplayLabel(sqlname)} icon={<Next />} disabled={true} />);
-      }
-
-      return header;
-    }
-  }
-
   renderToolBox() {
     if (!this.state.param.showHeader) {
       return;
     }
     const resultRecords = this.state.filtered ? this.state.filtered : this.state.records;
-    const noLinks = (this.props.body.links && this.props.body.links.length > 0) ? `${this.props.body.links.length} sub link(s)` : 'no sub link';
     const aqlWhere = "press / input AQL where statement";
     const quickSearch = this.state.searchFields ? `press Enter to quick search in ${this.state.searchFields}; ${aqlWhere}` : aqlWhere;
     const placeholder = this.state.param.aqlInput ? "input AQL where statement…" : quickSearch;
@@ -490,19 +438,19 @@ export default class RecordList extends Component {
             {`${this.state.timeQuery}ms`}
           </Box>
         </Box>
-        <Menu icon={<Filter />} dropAlign={{ right: 'right', top: 'top' }} >
+        <Menu icon={<Filter />}>
           {this.renderGroupBy()}
         </Menu>
         <Menu icon={<MenuIcon />} dropAlign={{ right: 'right', top: 'top' }}>
-          <Anchor icon={this.state.param.showMap?<CheckboxSelected />:<Checkbox />} label={`View Map [${noLinks}]`}
-                  onClick={this._toggleShowMap.bind(this)}/>
+          <Anchor icon={<Cluster colorIndex={this.state.param.showTopology?'brand': ''}/>} label='View Topology'
+                  onClick={this._toggleShowTopology.bind(this)}/>
           <Anchor icon={this.state.param.graphType=='legend'?<CheckboxSelected />:<Checkbox />} label="Vertical Graph"
                   onClick={this._toggleGraphType.bind(this)}/>
           <Anchor icon={this.state.param.aqlInput?<CheckboxSelected />:<Checkbox />} label="Input AQL"
                   onClick={this._toggleAQLInput.bind(this)}/>
-          <Anchor icon={this.state.param.allFields?<CheckboxSelected />:<Checkbox />} label="Full columns"
+          {!this.state.param.showTopology && <Anchor icon={this.state.param.allFields?<CheckboxSelected />:<Checkbox />} label="Full columns"
                   onClick={() => (this.props.body.fields.length > this.state.numColumn) && this._toggleAllFields()}
-                  disabled={this.props.body.fields.length <= this.state.numColumn}/>
+                  disabled={this.props.body.fields.length <= this.state.numColumn}/>}
           <Anchor icon={<Download />} label="Download CSV"
                   disabled={this.state.numTotal < 1}
                   onClick={() => (this.state.numTotal > 0) && this._download()}/>
@@ -517,30 +465,113 @@ export default class RecordList extends Component {
   }
 
   renderList() {
-    return (
-      <Table selectable={true} className='autoScroll'
-             onMore={this.state.onMoreLock || this.state.filtered ? null : this._getMoreRecords.bind(this)}>
-        <thead>
-        <tr>
-          {this.renderFieldsHeader()}
-        </tr>
-        </thead>
-        <tbody>
-        {this.renderRecords()}
-        </tbody>
-      </Table>
-    );
+    if (this.state.param.showTopology) {
+      return (
+        <RecordTopology {...this.state}
+          body={this.state.body || this.props.body}
+          getMoreRecords={this._getMoreRecords.bind(this)}
+          updateDetail={(body, record) => {
+            this.setState({
+              body, record
+            });
+          }}>
+          {this.renderGraph()}
+        </RecordTopology>
+      );
+    } else {
+      const renderFieldsHeader = () => {
+        return this.getDisplayFields().map((field, index) => (
+          <th key={index} className={this.state.locked ? 'disabled' : ''}>
+            <Anchor reverse={true} icon={this._showOrderByIcon(field.sqlname)}
+                    label={Format.getDisplayLabel(field)} key={`fieldsheader_${index}`}
+                    onClick={this._orderBy.bind(this, field.sqlname)}/>
+          </th>
+        ));
+      };
+
+      const renderRecords = () => {
+        var records = (this.state.filtered) ? this.state.filtered : this.state.records;
+        return (
+          records.map((record, index) => {
+            return (
+              <TableRow key={index} onClick={this.props.onClick ? this.props.onClick.bind(this, record) : this._viewDetailShow.bind(this, record)}>
+                {
+                  this.getDisplayFields().map((field, tdindex) => (
+                    <td key={tdindex}>
+                      {Format.getFieldStrVal(record, field)}
+                    </td>
+                  ))
+                }</TableRow>
+            );
+          })
+        );
+      };
+
+      return (
+        <Table selectable={true} className='autoScroll'
+               onMore={this.state.onMoreLock || this.state.filtered ? null : this._getMoreRecords.bind(this)}>
+          <thead>
+          <tr>
+            {renderFieldsHeader()}
+          </tr>
+          </thead>
+          <tbody>
+            {renderRecords()}
+          </tbody>
+        </Table>
+      );
+    }
   }
 
-  renderDetail() {
-    return (
-      this.state.record &&
-      <RecordDetail body={this.props.body} record={this.state.record} onClose={this._viewDetailClose.bind(this)}/>
-    );
+  renderDetail(record = this.state.record) {
+    if (!record) {
+      return;
+    }
+
+    if (this.state.param.showTopology) {
+      const body = this.props.body;
+      return (
+        <Box colorIndex='light-2'>
+          <Box align='end' onClick={() => this.setState({record: null})} pad='small'><Close /></Box>
+          <Box justify='center' pad={{horizontal: 'small'}} flex={true}>
+            <List>
+              <ListItem><Header>{body.label}</Header></ListItem>
+              {
+                body.fields.map((field, index) => {
+                  let value = record[field.sqlname];
+                  if (value && typeof value == 'object') {
+                    value = value[0];
+                  }
+                  return (
+                    <ListItem key={index} justify="between">
+                      <span>
+                        {field.label}
+                      </span>
+                          <Box pad={{horizontal: 'medium'}}/>
+                      <span className="secondary">
+                        {value}
+                      </span>
+                    </ListItem>
+                  );
+                })
+              }
+            </List>
+          </Box>
+        </Box>
+      );
+    } else {
+      return <RecordDetail body={this.props.body} record={record} onClose={this._viewDetailClose.bind(this)}/>;
+    }
   }
 
-  renderGraph() {
-    var config = {
+  renderGraph(graphData = this.state.graphData) {
+    if (!graphData || !this.state.showGraph) {
+      return;
+    }
+
+    const {locked, record, param: {showTopology, graphType: type, groupby: sqlname} }= this.state;
+
+    const config = {
       series_col: "1",
       label: "0",
       size: "small",
@@ -549,42 +580,94 @@ export default class RecordList extends Component {
       units: "",
       total: true
     };
+
+    const getGroupbyDisplayLabel = (sqlname) => {
+      if (sqlname) {
+        let groupby = this.props.body.fields.filter((field) => {
+          return field.sqlname == sqlname;
+        })[0];
+
+        return Format.getDisplayLabel(groupby);
+      }
+    };
+
+    const renderGroupByHeader = () => {
+      if (sqlname) {
+        let groupbys = this.props.body.groupby ? this.props.body.groupby.split('|') : [];
+        const header = [(
+          <Header key='b_groupby_header'>Statistics</Header>
+        )];
+
+        groupbys.map((groupby, index) => {
+          header.push((groupby && <Anchor key={`b_groupby_${index}`} label={getGroupbyDisplayLabel(groupby)}
+                                     icon={(groupby == sqlname)?<Next />:<EmptyIcon />}
+                                     disabled={this.state.locked || groupby == sqlname}
+                                     onClick={() => !(this.state.locked || groupby == sqlname) && this._getGroupByData(groupby)} />
+          ));
+        });
+
+        if (groupbys.indexOf(sqlname) < 0) {
+          header.push(<Anchor key='b_groupby_last' label={getGroupbyDisplayLabel(sqlname)} icon={<Next />} disabled={true} />);
+        }
+
+        return header;
+      }
+    };
+
+    let className = [];
+    if (showTopology && record) {
+      className.push('group-by');
+    }
+
+    if (type == 'legend') {
+      className.push('legend');
+      className.push('autoScroll');
+    }
+
     return (
-      <Graph type={this.state.param.graphType} data={this.state.graphData} config={config}
-             className={this.state.locked ? 'disabled' : ''}
+      <Box className={className.join(' ')} pad={type == 'legend' ? {horizontal: 'small'} : 'none'} flex={false}>
+        {type == 'legend' && renderGroupByHeader()}
+        <Graph type={type} data={graphData} config={config} className={locked ? 'disabled' : ''}
              onClick={(filter) => {
-               if (!this.state.locked) {
+               if (!locked) {
                  this._aqlFilterAdd(Format.getFilterFromField(this.props.body.fields, filter));
                }
              }}/>
+      </Box>
     );
   }
+
   render() {
     const fixIEScrollBar = this.props.root ? 'fixIEScrollBar' : '';
+    const {param: {graphType, showTopology, filters}, record} = this.state;
+    let direction = 'column', pad = {vertical: 'small'};
+    if (graphType=='legend') {
+      direction = 'row';
+      //pad = {horizontal: 'small'};
+      pad = 'none';
+    }
+
     return (
       <Box pad={{horizontal: 'medium'}} flex={true} className={fixIEScrollBar}>
         {this.renderToolBox()}
-        {this.renderAQLFilter()}
-        {
-          this.state.param.showMap &&
-          <Map vertical={true} data={bodyToMapData(this.props.body)} />
-        }
-        {
-          this.state.param.graphType=='legend' && this.state.graphData ?
-            <Box flex={true} direction="row" className={`fixMinSizing ${fixIEScrollBar}`}>
-              <Box pad={{horizontal: 'small'}}>
-                {this.renderGroupByHeader(this.state.param.groupby)}
-                {this.renderGraph()}
+        <Box direction='row'>
+          {filters.map((filter, index) => (
+              <Box direction='row' key={index} separator='all'>
+                <Box onClick={this._filterClear.bind(this, index)}><Close /></Box>
+                <Box onClick={this._filterReuse.bind(this, filter)} pad={{horizontal: 'small'}}>{filter}</Box>
               </Box>
-              <Box flex={true}>{this.renderList()}</Box>
-            </Box>
-          :
-            <Box className={`fixMinSizing ${fixIEScrollBar}`}>
-              {this.renderGraph()}
+            )
+          )}
+        </Box>
+        <Box flex={true} direction={direction} className={`fixMinSizing ${fixIEScrollBar}`} pad={filters.length > 0 ? {vertical: 'small'} : 'none'}>
+          {!(showTopology && record) && this.renderGraph()}
+          <Box flex={true} pad={(!showTopology || !record) ? pad : 'none'} direction='row'>
+            <Box flex={true} separator='all'>
               {this.renderList()}
             </Box>
-        }
-        {this.renderDetail()}
+            {this.renderDetail()}
+          </Box>
+        </Box>
       </Box>
     );
   }

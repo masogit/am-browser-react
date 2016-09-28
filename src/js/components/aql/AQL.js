@@ -487,7 +487,7 @@ export default class AQL extends ComponentBase {
               }
               <Box pad={{vertical: 'small'}}>
                 {validData && this.state.aql.form && !_.isEmpty(this.state.aql.form) && this.state.aql.type &&
-                <Box flex={false}>
+                <Box flex={false} className='grid'>
                   <Graph type={this.state.aql.type} data={this.state.data} config={this.state.aql.form}
                          onClick={(filter) => this._showViewRecords(filter, this.state.aql.view)}/>
                 </Box>}

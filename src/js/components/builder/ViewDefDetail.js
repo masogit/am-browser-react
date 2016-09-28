@@ -423,7 +423,7 @@ export default class ViewDefDetail extends ComponentBase {
             <Split flex="left" fixed={false} className='fixMinSizing'>
               <Box flex={true}>
                 {
-                  selectedView.body.sqlname && <Map vertical={true} data={bodyToMapData(selectedView.body)} />
+                  selectedView.body.sqlname && <Map vertical={true} className='grid' data={bodyToMapData(selectedView.body)} />
                 }
                 {table}
               </Box>

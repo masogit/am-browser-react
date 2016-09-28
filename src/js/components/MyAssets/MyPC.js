@@ -253,7 +253,7 @@ export default class MyPC extends Component {
           <Box flex={false} pad={{horizontal: 'medium'}}>
             {this.renderGraph()}
           </Box>
-          <Box flex={true} pad={{horizontal: 'medium'}}  align='center' justify='center' separator='all' className='grid autoScroll' style={{width: '1000px', height: '1000px'}}>
+          <Box flex={true} pad={{horizontal: 'medium'}}  align='center' justify='center' separator='all' className='grid autoScroll' style={{width: '1000px'}}>
             <PCDetail record={record} body={body} onClick={this.updateDetail.bind(this)}/>
           </Box>
           <Box flex={false}  align='center' justify='center' pad={{horizontal: 'small'}} colorIndex='light-2'>

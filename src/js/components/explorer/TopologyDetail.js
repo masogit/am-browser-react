@@ -126,11 +126,6 @@ export default class PCDetail extends Component {
           if (records.count > 0) {
             const body = getLinkBody(link, record);
             onClick = () => {
-              //const item = data.categories[childLayer].items[index];
-              //body.param = item.param = {
-              //  offset: item.param ? item.param.offset + item.param.limit : 0,
-              //  limit: 5
-              //};
               body.param = data.categories[childLayer].items[index].param;
               this.getChildLink(childLayer + 1, index, body, link);
             };
@@ -145,7 +140,6 @@ export default class PCDetail extends Component {
             limit: 5,
             offset: 0
           },
-          //iconB: 'dot',
           onClick: onClick
         });
         this.setState({data});

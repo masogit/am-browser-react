@@ -42,16 +42,20 @@ class AMSideBar extends Component {
   render() {
     const {toolbar, contents, focus, footer, loading, separator, colorIndex, showSidebar, toggle} = this.props;
     if (!showSidebar) {
-      return (
-        <Sidebar fixed={true} separator={separator || 'right'} full={false} style={{minHeight: '100%', width: '50px'}}
-                 colorIndex={colorIndex || 'light-2'}>
-          <Box style={{overflow: 'visible'}} className='fixMinSizing'>
-            <Header justify="between" pad='small' onClick={toggleSidebar}>
-              <ChapterNext />
-            </Header>
-          </Box>
-        </Sidebar>
-      );
+      if (toggle == false) {
+        return null;
+      } else {
+        return (
+          <Sidebar fixed={true} separator={separator || 'right'} full={false} style={{minHeight: '100%', width: '50px'}}
+                   colorIndex={colorIndex || 'light-2'}>
+            <Box style={{overflow: 'visible'}} className='fixMinSizing'>
+              <Header justify="between" pad='small' onClick={toggleSidebar}>
+                <ChapterNext />
+              </Header>
+            </Box>
+          </Sidebar>
+        );
+      }
     }
     // 1) Show group list
     // 2) Show table schema
@@ -108,7 +112,6 @@ class AMSideBar extends Component {
     );
   }
 }
-
 
 let select = (state) => {
   return {

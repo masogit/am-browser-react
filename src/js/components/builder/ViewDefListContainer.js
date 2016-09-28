@@ -26,6 +26,7 @@ class ViewDefListContainer extends Component {
   }
 
   componentWillMount() {
+    SystemActions.toggleSidebar(true);
   }
 
   componentDidMount() {

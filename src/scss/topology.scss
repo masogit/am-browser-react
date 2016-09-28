@@ -20,4 +20,29 @@
   -webkit-linear-gradient(top, transparent 19px, #efefef 20px),
   -webkit-linear-gradient(left, transparent 19px, #efefef 20px);
   background-size: 20px 20px;
+  position: relative;
+
+  .group-by {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(238, 238, 238, 0.3);
+    padding: 10px 25px;
+    overflow: auto;
+  }
+}
+
+.grommetux-topology td {
+  padding: 0;
+}
+
+.legend {
+  background: rgba(238, 238, 238, 0.3);
+  width: 300px;
+  .grommetux-menu {
+    .grommetux-button__icon {
+      padding: 0;
+    }
+  }
+
 }

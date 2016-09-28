@@ -3,6 +3,10 @@ import * as ExplorerActions from '../../actions/explorer';
 import RecordList from './RecordList';
 import Box from 'grommet/components/Box';
 import SideBar from '../commons/AMSideBar';
+import AMSideToolBar from '../commons/AMSideToolBar';
+import ChapterNext from 'grommet/components/icons/base/ChapterNext';
+import {toggleSidebar, addTool} from '../../actions/system';
+import store from '../../store';
 
 export default class Explorer extends Component {
 
@@ -10,11 +14,15 @@ export default class Explorer extends Component {
     super();
     this.state = {
       view: null,
-      navigation: null
+      navigation: null,
+      showSidebar: true
     };
   }
 
   componentWillMount() {
+    addTool({id: 'sidebar', icon: <ChapterNext />, onClick: toggleSidebar, disable: false, isActive: () => store.getState().session.showSidebar});
+    toggleSidebar(true);
+
     const id = this.props.params.id;
     if (id) {
       ExplorerActions.loadView(id).then((view) => {
@@ -47,13 +55,14 @@ export default class Explorer extends Component {
   }
 
   render() {
+    const {navigation, view} = this.state;
+
     return (
       <Box direction="row" flex={true}>
-        {this.state.navigation &&
-          <SideBar title='Views Navigation'
-                   contents={this.state.navigation}
-                   focus ={{expand: this.state.view ? this.state.view.category : false, selected: this.state.view ? this.state.view._id: ""}}/>}
-        {this.state.view ? <RecordList body={this.state.view.body} title={this.state.view.name} root={true}/> :
+        <AMSideToolBar />
+        <SideBar title='Views Navigation' contents={navigation} toggle={false}
+                 focus ={{expand: view ? view.category : false, selected: view ? view._id: ""}}/>
+        {view ? <RecordList body={view.body} title={view.name} root={true}/> :
           <Box pad={{horizontal: 'medium'}} flex={true} justify='center' align="center">
             <Box size="medium" colorIndex="light-2" pad={{horizontal: 'large', vertical: 'medium'}} align='center'>
               Select an item to query.
