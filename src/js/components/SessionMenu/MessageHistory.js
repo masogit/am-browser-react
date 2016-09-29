@@ -3,7 +3,6 @@ import {connect} from 'react-redux';
 import {
   Box,
   Header,
-  Title,
   Table,
   TableRow
 } from 'grommet';
@@ -14,7 +13,7 @@ class MessageHistory extends Component {
   render() {
     return (
       <Box pad="medium" size='large'>
-        <Header><Title>Message history</Title></Header>
+        <Header>Message history</Header>
         <Table>
           <thead>
           <tr>

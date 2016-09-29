@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import RecordDetail from './RecordDetail';
 import RecordTopology from './RecordTopology';
-import {Title, Table, TableRow, Box, Anchor, Header, Menu, List, ListItem}from 'grommet';
+import {Table, TableRow, Box, Anchor, Header, Menu, List, ListItem}from 'grommet';
 import Close from 'grommet/components/icons/base/Close';
 import Ascend from 'grommet/components/icons/base/Ascend';
 import Descend from 'grommet/components/icons/base/Descend';
@@ -424,11 +424,12 @@ export default class RecordList extends Component {
     const placeholder = this.state.param.aqlInput ? "input AQL where statement…" : quickSearch;
 
     return (
-      <Header justify="between">
-        <Title>{this.props.title}</Title>
-        <input type="text" className={this.state.param.aqlInput ? 'aql flex' : 'flex'} ref="search"
+      <Header justify="between" pad='none'>
+        <Box margin={{right: 'small'}}>{this.props.title}</Box>
+          <input type="text" className={this.state.param.aqlInput ? 'aql flex' : 'flex'} ref="search"
                placeholder={placeholder} disabled={this.state.locked} onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
-        <Box direction="column">
+
+        <Box direction="column" margin={{left: 'small'}}>
           <Anchor onClick={this._getMoreRecords.bind(this)} disabled={this.state.loading}>
             <Box style={{fontSize: '70%', fontWeight: 'bold'}}>
               {(this.state.loading?'...':resultRecords.length) + '/' + this.state.numTotal}
@@ -438,7 +439,7 @@ export default class RecordList extends Component {
             {`${this.state.timeQuery}ms`}
           </Box>
         </Box>
-        <Menu icon={<Filter />}>
+        <Menu icon={<Filter />} flex={false}>
           {this.renderGroupBy()}
         </Menu>
         <Menu icon={<MenuIcon />} dropAlign={{ right: 'right', top: 'top' }}>

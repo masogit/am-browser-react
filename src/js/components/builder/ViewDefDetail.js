@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import ComponentBase from '../commons/ComponentBase';
-import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Title, Split, Map} from 'grommet';
+import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Split, Map} from 'grommet';
 import Close from 'grommet/components/icons/base/Close';
 import Up from 'grommet/components/icons/base/LinkUp';
 import Down from 'grommet/components/icons/base/LinkDown';
@@ -299,7 +299,7 @@ export default class ViewDefDetail extends ComponentBase {
     //TODO: fix the onClick issue, so we can use an icon to toggle the textarea
     filter.show = true;
 
-    //const filter = <Anchor icon={<Filter />} className='fontNormal' reverse={true} label={title.label} onClick={title.onClick}/>;
+    //const filter = <Anchor icon={<Filter />} reverse={true} label={title.label} onClick={title.onClick}/>;
 
     const currentPath = root ? "" : path + ".";
     const tableLayer = currentPath.length / 10;
@@ -309,7 +309,7 @@ export default class ViewDefDetail extends ComponentBase {
 
     return (
       <Box className='table' key={key} style={style} flex={false}>
-        <Anchor icon={<CaretPrevious />} className='fontNormal' onClick={this._onClickTableTitle.bind(this, key)} label={title.label}/>
+        <Anchor icon={<CaretPrevious />} onClick={this._onClickTableTitle.bind(this, key)} label={title.label}/>
         <Table>
           {header}
           <tbody>
@@ -403,7 +403,7 @@ export default class ViewDefDetail extends ComponentBase {
         <Box flex={true}>
           {this.getLayer(this.state.layer)}
           <Header justify="between" pad={{horizontal: 'medium'}}>
-            <Title>View Builder</Title>
+            <Box>View Builder</Box>
             <Menu direction="row" align="center" responsive={true}>
               <Anchor icon={<Play />} onClick={() => table && this.props.openPreview()} label="Query" disabled={!table}/>
               <Anchor icon={<Checkmark />}

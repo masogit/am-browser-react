@@ -3,7 +3,7 @@ import history from '../../RouteHistory';
 import * as ExplorerActions from '../../actions/explorer';
 import * as AQLActions from '../../actions/aql';
 import {getJobList} from '../../actions/ucmdbAdapter';
-import {Title, Box, Tiles, Headline, Meter, Tile} from 'grommet';
+import {Header, Box, Tiles, Headline, Meter, Tile} from 'grommet';
 import Graph from '../commons/Graph';
 import UCMDBAdapterContainer from '../ucmdbAdapter/UCMDBAdapterPoint';
 import AQL from '../aql/AQL';
@@ -231,7 +231,7 @@ export default class Search extends Component {
 
     return (
       <Box align="center" justify="center" style={{flexShrink: 0, flexGrow: 1}}>
-        <Headline size="large">
+        <Headline size="medium">
           Asset Manager Browser
         </Headline>
         <Box direction="row" pad={{vertical: 'medium'}} flex={false}>
@@ -239,11 +239,11 @@ export default class Search extends Component {
                  onKeyDown={this._onEnter.bind(this)} onChange={this._onSearch.bind(this)} size="120"
                  maxLength={50}/>
         </Box>
-        <Tiles flush={false} justify="center" size="large" flex={false}>
+        <Tiles flush={false} justify="center" size="large" flex={false} colorIndex='light-2'>
           {
             tiles.map(tile => (
-              <Tile key={tile.title} className='box-shadow' onClick={tile.onClick}>
-                <Box pad={{vertical: 'small'}}><Title>{tile.title}</Title></Box>
+              <Tile key={tile.title} onClick={tile.onClick} colorIndex="light-1">
+                <Header size='small' justify='center'>{tile.title}</Header>
                 {tile.graph}
               </Tile>
             ))

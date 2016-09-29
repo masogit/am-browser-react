@@ -20,7 +20,7 @@ import {monitorEdit, stopMonitorEdit, dropCurrentPop, showInfo} from '../../acti
 import SearchInput from '../commons/SearchInput';
 import ComponentBase from '../commons/ComponentBase';
 import {
-  Anchor, Box, Form, FormField, Layer, Tabs, Table, TableRow, Title, Header, Menu
+  Anchor, Box, Form, FormField, Layer, Tabs, Table, TableRow, Header, Menu
 } from 'grommet';
 import Play from 'grommet/components/icons/base/Play';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
@@ -410,7 +410,7 @@ export default class AQL extends ComponentBase {
       return 0;
     };
 
-    const toolbar = <Anchor icon={<Add />} onClick={this._onNew.bind(this)} label="New" className='fontNormal'/>;
+    const toolbar = <Anchor icon={<Add />} onClick={this._onNew.bind(this)} label="New"/>;
     const contents = this.state.aqls.map((aql) => ({
       key: aql._id,
       groupby: aql.category,
@@ -432,7 +432,7 @@ export default class AQL extends ComponentBase {
         {!_.isEmpty(this.state.aql) ? <Box flex={true}>
           {this.getAlertLayer(this.state.alertLayer)}
           <Header justify="between" pad={{'horizontal': 'medium'}}>
-            <Title>AQL and Graph</Title>
+            <Box>AQL and Graph</Box>
             <Menu direction="row" align="center" responsive={true}>
               <Anchor link="#" icon={<Play />} onClick={() => this.state.aql.str && this._onQuery()} label="Query"
                       disabled={!this.state.aql.str}/>
@@ -487,7 +487,7 @@ export default class AQL extends ComponentBase {
               }
               <Box pad={{vertical: 'small'}}>
                 {validData && this.state.aql.form && !_.isEmpty(this.state.aql.form) && this.state.aql.type &&
-                <Box flex={false} className='grid'>
+                <Box flex={false} className='grid' margin={{vertical: 'small'}}>
                   <Graph type={this.state.aql.type} data={this.state.data} config={this.state.aql.form}
                          onClick={(filter) => this._showViewRecords(filter, this.state.aql.view)}/>
                 </Box>}

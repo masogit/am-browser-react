@@ -310,7 +310,7 @@ class MetaData extends ComponentBase {
       let row = entities[index];
       return (
         <ListItem separator="none" key={key} pad="none" flex={false}>
-          <Anchor className='fontNormal' icon={<LinkNext/>} label={row.sqlname}
+          <Anchor icon={<LinkNext/>} label={row.sqlname}
                   onClick={this._onClick.bind(this, {label: row.label, sqlname: row.sqlname, url: row["ref-link"]})}/>
         </ListItem>
       );
@@ -332,7 +332,7 @@ class MetaData extends ComponentBase {
       };
       return (
         <ListItem separator="none" key={key} pad="none">
-          <Anchor className='fontNormal' icon={<LinkNext/>} onClick={this._onClick.bind(this, newRow)} label={row.sqlname}/>
+          <Anchor icon={<LinkNext/>} onClick={this._onClick.bind(this, newRow)} label={row.sqlname}/>
         </ListItem>
       );
     };
@@ -344,7 +344,7 @@ class MetaData extends ComponentBase {
       let row = fields[index];
       return (
         <ListItem separator="none" key={key} pad="none">
-          <Anchor className='fontNormal' icon={<Notes />} onClick={this._onChange.bind(this, row)} label={row.sqlname}/>
+          <Anchor icon={<Notes />} onClick={this._onChange.bind(this, row)} label={row.sqlname}/>
         </ListItem>
       );
     };

@@ -72,13 +72,12 @@ class SessionMenu extends Component {
            <Anchor href="#" className="active">Settings</Anchor>
            <Anchor href="#">Help</Anchor>
            */}
-          <Anchor icon={<Help />} href="http://ambrowser.readthedocs.io" target="about:blank" label="Help" className="fontNormal"/>
-          <Anchor icon={<About />} onClick={() => this.showDialog("about")} label="About" className="fontNormal"/>
-          <Anchor icon={<History />} onClick={() => this.showDialog("history")} label="Message History"
-                  className="fontNormal"/>
-          <Anchor icon={<Slack />} onClick={() => this.showDialog("slack")} label="Slack" className="fontNormal"/>
-          <Anchor icon={<Archive />} onClick={() =>  history.push('/my')} label="My Assets" className="fontNormal"/>
-          <Anchor icon={<Logout />} onClick={this._onLogout.bind(this)} label="Logout" className="fontNormal"/>
+          <Anchor icon={<Help />} href="http://ambrowser.readthedocs.io" target="about:blank" label="Help"/>
+          <Anchor icon={<About />} onClick={() => this.showDialog("about")} label="About"/>
+          <Anchor icon={<History />} onClick={() => this.showDialog("history")} label="Message History"/>
+          <Anchor icon={<Slack />} onClick={() => this.showDialog("slack")} label="Slack"/>
+          <Anchor icon={<Archive />} onClick={() =>  history.push('/my')} label="My Assets"/>
+          <Anchor icon={<Logout />} onClick={this._onLogout.bind(this)} label="Logout"/>
         </Menu>
         {dialog &&
           <Layer align="center" closer={<Anchor className='grommetux-layer__closer' icon={<Close/>} onClick={this.closeDialog}/>}>

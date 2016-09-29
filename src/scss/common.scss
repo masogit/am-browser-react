@@ -7,10 +7,6 @@
   visibility: hidden;
 }
 
-.fontNormal {
-  font-weight: 400;
-}
-
 .autoScroll {
   overflow: auto;
 }
@@ -120,8 +116,10 @@ th {
   }
 }
 
-.grommetux-anchor {
+.grommetux-anchor--icon-label {
   display: flex;
+  font-weight: normal;
+  align-items: flex-end;
 }
 
 .anchor.small .grommetux-anchor__icon {

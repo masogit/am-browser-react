@@ -3,6 +3,7 @@ import * as ExplorerAction from '../../actions/explorer';
 import RecordDetail from './RecordDetail';
 import RecordListLayer from './RecordListLayer';
 import ComponentBase from '../commons/ComponentBase';
+import ContentPlaceHolder from '../commons/ContentPlaceHolder';
 import history from '../../RouteHistory';
 import Spinning from 'grommet/components/icons/Spinning';
 import {
@@ -204,15 +205,16 @@ export default class RecordSearch extends ComponentBase {
     });
 
     return (
-      <Box flex={true}>
-        <Header justify="between" pad={{'horizontal': 'medium'}}>
-          <Title>Global Search</Title>
-          <input type="search" className="flex" placeholder="Global Record search..." ref="search" style={{marginLeft: '20px', marginRight: '20px'}}
-            value={this.state.searchText} onChange={this._onEnter.bind(this)} onKeyDown={this._onEnter.bind(this)} maxLength={50}/>
-          <Button label="Search" onClick={()=>this._onSearch()} className={this.state.buttonDisabled ? 'grommetux-button--disabled' : ''}/>
+      <Box flex={true} pad="medium">
+        <Header justify="between">
+          <Box >Global Search</Box>
+          <Box flex={true} margin={{horizontal: 'small'}}>
+            <input type="search" className="flex" placeholder="Global Record search..." ref="search"
+              value={this.state.searchText} onChange={this._onEnter.bind(this)} onKeyDown={this._onEnter.bind(this)} maxLength={50}/>
+          </Box>
+          <Button label="Search" onClick={this.state.buttonDisabled ? null : ()=>this._onSearch()}/>
         </Header>
-        <Split flex="right" fixed={false} className={this.state.warning?'flex':''}>
-          <Box pad="medium" flex={true}>
+        <Split flex="right" fixed={false} className='flex'>
             <Table>
               <thead>
                 <tr>
@@ -243,37 +245,27 @@ export default class RecordSearch extends ComponentBase {
                 }
               </tbody>
             </Table>
-          </Box>
           {
-            this.state.warning ?
-              <Box pad='small' flex={true} justify='center' align="center">
-                <Box colorIndex="light-2" pad={{horizontal: 'large', vertical: 'medium'}}>
-                  {this.state.warning}
-                </Box>
-              </Box>
+            this.state.warning ? <ContentPlaceHolder content={this.state.warning} />
               :
-              <Tiles flush={false} size="large" className='autoScroll justify-around'>
+              <Tiles flush={false} fill={true} className='autoScroll fixIEScrollBar' pad='none'>
                 {
                   this.locked ? <Spinning /> : this.state.results.map((result, i) => {
                     return result.records.map((record, j) => {
-                      // var id = record['ref-link'].split('/')[2];
                       return (
-                        <Tile key={`${i}.${j}`} align="start" className='box-shadow'>
-                          <Header tag="h4" size="small" pad={{ horizontal: 'small' }}>
-                            {result.view.name}
-                          </Header>
-                          <Form>
-                            <Box pad="small">
-                              <Anchor onClick={this._onClick.bind(this, result.view, record)}
-                                      className='grommetux-text-ellipsis'>
-                                <span title={record.self}><b>{record.self}</b></span>
-                              </Anchor>
-                              {this._getContent(result.view, record)}
-                            </Box>
-                            <Footer pad={{ horizontal: 'small' }}>
-                              {'Table: ' + result.view.body.sqlname}
-                            </Footer>
-                          </Form>
+                        <Tile key={`${i}.${j}`} align="start" colorIndex='light-2' pad={{ horizontal: 'small' }}>
+                          <Header size="small">{result.view.name}</Header>
+
+                          <Box flex={true}>
+                            <Anchor onClick={this._onClick.bind(this, result.view, record)}
+                                    className='grommetux-text-ellipsis'>
+                              <span title={record.self}><b>{record.self}</b></span>
+                            </Anchor>
+                            {this._getContent(result.view, record)}
+                          </Box>
+                          <Footer>
+                            {'Table: ' + result.view.body.sqlname}
+                          </Footer>
                         </Tile>);
                     });
                   })

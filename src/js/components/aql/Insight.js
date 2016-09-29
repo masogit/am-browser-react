@@ -16,7 +16,7 @@ import More from 'grommet/components/icons/base/More';
 import Graph from '../commons/Graph';
 import ComponentBase  from '../commons/ComponentBase';
 import ActionTab from '../commons/ActionTab';
-import {Anchor, Box, Button, CheckBox, Header, Menu, Title, Table, TableRow, Layer, Carousel, RadioButton, Tabs} from 'grommet';
+import {Anchor, Box, Button, CheckBox, Header, Menu, Table, TableRow, Layer, Carousel, RadioButton, Tabs} from 'grommet';
 import SideBar from '../commons/AMSideBar';
 import _ from 'lodash';
 
@@ -542,7 +542,7 @@ export default class Insight extends ComponentBase {
     return (
       <Box full="horizontal">
         <Header justify="between" pad={{'horizontal': 'medium'}}>
-          <Title>Insight</Title>
+          <Box>Insight</Box>
           {
             !id &&
             <Menu direction="row" align="center" responsive={true}>

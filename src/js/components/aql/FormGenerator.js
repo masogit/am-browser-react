@@ -186,7 +186,7 @@ export default class GraphForm extends Component {
     const basic = genOptions(basicOptions, this, this.state.type, selections);
 
     return (
-      <Box>
+      <Box separator='bottom'>
         {showBasic && basic[0]}
         <Form className='vertical-form'>
           {showBasic && basic.slice(1)}
