@@ -432,6 +432,8 @@ export default class RecordList extends Component {
         <Anchor icon={<Cluster colorIndex={this.state.param.showTopology?'brand': ''}/>}
                 onClick={this._toggleShowTopology.bind(this)}/>
         <Menu icon={<MenuIcon />} dropAlign={{ right: 'right', top: 'top' }}>
+          <Anchor icon={this.state.param.graphType=='legend'?<CheckboxSelected />:<Checkbox />} label="Vertical Graph"
+                  onClick={this._toggleGraphType.bind(this)}/>
           <Anchor icon={this.state.param.aqlInput?<CheckboxSelected />:<Checkbox />} label="Input AQL"
                   onClick={this._toggleAQLInput.bind(this)}/>
           {!this.state.param.showTopology && <Anchor icon={this.state.param.allFields?<CheckboxSelected />:<Checkbox />} label="Full columns"
@@ -638,7 +640,7 @@ export default class RecordList extends Component {
       <Box flex={true} className={fixIEScrollBar}>
         {this.renderToolBox()}
         {filters.length > 0 &&
-          <Box direction='row' className='topology-background-color' pad='small' flex={false}>
+          <Box direction='row' className='topology-background-color' pad='small' flex={false} margin={{bottom: 'small'}}>
             {filters.map((filter, index) => (
                 <Box direction='row' key={index}>
                   <Box onClick={this._filterClear.bind(this, index)}><Close /></Box>
@@ -648,7 +650,7 @@ export default class RecordList extends Component {
             )}
         </Box>
         }
-        <Box flex={true} direction={direction} className={`fixMinSizing ${fixIEScrollBar}`} pad={filters.length > 0 ? {vertical: 'small'} : 'none'}>
+        <Box flex={true} direction={direction} className={`fixMinSizing ${fixIEScrollBar}`}>
           {this.renderGraph()}
           <Box flex={true} pad={(!showTopology || !record) ? pad : 'none'} direction='row'>
             <Box className='topology-background-color' flex={true} pad='small'>

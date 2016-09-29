@@ -53,7 +53,7 @@ export default class Explorer extends Component {
         <AMSideBar title='Views Navigation'
                  contents={this.state.navigation}
                  focus ={{expand: this.state.view ? this.state.view.category : false, selected: this.state.view ? this.state.view._id: ""}}/>}
-        {this.state.view ? <Box pad='small' flex={true}><RecordList body={this.state.view.body} title={this.state.view.name} root={true}/></Box> :
+        {this.state.view ? <Box margin={{horizontal: 'small'}} flex={true}><RecordList body={this.state.view.body} title={this.state.view.name} root={true}/></Box> :
           <Box pad={{horizontal: 'medium'}} flex={true} justify='center' align="center">
             <Box size="medium" colorIndex="light-2" pad={{horizontal: 'large', vertical: 'medium'}} align='center'>
               Select an item to query.
