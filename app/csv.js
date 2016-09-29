@@ -46,6 +46,104 @@ module.exports = function (am) {
       list(req, res);
   };
 
+  function getRESTData(args, label, fields) {
+    let url = "http://${server}${context}${ref-link}";
+    return new Promise((resolve, reject) => {
+      request = client.get(url, args, (data, response) => {
+        resolve({label, records: data.entities, fields});
+        // let offset = args.parameters.offset;
+        // if (data && data.count && data.entities && data.count > data.entities.length + offset) {
+          // args.parameters.offset += data.entities.length;
+          // getRESTData(args, promises, label);
+        // }
+      }).on('error', function (err) {
+        reject(err);
+        logger.error('Query REST data: ' + err.toString());
+        res.status(500).send(err.toString());
+      });
+      request.on('error', function (err) {
+        reject(err);
+        logger.error('Query REST data: ' + err);
+        res.status(500).send(err.toString());
+      });
+    });
+  };
+
+  function getArgs(jwt, tableName, param) {
+    var auth = jwt ? jwt.secret : undefined;
+    param.limit = 100;
+    var args = {
+      path: {
+        server: am.server,
+        context: am.context,
+        "ref-link": '/db/' + tableName
+      },
+      parameters: param,
+      headers: (auth) ? {
+        "Content-Type": "application/json",
+        "X-Authorization": auth
+      } : undefined
+    };
+
+    return args;
+  }
+
+  function getQueryByBody(body) {
+
+    var fields = [];
+    body.fields.forEach(function (field) {
+      fields.push(field.sqlname);
+    });
+
+    // add src_fields before query
+    if (body.links && body.links.length > 0) {
+      var src_fields = body.links.map((link) => {
+        if (link.src_field) {
+          var relative_path = link.src_field.relative_path;
+          return relative_path ? relative_path + '.' + link.src_field.sqlname : link.src_field.sqlname;
+        }
+      });
+
+      // remove same fields
+      src_fields.filter((elem, pos, arr) => {
+        return arr.indexOf(elem) == pos;
+      });
+
+      fields = fields.concat(src_fields);
+    }
+
+    var param = {
+      limit: 100,
+      offset: 0,
+      countEnabled: true,
+      fields: fields.join(',')
+    };
+    if (body.orderby) {
+      param.orderby = body.orderby;
+    }
+    if (body.filter) {
+      param.filter = body.filter;
+    }
+
+    var userParam = body.param;
+    if (userParam) {
+      if (userParam.orderby)
+        param.orderby = userParam.orderby;
+      if (userParam.limit)
+        param.limit = userParam.limit;
+      if (userParam.offset)
+        param.offset = userParam.offset;
+      if (userParam.filters && userParam.filters.length > 0) {
+        var userFilters = userParam.filters.map((filter) => {
+          return '(' + filter + ')';
+        }).join(" AND ");
+        param.filter = param.filter ? `(${param.filter}) AND (${userFilters})` : userFilters;
+      }
+    }
+
+    return param;
+  }
+
   function list (req, res) {
     if (!req.body.param || !req.body.fields || !req.body.fields instanceof Array || req.body.fields.length < 1) {
       res.status(400).send('Bad parameters for exporting csv!');
@@ -151,10 +249,45 @@ module.exports = function (am) {
       ],
       styles: pdf_styles
     };
-    var pdfDoc = printer.createPdfKitDocument(pdf_data);
-    pdfDoc.pipe(res);
-    pdfDoc.end();
+
+    // Query links' data
+    let links = JSON.parse(req.body.links);
+    let promises = [];
+    links.forEach((link) => {
+      let args = getArgs(req.session.jwt, link.body.sqlname, getQueryByBody(link.body));
+      promises.push(getRESTData(args, link.label, link.body.fields));
+    });
+    Promise.all(promises).then((values) => {
+      let links = [];
+      let max = 0;
+      values.forEach((value) => {
+        links.push(genTable(value, max));
+      });
+      pdf_data.content.push(links);
+
+      var pdfDoc = printer.createPdfKitDocument(pdf_data);
+      pdfDoc.pipe(res);
+      pdfDoc.end();
+    }, (reason) => {
+      console.log(reason);
+    });
+
   };
+
+  function genTable({label, records, fields}, max) {
+    let table = [
+      {
+        text: `${label} (${records.length})`, style: 'subheader'
+      },
+      {
+        table: {
+          body: genTbody(records, fields, max)
+        }
+      }
+    ];
+
+    return table;
+  }
 
   function genHeader(record, fields) {
     var pdf_header = [{}, {}];
