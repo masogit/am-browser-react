@@ -210,17 +210,6 @@ export function dropCurrentPop_stopMonitor(title, onConfirm) {
   }
 }
 
-export function toggleSidebar(show) {
-  if (show != true || !store.getState().session.showSidebar) {
-    store.dispatch({type: Types.TOGGLE_SIDEBAR});
-  }
+export function toggleSidebar() {
+  store.dispatch({type: Types.TOGGLE_SIDEBAR});
 }
-
-export function addTool(tool) {
-  store.dispatch({type: Types.ADD_TOOL, tool: tool});
-}
-
-export function removeTool(toolId) {
-  store.dispatch({type: Types.REMOVE_TOOL, toolId: toolId});
-}
-

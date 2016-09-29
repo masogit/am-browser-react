@@ -265,9 +265,7 @@ export default class Graph extends Component {
           case 'distribution':
             return <Distribution {...graph} className={classes}/>;
           case 'legend': {
-            return (
-              <Legend {...graph} className={classes}/>
-            );
+            return <Legend {...graph} className={classes}/>;
           }
         }
       } else {

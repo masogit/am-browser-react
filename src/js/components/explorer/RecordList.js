@@ -19,7 +19,6 @@ import EmptyIcon from '../commons/EmptyIcon';
 import * as Format from '../../util/RecordFormat';
 import {hash, loadSetting, saveSetting} from '../../util/util';
 import cookies from 'js-cookie';
-import {addTool, removeTool} from '../../actions/system';
 import Cluster from 'grommet/components/icons/base/Cluster';
 
 const getFirstGroupby = (groupby) => {
@@ -78,21 +77,10 @@ export default class RecordList extends Component {
     this._getRecords(this.state.param);
   }
 
-  componentDidMount() {
-    addTool({
-      icon: <Aggregate />,
-      id: 'groupby',
-      isActive: () => this.state.showGraph,
-      disable: !this.state.param.groupby || !this.state.showGraph,
-      onClick: this.state.param.groupby ? () => this.setState({showGraph: !this.state.showGraph}) : null
-    });
-  }
-
   componentWillUnmount() {
     if (!this.props.noCache) {
       saveSetting(hash(Object.assign({}, this.props.body, {filter: ''})), this.state.param);
     }
-    removeTool('groupby');
   }
 
   _getGroupByData(groupby) {

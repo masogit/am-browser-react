@@ -38,8 +38,6 @@ export const ROUTE_CHANGED = 'ROUTE_CHANGED';
 // nav
 export const NAV_RESPONSIVE = 'NAV_RESPONSIVE';
 export const TOGGLE_SIDEBAR = 'TOGGLE_SIDEBAR';
-export const ADD_TOOL = 'ADD_TOOL';
-export const REMOVE_TOOL = 'REMOVE_TOOL';
 
 // ucmdb Adapter
 export const ADAPTER_DATA_SUCCESS = 'ADAPTER_DATA_SUCCESS';
