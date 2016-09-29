@@ -7,7 +7,7 @@ import ContentPlaceHolder from '../commons/ContentPlaceHolder';
 import history from '../../RouteHistory';
 import Spinning from 'grommet/components/icons/Spinning';
 import {
-  Anchor, Box, Button, Header, Footer, Split, Table, TableRow, Tiles, Title, Tile, Form
+  Anchor, Box, Button, Header, Footer, Split, Table, TableRow, Tiles, Tile
 } from 'grommet';
 
 export default class RecordSearch extends ComponentBase {
@@ -192,7 +192,7 @@ export default class RecordSearch extends ComponentBase {
   }
 
   render() {
-    var messages = Object.keys(this.state.messages).map((key) => {
+    const messages = Object.keys(this.state.messages).map((key) => {
       return {
         _id: key,
         view: this.state.messages[key].view,
@@ -200,15 +200,21 @@ export default class RecordSearch extends ComponentBase {
         timeStart: this.state.messages[key].timeStart,
         num: this.state.messages[key].num
       };
-    }).sort((a, b) => {
-      return b.num - a.num;
-    });
+    }).sort((a, b) => b.num - a.num);
+
+    const cards = [];
+    if (!this.locked) {
+      this.state.results.map((result) => (result.records.map(record => {
+        record.view = result.view;
+        cards.push(record);
+      })));
+    }
 
     return (
-      <Box flex={true} pad="medium">
+      <Box flex={true} pad={{horizontal: "medium", vertical: 'small'}}>
         <Header justify="between">
           <Box >Global Search</Box>
-          <Box flex={true} margin={{horizontal: 'small'}}>
+          <Box flex={true}>
             <input type="search" className="flex" placeholder="Global Record search..." ref="search"
               value={this.state.searchText} onChange={this._onEnter.bind(this)} onKeyDown={this._onEnter.bind(this)} maxLength={50}/>
           </Box>
@@ -248,27 +254,23 @@ export default class RecordSearch extends ComponentBase {
           {
             this.state.warning ? <ContentPlaceHolder content={this.state.warning} />
               :
-              <Tiles flush={false} fill={true} className='autoScroll fixIEScrollBar' pad='none'>
+              <Tiles flush={false} fill={true} className={`autoScroll ${cards.length > 10 ? 'fixIEScrollBar' : ''}`}>
                 {
-                  this.locked ? <Spinning /> : this.state.results.map((result, i) => {
-                    return result.records.map((record, j) => {
-                      return (
-                        <Tile key={`${i}.${j}`} align="start" colorIndex='light-2' pad={{ horizontal: 'small' }}>
-                          <Header size="small">{result.view.name}</Header>
-
-                          <Box flex={true}>
-                            <Anchor onClick={this._onClick.bind(this, result.view, record)}
-                                    className='grommetux-text-ellipsis'>
-                              <span title={record.self}><b>{record.self}</b></span>
-                            </Anchor>
-                            {this._getContent(result.view, record)}
-                          </Box>
-                          <Footer>
-                            {'Table: ' + result.view.body.sqlname}
-                          </Footer>
-                        </Tile>);
-                    });
-                  })
+                  this.locked ? <Spinning /> : cards.map((record, index) => (
+                    <Tile key={index} align="start" colorIndex='light-2' pad={{ horizontal: 'small' }}>
+                      <Header size="small">{record.view.name}</Header>
+                      <Box flex={true}>
+                        <Anchor onClick={this._onClick.bind(this, record.view, record)}
+                                className='grommetux-text-ellipsis'>
+                          <span title={record.self}><b>{record.self}</b></span>
+                        </Anchor>
+                        {this._getContent(record.view, record)}
+                      </Box>
+                      <Footer>
+                        {'Table: ' + record.view.body.sqlname}
+                      </Footer>
+                    </Tile>
+                  ))
                 }
               </Tiles>
           }
