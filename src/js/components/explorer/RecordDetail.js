@@ -26,7 +26,8 @@ export default class RecordDetail extends Component {
     this._getUCMDBURL(this.props.body.fields);
 
     if (this.props.body.links)
-      this.props.body.links.forEach((link) => {
+      this.props.body.links.forEach((bodyLink) => {
+        let link = Object.assign({}, bodyLink);
         var body = this._getLinkBody(link, this.props.record);
         if (body.filter) {
           ExplorerActions.getCount(body).then(records => {
