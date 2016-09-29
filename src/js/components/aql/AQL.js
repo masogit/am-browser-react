@@ -9,7 +9,7 @@ import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
 import RecordListLayer from '../explorer/RecordListLayer';
 import ActionTab from '../commons/ActionTab';
-import SideBar from '../commons/AMSideBar';
+import AMSideBar from '../commons/AMSideBar';
 import * as Format from '../../util/RecordFormat';
 import Download from 'grommet/components/icons/base/Download';
 import More from 'grommet/components/icons/base/More';
@@ -353,8 +353,8 @@ export default class AQL extends ComponentBase {
       }));
 
       return (
-        <Layer onClose={this._onClose} closer={true} align="left">
-          <SideBar title='AQL Selector' contents={contents} separator={'none'} colorIndex='light-1' toggle={false}/>
+        <Layer onClose={this._onClose} closer={true} align="left" flush={true}>
+          <AMSideBar title='AQL Selector' contents={contents} colorIndex='light-1' toggle={false} margin={{horizontal: 'medium'}} pad={{vertical: 'small'}}/>
         </Layer>
       );
     } else if (type == 'view') {
@@ -367,8 +367,8 @@ export default class AQL extends ComponentBase {
       }));
 
       return (
-        <Layer onClose={this._onClose} closer={true} align="left">
-          <SideBar title='Views Selector' contents={contents} separator={'none'} colorIndex='light-1' toggle={false}/>
+        <Layer onClose={this._onClose} closer={true} align="left" flush={true}>
+          <AMSideBar title='Views Selector' contents={contents} colorIndex='light-1' toggle={false} margin={{horizontal: 'medium'}} pad={{vertical: 'small'}}/>
         </Layer>
       );
     } else if (typeof type == 'object' && type.type == 'records') {
@@ -428,7 +428,7 @@ export default class AQL extends ComponentBase {
     const activeIndex = validData ? getIndex(this.state.aql.type) : 0;
     return (
       <Box direction="row" flex={true}>
-        <SideBar title='Graphs' toolbar={toolbar} contents={contents} focus={focus}/>
+        <AMSideBar title='Graphs' toolbar={toolbar} contents={contents} focus={focus}/>
         {!_.isEmpty(this.state.aql) ? <Box flex={true}>
           {this.getAlertLayer(this.state.alertLayer)}
           <Header justify="between" pad={{'horizontal': 'medium'}}>

@@ -413,7 +413,7 @@ export default class RecordList extends Component {
 
     return (
       <Header justify="between" pad='none'>
-        <Box margin={{right: 'small'}}>{this.props.title}</Box>
+        {this.props.title && <Box margin={{right: 'small'}}>{this.props.title}</Box>}
         <input type="text" className={this.state.param.aqlInput ? 'aql flex' : 'flex'} ref="search"
              placeholder={placeholder} disabled={this.state.locked} onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
         <Box direction="column" margin={{left: 'small'}}>
@@ -519,7 +519,7 @@ export default class RecordList extends Component {
     if (this.state.param.showTopology) {
       const body = this.props.body;
       return (
-        <Box className='topology-background-color'>
+        <Box className='topology-background-color autoScroll' flex={false}>
           <Box align='end' onClick={() => this.setState({record: null})} pad='small'><Close /></Box>
           <Box justify='center' pad={{horizontal: 'small'}} flex={true}>
             <List>
@@ -635,7 +635,7 @@ export default class RecordList extends Component {
     }
 
     return (
-      <Box pad={{horizontal: 'medium'}} flex={true} className={fixIEScrollBar}>
+      <Box flex={true} className={fixIEScrollBar}>
         {this.renderToolBox()}
         {filters.length > 0 &&
           <Box direction='row' className='topology-background-color' pad='small' flex={false}>

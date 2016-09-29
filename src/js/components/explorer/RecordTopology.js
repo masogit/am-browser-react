@@ -63,13 +63,14 @@ export default class MyPC extends Component {
   }
 
   render() {
-    const {record, body, children : legend} = this.props;
+    const {record, body} = this.props;
 
     if (record) {
       return (
-        <Box flex={true} align='center' justify='center' className='grid autoScroll' style={{minWidth: '1000px',width: '100%'}}>
-          {legend}
-          <TopologyDetail record={record} body={body} onClick={this.updateDetail}/>
+        <Box className='autoScroll' flex={true}>
+          <Box flex={true} align='center' justify='center' className='grid' style={{minWidth: '1000px',width: '100%'}}>
+            <TopologyDetail record={record} body={body} onClick={this.updateDetail}/>
+          </Box>
         </Box>
       );
     } else {

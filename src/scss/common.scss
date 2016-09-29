@@ -76,11 +76,12 @@ table {
 }
 
 /** Tab: */
-.autoScroll {
+.autoScroll, .grommetux-layer {
   & div[role=tablist] {
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    flex: 1;
 
     & ul {
       flex-shrink: 0;
@@ -90,6 +91,7 @@ table {
   & div[role=tabpanel] {
     display: flex;
     overflow-y: auto;
+    flex: 1;
 
     & li {
       flex-shrink: 0;

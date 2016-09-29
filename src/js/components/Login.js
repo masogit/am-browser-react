@@ -72,7 +72,7 @@ class IndexerLogin extends ComponentBase {
     }
 
     return (
-      <Split flex="left" separator={true} onResponsive={this._onResponsive}>
+      <Split flex="left" onResponsive={this._onResponsive}>
         {image}
         <Sidebar justify="center" align="center" pad="medium" size="large">
           <LoginForm

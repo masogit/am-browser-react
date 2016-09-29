@@ -4,13 +4,13 @@
 import expect from 'expect';
 import React from 'react';
 import TestUtils from 'react-addons-test-utils';
-import SideBar from '../../../src/js/components/commons/AMSideBar';
+import AMSideBar from '../../../src/js/components/commons/AMSideBar';
 import {Sidebar, Header, Footer} from 'grommet';
 
 describe('commons - components/explorer/Sidebar-spec.js', () => {
   it('should render Sidebar correctly', () => {
     const renderer = TestUtils.createRenderer();
-    const sidebar = renderer.render(<SideBar />);
+    const sidebar = renderer.render(<AMSideBar />);
 
     expect(sidebar.type).toEqual(Sidebar);
 

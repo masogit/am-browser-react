@@ -110,7 +110,7 @@ export default class GroupList extends Component {
                          onSelect={this._selectSuggestion.bind(this)}/>
           </Box>
         }
-        <Box className='autoScroll fixIEScrollBar'>
+        <Box className='autoScroll fixIEScrollBar' margin={{vertical: 'small'}}>
         {this.props.loading ? <ListItem separator="none"><Spinning /></ListItem>
           :
           Object.keys(grouped).sort().map((key, i) => {
