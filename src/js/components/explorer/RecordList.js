@@ -426,9 +426,8 @@ export default class RecordList extends Component {
     return (
       <Header justify="between" pad='none'>
         <Box margin={{right: 'small'}}>{this.props.title}</Box>
-          <input type="text" className={this.state.param.aqlInput ? 'aql flex' : 'flex'} ref="search"
-               placeholder={placeholder} disabled={this.state.locked} onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
-
+        <input type="text" className={this.state.param.aqlInput ? 'aql flex' : 'flex'} ref="search"
+             placeholder={placeholder} disabled={this.state.locked} onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
         <Box direction="column" margin={{left: 'small'}}>
           <Anchor onClick={this._getMoreRecords.bind(this)} disabled={this.state.loading}>
             <Box style={{fontSize: '70%', fontWeight: 'bold'}}>
@@ -442,11 +441,9 @@ export default class RecordList extends Component {
         <Menu icon={<Filter />} flex={false}>
           {this.renderGroupBy()}
         </Menu>
+        <Anchor icon={<Cluster colorIndex={this.state.param.showTopology?'brand': ''}/>}
+                onClick={this._toggleShowTopology.bind(this)}/>
         <Menu icon={<MenuIcon />} dropAlign={{ right: 'right', top: 'top' }}>
-          <Anchor icon={<Cluster colorIndex={this.state.param.showTopology?'brand': ''}/>} label='View Topology'
-                  onClick={this._toggleShowTopology.bind(this)}/>
-          <Anchor icon={this.state.param.graphType=='legend'?<CheckboxSelected />:<Checkbox />} label="Vertical Graph"
-                  onClick={this._toggleGraphType.bind(this)}/>
           <Anchor icon={this.state.param.aqlInput?<CheckboxSelected />:<Checkbox />} label="Input AQL"
                   onClick={this._toggleAQLInput.bind(this)}/>
           {!this.state.param.showTopology && <Anchor icon={this.state.param.allFields?<CheckboxSelected />:<Checkbox />} label="Full columns"
@@ -509,17 +506,19 @@ export default class RecordList extends Component {
       };
 
       return (
-        <Table selectable={true} className='autoScroll'
-               onMore={this.state.onMoreLock || this.state.filtered ? null : this._getMoreRecords.bind(this)}>
-          <thead>
-          <tr>
-            {renderFieldsHeader()}
-          </tr>
-          </thead>
-          <tbody>
-            {renderRecords()}
-          </tbody>
-        </Table>
+        <Box colorIndex='light-1' pad='small' flex={true}>
+          <Table selectable={true} className='autoScroll'
+                 onMore={this.state.onMoreLock || this.state.filtered ? null : this._getMoreRecords.bind(this)}>
+            <thead>
+            <tr>
+              {renderFieldsHeader()}
+            </tr>
+            </thead>
+            <tbody>
+              {renderRecords()}
+            </tbody>
+          </Table>
+        </Box>
       );
     }
   }
@@ -532,7 +531,7 @@ export default class RecordList extends Component {
     if (this.state.param.showTopology) {
       const body = this.props.body;
       return (
-        <Box colorIndex='light-2'>
+        <Box className='topology-background-color'>
           <Box align='end' onClick={() => this.setState({record: null})} pad='small'><Close /></Box>
           <Box justify='center' pad={{horizontal: 'small'}} flex={true}>
             <List>
@@ -626,7 +625,7 @@ export default class RecordList extends Component {
     }
 
     return (
-      <Box className={className.join(' ')} pad={type == 'legend' ? {horizontal: 'small'} : 'none'} flex={false}>
+      <Box className={className.join(' ')} pad={type == 'legend' ? {horizontal: 'small'} : 'none'} flex={false}  margin={{right: 'small'}}>
         {type == 'legend' && renderGroupByHeader()}
         <Graph type={type} data={graphData} config={config} className={locked ? 'disabled' : ''}
              onClick={(filter) => {
@@ -644,26 +643,27 @@ export default class RecordList extends Component {
     let direction = 'column', pad = {vertical: 'small'};
     if (graphType=='legend') {
       direction = 'row';
-      //pad = {horizontal: 'small'};
       pad = 'none';
     }
 
     return (
       <Box pad={{horizontal: 'medium'}} flex={true} className={fixIEScrollBar}>
         {this.renderToolBox()}
-        <Box direction='row'>
-          {filters.map((filter, index) => (
-              <Box direction='row' key={index} separator='all'>
-                <Box onClick={this._filterClear.bind(this, index)}><Close /></Box>
-                <Box onClick={this._filterReuse.bind(this, filter)} pad={{horizontal: 'small'}}>{filter}</Box>
-              </Box>
-            )
-          )}
+        {filters.length > 0 &&
+          <Box direction='row' className='topology-background-color' pad='small' flex={false}>
+            {filters.map((filter, index) => (
+                <Box direction='row' key={index}>
+                  <Box onClick={this._filterClear.bind(this, index)}><Close /></Box>
+                  <Box onClick={this._filterReuse.bind(this, filter)} pad={{horizontal: 'small'}}>{filter}</Box>
+                </Box>
+              )
+            )}
         </Box>
+        }
         <Box flex={true} direction={direction} className={`fixMinSizing ${fixIEScrollBar}`} pad={filters.length > 0 ? {vertical: 'small'} : 'none'}>
-          {!(showTopology && record) && this.renderGraph()}
+          {this.renderGraph()}
           <Box flex={true} pad={(!showTopology || !record) ? pad : 'none'} direction='row'>
-            <Box flex={true} separator='all'>
+            <Box className='topology-background-color' flex={true} pad='small'>
               {this.renderList()}
             </Box>
             {this.renderDetail()}

@@ -15,19 +15,25 @@
   }
 }
 
+.topology-background-color {
+  background-color: #fafafa;
+}
+
 .grid {
   background:
   -webkit-linear-gradient(top, transparent 19px, #efefef 20px),
   -webkit-linear-gradient(left, transparent 19px, #efefef 20px);
   background-size: 20px 20px;
   position: relative;
+  background-color: #fff;
+  padding: $inuit-base-spacing-unit;
 
   .group-by {
     position: absolute;
     top: 10px;
     left: 10px;
     background: rgba(238, 238, 238, 0.3);
-    padding: 10px 25px;
+    padding: $inuit-base-spacing-unit * 0.5 $inuit-base-spacing-unit;
     overflow: auto;
   }
 }
@@ -37,7 +43,7 @@
 }
 
 .legend {
-  background: rgba(238, 238, 238, 0.3);
+  background-color: rgba(238, 238, 238, 0.3);
   width: 300px;
   .grommetux-menu {
     .grommetux-button__icon {

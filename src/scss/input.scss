@@ -4,6 +4,10 @@ input {
     border-color: #FFD144;
   }
 
+  .grommetux-header &{
+    font-size: $h5-font-size;
+  }
+
   &[disabled] {
     border-color: $disabled-icon-color;
   }

@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import TopologyDetail from './TopologyDetail';
-import {Box, Anchor, Topology, Map, Columns}from 'grommet';
+import {Box, Anchor, Topology, Map, Tiles}from 'grommet';
 const Part = Topology.Part;
 const Label = Topology.Label;
 import More from 'grommet/components/icons/base/More';
@@ -10,14 +10,14 @@ import {bodyToMapData} from '../../util/util';
 
 const splitLine = (records, maxNum) => {
   return (
-    <Columns masonry={true} maxCount={maxNum} className='justify-around'>{
+    <Tiles flush={false} fill={true}>{
       records.map((record, index) => (
-        <Box key={index} colorIndex='light-2' margin="small">
+        <Box key={index} margin="small" className='topology-background-color'>
           {record}
         </Box>
       ))
     }
-    </Columns>);
+    </Tiles>);
 };
 
 export default class MyPC extends Component {
@@ -41,13 +41,13 @@ export default class MyPC extends Component {
     }
 
     const parts = records.map((record, index) => (
-        <Part demarcate={false} align="center" key={index} justify='start'>
-          <Box onClick={() => this.updateDetail(this.props.body, record)} direction="row">
-            <ComputerPersonal/>
-            <Label>{record.self}</Label>
-          </Box>
-        </Part>
-      ));
+      <Part demarcate={false} align="center" key={index} justify='start'>
+        <Box onClick={() => this.updateDetail(this.props.body, record)} direction="row">
+          <ComputerPersonal/>
+          <Label>{record.self}</Label>
+        </Box>
+      </Part>
+    ));
 
 
     return (
@@ -67,18 +67,22 @@ export default class MyPC extends Component {
 
     if (record) {
       return (
-        <Box flex={true} pad={{horizontal: 'medium'}} align='center' justify='center' className='grid autoScroll' style={{minWidth: '1000px',width: '100%'}}>
+        <Box flex={true} align='center' justify='center' className='grid autoScroll' style={{minWidth: '1000px',width: '100%'}}>
           {legend}
           <TopologyDetail record={record} body={body} onClick={this.updateDetail}/>
         </Box>
       );
     } else {
       return (
-        <Box flex={true}>
-          <Box pad='small' flex={false}>
-            {this.props.body.links.length > 0 && <Map vertical={true} className='hiddenScroll grid' data={bodyToMapData(this.props.body)} />}
+        <Box flex={true} className='topology-background-color'>
+          {this.props.body.links.length > 0 &&
+          <Box flex={false} margin={{bottom: 'small'}}>
+            <Map vertical={true} className='hiddenScroll grid' data={bodyToMapData(this.props.body)} />
           </Box>
-          {this.renderTopology()}
+          }
+          <Box colorIndex='light-1' flex={true}>
+            {this.renderTopology()}
+          </Box>
         </Box>
       );
     }
