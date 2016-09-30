@@ -21,7 +21,7 @@ var pdf_styles = {
   subheader: {
     fontSize: 16,
     bold: true,
-    margin: [0, 10, 0, 5]
+    margin: [0, 10, 0, 15]
   },
   tableFields: {
     margin: [0, 20, 20, 15]
@@ -46,16 +46,64 @@ module.exports = function (am) {
       list(req, res);
   };
 
-  function getRESTData(args, label, fields) {
+  function getLinkData(args, link, pdf_link) {
+    let label = link.label;
+    let fields = link.body.fields;
     let url = "http://${server}${context}${ref-link}";
     return new Promise((resolve, reject) => {
       request = client.get(url, args, (data, response) => {
-        resolve({label, records: data.entities, fields});
-        // let offset = args.parameters.offset;
-        // if (data && data.count && data.entities && data.count > data.entities.length + offset) {
-          // args.parameters.offset += data.entities.length;
-          // getRESTData(args, promises, label);
-        // }
+        let links = link.body.links;
+        if (links && links.length > 0) {
+          pdf_link.push({
+            text: `${label} (${data.count})`, style: 'subheader'
+          });
+          let pdf_ol = [];
+          pdf_link.push({
+            ol: pdf_ol,
+            margin: [20, 0, 0, 0]
+          });
+
+          let promises = [];  // create promise for each record
+          data.entities.map((record) => {
+            promises.push(new Promise((res, rej) => {
+              let summary = {
+                stack: [
+                  {text: record.self, style: 'tableHeader'},
+                  {
+                    alignment: 'justify',
+                    columns: genSummary(record, fields)
+                  }
+                ],
+                margin: [0, 0, 0, 40]
+              };
+              pdf_ol.push(summary);
+
+              let link_promises = [];
+              links.forEach((sub_link) => {
+                let link_args = Object.assign({}, args);
+                link_args.path['ref-link'] = '/db/' + sub_link.body.sqlname;
+                link_args.parameters = getQueryByBody(getLinkBody(sub_link, record));
+                link_promises.push(getLinkData(link_args, sub_link, summary.stack));
+              });
+              Promise.all(link_promises).then(()=>{
+                res();
+              }, (reason) => {
+                rej(reason);
+              });
+            }));
+
+          });
+
+          Promise.all(promises).then(()=>{
+            resolve();
+          }, (reason) => {
+            reject(reason);
+          });
+        } else {
+          pdf_link.push(genTable({label, records: data.entities, fields}, {length: 0}));
+          resolve();
+        }
+
       }).on('error', function (err) {
         reject(err);
         logger.error('Query REST data: ' + err.toString());
@@ -142,6 +190,22 @@ module.exports = function (am) {
     }
 
     return param;
+  }
+
+  function getLinkBody(link, record) {
+    var body = Object.assign({}, link.body);
+
+    let AQL = "";
+    if (link.src_field) {
+      var relative_path = link.src_field.relative_path;
+      var src_field = relative_path ? relative_path + '.' + link.src_field.sqlname : link.src_field.sqlname;
+      if (record[src_field]) {
+        AQL = `${link.dest_field.sqlname}=${record[src_field]}`;
+      }
+    }
+
+    body.filter = body.filter ? `(${body.filter}) AND ${AQL}` : AQL;
+    return body;
   }
 
   function list (req, res) {
@@ -244,7 +308,7 @@ module.exports = function (am) {
         'Below report is generated from AM Browser.',
         {
           alignment: 'justify',
-          columns: genHeader(JSON.parse(req.body.record), JSON.parse(req.body.fields))
+          columns: genSummary(JSON.parse(req.body.record), JSON.parse(req.body.fields))
         }
       ],
       styles: pdf_styles
@@ -253,18 +317,15 @@ module.exports = function (am) {
     // Query links' data
     let links = JSON.parse(req.body.links);
     let promises = [];
+    let pdf_links = [];
+    pdf_data.content.push(pdf_links);
     links.forEach((link) => {
+      let pdf_link = [];
+      pdf_links.push(pdf_link);
       let args = getArgs(req.session.jwt, link.body.sqlname, getQueryByBody(link.body));
-      promises.push(getRESTData(args, link.label, link.body.fields));
+      promises.push(getLinkData(args, link, pdf_link));
     });
-    Promise.all(promises).then((values) => {
-      let links = [];
-      let max = 0;
-      values.forEach((value) => {
-        links.push(genTable(value, max));
-      });
-      pdf_data.content.push(links);
-
+    Promise.all(promises).then(() => {
       var pdfDoc = printer.createPdfKitDocument(pdf_data);
       pdfDoc.pipe(res);
       pdfDoc.end();
@@ -275,21 +336,26 @@ module.exports = function (am) {
   };
 
   function genTable({label, records, fields}, max) {
+    if (!records)
+      return [];
+
     let table = [
       {
         text: `${label} (${records.length})`, style: 'subheader'
       },
       {
+        style: 'tableExample',
         table: {
           body: genTbody(records, fields, max)
-        }
+        },
+        layout: 'lightHorizontalLines'
       }
     ];
 
     return table;
   }
 
-  function genHeader(record, fields) {
+  function genSummary(record, fields) {
     var pdf_header = [{}, {}];
 
     fields.forEach((field, index) => {
