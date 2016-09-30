@@ -9,6 +9,7 @@ import Download from 'grommet/components/icons/base/Download';
 import MenuIcon from 'grommet/components/icons/base/Menu';
 import Checkbox from 'grommet/components/icons/base/Checkbox';
 import Filter from 'grommet/components/icons/base/Filter';
+import Code from 'grommet/components/icons/base/Code';
 import BarChart from 'grommet/components/icons/base/BarChart';
 import LineChart from 'grommet/components/icons/base/LineChart';
 import Status from 'grommet/components/icons/Status';
@@ -414,7 +415,10 @@ export default class RecordList extends Component {
       <Header justify="between" pad='none'>
         {this.props.title && <Box margin={{right: 'small'}}>{this.props.title}</Box>}
         <input type="text" className={aqlInput ? 'aql flex' : 'flex'} ref="search"
-             placeholder={placeholder} disabled={locked} onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
+               placeholder={placeholder} disabled={locked} onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
+        <Box colorIndex='light-2' onClick={this._toggleAQLInput.bind(this)} pad='small'>
+          <Code colorIndex={aqlInput ? 'accent-3' : 'brand'}/>
+        </Box>
         <Box direction="column" margin={{left: 'small'}}>
           <Anchor onClick={this._getMoreRecords.bind(this)} disabled={loading}>
             <Box style={{fontSize: '70%', fontWeight: 'bold'}}>
@@ -431,8 +435,6 @@ export default class RecordList extends Component {
         <Anchor icon={<Cluster colorIndex={showTopology?'brand': ''}/>}
                 onClick={this._toggleShowTopology.bind(this)}/>
         <Menu icon={<MenuIcon />} dropAlign={{ right: 'right', top: 'top' }}>
-          <Anchor icon={aqlInput?<CheckboxSelected />:<Checkbox />} label="Input AQL"
-                  onClick={this._toggleAQLInput.bind(this)}/>
           {!showTopology && <Anchor icon={allFields?<CheckboxSelected />:<Checkbox />} label="Full columns"
                   onClick={() => (this.props.body.fields.length > numColumn) && this._toggleAllFields()}
                   disabled={this.props.body.fields.length <= numColumn}/>}
