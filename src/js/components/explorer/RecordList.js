@@ -495,7 +495,7 @@ export default class RecordList extends Component {
       };
 
       return (
-        <Box colorIndex='light-1' pad='small' flex={true}>
+        <Box colorIndex='light-1' pad='small' flex={true} className='fixMinSizing'>
           <Table selectable={true} className='autoScroll'
                  onMore={this.state.onMoreLock || this.state.filtered ? null : this._getMoreRecords.bind(this)}>
             <thead>
@@ -558,7 +558,7 @@ export default class RecordList extends Component {
       return;
     }
 
-    const {locked, record, param: {showTopology, graphType: type, groupby: sqlname} }= this.state;
+    const {locked, param: {graphType: type, groupby: sqlname} }= this.state;
 
     const config = {
       series_col: "1",

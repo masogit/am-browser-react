@@ -67,7 +67,7 @@ export default class MyPC extends Component {
 
     if (record) {
       return (
-        <Box className='autoScroll' flex={true}>
+        <Box className='autoScroll fixMinSizing' flex={true}>
           <Box flex={true} align='center' justify='center' className='grid' style={{minWidth: '1000px',width: '100%'}}>
             <TopologyDetail record={record} body={body} onClick={this.updateDetail}/>
           </Box>
@@ -75,13 +75,13 @@ export default class MyPC extends Component {
       );
     } else {
       return (
-        <Box flex={true} className='topology-background-color'>
+        <Box flex={true} className='topology-background-color fixMinSizing'>
           {this.props.body.links.length > 0 &&
           <Box flex={false} margin={{bottom: 'small'}}>
             <Map vertical={true} className='hiddenScroll grid' data={bodyToMapData(this.props.body)} />
           </Box>
           }
-          <Box colorIndex='light-1' flex={true}>
+          <Box colorIndex='light-1' flex={true} className='fixMinSizing'>
             {this.renderTopology()}
           </Box>
         </Box>
