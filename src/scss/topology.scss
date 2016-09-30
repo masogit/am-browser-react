@@ -27,15 +27,6 @@
   position: relative;
   background-color: #fff;
   padding: $inuit-base-spacing-unit;
-
-  .group-by {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: rgba(238, 238, 238, 0.3);
-    padding: $inuit-base-spacing-unit * 0.5 $inuit-base-spacing-unit;
-    overflow: auto;
-  }
 }
 
 .grommetux-topology td {
@@ -43,12 +34,5 @@
 }
 
 .legend {
-  background-color: rgba(238, 238, 238, 0.3);
-  width: 300px;
-  .grommetux-menu {
-    .grommetux-button__icon {
-      padding: 0;
-    }
-  }
-
+  width: $sidebar-width;
 }
