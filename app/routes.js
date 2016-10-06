@@ -22,7 +22,16 @@ module.exports = function (app) {
   var enable_csrf = config.enable_csrf;
   var jwt_max_age = config.jwt_max_age;
 
-  db.init(config.db_folder);
+  switch (config.db_type) {
+    case 'file':
+      db.init(config.db_folder);
+      break;
+    case 'mongo':
+      db.mongo(config.mongo);
+      break;
+    default:
+      logger.error("database", "db init error");
+  }
 
   var httpProxy = require('http-proxy');
   var apiProxy = httpProxy.createProxyServer();

@@ -1,5 +1,5 @@
-var Engine = require('tingodb')();
-var tingodbFolder;
+var Engine;
+var db;
 const fs = require('fs');
 var logger = require('./logger.js');
 var Validator = require('./validator.js');
@@ -8,7 +8,8 @@ var modules = require('./constants').modules;
 // check db folder and files
 exports.init = function (dbFolder) {
   logger.info("[server]", `Set db folder to ${dbFolder}`);
-  tingodbFolder = dbFolder;
+  Engine = require('tingodb')();
+  db = new Engine.Db(dbFolder, {});
   fs.exists(dbFolder, function (db) {
     if (!db) {
       logger.info("[server]", `The db folder '${dbFolder}' not found, will create it.`);
@@ -21,6 +22,22 @@ exports.init = function (dbFolder) {
         }
       });
 
+    }
+  });
+};
+
+exports.mongo = function (mongo) {
+  logger.info("[server]", `Connecting mongodb`);
+
+  var MongoClient = require('mongodb').MongoClient;
+  var authUrl = `${mongo.username}:${mongo.password}@`;
+  var url = `mongodb://${mongo.username ? authUrl : ''}${mongo.server}:${mongo.port}/${mongo.db}`;
+  MongoClient.connect(url, function(err, ambdb) {
+    if(!err) {
+      db = ambdb;
+      logger.info("[server]", `Mongodb ${mongo.server} connected`);
+    } else {
+      logger.error("[mongodb]", err);
     }
   });
 };
@@ -38,7 +55,6 @@ function JSONDownloader(res, json, filename) {
 
 // tingodb Read all or one
 exports.find = function (req, res) {
-  var db = new Engine.Db(tingodbFolder, {});
   var collectionName = req.params.collection;
   var id = req.params.id;
   var download = req.query.download;
@@ -57,7 +73,6 @@ exports.find = function (req, res) {
         JSONDownloader(res, document, (document.name || id) + '.json');
       else
         res.json(document);
-      db.close();
     });
   else
     db.collection(collectionName).find(filter).toArray(function (err, documents) {
@@ -67,13 +82,10 @@ exports.find = function (req, res) {
         JSONDownloader(res, documents, collectionName + '.json');
       else
         res.json(documents);
-      db.close();
     });
 };
 
 exports.findOne = function (collectionName, id, callback) {
-  var db = new Engine.Db(tingodbFolder, {});
-
   // Insight get data by user
   var filter = {};
   if (req.originalUrl.indexOf(modules.insight) > -1) {
@@ -85,14 +97,11 @@ exports.findOne = function (collectionName, id, callback) {
       logger.error("[tingo]", err);
     if (typeof callback == 'function')
       callback(documents);
-    db.close();
   });
 };
 
 // tingodb Find by filter
 exports.findBy = function (collectionName, filter) {
-  var db = new Engine.Db(tingodbFolder, {});
-
   return new Promise(function (resolve, reject) {
     db.collection(collectionName).find(filter).toArray(function (err, documents) {
       if (err) {
@@ -101,14 +110,12 @@ exports.findBy = function (collectionName, filter) {
       }
 
       resolve(documents);
-      db.close();
     });
   });
 };
 
 // tingodb Insert or Update
 exports.upsert = function (req, res) {
-  var db = new Engine.Db(tingodbFolder, {});
   var collectionName = req.params.collection;
   var id = req.params.id;
   var obj = req.file ? JSON.parse(req.file.buffer) : req.body;
@@ -140,7 +147,6 @@ exports.upsert = function (req, res) {
           if (err)
             logger.error("[tingo]", err);
           res.send(obj._id);
-          db.close();
         });
       }
     });
@@ -155,21 +161,18 @@ exports.upsert = function (req, res) {
       if (err)
         logger.error("[tingo]", err);
       res.send(obj._id);
-      db.close();
     });
   }
 };
 
 // tingodb Delete
 exports.delete = function (req, res) {
-  var db = new Engine.Db(tingodbFolder, {});
   var collectionName = req.params.collection;
   var id = req.params.id;
   db.collection(collectionName).remove([{_id: id}], function (err, result) {
     if (err)
       logger.error("[tingo]", err);
     res.send(id);
-    db.close();
   });
 };
 

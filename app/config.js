@@ -32,6 +32,15 @@ module.exports = {
   ucmdb_browser_param: properties.get('ucmdb.browser_param'),
 
   db_folder: properties.get('db.folder'),
+  db_type: properties.get('db.type'),
+
+  mongo: {
+    server: properties.get('mongo.server'),
+    port: properties.get('mongo.port'),
+    db: properties.get('mongo.db'),
+    username: properties.get('mongo.username'),
+    password: properties.get('mongo.password')
+  },
 
   slack_url: properties.get('slack.url'),
   slack_channel: properties.get('slack.channel'),

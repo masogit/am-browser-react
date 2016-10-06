@@ -28,7 +28,15 @@ browser_port = 8080
 browser_param = /ucmdb-browser/ucmdb_widget.jsp?server=Default%20Client&locale=en#widget=properties;refocus-selection=
 
 [db]
+type = file
 folder = ./db
+
+[mongo]
+server = localhost
+port = 27017
+db = test
+username =
+password =
 
 [user]
 admin = @admin
