@@ -33,8 +33,8 @@ const getFirstGroupby = (groupby) => {
 };
 
 export default class RecordList extends Component {
-  constructor(props) {
-    super();
+  componentWillMount() {
+    const props = this.props;
     this.state = {
       numColumn: 5,
       numTotal: 0,
@@ -58,13 +58,12 @@ export default class RecordList extends Component {
       },
       onMoreLock: false,
       locked: false,
-      showGraph: true
+      showGraph: true,
+      body: props.body
     };
-  }
 
-  componentWillMount() {
     const getSearchableFields = () => {
-      let searchFields = this.props.body.fields.filter((field) => {
+      let searchFields = props.body.fields.filter((field) => {
         return field.searchable;
       }).map((field) => {
         return Format.getDisplayLabel(field);
@@ -462,7 +461,8 @@ export default class RecordList extends Component {
     if (this.state.param.showTopology) {
       return (
         <RecordTopology {...this.state}
-          body={this.state.body || this.props.body}
+          body={this.state.body}
+          recordBody={this.props.body}
           getMoreRecords={this._getMoreRecords.bind(this)}
           updateDetail={(body, record) => {
             this.setState({
@@ -525,7 +525,7 @@ export default class RecordList extends Component {
     }
 
     if (this.state.param.showTopology) {
-      const body = this.props.body;
+      const body = this.state.body;
       return (
         <Box className='topology-background-color autoScroll' flex={false}>
           <Box align='end' onClick={() => this.setState({record: null})} pad='small'><Close /></Box>
@@ -590,8 +590,8 @@ export default class RecordList extends Component {
     const renderGroupByHeader = () => {
       if (sqlname) {
         const anchor = (groupby, key) => (
-          <Box direction='row'>
-            <Anchor key={key} label={getGroupbyDisplayLabel(groupby)}
+          <Box direction='row' key={key}>
+            <Anchor label={getGroupbyDisplayLabel(groupby)}
                     icon={<Box pad={{horizontal: 'small'}}><Status value={groupby == sqlname ? 'ok' : 'blank'} size='small'/></Box>}
                   onClick={() => !(locked || groupby == sqlname) && this._getGroupByData(groupby)}
                   disabled={locked || groupby == sqlname} />
