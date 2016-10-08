@@ -113,7 +113,7 @@ module.exports = function (am) {
       param.limit = 1000;
 
       if (data.entities && data.entities.length > 0) {
-        var Export_file = require('./csv.js');
+        var Export_file = require('./export_file.js');
         var export_file = new Export_file(am);
         if (type == 'csv')
           Convertor.json2csv(getFormattedRecords(JSON.parse(req.body.fields), data.entities), (err, csv) => {
