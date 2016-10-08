@@ -2,7 +2,7 @@ var util = require('util');
 var db = require('./db.js');
 var logger = require('./logger.js');
 var REST = require('./rest.js');
-var CSV = require('./csv.js');
+var Export_file = require('./csv.js');
 var sessionUtil = require('./sessionUtil.js');
 var config = require('./config.js');
 var version = require('../version.json');
@@ -57,7 +57,7 @@ module.exports = function (app) {
   };
 
   var rest = new REST(conn);
-  var csv = new CSV(conn);
+  var export_file = new Export_file(conn);
 
   apiProxy.on('error', function (e, req, res) {
     logger.error(`[proxy] [${req.sessionID}] [error] ${req.method} ${req.originalUrl}`, util.inspect(e));
@@ -143,7 +143,13 @@ module.exports = function (app) {
   app.delete('/coll/:collection/:id', isAuthenticated, db.delete);
 
   // Download CSV in server side
-  app.use('/am/download/:tableName', csv.download);
+  app.use('/am/download/:tableName', function (req, res) {
+    // type: 'csv' or 'pdf' or '1vM'
+    if (req.query.type == '1vM')
+      export_file.report(req, res);
+    else
+      export_file.list(req, res);
+  });
 
   // Proxy the backend rest service /rs/db -> /am/db
   app.use('/am/db', function (req, res) {
