@@ -590,12 +590,10 @@ export default class RecordList extends Component {
     const renderGroupByHeader = () => {
       if (sqlname) {
         const anchor = (groupby, key) => (
-          <Box direction='row' key={key}>
-            <Anchor label={getGroupbyDisplayLabel(groupby)}
-                    icon={<Box pad={{horizontal: 'small'}}><Status value={groupby == sqlname ? 'ok' : 'blank'} size='small'/></Box>}
+          <Anchor label={getGroupbyDisplayLabel(groupby)} key={key}
+                  icon={<Box pad={{horizontal: 'small'}}><Status value={groupby == sqlname ? 'ok' : 'blank'} size='small'/></Box>}
                   onClick={() => !(locked || groupby == sqlname) && this._getGroupByData(groupby)}
                   disabled={locked || groupby == sqlname} />
-          </Box>
         );
 
         const groupbys = this.props.body.groupby ? this.props.body.groupby.split('|') : [];
@@ -606,7 +604,7 @@ export default class RecordList extends Component {
         }
 
         return (
-          <Box direction={type == 'legend' ? 'column' : 'row'} margin={{horizontal: 'small'}}>
+          <Box direction={type == 'legend' ? 'column' : 'row'}>
             {breadCrumb}
           </Box>
         );

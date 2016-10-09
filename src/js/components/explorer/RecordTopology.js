@@ -4,9 +4,8 @@ import {Box, Anchor, Topology, Map, Tiles}from 'grommet';
 const Part = Topology.Part;
 const Label = Topology.Label;
 import More from 'grommet/components/icons/base/More';
-//import Cluster from 'grommet/components/icons/base/Cluster';
-import ComputerPersonal from 'grommet/components/icons/base/ComputerPersonal';
 import {bodyToMapData} from '../../util/util';
+import getIcon from './iconPicker';
 
 const splitLine = (records, maxNum) => {
   return (
@@ -43,7 +42,7 @@ export default class RecordTopology extends Component {
     const parts = records.map((record, index) => (
       <Part demarcate={false} align="center" key={index} justify='start'>
         <Box onClick={() => this.updateDetail(this.state.body, record)} direction="row">
-          <ComputerPersonal/>
+          {getIcon(this.props.body, record)}
           <Label>{record.self}</Label>
         </Box>
       </Part>

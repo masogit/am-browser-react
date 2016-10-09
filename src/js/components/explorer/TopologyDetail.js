@@ -7,11 +7,10 @@ import {Topology, Box}from 'grommet';
 //const Parts = Topology.Parts;
 const Part = Topology.Part;
 const Label = Topology.Label;
-import ComputerPersonal from 'grommet/components/icons/base/ComputerPersonal';
-import App from 'grommet/components/icons/base/App';
 import More from 'grommet/components/icons/base/More';
 import LinkPrevious  from 'grommet/components/icons/base/LinkPrevious';
-import Spinning from 'grommet/components/Icons/Spinning';
+import Spinning from 'grommet/components/icons/Spinning';
+import getIcon from './iconPicker';
 
 const getLinkBody = (link, record) => {
   var body = Object.assign({}, link.body);
@@ -30,7 +29,7 @@ const getLinkBody = (link, record) => {
 };
 
 let usedIds = {'item-1-0': true};
-export default class PCDetail extends Component {
+export default class TopologyDetail extends Component {
   componentWillMount() {
 
     this.state = {
@@ -63,6 +62,7 @@ export default class PCDetail extends Component {
           items: [
             {
               id: "item-1-0",
+              icon: getIcon(this.state.body, record),
               demarcate: true,
               label: record.self + (this.state.body.links ? ` (${this.state.body.links.length})` : ''),
               onClick: (callback) => {
@@ -136,7 +136,7 @@ export default class PCDetail extends Component {
         data.categories[childLayer].items.push({
           id: id,
           label: label,
-          icon: <App/>,
+          icon: getIcon(link.body),
           param: {
             limit: 5,
             offset: 0
@@ -183,6 +183,7 @@ export default class PCDetail extends Component {
 
           data.categories[childLayer].items.push({
             id: id,
+            icon: getIcon(link.body, record),
             label: label,
             onClick: onClick
           });
@@ -286,7 +287,7 @@ class IconPart extends Component {
     this.state = {
       loading: false,
       isLoaded: false
-    }
+    };
   }
 
   onClick() {
@@ -309,7 +310,7 @@ class IconPart extends Component {
 
   render() {
     const {id, label, icon, iconA, iconB, onClick, demarcate} = this.props;
-    let leftIcon = icon || <ComputerPersonal/>;
+    let leftIcon = icon || getIcon();
     if (this.state.loading) {
       leftIcon = <Spinning />;
     }
@@ -338,7 +339,7 @@ class IconPart extends Component {
 }
 
 
-PCDetail.propTypes = {
+TopologyDetail.propTypes = {
   body: PropTypes.object.isRequired,
   record: PropTypes.object.isRequired,
   onClick: PropTypes.func

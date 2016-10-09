@@ -1,0 +1,61 @@
+{
+  "defaultIcon": "Inbox",
+  "amComputer": "ComputerPersonal",
+  "amSoftInstall": "App",
+  "amExpenseLine": [
+    {
+      "field": "Title",
+      "like": "SIM",
+      "icon": "CreditCard"
+    }
+  ],
+  "amPortfolio": [
+    {
+      "field": "Model.Nature.Name",
+      "like": "Computer",
+      "icon": "ComputerPersonal"
+    }
+  ],
+  "amContact": [
+    {
+      "field": "Title",
+      "like": "manager",
+      "icon": "UserManager"
+    },
+    {
+      "field": "MrMrs",
+      "eq": [
+        "Mrs.",
+        "Miss"
+      ],
+      "icon": "UserFemale"
+    },
+    "User"
+  ],
+  "amEmplDept": [
+    {
+      "field": "bAdminRight",
+      "eq": "Yes",
+      "icon": "UserAdmin"
+    },
+    {
+      "field": "bDepartment",
+      "eq": "Yes",
+      "icon": "Group"
+    },
+    {
+      "field": "Title",
+      "like": "manager",
+      "icon": "UserManager"
+    },
+    {
+      "field": "MrMrs",
+      "eq": [
+        "Mrs.",
+        "Miss"
+      ],
+      "icon": "UserFemale"
+    },
+    "User"
+  ]
+}
