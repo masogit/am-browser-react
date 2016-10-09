@@ -464,10 +464,10 @@ export default class RecordList extends Component {
           body={this.state.body}
           recordBody={this.props.body}
           getMoreRecords={this._getMoreRecords.bind(this)}
-          updateDetail={(body, record) => {
+          updateDetail={(body, record, callback) => {
             this.setState({
               body, record
-            });
+            }, callback);
           }}>
           {this.renderGraph()}
         </RecordTopology>

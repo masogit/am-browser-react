@@ -11,6 +11,7 @@ import ComputerPersonal from 'grommet/components/icons/base/ComputerPersonal';
 import App from 'grommet/components/icons/base/App';
 import More from 'grommet/components/icons/base/More';
 import LinkPrevious  from 'grommet/components/icons/base/LinkPrevious';
+import Spinning from 'grommet/components/Icons/Spinning';
 
 const getLinkBody = (link, record) => {
   var body = Object.assign({}, link.body);
@@ -64,9 +65,9 @@ export default class PCDetail extends Component {
               id: "item-1-0",
               demarcate: true,
               label: record.self + (this.state.body.links ? ` (${this.state.body.links.length})` : ''),
-              onClick: () => {
+              onClick: (callback) => {
                 if (this.props.onClick) {
-                  this.props.onClick(this.state.body, record);
+                  this.props.onClick(this.state.body, record, callback);
                 }
               }
             }
@@ -106,7 +107,7 @@ export default class PCDetail extends Component {
     return data;
   }
 
-  getLinks(childLayer, parentIndex, data, links, record) {
+  getLinks(childLayer, parentIndex, data, links, record, callback) {
     links.forEach((link, index) => {
       const id =`item-${childLayer}-${index + parentIndex * links.length}`;
       if (usedIds[id]) {
@@ -125,9 +126,9 @@ export default class PCDetail extends Component {
           label = `${label} (${records.count})`;
           if (records.count > 0) {
             const body = getLinkBody(link, record);
-            onClick = () => {
+            onClick = (callback) => {
               body.param = data.categories[childLayer].items[index].param;
-              this.getChildLink(childLayer + 1, index, body, link);
+              this.getChildLink(childLayer + 1, index, body, link, callback);
             };
           }
         }
@@ -140,16 +141,17 @@ export default class PCDetail extends Component {
             limit: 5,
             offset: 0
           },
+          isLink: true,
           onClick: onClick
         });
-        this.setState({data});
+        this.setState({data}, callback);
       });
 
       usedIds[id] = true;
     });
   }
 
-  getChildLink(childLayer, parentIndex, body, link) {
+  getChildLink(childLayer, parentIndex, body, link, callback) {
     const data = this.state.data;
     if (body.filter) {
       ExplorerActions.loadRecordsByBody(body).then(records => {
@@ -167,23 +169,22 @@ export default class PCDetail extends Component {
           if (link.body.links) {
             label = `${label} (${link.body.links.length})`;
             if (link.body.links.length > 0) {
-              onClick = () => {
-                this.getLinks(childLayer + 1, index, data, link.body.links, record);
-                this.setState({data});
+              const linkIndex = index + body.param.offset;
+              onClick = (callback) => {
+                this.getLinks(childLayer + 1, linkIndex, data, link.body.links, record, callback);
                 if (this.props.onClick) {
                   this.props.onClick(link.body, record);
                 }
               };
             }
           } else {
-            onClick = () => this.setState({record, body: link.body});
+            onClick = (callback) => this.setState({record, body: link.body}, callback);
           }
 
           data.categories[childLayer].items.push({
             id: id,
             label: label,
-            onClick: onClick//,
-            //showDetail: () => this.setState({record, body: link.body})
+            onClick: onClick
           });
           data.links.push({parentId: `item-${childLayer - 1}-${parentIndex}`, childId: id});
           usedIds[id] = true;
@@ -195,13 +196,13 @@ export default class PCDetail extends Component {
             id: moreId,
             label: 'more',
             icon: <More/>,
-            onClick: () => {
+            onClick: (callback) => {
               const item = data.categories[childLayer - 1].items[parentIndex];
               body.param = item.param = {
                 offset: item.param ? item.param.offset + item.param.limit : 0,
                 limit: 5
               };
-              this.getChildLink(childLayer, parentIndex, body, link);
+              this.getChildLink(childLayer, parentIndex, body, link, callback);
               if (this.props.onClick) {
                 this.props.onClick(body, link);
               }
@@ -215,7 +216,7 @@ export default class PCDetail extends Component {
 
         this.setState({
           data: data
-        });
+        }, callback);
       });
     }
   }
@@ -234,7 +235,7 @@ export default class PCDetail extends Component {
           return (
             <Part justify='start' demarcate={false} key={index}>
               <Part demarcate={false} align='start' direction='column' key={index}>
-                {getParts(item)}
+                <IconPart {...item}/>
               </Part>
               {idMap[item.id] && this.getItems(idMap[item.id].map(id => categoryMap[id]), idMap, categoryMap, item.id + index)}
             </Part>
@@ -280,27 +281,62 @@ export default class PCDetail extends Component {
   }
 }
 
-const getParts = ({id, label, icon, iconA, iconB, onClick, showDetail, noLeadingStatus, demarcate}) => {
-  return (
-    <Part className='margin30' key={id} demarcate={false}>
-      <Part id={id + 'A'} demarcate={false} status={iconA == 'dot' ? 'ok' : ''} align='center'>
-        {iconA != 'dot' && iconA}
+class IconPart extends Component {
+  componentWillMount() {
+    this.state = {
+      loading: false,
+      isLoaded: false
+    }
+  }
+
+  onClick() {
+    const {onClick, isLink} = this.props;
+    const isLoaded = this.state.isLoaded;
+    if (isLink && isLoaded) {
+      return;
+    }
+
+    if (onClick) {
+      if (isLoaded) {
+        onClick();
+      } else {
+        this.setState({loading: true}, () => {
+          onClick(() => this.setState({loading: false, isLoaded: true}));
+        });
+      }
+    }
+  }
+
+  render() {
+    const {id, label, icon, iconA, iconB, onClick, demarcate} = this.props;
+    let leftIcon = icon || <ComputerPersonal/>;
+    if (this.state.loading) {
+      leftIcon = <Spinning />;
+    }
+    const click = onClick && this.onClick.bind(this);
+
+    return (
+      <Part className='margin30' key={id} demarcate={false}>
+        <Part id={id + 'A'} demarcate={false} status={iconA == 'dot' ? 'ok' : ''} align='center'>
+          {iconA != 'dot' && iconA}
+        </Part>
+        <Part demarcate={demarcate || false}>
+          <Box direction='row' onClick={click}>
+            {leftIcon}
+            <Label>{label}</Label>
+          </Box>
+        </Part>
+        {click &&
+        <Part id={id + 'B'} demarcate={false} align='start'>
+          <Box onClick={onClick}>
+            {iconB}
+          </Box>
+        </Part>}
       </Part>
-      <Part demarcate={demarcate || false}>
-        <Box direction='row' onClick={onClick}>
-          {icon || <ComputerPersonal/>}
-          <Label>{label}</Label>
-        </Box>
-      </Part>
-      {onClick &&
-      <Part id={id + 'B'} demarcate={false} align='start'>
-        <Box onClick={onClick}>
-          {iconB}
-        </Box>
-      </Part>}
-    </Part>
-  );
-};
+    );
+  }
+}
+
 
 PCDetail.propTypes = {
   body: PropTypes.object.isRequired,
