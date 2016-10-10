@@ -1,6 +1,38 @@
 {
   "defaultIcon": "Inbox",
-  "amComputer": "ComputerPersonal",
+  "amComputer": [
+    {
+      "field": "ComputerType",
+      "like": "VMware",
+      "icon": "VmMaintenance"
+    },
+    {
+      "field": "ComputerType",
+      "like": "Unix",
+      "icon": "PlatformUnixware"
+    },
+    {
+      "field": "ComputerType",
+      "like": "Windows",
+      "icon": "PlatformWindows"
+    },
+    {
+      "field": "ComputerType",
+      "like": "Camera",
+      "icon": "Camera"
+    },
+    {
+      "field": "ComputerType",
+      "like": "Virtual",
+      "icon": "VirtualMachine"
+    },
+    {
+      "field": "ComputerType",
+      "like": "server",
+      "icon": "Server"
+    },
+    "ComputerPersonal"
+  ],
   "amSoftInstall": "App",
   "amExpenseLine": [
     {
