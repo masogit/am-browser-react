@@ -534,18 +534,14 @@ export default class RecordList extends Component {
               <ListItem><Header>{body.label}</Header></ListItem>
               {
                 body.fields.map((field, index) => {
-                  let value = record[field.sqlname];
-                  if (value && typeof value == 'object') {
-                    value = value[0];
-                  }
                   return (
                     <ListItem key={index} justify="between">
                       <span>
                         {field.label}
                       </span>
-                          <Box pad={{horizontal: 'medium'}}/>
+                      <Box pad={{horizontal: 'medium'}}/>
                       <span className="secondary">
-                        {value}
+                        {Format.getFieldStrVal(record, field)}
                       </span>
                     </ListItem>
                   );

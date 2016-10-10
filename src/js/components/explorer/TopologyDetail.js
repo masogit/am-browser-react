@@ -64,7 +64,7 @@ export default class TopologyDetail extends Component {
               id: "item-1-0",
               icon: getIcon(this.state.body, record),
               demarcate: true,
-              label: record.self + (this.state.body.links ? ` (${this.state.body.links.length})` : ''),
+              label: record.self + (this.state.body.links ? ` [${this.state.body.links.length}]` : ''),
               onClick: (callback) => {
                 if (this.props.onClick) {
                   this.props.onClick(this.state.body, record, callback);
@@ -167,7 +167,7 @@ export default class TopologyDetail extends Component {
 
           let label = record.self, onClick = null;
           if (link.body.links) {
-            label = `${label} (${link.body.links.length})`;
+            label = `${label} [${link.body.links.length}]`;
             if (link.body.links.length > 0) {
               const linkIndex = index + body.param.offset;
               onClick = (callback) => {
@@ -176,6 +176,8 @@ export default class TopologyDetail extends Component {
                   this.props.onClick(link.body, record);
                 }
               };
+            } else if (this.props.onClick) {
+              onClick = (callback) => this.props.onClick(link.body, record, callback);
             }
           } else {
             onClick = (callback) => this.setState({record, body: link.body}, callback);
@@ -204,9 +206,6 @@ export default class TopologyDetail extends Component {
                 limit: 5
               };
               this.getChildLink(childLayer, parentIndex, body, link, callback);
-              if (this.props.onClick) {
-                this.props.onClick(body, link);
-              }
             }
           });
           data.links.push({parentId: `item-${childLayer - 1}-${parentIndex}`, childId: moreId});

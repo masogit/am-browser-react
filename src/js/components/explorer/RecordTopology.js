@@ -42,7 +42,7 @@ export default class RecordTopology extends Component {
     const parts = records.map((record, index) => (
       <Part demarcate={false} align="center" key={index} justify='start'>
         <Box onClick={() => this.updateDetail(this.state.body, record)} direction="row">
-          {getIcon(this.props.body, record)}
+          {getIcon(this.props.recordBody, record)}
           <Label>{record.self}</Label>
         </Box>
       </Part>
@@ -75,7 +75,7 @@ export default class RecordTopology extends Component {
     } else {
       return (
         <Box flex={true} className='topology-background-color fixMinSizing'>
-          {body.links.length > 0 &&
+          {recordBody.links.length > 0 &&
           <Box flex={false} margin={{bottom: 'small'}}>
             <Map vertical={true} className='hiddenScroll grid' data={bodyToMapData(recordBody)} />
           </Box>
