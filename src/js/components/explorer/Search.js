@@ -3,12 +3,12 @@ import history from '../../RouteHistory';
 import * as ExplorerActions from '../../actions/explorer';
 import * as AQLActions from '../../actions/aql';
 import {getJobList} from '../../actions/ucmdbAdapter';
-import {Header, Box, Tiles, Headline, Meter, Tile, Anchor} from 'grommet';
+import {Header, Box, Tiles, Meter, Tile} from 'grommet';
 import Graph from '../commons/Graph';
 import UCMDBAdapterContainer from '../ucmdbAdapter/UCMDBAdapterPoint';
 import AQL from '../aql/AQL';
 import Spinning from 'grommet/components/icons/Spinning';
-import SearchIcon from 'grommet/components/icons/base/Search';
+import {LongSearchInput} from '../commons/SearchInput';
 
 export default class Search extends Component {
 
@@ -93,18 +93,6 @@ export default class Search extends Component {
 
   filter(objs, num) {
     return objs.length > num ? objs.filter((item, index) => index < num) : objs;
-  }
-
-  _onEnter(event) {
-    if ((event.keyCode === 13))
-      this.goRecordSearch(event.target.value.trim());
-  }
-
-  _onSearch(event) {
-    if (event.target.value.toLowerCase().trim() === '')
-      this.setState({
-        keyword: ''
-      });
   }
 
   getSeries(children, groupby) {
@@ -232,18 +220,7 @@ export default class Search extends Component {
 
     return (
       <Box align="center" justify="center" style={{flexShrink: 0, flexGrow: 1}}>
-        <Headline size="medium">
-          Asset Manager Browser
-        </Headline>
-        <Header direction="row" pad={{vertical: 'medium'}} justify='center'>
-          <input type="search" placeholder="Global Record Search..." ref='search'
-                 onKeyDown={this._onEnter.bind(this)} onChange={this._onSearch.bind(this)} size="120"
-                 maxLength={50}/>
-          <Box colorIndex='brand' pad={{vertical: 'small', horizontal: 'medium'}}
-               onClick={() => this.goRecordSearch(this.refs.search.value.trim())}>
-            <Anchor icon={<SearchIcon/>} label='Search'/>
-          </Box>
-        </Header>
+        <LongSearchInput onSearch={this.goRecordSearch.bind(this)} direction='column'/>
         <Tiles flush={false} justify="center" size="large" flex={false}>
           {
             tiles.map(tile => (
