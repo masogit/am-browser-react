@@ -3,11 +3,12 @@ import history from '../../RouteHistory';
 import * as ExplorerActions from '../../actions/explorer';
 import * as AQLActions from '../../actions/aql';
 import {getJobList} from '../../actions/ucmdbAdapter';
-import {Header, Box, Tiles, Headline, Meter, Tile} from 'grommet';
+import {Header, Box, Tiles, Headline, Meter, Tile, Anchor} from 'grommet';
 import Graph from '../commons/Graph';
 import UCMDBAdapterContainer from '../ucmdbAdapter/UCMDBAdapterPoint';
 import AQL from '../aql/AQL';
 import Spinning from 'grommet/components/icons/Spinning';
+import SearchIcon from 'grommet/components/icons/base/Search';
 
 export default class Search extends Component {
 
@@ -234,15 +235,19 @@ export default class Search extends Component {
         <Headline size="medium">
           Asset Manager Browser
         </Headline>
-        <Box direction="row" pad={{vertical: 'medium'}} flex={false}>
-          <input type="search" className="flex" placeholder="Global Record Search..."
+        <Header direction="row" pad={{vertical: 'medium'}} justify='center'>
+          <input type="search" placeholder="Global Record Search..." ref='search'
                  onKeyDown={this._onEnter.bind(this)} onChange={this._onSearch.bind(this)} size="120"
                  maxLength={50}/>
-        </Box>
-        <Tiles flush={false} justify="center" size="large" flex={false} colorIndex='light-2'>
+          <Box colorIndex='brand' pad={{vertical: 'small', horizontal: 'medium'}}
+               onClick={() => this.goRecordSearch(this.refs.search.value.trim())}>
+            <Anchor icon={<SearchIcon/>} label='Search'/>
+          </Box>
+        </Header>
+        <Tiles flush={false} justify="center" size="large" flex={false}>
           {
             tiles.map(tile => (
-              <Tile key={tile.title} onClick={tile.onClick} colorIndex="light-1">
+              <Tile key={tile.title} onClick={tile.onClick} colorIndex="light-2">
                 <Header size='small' justify='center'>{tile.title}</Header>
                 {tile.graph}
               </Tile>

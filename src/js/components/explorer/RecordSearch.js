@@ -7,8 +7,9 @@ import ContentPlaceHolder from '../commons/ContentPlaceHolder';
 import history from '../../RouteHistory';
 import Spinning from 'grommet/components/icons/Spinning';
 import {
-  Anchor, Box, Button, Header, Footer, Split, Table, TableRow, Tiles, Tile
+  Anchor, Box, Header, Footer, Split, Table, TableRow, Tiles, Tile
 } from 'grommet';
+import SearchIcon from 'grommet/components/icons/base/Search';
 
 export default class RecordSearch extends ComponentBase {
   constructor() {
@@ -214,11 +215,14 @@ export default class RecordSearch extends ComponentBase {
       <Box flex={true} pad={{horizontal: "medium", vertical: 'small'}}>
         <Header justify="between">
           <Box >Global Search</Box>
-          <Box flex={true}>
+          <Box flex={true} direction='row'>
             <input type="search" className="flex" placeholder="Global Record search..." ref="search"
               value={this.state.searchText} onChange={this._onEnter.bind(this)} onKeyDown={this._onEnter.bind(this)} maxLength={50}/>
+            <Box colorIndex='brand' pad={{vertical: 'small', horizontal: 'medium'}}
+                 onClick={this._onSearch.bind(this)}>
+              <Anchor icon={<SearchIcon/>} label='Search'/>
+            </Box>
           </Box>
-          <Button label="Search" onClick={this.state.buttonDisabled ? null : ()=>this._onSearch()}/>
         </Header>
         <Split flex="right" fixed={false} className='flex'>
             <Table>
