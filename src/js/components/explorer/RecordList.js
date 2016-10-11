@@ -1,4 +1,4 @@
-import React, {Component, PropTypes} from 'react';
+import React, {PropTypes} from 'react';
 import RecordDetail from './RecordDetail';
 import RecordTopology from './RecordTopology';
 import {Table, TableRow, Box, Anchor, Header, Menu, List, ListItem}from 'grommet';
@@ -19,6 +19,7 @@ import Csv from 'grommet/components/icons/base/DocumentCsv';
 import * as ExplorerActions from '../../actions/explorer';
 import * as AQLActions from '../../actions/aql';
 import Graph from '../commons/Graph';
+import ComponentBase from '../commons/ComponentBase';
 import EmptyIcon from '../commons/EmptyIcon';
 import * as Format from '../../util/RecordFormat';
 import {hash, loadSetting, saveSetting} from '../../util/util';
@@ -32,51 +33,50 @@ const getFirstGroupby = (groupby) => {
     return '';
 };
 
-export default class RecordList extends Component {
+const init = (props) => {
+  let searchFields = props.body.fields.filter((field) => {
+    return field.searchable;
+  }).map((field) => {
+    return Format.getDisplayLabel(field);
+  }).join(', ');
+
+  return {
+    numColumn: 5,
+    numTotal: 0,
+    timeQuery: 0,
+    records: [],
+    filtered: null,
+    record: null,
+    searchFields: searchFields,
+    graphData: null,
+    param: (!props.noCache && loadSetting(hash(Object.assign({},props.body, {filter: ''})))) || {
+      showTopology: props.showTopology != undefined ? props.showTopology : false,
+      graphType: props.graphType || "legend",
+      allFields: props.allField || false,
+      groupby: props.groupby || getFirstGroupby(props.body.groupby),
+      aqlInput: props.aqlInput || false,
+      orderby: props.orderby || "",
+      offset: props.offset || 0,
+      limit: props.limit || 30,
+      filters: props.filters || []
+    },
+    onMoreLock: false,
+    locked: false,
+    showGraph: true,
+    body: props.body
+  };
+
+};
+
+export default class RecordList extends ComponentBase {
   componentWillMount() {
-    const props = this.props;
-    this.state = {
-      numColumn: 5,
-      numTotal: 0,
-      timeQuery: 0,
-      records: [],
-      filtered: null,
-      record: null,
-      searchFields: null,
-      graphData: null,
-      param: (!props.noCache && loadSetting(hash(Object.assign({},props.body, {filter: ''})))) || {
-        showMap: props.showMap != undefined ? props.showMap : (props.body.links && props.body.links.length > 0),
-        showTopology: props.showTopology != undefined ? props.showTopology : false,
-        graphType: props.graphType || "legend",
-        allFields: props.allField || false,
-        groupby: props.groupby || getFirstGroupby(props.body.groupby),
-        aqlInput: props.aqlInput || false,
-        orderby: props.orderby || "",
-        offset: props.offset || 0,
-        limit: props.limit || 30,
-        filters: props.filters || []
-      },
-      onMoreLock: false,
-      locked: false,
-      showGraph: true,
-      body: props.body
-    };
-
-    const getSearchableFields = () => {
-      let searchFields = props.body.fields.filter((field) => {
-        return field.searchable;
-      }).map((field) => {
-        return Format.getDisplayLabel(field);
-      }).join(', ');
-
-      if (searchFields)
-        this.setState({
-          searchFields: searchFields
-        });
-    };
-
-    getSearchableFields();
+    this.state = init(this.props);
     this._getRecords(this.state.param);
+  }
+
+  componentWillReceiveProps(props) {
+    super.cancelPromises();
+    this.setState(init(props), () => this._getRecords(this.state.param));
   }
 
   componentWillUnmount() {
@@ -107,7 +107,7 @@ export default class RecordList extends Component {
         body.filter = body.filter ? body.filter + ' AND (' + userFilters + ')' : userFilters;
       }
       body.groupby = groupby;
-      AQLActions.queryAQL(ExplorerActions.getGroupByAql(body)).then((data)=> {
+      this.addPromise(AQLActions.queryAQL(ExplorerActions.getGroupByAql(body)).then((data)=> {
         let param = this.state.param;
         param.groupby = groupby;
         let graphData = (data && data.rows.length > 0) ? data : null;
@@ -117,7 +117,7 @@ export default class RecordList extends Component {
           param: param,
           locked: false
         });
-      });
+      }));
     }
   }
 
@@ -141,7 +141,7 @@ export default class RecordList extends Component {
       this.setState({
         loading: true
       });
-      ExplorerActions.loadRecordsByBody(body).then((data) => {
+      this.addPromise(ExplorerActions.loadRecordsByBody(body).then((data) => {
         const records = this.state.records;
         this.setState({
           loading: false,
@@ -161,7 +161,7 @@ export default class RecordList extends Component {
           if (this.state.param.groupby && !onMore)
             this._getGroupByData(this.state.param.groupby);
         });
-      });
+      }));
     }
   }
 
@@ -632,11 +632,10 @@ export default class RecordList extends Component {
   }
 
   render() {
-    const fixIEScrollBar = this.props.root ? 'fixIEScrollBar' : '';
     const {record, param: {graphType, filters, showTopology}} = this.state;
 
     return (
-      <Box flex={true} className={fixIEScrollBar}>
+      <Box flex={true} className='fixIEScrollBar'>
         {this.renderToolBox()}
         {filters.length > 0 &&
           <Box direction='row' className='topology-background-color' pad='small' flex={false} margin={{bottom: 'small'}}>
@@ -649,7 +648,7 @@ export default class RecordList extends Component {
             )}
         </Box>
         }
-        <Box flex={true} direction={graphType=='legend' ? 'row' : 'column'} className={`fixMinSizing ${fixIEScrollBar}`}>
+        <Box flex={true} direction={graphType=='legend' ? 'row' : 'column'} className='fixMinSizing fixIEScrollBar'>
           {!(showTopology && record) && this.renderGraph()}
           <Box flex={true} pad={graphType=='legend' ? 'none' : {vertical: 'small'}} direction='row'>
             <Box className='topology-background-color' flex={true} pad='small'>

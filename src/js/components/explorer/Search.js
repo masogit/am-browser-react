@@ -72,7 +72,7 @@ export default class Search extends Component {
         });
     }
     getOnlineUser().then(onlineUsers => {
-      this.setState({onlineUsers})
+      this.setState({onlineUsers});
     });
   }
 

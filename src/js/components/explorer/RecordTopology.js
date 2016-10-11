@@ -41,7 +41,7 @@ export default class RecordTopology extends Component {
 
     const parts = records.map((record, index) => (
       <Part demarcate={false} align="center" key={index} justify='start'>
-        <Box onClick={() => this.updateDetail(this.state.body, record)} direction="row">
+        <Box onClick={() => this.updateDetail(this.props.body, record)} direction="row">
           {getIcon(this.props.recordBody, record)}
           <Label>{record.self}</Label>
         </Box>
