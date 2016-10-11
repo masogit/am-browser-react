@@ -1,6 +1,6 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 import React, {Component} from 'react';
-import {SearchInput, Header, Box, Anchor} from 'grommet';
+import {SearchInput, Box, Anchor} from 'grommet';
 import Search from 'grommet/components/icons/base/Search';
 
 export default class Input extends SearchInput {
@@ -61,9 +61,9 @@ export class LongSearchInput extends Component {
     direction = direction || 'row';
 
     return (
-      <Header justify="between" direction={direction}>
-        <Box tag={direction == 'row' ? 'h2' : 'h1'}>{title}</Box>
-        <Box flex={true} direction='row'>
+      <Box justify="between" direction={direction} full='horizontal' align='center'>
+        <Box tag={direction == 'row' ? 'h2' : 'h1'} style={{marginBottom: 0, marginRight: direction == 'row' ? '12px' : 0 }}>{title}</Box>
+        <Box flex={direction == 'row'} direction='row'>
           <input type="search" className="flex" placeholder="Global Record search..." ref="input" size='120'
                  onKeyDown={this._onEnter.bind(this)} maxLength={50}/>
           <Box colorIndex='brand' pad={{vertical: 'small', horizontal: 'medium'}}
@@ -71,7 +71,7 @@ export class LongSearchInput extends Component {
             <Anchor icon={<Search/>} label='Search'/>
           </Box>
         </Box>
-      </Header>
+      </Box>
     );
   }
 }

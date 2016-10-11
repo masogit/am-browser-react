@@ -5,6 +5,38 @@ var config = require('./config');
 var rights = require('./constants').rights;
 var logger = require('./logger');
 
+
+var onlineUsers = {};
+var userTracking = {
+  add: function(session) {
+    const ipAddress = session.id;
+    onlineUsers[ipAddress] = session;
+    onlineUsers[ipAddress].online = true;
+  },
+  remove: function(ipAddress) {
+    if (onlineUsers[ipAddress]) {
+      onlineUsers[ipAddress].online = false;
+    }
+  },
+  get: function() {
+    const result = {};
+    Object.keys(onlineUsers).map(sessionId => {
+      const session = onlineUsers[sessionId];
+      if (session.online) {
+        if (!result[session.user]) {
+          result[session.user] = {
+            name: session.user,
+            count: 1
+          };
+        } else {
+          result[session.user].count++;
+        }
+      }
+    });
+    return Object.keys(result).map(key => result[key]);
+  }
+};
+
 module.exports = function (am) {
 
   this.login = function (req, res) {
@@ -121,6 +153,18 @@ module.exports = function (am) {
     });
   };
 
+  this.logout = function(req, res) {
+    logger.info(`[user] [${req.sessionID || '-'}]`, (req.session && req.session.user ? req.session.user : "user") + " logout.");
+    const username = req.session.user;
+    userTracking.remove(req.session.id);
+    req.session.regenerate((err)=> {});
+    res.clearCookie('headerNavs');
+    res.json({});
+    if (username) {
+      slack(username, `${username} logs out`);
+    }
+  };
+
   this.jwtRenew = function (req, res) {
 
     var url = "http://${server}${context}${ref-link}";
@@ -148,6 +192,9 @@ module.exports = function (am) {
 
   this.slack = slack;
   this.live_net_work = live_net_work;
+  this.getOnlineUser = function(req, res) {
+    res.json(userTracking.get());
+  };
 };
 
 var slackProcess;
@@ -190,6 +237,7 @@ function loginSuccess(req, res, username, password, email, rights, am) {
   res.cookie("email", email);
   res.json(am_rest);
   slack(username, `${username} logs in`);
+  userTracking.add(req.session);
   logger.info(`[user] [${req.sessionID || '-'}]`, (req.session && req.session.user ? req.session.user : "user") + " login.");
 }
 

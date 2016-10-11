@@ -91,17 +91,7 @@ module.exports = function (app) {
   // AM Server Login
   app.post('/am/login', rest.login);
 
-  app.get('/am/logout', function (req, res) {
-    logger.info(`[user] [${req.sessionID || '-'}]`, (req.session && req.session.user ? req.session.user : "user") + " logout.");
-    var am_rest = {};
-    const username = req.session.user;
-    req.session.regenerate((err)=>{});
-    res.clearCookie('headerNavs');
-    res.json(am_rest);
-    if (username) {
-      rest.slack(username, `${username} logs out`);
-    }
-  });
+  app.get('/am/logout', rest.logout);
 
   app.all("/*", function (req, res, next) {
     var session = req.session;
@@ -125,6 +115,8 @@ module.exports = function (app) {
       next(); // Call the next middleware
     }
   });
+
+  app.get('/am/onlineUser', rest.getOnlineUser);
 
   const sendSlack = (req, res, next) => {
     if (req.originalUrl.indexOf('view') > -1 && !req.body._id) {
