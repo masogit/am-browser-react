@@ -260,7 +260,7 @@ export default class Search extends Component {
     return (
       <Box align="center" justify="center" style={{flexShrink: 0, flexGrow: 1}}>
         <LongSearchInput onSearch={this.goRecordSearch.bind(this)} direction='column'/>
-        <Tiles flush={false} justify="center" size="large" flex={false}>
+        <Tiles flush={false} justify="center" size="medium" flex={false}>
           {
             tiles.map(tile => (
               <Tile key={tile.title} onClick={tile.onClick} colorIndex="light-2">

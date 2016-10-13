@@ -34,7 +34,7 @@ export default class NavHeader extends Component {
     }
 
     return (
-      <Header fixed={true} size="medium" full="horizontal" direction="row" justify="between" colorIndex="neutral-1" responsive={false}>
+      <Header fixed={true} size="medium" full="horizontal" direction="row" justify="between" colorIndex="neutral-1" responsive={false} className='shadow'>
         <Title>
           <img src="../../img/favicon.png" className='logo' onClick={toggleSidebar}/> AM Browser
         </Title>

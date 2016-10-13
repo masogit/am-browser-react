@@ -74,7 +74,7 @@ export default class RecordTopology extends Component {
       );
     } else {
       return (
-        <Box flex={true} className='topology-background-color fixMinSizing'>
+        <Box flex={true} className='fixMinSizing'>
           {recordBody.links.length > 0 &&
           <Box flex={false} margin={{bottom: 'small'}}>
             <Map vertical={true} className='hiddenScroll grid' data={bodyToMapData(recordBody)} />

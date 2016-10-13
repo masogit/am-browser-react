@@ -229,7 +229,7 @@ export default class RecordSearch extends ComponentBase {
                   </TableRow>))
               }</tbody>
             </Table>
-            <Tiles flush={false} fill={true} pad='none' className={`autoScroll ${cards.length > 10 ? 'fixIEScrollBar' : ''}`}>
+            <Tiles flush={false} fill={true} className={`autoScroll ${cards.length > 10 ? 'fixIEScrollBar' : ''}`}>
               {
                 this.locked ? <Spinning /> : cards.map((record, index) => (
                   <Tile key={index} align="start" colorIndex='light-2' pad={{ horizontal: 'small' }}>

@@ -415,10 +415,10 @@ export default class RecordList extends ComponentBase {
     return (
       <Header justify="between" pad='none'>
         {this.props.title && <Box margin={{right: 'small'}}>{this.props.title}</Box>}
-        <input type="text" className={aqlInput ? 'aql flex' : 'flex'} ref="search"
+        <input type="text" className={aqlInput ? 'aql flex shadow' : 'flex shadow'} ref="search"
                placeholder={placeholder} disabled={locked} onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
-        <Box colorIndex='light-2' onClick={this._toggleAQLInput.bind(this)} pad='small'>
-          <Code colorIndex={aqlInput ? 'accent-3' : 'brand'}/>
+        <Box colorIndex={aqlInput ? 'accent-3' : 'brand'} onClick={this._toggleAQLInput.bind(this)} pad='small' className='button'>
+          <Code />
         </Box>
         <Box direction="column" margin={{left: 'small'}}>
           <Anchor onClick={this._getMoreRecords.bind(this)} disabled={loading}>
