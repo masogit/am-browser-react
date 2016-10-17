@@ -486,7 +486,7 @@ function getFormattedRecords(fields, rawRecords) {
 }
 
 function getFieldStrVal(record, field, noEscape) {
-  var val = record[field.sqlname];
+  var val = record[field.sqlname] || '';
   if (field.user_type && field.user_type == 'System Itemized List')
     val = val[Object.keys(val)[0]];
   else if (field.type && field.type == 'Date+Time') {
