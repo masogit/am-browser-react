@@ -1,21 +1,10 @@
 import React, {PropTypes} from 'react';
 import RecordDetail from './RecordDetail';
 import RecordTopology from './RecordTopology';
-import {Table, TableRow, Box, Anchor, Header, Menu, List, ListItem}from 'grommet';
-import Close from 'grommet/components/icons/base/Close';
-import Ascend from 'grommet/components/icons/base/Ascend';
-import Descend from 'grommet/components/icons/base/Descend';
-import MenuIcon from 'grommet/components/icons/base/Menu';
-import Checkbox from 'grommet/components/icons/base/Checkbox';
-import Filter from 'grommet/components/icons/base/Filter';
-import Code from 'grommet/components/icons/base/Code';
-import BarChart from 'grommet/components/icons/base/BarChart';
-import LineChart from 'grommet/components/icons/base/LineChart';
+import {Table, TableRow, Box, Anchor, Header, Menu, List, ListItem, Icons} from 'grommet';
+const { Close, Ascend, Descend, Checkbox, Filter, Code, BarChart, LineChart, Aggregate,
+   CheckboxSelected, Cluster, Menu: MenuIcon, DocumentPdf: Pdf, DocumentCsv: Csv}= Icons.Base;
 import Status from 'grommet/components/icons/Status';
-import Aggregate from 'grommet/components/icons/base/Aggregate';
-import CheckboxSelected from 'grommet/components/icons/base/CheckboxSelected';
-import Pdf from 'grommet/components/icons/base/DocumentPdf';
-import Csv from 'grommet/components/icons/base/DocumentCsv';
 import * as ExplorerActions from '../../actions/explorer';
 import * as AQLActions from '../../actions/aql';
 import Graph from '../commons/Graph';
@@ -24,7 +13,6 @@ import EmptyIcon from '../commons/EmptyIcon';
 import * as Format from '../../util/RecordFormat';
 import {hash, loadSetting, saveSetting} from '../../util/util';
 import cookies from 'js-cookie';
-import Cluster from 'grommet/components/icons/base/Cluster';
 
 const getFirstGroupby = (groupby) => {
   if (groupby && groupby.split('|').length > 0)
@@ -445,6 +433,9 @@ export default class RecordList extends ComponentBase {
           <Anchor icon={<Pdf />} label="PDF Report"
                   disabled={numTotal < 1}
                   onClick={() => (numTotal > 0) && this._download('pdf')}/>
+          <Anchor icon={<Pdf />} label="Print BarCode"
+                  disabled={numTotal < 1}
+                  onClick={() => (numTotal > 0) && this.props.printPdf({body: this.state.body, records: this.state.records, total: numTotal})}/>
         </Menu>
         <form name="Download" ref="downloadForm" method="post">
           <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>

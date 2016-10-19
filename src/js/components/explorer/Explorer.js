@@ -3,6 +3,8 @@ import * as ExplorerActions from '../../actions/explorer';
 import RecordList from './RecordList';
 import Box from 'grommet/components/Box';
 import AMSideBar from '../commons/AMSideBar';
+import ContentPlaceHolder from '../commons/ContentPlaceHolder';
+import BarCodeEditor from './BarCodeEditor';
 
 export default class Explorer extends Component {
 
@@ -10,7 +12,8 @@ export default class Explorer extends Component {
     super();
     this.state = {
       view: null,
-      navigation: null
+      navigation: null,
+      pdfGenerator: null
     };
   }
 
@@ -46,20 +49,38 @@ export default class Explorer extends Component {
     });
   }
 
+  printPdf(pdfGenerator) {
+    this.setState({pdfGenerator});
+  }
+
   render() {
+    const {navigation, view, pdfGenerator} = this.state;
+    const content = [];
+    if (pdfGenerator) {
+      content.push(<BarCodeEditor {...pdfGenerator} back={() => this.setState({pdfGenerator: null})}/>);
+    } else {
+      const focus = {};
+      if (view) {
+        focus.expand = view.category;
+        focus.selected = view._id;
+        content.push(
+          <Box margin={{horizontal: 'small'}} flex={true}>
+            <RecordList body={view.body} title={view.name} root={true} printPdf={this.printPdf.bind(this)}/>
+          </Box>);
+      } else {
+        focus.expand = false;
+        focus.selected = '';
+        content.push(<ContentPlaceHolder content='Select an item to query.' />);
+      }
+
+      if (navigation) {
+        content.unshift(<AMSideBar focus ={focus} title='Views Navigation' contents={navigation}/>);
+      }
+    }
+
     return (
       <Box direction="row" flex={true}>
-        {this.state.navigation &&
-        <AMSideBar title='Views Navigation'
-                 contents={this.state.navigation}
-                 focus ={{expand: this.state.view ? this.state.view.category : false, selected: this.state.view ? this.state.view._id: ""}}/>}
-        {this.state.view ? <Box margin={{horizontal: 'small'}} flex={true}><RecordList body={this.state.view.body} title={this.state.view.name} root={true}/></Box> :
-          <Box pad={{horizontal: 'medium'}} flex={true} justify='center' align="center">
-            <Box size="medium" colorIndex="light-2" pad={{horizontal: 'large', vertical: 'medium'}} align='center'>
-              Select an item to query.
-            </Box>
-          </Box>
-        }
+        {content}
       </Box>
     );
   }

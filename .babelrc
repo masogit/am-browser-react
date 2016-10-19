@@ -3,5 +3,9 @@
   "plugins": [
     "transform-object-rest-spread",
     "transform-object-assign"
+  ],
+  "ignore": [
+    "scripts/vfs_font.js",
+    "scripts/pdfmake.min.js"
   ]
 }
