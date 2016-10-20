@@ -10,7 +10,8 @@ import '../../../scripts/vfs_fonts';
 const barcodeType = [{
   name: 'CODE128',
   label: 'CODE128',
-  type: 'string'
+  type: 'string',
+  checked: true
 }, {
   name: 'CODE39',
   label: 'CODE39',
@@ -122,6 +123,17 @@ const recordsToPdfDoc_barcode = (fields, records, reportLabel, param) => {
   };
 };
 
+const dataReady = ({records, fields, defaultValue}) => {
+  let ready = defaultValue || true;
+  if (records) {
+    ready = records.filter(record => record.selected).length > 0;
+  }
+  if (fields) {
+    ready = ready && fields.filter(field => field.selected).length > 0;
+  }
+  return ready;
+};
+
 export default class RecordList extends Component {
   componentWillMount() {
     const records = this.props.records.slice(0, 5);
@@ -138,7 +150,7 @@ export default class RecordList extends Component {
       split: true,
       loading: false,
       recordsStart: 1,
-      recordsEnd: this.props.total > 1000 ? 1000 : this.props.total
+      limit: 100
     };
     this.updateValue = this.updateValue.bind(this);
   }
@@ -165,30 +177,31 @@ export default class RecordList extends Component {
     this.setState(this.state);
   }
 
-  renderNumberInput(label, name, min, max) {
+  renderNumberInput(label, name, min, max, displayValue, step = 1) {
     //https://gist.github.com/Candy374/80bf411ff286f6785eb80a9098f01c39
     return (
       <FormField label={
           <Box justify='between' direction='row'>
             <span>{label}</span>
-            {this.state[name]}
+            {displayValue || this.state[name]}
           </Box>}>
-        <input name={name} type="range" min={min} max={max} value={this.state[name]} onChange={this.updateValue}/>
+        <input name={name} type="range" min={min} max={max} step={step} value={this.state[name]} onChange={this.updateValue}/>
       </FormField>
     );
   }
 
   renderForm() {
-    const {hideLabel, split, width, recordsStart, recordsEnd} = this.state;
+    const {hideLabel, split, width, limit, recordsStart} = this.state;
+    const total = this.props.total;
     return (
-      <Form className='no-border strong-label'>
-        <FormField>
+      <Form className='no-border strong-label' >
+        <FormField label='Page Setting'>
           <CheckBox checked={hideLabel} name='hideLabel' value={hideLabel} label='Hide Field Name'
-                    onChange={this.updateValue} toggle={true} />
+                    onChange={this.updateValue}/>
           <CheckBox checked={split} name='split' value={split} label='Break Page'
-                    onChange={this.updateValue} toggle={true} />
+                    onChange={this.updateValue} />
         </FormField>
-        <FormField label='Bar Code Type' className='multi-check'>
+        <FormField label='Bar Code Type'>
           {barcodeType.map((type, index)=> {
             return (
               <RadioButton key={index} id='format' name='format' value={type.name}
@@ -201,8 +214,8 @@ export default class RecordList extends Component {
         {this.renderNumberInput('Height', 'height', 50, 200)}
         {this.renderNumberInput('Margin', 'margin', 1, 20)}
         {this.renderNumberInput('Text Margin', 'textMargin', 1, 20)}
-        {this.renderNumberInput('Download Records From', 'recordsStart', 1, recordsEnd)}
-        {this.renderNumberInput('Download Records To', 'recordsEnd', recordsStart, this.props.total)}
+        {this.renderNumberInput('Download Records From', 'recordsStart', 1, total, `${recordsStart}/${total}`)}
+        {this.renderNumberInput('Records Limit', 'limit', 100, 1000, limit, 100)}
       </Form>
     );
   }
@@ -241,7 +254,7 @@ export default class RecordList extends Component {
 
     body.param = {
       offset: this.state.recordsStart - 1,
-      limit: this.state.recordsEnd - this.state.recordsStart + 1
+      limit: this.state.limit
     };
     ExplorerActions.loadRecordsByBody(body).then((data) => {
       const dd = recordsToPdfDoc_barcode(this.state.fields, data.entities, name, this.state);
@@ -255,9 +268,10 @@ export default class RecordList extends Component {
   renderFields() {
     const fields = this.state.fields;
     let error;
-    if (fields.filter(field => field.selected).length == 0) {
-      error = 'No field selected';
+    if (!dataReady({fields})) {
+      error = 'No Field Selected';
     }
+
     return (
       <FormField label="Choose Fields" error={error}>
         <Box pad={{horizontal: 'medium'}}>{
@@ -279,9 +293,10 @@ export default class RecordList extends Component {
   renderRecordChooser() {
     const records = this.state.records;
     let error;
-    if (records.filter(record => record.selected).length == 0) {
-      error = 'No Record selected';
+    if (!dataReady({records})) {
+      error = 'No Record Selected';
     }
+
     return (
         <FormField label='Choose Preview Records' error={error}>
           <Box pad={{horizontal: 'medium', vertical: 'small'}} direction='row'>{
@@ -307,14 +322,19 @@ export default class RecordList extends Component {
       return <Box>No Records</Box>;
     }
 
+    const {records: stateRecords, fields, loading, downloading} = this.state;
+
+    const previewDisabled = !dataReady({records: stateRecords, fields, defaultValue: loading});
+    const downloadDisabled = !dataReady({records: stateRecords, fields, defaultValue: downloading});
+
     return (
       <Box pad='small' flex={true}  direction='row'>
         <Box flex={true} style={{maxWidth: '50vw'}} pad={{horizontal: 'medium'}}>
           <Header justify='between'>
             <Box>PDF Generator</Box>
-            <Menu direction="row" align="center">
-              <Anchor icon={<Preview/>} disabled={this.state.loading} onClick={this.state.loading ? null : () => this.preview()} label='Preview'/>
-              <Anchor icon={<Download />} disabled={this.state.downloading} onClick={this.state.downloading ? null : () => this.download()} label='Download'/>
+            <Menu direction="row" align="center" responsive={true}>
+              <Anchor icon={<Preview/>} disabled={previewDisabled} onClick={previewDisabled ? null : () => this.preview()} label='Preview'/>
+              <Anchor icon={<Download />} disabled={downloadDisabled} onClick={downloadDisabled ? null : () => this.download()} label='Download'/>
               <Anchor label='Back' icon={<Close/>} onClick={() => this.props.back()}/>
             </Menu>
           </Header>
