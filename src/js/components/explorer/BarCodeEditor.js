@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {Box, Form, FormField, Header, CheckBox, Icons, Anchor, Menu, NumberInput}from 'grommet';
-const {Download, Close, Spinning} = Icons.Base;
+import {Box, Form, FormField, Header, CheckBox, Icons, Anchor, Menu, NumberInput, RadioButton }from 'grommet';
+const {Download, Close, Play: Preview} = Icons.Base;
 import {getDisplayLabel, getFieldStrVal} from '../../util/RecordFormat';
 import JsBarcode from 'jsbarcode';
 import * as ExplorerActions from '../../actions/explorer';
@@ -60,27 +60,28 @@ const recordsToPdfDoc_barcode = (fields, records, reportLabel, param) => {
       }
 
       availableFields.map(field => {
-        let text = getFieldStrVal(record, field);
+        let text = getFieldStrVal(record, field).toString();
         if (text.indexOf('"') == 0) {
           text = text.substr(1, text.length - 2);
         }
-        if (text) {
-          JsBarcode('#canvas', text, param);
-          const canvas = document.getElementById('canvas');
 
-          const columns = param.hideLabel ? [] : [{
-            width: 100,
-            height: 100,
-            stack: [{text: getDisplayLabel(field),  margin: [0, 30]}]
-          }];
+        text = text || 'No Data';
+        JsBarcode('#canvas', text, param);
+        const canvas = document.getElementById('canvas');
 
-          columns.push({
-            height: 100,
-            image: canvas.toDataURL('image/png')
-          });
+        const columns = param.hideLabel ? [] : [{
+          width: 100,
+          height: 100,
+          stack: [{text: getDisplayLabel(field),  margin: [0, 30]}]
+        }];
 
-          barCodes.push({columns});
-        }
+        columns.push({
+          height: 100,
+          image: canvas.toDataURL('image/png')
+        });
+
+        barCodes.push({columns});
+
       });
       content.push(barCodes);
     });
@@ -123,7 +124,7 @@ const recordsToPdfDoc_barcode = (fields, records, reportLabel, param) => {
 
 export default class RecordList extends Component {
   componentWillMount() {
-    const records = this.props.records.slice(0, 10);
+    const records = this.props.records.slice(0, 5);
     records[0].selected = true;
     this.state = {
       fields: this.props.body.fields,
@@ -136,7 +137,8 @@ export default class RecordList extends Component {
       hideLabel: false,
       split: true,
       loading: false,
-      activeIndex: 0
+      recordsStart: 1,
+      recordsEnd: this.props.total > 1000 ? 1000 : this.props.total
     };
     this.updateValue = this.updateValue.bind(this);
   }
@@ -161,13 +163,25 @@ export default class RecordList extends Component {
 
     this.state[name] = val;
     this.setState(this.state);
-    this.preview();
+  }
+
+  renderNumberInput(label, name, min, max) {
+    //https://gist.github.com/Candy374/80bf411ff286f6785eb80a9098f01c39
+    return (
+      <FormField label={
+          <Box justify='between' direction='row'>
+            <span>{label}</span>
+            {this.state[name]}
+          </Box>}>
+        <input name={name} type="range" min={min} max={max} value={this.state[name]} onChange={this.updateValue}/>
+      </FormField>
+    );
   }
 
   renderForm() {
-    const {hideLabel, split, width, height, margin, textMargin, format} = this.state;
+    const {hideLabel, split, width, recordsStart} = this.state;
     return (
-      <Form>
+      <Form className='no-border strong-label'>
         <FormField  label='Hide Field Name'>
           <CheckBox checked={hideLabel} name='hideLabel' value={hideLabel}
                     onChange={this.updateValue} toggle={true}/>
@@ -177,24 +191,20 @@ export default class RecordList extends Component {
                     onChange={this.updateValue} toggle={true}/>
         </FormField>
         <FormField label='Bar Code Type'>
-          <select value={format} name='format' onChange={this.updateValue}>
-            {barcodeType.map((type, index)=> {
-              return (<option key={index}>{type.label}</option>);
-            })}
-          </select>
+          {barcodeType.map((type, index)=> {
+            return (
+              <RadioButton key={index} id='format' name='format' value={type.name}
+                           label={type.label} checked={type.checked} onChange={this.updateValue}/>);
+          })}
         </FormField>
-        <FormField label='Width'>
+        <FormField label='Bar Code Width'>
           <NumberInput name='width' type="range" value={width} onChange={this.updateValue}/>
         </FormField>
-        <FormField label={<Box justify='between' direction='row'><span>Height</span>{height}</Box>}>
-          <input name='height' type="range" min={50} max={200} value={height} onChange={this.updateValue}/>
-        </FormField>
-        <FormField label={<Box justify='between' direction='row'><span>Margin</span>{margin}</Box>}>
-          <input name='margin' type="range" min={1} max={20} value={margin} onChange={this.updateValue}/>
-        </FormField>
-        <FormField label={<Box justify='between' direction='row'><span>Text Margin</span>{textMargin}</Box>}>
-          <input name='textMargin' type="range" min={1} max={20} value={textMargin} onChange={this.updateValue}/>
-        </FormField>
+        {this.renderNumberInput('Height', 'height', 50, 200)}
+        {this.renderNumberInput('Margin', 'margin', 1, 20)}
+        {this.renderNumberInput('Text Margin', 'textMargin', 1, 20)}
+        {this.renderNumberInput('Print Records From', 'recordsStart', 1, this.props.total)}
+        {this.renderNumberInput('Print Records To', 'recordsEnd', recordsStart, this.props.total)}
       </Form>
     );
   }
@@ -209,7 +219,19 @@ export default class RecordList extends Component {
     const dd = recordsToPdfDoc_barcode(this.state.fields, availableRecords, this.props.body.label, this.state);
     if (dd) {
       pdfMake.createPdf(dd).getDataUrl((outDoc) => {
-        document.getElementById('pdfV').src = outDoc;
+        const lastPDF = document.getElementById('pdfV');
+        if (lastPDF) {
+          lastPDF.remove();
+        }
+
+        const pdfContent = document.createElement('embed');
+        pdfContent.id = 'pdfV';
+        pdfContent.width = '100%';
+        pdfContent.height = '100%';
+        pdfContent.src = outDoc;
+
+        document.getElementById('pdfContainer').appendChild(pdfContent);
+
         this.setState({loading: false});
       });
     }
@@ -220,8 +242,8 @@ export default class RecordList extends Component {
     const body = this.props.body;
 
     body.param = {
-      offset: 0,
-      limit: 1000
+      offset: this.state.recordsStart - 1,
+      limit: this.state.recordsEnd - this.state.recordsStart + 1
     };
     ExplorerActions.loadRecordsByBody(body).then((data) => {
       const dd = recordsToPdfDoc_barcode(this.state.fields, data.entities, name, this.state);
@@ -233,40 +255,51 @@ export default class RecordList extends Component {
   }
 
   renderFields() {
-    return this.state.fields.map((field, index) => (
-        <Box pad={{vertical: 'small'}}>
-          <CheckBox checked={field.selected} key={index}
-                  label={getDisplayLabel(field)}
-                  onChange={() => {
-                    field.selected = !field.selected;
-                    this.setState({fields: this.state.fields}, this.preview);
-                  }}/>
+    const fields = this.state.fields;
+    let error;
+    if (fields.filter(field => field.selected).length == 0) {
+      error = 'No field selected';
+    }
+    return (
+      <FormField label="Choose Field" error={error}>
+        <Box pad={{horizontal: 'medium'}}>{
+          fields.map((field, index) => (
+            <Box margin={{top: 'small'}} key={index}>
+              <CheckBox checked={!!field.selected} label={getDisplayLabel(field)}
+                        onChange={() => {
+                          field.selected = !field.selected;
+                          this.setState({fields: fields});
+                        }}/>
+            </Box>
+          ))
+        }
         </Box>
-      )
+      </FormField>
     );
   }
 
   renderRecordChooser() {
+    const records = this.state.records;
+    let error;
+    if (records.filter(record => record.selected).length == 0) {
+      error = 'No Record selected';
+    }
     return (
-      <Box className='grommetux-form' style={{width: '100%'}}>
-        <FormField label='Choose preview data'>
-          <Box pad={{horizontal: 'medium', vertical: 'small'}} direction='row'>
-        {
-          this.state.records.map((record, index) => {
-            return (
-              <CheckBox key={index} checked={record.selected} label={index + 1}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        record.selected = !record.selected;
-                        this.setState({records: this.state.records});
-                        this.preview();
-                      }
-                      }/>
-            );
-          })}
-            </Box>
+        <FormField label='Choose Preview Data' error={error}>
+          <Box pad={{horizontal: 'medium', vertical: 'small'}} direction='row'>{
+            records.map((record, index) => {
+              return (
+                <CheckBox key={index} checked={!!record.selected} label={index + 1}
+                        onChange={(event) => {
+                          event.stopPropagation();
+                          record.selected = !record.selected;
+                          this.setState({records: records});
+                        }
+                        }/>
+              );
+            })}
+          </Box>
         </FormField>
-      </Box>
     );
   }
 
@@ -282,26 +315,20 @@ export default class RecordList extends Component {
           <Header justify='between'>
             <Box>PDF Generator</Box>
             <Menu direction="row" align="center">
-              <Anchor icon={this.state.downloading ? <Spinning/> : <Download />} onClick={() => this.download()} label={`Download (${this.props.total})`}/>
+              <Anchor icon={<Preview/>} disabled={this.state.loading} onClick={this.state.loading ? null : () => this.preview()} label='Preview'/>
+              <Anchor icon={<Download />} disabled={this.state.downloading} onClick={this.state.downloading ? null : () => this.download()} label='Download'/>
               <Anchor label='Back' icon={<Close/>} onClick={() => this.props.back()}/>
             </Menu>
           </Header>
           <Box direction='row' justify='center'>
-            <Form>
-              <FormField label="Choose Field">
-                <Box pad={{horizontal: 'medium'}} style={{height: '512px'}} className='autoScroll'>
-                  {this.renderFields()}
-                </Box>
-              </FormField>
+            <Form className='no-border strong-label'>
+              {this.renderRecordChooser()}
+              {this.renderFields()}
             </Form>
             {this.renderForm()}
           </Box>
-          {this.renderRecordChooser()}
-          {this.state.loading && <Spinning/>}
         </Box>
-        <Box style={{width: '50vw'}}>
-          <iframe id='pdfV' style={{height: '100%'}} title={'PDF Preview for ' + this.props.body.label} />
-        </Box>
+        <div style={{width: '50vw'}} id='pdfContainer'/>
         <canvas id='canvas' style={{display: 'none'}} />
       </Box>
     );

@@ -20,4 +20,10 @@ input {
     margin-left: -1px;
     box-shadow: 1px 1px 2px rgba(204, 204, 204, 0.50);
   }
+
+  &.span, &.span:focus {
+    line-height: 1;
+    padding: 0 4px;
+    width: 50px;
+  }
 }

@@ -57,24 +57,24 @@ export default class Explorer extends Component {
     const {navigation, view, pdfGenerator} = this.state;
     const content = [];
     if (pdfGenerator) {
-      content.push(<BarCodeEditor {...pdfGenerator} back={() => this.setState({pdfGenerator: null})}/>);
+      content.push(<BarCodeEditor {...pdfGenerator} key='BarCodeEditor' back={() => this.setState({pdfGenerator: null})}/>);
     } else {
       const focus = {};
       if (view) {
         focus.expand = view.category;
         focus.selected = view._id;
         content.push(
-          <Box margin={{horizontal: 'small'}} flex={true}>
+          <Box margin={{horizontal: 'small'}} flex={true} key='RecordList'>
             <RecordList body={view.body} title={view.name} root={true} printPdf={this.printPdf.bind(this)}/>
           </Box>);
       } else {
         focus.expand = false;
         focus.selected = '';
-        content.push(<ContentPlaceHolder content='Select an item to query.' />);
+        content.push(<ContentPlaceHolder key='ContentPlaceHolder' content='Select an item to query.' />);
       }
 
       if (navigation) {
-        content.unshift(<AMSideBar focus ={focus} title='Views Navigation' contents={navigation}/>);
+        content.unshift(<AMSideBar key='AMSideBar' focus={focus} title='Views Navigation' contents={navigation}/>);
       }
     }
 

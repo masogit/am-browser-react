@@ -29,3 +29,15 @@
 .long-form {
   width: 700px;
 }
+
+.no-border {
+  .grommetux-form-field {
+    border: none;
+  }
+}
+
+.strong-label {
+  .grommetux-form-field__label {
+    font-weight: bold;
+  }
+}

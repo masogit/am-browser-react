@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import TopologyDetail from './TopologyDetail';
-import {Box, Anchor, Topology, Map, Tiles}from 'grommet';
+import {Box, Anchor, Topology, Map, Tiles, Tile}from 'grommet';
 const Part = Topology.Part;
 const Label = Topology.Label;
 import More from 'grommet/components/icons/base/More';
@@ -11,9 +11,9 @@ const splitLine = (records, maxNum) => {
   return (
     <Tiles flush={false} fill={true}>{
       records.map((record, index) => (
-        <Box key={index} margin="small" className='topology-background-color'>
+        <Tile key={index} className='topology-background-color'>
           {record}
-        </Box>
+        </Tile>
       ))
     }
     </Tiles>);
