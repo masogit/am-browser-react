@@ -40,4 +40,9 @@
   .grommetux-form-field__label {
     font-weight: bold;
   }
+
+  .grommetux-check-box__label {
+    @extend .grommetux-form-field__label;
+    display: inline;
+  }
 }

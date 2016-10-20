@@ -179,18 +179,16 @@ export default class RecordList extends Component {
   }
 
   renderForm() {
-    const {hideLabel, split, width, recordsStart} = this.state;
+    const {hideLabel, split, width, recordsStart, recordsEnd} = this.state;
     return (
       <Form className='no-border strong-label'>
-        <FormField  label='Hide Field Name'>
-          <CheckBox checked={hideLabel} name='hideLabel' value={hideLabel}
-                    onChange={this.updateValue} toggle={true}/>
+        <FormField>
+          <CheckBox checked={hideLabel} name='hideLabel' value={hideLabel} label='Hide Field Name'
+                    onChange={this.updateValue} toggle={true} />
+          <CheckBox checked={split} name='split' value={split} label='Break Page'
+                    onChange={this.updateValue} toggle={true} />
         </FormField>
-        <FormField label='Break Page for each record'>
-          <CheckBox checked={split} name='split' value={split}
-                    onChange={this.updateValue} toggle={true}/>
-        </FormField>
-        <FormField label='Bar Code Type'>
+        <FormField label='Bar Code Type' className='multi-check'>
           {barcodeType.map((type, index)=> {
             return (
               <RadioButton key={index} id='format' name='format' value={type.name}
@@ -203,8 +201,8 @@ export default class RecordList extends Component {
         {this.renderNumberInput('Height', 'height', 50, 200)}
         {this.renderNumberInput('Margin', 'margin', 1, 20)}
         {this.renderNumberInput('Text Margin', 'textMargin', 1, 20)}
-        {this.renderNumberInput('Print Records From', 'recordsStart', 1, this.props.total)}
-        {this.renderNumberInput('Print Records To', 'recordsEnd', recordsStart, this.props.total)}
+        {this.renderNumberInput('Download Records From', 'recordsStart', 1, recordsEnd)}
+        {this.renderNumberInput('Download Records To', 'recordsEnd', recordsStart, this.props.total)}
       </Form>
     );
   }
@@ -261,7 +259,7 @@ export default class RecordList extends Component {
       error = 'No field selected';
     }
     return (
-      <FormField label="Choose Field" error={error}>
+      <FormField label="Choose Fields" error={error}>
         <Box pad={{horizontal: 'medium'}}>{
           fields.map((field, index) => (
             <Box margin={{top: 'small'}} key={index}>
@@ -285,7 +283,7 @@ export default class RecordList extends Component {
       error = 'No Record selected';
     }
     return (
-        <FormField label='Choose Preview Data' error={error}>
+        <FormField label='Choose Preview Records' error={error}>
           <Box pad={{horizontal: 'medium', vertical: 'small'}} direction='row'>{
             records.map((record, index) => {
               return (
