@@ -33,7 +33,7 @@ export default class Card extends Component {
 
     tiles = tiles.map((record, index) => {
       return (
-        <Tile key={`${record[this.props.conf.header]}-${index}`} separator="top" colorIndex="light-1" pad="small">
+        <Tile key={`${record[this.props.conf.header]}-${index}`} separator="top" colorIndex="light-1" pad="small" size="small">
           <Header>{record[this.props.conf.header]}</Header>
           {
             this.props.conf.body.map((row, index) => {
