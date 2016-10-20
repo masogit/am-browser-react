@@ -66,7 +66,7 @@ export default class About extends Component {
         versions.list.map((app, index) => {
           const packages = app.hplnContentpackage;
           const expand = app.expand && (
-              <Box key={index} colorIndex="light-2">
+              <Box key={index}>
                 <List>
                   <ListItem justify="between" separator='none'>
                     <div dangerouslySetInnerHTML={{__html: app.hplnContentpackage.description}} />
