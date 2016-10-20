@@ -46,17 +46,30 @@ const barcodeType = [{
 const recordsToPdfDoc_barcode = (fields, records, reportLabel, param) => {
   const availableFields = fields.filter(field => field.selected);
 
-  const content = [
-    {text: 'Bar Codes for: ' + reportLabel, style: 'header'}
-  ];
+  const content = [];
 
   if (availableFields.length > 0) {
     records.map((record, index) => {
       const barCodes = [];
+
       if (index > 0 && param.split) {
         barCodes.push({
           text: '',
-          pageBreak: 'after'
+          pageBreak: 'before'
+        });
+      }
+
+      if (param.showSelf) {
+        barCodes.push({
+          layout: 'lightHorizontalLines',
+          table: {
+            widths: ['*'],
+            headerRows: 1,
+            body: [
+              [record.self],
+              ['']
+            ]
+          }
         });
       }
 
@@ -70,14 +83,15 @@ const recordsToPdfDoc_barcode = (fields, records, reportLabel, param) => {
         JsBarcode('#canvas', text, param);
         const canvas = document.getElementById('canvas');
 
-        const columns = param.hideLabel ? [] : [{
+        const columns = param.showLabel ? [{
           width: 100,
-          height: 100,
-          stack: [{text: getDisplayLabel(field),  margin: [0, 30]}]
-        }];
+          height: param.lineHeight,
+          stack: [{text: getDisplayLabel(field), style: 'text', margin: [0, (param.lineHeight - 12) * 0.3]}]
+        }] : [];
 
         columns.push({
-          height: 100,
+          fit: ['100%',param.lineHeight],
+          alignment: 'center',
           image: canvas.toDataURL('image/png')
         });
 
@@ -90,6 +104,7 @@ const recordsToPdfDoc_barcode = (fields, records, reportLabel, param) => {
 
   const date = (new Date()).toDateString();
   return {
+    header: {text: reportLabel, margin: [15, 5, 0, 0]},
     pageOrientation: 'portrait',
     content: content,
     footer: {
@@ -101,12 +116,16 @@ const recordsToPdfDoc_barcode = (fields, records, reportLabel, param) => {
       header: {
         fontSize: 18,
         bold: true,
+
         margin: [0, 0, 0, 10]
       },
       subheader: {
         fontSize: 16,
         bold: true,
         margin: [0, 10, 0, 15]
+      },
+      text: {
+        fontSize: 12
       },
       tableFields: {
         margin: [0, 20, 20, 15]
@@ -144,10 +163,12 @@ export default class RecordList extends Component {
       format: barcodeType[0].name,
       width: 2,
       height: 100,
+      lineHeight: 100,
       margin: 10,
       textMargin: 10,
-      hideLabel: false,
+      showLabel: false,
       split: true,
+      showSelf: true,
       loading: false,
       recordsStart: 1,
       limit: 100
@@ -191,14 +212,16 @@ export default class RecordList extends Component {
   }
 
   renderForm() {
-    const {hideLabel, split, width, limit, recordsStart} = this.state;
+    const {showLabel, split, showSelf, limit, recordsStart} = this.state;
     const total = this.props.total;
     return (
       <Form className='no-border strong-label' >
         <FormField label='Page Setting'>
-          <CheckBox checked={hideLabel} name='hideLabel' value={hideLabel} label='Hide Field Name'
+          <CheckBox checked={showLabel} name='showLabel' value={showLabel} label='Display Field Name'
                     onChange={this.updateValue}/>
           <CheckBox checked={split} name='split' value={split} label='Break Page'
+                    onChange={this.updateValue} />
+          <CheckBox checked={showSelf} name='showSelf' value={split} label='Display Self'
                     onChange={this.updateValue} />
         </FormField>
         <FormField label='Bar Code Type'>
@@ -208,11 +231,10 @@ export default class RecordList extends Component {
                            label={type.label} checked={type.checked} onChange={this.updateValue}/>);
           })}
         </FormField>
-        <FormField label='Bar Code Width'>
-          <NumberInput name='width' type="range" value={width} onChange={this.updateValue}/>
-        </FormField>
-        {this.renderNumberInput('Height', 'height', 50, 200)}
-        {this.renderNumberInput('Margin', 'margin', 1, 20)}
+        {this.renderNumberInput('Bar Code Thickness', 'width', 1, 4)}
+        {this.renderNumberInput('Bar Code Height', 'height', 50, 200)}
+        {this.renderNumberInput('Line Height', 'lineHeight', 50, 200)}
+        {this.renderNumberInput('Bar Code Margin', 'margin', 1, 20)}
         {this.renderNumberInput('Text Margin', 'textMargin', 1, 20)}
         {this.renderNumberInput('Download Records From', 'recordsStart', 1, total, `${recordsStart}/${total}`)}
         {this.renderNumberInput('Records Limit', 'limit', 100, 1000, limit, 100)}
