@@ -1,7 +1,7 @@
 import React, {Component/*, PropTypes*/} from 'react';
 import history from '../../RouteHistory';
 import Anchor from 'grommet/components/Anchor';
-import SideBar from '../commons/AMSideBar';
+import AMSideBar from '../commons/AMSideBar';
 import Builder from './Builder';
 import Add from 'grommet/components/icons/base/Add';
 import Close from 'grommet/components/icons/base/Close';
@@ -61,11 +61,11 @@ export default class ViewsDefList extends Component {
     let toolbar, contents, focus;
 
     if (this.state.editView) {
-      toolbar = <Anchor href="#" icon={<Close />} label="Close" onClick={this._closeEdit.bind(this)} className='fontNormal'/>;
+      toolbar = <Anchor href="#" icon={<Close />} label="Close" onClick={this._closeEdit.bind(this)}/>;
       contents = this.state.editView &&
         <Builder schemaToLoad={this.state.schema} linkNames={this.state.linkNames} ref='builder'/>;
     } else {
-      toolbar = <Anchor href="#" icon={<Add />} label="New" onClick={this.dropCurrentPop.bind(this, 'Create a view?', this._newView.bind(this))} className='fontNormal'/>;
+      toolbar = <Anchor href="#" icon={<Add />} label="New" onClick={this.dropCurrentPop.bind(this, 'Create a view?', this._newView.bind(this))}/>;
       contents = views.map((view, key) => ({
         key: view._id,
         groupby: view.category,
@@ -98,7 +98,7 @@ export default class ViewsDefList extends Component {
     }
 
     return (
-      <SideBar title='Views Builder' toolbar={toolbar} contents={contents} focus={focus}/>
+      <AMSideBar title='Views Builder' toolbar={toolbar} contents={contents} focus={focus}/>
     );
   }
 }

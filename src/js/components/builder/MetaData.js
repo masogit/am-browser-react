@@ -7,6 +7,7 @@ import Tab from 'grommet/components/Tab';
 import ListItem from 'grommet/components/ListItem';
 import SearchInput from '../commons/SearchInput';
 import Notes from 'grommet/components/icons/base/Notes';
+import LinkNext from 'grommet/components/icons/base/LinkNext';
 import Spinning from 'grommet/components/icons/Spinning';
 
 import {metadataLoadDetail, metadataLoad, loadAllMetadataSuccess, loadMetadataDetailSuccess } from '../../actions/system';
@@ -309,7 +310,7 @@ class MetaData extends ComponentBase {
       let row = entities[index];
       return (
         <ListItem separator="none" key={key} pad="none" flex={false}>
-          <Anchor href="#" primary={true} label={row.sqlname}
+          <Anchor icon={<LinkNext/>} label={row.sqlname}
                   onClick={this._onClick.bind(this, {label: row.label, sqlname: row.sqlname, url: row["ref-link"]})}/>
         </ListItem>
       );
@@ -331,7 +332,7 @@ class MetaData extends ComponentBase {
       };
       return (
         <ListItem separator="none" key={key} pad="none">
-          <Anchor href="#" primary={true} onClick={this._onClick.bind(this, newRow)} label={row.sqlname}/>
+          <Anchor icon={<LinkNext/>} onClick={this._onClick.bind(this, newRow)} label={row.sqlname}/>
         </ListItem>
       );
     };
@@ -343,7 +344,7 @@ class MetaData extends ComponentBase {
       let row = fields[index];
       return (
         <ListItem separator="none" key={key} pad="none">
-          <Anchor href="#" icon={<Notes />} onClick={this._onChange.bind(this, row)} label={row.sqlname}/>
+          <Anchor icon={<Notes />} onClick={this._onChange.bind(this, row)} label={row.sqlname}/>
         </ListItem>
       );
     };

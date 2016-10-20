@@ -15,6 +15,8 @@ import History from 'grommet/components/icons/base/History';
 import About from 'grommet/components/icons/base/Information';
 import Help from 'grommet/components/icons/base/Help';
 import User from 'grommet/components/icons/base/User';
+import Archive from 'grommet/components/icons/base/Archive';
+import history from '../../RouteHistory';
 
 import cookies from 'js-cookie';
 
@@ -67,15 +69,15 @@ class SessionMenu extends Component {
       <Box>
         <Menu icon={<User />} label={cookies.get('user')} dropAlign={{ right: 'right', top: 'top' }}>
           {/*
-          <Anchor href="#" className="active">Settings</Anchor>
-          <Anchor href="#">Help</Anchor>
+           <Anchor href="#" className="active">Settings</Anchor>
+           <Anchor href="#">Help</Anchor>
            */}
-          <Anchor icon={<Help />} href="http://ambrowser.readthedocs.io" target="about:blank" label="Help" className="fontNormal"/>
-          <Anchor icon={<About />} onClick={() => this.showDialog("about")} label="About" className="fontNormal"/>
-          <Anchor icon={<History />} onClick={() => this.showDialog("history")} label="Message History"
-                  className="fontNormal"/>
-          <Anchor icon={<Slack />} onClick={() => this.showDialog("slack")} label="Slack" className="fontNormal"/>
-          <Anchor icon={<Logout />} onClick={this._onLogout.bind(this)} label="Logout" className="fontNormal"/>
+          <Anchor icon={<Help />} href="http://ambrowser.readthedocs.io" target="about:blank" label="Help"/>
+          <Anchor icon={<About />} onClick={() => this.showDialog("about")} label="About"/>
+          <Anchor icon={<History />} onClick={() => this.showDialog("history")} label="Message History"/>
+          <Anchor icon={<Slack />} onClick={() => this.showDialog("slack")} label="Slack"/>
+          <Anchor icon={<Archive />} onClick={() =>  history.push('/my')} label="My Assets"/>
+          <Anchor icon={<Logout />} onClick={this._onLogout.bind(this)} label="Logout"/>
         </Menu>
         {dialog &&
           <Layer align="center" closer={<Anchor className='grommetux-layer__closer' icon={<Close/>} onClick={this.closeDialog}/>}>

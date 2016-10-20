@@ -56,7 +56,7 @@ class Indexer extends Component {
     }
     return (
       <App centered={false}>
-        <Box full='vertical' style={{height: '100%'}}>
+        <Box full='vertical'>
           {alert || header}
           {this.props.children}
         </Box>
@@ -66,9 +66,9 @@ class Indexer extends Component {
 }
 
 let select = (state) => ({...state.nav,
-    headerNavs: state.session.headerNavs,
-    message: state.message,
-    path: state.router.location.pathname
+  headerNavs: state.session.headerNavs,
+  message: state.message,
+  path: state.router.location.pathname
 });
 
 export default connect(select)(Indexer);

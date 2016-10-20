@@ -3,11 +3,13 @@ import history from '../../RouteHistory';
 import * as ExplorerActions from '../../actions/explorer';
 import * as AQLActions from '../../actions/aql';
 import {getJobList} from '../../actions/ucmdbAdapter';
-import {Title, Box, Tiles, Headline, Meter, Tile} from 'grommet';
+import {getOnlineUser} from '../../actions/system';
+import {Header, Box, Tiles, Meter, Tile, List, ListItem} from 'grommet';
 import Graph from '../commons/Graph';
 import UCMDBAdapterContainer from '../ucmdbAdapter/UCMDBAdapterPoint';
 import AQL from '../aql/AQL';
 import Spinning from 'grommet/components/icons/Spinning';
+import {LongSearchInput} from '../commons/SearchInput';
 
 export default class Search extends Component {
 
@@ -20,7 +22,8 @@ export default class Search extends Component {
         popJobs: [],
         pushJobs: [],
         errorMsg: ''
-      }
+      },
+      onlineUsers: []
     };
     this._isUnmount = false;
   }
@@ -68,6 +71,9 @@ export default class Search extends Component {
           }
         });
     }
+    getOnlineUser().then(onlineUsers => {
+      this.setState({onlineUsers});
+    });
   }
 
   componentWillUnmount() {
@@ -92,18 +98,6 @@ export default class Search extends Component {
 
   filter(objs, num) {
     return objs.length > num ? objs.filter((item, index) => index < num) : objs;
-  }
-
-  _onEnter(event) {
-    if ((event.keyCode === 13))
-      this.goRecordSearch(event.target.value.trim());
-  }
-
-  _onSearch(event) {
-    if (event.target.value.toLowerCase().trim() === '')
-      this.setState({
-        keyword: ''
-      });
   }
 
   getSeries(children, groupby) {
@@ -200,6 +194,35 @@ export default class Search extends Component {
     history.push(`/search/${encodeURI(keyword)}`);
   }
 
+  renderOnlineUser() {
+    return (
+      <Box flex={true} className='autoScroll'>
+        <List>
+          <ListItem justify="between" pad='none'>
+            <span>User Name</span>
+            <Box pad={{horizontal: 'medium'}}/>
+            <span className="secondary">Count</span>
+          </ListItem>
+          {
+            this.state.onlineUsers.map((user, index) => {
+              return (
+                <ListItem key={index} justify="between" separator='none' pad='none'>
+                  <span>
+                    {user.name}
+                  </span>
+                  <Box pad={{horizontal: 'medium'}}/>
+                  <span className="secondary">
+                    {user.count}
+                  </span>
+                </ListItem>
+              );
+            })
+          }
+        </List>
+      </Box>
+    );
+  }
+
   render() {
     const tiles = [{
       title: 'Browser Views',
@@ -213,6 +236,11 @@ export default class Search extends Component {
         onClick: this.goAQL,
         graph: this.state.aqlSeries &&
         <Meter legend={{"placement": "inline"}} series={this.state.aqlSeries} a11yTitle="meter-title-12"/>
+      });
+
+      tiles.push({
+        title: 'Online Users',
+        graph: this.renderOnlineUser()
       });
     }
 
@@ -231,19 +259,12 @@ export default class Search extends Component {
 
     return (
       <Box align="center" justify="center" style={{flexShrink: 0, flexGrow: 1}}>
-        <Headline size="large">
-          Asset Manager Browser
-        </Headline>
-        <Box direction="row" pad={{vertical: 'medium'}} flex={false}>
-          <input type="search" className="flex" placeholder="Global Record Search..."
-                 onKeyDown={this._onEnter.bind(this)} onChange={this._onSearch.bind(this)} size="120"
-                 maxLength={50}/>
-        </Box>
-        <Tiles flush={false} justify="center" size="large" flex={false}>
+        <LongSearchInput onSearch={this.goRecordSearch.bind(this)} direction='column'/>
+        <Tiles flush={false} justify="center" size="medium" flex={false}>
           {
             tiles.map(tile => (
-              <Tile key={tile.title} className='box-shadow' onClick={tile.onClick}>
-                <Box pad={{vertical: 'small'}}><Title>{tile.title}</Title></Box>
+              <Tile key={tile.title} onClick={tile.onClick} colorIndex="light-2">
+                <Header size='small' justify='center'>{tile.title}</Header>
                 {tile.graph}
               </Tile>
             ))

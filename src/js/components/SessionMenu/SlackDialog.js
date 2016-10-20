@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-import { Box, Button, Title, FormField, Form, Footer, Menu } from 'grommet';
+import { Box, Button, Header, FormField, Form, Footer, Menu } from 'grommet';
 import SocialSlack from 'grommet/components/icons/base/SocialSlack';
 
 export default class SlackDialog extends Component {
@@ -32,18 +32,16 @@ export default class SlackDialog extends Component {
 
   render() {
     return (
-      <Box pad='medium' size='medium'>
+      <Box pad='medium' size='large'>
         <Form className='long-form'>
-          <Title>Send message to Slack</Title>
-          <fieldset>
-            <FormField>
-              <textarea value={this.state.message} onChange={this.onChange.bind(this)}
-                        placeholder='What do you want to say to HPE AM Browser team?'
-                        onKeyUp={this.onKeyUp.bind(this)} rows={8}>
-              </textarea>
-            </FormField>
-          </fieldset>
-          <Footer justify="between">
+          <Header>Send message to Slack</Header>
+          <FormField>
+            <textarea value={this.state.message} onChange={this.onChange.bind(this)}
+                      placeholder='What do you want to say to HPE AM Browser team?'
+                      onKeyUp={this.onKeyUp.bind(this)} rows={8}>
+            </textarea>
+          </FormField>
+          <Footer justify="between" margin={{top: 'small'}}>
             <a href='https://ambrowser.slack.com' style={{ lineHeight: '13px', fontSize: '13px'}} target='_blank'>
               <Box align='center'>
                 <SocialSlack />

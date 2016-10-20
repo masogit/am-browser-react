@@ -7,10 +7,6 @@
   visibility: hidden;
 }
 
-.fontNormal {
-  font-weight: 400;
-}
-
 .autoScroll {
   overflow: auto;
 }
@@ -80,11 +76,12 @@ table {
 }
 
 /** Tab: */
-.autoScroll {
+.autoScroll, .grommetux-layer {
   & div[role=tablist] {
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    flex: 1;
 
     & ul {
       flex-shrink: 0;
@@ -94,9 +91,22 @@ table {
   & div[role=tabpanel] {
     display: flex;
     overflow-y: auto;
+    flex: 1;
 
     & li {
       flex-shrink: 0;
+    }
+  }
+}
+
+th {
+  white-space: nowrap;
+  a {
+    display: flex;
+    align-items: baseline;
+    &.grommetux-anchor svg.grommetux-control-icon {
+      margin-left: 0;
+      margin-right: 12px;
     }
   }
 }
@@ -106,6 +116,12 @@ table {
   & div {
     padding-bottom: 8px;
   }
+}
+
+.grommetux-anchor--icon-label {
+  display: flex;
+  font-weight: normal;
+  align-items: flex-end;
 }
 
 .anchor.small .grommetux-anchor__icon {
@@ -139,3 +155,10 @@ table {
   overflow: hidden;
 }
 
+.grommetux-background-color-index-light-2 {
+  box-shadow: 3px 3px 5px rgba(221, 221, 221, 0.7);
+}
+
+.grommetux-background-color-index-neutral-1.shadow {
+  box-shadow: 0 2px 4px rgba(0, 0, 17, 0.7);
+}

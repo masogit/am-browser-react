@@ -9,7 +9,8 @@ import {
   LOGIN_DEF_URL,
   LOGOUT_DEF_URL,
   AM_SCHEMA_DEF_URL,
-  AM_DEF_URL
+  AM_DEF_URL,
+  ONLINE_USER_DEF_URL
 } from '../constants/ServiceConfig';
 
 export function init(email, headerString) {
@@ -212,4 +213,11 @@ export function dropCurrentPop_stopMonitor(title, onConfirm) {
 
 export function toggleSidebar() {
   store.dispatch({type: Types.TOGGLE_SIDEBAR});
+}
+
+export function getOnlineUser() {
+  return Rest.get(ONLINE_USER_DEF_URL)
+    .then(res => {
+      return res.body || [];
+    });
 }

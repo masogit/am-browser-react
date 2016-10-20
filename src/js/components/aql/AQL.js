@@ -9,7 +9,7 @@ import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
 import RecordListLayer from '../explorer/RecordListLayer';
 import ActionTab from '../commons/ActionTab';
-import SideBar from '../commons/AMSideBar';
+import AMSideBar from '../commons/AMSideBar';
 import * as Format from '../../util/RecordFormat';
 import Download from 'grommet/components/icons/base/Download';
 import More from 'grommet/components/icons/base/More';
@@ -20,7 +20,7 @@ import {monitorEdit, stopMonitorEdit, dropCurrentPop, showInfo} from '../../acti
 import SearchInput from '../commons/SearchInput';
 import ComponentBase from '../commons/ComponentBase';
 import {
-  Anchor, Box, Form, FormField, Layer, Tabs, Table, TableRow, Title, Header, Menu
+  Anchor, Box, Form, FormField, Layer, Tabs, Table, TableRow, Header, Menu
 } from 'grommet';
 import Play from 'grommet/components/icons/base/Play';
 import Checkmark from 'grommet/components/icons/base/Checkmark';
@@ -353,8 +353,8 @@ export default class AQL extends ComponentBase {
       }));
 
       return (
-        <Layer onClose={this._onClose} closer={true} align="left">
-          <SideBar title='AQL Selector' contents={contents} separator={'none'} colorIndex='light-1' toggle={false}/>
+        <Layer onClose={this._onClose} closer={true} align="left" flush={true}>
+          <AMSideBar title='AQL Selector' contents={contents} colorIndex='light-1' toggle={false} margin={{horizontal: 'medium'}} pad={{vertical: 'small'}}/>
         </Layer>
       );
     } else if (type == 'view') {
@@ -367,8 +367,8 @@ export default class AQL extends ComponentBase {
       }));
 
       return (
-        <Layer onClose={this._onClose} closer={true} align="left">
-          <SideBar title='Views Selector' contents={contents} separator={'none'} colorIndex='light-1' toggle={false}/>
+        <Layer onClose={this._onClose} closer={true} align="left" flush={true}>
+          <AMSideBar title='Views Selector' contents={contents} colorIndex='light-1' toggle={false} margin={{horizontal: 'medium'}} pad={{vertical: 'small'}}/>
         </Layer>
       );
     } else if (typeof type == 'object' && type.type == 'records') {
@@ -410,7 +410,7 @@ export default class AQL extends ComponentBase {
       return 0;
     };
 
-    const toolbar = <Anchor icon={<Add />} onClick={this._onNew.bind(this)} label="New" className='fontNormal'/>;
+    const toolbar = <Anchor icon={<Add />} onClick={this._onNew.bind(this)} label="New"/>;
     const contents = this.state.aqls.map((aql) => ({
       key: aql._id,
       groupby: aql.category,
@@ -428,11 +428,11 @@ export default class AQL extends ComponentBase {
     const activeIndex = validData ? getIndex(this.state.aql.type) : 0;
     return (
       <Box direction="row" flex={true}>
-        <SideBar title='Graphs' toolbar={toolbar} contents={contents} focus={focus}/>
+        <AMSideBar title='Graphs' toolbar={toolbar} contents={contents} focus={focus}/>
         {!_.isEmpty(this.state.aql) ? <Box flex={true}>
           {this.getAlertLayer(this.state.alertLayer)}
           <Header justify="between" pad={{'horizontal': 'medium'}}>
-            <Title>AQL and Graph</Title>
+            <Box>AQL and Graph</Box>
             <Menu direction="row" align="center" responsive={true}>
               <Anchor link="#" icon={<Play />} onClick={() => this.state.aql.str && this._onQuery()} label="Query"
                       disabled={!this.state.aql.str}/>
@@ -487,7 +487,7 @@ export default class AQL extends ComponentBase {
               }
               <Box pad={{vertical: 'small'}}>
                 {validData && this.state.aql.form && !_.isEmpty(this.state.aql.form) && this.state.aql.type &&
-                <Box flex={false}>
+                <Box flex={false} className='grid' margin={{vertical: 'small'}}>
                   <Graph type={this.state.aql.type} data={this.state.data} config={this.state.aql.form}
                          onClick={(filter) => this._showViewRecords(filter, this.state.aql.view)}/>
                 </Box>}

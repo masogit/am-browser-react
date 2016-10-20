@@ -1,77 +1,11 @@
 var Client = require('node-rest-client').Client;
 var client = new Client();
-var Convertor = require('json-2-csv');
 var sessionUtil = require('./sessionUtil');
 var config = require('./config');
 var rights = require('./constants').rights;
 var logger = require('./logger');
 
 module.exports = function (am) {
-
-  this.csv = function (req, res) {
-
-    var url = "http://${server}${context}${ref-link}";
-    var auth = req.session.jwt ? req.session.jwt.secret : undefined;
-    var request;
-    var param = JSON.parse(req.body.param);
-    var args = {
-      path: {
-        server: am.server,
-        context: am.context,
-        "ref-link": '/db/' + req.params.tableName
-      },
-      parameters: param,
-      headers: (auth) ? {
-        "Content-Type": "application/json",
-        "X-Authorization": auth
-      } : undefined
-    };
-
-    request = client.get(url, args, (data, response) => {
-      var isOffset = !param.offset || param.offset === 0 || param.offset === "0";
-      if (isOffset) {
-        param.offset = 0;
-        res.setHeader('Content-disposition', 'attachment; filename=' + req.params.tableName + '.csv');
-        res.setHeader('Content-type', 'text/csv');
-      }
-
-      if (data.count >= 10000)
-        param.limit = 1000;
-      else if (data.count < 10000 && data.count >= 1000)
-        param.limit = parseInt(data.count / 10);
-      else
-        param.limit = 100;
-
-      if (data.entities && data.entities.length > 0)
-        Convertor.json2csv(getFormattedRecords(JSON.parse(req.body.fields), data.entities), (err, csv) => {
-          res.write(csv, 'binary');
-
-          if (data.count > data.entities.length + param.offset) {
-            param.offset += data.entities.length;
-            var REST = require('./rest.js');
-            var rest = new REST(am);
-            req.body.param = JSON.stringify(param);
-            rest.csv(req, res);
-          } else
-            res.end();
-
-        }, {delimiter: {field: ',', array: ';', wrap: '', eol: '\n'}, prependHeader: isOffset});
-
-      else
-        res.end();
-
-    }).on('error', function (err) {
-      logger.error('Export CSV: ' + err.toString());
-      res.status(500).send(err.toString());
-    });
-    //console.log("request.options: " + JSON.stringify(request.options));
-    request.on('error', function (err) {
-      logger.error('Export CSV: ' + err);
-      console.log('request error: ' + err);
-    });
-
-
-  };
 
   this.login = function (req, res) {
     var url = "http://${server}${context}${ref-link}";
@@ -187,6 +121,18 @@ module.exports = function (am) {
     });
   };
 
+  this.logout = function(req, res) {
+    logger.info(`[user] [${req.sessionID || '-'}]`, (req.session && req.session.user ? req.session.user : "user") + " logout.");
+    const username = req.session.user;
+    sessionUtil.userTracking.remove(req.session.id);
+    req.session.regenerate((err)=> {});
+    res.clearCookie('headerNavs');
+    res.json({});
+    if (username) {
+      slack(username, `${username} logs out`);
+    }
+  };
+
   this.jwtRenew = function (req, res) {
 
     var url = "http://${server}${context}${ref-link}";
@@ -214,6 +160,9 @@ module.exports = function (am) {
 
   this.slack = slack;
   this.live_net_work = live_net_work;
+  this.getOnlineUser = function(req, res) {
+    res.json(sessionUtil.userTracking.get());
+  };
 };
 
 var slackProcess;
@@ -256,51 +205,8 @@ function loginSuccess(req, res, username, password, email, rights, am) {
   res.cookie("email", email);
   res.json(am_rest);
   slack(username, `${username} logs in`);
+  sessionUtil.userTracking.add(req.session);
   logger.info(`[user] [${req.sessionID || '-'}]`, (req.session && req.session.user ? req.session.user : "user") + " login.");
-}
-
-function getFormattedRecords(fields, rawRecords) {
-  var records = [];
-  rawRecords.forEach((rawRecord) => {
-    var record = {Self: escapeStr(rawRecord.self)};
-    fields.forEach((field) => {
-      record[getDisplayLabel(field)] = getFieldStrVal(rawRecord, field);
-    });
-    records.push(record);
-  });
-  return records;
-}
-
-function getFieldStrVal(record, field) {
-  var val = record[field.sqlname];
-  if (field.user_type && field.user_type == 'System Itemized List')
-    val = val[Object.keys(val)[0]];
-  else if (field.type && field.type == 'Date+Time') {
-    if (val) {
-      var d = new Date(val * 1000);
-      val = d.toLocaleString();
-    }
-  } else if (field.type && field.type == 'Date') {
-    if (val) {
-      var d = new Date(val * 1000);
-      val = d.toLocaleDateString();
-    }
-  } else if (val instanceof Object)
-    val = val[Object.keys(val)[0]];
-
-  return escapeStr(val);
-}
-
-function escapeStr(val) {
-  if (typeof val == 'string') {
-    val = val.replace(/"/g, '""');
-    return '"' + val + '"';
-  } else
-    return val;
-}
-
-function getDisplayLabel(field) {
-  return field.alias ? field.alias : (field.label ? field.label : field.sqlname);
 }
 
 function getHeadNav(rights) {
@@ -320,7 +226,8 @@ function getHeadNav(rights) {
     'ucmdbAdapter(/:pointName)(/:tabName)(/:integrationJobName)': config.ucmdb_adapter_enabled && rights.index < 1 && rights.ucmdbAdapter,
     aql: rights.index < 1,
     views: rights.index < 1,
-    'views/:id': rights.index < 1
+    'views/:id': rights.index < 1,
+    my: rights.index < 3
   };
 }
 

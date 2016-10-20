@@ -25,9 +25,6 @@ class ViewDefListContainer extends Component {
     this._onClickTableTitle = this._onClickTableTitle.bind(this);
   }
 
-  componentWillMount() {
-  }
-
   componentDidMount() {
     // Initialize list data, called only once.
     this.props.actions.loadViews(this.props.params.id, this.props.location.pathname).then(urlOfFirstRecord => {

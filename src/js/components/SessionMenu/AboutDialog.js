@@ -2,12 +2,13 @@ import React, {Component} from 'react';
 import {initAbout} from '../../actions/system';
 import {getVersionFromLiveNetWork} from '../../actions/sessionMenu';
 import {
-  Box,  Header, Title, Table,  TableRow, Label, Tabs, Tab, Tiles, Tile, Anchor, List, ListItem, Button
+  Box,  Header, Table, TableRow, Label, Tabs, Tiles, Tile, Anchor, List, ListItem, Button
 } from 'grommet';
 import Star from 'grommet/components/icons/base/Star';
 import Down from 'grommet/components/icons/base/Down';
 import Next from 'grommet/components/icons/base/Next';
 import ActionTab from '../commons/ActionTab';
+import Spinning from 'grommet/components/icons/Spinning';
 
 export default class About extends Component {
 
@@ -26,7 +27,9 @@ export default class About extends Component {
           port: null
         }
       },
-      versions: {}
+      versions: {},
+      activeIndex: 0,
+      loading: false
     };
   }
 
@@ -42,9 +45,15 @@ export default class About extends Component {
 
   getVersions() {
     if (!this.state.versions.list || this.state.versions.list.length == 0) {
+      this.setState({loading: true});
       getVersionFromLiveNetWork().then((versions) => {
-        this.setState({versions});
+        versions.list = versions.list.sort((version1, version2) => {
+          return version1.hplnContentpackage.publicationTime < version2.hplnContentpackage.publicationTime;
+        });
+        this.setState({activeIndex: 1, versions: versions, loading: false});
       });
+    } else {
+      this.setState({activeIndex: 1});
     }
   }
 
@@ -53,11 +62,11 @@ export default class About extends Component {
       versions.list[0].expand = true;
     }
     return (
-      <Tiles flush={false} justify="center" colorIndex="light-2" full="horizontal">{
+      <Tiles flush={false} justify="center" full="horizontal" pad='none'>{
         versions.list.map((app, index) => {
           const packages = app.hplnContentpackage;
           const expand = app.expand && (
-              <Box key={index}>
+              <Box key={index} colorIndex="light-2">
                 <List>
                   <ListItem justify="between" separator='none'>
                     <div dangerouslySetInnerHTML={{__html: app.hplnContentpackage.description}} />
@@ -93,25 +102,25 @@ export default class About extends Component {
             );
 
           return (
-            <Tile key={index} wide={true}>
+            <Tile key={index} wide={true} colorIndex="light-2" pad='small'>
               <Box direction='row' style={{width: '100%'}}>
                 <Anchor icon={app.expand ? <Down size='small'/> : <Next size='small'/>} onClick={() => {
                   app.expand = !app.expand;
                   this.setState({apps: this.state.apps});
                 }}/>
                 <Box flex={true} separator={app.expand ? 'bottom' : 'none'} pad={{vertical: 'small'}}>
-                  <Box tag='h4' pad='none'>{`${packages.name}, Version ${packages.version}`}</Box>
-                  <Box direction='row' align='center' justify='between' pad='none'>
-                    <Box tag='h5'>{`Last Update: ${new Date(packages.publicationTime).toDateString()}`}</Box>
-                    <Box tag='h5'>{`Downloads: ${packages.downloads}`}</Box>
-                    <Box tag='h5' direction='row'>
+                  <Box tag='h4' margin='none'>{`${packages.name}, Version ${packages.version}`}</Box>
+                  <Box direction='row' align='center' justify='between' margin='none'>
+                    <Box tag='h5' margin='none'>{`Last Update: ${new Date(packages.publicationTime).toDateString()}`}</Box>
+                    <Box tag='h5' margin='none'>{`Downloads: ${packages.downloads}`}</Box>
+                    <Box tag='h5' direction='row' margin='none'>
                       {
                         [1,2,3,4,5].map(i => {
                           return <Star colorIndex={packages.rating >= i ? 'accent-3' : ''} type='status' key={i}/>;
                         })
                       }
                     </Box>
-                    <Box tag='h5'>
+                    <Box tag='h5' margin='none'>
                       <Button onClick={this._download.bind(this)}>Download</Button>
                     </Box>
                   </Box>
@@ -126,13 +135,20 @@ export default class About extends Component {
   }
 
   render() {
-    const versions = this.state.versions;
+    const {activeIndex, versions, loading} = this.state;
+
+    let versionList;
+    if (loading) {
+      versionList = <Spinning />;
+    } else if (versions.list) {
+      versionList = versions.err ? <Label>{versions.err}</Label> : this.showVersions(versions);
+    }
 
     return (
-      <Box size="large" pad='medium'>
-        <Header><Title><img src="../../img/favicon.png" className='logo'/> Asset Manager Browser</Title></Header>
-        <Tabs justify='start'>
-          <Tab title="General">
+      <Box pad='medium' className='autoScroll'>
+        <Header pad='none'><img src="../../img/favicon.png"/><Box margin={{left: 'small'}}>Asset Manager Browser</Box></Header>
+        <Tabs justify='start' activeIndex={activeIndex}>
+          <ActionTab title="General" onClick={() => this.setState({activeIndex: 0})}>
             <Table>
               <tbody>
               <TableRow>
@@ -157,9 +173,9 @@ export default class About extends Component {
               </TableRow>
               </tbody>
             </Table>
-          </Tab>
+          </ActionTab>
           <ActionTab title="All Versions" onClick={this.getVersions.bind(this)}>
-            {versions.list && (versions.err ? <Label>{versions.err}</Label> : this.showVersions(versions))}
+            {versionList}
           </ActionTab>
         </Tabs>
         <Label className='copyright'>

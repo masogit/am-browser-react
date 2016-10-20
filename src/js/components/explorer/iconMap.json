@@ -1,0 +1,93 @@
+{
+  "defaultIcon": "Inbox",
+  "amComputer": [
+    {
+      "field": "ComputerType",
+      "like": "VMware",
+      "icon": "VmMaintenance"
+    },
+    {
+      "field": "ComputerType",
+      "like": "Unix",
+      "icon": "PlatformUnixware"
+    },
+    {
+      "field": "ComputerType",
+      "like": "Windows",
+      "icon": "PlatformWindows"
+    },
+    {
+      "field": "ComputerType",
+      "like": "Camera",
+      "icon": "Camera"
+    },
+    {
+      "field": "ComputerType",
+      "like": "Virtual",
+      "icon": "VirtualMachine"
+    },
+    {
+      "field": "ComputerType",
+      "like": "server",
+      "icon": "Server"
+    },
+    "ComputerPersonal"
+  ],
+  "amSoftInstall": "App",
+  "amExpenseLine": [
+    {
+      "field": "Title",
+      "like": "SIM",
+      "icon": "CreditCard"
+    }
+  ],
+  "amPortfolio": [
+    {
+      "field": "Model.Nature.Name",
+      "like": "Computer",
+      "icon": "ComputerPersonal"
+    }
+  ],
+  "amContact": [
+    {
+      "field": "Title",
+      "like": "manager",
+      "icon": "UserManager"
+    },
+    {
+      "field": "MrMrs",
+      "eq": [
+        "Mrs.",
+        "Miss"
+      ],
+      "icon": "UserFemale"
+    },
+    "User"
+  ],
+  "amEmplDept": [
+    {
+      "field": "bAdminRight",
+      "eq": "Yes",
+      "icon": "UserAdmin"
+    },
+    {
+      "field": "bDepartment",
+      "eq": "Yes",
+      "icon": "Group"
+    },
+    {
+      "field": "Title",
+      "like": "manager",
+      "icon": "UserManager"
+    },
+    {
+      "field": "MrMrs",
+      "eq": [
+        "Mrs.",
+        "Miss"
+      ],
+      "icon": "UserFemale"
+    },
+    "User"
+  ]
+}

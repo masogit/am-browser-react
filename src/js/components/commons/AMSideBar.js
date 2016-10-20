@@ -3,7 +3,7 @@
  */
 
 import React, {Component} from 'react';
-import { Header, Sidebar, Menu, Box, Footer, Anchor, Title } from 'grommet';
+import { Header, Sidebar, Menu, Box, Footer, Anchor} from 'grommet';
 import GroupList from './GroupList';
 import GroupListItem from './GroupListItem';
 import EmptyIcon from './EmptyIcon';
@@ -40,10 +40,10 @@ class AMSideBar extends Component {
   }
 
   render() {
-    const {toolbar, contents, focus, footer, loading, separator, colorIndex, showSidebar, toggle} = this.props;
+    const {toolbar, contents, focus, footer, loading, colorIndex, showSidebar, toggle, pad, margin} = this.props;
     if (!showSidebar) {
       return (
-        <Sidebar fixed={true} separator={separator || 'right'} full={false} style={{minHeight: '100%', width: '50px'}}
+        <Sidebar fixed={true} full={false} style={{minHeight: '100%', width: '50px'}}
                  colorIndex={colorIndex || 'light-2'}>
           <Box style={{overflow: 'visible'}} className='fixMinSizing'>
             <Header justify="between" pad='small' onClick={toggleSidebar}>
@@ -86,10 +86,10 @@ class AMSideBar extends Component {
     }
 
     return (
-      <Sidebar fixed={true} separator={separator || 'right'} full={false} style={{minHeight: '100%'}} colorIndex={colorIndex || 'light-2'}>
+      <Sidebar fixed={true} full={false} style={{minHeight: '100%'}} colorIndex={colorIndex || 'light-2'} pad={pad} margin={margin}>
         <Box style={{overflow: 'visible'}} className='fixMinSizing'>
           <Header justify="between" pad='small'>
-            {toggle == false ? <Title>{this.state.title}</Title>
+            {toggle == false ? this.state.title
               : (<Anchor icon={<ChapterPrevious/>} onClick={toggleSidebar} label={this.state.title}
                       className='grommetux-title'/>)
             }
@@ -100,15 +100,16 @@ class AMSideBar extends Component {
             }
           </Header>
           {sidebarContent}
-          <Footer separator="top" justify="center">
-            {footer ? footer : (new Date()).toLocaleString()}
-          </Footer>
+          {footer ? footer :
+            <Footer justify="center">
+               {(new Date()).toLocaleString()}
+            </Footer>
+          }
         </Box>
       </Sidebar>
     );
   }
 }
-
 
 let select = (state) => {
   return {

@@ -1,5 +1,5 @@
 echo off
-set basename=/AMB
+set basename=/
 set html=index.html
 set htmlFullPath=%~dp0\dist\%html%
 set properties_default=am-browser-config.properties.default

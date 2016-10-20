@@ -104,13 +104,13 @@ export default class GroupList extends Component {
       <Box direction="column" className='fixMinSizing' flex={true}>
         {
           this.props.searchable &&
-          <Box pad='small' flex={false}>
+          <Box pad={{horizontal: 'small'}} flex={false}>
             <SearchInput placeHolder="Search..."  suggestions={this._getSuggestions(children)}
                          onDOMChange={this._onSearch.bind(this)}
                          onSelect={this._selectSuggestion.bind(this)}/>
           </Box>
         }
-        <Box className='autoScroll fixIEScrollBar'>
+        <Box className='autoScroll fixIEScrollBar' margin={{vertical: 'small'}}>
         {this.props.loading ? <ListItem separator="none"><Spinning /></ListItem>
           :
           Object.keys(grouped).sort().map((key, i) => {

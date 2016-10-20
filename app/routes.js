@@ -2,6 +2,7 @@ var util = require('util');
 var db = require('./db.js');
 var logger = require('./logger.js');
 var REST = require('./rest.js');
+var Export_file = require('./export_file.js');
 var sessionUtil = require('./sessionUtil.js');
 var config = require('./config.js');
 var version = require('../version.json');
@@ -21,7 +22,16 @@ module.exports = function (app) {
   var enable_csrf = config.enable_csrf;
   var jwt_max_age = config.jwt_max_age;
 
-  db.init(config.db_folder);
+  switch (config.db_type) {
+    case 'file':
+      db.init(config.db_folder);
+      break;
+    case 'mongo':
+      db.mongo(config.mongo);
+      break;
+    default:
+      logger.error("database", "db init error");
+  }
 
   var httpProxy = require('http-proxy');
   var apiProxy = httpProxy.createProxyServer();
@@ -38,13 +48,16 @@ module.exports = function (app) {
     }
   });
 
-  var rest = new REST({
+  var conn = {
     server: rest_server + ":" + rest_port,
     session_max_age: session_max_age,
     jwt_max_age: jwt_max_age,
     enable_csrf: enable_csrf,
     context: config.base + config.version
-  });
+  };
+
+  var rest = new REST(conn);
+  var export_file = new Export_file(conn);
 
   apiProxy.on('error', function (e, req, res) {
     logger.error(`[proxy] [${req.sessionID}] [error] ${req.method} ${req.originalUrl}`, util.inspect(e));
@@ -78,17 +91,7 @@ module.exports = function (app) {
   // AM Server Login
   app.post('/am/login', rest.login);
 
-  app.get('/am/logout', function (req, res) {
-    logger.info(`[user] [${req.sessionID || '-'}]`, (req.session && req.session.user ? req.session.user : "user") + " logout.");
-    var am_rest = {};
-    const username = req.session.user;
-    req.session.regenerate((err)=>{});
-    res.clearCookie('headerNavs');
-    res.json(am_rest);
-    if (username) {
-      rest.slack(username, `${username} logs out`);
-    }
-  });
+  app.get('/am/logout', rest.logout);
 
   app.all("/*", function (req, res, next) {
     var session = req.session;
@@ -113,6 +116,8 @@ module.exports = function (app) {
     }
   });
 
+  app.get('/am/onlineUser', rest.getOnlineUser);
+
   const sendSlack = (req, res, next) => {
     if (req.originalUrl.indexOf('view') > -1 && !req.body._id) {
       next();
@@ -130,7 +135,13 @@ module.exports = function (app) {
   app.delete('/coll/:collection/:id', isAuthenticated, db.delete);
 
   // Download CSV in server side
-  app.use('/am/download/:tableName', rest.csv);
+  app.use('/am/download/:tableName', function (req, res) {
+    // type: 'csv' or 'pdf' or '1vM'
+    if (req.query.type == '1vM')
+      export_file.report(req, res);
+    else
+      export_file.list(req, res);
+  });
 
   // Proxy the backend rest service /rs/db -> /am/db
   app.use('/am/db', function (req, res) {

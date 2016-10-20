@@ -8,7 +8,7 @@ import IntegrationJobItemContainer from './IntegrationJobItem.js';
 
 import statusAdapter from '../../constants/StatusAdapter';
 import Status from 'grommet/components/icons/Status';
-import SideBar from '../commons/AMSideBar';
+import AMSideBar from '../commons/AMSideBar';
 import Box from 'grommet/components/Box';
 import {bindActionCreators} from 'redux';
 
@@ -98,7 +98,7 @@ class UCMDBAdapterContainer extends Component {
 
     return (
       <Box direction="row" flex={true}>
-        <SideBar title='Integration Point' contents={pointList || []} focus={focus} loading={loading && !pointList}/>
+        <AMSideBar title='Integration Point' contents={pointList || []} focus={focus} loading={loading && !pointList}/>
         {point && tabName &&
         <Box pad={{horizontal: 'medium'}} flex={true} justify='between'>
           <IntegrationJobContainer {...this.props}

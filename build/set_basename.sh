@@ -1,5 +1,5 @@
-base_name=/AMB
-html=index.html
+base_name=/
+html=./dist/index.html
 origin=${html}_bak
 
 properties_default=am-browser-config.properties.default

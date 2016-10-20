@@ -1,0 +1,40 @@
+
+.grommetux-topology__part {
+  .grommetux-anchor__icon {
+    padding: 0;
+  }
+
+  .margin30 {
+    margin: 5px 30px;
+  }
+}
+
+.grommetux-topology__parts {
+  &.line {
+    justify-content: space-between;
+  }
+}
+
+.topology-background-color {
+  background-color: #fafafa;
+  box-shadow: 3px 3px 5px rgba(221, 221, 221, 0.7);
+}
+
+.grid {
+  background-image:
+  linear-gradient(to top, transparent 19px, #efefef 20px),
+  linear-gradient(to left, transparent 19px, #efefef 20px);
+  background-repeat: repeat;
+  background-size: 20px 20px;
+  background-color: #fff;
+  position: relative;
+  padding: $inuit-base-spacing-unit;
+}
+
+.grommetux-topology td {
+  padding: 0;
+}
+
+.legend {
+  width: $sidebar-width;
+}

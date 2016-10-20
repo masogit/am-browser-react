@@ -19,6 +19,7 @@ export const CSRF_DEF_URL = "/am/csrf";
 export const ABOUT_DEF_URL = "/am/about";
 export const LOGIN_DEF_URL = "/am/login";
 export const LOGOUT_DEF_URL = "/am/logout";
+export const ONLINE_USER_DEF_URL = "/am/onlineUser";
 export const DOWNLOAD_DEF_URL = `${BASE_NAME}/am/download`.replace('//', '/'); // base name can be '/' or '/amb' or '/amb/'
 
 // UCMDB SERVICE

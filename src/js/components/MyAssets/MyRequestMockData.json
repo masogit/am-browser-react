@@ -1,0 +1,87 @@
+{
+  "orderby": "",
+  "filter": "",
+  "label": "Requests",
+  "sqlname": "amRequest",
+  "fields": [
+    {
+      "ref-link": "schema/amRequest/field/ReqNumber",
+      "user_type": "",
+      "size": 61,
+      "user_type_format": "",
+      "label": "Number",
+      "sqlname": "ReqNumber",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "Request number"
+    },
+    {
+      "ref-link": "schema/amRequest/field/mPrice",
+      "user_type": "Money",
+      "size": 8,
+      "user_type_format": "",
+      "label": "Price",
+      "sqlname": "mPrice",
+      "type": "Double",
+      "is_calc": false,
+      "long_desc": "Reference price for the service"
+    },
+    {
+      "ref-link": "schema/amRequest/field/dtService",
+      "user_type": "",
+      "size": 8,
+      "user_type_format": "",
+      "label": "Request. for",
+      "sqlname": "dtService",
+      "type": "Date+Time",
+      "is_calc": false,
+      "long_desc": "Requested in-service date for the requested items"
+    },
+    {
+      "ref-link": "schema/amRequest/field/seStatus",
+      "user_type": "System Itemized List",
+      "size": 2,
+      "user_type_format": "In preparation|0|Standard request|1|Quoted|11|Awaiting approval|13|Validated|14|Refused|15|Cancelled|16|Rejected|17|Reserved|23|Satisfied|31|Closed|41",
+      "label": "Req. status",
+      "sqlname": "seStatus",
+      "type": "Short",
+      "is_calc": false,
+      "long_desc": "Status of the request"
+    },
+    {
+      "ref-link": "schema/amModel/field/Name",
+      "user_type": "",
+      "size": 129,
+      "user_type_format": "",
+      "label": "Name",
+      "sqlname": "Model.Name",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "Name of the model"
+    },
+    {
+      "ref-link": "schema/amCostCenter/field/AcctNo",
+      "user_type": "",
+      "size": 31,
+      "user_type_format": "",
+      "label": "#",
+      "sqlname": "CostCenter.AcctNo",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "Associated accounting code"
+    },
+    {
+      "ref-link": "schema/amCostCenter/field/Title",
+      "user_type": "",
+      "size": 31,
+      "user_type_format": "",
+      "label": "Title",
+      "sqlname": "CostCenter.Title",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "Title of cost center"
+    }
+  ],
+  "links": [],
+  "groupby": "seStatus"
+}

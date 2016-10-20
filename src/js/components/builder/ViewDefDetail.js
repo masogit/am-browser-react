@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import ComponentBase from '../commons/ComponentBase';
-import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Title, Split, Map} from 'grommet';
+import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Split, Map} from 'grommet';
 import Close from 'grommet/components/icons/base/Close';
 import Up from 'grommet/components/icons/base/LinkUp';
 import Down from 'grommet/components/icons/base/LinkDown';
@@ -174,11 +174,22 @@ export default class ViewDefDetail extends ComponentBase {
     return links;
   }
 
-  renderTemplateTable(selectedView, root, path) {
+  renderTemplateTable(selectedView, root, path, key) {
     let currentPath = root ? "" : path + ".";
     let selfView = selectedView;
     // map, then filter out null elements, the index is correct; filter out PK fields, then map, the index is wrong.
     return selfView.body.fields.map((field, index) => {
+      let fieldName = field.sqlname;
+      const pointIndex = fieldName.lastIndexOf('.');
+      if (pointIndex > 0) {
+        const link = fieldName.substr(0, pointIndex);
+        fieldName = (
+          <Box direction='row'>
+            <Anchor onClick={this._onClickTableTitle.bind(this, key + '.' + link)} label={link}/>
+            {fieldName.substr(pointIndex)}
+          </Box>
+      );
+      }
       return (
         <tr id={`${currentPath}_${selfView.body.sqlname}_${field.sqlname}_${index}_row`}
             key={`${currentPath}_${selfView.body.sqlname}_${field.sqlname}_${index}_row`}>
@@ -195,7 +206,7 @@ export default class ViewDefDetail extends ComponentBase {
                onClick={this.props.onMoveRowDown}><Down size="small" type="status" style={{color: "#666"}}/></a>
             }
           </td>
-          <td>{field.sqlname}</td>
+          <td>{fieldName}</td>
           <td>
             <input id={`v.${currentPath}body.fields.${index}.alias`}
                    name={`v.${currentPath}body.fields.${index}.alias`}
@@ -288,7 +299,7 @@ export default class ViewDefDetail extends ComponentBase {
     //TODO: fix the onClick issue, so we can use an icon to toggle the textarea
     filter.show = true;
 
-    //const filter = <Anchor icon={<Filter />} className='fontNormal' reverse={true} label={title.label} onClick={title.onClick}/>;
+    //const filter = <Anchor icon={<Filter />} reverse={true} label={title.label} onClick={title.onClick}/>;
 
     const currentPath = root ? "" : path + ".";
     const tableLayer = currentPath.length / 10;
@@ -312,7 +323,7 @@ export default class ViewDefDetail extends ComponentBase {
             </td>
           </tr>
           }
-          {this.renderTemplateTable(selectedView, root, path)}
+          {this.renderTemplateTable(selectedView, root, path, key)}
           </tbody>
         </Table>
         {selectedView.body.links && selectedView.body.links.length > 0 && this.renderLinks([], selectedView, currentPath + "body.links", key)}
@@ -392,7 +403,7 @@ export default class ViewDefDetail extends ComponentBase {
         <Box flex={true}>
           {this.getLayer(this.state.layer)}
           <Header justify="between" pad={{horizontal: 'medium'}}>
-            <Title>View Builder</Title>
+            <Box>View Builder</Box>
             <Menu direction="row" align="center" responsive={true}>
               <Anchor icon={<Play />} onClick={() => table && this.props.openPreview()} label="Query" disabled={!table}/>
               <Anchor icon={<Checkmark />}
@@ -423,7 +434,10 @@ export default class ViewDefDetail extends ComponentBase {
             <Split flex="left" fixed={false} className='fixMinSizing'>
               <Box flex={true}>
                 {
-                  selectedView.body.sqlname && <Map vertical={true} data={bodyToMapData(selectedView.body)} />
+                  selectedView.body.sqlname &&
+                  <Box className='hiddenScroll' flex={false}>
+                    <Map vertical={true} className='grid' data={bodyToMapData(selectedView.body)} />
+                  </Box>
                 }
                 {table}
               </Box>

@@ -3,11 +3,13 @@ import * as ExplorerAction from '../../actions/explorer';
 import RecordDetail from './RecordDetail';
 import RecordListLayer from './RecordListLayer';
 import ComponentBase from '../commons/ComponentBase';
+import ContentPlaceHolder from '../commons/ContentPlaceHolder';
 import history from '../../RouteHistory';
 import Spinning from 'grommet/components/icons/Spinning';
 import {
-  Anchor, Box, Button, Header, Footer, Split, Table, TableRow, Tiles, Title, Tile, Form
+  Anchor, Box, Header, Footer, Split, Table, TableRow, Tiles, Tile
 } from 'grommet';
+import {LongSearchInput} from '../commons/SearchInput';
 
 export default class RecordSearch extends ComponentBase {
   constructor() {
@@ -17,24 +19,24 @@ export default class RecordSearch extends ComponentBase {
       results: [],
       record: null,
       view: null,
-      warning: null,
-      searchText: '',
+      warning: '',
       buttonDisabled: true
     };
     this.lastSearchTime = {};
   }
 
   componentDidMount() {
-    this.checkSearchTextLength(this.props.params.keyword, this._search);
+    const keyword = this.props.params.keyword;
+    this._onSearch(keyword);
+    this.refs.search.refs.input.value = keyword;
     this.loadViews = ExplorerAction.loadViews();
   }
 
-  _search() {
+  _search(keyword) {
     if (!this.acquireLock()) {
       return;
     }
 
-    let keyword = this.state.searchText;
     //  Escaped for SQL. e.g. org.apache.commons.lang.StringEscapeUtils.escapeSql(String str).
     keyword = keyword.replace(/[']/g, '\'\'');
     keyword = encodeURI(keyword);
@@ -130,8 +132,17 @@ export default class RecordSearch extends ComponentBase {
     return this.lastSearchTime[key] && (this.lastSearchTime[key].searching || (new Date() - this.lastSearchTime[key].end < 2000));
   }
 
-  _onSearch() {
-    const keyword = this.state.searchText;
+  _onSearch(keyword) {
+    if (keyword.length <= 2) {
+      if (this.state.warning == '' || !this.state.buttonDisabled) {
+        this.setState({
+          warning: 'Please type at least 3 words to search',
+          buttonDisabled: true
+        });
+      }
+      return;
+    }
+
     const pathname = `/search/${encodeURI(keyword)}`;
     if (location.pathname == decodeURI(pathname) && this.doNotNeedSearch(location.pathname)) {
       if (!this.state.buttonDisabled) {
@@ -151,35 +162,11 @@ export default class RecordSearch extends ComponentBase {
 
     history.push(pathname);
     this.setState({
+      warning: '',
       keyword: keyword,
       buttonDisabled: true
     });
     this._search(keyword);
-  }
-
-  checkSearchTextLength(searchText, callback) {
-    if (searchText.length <= 2) {
-      this.setState({
-        warning: 'Please type at least 3 words to search',
-        searchText,
-        buttonDisabled: true
-      });
-    } else {
-      this.setState({
-        warning: '',
-        searchText,
-        buttonDisabled: false
-      }, callback);
-    }
-  }
-
-  _onEnter(event) {
-    if (event.keyCode === 13) {
-      this._onSearch();
-    } else {
-      const searchText = event.target.value.trim();
-      this.checkSearchTextLength(searchText);
-    }
   }
 
   _showViewRecords(view) {
@@ -191,7 +178,7 @@ export default class RecordSearch extends ComponentBase {
   }
 
   render() {
-    var messages = Object.keys(this.state.messages).map((key) => {
+    const messages = Object.keys(this.state.messages).map((key) => {
       return {
         _id: key,
         view: this.state.messages[key].view,
@@ -199,20 +186,22 @@ export default class RecordSearch extends ComponentBase {
         timeStart: this.state.messages[key].timeStart,
         num: this.state.messages[key].num
       };
-    }).sort((a, b) => {
-      return b.num - a.num;
-    });
+    }).sort((a, b) => b.num - a.num);
+
+    const cards = [];
+    if (!this.locked) {
+      this.state.results.map((result) => (result.records.map(record => {
+        record.view = result.view;
+        cards.push(record);
+      })));
+    }
 
     return (
-      <Box flex={true}>
-        <Header justify="between" pad={{'horizontal': 'medium'}}>
-          <Title>Global Search</Title>
-          <input type="search" className="flex" placeholder="Global Record search..." ref="search" style={{marginLeft: '20px', marginRight: '20px'}}
-            value={this.state.searchText} onChange={this._onEnter.bind(this)} onKeyDown={this._onEnter.bind(this)} maxLength={50}/>
-          <Button label="Search" onClick={()=>this._onSearch()} className={this.state.buttonDisabled ? 'grommetux-button--disabled' : ''}/>
-        </Header>
-        <Split flex="right" fixed={false} className={this.state.warning?'flex':''}>
-          <Box pad="medium" flex={true}>
+      <Box flex={true} pad={{horizontal: "medium", vertical: 'small'}}>
+        <LongSearchInput onSearch={this._onSearch.bind(this)} ref='search'/>
+        {this.state.warning ? <ContentPlaceHolder content={this.state.warning} />
+          :
+          <Split flex="right" fixed={false} className='flex'>
             <Table>
               <thead>
                 <tr>
@@ -221,66 +210,46 @@ export default class RecordSearch extends ComponentBase {
                   <th><Box align="end">Count</Box></th>
                 </tr>
               </thead>
-              <tbody>
-                {
-                  messages.map((msg) => {
-                    return (<TableRow key={msg._id} justify="between">
-                      <td>{msg.view.name}</td>
-                      <td>
-                        <Box align="end">
-                          {`${msg.timeEnd ? (msg.timeEnd - msg.timeStart) + ' ms' : ''}`}
-                        </Box>
-                      </td>
-                      <td>
-                        <Box align="end">
-                        {msg.num > 0 ?
-                            <Anchor onClick={this._showViewRecords.bind(this, msg.view)} label={msg.num}/> : msg.num
-                        }
-                        </Box>
-                      </td>
-                    </TableRow>);
-                  })
-                }
-              </tbody>
+              <tbody>{
+                messages.map((msg) => (
+                  <TableRow key={msg._id} justify="between">
+                    <td>{msg.view.name}</td>
+                    <td>
+                      <Box align="end">
+                        {`${msg.timeEnd ? (msg.timeEnd - msg.timeStart) + ' ms' : ''}`}
+                      </Box>
+                    </td>
+                    <td>
+                      <Box align="end">
+                      {msg.num > 0 ?
+                          <Anchor onClick={this._showViewRecords.bind(this, msg.view)} label={msg.num}/> : msg.num
+                      }
+                      </Box>
+                    </td>
+                  </TableRow>))
+              }</tbody>
             </Table>
-          </Box>
-          {
-            this.state.warning ?
-              <Box pad='small' flex={true} justify='center' align="center">
-                <Box colorIndex="light-2" pad={{horizontal: 'large', vertical: 'medium'}}>
-                  {this.state.warning}
-                </Box>
-              </Box>
-              :
-              <Tiles flush={false} size="large" className='autoScroll justify-around'>
-                {
-                  this.locked ? <Spinning /> : this.state.results.map((result, i) => {
-                    return result.records.map((record, j) => {
-                      // var id = record['ref-link'].split('/')[2];
-                      return (
-                        <Tile key={`${i}.${j}`} align="start" className='box-shadow'>
-                          <Header tag="h4" size="small" pad={{ horizontal: 'small' }}>
-                            {result.view.name}
-                          </Header>
-                          <Form>
-                            <Box pad="small">
-                              <Anchor onClick={this._onClick.bind(this, result.view, record)}
-                                      className='grommetux-text-ellipsis'>
-                                <span title={record.self}><b>{record.self}</b></span>
-                              </Anchor>
-                              {this._getContent(result.view, record)}
-                            </Box>
-                            <Footer pad={{ horizontal: 'small' }}>
-                              {'Table: ' + result.view.body.sqlname}
-                            </Footer>
-                          </Form>
-                        </Tile>);
-                    });
-                  })
-                }
-              </Tiles>
-          }
-        </Split>
+            <Tiles flush={false} fill={true} className={`autoScroll ${cards.length > 10 ? 'fixIEScrollBar' : ''}`}>
+              {
+                this.locked ? <Spinning /> : cards.map((record, index) => (
+                  <Tile key={index} align="start" colorIndex='light-2' pad={{ horizontal: 'small' }}>
+                    <Header size="small">{record.view.name}</Header>
+                    <Box flex={true}>
+                      <Anchor onClick={this._onClick.bind(this, record.view, record)}
+                              className='grommetux-text-ellipsis'>
+                        <span title={record.self}><b>{record.self}</b></span>
+                      </Anchor>
+                      {this._getContent(record.view, record)}
+                    </Box>
+                    <Footer>
+                      {'Table: ' + record.view.body.sqlname}
+                    </Footer>
+                  </Tile>
+                ))
+              }
+            </Tiles>
+          </Split>
+        }
         {
           this.state.record &&
           <RecordDetail body={this.state.view.body} record={this.state.record} onClose={this._onClose.bind(this)}/>
