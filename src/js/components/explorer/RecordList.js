@@ -433,7 +433,7 @@ export default class RecordList extends ComponentBase {
           <Anchor icon={<Pdf />} label="PDF Report"
                   disabled={numTotal < 1}
                   onClick={() => (numTotal > 0) && this._download('pdf')}/>
-          <Anchor icon={<Pdf />} label="Print BarCode"
+          <Anchor icon={<Pdf />} label="Barcode"
                   disabled={numTotal < 1}
                   onClick={() => (numTotal > 0) && this.props.printPdf({body: this.state.body, records: this.state.records, total: numTotal})}/>
         </Menu>

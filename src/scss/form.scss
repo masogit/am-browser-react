@@ -41,19 +41,3 @@
     font-weight: bold;
   }
 }
-
-.background-color {
-  .grommetux-form-field {
-    background-color: #fafafa;
-    border-bottom: 2px solid #f0f0f0;
-    &:last-child {
-      border-bottom-width: 0;
-    }
-  }
-
-  &.vertical-form {
-    .grommetux-form-field {
-      border-bottom: 2px solid #f0f0f0;
-    }
-  }
-}

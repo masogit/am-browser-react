@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Box, Form, FormField, Header, CheckBox, Icons, Anchor, Menu, NumberInput, RadioButton }from 'grommet';
+import {Box, Form, FormField, Header, CheckBox, Icons, Anchor, Menu, RadioButton }from 'grommet';
 const {Download, Close, Play: Preview} = Icons.Base;
 import {getDisplayLabel, getFieldStrVal} from '../../util/RecordFormat';
 import JsBarcode from 'jsbarcode';
@@ -10,8 +10,7 @@ import '../../../scripts/vfs_fonts';
 const barcodeType = [{
   name: 'CODE128',
   label: 'CODE128',
-  type: 'string',
-  checked: true
+  type: 'string'
 }, {
   name: 'CODE39',
   label: 'CODE39',
@@ -74,29 +73,35 @@ const recordsToPdfDoc_barcode = (fields, records, reportLabel, param) => {
       }
 
       availableFields.map(field => {
+        const label = getDisplayLabel(field);
+        const columns = param.showLabel ? [{
+          width: 100,
+          height: param.lineHeight,
+          stack: [{text: label, style: 'text', margin: [0, (param.lineHeight - 12) * 0.3]}]
+        }] : [];
+
         let text = getFieldStrVal(record, field).toString();
         if (text.indexOf('"') == 0) {
           text = text.substr(1, text.length - 2);
         }
 
-        text = text || 'No Data';
-        JsBarcode('#canvas', text, param);
-        const canvas = document.getElementById('canvas');
-
-        const columns = param.showLabel ? [{
-          width: 100,
-          height: param.lineHeight,
-          stack: [{text: getDisplayLabel(field), style: 'text', margin: [0, (param.lineHeight - 12) * 0.3]}]
-        }] : [];
-
-        columns.push({
-          fit: ['100%',param.lineHeight],
-          alignment: 'center',
-          image: canvas.toDataURL('image/png')
-        });
-
+        if (text) {
+          JsBarcode('#canvas', text, param);
+          const canvas = document.getElementById('canvas');
+          columns.push({
+            fit: ['100%', param.lineHeight],
+            alignment: 'center',
+            image: canvas.toDataURL('image/png')
+          });
+        } else {
+          columns.push({
+            width: '*',
+            height: param.lineHeight,
+            alignment: 'center',
+            stack: [{text: label + ' is empty', style: 'text', margin: [0, (param.lineHeight - 12) * 0.3]}]
+          });
+        }
         barCodes.push({columns});
-
       });
       content.push(barCodes);
     });
@@ -142,8 +147,12 @@ const recordsToPdfDoc_barcode = (fields, records, reportLabel, param) => {
   };
 };
 
-const dataReady = ({records, fields, defaultValue}) => {
-  let ready = defaultValue || true;
+const dataReady = ({records, fields, loading}) => {
+  if (loading) {
+    return false;
+  }
+
+  let ready = true;
   if (records) {
     ready = records.filter(record => record.selected).length > 0;
   }
@@ -189,9 +198,8 @@ export default class RecordList extends Component {
       val = parseInt(val);
     } else if (type == 'checkbox') {
       val = event.target.checked;
-    } else if (type == 'select-one') {
-      val = barcodeType[event.target.selectedIndex].name;
-      this.state.supportType = barcodeType[event.target.selectedIndex].type;
+    } else if (type == 'radio') {
+      val = value || event.target.typeValue;
     }
 
     this.state[name] = val;
@@ -212,7 +220,7 @@ export default class RecordList extends Component {
   }
 
   renderForm() {
-    const {showLabel, split, showSelf, limit, recordsStart} = this.state;
+    const {showLabel, split, showSelf, format, limit, recordsStart} = this.state;
     const total = this.props.total;
     return (
       <Form className='no-border strong-label' >
@@ -224,17 +232,17 @@ export default class RecordList extends Component {
           <CheckBox checked={showSelf} name='showSelf' value={split} label='Display Self'
                     onChange={this.updateValue} />
         </FormField>
-        <FormField label='Bar Code Type'>
+        <FormField label='Barcode Type'>
           {barcodeType.map((type, index)=> {
             return (
-              <RadioButton key={index} id='format' name='format' value={type.name}
-                           label={type.label} checked={type.checked} onChange={this.updateValue}/>);
+              <RadioButton key={index} id='format' name='format' label={type.label}
+                           checked={type.name == format} onChange={(event) => this.updateValue(event, type.name)}/>);
           })}
         </FormField>
-        {this.renderNumberInput('Bar Code Thickness', 'width', 1, 4)}
-        {this.renderNumberInput('Bar Code Height', 'height', 50, 200)}
+        {this.renderNumberInput('Barcode Thickness', 'width', 1, 4)}
+        {this.renderNumberInput('Barcode Height', 'height', 50, 200)}
         {this.renderNumberInput('Line Height', 'lineHeight', 50, 200)}
-        {this.renderNumberInput('Bar Code Margin', 'margin', 1, 20)}
+        {this.renderNumberInput('Barcode Margin', 'margin', 1, 20)}
         {this.renderNumberInput('Text Margin', 'textMargin', 1, 20)}
         {this.renderNumberInput('Download Records From', 'recordsStart', 1, total, `${recordsStart}/${total}`)}
         {this.renderNumberInput('Records Limit', 'limit', 100, 1000, limit, 100)}
@@ -346,8 +354,8 @@ export default class RecordList extends Component {
 
     const {records: stateRecords, fields, loading, downloading} = this.state;
 
-    const previewDisabled = !dataReady({records: stateRecords, fields, defaultValue: loading});
-    const downloadDisabled = !dataReady({records: stateRecords, fields, defaultValue: downloading});
+    const previewDisabled = !dataReady({records: stateRecords, fields, loading: loading});
+    const downloadDisabled = !dataReady({records: stateRecords, fields, loading: downloading});
 
     return (
       <Box pad='small' flex={true}  direction='row'>
