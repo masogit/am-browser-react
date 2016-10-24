@@ -49,7 +49,8 @@ const opts = {
         path.resolve(__dirname, 'src/scss'),
         path.resolve(__dirname, 'node_modules')
       ]
-    }
+    },
+    devtool: 'cheap-source-map'
   },
   devServerHost: 'localhost',
   devServerPort: 8001,
