@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Box, Form, FormField, Header, CheckBox, Icons, Anchor, Menu, RadioButton, Layer,
-  Title, Footer, Button, Paragraph}from 'grommet';
+  Title, Footer, Button, Paragraph, NumberInput}from 'grommet';
 const {Download, Close, Play: Preview} = Icons.Base;
 import {getDisplayLabel, getFieldStrVal} from '../../util/RecordFormat';
 import JsBarcode from 'jsbarcode';
@@ -158,14 +158,6 @@ const recordsToPdfDoc_barcode = (fields, records, reportLabel, param) => {
   };
 };
 
-const dataReady = (fields, loading) => {
-  if (loading) {
-    return false;
-  }
-
-  return fields.filter(field => field.selected).length > 0;
-};
-
 export default class RecordList extends Component {
   componentWillMount() {
     this.state = {
@@ -188,17 +180,30 @@ export default class RecordList extends Component {
     };
     this.updateValue = this.updateValue.bind(this);
     this.preview = this.preview.bind(this);
+    this.dataReady = this.dataReady.bind(this);
   }
 
   componentDidMount() {
     this.preview();
   }
 
-  autoPreview() {
-    if (this.previewTimer) {
-      clearTimeout(this.previewTimer);
+  dataReady(loading = this.state.loading) {
+    if (loading) {
+      return false;
     }
-    this.previewTimer = setTimeout(this.preview, 2000);
+
+    return this.state.fields.filter(field => field.selected).length > 0;
+  };
+
+  autoPreview() {
+    if (this.dataReady(false)) {
+      this.setState({loading: true});
+      if (this.previewTimer) {
+        clearTimeout(this.previewTimer);
+      }
+
+      this.previewTimer = setTimeout(this.preview, 2000);
+    }
   }
 
   updateValue(event, value) {
@@ -206,7 +211,7 @@ export default class RecordList extends Component {
     const name = event.target.name;
     const type = event.target.type;
 
-    if (type == 'range') {
+    if (type == 'range' || type == 'number') {
       val = parseInt(val);
     } else if (type == 'checkbox') {
       val = event.target.checked;
@@ -219,14 +224,14 @@ export default class RecordList extends Component {
     this.autoPreview();
   }
 
-  renderNumberInput(label, name, min, max, displayValue, step = 1) {
+  renderNumberInput(label, name, min, max, step = 1) {
     //https://gist.github.com/Candy374/80bf411ff286f6785eb80a9098f01c39
     return (
       <FormField label={
           <Box justify='between' direction='row'>
             <span>{label}</span>
-            {displayValue || this.state[name]}
           </Box>}>
+        <NumberInput className='number-input-label' name={name} type="range" min={min} max={max} step={step} value={this.state[name]} onChange={this.updateValue}/>
         <input name={name} type="range" min={min} max={max} step={step} value={this.state[name]} onChange={this.updateValue}/>
       </FormField>
     );
@@ -304,7 +309,7 @@ export default class RecordList extends Component {
   renderFields() {
     const fields = this.state.fields;
     let error;
-    if (!dataReady(fields)) {
+    if (!this.dataReady(false)) {
       error = 'No Field Selected';
     }
 
@@ -314,10 +319,9 @@ export default class RecordList extends Component {
           fields.map((field, index) => (
             <Box margin={{top: 'small'}} key={index}>
               <CheckBox checked={!!field.selected} label={getDisplayLabel(field)}
-                        onChange={(event) => {
+                        onChange={() => {
                           field.selected = !field.selected;
-                          this.setState({fields: fields});
-                          this.autoPreview();
+                          this.setState({fields}, this.autoPreview);
                         }}/>
             </Box>
           ))
@@ -345,17 +349,13 @@ export default class RecordList extends Component {
           <Header><Title>Choose records to export</Title></Header>
 
           <Form className='no-border strong-label'>
-            <FormField label='How many records do you want to export?' help={limit}>
-              <input name='limit' type="range" min={100} max={1000} step={100} value={limit} onChange={this.updateValue}/>
-            </FormField>
-            <FormField label='From which record' help={recordsStart}>
-              <input name='recordsStart' type="range" min={1} max={total - 1} step={1} value={recordsStart} onChange={this.updateValue}/>
-            </FormField>
+            {this.renderNumberInput('How many records do you want to export?', 'limit', 100, 1000, 100)}
+            {this.renderNumberInput('From which record do you want to export?', 'recordsStart', 1, total - 1)}
           </Form>
 
           <Box pad={{horizontal: 'medium'}}>
             <Paragraph size='small'>{'You have '}<strong>{total}</strong>{' records in total.'}</Paragraph>
-            <Paragraph size='small'>{`You will export records `}<strong>{`${recordsStart} ~ ${getRecordNumber() + recordsStart}`}</strong></Paragraph>
+            <Paragraph size='small'>{`You will export records `}<strong>{`${recordsStart} ~ ${getRecordNumber() + recordsStart - 1}`}</strong></Paragraph>
           </Box>
 
           <Footer justify='end' pad={{vertical: 'medium'}}>
@@ -375,10 +375,10 @@ export default class RecordList extends Component {
       return <Box>No Records</Box>;
     }
 
-    const {fields, loading, downloading, showExportLayer} = this.state;
+    const {loading, downloading, showExportLayer} = this.state;
 
-    const previewDisabled = !dataReady(fields, loading);
-    const downloadDisabled = !dataReady(fields,  downloading);
+    const previewDisabled = !this.dataReady(loading);
+    const downloadDisabled = !this.dataReady(downloading);
 
     return (
       <Box pad='small' flex={true}  direction='row'>
