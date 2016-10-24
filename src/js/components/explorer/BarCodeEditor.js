@@ -187,10 +187,18 @@ export default class RecordList extends Component {
       showExportLayer: false
     };
     this.updateValue = this.updateValue.bind(this);
+    this.preview = this.preview.bind(this);
   }
 
   componentDidMount() {
     this.preview();
+  }
+
+  autoPreview() {
+    if (this.previewTimer) {
+      clearTimeout(this.previewTimer);
+    }
+    this.previewTimer = setTimeout(this.preview, 2000);
   }
 
   updateValue(event, value) {
@@ -208,6 +216,7 @@ export default class RecordList extends Component {
 
     this.state[name] = val;
     this.setState(this.state);
+    this.autoPreview();
   }
 
   renderNumberInput(label, name, min, max, displayValue, step = 1) {
@@ -305,9 +314,10 @@ export default class RecordList extends Component {
           fields.map((field, index) => (
             <Box margin={{top: 'small'}} key={index}>
               <CheckBox checked={!!field.selected} label={getDisplayLabel(field)}
-                        onChange={() => {
+                        onChange={(event) => {
                           field.selected = !field.selected;
                           this.setState({fields: fields});
+                          this.autoPreview();
                         }}/>
             </Box>
           ))
