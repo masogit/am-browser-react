@@ -13,6 +13,8 @@ import EmptyIcon from '../commons/EmptyIcon';
 import * as Format from '../../util/RecordFormat';
 import {hash, loadSetting, saveSetting} from '../../util/util';
 import cookies from 'js-cookie';
+import BarCodeEditor from './BarCodeEditor';
+import {toggleSidebar} from '../../actions/system';
 
 const getFirstGroupby = (groupby) => {
   if (groupby && groupby.split('|').length > 0)
@@ -51,7 +53,8 @@ const init = (props) => {
     onMoreLock: false,
     locked: false,
     showGraph: true,
-    body: props.body
+    body: props.body,
+    pdfGenerator: null
   };
 
 };
@@ -435,7 +438,7 @@ export default class RecordList extends ComponentBase {
                   onClick={() => (numTotal > 0) && this._download('pdf')}/>
           <Anchor icon={<Pdf />} label="Barcode"
                   disabled={numTotal < 1}
-                  onClick={() => (numTotal > 0) && this.props.printPdf({body: this.state.body, records: this.state.records, total: numTotal})}/>
+                  onClick={() => (numTotal > 0) && this.printPdf.bind(this, {body: this.state.body, records: this.state.records, total: numTotal})()}/>
         </Menu>
         <form name="Download" ref="downloadForm" method="post">
           <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
@@ -446,6 +449,13 @@ export default class RecordList extends ComponentBase {
         </form>
       </Header>
     );
+  }
+
+  printPdf(pdfGenerator) {
+    this.setState({pdfGenerator});
+    if (this.props.root) {
+      toggleSidebar(false);
+    }
   }
 
   renderList() {
@@ -623,12 +633,15 @@ export default class RecordList extends ComponentBase {
   }
 
   render() {
-    const {record, param: {graphType, filters, showTopology}} = this.state;
+    const {record, pdfGenerator, param: {graphType, filters, showTopology}} = this.state;
 
-    return (
-      <Box flex={true} className='fixIEScrollBar'>
-        {this.renderToolBox()}
-        {filters.length > 0 &&
+    if (pdfGenerator) {
+      return <BarCodeEditor {...pdfGenerator} key='BarCodeEditor' back={() => this.setState({pdfGenerator: null})}/>;
+    } else {
+      return (
+        <Box flex={true} className='fixIEScrollBar'>
+          {this.renderToolBox()}
+          {filters.length > 0 &&
           <Box direction='row' className='topology-background-color' pad='small' flex={false} margin={{bottom: 'small'}}>
             {filters.map((filter, index) => (
                 <Box direction='row' key={index}>
@@ -637,19 +650,20 @@ export default class RecordList extends ComponentBase {
                 </Box>
               )
             )}
-        </Box>
-        }
-        <Box flex={true} direction={graphType=='legend' ? 'row' : 'column'} className='fixMinSizing fixIEScrollBar'>
-          {!(showTopology && record) && this.renderGraph()}
-          <Box flex={true} pad={graphType=='legend' ? 'none' : {vertical: 'small'}} direction='row'>
-            <Box className='topology-background-color' flex={true} pad='small'>
-              {this.renderList()}
+          </Box>
+          }
+          <Box flex={true} direction={graphType=='legend' ? 'row' : 'column'} className='fixMinSizing fixIEScrollBar'>
+            {!(showTopology && record) && this.renderGraph()}
+            <Box flex={true} pad={graphType=='legend' ? 'none' : {vertical: 'small'}} direction='row'>
+              <Box className='topology-background-color' flex={true} pad='small'>
+                {this.renderList()}
+              </Box>
+              {this.renderDetail()}
             </Box>
-            {this.renderDetail()}
           </Box>
         </Box>
-      </Box>
-    );
+      );
+    }
   }
 }
 

@@ -211,8 +211,10 @@ export function dropCurrentPop_stopMonitor(title, onConfirm) {
   }
 }
 
-export function toggleSidebar() {
-  store.dispatch({type: Types.TOGGLE_SIDEBAR});
+export function toggleSidebar(showSidebar = !store.getState().session.showSidebar) {
+  if (showSidebar != store.getState().session.showSidebar) {
+    store.dispatch({type: Types.TOGGLE_SIDEBAR});
+  }
 }
 
 export function getOnlineUser() {
