@@ -284,7 +284,7 @@ export default class ViewDefDetail extends ComponentBase {
     const header = (
       <thead>
       <tr>
-        <th></th>
+        <th/>
         <th>Field</th>
         <th>Alias</th>
         <th>Search</th>
@@ -315,7 +315,7 @@ export default class ViewDefDetail extends ComponentBase {
           <tbody>
           {filter.show &&
           <tr>
-            <td></td>
+            <td/>
             <td colSpan={8}>
               <textarea id={filter.id} name={filter.name} value={filter.value}
                         placeholder="Input AQL as filter" onChange={filter.onChange}

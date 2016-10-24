@@ -38,8 +38,7 @@ export default class SlackDialog extends Component {
           <FormField>
             <textarea value={this.state.message} onChange={this.onChange.bind(this)}
                       placeholder='What do you want to say to HPE AM Browser team?'
-                      onKeyUp={this.onKeyUp.bind(this)} rows={8}>
-            </textarea>
+                      onKeyUp={this.onKeyUp.bind(this)} rows={8}/>
           </FormField>
           <Footer justify="between" margin={{top: 'small'}}>
             <a href='https://ambrowser.slack.com' style={{ lineHeight: '13px', fontSize: '13px'}} target='_blank'>
@@ -51,7 +50,7 @@ export default class SlackDialog extends Component {
 
             <Menu direction="row">
               <Button label="Send" primary={true} onClick={this.state.message.trim() ? this.onClick.bind(this) : null}/>
-              <span></span>
+              <span/>
               <Button label="Cancel" onClick={this.props.onClose}/>
             </Menu>
           </Footer>

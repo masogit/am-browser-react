@@ -9,7 +9,7 @@ const EditLayer = ({onChange, value, label, onClose, name}) => (
     <Box flex={true} size='large'>
       <Header><Title>Edit</Title></Header>
       <FormField label={label} htmlFor={name}>
-            <textarea id={name} rows='5' name={name} value={value} onChange={onChange}></textarea>
+            <textarea id={name} rows='5' name={name} value={value} onChange={onChange}/>
       </FormField>
       <Footer justify='end' pad={{vertical: 'medium'}}>
         <Button label="Confirm" primary={true} strong={true} onClick={onClose}/>

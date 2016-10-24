@@ -269,10 +269,10 @@ export default class Graph extends Component {
           }
         }
       } else {
-        return <div></div>;
+        return <div/>;
       }
     } else
-      return <div></div>;
+      return <div/>;
   }
 }
 
