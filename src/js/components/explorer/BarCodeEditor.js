@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import {Box, Form, FormField, Header, CheckBox, Icons, Anchor, Menu, RadioButton }from 'grommet';
+import {Box, Form, FormField, Header, CheckBox, Icons, Anchor, Menu, RadioButton, Layer,
+  Title, Footer, Button, Paragraph}from 'grommet';
 const {Download, Close, Play: Preview} = Icons.Base;
 import {getDisplayLabel, getFieldStrVal} from '../../util/RecordFormat';
 import JsBarcode from 'jsbarcode';
@@ -49,35 +50,30 @@ const recordsToPdfDoc_barcode = (fields, records, reportLabel, param) => {
 
   if (availableFields.length > 0) {
     records.map((record, index) => {
-      const barCodes = [];
-
-      if (index > 0 && param.split) {
-        barCodes.push({
-          text: '',
-          pageBreak: 'before'
-        });
-      }
+      const barCodes = [], body = [];
 
       if (param.showSelf) {
-        barCodes.push({
-          layout: 'lightHorizontalLines',
-          table: {
-            widths: ['*'],
-            headerRows: 1,
-            body: [
-              [record.self],
-              ['']
-            ]
-          }
-        });
+        body.push([record.self]);
+      } else {
+        body.push(['']);
       }
+
+      barCodes.push({
+        layout: 'headerLineOnly',
+        table: {
+          widths: ['*'],
+          headerRows: 1,
+          body: body
+        }
+      });
 
       availableFields.map(field => {
         const label = getDisplayLabel(field);
+        const textMargin = [0, (param.lineHeight - 12) * 0.3];
         const columns = param.showLabel ? [{
-          width: 100,
           height: param.lineHeight,
-          stack: [{text: label, style: 'text', margin: [0, (param.lineHeight - 12) * 0.3]}]
+          width: param.labelWidth,
+          stack: [{text: label, style: 'text', margin: textMargin}]
         }] : [];
 
         let text = getFieldStrVal(record, field).toString();
@@ -86,23 +82,38 @@ const recordsToPdfDoc_barcode = (fields, records, reportLabel, param) => {
         }
 
         if (text) {
-          JsBarcode('#canvas', text, param);
-          const canvas = document.getElementById('canvas');
-          columns.push({
-            fit: ['100%', param.lineHeight],
-            alignment: 'center',
-            image: canvas.toDataURL('image/png')
-          });
+          try {
+            JsBarcode('#canvas', text, param);
+            const canvas = document.getElementById('canvas');
+            columns.push({
+              fit: ['100%', param.lineHeight],
+              alignment: 'center',
+              image: canvas.toDataURL('image/png')
+            });
+          } catch (e) {
+            columns.push({
+              height: param.lineHeight,
+              alignment: 'center',
+              stack: [{text: e, style: 'text', margin: textMargin}]
+            });
+          }
         } else {
           columns.push({
-            width: '*',
             height: param.lineHeight,
             alignment: 'center',
-            stack: [{text: label + ' is empty', style: 'text', margin: [0, (param.lineHeight - 12) * 0.3]}]
+            stack: [{text: label + ' is empty', style: 'text', margin: textMargin}]
           });
         }
-        barCodes.push({columns});
+        body.push([{columns}]);
       });
+
+      if (index > 0 && param.split) {
+        content.push({
+          text: '',
+          pageBreak: 'after'
+        });
+      }
+
       content.push(barCodes);
     });
   }
@@ -147,30 +158,22 @@ const recordsToPdfDoc_barcode = (fields, records, reportLabel, param) => {
   };
 };
 
-const dataReady = ({records, fields, loading}) => {
+const dataReady = (fields, loading) => {
   if (loading) {
     return false;
   }
 
-  let ready = true;
-  if (records) {
-    ready = records.filter(record => record.selected).length > 0;
-  }
-  if (fields) {
-    ready = ready && fields.filter(field => field.selected).length > 0;
-  }
-  return ready;
+  return fields.filter(field => field.selected).length > 0;
 };
 
 export default class RecordList extends Component {
   componentWillMount() {
-    const records = this.props.records.slice(0, 5);
-    records[0].selected = true;
     this.state = {
       fields: this.props.body.fields,
-      records: records,
+      previewCount: 1,
       format: barcodeType[0].name,
       width: 2,
+      labelWidth: 100,
       height: 100,
       lineHeight: 100,
       margin: 10,
@@ -180,7 +183,8 @@ export default class RecordList extends Component {
       showSelf: true,
       loading: false,
       recordsStart: 1,
-      limit: 100
+      limit: 100,
+      showExportLayer: false
     };
     this.updateValue = this.updateValue.bind(this);
   }
@@ -220,8 +224,7 @@ export default class RecordList extends Component {
   }
 
   renderForm() {
-    const {showLabel, split, showSelf, format, limit, recordsStart} = this.state;
-    const total = this.props.total;
+    const {showLabel, split, showSelf, format} = this.state;
     return (
       <Form className='no-border strong-label' >
         <FormField label='Page Setting'>
@@ -240,24 +243,18 @@ export default class RecordList extends Component {
           })}
         </FormField>
         {this.renderNumberInput('Barcode Thickness', 'width', 1, 4)}
+        {this.renderNumberInput('Field Width', 'labelWidth', 20, 200)}
         {this.renderNumberInput('Barcode Height', 'height', 50, 200)}
         {this.renderNumberInput('Line Height', 'lineHeight', 50, 200)}
         {this.renderNumberInput('Barcode Margin', 'margin', 1, 20)}
         {this.renderNumberInput('Text Margin', 'textMargin', 1, 20)}
-        {this.renderNumberInput('Download Records From', 'recordsStart', 1, total, `${recordsStart}/${total}`)}
-        {this.renderNumberInput('Records Limit', 'limit', 100, 1000, limit, 100)}
       </Form>
     );
   }
 
-  preview(records = this.state.records) {
+  preview(records = this.props.records.slice(0, this.state.previewCount)) {
     this.setState({loading: true});
-    this.print(records);
-  }
-
-  print(records) {
-    const availableRecords = records.filter(record => record.selected);
-    const dd = recordsToPdfDoc_barcode(this.state.fields, availableRecords, this.props.body.label, this.state);
+    const dd = recordsToPdfDoc_barcode(this.state.fields, records, this.props.body.label, this.state);
     if (dd) {
       pdfMake.createPdf(dd).getDataUrl((outDoc) => {
         const lastPDF = document.getElementById('pdfV');
@@ -298,7 +295,7 @@ export default class RecordList extends Component {
   renderFields() {
     const fields = this.state.fields;
     let error;
-    if (!dataReady({fields})) {
+    if (!dataReady(fields)) {
       error = 'No Field Selected';
     }
 
@@ -320,42 +317,58 @@ export default class RecordList extends Component {
     );
   }
 
-  renderRecordChooser() {
-    const records = this.state.records;
-    let error;
-    if (!dataReady({records})) {
-      error = 'No Record Selected';
-    }
+  renderExportLayer() {
+    const {total}= this.props;
+    const {recordsStart, limit} = this.state;
+
+    const getRecordNumber = () => {
+      if (recordsStart + limit > total) {
+        return total - recordsStart;
+      } else {
+        return limit;
+      }
+    };
 
     return (
-        <FormField label='Choose Preview Records' error={error}>
-          <Box pad={{horizontal: 'medium', vertical: 'small'}} direction='row'>{
-            records.map((record, index) => {
-              return (
-                <CheckBox key={index} checked={!!record.selected} label={index + 1}
-                        onChange={(event) => {
-                          event.stopPropagation();
-                          record.selected = !record.selected;
-                          this.setState({records: records});
-                        }
-                        }/>
-              );
-            })}
+      <Layer closer={true} onClose={() => this.setState({showExportLayer: false})}>
+        <Box flex={true} size='large'>
+          <Header><Title>Choose records to export</Title></Header>
+
+          <Form className='no-border strong-label'>
+            <FormField label='How many records do you want to export?' help={limit}>
+              <input name='limit' type="range" min={100} max={1000} step={100} value={limit} onChange={this.updateValue}/>
+            </FormField>
+            <FormField label='From which record' help={recordsStart}>
+              <input name='recordsStart' type="range" min={1} max={total - 1} step={1} value={recordsStart} onChange={this.updateValue}/>
+            </FormField>
+          </Form>
+
+          <Box pad={{horizontal: 'medium'}}>
+            <Paragraph size='small'>{'You have '}<strong>{total}</strong>{' records in total.'}</Paragraph>
+            <Paragraph size='small'>{`You will export records `}<strong>{`${recordsStart} ~ ${getRecordNumber() + recordsStart}`}</strong></Paragraph>
           </Box>
-        </FormField>
+
+          <Footer justify='end' pad={{vertical: 'medium'}}>
+            <Button label={`Export ${getRecordNumber()} records`} primary={true} strong={true} onClick={() => {
+              this.download();
+              this.setState({showExportLayer: false});
+            }}/>
+          </Footer>
+        </Box>
+      </Layer>
     );
   }
 
   render() {
-    const records = this.props.records;
+    const {records}= this.props;
     if (records.length == 0) {
       return <Box>No Records</Box>;
     }
 
-    const {records: stateRecords, fields, loading, downloading} = this.state;
+    const {fields, loading, downloading, showExportLayer} = this.state;
 
-    const previewDisabled = !dataReady({records: stateRecords, fields, loading: loading});
-    const downloadDisabled = !dataReady({records: stateRecords, fields, loading: downloading});
+    const previewDisabled = !dataReady(fields, loading);
+    const downloadDisabled = !dataReady(fields,  downloading);
 
     return (
       <Box pad='small' flex={true}  direction='row'>
@@ -364,13 +377,13 @@ export default class RecordList extends Component {
             <Box>PDF Generator</Box>
             <Menu direction="row" align="center" responsive={true}>
               <Anchor icon={<Preview/>} disabled={previewDisabled} onClick={previewDisabled ? null : () => this.preview()} label='Preview'/>
-              <Anchor icon={<Download />} disabled={downloadDisabled} onClick={downloadDisabled ? null : () => this.download()} label='Download'/>
+              <Anchor icon={<Download />} disabled={downloadDisabled} onClick={downloadDisabled ? null : () => this.setState({showExportLayer: true})} label='Export'/>
               <Anchor label='Back' icon={<Close/>} onClick={() => this.props.back()}/>
             </Menu>
           </Header>
           <Box direction='row' justify='center'>
             <Form className='no-border strong-label'>
-              {this.renderRecordChooser()}
+              {this.renderNumberInput('Preview Records', 'previewCount', 1, 5)}
               {this.renderFields()}
             </Form>
             {this.renderForm()}
@@ -378,6 +391,7 @@ export default class RecordList extends Component {
         </Box>
         <div style={{width: '50vw'}} id='pdfContainer'/>
         <canvas id='canvas' style={{display: 'none'}} />
+        {showExportLayer && this.renderExportLayer()}
       </Box>
     );
   }
