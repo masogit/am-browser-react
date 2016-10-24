@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Box, Form, FormField, Header, CheckBox, Icons, Anchor, Menu, RadioButton, Layer,
-  Title, Footer, Button, Paragraph, NumberInput}from 'grommet';
+  Title, Footer, Button, Paragraph, NumberInput} from 'grommet';
 const {Download, Close, Play: Preview} = Icons.Base;
 import {getDisplayLabel, getFieldStrVal} from '../../util/RecordFormat';
 import JsBarcode from 'jsbarcode';
