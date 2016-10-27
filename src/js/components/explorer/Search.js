@@ -3,8 +3,7 @@ import history from '../../RouteHistory';
 import * as ExplorerActions from '../../actions/explorer';
 import * as AQLActions from '../../actions/aql';
 import {getJobList} from '../../actions/ucmdbAdapter';
-import {getOnlineUser} from '../../actions/system';
-import {Header, Box, Tiles, Meter, Tile, List, ListItem} from 'grommet';
+import {Header, Box, Tiles, Meter, Tile} from 'grommet';
 import Graph from '../commons/Graph';
 import UCMDBAdapterContainer from '../ucmdbAdapter/UCMDBAdapterPoint';
 import AQL from '../aql/AQL';
@@ -22,8 +21,7 @@ export default class Search extends Component {
         popJobs: [],
         pushJobs: [],
         errorMsg: ''
-      },
-      onlineUsers: []
+      }
     };
     this._isUnmount = false;
   }
@@ -71,9 +69,6 @@ export default class Search extends Component {
           }
         });
     }
-    getOnlineUser().then(onlineUsers => {
-      this.setState({onlineUsers});
-    });
   }
 
   componentWillUnmount() {
@@ -194,34 +189,7 @@ export default class Search extends Component {
     history.push(`/search/${encodeURI(keyword)}`);
   }
 
-  renderOnlineUser() {
-    return (
-      <Box flex={true} className='autoScroll'>
-        <List>
-          <ListItem justify="between" pad='none'>
-            <span>User Name</span>
-            <Box pad={{horizontal: 'medium'}}/>
-            <span className="secondary">Count</span>
-          </ListItem>
-          {
-            this.state.onlineUsers.map((user, index) => {
-              return (
-                <ListItem key={index} justify="between" separator='none' pad='none'>
-                  <span>
-                    {user.name}
-                  </span>
-                  <Box pad={{horizontal: 'medium'}}/>
-                  <span className="secondary">
-                    {user.count}
-                  </span>
-                </ListItem>
-              );
-            })
-          }
-        </List>
-      </Box>
-    );
-  }
+
 
   render() {
     const tiles = [{
@@ -236,11 +204,6 @@ export default class Search extends Component {
         onClick: this.goAQL,
         graph: this.state.aqlSeries &&
         <Meter legend={{"placement": "inline"}} series={this.state.aqlSeries} a11yTitle="meter-title-12"/>
-      });
-
-      tiles.push({
-        title: 'Online Users',
-        graph: this.renderOnlineUser()
       });
     }
 
