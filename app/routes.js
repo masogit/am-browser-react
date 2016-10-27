@@ -11,6 +11,7 @@ var storage = multer.memoryStorage();
 var upload = multer({storage: storage});
 var isAuthenticated = require('./authentication').isAuthenticated;
 var path = require('path');
+var cookiesUtil = require('./cookiesUtil');
 
 module.exports = function (app) {
   var rest_protocol = config.rest_protocol;
@@ -21,6 +22,7 @@ module.exports = function (app) {
   var session_max_age = config.session_max_age;
   var enable_csrf = config.enable_csrf;
   var jwt_max_age = config.jwt_max_age;
+  var enable_lwsso = config.enable_lwsso;
 
   switch (config.db_type) {
     case 'file':
@@ -37,7 +39,14 @@ module.exports = function (app) {
   var apiProxy = httpProxy.createProxyServer();
 
   apiProxy.on('proxyReq', function (proxyReq, req, res) {
-    proxyReq.setHeader('X-Authorization', req.session.jwt.secret);
+    // add jwt check for LWSSO jwt may not exist
+    if (req.session.jwt) {
+      proxyReq.setHeader('X-Authorization', req.session.jwt.secret);
+    }
+    // LWSSO enabled
+    if (enable_lwsso) {
+      proxyReq.setHeader('Cookie', cookiesUtil.getCookies(req));
+    }
     logger.debug(`[proxy] [${req.sessionID}] [request] ${req.method} ${req.originalUrl}`);
   });
 
@@ -53,6 +62,7 @@ module.exports = function (app) {
     session_max_age: session_max_age,
     jwt_max_age: jwt_max_age,
     enable_csrf: enable_csrf,
+    enable_lwsso: enable_lwsso,
     context: config.base + config.version
   };
 
@@ -90,9 +100,12 @@ module.exports = function (app) {
 
   // AM Server Login
   app.post('/am/login', rest.login);
-
   app.get('/am/logout', rest.logout);
+  // AM LWSSO Login
+  if (enable_lwsso) {
+    app.post('/am/lwssoLogin', rest.lwssoLogin);
 
+  }
   app.all("/*", function (req, res, next) {
     var session = req.session;
     if (!session || !session.user) {
@@ -109,7 +122,9 @@ module.exports = function (app) {
       req.session.expires = new Date(Date.now() + session_max_age * 60 * 1000);
       sessionUtil.touch(req.session, session_max_age);
       // Renew jwt token.
-      if ((new Date(req.session.jwt.expires) - req.session.expires) < 1 * 60 * 1000) {
+      // add jet check for LWSSO jwt may not exist
+      if (req.session.jwt && req.session.jwt.expires && req.session.expires
+        && (new Date(req.session.jwt.expires) - req.session.expires) < 1 * 60 * 1000) {
         rest.jwtRenew(req, res);
       }
       next(); // Call the next middleware

@@ -4,6 +4,7 @@ var sessionUtil = require('./sessionUtil');
 var config = require('./config');
 var rights = require('./constants').rights;
 var logger = require('./logger');
+var cookiesUtil = require('./cookiesUtil');
 
 module.exports = function (am) {
 
@@ -121,6 +122,100 @@ module.exports = function (am) {
     });
   };
 
+  // LWSSO login
+  this.lwssoLogin = function (req, res) {
+    var url = "http://${server}${context}${ref-link}";
+
+    var am_rights = ['@anyone'];
+
+    args = {
+      path: {
+        server: am.server,
+        context: am.context,
+        "ref-link": `/db/amEmplDept`
+      },
+      parameters: {
+        fields: `bAdminRight, lEmplDeptId, EMail, UserLogin`,
+        filter: `lEmplDeptId=CurrentUser.lEmplDeptId`
+      },
+      headers: {
+        "Content-Type": "application/json",
+        'Cookie': cookiesUtil.getCookies(req)
+      }
+    };
+
+    client.get(url, args, (data, response) => {
+      var user_rights = Object.assign({}, rights.guest);
+      if (!data.entities || !data.entities[0]) {
+        var message = response.statusMessage;
+        logger.warn(`[user] [${req.sessionID || '-'}]`, message, username);
+        res.status(response.statusCode).send(message);
+      } else {
+        var email = data.entities[0].EMail;
+        var username = data.entities[0].UserLogin;
+        var isAdmin = !!data.entities[0].bAdminRight[1];
+        var empId = data.entities[0].lEmplDeptId;
+        if (isAdmin) {
+          am_rights.push('@admin');
+          user_rights.ucmdbAdapter = true;
+        }
+
+        if (config.rights_power.indexOf('@anyone') > -1 || isAdmin && config.rights_power.indexOf('@admin') > -1) {
+          loginSuccess(req, res, username, '', email, Object.assign(user_rights, rights.admin), am);
+          res.end();
+        } else {
+          // get detail rights
+          var aqlUrl = "http://${server}${context}/aql/${tables}/${fields} WHERE ${clause}";
+          args = {
+            path: {
+              server: am.server,
+              context: config.base,
+              tables: "amMasterProfile MP,amRelEmplMProf REM",
+              fields: "MP.SQLName",
+              clause: `MP.lMProfileId=REM.lMProfileId AND REM.lEmplDeptId=${empId}`
+            },
+            headers: {
+              Accept: "application/json",
+              Cookie: cookiesUtil.getCookies(req)
+            }
+          };
+
+          client.get(aqlUrl, args, (data, response) => {
+            // get user right defined in AM
+            if (data.Query.Result.Row) {
+              var row = data.Query.Result.Row;
+              if (!row.length) {
+                am_rights.push(row.Column.content);
+              } else {
+                row.forEach(data => {
+                  am_rights.push(data.Column.content);
+                });
+              }
+            }
+
+            // match am_rights and amb rights
+
+            for (var i = 0; i < am_rights.length; i++) {
+              if (config.rights_admin.indexOf(am_rights[i]) > -1) {
+                Object.assign(user_rights, rights.admin);
+                break;
+              } else if (config.rights_power.indexOf(am_rights[i]) > -1) {
+                Object.assign(user_rights, rights.power);
+              }
+            }
+
+            loginSuccess(req, res, username, '', email, user_rights, am);
+
+            res.end();
+          });
+        }
+      }
+    }).on('error', function (err) {
+      logger.error(`[user] [${req.sessionID || '-'}]`, "login failed with error: " + err.toString());
+      res.status(500).send(err.toString());
+    });
+  };
+
   this.logout = function(req, res) {
     logger.info(`[user] [${req.sessionID || '-'}]`, (req.session && req.session.user ? req.session.user : "user") + " logout.");
     const username = req.session.user;
@@ -200,6 +295,7 @@ function loginSuccess(req, res, username, password, email, rights, am) {
   req.session.user = username;
   req.session.rights = rights;
   am_rest.headerNavs = getHeadNav(rights);
+  am_rest.username = username;
   res.cookie('headerNavs', am_rest.headerNavs);
   res.cookie("user", username);
   res.cookie("email", email);

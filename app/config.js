@@ -25,6 +25,7 @@ module.exports = {
 
   isDebug: process.env.AMB_NODE_DEBUG || properties.get('node.is_debug'),
   enable_csrf: process.env.AMB_NODE_CSRF || properties.get('node.enable_csrf'),
+  enable_lwsso: process.env.AMB_NODE_LWSSO || properties.get('node.enable_lwsso'),
 
   ucmdb_adapter_enabled: properties.get('ucmdb.adapter'),
   ucmdb_browser_server: process.env.UCMDB_BROWSER_SERVER || properties.get('ucmdb.browser_server'),

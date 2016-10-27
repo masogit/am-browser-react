@@ -1,6 +1,7 @@
 // set up =======
 var compression = require('compression');
 var express = require('express');
+var cookieParser = require('cookie-parser');
 var path = require('path');
 var app = express(); 								// create our app w/ express
 var morgan = require('morgan');
@@ -13,6 +14,7 @@ var fs = require('fs'), https = require('https'), http = require('http');
 var cors = require('cors');
 var config = require('./config.js');
 var AMBRouter = express.Router();
+app.use(cookieParser());
 if (config.node_base == '/') {
   AMBRouter = app;
 } else {

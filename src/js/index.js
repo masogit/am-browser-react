@@ -17,7 +17,7 @@ import {IntlProvider} from 'react-intl';
 
 import store from './store';
 import history from './RouteHistory';
-import {init, initToken, routeChanged} from './actions/system';
+import {init, initToken, lwssoPreAuthenticate, routeChanged} from './actions/system';
 import {ReduxRouter} from 'redux-router';
 
 Rest.setHeader('Accept', 'application/json');
@@ -37,6 +37,10 @@ try {
 var localeData = getLocaleData(messages, locale);
 
 import cookies from 'js-cookie';
+
+if (cookies.get('LWSSO_COOKIE_KEY')) {
+  store.dispatch(lwssoPreAuthenticate());
+}
 
 if (cookies.get('headerNavs')) {
   store.dispatch(init(cookies.get('user'), cookies.get('headerNavs')));

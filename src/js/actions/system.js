@@ -7,6 +7,7 @@ import {
   CSRF_DEF_URL,
   ABOUT_DEF_URL,
   LOGIN_DEF_URL,
+  LWSSO_LOGIN_DEF_URL,
   LOGOUT_DEF_URL,
   AM_SCHEMA_DEF_URL,
   AM_DEF_URL,
@@ -40,6 +41,46 @@ export function initAbout() {
     console.log('Get About failed');
     throw err;
   });
+}
+
+export function lwssoPreAuthenticate() {
+  return function (dispatch) {
+    return Rest.post(LWSSO_LOGIN_DEF_URL)
+      .then(res => {
+        if (res.body) {
+          const headerNavs = res.body.headerNavs;
+          const username = res.body.username;
+          dispatch(loginSuccess(username, headerNavs));
+        } else {
+          dispatch(loginFailure({message: res.text}));
+        }
+      }, err => {
+        if (err) {
+          let message = err.response ? err.response.text : '', retrying = false;
+          const CANNOT_CONNECT_REST = 'Can not connect to rest server.';
+          const CANNOT_CONNECT_NODE = 'Can not connect to node server.';
+          if (err.status) {
+            if (err.status == 500 && message.indexOf('ECONNREFUSED') > -1) {
+              message = CANNOT_CONNECT_REST;
+            } else if(err.status == 502) {
+              message = CANNOT_CONNECT_NODE;
+            } else if (err.status == 403 && message.indexOf('invalid csrf token') > -1) {
+              message = 'Invalid csrf token';
+              if (!retry) {
+                lwssoPreAuthenticate()(dispatch);
+                retrying = true;
+              }
+            }
+          } else {
+            message = err.message.indexOf('network is offline') > -1 ? CANNOT_CONNECT_NODE : err.message;
+          }
+
+          if (!retrying) {
+            dispatch(loginFailure({message: 'Login failed. ' + message}));
+          }
+        }
+      });
+  };
 }
 
 export function login(username, password, retry) {

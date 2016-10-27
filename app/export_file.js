@@ -3,6 +3,7 @@ var client = new Client();
 var Convertor = require('json-2-csv');
 var logger = require('./logger');
 var PdfPrinter = require('pdfmake/src/printer');
+var cookiesUtil = require('./cookiesUtil');
 var fonts = {
   Roboto: {
     normal: './app/fonts/Roboto-Regular.ttf',
@@ -85,6 +86,22 @@ module.exports = function (am) {
 
     var url = "http://${server}${context}${ref-link}";
     var auth = req.session.jwt ? req.session.jwt.secret : undefined;
+    var headers = (auth) ? {
+      "Content-Type": "application/json",
+      "X-Authorization": auth
+    } : undefined;
+    // LWSSO enabled
+    if (am.enable_lwsso) {
+      if (headers) {
+        headers.Cookies = cookiesUtil.getCookies(req);
+      } else {
+        headers = {
+          "Content-Type": "application/json",
+          "Cookies": cookiesUtil.getCookies(req)
+        }
+      }
+
+    }
     var request;
     var param = JSON.parse(req.body.param);
     var args = {
@@ -94,10 +111,7 @@ module.exports = function (am) {
         "ref-link": '/db/' + req.params.tableName
       },
       parameters: param,
-      headers: (auth) ? {
-        "Content-Type": "application/json",
-        "X-Authorization": auth
-      } : undefined
+      headers: headers
     };
 
     request = client.get(url, args, (data) => {
