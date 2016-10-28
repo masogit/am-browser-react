@@ -29,6 +29,9 @@ $ gulp copy-demo
 $ gulp amdev
 ```
 ##  7. Database configuration
+  AM Browser has several configuration data allow to save in local file or Mongodb, type:
+  - file
+  - mongo
 ```
 [db]
 type = file
@@ -41,7 +44,6 @@ db = test
 username =
 password =
 ```
-> Type: **`file`** or **`mongo`**
 
 # For unit testing and code coverage, run the following commands:
 ##  1. Unit tests:
