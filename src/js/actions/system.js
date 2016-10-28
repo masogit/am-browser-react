@@ -43,7 +43,7 @@ export function initAbout() {
   });
 }
 
-export function lwssoPreAuthenticate() {
+export function lwssoPreAuthenticate(retry) {
   return function (dispatch) {
     return Rest.post(LWSSO_LOGIN_DEF_URL)
       .then(res => {
@@ -67,7 +67,7 @@ export function lwssoPreAuthenticate() {
             } else if (err.status == 403 && message.indexOf('invalid csrf token') > -1) {
               message = 'Invalid csrf token';
               if (!retry) {
-                lwssoPreAuthenticate()(dispatch);
+                lwssoPreAuthenticate(true)(dispatch);
                 retrying = true;
               }
             }
