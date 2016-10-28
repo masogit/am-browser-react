@@ -50,7 +50,7 @@ const opts = {
         path.resolve(__dirname, 'node_modules')
       ]
     },
-    devtool: 'inline-source-map'
+    devtool: ''
   },
   devServerHost: 'localhost',
   devServerPort: 8001,
@@ -82,6 +82,7 @@ gulp.task('set-webpack-alias', () => {
     console.log('Using local alias for development.');
     opts.webpack.resolve.alias = opts.alias;
   }
+  opts.webpack.devtool = 'eval';
 });
 
 gulp.task('copy-demo', function () {
@@ -531,7 +532,7 @@ gulp.task('gen-ws-base-linux', ['clean-gen-ws-linux', 'download-ws-linux'], func
       .pipe(gulp.dest('./rest/gen/temp/websvc'));
   var copy_version = gulp.src('./version.json', {base : '.'})
       .pipe(jeditor({'id': currentId}))
-      .pipe(gulp.dest('./rest/gen/temp/'));      
+      .pipe(gulp.dest('./rest/gen/temp/'));
   var copy_swidtag= gulp.src('./*.swidtag')
       .pipe(gulp.dest('./rest/gen/temp/'));
   var copy_sh = gulp.src('./rest/bin/*.sh')
