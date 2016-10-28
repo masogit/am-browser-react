@@ -1,13 +1,13 @@
 # To run this application, execute the following commands: 
 
-##  1. Install NPM modules
+## 1. Install NPM modules
     $ cd am-browser
     $ npm install
 ##  2. Start the server
     $ cd am-browser
     $ node app\server.js
       or 'node app/server.js' if you use git bash.
-## 3. Start the UI development server
+##  3. Start the UI development server
     $ cd am-browser
     $ gulp dev
 ##  4. Distribution build
@@ -28,6 +28,20 @@ $ gulp copy-demo
 ```
 $ gulp amdev
 ```
+##  7. Database configuration
+```
+[db]
+type = file
+folder = ./db
+
+[mongo]
+server = localhost
+port = 27017
+db = test
+username =
+password =
+```
+> Type: **`file`** or **`mongo`**
 
 # For unit testing and code coverage, run the following commands:
 ##  1. Unit tests:
