@@ -63,7 +63,6 @@ export default class RecordList extends ComponentBase {
   componentWillMount() {
     this.state = init(this.props);
     this._getRecords(this.state.param);
-    this._getSearchableFields();
     if (this.props.body.groupby)
       this._getGroupByData();
     this.setState({
