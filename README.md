@@ -44,6 +44,10 @@ db = test
 username =
 password =
 ```
+  Migrate data from file db to Mongodb, make sure both file and Mongodb properties correct and db service is running.
+```
+node app/db migrate
+```
 
 # For unit testing and code coverage, run the following commands:
 ##  1. Unit tests:
