@@ -41,3 +41,19 @@
     font-weight: bold;
   }
 }
+
+.code-panel {
+  width: 50vw;
+  .grommetux-form-field__contents {
+    height: 100%;
+  }
+
+  .grommetux-form-field__error {
+    position: absolute;
+    right: 20px;
+  }
+
+  textarea {
+    height: 100%
+  }
+}
