@@ -73,7 +73,7 @@ const opts = {
 };
 
 var express;
-//var timestamp = dateformat(new Date(), 'yyyymmddHHMM');
+var timestamp = dateformat(new Date(), 'yyyymmddHHMM');
 var currentId = (parseInt(version.id)+1).toString();
 console.log("currentId is " + currentId)
 
@@ -138,7 +138,7 @@ gulp.task('gen', ['copy-temp'], function () {
   console.log('Generate am-browser.zip from temp folder');
   //var timestamp = Math.floor(new Date().getTime()/1000);
   //var build = version.stage ? '-' + timestamp + '_' + version.stage : '';
-  var name = 'am-browser' + '-' + version.number + '-' + currentId + '.zip';
+  var name = 'am-browser' + '-' + version.number + '-' + currentId + timestamp + '.zip';
   // generate am-browser.zip from temp folder
   return gulp.src('./gen/temp/**')
       .pipe(zip(name))
@@ -330,7 +330,7 @@ gulp.task('gen-ws', ['gen-ws-conf'], function () {
   // generate am-browser-rest.zip from temp folder
   //var timestamp = Math.floor(new Date().getTime()/1000);
   //var build = version.stage ? '-' + timestamp + '_' + version.stage : '';
-  var name = 'am-browser-rest' + '-' + version.number + '-' + currentId + '.zip';
+  var name = 'am-browser-rest' + '-' + version.number + '-' + currentId + timestamp + '.zip';
   return gulp.src('./rest/gen/temp/**')
       .pipe(zip(name))
       .pipe(gulp.dest('./rest/gen'));
@@ -394,7 +394,7 @@ gulp.task('gen-linux', ['chmod-linux'], function () {
   console.log('Generate am-browser.zip from temp folder');
   //var timestamp = Math.floor(new Date().getTime()/1000);
   //var build = version.stage ? '-' + timestamp + '_' + version.stage : '';
-  var name = 'am-browser' + '-' + version.number + '-' + currentId + '.tar';
+  var name = 'am-browser' + '-' + version.number + '-' + currentId + timestamp + '.tar';
   // generate am-browser.zip from temp folder
   return gulp.src('./gen/temp/**')
       .pipe(tar(name))
@@ -608,7 +608,7 @@ gulp.task('gen-ws-linux', ['gen-ws-chmod-linux'], function () {
   // generate am-browser-rest.zip from temp folder
   //var timestamp = Math.floor(new Date().getTime()/1000);
   //var build = version.stage ? '-' + timestamp + '_' + version.stage : '';
-  var name = 'am-browser-rest' + '-' + version.number + '-' + currentId + '.tar';
+  var name = 'am-browser-rest' + '-' + version.number + '-' + currentId + timestamp + '.tar';
   return gulp.src('./rest/gen/temp/**')
       .pipe(tar(name))
 	  .pipe(gzip())
