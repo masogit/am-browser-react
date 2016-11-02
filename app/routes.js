@@ -23,7 +23,6 @@ module.exports = function (app) {
   var enable_csrf = config.enable_csrf;
   var jwt_max_age = config.jwt_max_age;
   var enable_lwsso = config.enable_lwsso;
-  var loginUrl = config.node_base == '/' ? '/login' : config.node_base + "/login";
 
   switch (config.db_type) {
     case 'file':

@@ -5,8 +5,6 @@ const {Download, Close, Play: Preview} = Icons.Base;
 import {getDisplayLabel, getFieldStrVal} from '../../util/RecordFormat';
 import JsBarcode from 'jsbarcode';
 import * as ExplorerActions from '../../actions/explorer';
-import '../../../scripts/pdfmake.min';
-import '../../../scripts/vfs_fonts';
 
 const barcodeType = [{
   name: 'CODE128',

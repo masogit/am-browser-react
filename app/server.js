@@ -44,7 +44,7 @@ if (enable_csrf) {
   app.use(csrf());
 }
 
-app.use(config.node_base,express.static(path.join(__dirname, '/../dist')));
+app.use(config.node_base, express.static(path.join(__dirname, '/../dist')));
 // routes ======================================================================
 var AMBRouter;
 if (config.node_base == '/') {
