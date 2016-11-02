@@ -44,13 +44,13 @@ if (enable_csrf) {
   app.use(csrf());
 }
 
-app.use('/', express.static(path.join(__dirname, '/../dist')));
-
 // routes ======================================================================
 if (config.node_base == '/') {
+  app.use(express.static(path.join(__dirname, '/../dist')));
   require('./routes.js')(app);
 } else {
   var AMBRouter = express.Router();
+  app.use('/AMB',express.static(path.join(__dirname, '/../dist')));
   app.use(config.node_base, AMBRouter);
   require('./routes.js')(AMBRouter);
 }
