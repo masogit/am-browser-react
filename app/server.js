@@ -4,7 +4,6 @@ var express = require('express');
 var cookieParser = require('cookie-parser');
 var path = require('path');
 var app = express(); 								// create our app w/ express
-var morgan = require('morgan');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var logger = require('./logger.js');
@@ -13,13 +12,6 @@ var csrf = require('csurf');
 var fs = require('fs'), https = require('https'), http = require('http');
 var cors = require('cors');
 var config = require('./config.js');
-var AMBRouter = express.Router();
-app.use(cookieParser());
-if (config.node_base == '/') {
-  AMBRouter = app;
-} else {
-  app.use(config.node_base, AMBRouter);
-}
 
 // initial AM node server
 var server = config.node_server;
@@ -29,53 +21,41 @@ var https_port = config.node_https_port;     // set the https port
 var isDebug = config.isDebug;
 var enable_csrf = config.enable_csrf;
 
-AMBRouter.use(compression());
+app.use(cookieParser());
+app.use(compression());
 //app.use(morgan('dev')); // log every request to the console
-AMBRouter.use(bodyParser.urlencoded({'extended': 'true'})); // parse application/x-www-form-urlencoded
-AMBRouter.use(bodyParser.json()); // parse application/json
-AMBRouter.use(bodyParser.json({type: 'application/vnd.api+json'})); // parse application/vnd.api+json as json
-AMBRouter.use(methodOverride('X-HTTP-Method-Override')); // override with the X-HTTP-Method-Override header in the request
-AMBRouter.use(session({
+app.use(bodyParser.urlencoded({'extended': 'true'})); // parse application/x-www-form-urlencoded
+app.use(bodyParser.json()); // parse application/json
+app.use(bodyParser.json({type: 'application/vnd.api+json'})); // parse application/vnd.api+json as json
+app.use(methodOverride('X-HTTP-Method-Override')); // override with the X-HTTP-Method-Override header in the request
+app.use(session({
   resave: true,
   saveUninitialized: true,
   secret: config.session_secret
 }));
+
 if (isDebug) {
-  AMBRouter.use(cors({origin: true, credentials: true}));
+  app.use(cors({origin: true, credentials: true}));
 } else {
-  AMBRouter.use(cors());
+  app.use(cors());
 }
 
 if (enable_csrf) {
-  AMBRouter.use(csrf());
+  app.use(csrf());
 }
 
 app.use('/', express.static(path.join(__dirname, '/../dist')));
 
-var indexHtml = function (req, res) {
-  if (enable_csrf) {
-    res.cookie('csrf-token', req.csrfToken());
-  }
-  res.sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));
-};
-
 // routes ======================================================================
-require('./routes.js')(AMBRouter);
+if (config.node_base == '/') {
+  require('./routes.js')(app);
+} else {
+  var AMBRouter = express.Router();
+  app.use(config.node_base, AMBRouter);
+  require('./routes.js')(AMBRouter);
+}
 
-AMBRouter.get('/*', indexHtml);
-
-// redirect morgan log to winston
-morgan.token('sessionId', function getSessionId (req) {
-  return req.session ? req.session.id : '';
-});
-var morganFormat = "[express] [:sessionId] [:remote-addr] [:remote-user] :method :url HTTP/:http-version :status :res[content-length] - :response-time ms";
-var stream = {
-  write: function (message, encoding) {
-    logger.debug(message);
-  }
-};
-app.use(morgan(morganFormat, {stream: stream}));
-
+// error handle
 app.use(function (err, req, res, next) {
   logger.error(`[csrf] [${req.sessionID}] [${req.session && req.session.csrfSecret}] [${err.name}: ${err.message}] ${req.method} ${req.url}`);
   if (enable_csrf && (err.code === 'EBADCSRFTOKEN') ) {
