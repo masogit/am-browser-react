@@ -44,6 +44,66 @@ const defaultPDFDefinition = {
   }
 };
 
+const analyzeRecordList = (filter, allFields, records) => {
+  let avalableFields = [];
+  if (filter.length > 0) {
+    allFields.map(field => {
+      for (let f of filter) {
+        if (field.sqlname.toLowerCase() == f.toLowerCase()) {
+          avalableFields.push(field);
+          break;
+        }
+      }
+    });
+  }
+
+  if (avalableFields.length == 0) {
+    avalableFields = allFields;
+  }
+
+  const body = [];
+  const content = [{
+    layout: 'headerLineOnly',
+    table: {
+      headerRows: 1,
+      body: body
+    }
+  }];
+
+  body.push(avalableFields.map((field, index) => (
+    { text: getDisplayLabel(field), style: 'tableHeader' }
+  )));
+
+  records.map((record, index) => {
+    const row = [];
+    avalableFields.map((field, tdindex) => (
+      row.push(getFieldStrVal(record, field))
+    ));
+    body.push(row);
+  });
+
+
+  const pdfDefinition = cloneDeep(pdfobj);
+  pdfDefinition.content = content;
+  return pdfDefinition;
+};
+
+const analyzeTitle = (text, title) => {
+  if (text.toLowerCase().includes('@title')) {
+    return text.replace(/@title/gi, title);
+  }
+
+  return text;
+};
+
+const analyzeDate = (text, date) => {
+  if (text.toLowerCase().includes('@date')) {
+    return text.replace(/@date/gi, date);
+  }
+
+  return text;
+};
+
 export default class RecordList extends Component {
   componentWillMount() {
     this.state = {
@@ -86,15 +146,6 @@ export default class RecordList extends Component {
   updateValue(event, value) {
     let val = value || event.target.value;
     const name = event.target.name;
-    const type = event.target.type;
-
-    if (type == 'range' || type == 'number') {
-      val = parseInt(val);
-    } else if (type == 'checkbox') {
-      val = event.target.checked;
-    } else if (type == 'radio') {
-      val = value || event.target.typeValue;
-    }
 
     let error = '', obj;
     try {
@@ -110,63 +161,18 @@ export default class RecordList extends Component {
     this.autoPreview();
   }
 
-
-  analyzeRecordList(pdfobj, allFields, records) {
-    if (typeof pdfobj == 'string' || records.length == 0) {
-      return '';
-    }
-
-    const filter = pdfobj.content;
-    let avalableFields = [];
-    if (filter.length > 0) {
-      allFields.map(field => {
-        for (let f of filter) {
-          if (field.sqlname.toLowerCase() == f.toLowerCase()) {
-            avalableFields.push(field);
-            break;
-          }
-        }
-      });
-    }
-
-    if (avalableFields.length == 0) {
-      avalableFields = allFields;
-    }
-
-    const body = [];
-    const content = [{
-      layout: 'headerLineOnly',
-      table: {
-        headerRows: 1,
-        body: body
-      }
-    }];
-
-    body.push(avalableFields.map((field, index) => (
-      { text: getDisplayLabel(field), style: 'tableHeader' }
-    )));
-
-    records.map((record, index) => {
-      const row = [];
-      avalableFields.map((field, tdindex) => (
-        row.push(getFieldStrVal(record, field))
-      ));
-      body.push(row);
-    });
-
-
-    const pdfDefinition = cloneDeep(pdfobj);
-    pdfDefinition.content = content;
-
-    // const date = (new Date()).toDateString();
-    // const headerText = JSON.stringify(pdfDefinition.header);
-// const funcs = headerText.match('@{}')
-
-    return pdfDefinition;
-  };
-
   preview(pdfDefinition = this.state.pdfDefinition) {
-    pdfDefinition = this.analyzeRecordList(this.state.pdfDefinition, this.props.body.fields, this.state.records);
+    pdfDefinition = analyzeRecordList(this.state.pdfDefinition, this.props.body.fields, this.state.records);
+    const date = (new Date()).toLocaleDateString();
+    if (pdfDefinition.header) {
+      pdfDefinition.header.text = analyzeTitle(pdfDefinition.header.text, this.props.body.label);
+      pdfDefinition.header.text = analyzeDate(pdfDefinition.header.text, date);
+    }
+
+    if (pdfDefinition.footer) {
+      pdfDefinition.footer.columns[0].text = analyzeDate(pdfDefinition.footer.columns[0].text, date);
+    }
+
     if (pdfDefinition) {
       pdfMake.createPdf(cloneDeep(pdfDefinition)).getDataUrl((outDoc) => {
         const lastPDF = document.getElementById('pdfV');
