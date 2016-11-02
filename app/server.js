@@ -44,16 +44,17 @@ if (enable_csrf) {
   app.use(csrf());
 }
 
+app.use(config.node_base,express.static(path.join(__dirname, '/../dist')));
 // routes ======================================================================
+var AMBRouter;
 if (config.node_base == '/') {
-  app.use(express.static(path.join(__dirname, '/../dist')));
-  require('./routes.js')(app);
+  AMBRouter = app;
 } else {
-  var AMBRouter = express.Router();
-  app.use('/AMB',express.static(path.join(__dirname, '/../dist')));
+  AMBRouter = express.Router();
   app.use(config.node_base, AMBRouter);
-  require('./routes.js')(AMBRouter);
 }
+
+require('./routes.js')(AMBRouter);
 
 // error handle
 app.use(function (err, req, res, next) {
