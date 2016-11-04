@@ -10,7 +10,7 @@ import Graph from '../commons/Graph';
 import ComponentBase  from '../commons/ComponentBase';
 import ActionTab from '../commons/ActionTab';
 import {Anchor, Box, Button, CheckBox, Header, Menu, Table, TableRow, Layer, Carousel, RadioButton, Tabs, Icons} from 'grommet';
-const { Add, Close, Attachment, Checkmark, Search, Shift, More } = Icons.Base;
+const { Add, Close, Attachment, Checkmark, Search, Shift, More, Group } = Icons.Base;
 import AMSideBar from '../commons/AMSideBar';
 import _ from 'lodash';
 
@@ -586,7 +586,7 @@ export default class Insight extends ComponentBase {
               {edit &&
               <Anchor icon={<Close />} onClick={() => this.state.tabs.length > 1 && this._onRemove(this.state.focusTab)} label="Delete Tab" disabled={this.state.tabs.length <= 1}/>}
               {edit &&
-              <CheckBox label="Public" checked={this.state.focusTab.public}
+              <Anchor icon={<Group colorIndex={this.state.focusTab.public ? '' : 'grey-4'} />} label="Public"
                       onClick={() => this.state.tabs.length > 1 && this._onPublic(this.state.focusTab)}
                       disabled={this.state.tabs.length <= 1}/>}
               <CheckBox id="edit" label="Edit" checked={edit} onChange={this._toggleEdit.bind(this)}
