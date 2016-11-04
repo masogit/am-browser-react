@@ -148,49 +148,45 @@ exports.find = function (req, res) {
   var id = req.params.id;
   var download = req.query.download;
 
-  // Insight get data by user
-  var filter = {};
-  if (req.originalUrl.indexOf(modules.insight) > -1) {
-    filter = {user: req.session.user};
-  }
-
-  if (id)
-    db.collection(collectionName).findOne(Object.assign({_id: id}, filter), function (err, document) {
-      if (err)
+  // if query by filter, call findBy
+  if (req.query.filter) {
+    db.collection(collectionName).find(JSON.parse(req.query.filter)).toArray(function (err, documents) {
+      if (err) {
         logger.error("[tingo]", err);
-      else if (download)
-        JSONDownloader(res, document, (document.name || id) + '.json');
-      else
-        res.json(document);
+        reject(err);
+      }
+      res.json(documents);
     });
-  else
-    db.collection(collectionName).find(filter).toArray(function (err, documents) {
-      if (err)
-        logger.error("[tingo]", err);
-      else if (download)
-        JSONDownloader(res, documents, collectionName + '.json');
-      else
-        res.json(documents);
-    });
-};
+  } else {
+    // Insight get data by user
+    var filter = {};
+    if (req.originalUrl.indexOf(modules.insight) > -1) {
+      filter = {user: req.session.user};
+    }
 
-exports.findOne = function (collectionName, id, callback) {
-  // Insight get data by user
-  var filter = {};
-  if (req.originalUrl.indexOf(modules.insight) > -1) {
-    filter = {user: req.session.user};
+    if (id)
+      db.collection(collectionName).findOne(Object.assign({_id: id}, filter), function (err, document) {
+        if (err)
+          logger.error("[tingo]", err);
+        else if (download)
+          JSONDownloader(res, document, (document.name || id) + '.json');
+        else
+          res.json(document);
+      });
+    else
+      db.collection(collectionName).find(filter).toArray(function (err, documents) {
+        if (err)
+          logger.error("[tingo]", err);
+        else if (download)
+          JSONDownloader(res, documents, collectionName + '.json');
+        else
+          res.json(documents);
+      });
   }
-
-  db.collection(collectionName).findOne(Object.assign({_id: id}, filter), function (err, documents) {
-    if (err)
-      logger.error("[tingo]", err);
-    if (typeof callback == 'function')
-      callback(documents);
-  });
 };
 
 // tingodb Find by filter
-exports.findBy = function (collectionName, filter) {
+function findBy (collectionName, filter) {
   return new Promise(function (resolve, reject) {
     db.collection(collectionName).find(filter).toArray(function (err, documents) {
       if (err) {
@@ -202,6 +198,8 @@ exports.findBy = function (collectionName, filter) {
     });
   });
 };
+
+exports.findBy = findBy;
 
 // tingodb Insert or Update
 exports.upsert = function (req, res) {
