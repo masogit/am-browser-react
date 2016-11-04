@@ -148,41 +148,28 @@ exports.find = function (req, res) {
   var id = req.params.id;
   var download = req.query.download;
 
-  // if query by filter, call findBy
-  if (req.query.filter) {
-    db.collection(collectionName).find(JSON.parse(req.query.filter)).toArray(function (err, documents) {
-      if (err) {
-        logger.error("[tingo]", err);
-        reject(err);
-      }
-      res.json(documents);
-    });
-  } else {
-    // Insight get data by user
-    var filter = {};
-    if (req.originalUrl.indexOf(modules.insight) > -1) {
-      filter = {user: req.session.user};
-    }
+  // Insight get data by user
+  var filter = req.query.filter ? JSON.parse(req.query.filter) : {};
 
-    if (id)
-      db.collection(collectionName).findOne(Object.assign({_id: id}, filter), function (err, document) {
-        if (err)
-          logger.error("[tingo]", err);
-        else if (download)
-          JSONDownloader(res, document, (document.name || id) + '.json');
-        else
-          res.json(document);
-      });
-    else
-      db.collection(collectionName).find(filter).toArray(function (err, documents) {
-        if (err)
-          logger.error("[tingo]", err);
-        else if (download)
-          JSONDownloader(res, documents, collectionName + '.json');
-        else
-          res.json(documents);
-      });
-  }
+  if (id)
+    db.collection(collectionName).findOne(Object.assign({_id: id}, filter), function (err, document) {
+      if (err)
+        logger.error("[tingo]", err);
+      else if (download)
+        JSONDownloader(res, document, (document.name || id) + '.json');
+      else
+        res.json(document);
+    });
+  else
+    db.collection(collectionName).find(filter).toArray(function (err, documents) {
+      if (err)
+        logger.error("[tingo]", err);
+      else if (download)
+        JSONDownloader(res, documents, collectionName + '.json');
+      else
+        res.json(documents);
+    });
+
 };
 
 // tingodb Find by filter
@@ -206,11 +193,6 @@ exports.upsert = function (req, res) {
   var collectionName = req.params.collection;
   var id = req.params.id;
   var obj = req.file ? JSON.parse(req.file.buffer) : req.body;
-
-  // Insight save by user
-  if (req.originalUrl.indexOf(modules.insight) > -1) {
-    obj = Object.assign(obj, {user: req.session.user});
-  }
 
   // Validation then save or update
   var validator = new Validator();

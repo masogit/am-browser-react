@@ -6,19 +6,15 @@ import * as Format from '../../util/RecordFormat';
 import history from '../../RouteHistory';
 import RecordListLayer from '../explorer/RecordListLayer';
 import AlertForm from '../commons/AlertForm';
-import Add from 'grommet/components/icons/base/Add';
-import Close from 'grommet/components/icons/base/Close';
-import Attachment from 'grommet/components/icons/base/Attachment';
-import Checkmark from 'grommet/components/icons/base/Checkmark';
-import Search from 'grommet/components/icons/base/Search';
-import Shift from 'grommet/components/icons/base/Shift';
-import More from 'grommet/components/icons/base/More';
 import Graph from '../commons/Graph';
 import ComponentBase  from '../commons/ComponentBase';
 import ActionTab from '../commons/ActionTab';
-import {Anchor, Box, Button, CheckBox, Header, Menu, Table, TableRow, Layer, Carousel, RadioButton, Tabs} from 'grommet';
+import {Anchor, Box, Button, CheckBox, Header, Menu, Table, TableRow, Layer, Carousel, RadioButton, Tabs, Icons} from 'grommet';
+const { Add, Close, Attachment, Checkmark, Search, Shift, More } = Icons.Base;
 import AMSideBar from '../commons/AMSideBar';
 import _ from 'lodash';
+
+import cookies from 'js-cookie';
 
 let tabIdMap = {};
 export default class Insight extends ComponentBase {
@@ -112,7 +108,7 @@ export default class Insight extends ComponentBase {
 
   _loadWall() {
     this.setState({data: {}});
-    this.addPromise(AQLActions.loadWalls().then(walls => {
+    this.addPromise(AQLActions.loadWalls(cookies.get("user")).then(walls => {
       if (walls) {
         if (walls[0]) {
           this.wall = _.cloneDeep(walls[0]);
@@ -429,6 +425,7 @@ export default class Insight extends ComponentBase {
   _onSaveWall() {
     var wall = this.state.wall;
     wall.tabs = this.state.tabs;
+    wall.user = cookies.get('user');
     AQLActions.saveWall(wall).then(data => {
       if (data)
         this._loadWall();
@@ -518,6 +515,37 @@ export default class Insight extends ComponentBase {
     this.setState(this.state);
   }
 
+  _onPublic(targetTab) {
+    var isPublic = targetTab.public;
+    var alert = (<AlertForm onClose={this._closeAlert.bind(this)}
+                            title={'Confirmation for tab public'}
+                            desc={`${isPublic?'Cancel to public this tab':'Public this tab'}: ${targetTab.name}?`}
+                            onConfirm={this._onPublicTab.bind(this, targetTab)}/>);
+    this.setState({
+      alert: alert
+    });
+  }
+
+  _onPublicTab(targetTab) {
+    targetTab.public = !targetTab.public;
+    // let focusIndex = -1;
+    let tabs = this.state.tabs;
+    tabs.forEach((tab, index) => {
+      if (tab.name == targetTab.name) {
+        tab = targetTab;
+        return;
+      }
+    });
+    // focusIndex = (focusIndex + 1) % tabs.length;
+    // let focusTab = tabs[focusIndex];
+    // this.state.tabs = leftTabs;
+    // this.state.wall.tabs = leftTabs;
+    // this.state.focusIndex = focusIndex > 0 ? focusIndex -1 : focusIndex;
+    this.state.focusTab = targetTab;
+    this.state.tabs = tabs;
+    this.setState(this.state);
+  }
+
   render() {
     const {tabs, data, carousel, edit, layer, alert} = this.state;
     const id = this.props.params.id;
@@ -557,6 +585,10 @@ export default class Insight extends ComponentBase {
               {edit && <Anchor icon={<Add />} onClick={this._addTab.bind(this)} label="Add Tab"/>}
               {edit &&
               <Anchor icon={<Close />} onClick={() => this.state.tabs.length > 1 && this._onRemove(this.state.focusTab)} label="Delete Tab" disabled={this.state.tabs.length <= 1}/>}
+              {edit &&
+              <CheckBox label="Public" checked={this.state.focusTab.public}
+                      onClick={() => this.state.tabs.length > 1 && this._onPublic(this.state.focusTab)}
+                      disabled={this.state.tabs.length <= 1}/>}
               <CheckBox id="edit" label="Edit" checked={edit} onChange={this._toggleEdit.bind(this)}
                         toggle={true}/>
             </Menu>
