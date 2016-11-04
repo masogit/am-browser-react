@@ -18,6 +18,10 @@ import history from './RouteHistory';
 import {init, initToken, lwssoPreAuthenticate, routeChanged} from './actions/system';
 import {ReduxRouter} from 'redux-router';
 
+if (process.env.NODE_ENV !== 'production') {
+  require('index.scss');
+}
+
 Rest.setHeader('Accept', 'application/json');
 Rest.setHeader('X-API-Version', 200);
 
