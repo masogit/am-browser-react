@@ -1,7 +1,5 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import 'index.scss';
-
 import React from 'react';
 import ReactDOM from 'react-dom';
 //import Router from 'react-router';

@@ -21,6 +21,7 @@ import version from './version.json';
 import config from './rest/conf/config.json';
 import linuxConfig from './rest/conf/linux-config.json';
 import amb_config from './app/config';
+import ExtractTextPlugin from "extract-text-webpack-plugin";
 
 const argv = yargs.argv;
 const spawn = child_process.spawn;
@@ -44,8 +45,13 @@ const opts = {
   mainJs: 'src/js/index.js',
   mainScss: 'src/scss/index.scss',
   webpack: {
+    entry: {
+      style: './src/scss',
+      index: './src/js/index.js'
+    },
     output: {
-      publicPath: '/'
+      filename: "[name].js",
+      chunkFilename: "[name].js"
     },
     resolve: {
       root: [
@@ -54,7 +60,13 @@ const opts = {
         path.resolve(__dirname, 'node_modules')
       ]
     },
-    devtool: ''
+    devtool: '',
+    plugins: [new ExtractTextPlugin("[name].css")]
+  },
+  scssLoader: {
+    test: /\.scss$/,
+    loader: ExtractTextPlugin.extract(['css','sass?includePaths[]=' + path.resolve(__dirname, './node_modules') +
+    '&includePaths[]=' + encodeURIComponent(path.resolve(__dirname, './node_modules/grommet/node_modules'))])
   },
   devServerHost: 'localhost',
   devServerPort: 8001,
