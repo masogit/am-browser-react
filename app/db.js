@@ -3,7 +3,6 @@ var db;
 const fs = require('fs');
 var logger = require('./logger.js');
 var Validator = require('./validator.js');
-var modules = require('./constants').modules;
 const config = require('./config');
 
 process.argv.forEach(function (val, index, array) {
