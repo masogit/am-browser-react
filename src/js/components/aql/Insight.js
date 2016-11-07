@@ -110,11 +110,14 @@ export default class Insight extends ComponentBase {
     this.setState({data: {}});
     this.addPromise(AQLActions.loadWalls(cookies.get("user")).then(walls => {
       if (walls) {
-        if (walls[0]) {
+        var userWall = walls.filter((wall) => {
+          return wall.user == cookies.get("user");
+        })[0];
+        if (userWall) {
           this.wall = _.cloneDeep(walls[0]);
           this.setState({
-            wall: walls[0],
-            tabs: walls[0].tabs
+            wall: userWall,
+            tabs: userWall.tabs
           }, () => {
             this._findTabAqls(walls[0].tabs);
             monitorEdit(this.wall, this.state.wall);
