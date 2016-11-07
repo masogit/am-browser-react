@@ -33,6 +33,10 @@ const opts = {
     {
       asset: 'src/img/**',
       dist: 'dist/img/'
+    },
+    {
+      asset: 'src/scripts/**',
+      dist: 'dist/scripts/'
     }
   ],
   scssAssets: ['src/scss/**/*.scss'],
@@ -56,9 +60,7 @@ const opts = {
   devServerPort: 8001,
   // The 8010 port number needs to align with hostName in index.js
   devServerProxy: {
-    // if you need a prefix for dev server, you must add it here
-    // eg: `http://${amb_config.node_server=='0.0.0.0'?'localhost':amb_config.node_server}:${amb_config.node_port}/AMB`
-    '**': `http://${amb_config.node_server=='0.0.0.0'?'localhost':amb_config.node_server}:${amb_config.node_port}`
+    '!**/index.js': `http://${amb_config.node_server == '0.0.0.0' ? 'localhost' : amb_config.node_server}:${amb_config.node_port}`
   },
   websocketHost: 'localhost:8010',
   alias: {
@@ -75,7 +77,7 @@ const opts = {
 var express;
 var timestamp = dateformat(new Date(), 'yyyymmddHHMM');
 var currentId = (parseInt(version.id)+1).toString();
-console.log("currentId is " + currentId)
+console.log("currentId is " + currentId);
 
 gulp.task('set-webpack-alias', () => {
   if (opts.alias && argv.useAlias) {
