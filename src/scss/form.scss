@@ -34,11 +34,51 @@
   .grommetux-form-field {
     border: none;
   }
+  .grommetux-menu.grommetux-menu--controlled {
+    display: flex;
+    align-items: center;
+  }
 }
 
 .strong-label {
   .grommetux-form-field__label {
     font-weight: bold;
+  }
+
+  .grommetux-button__icon {
+    padding-top: 0;
+    padding-bottom: 0;
+    height: 12px;
+  }
+
+  .grommetux-anchor__icon {
+    padding: 0;
+    width: 12px;
+    height: 12px;
+  }
+
+  .grommetux-control-icon {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+.grommetux-form-field {
+  .grommetux-form-field {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .grommetux-form-field__contents {
+    .grommetux-form-field__label {
+      border: none;
+    }
+  }
+
+  .grommetux-menu__control-label {
+    @extend .grommetux-form-field__label;
+    display: inline;
+    float: left;
   }
 }
 
