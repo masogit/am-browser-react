@@ -18,6 +18,7 @@ export default class NavHeader extends Component {
       {to: '/search', text: 'Search'},
       {to: '/insight', text: 'Insight'},
       {to: '/explorer', text: 'Viewer'},
+      {to: '/report', text: 'Reports'},
       {to: '/views', text: 'Builder'},
       {to: '/aql', text: 'Graph'},
       {to: '/ucmdbAdapter', text: 'Adapter'}
@@ -56,4 +57,3 @@ export default class NavHeader extends Component {
     );
   }
 }
-

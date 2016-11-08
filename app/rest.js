@@ -315,6 +315,7 @@ function getHeadNav(rights) {
     'insight/:id': rights.index < 3,
     explorer: rights.index < 2,
     'explorer/:id': rights.index < 3,
+    report: rights.index < 2,
     tbd: rights.index < 2,
     ucmdbAdapter: config.ucmdb_adapter_enabled && rights.index < 1 && rights.ucmdbAdapter,
     'ucmdbAdapter(/:pointName)(/:tabName)(/:integrationJobName)': config.ucmdb_adapter_enabled && rights.index < 1 && rights.ucmdbAdapter,

@@ -4,7 +4,8 @@
 var db = {
   view: 'view',
   insight: 'wall',
-  graph: 'aql'
+  graph: 'aql',
+  report: 'report'
 };
 
 module.exports = {
@@ -25,7 +26,8 @@ module.exports = {
   modules: {
     view: '/coll/' + db.view,
     insight: '/coll/' + db.insight,
-    graph: '/coll/' + db.graph
+    graph: '/coll/' + db.graph,
+    report: '/coll/' + db.report
   },
   collections: db
 };

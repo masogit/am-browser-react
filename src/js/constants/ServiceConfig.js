@@ -7,6 +7,7 @@ export const BASE_NAME = window.amb_basename || '/';
 export const VIEW_DEF_URL = "/coll/view/";
 export const GRAPH_DEF_URL = "/coll/aql/";
 export const INSIGHT_DEF_URL = "/coll/wall/";
+export const REPORT_DEF_URL = "/coll/report/";
 
 // AM REST SERVICE
 export const AM_DEF_URL = "/am/";

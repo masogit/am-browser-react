@@ -17,6 +17,7 @@ module.exports = function () {
   this.view = (document) => view(document);
   this.aql = (document) => aql(document);
   this.wall = (document) => wall(document);
+  this.report = (document) => report(document);
 };
 
 /************ Unit validation functions *************/
@@ -38,6 +39,22 @@ function view(obj) {
   return db.findBy(coll.view, {name: {'$regex' : `^${obj.name.trim()}$`, '$options' : 'i'}, category: {'$regex' : `^${obj.category.trim()}$`, '$options' : 'i'}}).then((documents) => {
     if (documents.length > 0 && documents[0]._id != obj._id)
       return "View name can not duplicate in same category!";
+    else
+      return null;
+  });
+}
+
+function report(obj) {
+  // existing validation
+  if (invalidLength(obj.name, 1, 100))
+    return "Report's name is required, limit length: 1 to 100!";
+  if (invalidLength(obj.category, 1, 100))
+    return "Report's category is required, limit length: 1 to 100!";
+
+  // check duplicate
+  return db.findBy(coll.report, {name: {'$regex' : `^${obj.name.trim()}$`, '$options' : 'i'}, category: {'$regex' : `^${obj.category.trim()}$`, '$options' : 'i'}}).then((documents) => {
+    if (documents.length > 0 && documents[0]._id != obj._id)
+      return "Report name can not duplicate in same category!";
     else
       return null;
   });

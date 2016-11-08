@@ -6,6 +6,7 @@ import Search from './components/explorer/Search';
 import RecordSearch from './components/explorer/RecordSearch';
 import Insight from './components/aql/Insight';
 import Explorer from './components/explorer/Explorer';
+import Report from './components/reports/reports';
 import ViewDefListContainer from './components/builder/ViewDefListContainer';
 import AQL from './components/aql/AQL';
 import TBD from 'grommet/components/TBD';
@@ -30,6 +31,7 @@ export const getRoutes = (headerNavs) => {
       {path: 'search/:keyword', component: RecordSearch},
       {path: 'explorer', component: Explorer},
       {path: 'explorer/:id', component: Explorer},
+      {path: 'report', component: Report},
       {path: 'insight', component: Insight},
       {path: 'insight/:id', component: Insight},
       {path: 'tbd', component: TBD},
