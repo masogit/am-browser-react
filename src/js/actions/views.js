@@ -134,7 +134,7 @@ export function deleteTableRow(selectedView, path) {
     let groupBy = objectPath.get(clonedView, groupByPath);
     let sum = objectPath.get(clonedView, sumPath);
     let field = objectPath.get(clonedView, path);
-    if(field.sqlname == orderBy) {
+    if(orderBy.indexOf(field.sqlname) > -1) {
       objectPath.del(clonedView, orderByPath);
     }
     if(field.sqlname == groupBy) {
