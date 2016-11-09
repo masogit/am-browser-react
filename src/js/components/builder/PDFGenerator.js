@@ -137,26 +137,85 @@ const analyzeDate = (text, date) => {
   return text;
 };
 
+const getPreviewStyle = (styleObj) => {
+  const previewStyle = {border: '1px dashed'};
+  if (styleObj.bold) {
+    previewStyle.fontWeight = 'bold';
+  }
+
+  if (styleObj.italics) {
+    previewStyle.fontStyle = 'italic';
+  }
+
+  previewStyle.fontSize = styleObj.fontSize;
+  previewStyle.color = styleObj.color;
+  previewStyle.margin = styleObj.margin.slice(1).join('px ') + 'px ' + styleObj.margin[0] + 'px';
+
+  return previewStyle;
+};
+
+class MarginDesigner extends Component {
+  componentWillMount() {
+    this.updateValue = this.updateValue.bind(this);
+  }
+
+  updateValue(event) {
+    const value = [parseInt(this.left.value), parseInt(this.top.value), parseInt(this.right.value), parseInt(this.bottom.value)];
+    this.props.updateValue(event, value, 'margin', 'text');
+  }
+
+  render() {
+    const {styleObj, updateValue} = this.props;
+    const {name, margin: [left, top, right, bottom]} = styleObj;
+
+    return (
+      <Box className='margin-designer' pad={{horizontal: 'medium'}}>
+        <Box colorIndex='light-2'>
+          <Box align='center' justify='center' >
+            <input type='number' ref={node=> this.top = node} value={top} onChange={this.updateValue}/>
+          </Box>
+          <Box direction='row' justify='center' align='center'>
+            <input type='number' ref={node=> this.left = node} value={left} onChange={this.updateValue}/>
+            <Box separator='all'>
+              <input name='name' type="text" value={name} onChange={updateValue} style={getPreviewStyle(styleObj)}/>
+            </Box>
+            <input type='number' ref={node=> this.right = node} value={right} onChange={this.updateValue}/>
+          </Box>
+          <Box align='center' justify='center'>
+            <input type='number' ref={node=> this.bottom = node} value={bottom} onChange={this.updateValue}/>
+          </Box>
+        </Box>
+      </Box>
+    );
+  }
+}
+
 class StyleDesigner extends Component {
   componentWillMount() {
     const styleObj = this.props.styleObj;
-    this.state = Object.assign(init_style, styleObj);
+    this.state = Object.assign({}, init_style, styleObj);
     this.title = (styleObj.name ? 'Edit' : 'Add') + ' style';
     this.updateValue = this.updateValue.bind(this);
   }
 
-  updateValue(event, value) {
-    let val = value || event.target.value;
-    const name = event.target.name;
-    const type = event.target.type;
-
+  updateValue(event, val = event.target.value, name = event.target.name, type = event.target.type) {
     if (type == 'range' || type == 'number') {
       val = parseInt(val);
     } else if (type == 'checkbox') {
       val = event.target.checked;
     }
 
-    this.state[name] = val;
+    if (name.indexOf('.') > -1) {
+      const nameParts = name.split('.');
+      nameParts.reduce((state, key, index) => {
+        if (index == nameParts.length - 1) {
+          state[key] = val;
+        }
+        return state[key];
+      }, this.state);
+    } else {
+      this.state[name] = val;
+    }
 
     this.setState(this.state);
   }
@@ -185,11 +244,10 @@ class StyleDesigner extends Component {
         <Header><Title>{this.title}</Title></Header>
         <Form className='no-border strong-label'>
           <FormField label='Name'>
-            <input name='name' type="text" value={styleObj.name} onChange={this.updateValue}/>
+            <MarginDesigner styleObj={styleObj} updateValue={this.updateValue}/>
           </FormField>
-          {this.renderNumberInput('Font Size', 'fontSize')}
           <FormField>
-            <Box direction='row' align='center' justify='between' pad={{horizontal: 'medium'}}>
+            <Box direction='row' align='center' justify='between' pad='medium'>
               <label>Color:<input type='color' name='color' value={styleObj.color} onChange={this.updateValue}/></label>
               <CheckBox checked={styleObj.bold} name='bold'
                         value={styleObj.bold} label='Bold'
@@ -199,9 +257,11 @@ class StyleDesigner extends Component {
                         onChange={this.updateValue}/>
             </Box>
           </FormField>
+          {this.renderNumberInput('Font Size', 'fontSize')}
         </Form>
-        <Footer justify='end' pad={{vertical: 'medium'}}>
-          <Button label="Confirm" primary={true} strong={true} onClick={() => onConfirm(styleObj)}/>
+
+        <Footer justify='end' pad='large'>
+          <Button label="Confirm" primary={true} strong={true} onClick={styleObj.name ? () => onConfirm(styleObj) : null}/>
           <Box pad={{horizontal: 'small'}}/>
           <Button label="Cancel" primary={true} strong={true} onClick={onCancel}/>
         </Footer>
