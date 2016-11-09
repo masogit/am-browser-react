@@ -11,6 +11,15 @@ const MODE = {
   DESIGN: 'design'
 };
 
+const init_style = {
+  name: '',
+  fontSize: 16,
+  bold: false,
+  margin: [0, 0, 0, 0],
+  color: '#000000',
+  italics: false
+};
+
 const styles = {
   header: {
     fontSize: 18,
@@ -128,6 +137,79 @@ const analyzeDate = (text, date) => {
   return text;
 };
 
+class StyleDesigner extends Component {
+  componentWillMount() {
+    const styleObj = this.props.styleObj;
+    this.state = Object.assign(init_style, styleObj);
+    this.title = (styleObj.name ? 'Edit' : 'Add') + ' style';
+    this.updateValue = this.updateValue.bind(this);
+  }
+
+  updateValue(event, value) {
+    let val = value || event.target.value;
+    const name = event.target.name;
+    const type = event.target.type;
+
+    if (type == 'range' || type == 'number') {
+      val = parseInt(val);
+    } else if (type == 'checkbox') {
+      val = event.target.checked;
+    }
+
+    this.state[name] = val;
+
+    this.setState(this.state);
+  }
+
+  renderNumberInput(label, name, min, max, step = 1) {
+    let value = this.state[name];
+
+    //https://gist.github.com/Candy374/80bf411ff286f6785eb80a9098f01c39
+    return (
+      <FormField label={
+          <Box justify='between' direction='row'>
+            <span>{label}</span>
+          </Box>}>
+        <NumberInput className='number-input-label' name={name} type="range" min={min} max={max} step={step} value={value} onChange={this.updateValue}/>
+        <input name={name} type="range" min={min} max={max} step={step} value={value} onChange={this.updateValue}/>
+      </FormField>
+    );
+  }
+
+  render() {
+    const {onConfirm, onCancel} = this.props;
+    const styleObj = this.state;
+
+    return (
+      <Box flex={true} size='large'>
+        <Header><Title>{this.title}</Title></Header>
+        <Form className='no-border strong-label'>
+          <FormField label='Name'>
+            <input name='name' type="text" value={styleObj.name} onChange={this.updateValue}/>
+          </FormField>
+          {this.renderNumberInput('Font Size', 'fontSize')}
+          <FormField>
+            <Box direction='row' align='center' justify='between' pad={{horizontal: 'medium'}}>
+              <label>Color:<input type='color' name='color' value={styleObj.color} onChange={this.updateValue}/></label>
+              <CheckBox checked={styleObj.bold} name='bold'
+                        value={styleObj.bold} label='Bold'
+                        onChange={this.updateValue}/>
+              <CheckBox checked={styleObj.italics} name='italics'
+                        value={styleObj.italics} label='Italics'
+                        onChange={this.updateValue}/>
+            </Box>
+          </FormField>
+        </Form>
+        <Footer justify='end' pad={{vertical: 'medium'}}>
+          <Button label="Confirm" primary={true} strong={true} onClick={() => onConfirm(styleObj)}/>
+          <Box pad={{horizontal: 'small'}}/>
+          <Button label="Cancel" primary={true} strong={true} onClick={onCancel}/>
+        </Footer>
+      </Box>
+    );
+  }
+}
+
 export default class RecordList extends Component {
   componentWillMount() {
     this.state = {
@@ -157,15 +239,11 @@ export default class RecordList extends Component {
           style: 'header'
         }
       },
-      new_style: {
-        name: '',
-        props: {fontSize: 16}
-      },
+      new_style: {},
       showLayer: null
     };
     this.updatePDFSettings = this.updatePDFSettings.bind(this);
     this.updateCode = this.updateCode.bind(this);
-    this.updateValue = this.updateValue.bind(this);
     this.preview = this.preview.bind(this);
     this.dataReady = this.dataReady.bind(this);
   }
@@ -210,32 +288,6 @@ export default class RecordList extends Component {
     this.state.error = error;
     this.state[name] = obj;
     this.setState(this.state, this.autoPreview);
-  }
-
-  updateValue(event, value) {
-    let val = value || event.target.value;
-    const name = event.target.name;
-    const type = event.target.type;
-
-    if (type == 'range' || type == 'number') {
-      val = parseInt(val);
-    } else if (type == 'checkbox') {
-      val = event.target.checked;
-    }
-
-    if (name.indexOf('.') > -1) {
-      const nameParts = name.split('.');
-      nameParts.reduce((state, key, index) => {
-        if (index == nameParts.length - 1) {
-          state[key] = val;
-        }
-        return state[key];
-      }, this.state);
-    } else {
-      this.state[name] = val;
-    }
-
-    this.setState(this.state);
   }
 
   updatePDFSettings(event, val = event.target.value, name = event.target.name) {
@@ -429,13 +481,12 @@ export default class RecordList extends Component {
           {Object.keys(styles).map((key, index) => {
             const stylePropKeys = Object.keys(styles[key]);
             //const value = stylePropKeys.map((style, j) => `${style}: ${styles[key][style]}`).join('\n');
-            const value = JSON.stringify(styles[key]).replace(/,"/g, ',\n"').slice(1, -1);
+            const styleObj = _.cloneDeep(styles[key]);
+            delete styleObj.name;
+            const value = JSON.stringify(styleObj).replace(/,"/g, ',\n"').slice(1, -1);
             const onClick = () => {
               this.setState({
-                new_style: {
-                  name: key,
-                  props: _.cloneDeep(styles[key])
-                },
+                new_style: Object.assign({}, styles[key], {name: key}),
                 showLayer: 'new_style'
               });
             };
@@ -452,93 +503,25 @@ export default class RecordList extends Component {
     );
   }
 
-  renderNumberInput(label, name, min, max, step = 1) {
-    let value;
-    if (name.indexOf('.') > -1) {
-      const nameParts = name.split('.');
-      nameParts.reduce((state, key, index) => {
-        if (index == nameParts.length - 1) {
-          value = state[key];
-        }
-        return state[key];
-      }, this.state);
-    } else {
-      value = this.state[name];
-    }
-
-    //https://gist.github.com/Candy374/80bf411ff286f6785eb80a9098f01c39
-    return (
-      <FormField label={
-          <Box justify='between' direction='row'>
-            <span>{label}</span>
-          </Box>}>
-        <NumberInput className='number-input-label' name={name} type="range" min={min} max={max} step={step} value={value} onChange={this.updateValue}/>
-        <input name={name} type="range" min={min} max={max} step={step} value={value} onChange={this.updateValue}/>
-      </FormField>
-    );
-  }
-
   renderStyleLayer() {
     const name = this.state.showLayer;
     if(name) {
-      let styleObj = this.state.new_style;
-      //let origin;
-      //if (name.indexOf('.') > -1) {
-      //  const nameParts = name.split('.');
-      //  nameParts.reduce((state, key, index) => {
-      //    if (index == nameParts.length - 1) {
-      //      origin = {
-      //        name: key,
-      //        props:state[key]
-      //      };
-      //      styleObj.name = key;
-      //      Object.assign(styleObj.props, state[key]);
-      //    }
-      //    return state[key];
-      //  }, this.state);
-      //}
+      const styleObj = this.state.new_style;
+      const closeState = {
+        showLayer: null,
+        new_style: Object.assign({}, init_style),
+        pdfSettings: this.state.pdfSettings
+      };
 
       return (
         <Layer>
-          <Box flex={true} size='large'>
-            <Header><Title>Add Style</Title></Header>
-            <Form className='no-border strong-label'>
-              <FormField label='Name'>
-                <input name='new_style.name' type="text" value={styleObj.name} onChange={this.updateValue}/>
-              </FormField>
-              {this.renderNumberInput('Font Size', 'new_style.props.fontSize')}
-              <FormField>
-                <CheckBox checked={styleObj.props.bold} name='new_style.props.bold'
-                          value={styleObj.props.bold} label='Bold'
-                          onChange={this.updateValue}/>
-                <CheckBox checked={styleObj.props.italics} name='new_style.props.italics'
-                          value={styleObj.props.italics} label='Italics'
-                          onChange={this.updateValue}/>
-              </FormField>
-              <FormField label='Color'>
-                <input type='color' name='new_style.props.color' value={styleObj.props.color} onChange={this.updateValue}/>
-              </FormField>
-
-              <FormField label='Properties'>
-                {
-                  styleObj.name
-                }
-                {
-                  Object.keys(styleObj.props).map(prop => prop + ': ' + styleObj.props[prop])
-                }
-              </FormField>
-            </Form>
-            <Footer justify='end' pad={{vertical: 'medium'}}>
-              <Button label="Confirm" primary={true} strong={true} onClick={() => {
-                this.state.pdfSettings.styles[styleObj.name] = styleObj.props;
-                this.state.showLayer = null;
-                this.setState(this.state);
-              }}/>
-              <Button label="Cancel" primary={true} strong={true} onClick={() => {
-                this.setState({showLayer: null});
-              }}/>
-            </Footer>
-          </Box>
+          <StyleDesigner
+            styleObj={styleObj}
+            onCancel={() => this.setState(closeState)}
+            onConfirm={(styleObj) => {
+              closeState.pdfSettings.styles[styleObj.name] = styleObj;
+              this.setState(closeState);
+            }}/>
         </Layer>
       );
     }
