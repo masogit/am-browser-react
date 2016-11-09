@@ -137,20 +137,24 @@ const analyzeDate = (text, date) => {
   return text;
 };
 
-const getPreviewStyle = (styleObj) => {
-  const previewStyle = {border: '1px dashed'};
+const getPreviewStyle = (styleObj, ignoreMargin) => {
+  const previewStyle = {};
   if (styleObj.bold) {
     previewStyle.fontWeight = 'bold';
   }
-
   if (styleObj.italics) {
     previewStyle.fontStyle = 'italic';
   }
-
-  previewStyle.fontSize = styleObj.fontSize;
-  previewStyle.color = styleObj.color;
-  previewStyle.margin = styleObj.margin.slice(1).join('px ') + 'px ' + styleObj.margin[0] + 'px';
-
+  if (styleObj.fontSize) {
+    previewStyle.fontSize = styleObj.fontSize;
+  }
+  if (styleObj.color) {
+    previewStyle.color = styleObj.color;
+  }
+  if (styleObj.margin && !ignoreMargin) {
+    previewStyle.margin = styleObj.margin.slice(1).join('px ') + 'px ' + styleObj.margin[0] + 'px';
+    previewStyle.border = '1px dashed';
+  }
   return previewStyle;
 };
 
@@ -517,18 +521,19 @@ export default class RecordList extends Component {
   }
 
   returnStyleField({label, name, value}) {
+    const styles = this.state.pdfSettings.styles;
     return (
       <FormField label={
           <Box justify='between' direction='row'>
             <span>{label}</span>
             <Menu size='small' label={value.style || 'styles'}>
-            {Object.keys(this.state.pdfSettings.styles).map(s => {
+            {Object.keys(styles).map(s => {
               return <Anchor onClick={(event) => this.updatePDFSettings(event, s, name + '.style')}>{s}</Anchor>;
             }
             )}</Menu>
           </Box>}>
         <input name={name + '.text'} type="text" onChange={this.updatePDFSettings}
-               value={value.text}/>
+               value={value.text} style={getPreviewStyle(styles[value.style], true)}/>
       </FormField>
     );
   }
@@ -553,8 +558,7 @@ export default class RecordList extends Component {
 
             return (
               <FormField label={<Box onClick={onClick}>{key}</Box>} key={index} error={styles[key].error}>
-                <textarea rows={stylePropKeys.length} value={value} name={'styles.' + key}
-                          onChange={this.updatePDFSettings}/>
+                <textarea rows={stylePropKeys.length} value={value} readOnly={true}/>
               </FormField>
             );
           })}
