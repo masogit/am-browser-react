@@ -26,6 +26,11 @@ input {
     padding: 0 4px;
     width: 50px;
   }
+
+  &[type="color"], &[type="color"]:focus {
+    padding: 0;
+    margin: 0 24px;
+  }
 }
 
 .grommetux-form-field__contents>.grommetux-number-input.number-input-label {

@@ -1,11 +1,9 @@
 import React, {Component} from 'react';
 import {Box, Header, Icons, Anchor, Menu, FormField, Form, CheckBox,
-  RadioButton} from 'grommet';
-const {Download, Close, Play: Preview, Code, Edit, Add} = Icons.Base;
+  RadioButton, Layer, Title, Button, Footer, NumberInput} from 'grommet';
+const {Download, Close, Play: Preview, Code, Add} = Icons.Base;
 import {getDisplayLabel, getFieldStrVal} from '../../util/RecordFormat';
 import * as ExplorerActions from '../../actions/explorer';
-import '../../../scripts/pdfmake.min';
-import '../../../scripts/vfs_fonts';
 import { cloneDeep } from 'lodash';
 
 const MODE = {
@@ -158,10 +156,16 @@ export default class RecordList extends Component {
           text: '@title',
           style: 'header'
         }
-      }
+      },
+      new_style: {
+        name: '',
+        props: {fontSize: 16}
+      },
+      showLayer: null
     };
     this.updatePDFSettings = this.updatePDFSettings.bind(this);
     this.updateCode = this.updateCode.bind(this);
+    this.updateValue = this.updateValue.bind(this);
     this.preview = this.preview.bind(this);
     this.dataReady = this.dataReady.bind(this);
   }
@@ -206,6 +210,32 @@ export default class RecordList extends Component {
     this.state.error = error;
     this.state[name] = obj;
     this.setState(this.state, this.autoPreview);
+  }
+
+  updateValue(event, value) {
+    let val = value || event.target.value;
+    const name = event.target.name;
+    const type = event.target.type;
+
+    if (type == 'range' || type == 'number') {
+      val = parseInt(val);
+    } else if (type == 'checkbox') {
+      val = event.target.checked;
+    }
+
+    if (name.indexOf('.') > -1) {
+      const nameParts = name.split('.');
+      nameParts.reduce((state, key, index) => {
+        if (index == nameParts.length - 1) {
+          state[key] = val;
+        }
+        return state[key];
+      }, this.state);
+    } else {
+      this.state[name] = val;
+    }
+
+    this.setState(this.state);
   }
 
   updatePDFSettings(event, val = event.target.value, name = event.target.name) {
@@ -374,17 +404,28 @@ export default class RecordList extends Component {
     );
   }
 
+  returnStyleField({label, name, value}) {
+    return (
+      <FormField label={
+          <Box justify='between' direction='row'>
+            <span>{label}</span>
+            <Menu size='small' label={value.style || 'styles'}>
+            {Object.keys(this.state.pdfSettings.styles).map(s => {
+              return <Anchor onClick={(event) => this.updatePDFSettings(event, s, name + '.style')}>{s}</Anchor>;
+            }
+            )}</Menu>
+          </Box>}>
+        <input name={name + '.text'} type="text" onChange={this.updatePDFSettings}
+               value={value.text}/>
+      </FormField>
+    );
+  }
+
   renderStyleSettings() {
     const styles = this.state.pdfSettings.styles;
     return (
       <Box>
         <Form compact={true} className='strong-label'>
-          <FormField label={
-            <Box direction='row' justify='between'>
-              Styles
-              <Anchor icon={<Add/>} onClick={null}/>
-            </Box>
-          }/>
           {Object.keys(styles).map((key, index) => {
             const stylePropKeys = Object.keys(styles[key]);
             //const value = stylePropKeys.map((style, j) => `${style}: ${styles[key][style]}`).join('\n');
@@ -401,27 +442,81 @@ export default class RecordList extends Component {
               </FormField>
             );
           })}
-
         </Form>
       </Box>
     );
   }
 
-  returnStyleField({label, name, value}) {
+  renderNumberInput(label, name, min, max, step = 1) {
+    let value;
+    if (name.indexOf('.') > -1) {
+      const nameParts = name.split('.');
+      nameParts.reduce((state, key, index) => {
+        if (index == nameParts.length - 1) {
+          value = state[key];
+        }
+        return state[key];
+      }, this.state);
+    } else {
+      value = this.state[name];
+    }
+
+    //https://gist.github.com/Candy374/80bf411ff286f6785eb80a9098f01c39
     return (
       <FormField label={
           <Box justify='between' direction='row'>
             <span>{label}</span>
-            <Menu size='small' label={value.style || 'styles'}>
-            {Object.keys(styles).map(s => {
-              return <Anchor onClick={(event) => this.updatePDFSettings(event, s, name + '.style')}>{s}</Anchor>;
-            }
-            )}</Menu>
           </Box>}>
-        <input name={name + '.text'} type="text" onChange={this.updatePDFSettings}
-               value={value.text}/>
+        <NumberInput className='number-input-label' name={name} type="range" min={min} max={max} step={step} value={value} onChange={this.updateValue}/>
+        <input name={name} type="range" min={min} max={max} step={step} value={value} onChange={this.updateValue}/>
       </FormField>
     );
+  }
+
+  renderLayer() {
+    if(this.state.showLayer == 'style') {
+      return (
+        <Layer>
+          <Box flex={true} size='large'>
+            <Header><Title>Add Style</Title></Header>
+            <Form className='no-border strong-label'>
+              <FormField label='Name'>
+                <input name='new_style.name' type="text" value={this.state.new_style.name} onChange={this.updateValue}/>
+              </FormField>
+              {this.renderNumberInput('Font Size', 'new_style.props.fontSize')}
+              <FormField>
+                <CheckBox checked={this.state.new_style.props.bold} name='new_style.props.bold'
+                          value={this.state.new_style.props.bold} label='Bold'
+                          onChange={this.updateValue}/>
+                <CheckBox checked={this.state.new_style.props.italics} name='new_style.props.italics'
+                          value={this.state.new_style.props.italics} label='Italics'
+                          onChange={this.updateValue}/>
+              </FormField>
+              <FormField label='Color'>
+                <input type='color' name='new_style.props.color' value={this.state.new_style.props.color} onChange={this.updateValue}/>
+              </FormField>
+
+              <FormField label='Properties'>
+                {
+                  this.state.new_style.name
+                }
+                {
+                  Object.keys(this.state.new_style.props).map(prop => prop + ': ' + this.state.new_style.props[prop])
+                }
+              </FormField>
+            </Form>
+            <Footer justify='end' pad={{vertical: 'medium'}}>
+              <Button label="Confirm" primary={true} strong={true} onClick={() => {
+                this.state.pdfSettings.styles[this.state.new_style.name] = this.state.new_style.props;
+                this.state.showLayer = null;
+                this.setState(this.state);
+              }}/>
+              <Button label="Cancel" primary={true} strong={true} onClick={() => this.setState({showLayer: null})}/>
+            </Footer>
+          </Box>
+        </Layer>
+      );
+    }
   }
 
   render() {
@@ -432,6 +527,7 @@ export default class RecordList extends Component {
           <Box>PDF Generator</Box>
           <Menu direction="row" align="center" responsive={true}>
             <Anchor icon={<Code/>} onClick={() => this.setState({ mode: mode == MODE.CODE ? MODE.DESIGN : MODE.CODE })} label={mode}/>
+            <Anchor icon={<Add />} onClick={() => this.setState({showLayer: 'style'})} label="Add style"/>
             <Anchor icon={<Preview/>} onClick={this.preview} label='Preview'/>
             <Anchor icon={<Download />} onClick={() => this.setState({ showExportLayer: true })} label='Export'/>
             <Anchor label='Back' icon={<Close/>} onClick={() => this.props.back()}/>
@@ -444,17 +540,17 @@ export default class RecordList extends Component {
           </FormField> :
             <Box flex={true} style={{maxWidth: '50vw'}} direction='row'>
               <Form className='no-border strong-label'>
-                  {this.returnStyleField({label: 'Page Header Left', name:"pageHeader.left", value:pdfSettings.pageHeader.left})}
-                  {this.returnStyleField({label: 'Page Header Center', name:"pageHeader.center", value:pdfSettings.pageHeader.center})}
-                  {this.returnStyleField({label: 'Page Header Right', name:"pageHeader.right", value:pdfSettings.pageHeader.right})}
+                {this.returnStyleField({label: 'Page Header Left', name:"pageHeader.left", value:pdfSettings.pageHeader.left})}
+                {this.returnStyleField({label: 'Page Header Center', name:"pageHeader.center", value:pdfSettings.pageHeader.center})}
+                {this.returnStyleField({label: 'Page Header Right', name:"pageHeader.right", value:pdfSettings.pageHeader.right})}
 
                 {this.returnStyleField({label: 'Report Header', name:"reportHead", value:pdfSettings.reportHead})}
                 {this.returnStyleField({label: 'Report Descriptions', name:"reportDesc", value:pdfSettings.reportDesc})}
                 {/*this.renderFields()*/}
 
-                  {this.returnStyleField({label: 'Page Footer Left', name:"pageFooter.left", value:pdfSettings.pageFooter.left})}
-                  {this.returnStyleField({label: 'Page Footer Center', name:"pageFooter.center", value:pdfSettings.pageFooter.center})}
-                  {this.returnStyleField({label: 'Page Footer Right', name:"pageFooter.right", value:pdfSettings.pageFooter.right})}
+                {this.returnStyleField({label: 'Page Footer Left', name:"pageFooter.left", value:pdfSettings.pageFooter.left})}
+                {this.returnStyleField({label: 'Page Footer Center', name:"pageFooter.center", value:pdfSettings.pageFooter.center})}
+                {this.returnStyleField({label: 'Page Footer Right', name:"pageFooter.right", value:pdfSettings.pageFooter.right})}
 
                 <FormField label="Page Orientation">
                   <RadioButton id='pageOrientation' name='pageOrientation' label='portrait'
@@ -468,6 +564,7 @@ export default class RecordList extends Component {
           }
           <div style={{ width: '50vw' }} id='pdfContainer' />
         </Box>
+        {this.renderLayer()}
       </Box>
     );
   }
