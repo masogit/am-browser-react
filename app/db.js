@@ -3,7 +3,6 @@ var db;
 const fs = require('fs');
 var logger = require('./logger.js');
 var Validator = require('./validator.js');
-var modules = require('./constants').modules;
 const config = require('./config');
 
 process.argv.forEach(function (val, index, array) {
@@ -149,10 +148,7 @@ exports.find = function (req, res) {
   var download = req.query.download;
 
   // Insight get data by user
-  var filter = {};
-  if (req.originalUrl.indexOf(modules.insight) > -1) {
-    filter = {user: req.session.user};
-  }
+  var filter = (config.db_type == 'mongo' && req.query.filter) ? JSON.parse(req.query.filter) : {};
 
   if (id)
     db.collection(collectionName).findOne(Object.assign({_id: id}, filter), function (err, document) {
@@ -172,25 +168,11 @@ exports.find = function (req, res) {
       else
         res.json(documents);
     });
-};
 
-exports.findOne = function (collectionName, id, callback) {
-  // Insight get data by user
-  var filter = {};
-  if (req.originalUrl.indexOf(modules.insight) > -1) {
-    filter = {user: req.session.user};
-  }
-
-  db.collection(collectionName).findOne(Object.assign({_id: id}, filter), function (err, documents) {
-    if (err)
-      logger.error("[tingo]", err);
-    if (typeof callback == 'function')
-      callback(documents);
-  });
 };
 
 // tingodb Find by filter
-exports.findBy = function (collectionName, filter) {
+function findBy (collectionName, filter) {
   return new Promise(function (resolve, reject) {
     db.collection(collectionName).find(filter).toArray(function (err, documents) {
       if (err) {
@@ -203,16 +185,13 @@ exports.findBy = function (collectionName, filter) {
   });
 };
 
+exports.findBy = findBy;
+
 // tingodb Insert or Update
 exports.upsert = function (req, res) {
   var collectionName = req.params.collection;
   var id = req.params.id;
   var obj = req.file ? JSON.parse(req.file.buffer) : req.body;
-
-  // Insight save by user
-  if (req.originalUrl.indexOf(modules.insight) > -1) {
-    obj = Object.assign(obj, {user: req.session.user});
-  }
 
   // Validation then save or update
   var validator = new Validator();
