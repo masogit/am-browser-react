@@ -12,6 +12,7 @@ import ActionTab from '../commons/ActionTab';
 import {Anchor, Box, Button, CheckBox, Header, Menu, Table, TableRow, Layer, Carousel, RadioButton, Tabs, Icons} from 'grommet';
 const { Add, Close, Attachment, Checkmark, Search, Shift, More, Group } = Icons.Base;
 import AMSideBar from '../commons/AMSideBar';
+import AQL from './AQL';
 import _ from 'lodash';
 
 import cookies from 'js-cookie';
@@ -160,6 +161,13 @@ export default class Insight extends ComponentBase {
         }
       }
     }));
+  }
+
+  checkAdmin() {
+    if (this.isAdmin === undefined) {
+      this.isAdmin = this.props.routes[1].childRoutes.filter((item)=> item.path.indexOf('aql') > -1 && item.component == AQL).length > 0;
+    }
+    return this.isAdmin;
   }
 
   _toggleEdit() {
@@ -624,8 +632,8 @@ export default class Insight extends ComponentBase {
                   <Anchor icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>
                   <Anchor icon={<Add />} onClick={this._addTab.bind(this)} label="Add Tab"/>
                   <Anchor icon={<Close />} onClick={() => this.state.tabs.length > 1 && this._onRemove(this.state.focusTab)} label="Delete Tab" disabled={this.state.tabs.length <= 1}/>
-                  <Anchor icon={<Group colorIndex={this.state.tabs[this.state.focusIndex].public ? '' : 'grey-4'} />} label="Public"
-                          onClick={this._onPublic.bind(this, this.state.focusTab)}/>
+                  { this.checkAdmin() && <Anchor icon={<Group colorIndex={this.state.tabs[this.state.focusIndex].public ? '' : 'grey-4'} />} label="Public"
+                          onClick={this._onPublic.bind(this, this.state.focusTab)}/> }
                 </Menu>
               }
               <CheckBox id="edit" label="Edit" checked={edit} onChange={this._toggleEdit.bind(this)}
