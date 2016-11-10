@@ -1,14 +1,23 @@
 import React, {Component} from 'react';
-import {Box, Header, Icons, Anchor, Menu, FormField, Form, CheckBox,
-  RadioButton, Layer, Title, Button, Footer, NumberInput} from 'grommet';
+import {Box, Header, Icons, Anchor, Menu, FormField, Form, CheckBox, SVGIcon,
+  RadioButton, Layer, Title, Button, Footer, NumberInput, List, ListItem, Label} from 'grommet';
 const {Download, Close, Play: Preview, Code, Add} = Icons.Base;
 import {getDisplayLabel, getFieldStrVal} from '../../util/RecordFormat';
 import * as ExplorerActions from '../../actions/explorer';
 import { cloneDeep } from 'lodash';
 
+
+const Brush = (props) => (
+  <SVGIcon viewBox="0 0 24 24" {...props}>
+    <path fill="none" stroke="#000000" strokeWidth="2" d="M13,9 L20.5,2 C20.5,2 21.125,2.125 21.5,2.5 C21.875,2.875 22,3.5 22,3.5 L15,11 L13,9 Z M14,14 L10,10 M1.70033383,20.1053387 C1.70033383,20.1053387 3.79489719,20.0776099 5.25566729,20.060253 C6.71643739,20.0428962 8.23797002,20.0142636 10.2253759,19.9972314 C12.2127817,19.9801992 14.4826673,16.0267479 11.414668,13.0099775 C8.34666868,9.99320721 6.34639355,12.0876248 5.34441315,13.062 C2.38723495,15.9377059 1.70033383,20.1053387 1.70033383,20.1053387 Z"/>
+  </SVGIcon>
+);
+
+
+
 const MODE = {
-  CODE: 'code',
-  DESIGN: 'design'
+  CODE: 'Code',
+  DESIGN: 'Design'
 };
 
 const init_style = {
@@ -142,23 +151,15 @@ const analyzeDate = (text, date) => {
   return text;
 };
 
-const getPreviewStyle = (styleObj, ignoreMargin) => {
+const getPreviewStyle = ({bold=false, italics=false, color='#000000', margin=[0,0,0,0], fontSize=16}, ignoreMargin = false) => {
   const previewStyle = {};
-  if (styleObj.bold) {
-    previewStyle.fontWeight = 'bold';
-  }
-  if (styleObj.italics) {
-    previewStyle.fontStyle = 'italic';
-  }
-  if (styleObj.fontSize) {
-    previewStyle.fontSize = styleObj.fontSize;
-  }
-  if (styleObj.color) {
-    previewStyle.color = styleObj.color;
-  }
-  if (styleObj.margin && !ignoreMargin) {
-    previewStyle.margin = styleObj.margin.slice(1).join('px ') + 'px ' + styleObj.margin[0] + 'px';
-    previewStyle.border = '1px dashed';
+  previewStyle.fontWeight = bold ? 'bold' : 'normal';
+  previewStyle.fontStyle = italics ? 'italic' : 'normal';
+  previewStyle.fontSize = fontSize;
+  previewStyle.color = color;
+
+  if (!ignoreMargin) {
+    previewStyle.margin = margin.slice(1).join('px ') + 'px ' + margin[0] + 'px';
   }
   return previewStyle;
 };
@@ -178,23 +179,19 @@ class MarginDesigner extends Component {
   }
 
   render() {
-    const {styleObj, updateValue} = this.props;
-    const {name, margin: [left, top, right, bottom]} = styleObj;
-    const inputStyle = getPreviewStyle(styleObj);
-    if (!name) {
-      inputStyle.borderColor = '#ff0000';
-    }
+    const {styleObj} = this.props;
+    const [left = 0, top = 0, right = 0, bottom = 0] = styleObj.margin || [];
 
     return (
       <Box className='margin-designer' pad={{horizontal: 'medium'}}>
-        <Box colorIndex='light-2'>
+        <Box className='grid' style={{height: 300}} align='center' justify='center'>
           <Box align='center' justify='center' >
             {this.renderInput('top', top)}
           </Box>
           <Box direction='row' justify='center' align='center'>
             {this.renderInput('left', left)}
-            <Box separator='all'>
-              <input name='name' type="text" value={name} onChange={updateValue} style={inputStyle} autoFocus={true}/>
+            <Box style={{border: '1px dashed'}}>
+              <input style={getPreviewStyle(styleObj)} value='AM Browser' readOnly={true}/>
             </Box>
             {this.renderInput('right', right)}
           </Box>
@@ -209,10 +206,16 @@ class MarginDesigner extends Component {
 
 class StyleDesigner extends Component {
   componentWillMount() {
-    const styleObj = this.props.styleObj;
-    this.state = Object.assign({}, init_style, styleObj);
-    this.title = (styleObj.name ? 'Edit' : 'Add') + ' style';
+    this.state = {
+      styles: this.props.styles
+    };
     this.updateValue = this.updateValue.bind(this);
+    this.initStyle = this.initStyle.bind(this);
+    this.initStyle();
+  }
+
+  initStyle() {
+    this.setState({styleObj: Object.assign({}, init_style)});
   }
 
   updateValue(event, val = event.target.value, name = event.target.name, type = event.target.type) {
@@ -229,22 +232,22 @@ class StyleDesigner extends Component {
           state[key] = val;
         }
         return state[key];
-      }, this.state);
+      }, this.state.styleObj);
     } else {
-      this.state[name] = val;
+      this.state.styleObj[name] = val;
     }
 
     this.setState(this.state);
   }
 
   renderNumberInput(label, name, min, max, step = 1) {
-    let value = this.state[name];
+    let value = this.state.styleObj[name];
 
     //https://gist.github.com/Candy374/80bf411ff286f6785eb80a9098f01c39
     return (
       <FormField label={
           <Box justify='between' direction='row'>
-            <span>{label}</span>
+            <Label margin='none'>{label}</Label>
           </Box>}>
         <NumberInput className='number-input-label' name={name} type="range" min={min} max={max} step={step} value={value} onChange={this.updateValue}/>
         <input name={name} type="range" min={min} max={max} step={step} value={value} onChange={this.updateValue}/>
@@ -252,42 +255,74 @@ class StyleDesigner extends Component {
     );
   }
 
+  renderSidebar(styles = this.state.styles) {
+    return (
+      <List>
+        {Object.keys(styles).map((key, index) => {
+          const onClick = () => {
+            this.setState({
+              styleObj: Object.assign(styles[key], {name: key})
+            });
+          };
+
+          return (
+            <ListItem onClick={onClick} key={index}>
+              <label style={getPreviewStyle(styles[key], true)}>{key}</label>
+            </ListItem>
+          );
+        })}
+      </List>
+    );
+  }
+
   render() {
     const {onConfirm, onCancel} = this.props;
-    const styleObj = this.state;
+    const { styleObj }= this.state;
 
     return (
       <Box flex={true}>
-        <Header><Title>{this.title}</Title></Header>
-        <Form className='no-border strong-label style-designer'>
-          <FormField label='Name'>
-            <MarginDesigner styleObj={styleObj} updateValue={this.updateValue}/>
-          </FormField>
-          <FormField>
-            <Box direction='row' align='center' justify='between' pad='medium'>
-              <label>Color:<input type='color' name='color' value={styleObj.color} onChange={this.updateValue}/></label>
-              <CheckBox checked={styleObj.bold} name='bold'
-                        value={styleObj.bold} label='Bold'
-                        onChange={this.updateValue}/>
-              <CheckBox checked={styleObj.italics} name='italics'
-                        value={styleObj.italics} label='Italics'
-                        onChange={this.updateValue}/>
-            </Box>
-          </FormField>
-          {this.renderNumberInput('Font Size', 'fontSize', 10, 64)}
-        </Form>
+        <Header direction='row' justify='between'>
+          <Title>Style Designer</Title>
+          <Box pad={{horizontal: 'medium'}}><Anchor icon={<Add />} onClick={this.initStyle} label="New Style"/></Box>
+        </Header>
+        <Box direction='row'>
+          {this.renderSidebar()}
+          <Box>
+            <Form className='no-border strong-label style-designer'>
+              <FormField>
+                <MarginDesigner styleObj={styleObj} updateValue={this.updateValue}/>
+              </FormField>
+              <FormField>
+                <Box direction='row' align='center' justify='between' pad='medium'>
+                  <Box direction='row'><Label margin='none' style={{color: '#ff0000', fontWeight: '400'}}>Name:</Label>
+                      <input className='input-field' name='name' type="text" value={styleObj.name} onChange={this.updateValue}
+                             autoFocus={true} maxLength='20'/>
+                  </Box>
+                  <label><Label>Color:</Label><input type='color' name='color' value={styleObj.color} onChange={this.updateValue}/></label>
+                  <CheckBox checked={styleObj.bold} name='bold' toggle={true}
+                            value={styleObj.bold} label={<Label>Bold</Label>}
+                            onChange={this.updateValue}/>
+                  <CheckBox checked={styleObj.italics} name='italics' toggle={true}
+                            value={styleObj.italics} label={<Label>Italics</Label>}
+                            onChange={this.updateValue}/>
+                </Box>
+              </FormField>
+              {this.renderNumberInput('Font Size', 'fontSize', 10, 64)}
+            </Form>
 
-        <Footer justify='end' pad='large'>
-          <Button label="Confirm" primary={true} strong={true} onClick={styleObj.name ? () => onConfirm(styleObj) : null}/>
-          <Box pad={{horizontal: 'small'}}/>
-          <Button label="Cancel" primary={true} strong={true} onClick={onCancel}/>
-        </Footer>
+            <Footer justify='end' pad='medium'>
+              <Button label="Confirm" primary={true} strong={true} onClick={styleObj.name ? () => onConfirm(styleObj) : null}/>
+              <Box pad={{horizontal: 'small'}}/>
+              <Button label="Cancel" primary={true} strong={true} onClick={onCancel}/>
+            </Footer>
+          </Box>
+        </Box>
       </Box>
     );
   }
 }
 
-export default class RecordList extends Component {
+export default class PDFGenerator extends Component {
   componentWillMount() {
     this.state = {
       pdfDefinition: defaultPDFDefinition,
@@ -539,102 +574,42 @@ export default class RecordList extends Component {
     );
   }
 
-  returnStyleField({label, name, value, styles = this.state.pdfSettings.styles}) {
+  returnStyleField({label, name, value, styles = this.state.pdfSettings.styles, data = Object.keys(styles), noInput=false}) {
+    const styleName = noInput ? name : name + '.style';
+    const styleValue = noInput ? value : value.style;
+
     return (
-      <FormField className='input-field' label={
+      <FormField className={noInput ? '' : 'input-field'} label={
           <Box justify='between' direction='row'>
             <span>{label}</span>
-            <Menu size='small' label={value.style}>
-            {Object.keys(styles).map(s => {
-              return <Anchor onClick={(event) => this.updatePDFSettings(event, s, name + '.style')}>{s}</Anchor>;
-            }
-            )}</Menu>
+            <Menu size='small' label={styleValue} dropAlign={{top: 'top', right: 'right'}}>
+             {data.map(s => <Anchor onClick={(event) => this.updatePDFSettings(event, s, styleName)}>{s}</Anchor>)}
+            </Menu>
           </Box>}>
-        <input name={name + '.text'} type="text" onChange={this.updatePDFSettings}
-               value={value.text} style={getPreviewStyle(styles[value.style], true)}/>
+        {!noInput && <input name={name + '.text'} type="text" onChange={this.updatePDFSettings}
+               value={value.text} style={getPreviewStyle(styles[value.style], true)}/>}
       </FormField>
     );
   }
 
-  returnTableStyleField({value}) {
-    const styles = this.state.pdfSettings.styles;
+  returnTableStyleField({layout, style, header, text}) {
     return (
       <FormField label='Content Table'>
         <Box direction='row' pad={{horizontal: 'small'}}>
-          <FormField label={
-            <Box justify='between' direction='row'>
-              <span>Layout:</span>
-              <Menu size='small' label={value.layout}>
-              {table_style.map(s => {
-                return <Anchor onClick={(event) => this.updatePDFSettings(event, s, 'contents.layout')}>{s}</Anchor>;
-              }
-              )}</Menu>
-            </Box>}/>
-          <FormField label={
-            <Box justify='between' direction='row'>
-              <span>Style:</span>
-              <Menu size='small' label={value.style}>
-              {Object.keys(styles).map(s => {
-                return <Anchor onClick={(event) => this.updatePDFSettings(event, s, 'contents.style')}>{s}</Anchor>;
-              }
-              )}</Menu>
-            </Box>}/>
-          <FormField label={
-            <Box justify='between' direction='row'>
-              <span>Header:</span>
-             <Menu size='small' label={value.header}>
-              {Object.keys(styles).map(s => {
-                return <Anchor onClick={(event) => this.updatePDFSettings(event, s, 'contents.header')}>{s}</Anchor>;
-              }
-              )}</Menu>
-            </Box>}/>
-          <FormField label={
-            <Box justify='between' direction='row'>
-              <span>Text:</span>
-              <Menu size='small' label={value.text}>
-              {Object.keys(styles).map(s => {
-                return <Anchor onClick={(event) => this.updatePDFSettings(event, s, 'contents.text')}>{s}</Anchor>;
-              }
-              )}</Menu>
-            </Box>}/>
+          {this.returnStyleField({label:'Layout:', name: 'contents.layout', value: layout, data: table_style, noInput: true})}
+          {this.returnStyleField({label:'Style:', name: 'contents.style', value: style, noInput: true})}
+        </Box>
+        <Box direction='row' pad={{horizontal: 'small'}}>
+          {this.returnStyleField({label:'Header:', name: 'contents.header', value: header, noInput: true})}
+          {this.returnStyleField({label:'Text:', name: 'contents.text', value: text, noInput: true})}
         </Box>
       </FormField>
-    );
-  }
-
-  renderStyleSettings() {
-    const styles = this.state.pdfSettings.styles;
-    return (
-      <Box>
-        <Form compact={true} className='strong-label'>
-          {Object.keys(styles).map((key, index) => {
-            const stylePropKeys = Object.keys(styles[key]);
-            //const value = stylePropKeys.map((style, j) => `${style}: ${styles[key][style]}`).join('\n');
-            const styleObj = _.cloneDeep(styles[key]);
-            delete styleObj.name;
-            const value = JSON.stringify(styleObj).replace(/,"/g, ',\n"').slice(1, -1);
-            const onClick = () => {
-              this.setState({
-                new_style: Object.assign({}, styles[key], {name: key}),
-                showLayer: 'new_style'
-              });
-            };
-
-            return (
-              <FormField label={<Box onClick={onClick}>{key}</Box>} key={index} error={styles[key].error}>
-                <textarea rows={stylePropKeys.length} value={value} readOnly={true}/>
-              </FormField>
-            );
-          })}
-        </Form>
-      </Box>
     );
   }
 
   renderStyleLayer() {
     const name = this.state.showLayer;
     if(name) {
-      const styleObj = this.state.new_style;
       const closeState = {
         showLayer: null,
         new_style: Object.assign({}, init_style),
@@ -644,7 +619,7 @@ export default class RecordList extends Component {
       return (
         <Layer>
           <StyleDesigner
-            styleObj={styleObj}
+            styles={this.state.pdfSettings.styles}
             onCancel={() => this.setState(closeState)}
             onConfirm={(styleObj) => {
               closeState.pdfSettings.styles[styleObj.name] = styleObj;
@@ -657,13 +632,14 @@ export default class RecordList extends Component {
 
   render() {
     const {mode, pdfDefinition, error, pdfSettings} = this.state;
+
     return (
       <Box pad='small' flex={true}>
         <Header justify='between' size='small'>
           <Box>PDF Generator</Box>
           <Menu direction="row" align="center" responsive={true}>
-            <Anchor icon={<Code/>} onClick={() => this.setState({ mode: mode == MODE.CODE ? MODE.DESIGN : MODE.CODE })} label={mode}/>
-            <Anchor icon={<Add />} onClick={() => this.setState({showLayer: 'new_style'})} label="Add style"/>
+            <Anchor icon={<Code />} onClick={() => this.setState({ mode: mode == MODE.CODE ? MODE.DESIGN : MODE.CODE })} label={mode}/>
+            <Anchor icon={<Brush />} onClick={() => this.setState({showLayer: 'new_style'})} label="Style Designer"/>
             <Anchor icon={<Preview/>} onClick={this.preview} label='Preview'/>
             <Anchor icon={<Download />} onClick={() => this.setState({ showExportLayer: true })} label='Export'/>
             <Anchor label='Back' icon={<Close/>} onClick={() => this.props.back()}/>
@@ -687,7 +663,7 @@ export default class RecordList extends Component {
                   <Box pad='small'>
                     {this.returnStyleField({label: 'Header', name:"reportHead", value:pdfSettings.reportHead})}
                     {this.returnStyleField({label: 'Descriptions', name:"reportDesc", value:pdfSettings.reportDesc})}
-                    {this.returnTableStyleField({label: 'Contents Table', name:"contents", value:pdfSettings.contents})}
+                    {this.returnTableStyleField(pdfSettings.contents)}
                   </Box>
                 </FormField>
                 {/*this.renderFields()*/}
