@@ -1,7 +1,5 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import 'index.scss';
-
 import React from 'react';
 import ReactDOM from 'react-dom';
 //import Router from 'react-router';
@@ -19,6 +17,10 @@ import store from './store';
 import history from './RouteHistory';
 import {init, initToken, lwssoPreAuthenticate, routeChanged} from './actions/system';
 import {ReduxRouter} from 'redux-router';
+
+if (process.env.NODE_ENV !== 'production') {
+  require('index.scss');
+}
 
 Rest.setHeader('Accept', 'application/json');
 Rest.setHeader('X-API-Version', 200);
