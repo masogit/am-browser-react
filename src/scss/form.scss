@@ -33,10 +33,15 @@
 .no-border {
   .grommetux-form-field {
     border: none;
+    overflow: hidden;
   }
   .grommetux-menu.grommetux-menu--controlled {
     display: flex;
     align-items: center;
+  }
+
+  .input-field {
+    border-bottom: 1px solid rgba(0,0,0,0.15);
   }
 }
 
@@ -71,8 +76,13 @@
 
 .grommetux-form-field {
   .grommetux-form-field {
-    padding-top: 0;
-    padding-bottom: 0;
+    padding: 0;
+    margin: 5px 24px;
+  }
+
+  .grommetux-box--direction-column > & {
+    width: calc(100% - 48px);
+
   }
 
   .grommetux-form-field__contents {

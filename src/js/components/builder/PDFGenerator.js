@@ -104,6 +104,7 @@ const analyzeRecordList = (filter, allFields, records, style = {layout: 'headerL
   const body = [];
   const table = {
     layout: style.layout,
+    style: style.style,
     table: {
       headerRows: 1,
       body: body
@@ -259,7 +260,7 @@ class StyleDesigner extends Component {
       <Box flex={true}>
         <Header><Title>{this.title}</Title></Header>
         <Form className='no-border strong-label style-designer'>
-          <FormField label='*Name'>
+          <FormField label='Name'>
             <MarginDesigner styleObj={styleObj} updateValue={this.updateValue}/>
           </FormField>
           <FormField>
@@ -302,6 +303,7 @@ export default class RecordList extends Component {
           right: {text: '', style: 'text'}
         },
         contents: {
+          style: 'tableExample',
           layout: 'headerLineOnly',
           header: 'tableHeader',
           text: 'text'
@@ -420,7 +422,7 @@ export default class RecordList extends Component {
 
     content.push(this.getPdfLine(settings.reportHead));
     content.push(this.getPdfLine(settings.reportDesc));
-    content.push(analyzeRecordList(fieldsName, this.props.body.fields, this.state.records));
+    content.push(analyzeRecordList(fieldsName, this.props.body.fields, this.state.records, settings.contents));
     pdfDefinition.content = content;
 
     this.setTextLine(pdfDefinition.header.columns[0], settings.pageHeader.left);
@@ -539,10 +541,10 @@ export default class RecordList extends Component {
 
   returnStyleField({label, name, value, styles = this.state.pdfSettings.styles}) {
     return (
-      <FormField label={
+      <FormField className='input-field' label={
           <Box justify='between' direction='row'>
             <span>{label}</span>
-            <Menu size='small' label={value.style || 'styles'}>
+            <Menu size='small' label={value.style}>
             {Object.keys(styles).map(s => {
               return <Anchor onClick={(event) => this.updatePDFSettings(event, s, name + '.style')}>{s}</Anchor>;
             }
@@ -558,22 +560,44 @@ export default class RecordList extends Component {
     const styles = this.state.pdfSettings.styles;
     return (
       <FormField label='Content Table'>
-
-        <Menu size='small' label={value.layout || 'styles'}>
-          {table_style.map(s => {
-            return <Anchor onClick={(event) => this.updatePDFSettings(event, s, 'content.layout')}>{s}</Anchor>;
-          }
-          )}</Menu>
-        <Menu size='small' label={value.header || 'styles'}>
-          {Object.keys(styles).map(s => {
-            return <Anchor onClick={(event) => this.updatePDFSettings(event, s, 'content.header')}>{s}</Anchor>;
-          }
-          )}</Menu>
-        <Menu size='small' label={value.text || 'styles'}>
-          {Object.keys(styles).map(s => {
-            return <Anchor onClick={(event) => this.updatePDFSettings(event, s, 'content.text')}>{s}</Anchor>;
-          }
-          )}</Menu>
+        <Box direction='row' pad={{horizontal: 'small'}}>
+          <FormField label={
+            <Box justify='between' direction='row'>
+              <span>Layout:</span>
+              <Menu size='small' label={value.layout}>
+              {table_style.map(s => {
+                return <Anchor onClick={(event) => this.updatePDFSettings(event, s, 'contents.layout')}>{s}</Anchor>;
+              }
+              )}</Menu>
+            </Box>}/>
+          <FormField label={
+            <Box justify='between' direction='row'>
+              <span>Style:</span>
+              <Menu size='small' label={value.style}>
+              {Object.keys(styles).map(s => {
+                return <Anchor onClick={(event) => this.updatePDFSettings(event, s, 'contents.style')}>{s}</Anchor>;
+              }
+              )}</Menu>
+            </Box>}/>
+          <FormField label={
+            <Box justify='between' direction='row'>
+              <span>Header:</span>
+             <Menu size='small' label={value.header}>
+              {Object.keys(styles).map(s => {
+                return <Anchor onClick={(event) => this.updatePDFSettings(event, s, 'contents.header')}>{s}</Anchor>;
+              }
+              )}</Menu>
+            </Box>}/>
+          <FormField label={
+            <Box justify='between' direction='row'>
+              <span>Text:</span>
+              <Menu size='small' label={value.text}>
+              {Object.keys(styles).map(s => {
+                return <Anchor onClick={(event) => this.updatePDFSettings(event, s, 'contents.text')}>{s}</Anchor>;
+              }
+              )}</Menu>
+            </Box>}/>
+        </Box>
       </FormField>
     );
   }
@@ -651,22 +675,30 @@ export default class RecordList extends Component {
                       onChange={this.updateCode}/>
           </FormField> :
             <Box flex={true} style={{maxWidth: '50vw'}} direction='row'>
-              <Form className='strong-label flex'>
-                <Box direction='row'>
-                  {this.returnStyleField({label: 'Page Header Left', name:"pageHeader.left", value:pdfSettings.pageHeader.left})}
-                  {this.returnStyleField({label: 'Page Header Center', name:"pageHeader.center", value:pdfSettings.pageHeader.center})}
-                  {this.returnStyleField({label: 'Page Header Right', name:"pageHeader.right", value:pdfSettings.pageHeader.right})}
-                </Box>
-                {this.returnStyleField({label: 'Report Header', name:"reportHead", value:pdfSettings.reportHead})}
-                {this.returnStyleField({label: 'Report Descriptions', name:"reportDesc", value:pdfSettings.reportDesc})}
-                {this.returnTableStyleField({label: 'Contents Table', name:"contents", value:pdfSettings.contents})}
+              <Form className='strong-label flex no-border'>
+                <FormField label='Page Header'>
+                  <Box direction='row' pad='small'>
+                    {this.returnStyleField({label: 'Left', name:"pageHeader.left", value:pdfSettings.pageHeader.left})}
+                    {this.returnStyleField({label: 'Center', name:"pageHeader.center", value:pdfSettings.pageHeader.center})}
+                    {this.returnStyleField({label: 'Right', name:"pageHeader.right", value:pdfSettings.pageHeader.right})}
+                  </Box>
+                </FormField>
+                <FormField label='Report Body'>
+                  <Box pad='small'>
+                    {this.returnStyleField({label: 'Header', name:"reportHead", value:pdfSettings.reportHead})}
+                    {this.returnStyleField({label: 'Descriptions', name:"reportDesc", value:pdfSettings.reportDesc})}
+                    {this.returnTableStyleField({label: 'Contents Table', name:"contents", value:pdfSettings.contents})}
+                  </Box>
+                </FormField>
                 {/*this.renderFields()*/}
-                <Box direction='row'>
-                  {this.returnStyleField({label: 'Page Footer Left', name:"pageFooter.left", value:pdfSettings.pageFooter.left})}
-                  {this.returnStyleField({label: 'Page Footer Center', name:"pageFooter.center", value:pdfSettings.pageFooter.center})}
-                  {this.returnStyleField({label: 'Page Footer Right', name:"pageFooter.right", value:pdfSettings.pageFooter.right})}
-                </Box>
-                <FormField label="Page Orientation">
+                <FormField label='Page Footer'>
+                  <Box direction='row' pad='small'>
+                    {this.returnStyleField({label: 'Left', name:"pageFooter.left", value:pdfSettings.pageFooter.left})}
+                    {this.returnStyleField({label: 'Center', name:"pageFooter.center", value:pdfSettings.pageFooter.center})}
+                    {this.returnStyleField({label: 'Right', name:"pageFooter.right", value:pdfSettings.pageFooter.right})}
+                  </Box>
+                </FormField>
+                <FormField label="Page Orientation" className='multi-check'>
                   <RadioButton id='pageOrientation' name='pageOrientation' label='portrait'
                                checked={pdfSettings.pageOrientation == 'portrait'} onChange={(event) => this.updatePDFSettings(event, 'portrait')}/>
                   <RadioButton id='pageOrientation' name='pageOrientation' label='landscape'
