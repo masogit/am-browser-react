@@ -29,6 +29,8 @@ export default class Insight extends ComponentBase {
       }
     }];
     this.state = {
+      showPublic: false,
+      publicTabs: [],
       focusTab: tabs[0],
       focusIndex: 0,
       wall: {tabs},
@@ -45,6 +47,7 @@ export default class Insight extends ComponentBase {
     this._deleteBox.bind(this);
     this._toggleDirection.bind(this);
     this._attachAQL.bind(this);
+    this._toggleShowPublic.bind(this);
   }
 
   componentDidMount() {
@@ -106,6 +109,30 @@ export default class Insight extends ComponentBase {
     }));
   }
 
+  _getPublicTabs(walls) {
+    var publicTabs = [];
+    walls.forEach((wall) => {
+      if (wall.user != cookies.get("user")) {
+        wall.tabs.forEach((tab) => {
+          if (tab.public) {
+            tab.user = wall.user;
+            // look up duplicated tab name
+            publicTabs.forEach((publicTab) => {
+              if (publicTab.name == tab.name) {
+                publicTab.name += ` (${publicTab.user})`;
+                tab.name += ` (${tab.user})`;
+              }
+            });
+            publicTabs.push(tab);
+          }
+        });
+      }
+    });
+    this.setState({
+      publicTabs
+    });
+  }
+
   _loadWall() {
     this.setState({data: {}});
     this.addPromise(AQLActions.loadWalls(cookies.get("user")).then(walls => {
@@ -113,6 +140,7 @@ export default class Insight extends ComponentBase {
         var userWall = walls.filter((wall) => {
           return wall.user == cookies.get("user");
         })[0];
+        this._getPublicTabs(walls);
         if (userWall) {
           this.wall = _.cloneDeep(walls[0]);
           this.setState({
@@ -142,6 +170,12 @@ export default class Insight extends ComponentBase {
   _toggleCarousel() {
     this.setState({
       carousel: !this.state.carousel
+    });
+  }
+
+  _toggleShowPublic() {
+    this.setState({
+      showPublic: !this.state.showPublic
     });
   }
 
@@ -539,11 +573,6 @@ export default class Insight extends ComponentBase {
         return;
       }
     });
-    // focusIndex = (focusIndex + 1) % tabs.length;
-    // let focusTab = tabs[focusIndex];
-    // this.state.tabs = leftTabs;
-    // this.state.wall.tabs = leftTabs;
-    // this.state.focusIndex = focusIndex > 0 ? focusIndex -1 : focusIndex;
     this.state.focusTab = targetTab;
     this.state.tabs = tabs;
     this.setState(this.state);
@@ -551,6 +580,7 @@ export default class Insight extends ComponentBase {
 
   render() {
     const {tabs, data, carousel, edit, layer, alert} = this.state;
+    let showedTabs = this.state.showPublic ? this.state.publicTabs : tabs;
     const id = this.props.params.id;
     let content;
     if (id) {
@@ -558,7 +588,7 @@ export default class Insight extends ComponentBase {
     } else {
       content = (
         <Tabs justify='center' className='flex' activeIndex={this.state.focusIndex} initialIndex={this.state.focusIndex}>{
-          tabs.map((tab, index) => (
+          showedTabs.map((tab, index) => (
             <ActionTab ref={tab.name} title={tab.name} key={tab.name} onClick={this._setFocusTab.bind(this, tab, index)}
                        onEdit={edit}
                        onDoubleClick={this.state.edit ? this._onUpdateTitle.bind(this, tab) : null}>
@@ -577,23 +607,30 @@ export default class Insight extends ComponentBase {
           {
             !id &&
             <Menu direction="row" align="center" responsive={true}>
-              {!edit &&
-              <RadioButton id="carousel" name="choice" label="Carousel" onChange={this._toggleCarousel.bind(this)}
-                           checked={carousel} disabled={edit}/>}
-              {!edit &&
-              <RadioButton id="dashboard" name="choice" label="Deck" onChange={this._toggleCarousel.bind(this)}
-                           checked={!carousel || edit}/>
+              {
+                !edit &&
+                <Menu direction="row" inline={true}>
+                  <RadioButton id="carousel" name="choice" label="Carousel" onChange={this._toggleCarousel.bind(this)}
+                            checked={carousel} disabled={edit}/>
+                  <RadioButton id="dashboard" name="choice" label="Deck" onChange={this._toggleCarousel.bind(this)}
+                              checked={!carousel || edit}/>
+                  <CheckBox label={`Public Tabs(${this.state.publicTabs.length})`} toggle={true} checked={this.state.showPublic}
+                            onChange={this._toggleShowPublic.bind(this)}/>
+                </Menu>
               }
-              {edit && <Anchor icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>}
-              {edit && <Anchor icon={<Add />} onClick={this._addTab.bind(this)} label="Add Tab"/>}
-              {edit &&
-              <Anchor icon={<Close />} onClick={() => this.state.tabs.length > 1 && this._onRemove(this.state.focusTab)} label="Delete Tab" disabled={this.state.tabs.length <= 1}/>}
-              {edit &&
-              <Anchor icon={<Group colorIndex={this.state.focusTab.public ? '' : 'grey-4'} />} label="Public"
+              {
+                edit &&
+                <Menu direction="row" inline={true}>
+                  <Anchor icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>
+                  <Anchor icon={<Add />} onClick={this._addTab.bind(this)} label="Add Tab"/>
+                  <Anchor icon={<Close />} onClick={() => this.state.tabs.length > 1 && this._onRemove(this.state.focusTab)} label="Delete Tab" disabled={this.state.tabs.length <= 1}/>
+                  <Anchor icon={<Group colorIndex={this.state.focusTab.public ? '' : 'grey-4'} />} label="Public"
                       onClick={() => this.state.tabs.length > 1 && this._onPublic(this.state.focusTab)}
-                      disabled={this.state.tabs.length <= 1}/>}
+                      disabled={this.state.tabs.length <= 1}/>
+                </Menu>
+              }
               <CheckBox id="edit" label="Edit" checked={edit} onChange={this._toggleEdit.bind(this)}
-                        toggle={true}/>
+                        disabled={this.state.showPublic} toggle={true}/>
             </Menu>
           }
           {
