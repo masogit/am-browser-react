@@ -48,6 +48,7 @@ export default class Insight extends ComponentBase {
     this._toggleDirection.bind(this);
     this._attachAQL.bind(this);
     this._toggleShowPublic.bind(this);
+    this._onPublic.bind(this);
   }
 
   componentDidMount() {
@@ -142,12 +143,12 @@ export default class Insight extends ComponentBase {
         })[0];
         this._getPublicTabs(walls);
         if (userWall) {
-          this.wall = _.cloneDeep(walls[0]);
+          this.wall = _.cloneDeep(userWall);
           this.setState({
             wall: userWall,
             tabs: userWall.tabs
           }, () => {
-            this._findTabAqls(walls[0].tabs);
+            this._findTabAqls(userWall.tabs);
             monitorEdit(this.wall, this.state.wall);
           });
         } else {
@@ -590,8 +591,7 @@ export default class Insight extends ComponentBase {
         <Tabs justify='center' className='flex' activeIndex={this.state.focusIndex} initialIndex={this.state.focusIndex}>{
           showedTabs.map((tab, index) => (
             <ActionTab ref={tab.name} title={tab.name} key={tab.name} onClick={this._setFocusTab.bind(this, tab, index)}
-                       onEdit={edit}
-                       onDoubleClick={this.state.edit ? this._onUpdateTitle.bind(this, tab) : null}>
+                       onEdit={edit} onDoubleClick={this.state.edit ? this._onUpdateTitle.bind(this, tab) : null}>
               {carousel && !edit ? this._buildCarousel(tab) : this._buildBox(tab.box, tab.box, tab.name)}
             </ActionTab>
           ))
@@ -624,9 +624,8 @@ export default class Insight extends ComponentBase {
                   <Anchor icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>
                   <Anchor icon={<Add />} onClick={this._addTab.bind(this)} label="Add Tab"/>
                   <Anchor icon={<Close />} onClick={() => this.state.tabs.length > 1 && this._onRemove(this.state.focusTab)} label="Delete Tab" disabled={this.state.tabs.length <= 1}/>
-                  <Anchor icon={<Group colorIndex={this.state.focusTab.public ? '' : 'grey-4'} />} label="Public"
-                      onClick={() => this.state.tabs.length > 1 && this._onPublic(this.state.focusTab)}
-                      disabled={this.state.tabs.length <= 1}/>
+                  <Anchor icon={<Group colorIndex={this.state.tabs[this.state.focusIndex].public ? '' : 'grey-4'} />} label="Public"
+                          onClick={this._onPublic.bind(this, this.state.focusTab)}/>
                 </Menu>
               }
               <CheckBox id="edit" label="Edit" checked={edit} onChange={this._toggleEdit.bind(this)}
