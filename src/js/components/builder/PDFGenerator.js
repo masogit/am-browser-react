@@ -584,7 +584,7 @@ export default class RecordList extends Component {
             onCancel={() => this.setState(closeState)}
             onConfirm={(styleObj) => {
               closeState.pdfSettings.styles[styleObj.name] = styleObj;
-              this.setState(closeState);
+              this.setState(closeState, this.autoPreview);
             }}/>
         </Layer>
       );
