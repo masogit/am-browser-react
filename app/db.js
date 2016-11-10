@@ -148,7 +148,7 @@ exports.find = function (req, res) {
   var download = req.query.download;
 
   // Insight get data by user
-  var filter = req.query.filter ? JSON.parse(req.query.filter) : {};
+  var filter = (config.db_type == 'mongo' && req.query.filter) ? JSON.parse(req.query.filter) : {};
 
   if (id)
     db.collection(collectionName).findOne(Object.assign({_id: id}, filter), function (err, document) {
