@@ -636,7 +636,12 @@ export default class RecordList extends ComponentBase {
     const {record, pdfGenerator, param: {graphType, filters, showTopology}} = this.state;
 
     if (pdfGenerator) {
-      return <BarCodeEditor {...pdfGenerator} key='BarCodeEditor' back={() => this.setState({pdfGenerator: null})}/>;
+      return (
+        <BarCodeEditor {...pdfGenerator} key='BarCodeEditor' back={() => {
+          this.setState({pdfGenerator: null});
+          toggleSidebar(true);
+        }}/>
+      );
     } else {
       return (
         <Box flex={true} className='fixIEScrollBar'>

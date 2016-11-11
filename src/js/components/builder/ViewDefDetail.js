@@ -384,7 +384,12 @@ export default class ViewDefDetail extends ComponentBase {
     const {layer, alertForm, pdfGenerator} = this.state;
 
     if (pdfGenerator) {
-      return <PDFGenerator {...pdfGenerator} back={() => this.setState({pdfGenerator: null})}/>;
+      return (
+        <PDFGenerator {...pdfGenerator} back={() => {
+          this.setState({pdfGenerator: null});
+          toggleSidebar(true);
+        }}/>
+      );
     }
 
     let table;
