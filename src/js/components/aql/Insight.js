@@ -130,6 +130,7 @@ export default class Insight extends ComponentBase {
         });
       }
     });
+    this._findTabAqls(publicTabs);
     this.setState({
       publicTabs
     });
