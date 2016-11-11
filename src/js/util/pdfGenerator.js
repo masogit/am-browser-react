@@ -2,6 +2,8 @@
  * Created by huling on 11/10/2016.
  */
 import {getDisplayLabel, getFieldStrVal } from './RecordFormat';
+import {loadRecordsByBody} from '../actions/explorer';
+
 const MODE = {
   CODE: 'Code',
   DESIGN: 'Design'
@@ -252,6 +254,23 @@ const format = (pdfDefinition) => {
   return result;
 };
 
+const download = ({onBefore, props, getPDFDefinition, onDone}) => {
+  onBefore();
+  const {body, name = body.label, recordsStart, limit} = props;
+  body.param = {
+    offset: recordsStart,
+    limit: limit
+  };
+
+  loadRecordsByBody(body).then((data) => {
+    const pdfDefinition = getPDFDefinition(data.entities);
+    if (pdfDefinition) {
+      pdfMake.createPdf(pdfDefinition).download(name + '.pdf');
+      onDone();
+    }
+  });
+};
+
 export {
   MODE,
   init_style,
@@ -262,5 +281,6 @@ export {
   getPreviewStyle,
   updateValue,
   translateText,
-  format
+  format,
+  download
 };

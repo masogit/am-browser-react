@@ -2,11 +2,11 @@ import React, {Component, PropTypes} from 'react';
 import {Box, Header, Icons, Anchor, Menu as GMenu, FormField, Form,
   RadioButton, Layer} from 'grommet';
 const {Download, Close, Play: Preview, Code} = Icons.Base;
-import * as ExplorerActions from '../../actions/explorer';
+import {loadRecordsByBody} from '../../actions/explorer';
 import { cloneDeep } from 'lodash';
 import { MODE, init_style, table_style, styles, defaultPDFDefinition,
-  getPreviewStyle, updateValue, translateText, format } from '../../util/pdfGenerator';
-import {Brush, StyleDesigner, ExportLayer} from './PDFWidgets';
+  getPreviewStyle, updateValue, translateText, format, download } from '../../util/pdfGenerator';
+import {Brush, StyleDesigner, ExportLayer} from './../commons/PDFWidgets';
 
 class Menu extends GMenu {
   render() {
@@ -69,7 +69,7 @@ export default class PDFGenerator extends Component {
   componentDidMount() {
     this.preview();
 
-    ExplorerActions.loadRecordsByBody(this.props.body).then((data) => {
+    loadRecordsByBody(this.props.body).then((data) => {
       this.setState({ records: data.entities, total: data.count }, this.preview);
     });
   }
@@ -144,21 +144,12 @@ export default class PDFGenerator extends Component {
 
   }
 
-  download({recordsStart, limit}, name = this.props.body.label) {
-    this.setState({ downloading: true });
-    const body = this.props.body;
-    body.param = {
-      offset: recordsStart,
-      limit: limit
-    };
-
-    ExplorerActions.loadRecordsByBody(body).then((data) => {
-      const dd = this._translateText(this.state.pdfDefinition, data.entities);
-      if (dd) {
-        pdfMake.createPdf(dd).download(name + '.pdf');
-        this.setState({ downloading: false });
-      }
-    });
+  _download({recordsStart, limit}) {
+    const onBefore = () => this.setState({downloading: true});
+    const props = {recordsStart, limit, body: this.props.body};
+    const getPDFDefinition = (data) =>  this._translateText(this.state.pdfDefinition, data);
+    const onDone = () => this.setState({downloading: false});
+    download({onBefore, props, getPDFDefinition, onDone});
   }
 
   returnStyleField({label, name, value, styles = this.state.pdfSettings.styles, data = Object.keys(styles), noInput=false}) {
@@ -221,7 +212,7 @@ export default class PDFGenerator extends Component {
     const {recordsStart, total, limit, showExportLayer} = this.state;
     if (showExportLayer) {
       const onConfirm = (props) => {
-        this.download(props);
+        this._download(props);
         this.setState({showExportLayer: false});
       };
 
@@ -280,7 +271,6 @@ export default class PDFGenerator extends Component {
                                checked={pdfSettings.pageOrientation == 'landscape'} onChange={(event) => this.updatePDFSettings(event, 'landscape')}/>
                 </FormField>
               </Form>
-              {/*this.renderStyleSettings()*/}
             </Box>
           }
           <div style={{ width: '50vw' }} id='pdfContainer' />

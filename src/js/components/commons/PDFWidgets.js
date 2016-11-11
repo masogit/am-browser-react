@@ -5,7 +5,7 @@ import React, {Component} from 'react';
 import {Box, Header, FormField, Form, CheckBox, SVGIcon, Layer, Paragraph,
   Title, Button, Footer, NumberInput, List, ListItem, Label} from 'grommet';
 import {init_style, getPreviewStyle, updateValue} from '../../util/pdfGenerator';
-import AlertForm from '../commons/AlertForm';
+import AlertForm from './AlertForm';
 
 const Brush = (props) => (
   <SVGIcon viewBox="0 0 24 24" {...props}>
