@@ -114,21 +114,19 @@ export default class Insight extends ComponentBase {
   _getPublicTabs(walls) {
     var publicTabs = [];
     walls.forEach((wall) => {
-      if (wall.user != cookies.get("user")) {
-        wall.tabs.forEach((tab) => {
-          if (tab.public) {
-            tab.user = wall.user;
-            // look up duplicated tab name
-            publicTabs.forEach((publicTab) => {
-              if (publicTab.name == tab.name) {
-                publicTab.name += ` (${publicTab.user})`;
-                tab.name += ` (${tab.user})`;
-              }
-            });
-            publicTabs.push(tab);
-          }
-        });
-      }
+      wall.tabs.forEach((tab) => {
+        if (tab.public) {
+          tab.user = wall.user;
+          // look up duplicated tab name
+          publicTabs.forEach((publicTab) => {
+            if (publicTab.name == tab.name) {
+              publicTab.name += ` (${publicTab.user})`;
+              tab.name += ` (${tab.user})`;
+            }
+          });
+          publicTabs.push(tab);
+        }
+      });
     });
     this._findTabAqls(publicTabs);
     this.setState({
@@ -634,7 +632,7 @@ export default class Insight extends ComponentBase {
                   <Anchor icon={<Add />} onClick={this._addTab.bind(this)} label="Add Tab"/>
                   <Anchor icon={<Close />} onClick={() => this.state.tabs.length > 1 && this._onRemove(this.state.focusTab)} label="Delete Tab" disabled={this.state.tabs.length <= 1}/>
                   { this.checkAdmin() && <Anchor icon={<Group colorIndex={this.state.tabs[this.state.focusIndex].public ? '' : 'grey-4'} />} label="Public"
-                          onClick={this._onPublic.bind(this, this.state.focusTab)}/> }
+                          onClick={this._onPublic.bind(this, this.state.tabs[this.state.focusIndex])}/> }
                 </Menu>
               }
               <CheckBox id="edit" label="Edit" checked={edit} onChange={this._toggleEdit.bind(this)}
