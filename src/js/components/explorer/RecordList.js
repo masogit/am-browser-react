@@ -162,28 +162,45 @@ export default class RecordList extends ComponentBase {
     }
 
     let param = this.state.param;
-    if (param.orderby == (sqlname + ' desc'))
-      param.orderby = "";
-    else if (param.orderby == sqlname)
-      param.orderby = sqlname + ' desc';
-    else
-      param.orderby = sqlname;
+    let fields = param.orderby.split(',');
+    let index = fields.indexOf(sqlname + ' desc') > -1 ? fields.indexOf(sqlname + ' desc') : fields.indexOf(sqlname);
+    if (index > -1 ) {
+      if (fields[index] == (sqlname + ' desc'))
+        fields.splice(index, 1);
+      else
+        fields[index] = sqlname + ' desc';
+    }else
+      fields.push(sqlname);
+
+    param.orderby = fields.filter(f => !(f == '')).join(',');
+
     this.setState({
       param: param
     }, this._getRecords);
   }
 
   _showOrderByIcon(sqlname) {
-    var orderby = this.state.param.orderby.split(' ');
-    if (orderby[0] == sqlname) {
-      if (orderby[1] == 'desc') {
-        return <Descend />;
-      } else {
-        return <Ascend />;
+    let fields = this.state.param.orderby.split(',');
+    let index = fields.indexOf(sqlname + ' desc') > -1 ? fields.indexOf(sqlname + ' desc') : fields.indexOf(sqlname);
+    if (index > -1) {
+      let orderby = fields[index].split(' ');
+
+      if (orderby[0] == sqlname) {
+        if (orderby[1] == 'desc') {
+          return <Descend />;
+        } else {
+          return <Ascend />;
+        }
       }
-    } else {
+    }else
       return <EmptyIcon />;
-    }
+  }
+
+  _posOrderby(orderby, field) {
+    let fields = orderby.split(',');
+    let seq = fields.indexOf(field + ' desc') > -1 ? fields.indexOf(field + ' desc') : fields.indexOf(field);
+    if (orderby &&  seq> -1)
+      return seq + 1;
   }
 
   _viewDetailShow(record) {
@@ -477,9 +494,15 @@ export default class RecordList extends ComponentBase {
       const renderFieldsHeader = () => {
         return this.getDisplayFields().map((field, index) => (
           <th key={index} className={this.state.locked ? 'disabled' : ''}>
-            <Anchor reverse={true} icon={this._showOrderByIcon(field.sqlname)}
-                    label={Format.getDisplayLabel(field)} key={`fieldsheader_${index}`}
-                    onClick={this._orderBy.bind(this, field.sqlname)}/>
+            <Box direction='row'>
+              <h4>
+                <Anchor reverse={true}
+                        label={Format.getDisplayLabel(field)} key={`fieldsheader_${index}`}
+                        onClick={this._orderBy.bind(this, field.sqlname)}/>
+              </h4>
+              {this._showOrderByIcon(field.sqlname)}
+              <div className='icon-side-sequence'>{this._posOrderby(this.state.param.orderby, field.sqlname)}</div>
+            </Box>
           </th>
         ));
       };

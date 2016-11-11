@@ -33,11 +33,83 @@
 .no-border {
   .grommetux-form-field {
     border: none;
+    overflow: hidden;
+  }
+  .grommetux-menu.grommetux-menu--controlled {
+    display: flex;
+    align-items: center;
+  }
+
+  .input-field {
+    border-bottom: 1px solid rgba(0,0,0,0.15);
   }
 }
 
 .strong-label {
   .grommetux-form-field__label {
     font-weight: bold;
+  }
+
+  .grommetux-button__icon {
+    padding-top: 0;
+    padding-bottom: 0;
+    height: 12px;
+  }
+
+  .grommetux-anchor__icon {
+    padding: 0;
+    width: 12px;
+    height: 12px;
+  }
+
+  .grommetux-control-icon {
+    width: 12px;
+    height: 12px;
+  }
+
+  .grommetux-menu__control {
+    .grommetux-menu__control-label {
+      font-weight: normal;
+    }
+  }
+}
+
+.grommetux-form-field {
+  .grommetux-form-field {
+    padding: 0;
+    margin: 5px 24px;
+  }
+
+  .grommetux-box--direction-column > & {
+    width: calc(100% - 48px);
+
+  }
+
+  .grommetux-form-field__contents {
+    .grommetux-form-field__label {
+      border: none;
+    }
+  }
+
+  .grommetux-menu__control-label {
+    @extend .grommetux-form-field__label;
+    display: inline;
+    float: left;
+  }
+}
+
+.code-panel {
+  width: 50vw;
+  .grommetux-form-field__contents {
+    height: 100%;
+  }
+
+  .grommetux-form-field__error {
+    position: absolute;
+    right: 20px;
+  }
+
+  textarea {
+    height: 100%
   }
 }

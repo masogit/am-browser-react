@@ -1,19 +1,9 @@
 import React, {PropTypes} from 'react';
 import ComponentBase from '../commons/ComponentBase';
-import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Split, Map} from 'grommet';
-import Close from 'grommet/components/icons/base/Close';
-import Up from 'grommet/components/icons/base/LinkUp';
-import Down from 'grommet/components/icons/base/LinkDown';
-import Ascend from 'grommet/components/icons/base/Ascend';
-import Descend from 'grommet/components/icons/base/Descend';
-import Play from 'grommet/components/icons/base/Play';
-import Checkmark from 'grommet/components/icons/base/Checkmark';
-import Duplicate from 'grommet/components/icons/base/Duplicate';
-import Download from 'grommet/components/icons/base/Download';
-import CaretPrevious from 'grommet/components/icons/base/CaretPrevious';
-import More from 'grommet/components/icons/base/More';
-import Mail from 'grommet/components/icons/base/Mail';
-import _ from 'lodash';
+import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Split, Map, Icons} from 'grommet';
+const {Close, LinkUp: Up, LinkDown: Down, Ascend, Descend, Play, Checkmark, Duplicate, Download,
+  CaretPrevious, More, Mail} = Icons.Base;
+import {isEmpty} from 'lodash';
 import AlertForm from '../../components/commons/AlertForm';
 import EditLayer from '../../components/commons/EditLayer';
 import ContentPlaceHolder from '../../components/commons/ContentPlaceHolder';
@@ -21,6 +11,8 @@ import FieldTypes from '../../constants/FieldTypes';
 import {saveAs} from 'file-saver';
 import SearchInput from '../commons/SearchInput';
 import {bodyToMapData} from '../../util/util';
+import PDFGenerator from './PDFGenerator';
+import {toggleSidebar} from '../../actions/system';
 
 const _onMail = (view) => {
   if (view._id) {
@@ -62,6 +54,7 @@ export default class ViewDefDetail extends ComponentBase {
     this._onDuplicate = this._onDuplicate.bind(this);
     this._onDelete = this._onDelete.bind(this);
     this._setCategory = this._setCategory.bind(this);
+    this.printPdf = this.printPdf.bind(this);
     this.state = {
       mainFilter: false,
       alertForm: null
@@ -99,11 +92,34 @@ export default class ViewDefDetail extends ComponentBase {
     this.props.onValueChange(event.target.name.substring(2), event.suggestion);
   }
 
-  _onTripleStateChange(event, value) {
-    let path = event.currentTarget.name;
-    this.props.onValueChange(path.substring(2), value);
+  _posOrderBy(orderby, field) {
+    let fields = orderby.split(',');
+    let seq = fields.indexOf(field + ' desc') > -1 ? fields.indexOf(field + ' desc') : fields.indexOf(field);
+    if (orderby &&  seq> -1)
+      return seq + 1;
   }
 
+  _onTripleStateChange(event, value, orderby) {
+    let path = event.currentTarget.name;
+    let fields = orderby.split(',');
+    let pos = (fields.indexOf(value + ' desc') > -1) ? fields.indexOf(value + ' desc') : fields.indexOf(value);
+
+    if (!_.isEmpty(orderby) && value.indexOf('desc') > -1) {
+      pos = _.indexOf(fields, value.substring(0, value.indexOf(' desc')));
+      fields.push(value);
+    }
+    if (pos > -1)
+      fields.splice(pos, 1);
+    else
+      fields.push(value);
+
+    this.props.onValueChange(path.substring(2), fields.filter(field => !(field == '')).join(','));
+  }
+
+  _onDefaultStateChange(event, value, orderby, field) {
+    if (_.isEmpty(value))
+      this._onTripleStateChange(event, field, orderby);
+  }
   openAlert(type) {
     this.setState({
       alertForm: type
@@ -177,6 +193,7 @@ export default class ViewDefDetail extends ComponentBase {
   renderTemplateTable(selectedView, root, path, key) {
     let currentPath = root ? "" : path + ".";
     let selfView = selectedView;
+    let orderbyArray = selfView.body.orderby.split(',');
     // map, then filter out null elements, the index is correct; filter out PK fields, then map, the index is wrong.
     return selfView.body.fields.map((field, index) => {
       let fieldName = field.sqlname;
@@ -242,34 +259,36 @@ export default class ViewDefDetail extends ComponentBase {
                         }}/>
           </td>
           <td>
-            {(!selfView.body.orderby || selfView.body.orderby.trim() == "" || !_.startsWith(selfView.body.orderby, field.sqlname)) &&
-            <CheckBox id={`v.${currentPath}body.orderby`} name={`v.${currentPath}body.orderby`}
+            {(!selfView.body.orderby || _.indexOf(selfView.body.orderby, [""]) > -1 || !_.includes(orderbyArray, field.sqlname)) && !_.includes(orderbyArray, `${field.sqlname} desc`) && !_.includes(orderbyArray, field.sqlname) &&
+              <CheckBox id={`v.${currentPath}body.orderby`} name={`v.${currentPath}body.orderby`}
                       value={field.sqlname}
-                      checked={!!selfView.body.orderby && _.startsWith(selfView.body.orderby, field.sqlname)}
-                      disabled={!!selfView.body.orderby && !_.startsWith(selfView.body.orderby, field.sqlname)}
+                      checked={!!selfView.body.orderby && _.includes(orderbyArray, field.sqlname)}
+                      disabled={!_.isEmpty(selfView.body.orderby) && orderbyArray.length >= 3}
                       onChange={
                         (event) => {
-                          this._onTripleStateChange(event, field.sqlname);
+                          this._onTripleStateChange(event, field.sqlname, selfView.body.orderby);
                         }}/>
             }
-            {selfView.body.orderby && selfView.body.orderby == field.sqlname &&
+            {selfView.body.orderby && _.includes(orderbyArray, field.sqlname) &&
+              !_.includes(orderbyArray,`${field.sqlname} desc`) &&
             <a name={`v.${currentPath}body.orderby`}
                onClick={
                         (event) => {
-                          this._onTripleStateChange(event, `${field.sqlname} desc`);
+                          this._onTripleStateChange(event, `${field.sqlname} desc`, selfView.body.orderby);
                         }}>
               <Ascend size="small"/>
             </a>
             }
-            {selfView.body.orderby && selfView.body.orderby == `${field.sqlname} desc` &&
+            {selfView.body.orderby && _.includes(orderbyArray, `${field.sqlname} desc`) &&
             <a name={`v.${currentPath}body.orderby`}
                onClick={
                         (event) => {
-                          this._onTripleStateChange(event, "");
+                          this._onDefaultStateChange(event, "", selfView.body.orderby, field.sqlname);
                         }}>
               <Descend size="small"/>
             </a>
             }
+            {this._posOrderBy(selfView.body.orderby, field.sqlname)}
           </td>
           <td>
             <a id={`${currentPath}body.fields.${index}.del`} name={`${currentPath}body.fields.${index}`}
@@ -376,10 +395,26 @@ export default class ViewDefDetail extends ComponentBase {
     return title && <AlertForm onClose={this.closeAlertForm} title={title} onConfirm={onConfirm}/>;
   }
 
-  render() {
-    let {selectedView} = this.props;
+  printPdf(pdfGenerator) {
+    this.setState({pdfGenerator});
+    toggleSidebar(false);
+  }
 
-    let p = "input", table;
+  render() {
+    const {selectedView, openPreview, categories, onSubmit, compact} = this.props;
+
+    if (isEmpty(selectedView)) {
+      toggleSidebar(true);
+      return <ContentPlaceHolder/>;
+    }
+
+    const {layer, alertForm, pdfGenerator} = this.state;
+
+    if (pdfGenerator) {
+      return <PDFGenerator {...pdfGenerator} back={() => this.setState({pdfGenerator: null})}/>;
+    }
+
+    let table;
 
     if (selectedView && selectedView.body && (selectedView.body.fields.length > 0 || selectedView.body.links.length > 0)) {
       const title = {
@@ -398,71 +433,66 @@ export default class ViewDefDetail extends ComponentBase {
       table = this.renderTable(title, filter, selectedView, true, '', selectedView.body.sqlname);
     }
 
+    const renderAnchor = ({icon, onClick, args, enable, label}) => {
+      return (<Anchor icon={icon} label={label} disabled={!enable} onClick={() => enable && onClick(args)}/>);
+    };
+
     return (
-      !_.isEmpty(selectedView) ?
-        <Box flex={true}>
-          {this.getLayer(this.state.layer)}
-          <Header justify="between" pad={{horizontal: 'medium'}}>
-            <Box>View Builder</Box>
-            <Menu direction="row" align="center" responsive={true}>
-              <Anchor icon={<Play />} onClick={() => table && this.props.openPreview()} label="Query" disabled={!table}/>
-              <Anchor icon={<Checkmark />}
-                      onClick={() => selectedView.name && selectedView.category && this.openAlert("save")} label="Save"
-                      disabled={!selectedView.name || !selectedView.category}/>
-              <Anchor icon={<Close />} onClick={() => selectedView._id && this.openAlert("delete")} label="Delete"
-                      disabled={!selectedView._id}/>
-              <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }}>
-                <Anchor link="#" icon={<Duplicate />} onClick={() => selectedView._id && this.openAlert("duplicate")}
-                        label="Duplicate"
-                        disabled={!selectedView._id}/>
-                {selectedView._id &&
-                <Anchor icon={<Mail />} onClick={() => _onMail(selectedView)} label="Mail"
-                        disabled={!selectedView._id}/>}
-                <Anchor icon={<Download />} onClick={() => _onDownload(selectedView)} label="Download"
-                        disabled={!selectedView._id}/>
-              </Menu>
+      <Box flex={true}>
+        {this.getLayer(layer)}
+        <Header justify="between" pad={{horizontal: 'medium'}}>
+          <Box>View Builder</Box>
+          <Menu direction="row" align="center" responsive={true}>
+            {renderAnchor({icon: <Play />, onClick: openPreview, label: 'Query', enable: table})}
+            {renderAnchor({icon: <Play />, onClick: this.printPdf, args: {body: selectedView.body}, label: 'PDF Generator', enable: table})}
+            {renderAnchor({icon: <Checkmark />, onClick: this.openAlert, args: 'save', label: 'Save', enable: selectedView.name && selectedView.category})}
+            {renderAnchor({icon: <Close />, onClick: this.openAlert, args: 'delete', label: 'Delete', enable: selectedView._id})}
+            <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }}>
+              {renderAnchor({icon: <Duplicate />, onClick: this.openAlert, args: 'duplicate', label: 'Duplicate', enable: selectedView._id})}
+              {selectedView._id && renderAnchor({icon: <Mail />, onClick: _onMail, args: selectedView, label: 'Mail', enable: selectedView._id})}
+              {renderAnchor({icon: <Download />, onClick: _onDownload,args: selectedView , label: 'Download', enable: selectedView._id})}
             </Menu>
-            {/* upload form
-             <form method="post" encType="multipart/form-data" action="http://localhost:8080/coll/view">
-             <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
-             <input type="file" name="docFile" accept=".json" />
-             <input type="submit" />
-             </form>
-             */}
-          </Header>
-          <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'medium'}}>
-            <Split flex="left" fixed={false} className='fixMinSizing'>
-              <Box flex={true}>
-                {
-                  selectedView.body.sqlname &&
-                  <Box className='hiddenScroll' flex={false}>
-                    <Map vertical={true} className='grid' data={bodyToMapData(selectedView.body)} />
-                  </Box>
-                }
-                {table}
-              </Box>
-              <Box pad={table ? 'small' : 'none'}>
-                <Form onSubmit={this.props.onSubmit} compact={this.props.compact}>
-                  <FormField label="Name" htmlFor={p + "item1"}>
-                    <input id="v.name" name="v.name" type="text" onChange={this._onChange}
-                           value={selectedView.name}/>
-                  </FormField>
-                  <FormField label="Description">
+          </Menu>
+          {/* upload form
+           <form method="post" encType="multipart/form-data" action="http://localhost:8080/coll/view">
+           <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
+           <input type="file" name="docFile" accept=".json" />
+           <input type="submit" />
+           </form>
+           */}
+        </Header>
+        <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'medium'}}>
+          <Split flex="left" fixed={false} className='fixMinSizing'>
+            <Box flex={true}>
+              {
+                selectedView.body.sqlname &&
+                <Box className='hiddenScroll' flex={false}>
+                  <Map vertical={true} className='grid' data={bodyToMapData(selectedView.body)}/>
+                </Box>
+              }
+              {table}
+            </Box>
+            <Box pad={table ? 'small' : 'none'}>
+              <Form onSubmit={onSubmit} compact={compact}>
+                <FormField label="Name">
+                  <input id="v.name" name="v.name" type="text" onChange={this._onChange}
+                         value={selectedView.name}/>
+                </FormField>
+                <FormField label="Description">
                     <textarea value={selectedView.desc} onClick={() => this.setState({layer: 'description'})}
                               onChange={() => this.setState({layer: 'description'})}/>
-                  </FormField>
-                  <FormField label="Category" htmlFor={p + "item3"}>
-                    <SearchInput id="v.category" name="v.category" value={selectedView.category}
-                                 suggestions={this.props.categories} onDOMChange={this._onChange}
-                                 onSelect={this._setCategory}/>
-                  </FormField>
-                </Form>
-              </Box>
-              {selectedView && selectedView.name && this.getAlertLayer(this.state.alertForm, selectedView.name)}
-            </Split>
-          </Box>
+                </FormField>
+                <FormField label="Category">
+                  <SearchInput id="v.category" name="v.category" value={selectedView.category}
+                               suggestions={categories} onDOMChange={this._onChange}
+                               onSelect={this._setCategory}/>
+                </FormField>
+              </Form>
+            </Box>
+            {selectedView && selectedView.name && this.getAlertLayer(alertForm, selectedView.name)}
+          </Split>
         </Box>
-        : <ContentPlaceHolder/>
+      </Box>
     );
   }
 }
