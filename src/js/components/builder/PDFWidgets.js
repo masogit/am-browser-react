@@ -2,9 +2,8 @@
  * Created by huling on 11/10/2016.
  */
 import React, {Component} from 'react';
-import {Box, Header, Anchor, FormField, Form, CheckBox, SVGIcon, Icons,
+import {Box, Header, FormField, Form, CheckBox, SVGIcon, Icons,
   Title, Button, Footer, NumberInput, List, ListItem, Label} from 'grommet';
-const {Add} = Icons.Base;
 import {init_style, getPreviewStyle} from '../../util/pdfGenerator';
 
 const Brush = (props) => (
@@ -63,6 +62,10 @@ class StyleDesigner extends Component {
     this.initStyle();
   }
 
+  componentWillUnmount() {
+    this.props.onConfirm(this.state.styles);
+  }
+
   initStyle() {
     this.setState({styleObj: Object.assign({}, init_style)});
   }
@@ -106,34 +109,50 @@ class StyleDesigner extends Component {
 
   renderSidebar(styles = this.state.styles) {
     return (
-      <List>
-        {Object.keys(styles).map((key, index) => {
-          const onClick = () => {
-            // add default styles
-            const newObj = Object.assign({}, init_style, styles[key]);
-            this.setState({
-              styleObj: Object.assign(styles[key], newObj, {name: key})
-            });
-          };
+      <Box className='style-designer-sidebar'>
+        <List >
+          {Object.keys(styles).map((key, index) => {
+            const onClick = () => {
+              // add default styles
+              const newObj = Object.assign({}, init_style, styles[key]);
+              this.setState({
+                styleObj: Object.assign(styles[key], newObj, {name: key})
+              });
+            };
 
-          return (
-            <ListItem onClick={onClick} key={index}>
-              <label style={getPreviewStyle(styles[key], true)}>{key}</label>
-            </ListItem>
-          );
-        })}
-      </List>
+            return (
+              <ListItem onClick={onClick} key={index} className={key == this.state.styleObj.name ? 'active' : ''}>
+                <label style={getPreviewStyle(styles[key], true)}>{key}</label>
+              </ListItem>
+            );
+          })}
+        </List>
+      </Box>
     );
   }
 
+  isChanged(origin, now) {
+
+  }
+
+  _onSave(styleObj) {
+    this.state.styles[styleObj.name] = styleObj;
+    this.setState({
+      styles: this.state.styles
+    });
+  }
+
+  _onDelete(styleObj) {
+    delete this.state.styles[styleObj.name];
+    this.initStyle();
+  }
+
   render() {
-    const {onConfirm, onCancel} = this.props;
     const { styleObj }= this.state;
     return (
       <Box flex={true}>
         <Header direction='row' justify='between'>
           <Title>Style Designer</Title>
-          <Box pad={{horizontal: 'medium'}}><Anchor icon={<Add />} onClick={this.initStyle} label="New Style"/></Box>
         </Header>
         <Box direction='row'>
           {this.renderSidebar()}
@@ -160,10 +179,13 @@ class StyleDesigner extends Component {
               {this.renderNumberInput('Font Size', 'fontSize', 10, 64)}
             </Form>
 
-            <Footer justify='end' pad='medium'>
-              <Button label="Confirm" primary={true} strong={true} onClick={styleObj.name ? () => onConfirm(styleObj) : null}/>
-              <Box pad={{horizontal: 'small'}}/>
-              <Button label="Cancel" primary={true} strong={true} onClick={onCancel}/>
+            <Footer justify='between' pad='medium' flex={false}>
+              <Box direction='row'>
+                <Button label="New" onClick={this.initStyle}/>
+                <Box pad={{horizontal: 'small'}}/>
+                <Button label="Delete" onClick={this._onDelete.bind(this, styleObj)} accent={true}/>
+              </Box>
+              <Button label="Save" primary={true} onClick={styleObj.name ? () => this._onSave(styleObj) : null}/>
             </Footer>
           </Box>
         </Box>

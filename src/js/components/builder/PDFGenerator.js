@@ -56,7 +56,7 @@ export default class PDFGenerator extends Component {
   componentDidMount() {
     this.preview();
     ExplorerActions.loadRecordsByBody(this.props.body).then((data) => {
-      this.setState({ records: data.entities });
+      this.setState({ records: data.entities }, this.preview);
     });
   }
 
@@ -269,8 +269,10 @@ export default class PDFGenerator extends Component {
       <FormField className={noInput ? '' : 'input-field'} label={
           <Box justify='between' direction='row'>
             <span>{label}</span>
-            <Menu size='small' label={styleValue} dropAlign={{top: 'top', right: 'right'}}>
-             {data.map(s => <Anchor onClick={(event) => this.updatePDFSettings(event, s, styleName)}>{s}</Anchor>)}
+            <Menu size='small' label={<span style={getPreviewStyle(styles[styleValue])}>{styleValue}</span>} dropAlign={{top: 'top', right: 'right'}}>
+             {data.map(s => <Anchor onClick={(event) => this.updatePDFSettings(event, s, styleName)}>
+              <span style={getPreviewStyle(styles[s])}>{s}</span>
+              </Anchor>)}
             </Menu>
           </Box>}>
         {!noInput && <input name={name + '.text'} type="text" onChange={this.updatePDFSettings}
@@ -302,15 +304,16 @@ export default class PDFGenerator extends Component {
         new_style: Object.assign({}, init_style),
         pdfSettings: this.state.pdfSettings
       };
+      //const onClose = () => {
+      //
+      //};
 
       return (
-        <Layer>
+        <Layer closer={true} onClose={() => this.setState(closeState, this.autoPreview)}>
           <StyleDesigner
             styles={this.state.pdfSettings.styles}
-            onCancel={() => this.setState(closeState)}
-            onConfirm={(styleObj) => {
-              closeState.pdfSettings.styles[styleObj.name] = styleObj;
-              this.setState(closeState, this.autoPreview);
+            onConfirm={(styles) => {
+              closeState.pdfSettings.styles = styles;
             }}/>
         </Layer>
       );

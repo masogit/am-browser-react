@@ -138,15 +138,18 @@ const analyzeDate = (text, date) => {
   return text;
 };
 
-const getPreviewStyle = ({bold=false, italics=false, color='#000000', margin=[0,0,0,0], fontSize=16}, ignoreMargin = false) => {
+const getPreviewStyle = (style = null, ignoreMargin = false) => {
   const previewStyle = {};
-  previewStyle.fontWeight = bold ? 'bold' : 'normal';
-  previewStyle.fontStyle = italics ? 'italic' : 'normal';
-  previewStyle.fontSize = fontSize;
-  previewStyle.color = color;
+  if (style) {
+    const {bold=false, italics=false, color='#000000', margin=[0, 0, 0, 0], fontSize=16} = style;
+    previewStyle.fontWeight = bold ? 'bold' : 'normal';
+    previewStyle.fontStyle = italics ? 'italic' : 'normal';
+    previewStyle.fontSize = fontSize;
+    previewStyle.color = color;
 
-  if (!ignoreMargin) {
-    previewStyle.margin = margin.slice(1).join('px ') + 'px ' + margin[0] + 'px';
+    if (!ignoreMargin) {
+      previewStyle.margin = margin.slice(1).join('px ') + 'px ' + margin[0] + 'px';
+    }
   }
   return previewStyle;
 };
