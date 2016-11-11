@@ -1,13 +1,12 @@
 import React, {Component, PropTypes} from 'react';
-import {Box, Header, Icons, Anchor, Menu as GMenu, FormField, Form, CheckBox, Paragraph, Title, Button,
-  RadioButton, Layer, Footer} from 'grommet';
+import {Box, Header, Icons, Anchor, Menu as GMenu, FormField, Form,
+  RadioButton, Layer} from 'grommet';
 const {Download, Close, Play: Preview, Code} = Icons.Base;
-import {getDisplayLabel} from '../../util/RecordFormat';
 import * as ExplorerActions from '../../actions/explorer';
 import { cloneDeep } from 'lodash';
 import { MODE, init_style, table_style, styles, defaultPDFDefinition,
-  getPreviewStyle, updateValue, translateText } from '../../util/pdfGenerator';
-import {Brush, StyleDesigner, NumberInputField} from './PDFWidgets';
+  getPreviewStyle, updateValue, translateText, format } from '../../util/pdfGenerator';
+import {Brush, StyleDesigner, ExportLayer} from './PDFWidgets';
 
 class Menu extends GMenu {
   render() {
@@ -63,7 +62,7 @@ export default class PDFGenerator extends Component {
     };
     this.updatePDFSettings = this.updatePDFSettings.bind(this);
     this.updateCode = this.updateCode.bind(this);
-    this.updateValue = this.updateValue.bind(this);
+    this._updateValue = this._updateValue.bind(this);
     this.preview = this.preview.bind(this);
   }
 
@@ -101,19 +100,19 @@ export default class PDFGenerator extends Component {
     this.setState(this.state, this.autoPreview);
   }
 
-  updateValue(event, props = {}) {
+  _updateValue(event, props = {}) {
     const {val = event.target.value, name = event.target.name, state = this.state, callback = ()=> this.setState(this.state)} = props;
     updateValue(event, {val, name, state, callback });
   }
 
   updatePDFSettings(event, val = event.target.value, name = event.target.name) {
-    this.updateValue(event, {
+    this._updateValue(event, {
       val, name, state: this.state.pdfSettings,
       callback: () => this.setState(this.state, this.autoPreview)
     });
   }
 
-  translateText(pdfDefinition, records = this.state.records) {
+  _translateText(pdfDefinition, records = this.state.records) {
     const settings = this.state.pdfSettings,
       body = this.props.body, fields_state= this.state.fields;
 
@@ -123,7 +122,7 @@ export default class PDFGenerator extends Component {
   preview() {
     let pdfDefinition = this.state.pdfDefinition;
     if (this.state.mode != MODE.CODE) {
-      pdfDefinition = this.translateText(pdfDefinition);
+      pdfDefinition = this._translateText(pdfDefinition);
     }
 
     pdfMake.createPdf(cloneDeep(pdfDefinition)).getDataUrl((outDoc) => {
@@ -145,51 +144,21 @@ export default class PDFGenerator extends Component {
 
   }
 
-  download(name = this.props.body.label) {
+  download({recordsStart, limit}, name = this.props.body.label) {
     this.setState({ downloading: true });
     const body = this.props.body;
+    body.param = {
+      offset: recordsStart,
+      limit: limit
+    };
 
     ExplorerActions.loadRecordsByBody(body).then((data) => {
-      const dd = this.translateText(this.state.pdfDefinition, data.entities);
+      const dd = this._translateText(this.state.pdfDefinition, data.entities);
       if (dd) {
         pdfMake.createPdf(dd).download(name + '.pdf');
         this.setState({ downloading: false });
       }
     });
-  }
-
-  format(pdfDefinition) {
-    if (typeof pdfDefinition == 'string') {
-      return pdfDefinition;
-    }
-    const text = JSON.stringify(pdfDefinition);
-    let spliters = 0, result = '', inArray = false, splitted = false;
-    for (let char of text) {
-      result += char;
-      if (char == '[') {
-        inArray = true;
-      } else if (char == ']') {
-        inArray = false;
-      }
-      if (splitted) {
-        splitted = false;
-        continue;
-      }
-
-      if (char == '{') {
-        result += '\n' + '\t'.repeat(++spliters);
-        splitted = true;
-      } else if (char == '}') {
-        result = result.slice(0, -1);
-        result += '\n' + '\t'.repeat(--spliters);
-        result += char;
-      } else if (char == ',' && !inArray) {
-        result += '\n' + '\t'.repeat(spliters);
-        splitted = true;
-      }
-    }
-
-    return result;
   }
 
   returnStyleField({label, name, value, styles = this.state.pdfSettings.styles, data = Object.keys(styles), noInput=false}) {
@@ -248,60 +217,18 @@ export default class PDFGenerator extends Component {
     }
   }
 
-  renderNumberInput(props) {
-    return <NumberInputField state={this.state} updateValue={(event)=>this.updateValue(event)} {...props}/>;
-  }
-
   renderExportLayer() {
-    const {recordsStart, limit, showExportLayer, total} = this.state;
+    const {recordsStart, total, limit, showExportLayer} = this.state;
     if (showExportLayer) {
-      const getRecordNumber = () => {
-        if (recordsStart + limit > total) {
-          return total - recordsStart;
-        } else {
-          return limit;
-        }
+      const onConfirm = (props) => {
+        this.download(props);
+        this.setState({showExportLayer: false});
       };
 
-      return (
-        <Layer closer={true} onClose={() => this.setState({showExportLayer: false})}>
-          <Box flex={true} size='large'>
-            <Header><Title>Choose records to export</Title></Header>
-
-            <Form className='no-border strong-label'>
-              {this.renderNumberInput({
-                label: 'How many records do you want to export?',
-                name: 'limit',
-                min: 100,
-                max: 1000,
-                step: 100
-              })}
-              {this.renderNumberInput({
-                label: 'From which record do you want to export?',
-                name: 'recordsStart',
-                min: 1,
-                max: total - 1
-              })}
-            </Form>
-
-            <Box pad={{horizontal: 'medium'}}>
-              <Paragraph size='small'>{'You have '}<strong>{total}</strong>{' records in total.'}</Paragraph>
-              <Paragraph
-                size='small'>{`You will export records `}<strong>{`${recordsStart} ~ ${getRecordNumber() + recordsStart - 1}`}</strong></Paragraph>
-            </Box>
-
-            <Footer justify='end' pad={{vertical: 'medium'}}>
-              <Button label={`Export ${getRecordNumber()} records`} primary={true} strong={true} onClick={() => {
-                this.download();
-                this.setState({showExportLayer: false});
-              }}/>
-            </Footer>
-          </Box>
-        </Layer>
-      );
+      const onClose = () => this.setState({showExportLayer: false});
+      return <ExportLayer onConfirm={onConfirm} onClose={onClose} recordsStart={recordsStart} total={total} limit={limit}/>;
     }
   }
-
 
   render() {
     const {mode, pdfDefinition, error, pdfSettings, loading} = this.state;
@@ -315,13 +242,12 @@ export default class PDFGenerator extends Component {
             <Anchor icon={<Brush />} onClick={() => this.setState({showLayer: 'new_style'})} label="Style Designer"/>
             <Anchor icon={<Preview/>} disabled={loading} onClick={loading ? null : this.preview} label='Preview'/>
             <Anchor icon={<Download />} disabled={loading} onClick={() => !loading && this.setState({showExportLayer: true})} label='Export'/>
-
             <Anchor label='Back' icon={<Close/>} onClick={() => this.props.back()}/>
           </Menu>
         </Header>
         <Box flex={true} direction='row'>
           {mode == MODE.CODE ? <FormField error={error} className='code-panel'>
-            <textarea name='pdfDefinition' value={this.format(pdfDefinition)}
+            <textarea name='pdfDefinition' value={format(pdfDefinition)}
                       onChange={this.updateCode}/>
           </FormField> :
             <Box flex={true} style={{maxWidth: '50vw'}} direction='row'>

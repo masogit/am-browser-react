@@ -2,9 +2,9 @@
  * Created by huling on 11/10/2016.
  */
 import React, {Component} from 'react';
-import {Box, Header, FormField, Form, CheckBox, SVGIcon, Icons,
+import {Box, Header, FormField, Form, CheckBox, SVGIcon, Layer, Paragraph,
   Title, Button, Footer, NumberInput, List, ListItem, Label} from 'grommet';
-import {init_style, getPreviewStyle} from '../../util/pdfGenerator';
+import {init_style, getPreviewStyle, updateValue} from '../../util/pdfGenerator';
 import AlertForm from '../commons/AlertForm';
 
 const Brush = (props) => (
@@ -205,5 +205,61 @@ class StyleDesigner extends Component {
   }
 }
 
-export {Brush, MarginDesigner, StyleDesigner, NumberInputField};
+const getRecordNumber = ({recordsStart, limit, total}) => {
+  if (recordsStart + limit > total) {
+    return total - recordsStart;
+  } else {
+    return limit;
+  }
+};
+
+class ExportLayer extends Component {
+  componentWillMount() {
+    this.state = {
+      recordsStart: this.props.recordsStart,
+      limit: this.props.limit,
+      total: this.props.total
+    };
+    this._updateValue = this._updateValue.bind(this);
+  }
+
+  _updateValue(event) {
+    updateValue(event, {val: event.target.value, name: event.target.name, state: this.state, callback: ()=> this.setState(this.state) });
+  }
+
+  render() {
+    const {onConfirm} = this.props;
+    const {recordsStart, total} = this.state;
+
+    return (
+      <Layer closer={true} onClose={() => this.setState({showExportLayer: false})}>
+        <Box flex={true} size='large'>
+          <Header><Title>Choose records to export</Title></Header>
+
+          <Form className='no-border strong-label'>
+            <NumberInputField state={this.state} updateValue={(event)=> this._updateValue(event)}
+                              label='How many records do you want to export?'
+                              name='limit' min={100} max={1000} step={100}/>
+            <NumberInputField state={this.state} updateValue={(event)=> this._updateValue(event)}
+                              label='From which record do you want to export?'
+                              name='recordsStart' min={1} max={total}/>
+          </Form>
+          <Box pad={{horizontal: 'medium'}}>
+            <Paragraph size='small'>{'You have '}<strong>{total}</strong>{' records in total.'}</Paragraph>
+            <Paragraph
+              size='small'>{`You will export records `}<strong>{`${recordsStart} ~ ${getRecordNumber(this.state) + recordsStart}`}</strong></Paragraph>
+          </Box>
+
+          <Footer justify='end' pad={{vertical: 'medium'}}>
+            <Button label={`Export ${getRecordNumber(this.state) + 1} records`} primary={true} strong={true}
+                    onClick={() => onConfirm({recordsStart: this.state.recordsStart - 1, limit: this.state.limit})}/>
+          </Footer>
+        </Box>
+      </Layer>
+    );
+  }
+}
+
+
+export {Brush, MarginDesigner, StyleDesigner, NumberInputField, ExportLayer};
 

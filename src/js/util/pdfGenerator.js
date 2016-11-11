@@ -218,6 +218,40 @@ const translateText = (pdfDefinition, {settings, records, fields_state, body}) =
   return pdfDefinition;
 };
 
+const format = (pdfDefinition) => {
+  if (typeof pdfDefinition == 'string') {
+    return pdfDefinition;
+  }
+  const text = JSON.stringify(pdfDefinition);
+  let spliters = 0, result = '', inArray = false, splitted = false;
+  for (let char of text) {
+    result += char;
+    if (char == '[') {
+      inArray = true;
+    } else if (char == ']') {
+      inArray = false;
+    }
+    if (splitted) {
+      splitted = false;
+      continue;
+    }
+
+    if (char == '{') {
+      result += '\n' + '\t'.repeat(++spliters);
+      splitted = true;
+    } else if (char == '}') {
+      result = result.slice(0, -1);
+      result += '\n' + '\t'.repeat(--spliters);
+      result += char;
+    } else if (char == ',' && !inArray) {
+      result += '\n' + '\t'.repeat(spliters);
+      splitted = true;
+    }
+  }
+
+  return result;
+};
+
 export {
   MODE,
   init_style,
@@ -227,5 +261,6 @@ export {
   analyzeRecordList,
   getPreviewStyle,
   updateValue,
-  translateText
+  translateText,
+  format
 };
