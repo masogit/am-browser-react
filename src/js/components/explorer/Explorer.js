@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import * as ExplorerActions from '../../actions/explorer';
+import {toggleSidebar} from '../../actions/system';
 import RecordList from './RecordList';
 import Box from 'grommet/components/Box';
 import AMSideBar from '../commons/AMSideBar';
@@ -64,6 +65,7 @@ export default class Explorer extends Component {
     } else {
       focus.expand = false;
       focus.selected = '';
+      toggleSidebar(true);
     }
 
 

@@ -16,3 +16,4 @@ ssl
 *.iml
 .idea
 am-browser-config.properties
+gen

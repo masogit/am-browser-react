@@ -87,7 +87,7 @@ module.exports = function (am) {
 
             client.get(aqlUrl, args, (data, response) => {
               // get user right defined in AM
-              if (data.Query.Result.Row) {
+              if (data.Query && data.Query.Result.Row) {
                 var row = data.Query.Result.Row;
                 if (!row.length) {
                   am_rights.push(row.Column.content);

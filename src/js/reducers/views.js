@@ -99,6 +99,5 @@ const handlers = {
 export default function viewsReducer(state = initialState, action) {
   let handler = handlers[action.type];
   if (!handler) return state;
-  return {...state, ...handler(state, action)
-};
+  return {...state, ...handler(state, action)};
 }

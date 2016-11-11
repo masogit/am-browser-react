@@ -11,6 +11,8 @@ session_max_age = 30
 is_debug = false
 session_secret = keyboard cat
 enable_csrf = true
+# LWSSO enabled
+enable_lwsso = true
 
 [rest]
 protocol = http

@@ -4,7 +4,7 @@ input {
     border-color: #FFD144;
   }
 
-  .grommetux-header &{
+  .grommetux-header & {
     font-size: $h5-font-size;
   }
 
@@ -25,6 +25,16 @@ input {
     line-height: 1;
     padding: 0 4px;
     width: 50px;
+  }
+
+  &[type="color"], &[type="color"]:focus {
+    padding: 0;
+    margin: 0 24px;
+  }
+
+  &[type='text'].input-field {
+    border-bottom: 1px solid rgba(0,0,0,0.15);
+    margin-left: 10px;
   }
 }
 

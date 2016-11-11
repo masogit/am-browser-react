@@ -52,7 +52,7 @@ module.exports = function (app) {
 
   apiProxy.on('proxyRes', function (proxyRes, req, res) {
     logger.debug(`[proxy] [${req.sessionID}] [response] ${req.method} ${req.originalUrl} ${proxyRes.statusCode} ${proxyRes.statusMessage}`);
-    if(proxyRes.statusCode == 401) {
+    if (proxyRes.statusCode == 401) {
       proxyRes.statusCode = 500;
     }
   });
@@ -116,7 +116,7 @@ module.exports = function (app) {
       if (req.headers['x-api-version']) {
         res.sendStatus(401); // if the request is from rest, won't send file
       } else {
-        res.status(401).sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));
+        res.redirect(config.node_base);
       }
     } else {
       req.session.expires = new Date(Date.now() + session_max_age * 60 * 1000);
@@ -161,22 +161,22 @@ module.exports = function (app) {
   // Proxy the backend rest service /rs/db -> /am/db
   app.use('/am/db', function (req, res) {
     // TODO: need to take care of https
-    apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}${config.version}/db`});
+    apiProxy.web(req, res, { target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}${config.version}/db` });
   });
 
   app.use('/am/aql', function (req, res) {
     // TODO: need to take care of https
-    apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}/aql`});
+    apiProxy.web(req, res, { target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}/aql` });
   });
 
   app.use('/am/schema', function (req, res) {
     // TODO: need to take care of https
-    apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}${config.version}/schema`});
+    apiProxy.web(req, res, { target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}${config.version}/schema` });
   });
 
   // get ucmdb point data
   app.use('/am/ucmdbPoint/', isAuthenticated, function (req, res) {
-    apiProxy.web(req, res, {target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}/integration/ucmdbAdapter/points`});
+    apiProxy.web(req, res, { target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}/integration/ucmdbAdapter/points` });
   });
 
   /**
@@ -202,7 +202,14 @@ module.exports = function (app) {
     });
   });
 
-  app.get('/live-network', function(req, res) {
+  app.get('/live-network', function (req, res) {
     rest.live_net_work(req, res);
+  });
+
+  app.get('/*', function (req, res) {
+    if (enable_csrf) {
+      res.cookie('csrf-token', req.csrfToken());
+    }
+    res.redirect(config.node_base);
   });
 };

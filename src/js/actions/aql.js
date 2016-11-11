@@ -19,8 +19,9 @@ export function saveWall(wall) {
   });
 }
 
-export function loadWalls() {
-  return Rest.get(INSIGHT_DEF_URL).then((res) => {
+export function loadWalls(user) {
+  var filter = JSON.stringify({"$or": [{ user }, {"tabs.public": {"$eq": true}}]});
+  return Rest.get(INSIGHT_DEF_URL + '?filter=' + filter).then((res) => {
     return res.body;
   }, (err) => {
     console.log(err.response ? err.response.text : err);
