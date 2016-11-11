@@ -5,12 +5,27 @@ import React, {Component} from 'react';
 import {Box, Header, FormField, Form, CheckBox, SVGIcon, Icons,
   Title, Button, Footer, NumberInput, List, ListItem, Label} from 'grommet';
 import {init_style, getPreviewStyle} from '../../util/pdfGenerator';
+import AlertForm from '../commons/AlertForm';
 
 const Brush = (props) => (
   <SVGIcon viewBox="0 0 24 24" {...props}>
     <path fill="none" stroke="#000000" strokeWidth="2" d="M13,9 L20.5,2 C20.5,2 21.125,2.125 21.5,2.5 C21.875,2.875 22,3.5 22,3.5 L15,11 L13,9 Z M14,14 L10,10 M1.70033383,20.1053387 C1.70033383,20.1053387 3.79489719,20.0776099 5.25566729,20.060253 C6.71643739,20.0428962 8.23797002,20.0142636 10.2253759,19.9972314 C12.2127817,19.9801992 14.4826673,16.0267479 11.414668,13.0099775 C8.34666868,9.99320721 6.34639355,12.0876248 5.34441315,13.062 C2.38723495,15.9377059 1.70033383,20.1053387 1.70033383,20.1053387 Z"/>
   </SVGIcon>
 );
+
+const NumberInputField = ({state, label, name, updateValue, min, max, step = 1}) => {
+  //https://gist.github.com/Candy374/80bf411ff286f6785eb80a9098f01c39
+  return (
+    <FormField label={
+          <Box justify='between' direction='row'>
+            <Label margin='none'>{label}</Label>
+          </Box>}>
+      <NumberInput className='number-input-label' name={name} type="range" min={min} max={max} step={step} value={state[name]} onChange={updateValue}/>
+      <input name={name} type="range" min={min} max={max} step={step} value={state[name]} onChange={updateValue}/>
+    </FormField>
+  );
+};
+
 
 class MarginDesigner extends Component {
   componentWillMount() {
@@ -60,6 +75,7 @@ class StyleDesigner extends Component {
     this.updateValue = this.updateValue.bind(this);
     this.initStyle = this.initStyle.bind(this);
     this.initStyle();
+    this.styles = _.cloneDeep(this.state.styles);
   }
 
   componentWillUnmount() {
@@ -92,21 +108,6 @@ class StyleDesigner extends Component {
     this.setState(this.state);
   }
 
-  renderNumberInput(label, name, min, max, step = 1) {
-    let value = this.state.styleObj[name];
-
-    //https://gist.github.com/Candy374/80bf411ff286f6785eb80a9098f01c39
-    return (
-      <FormField label={
-          <Box justify='between' direction='row'>
-            <Label margin='none'>{label}</Label>
-          </Box>}>
-        <NumberInput className='number-input-label' name={name} type="range" min={min} max={max} step={step} value={value} onChange={this.updateValue}/>
-        <input name={name} type="range" min={min} max={max} step={step} value={value} onChange={this.updateValue}/>
-      </FormField>
-    );
-  }
-
   renderSidebar(styles = this.state.styles) {
     return (
       <Box className='style-designer-sidebar'>
@@ -131,8 +132,8 @@ class StyleDesigner extends Component {
     );
   }
 
-  isChanged(origin, now) {
-
+  isChanged(name, now) {
+    return _.isEqual(this.styles[name], now);
   }
 
   _onSave(styleObj) {
@@ -145,6 +146,10 @@ class StyleDesigner extends Component {
   _onDelete(styleObj) {
     delete this.state.styles[styleObj.name];
     this.initStyle();
+  }
+
+  renderNumberInput(props) {
+    return <NumberInputField state={this.state.styleObj} {...props} updateValue={this.updateValue}/>;
   }
 
   render() {
@@ -176,7 +181,7 @@ class StyleDesigner extends Component {
                             onChange={this.updateValue}/>
                 </Box>
               </FormField>
-              {this.renderNumberInput('Font Size', 'fontSize', 10, 64)}
+              {this.renderNumberInput({label: 'Font Size', name: 'fontSize', min: 10, max: 64})}
             </Form>
 
             <Footer justify='between' pad='medium' flex={false}>
@@ -189,9 +194,16 @@ class StyleDesigner extends Component {
             </Footer>
           </Box>
         </Box>
+        {this.state.alert &&
+          <AlertForm onClose={() => this.setState({alert: false})}
+            title='Leave Style Designer'
+            desc='Do you want to leave without save your modifications?'
+            onConfirm={() => this.props.onConfirm(this.styles)}/>
+        }
       </Box>
     );
   }
 }
 
-export {Brush, MarginDesigner, StyleDesigner};
+export {Brush, MarginDesigner, StyleDesigner, NumberInputField};
+

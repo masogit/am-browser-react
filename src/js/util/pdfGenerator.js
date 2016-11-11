@@ -154,6 +154,70 @@ const getPreviewStyle = (style = null, ignoreMargin = false) => {
   return previewStyle;
 };
 
+const updateValue = (event, {state, callback, val = event.target.value, name = event.target.name, type = event.target.type}) => {
+  if (type == 'range' || type == 'number') {
+    val = parseInt(val);
+  } else if (type == 'checkbox') {
+    val = event.target.checked;
+  }
+
+  if (name.indexOf('.') > -1) {
+    const nameParts = name.split('.');
+    nameParts.reduce((state, key, index) => {
+      if (index == nameParts.length - 1) {
+        state[key] = val;
+      }
+      return state[key];
+    }, state);
+  } else {
+    state[name] = val;
+  }
+
+  if (typeof callback == 'function') {
+    callback();
+  }
+};
+
+const getPdfLine = (label, {text='', style=''}) => {
+  let result = analyzeTitle(text, label);
+
+  const date = (new Date()).toLocaleDateString();
+  result = analyzeDate(result, date);
+  return {
+    text: result, style
+  };
+};
+
+const setTextLine = (target, source, label) => {
+  const textObj = getPdfLine(label, source);
+  target.text = textObj.text;
+  target.style = textObj.style;
+};
+
+const translateText = (pdfDefinition, {settings, records, fields_state, body}) => {
+  const {fields: fields_props = [], label = ''} = body;
+  const fieldsName = fields_state.filter(field => field.selected).map(field => field.sqlname);
+
+  const content = [];
+
+  content.push(getPdfLine(label, settings.reportHead));
+  content.push(getPdfLine(label, settings.reportDesc));
+  content.push(analyzeRecordList(fieldsName, fields_props, records, settings.contents));
+  pdfDefinition.content = content;
+
+  setTextLine(pdfDefinition.header.columns[0], settings.pageHeader.left, label);
+  setTextLine(pdfDefinition.header.columns[1], settings.pageHeader.center, label);
+  setTextLine(pdfDefinition.header.columns[2], settings.pageHeader.right, label);
+
+  setTextLine(pdfDefinition.footer.columns[0], settings.pageFooter.left, label);
+  setTextLine(pdfDefinition.footer.columns[1], settings.pageFooter.center, label);
+  setTextLine(pdfDefinition.footer.columns[2], settings.pageFooter.right, label);
+
+  pdfDefinition.pageOrientation = settings.pageOrientation;
+  pdfDefinition.styles = settings.styles;
+  return pdfDefinition;
+};
+
 export {
   MODE,
   init_style,
@@ -161,7 +225,7 @@ export {
   styles,
   defaultPDFDefinition,
   analyzeRecordList,
-  analyzeTitle,
-  analyzeDate,
-  getPreviewStyle
+  getPreviewStyle,
+  updateValue,
+  translateText
 };

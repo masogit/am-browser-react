@@ -1,13 +1,23 @@
-import React, {Component} from 'react';
-import {Box, Header, Icons, Anchor, Menu, FormField, Form, CheckBox,
-  RadioButton, Layer} from 'grommet';
+import React, {Component, PropTypes} from 'react';
+import {Box, Header, Icons, Anchor, Menu as GMenu, FormField, Form, CheckBox, Paragraph, Title, Button,
+  RadioButton, Layer, Footer} from 'grommet';
 const {Download, Close, Play: Preview, Code} = Icons.Base;
 import {getDisplayLabel} from '../../util/RecordFormat';
 import * as ExplorerActions from '../../actions/explorer';
 import { cloneDeep } from 'lodash';
-import { MODE, init_style, table_style, styles, defaultPDFDefinition, analyzeRecordList,
-  analyzeTitle, analyzeDate, getPreviewStyle } from '../../util/pdfGenerator';
-import {Brush, StyleDesigner} from './PDFWidgets';
+import { MODE, init_style, table_style, styles, defaultPDFDefinition,
+  getPreviewStyle, updateValue, translateText } from '../../util/pdfGenerator';
+import {Brush, StyleDesigner, NumberInputField} from './PDFWidgets';
+
+class Menu extends GMenu {
+  render() {
+    return super.render();
+  }
+}
+
+Menu.propTypes = {
+  label: PropTypes.oneOfType([PropTypes.object, PropTypes.string])
+};
 
 export default class PDFGenerator extends Component {
   componentWillMount() {
@@ -45,32 +55,28 @@ export default class PDFGenerator extends Component {
         }
       },
       new_style: {},
-      showLayer: null
+      showLayer: null,
+      recordsStart: 1,
+      limit: 100,
+      showExportLayer: false,
+      total: 0
     };
     this.updatePDFSettings = this.updatePDFSettings.bind(this);
     this.updateCode = this.updateCode.bind(this);
+    this.updateValue = this.updateValue.bind(this);
     this.preview = this.preview.bind(this);
-    this.dataReady = this.dataReady.bind(this);
   }
 
   componentDidMount() {
     this.preview();
+
     ExplorerActions.loadRecordsByBody(this.props.body).then((data) => {
-      this.setState({ records: data.entities }, this.preview);
+      this.setState({ records: data.entities, total: data.count }, this.preview);
     });
   }
 
-  dataReady(loading = this.state.loading) {
-    return true;
-    if (loading) {
-      return false;
-    }
-
-    //return this.state.fields.filter(field => field.selected).length > 0;
-  };
-
   autoPreview() {
-    if (this.dataReady(false)) {
+    if (!this.state.loading) {
       this.setState({ loading: true });
       if (this.previewTimer) {
         clearTimeout(this.previewTimer);
@@ -95,69 +101,23 @@ export default class PDFGenerator extends Component {
     this.setState(this.state, this.autoPreview);
   }
 
+  updateValue(event, props = {}) {
+    const {val = event.target.value, name = event.target.name, state = this.state, callback = ()=> this.setState(this.state)} = props;
+    updateValue(event, {val, name, state, callback });
+  }
+
   updatePDFSettings(event, val = event.target.value, name = event.target.name) {
-    if (name.indexOf('.') > -1) {
-      const nameParts = name.split('.');
-      nameParts.reduce((pdfSettings, key, index) => {
-        if (index == nameParts.length - 1) {
-          if (event.target.type == 'textarea') {
-            try {
-              pdfSettings[key] = JSON.parse('{' + val + '}');
-            } catch (e) {
-              pdfSettings[key].error = e.message;
-              pdfSettings[key] = val;
-            }
-          } else {
-            pdfSettings[key] = val;
-          }
-        }
-        return pdfSettings[key];
-      }, this.state.pdfSettings);
-    } else {
-      this.state.pdfSettings[name] = val;
-    }
-
-    this.setState(this.state, this.autoPreview);
+    this.updateValue(event, {
+      val, name, state: this.state.pdfSettings,
+      callback: () => this.setState(this.state, this.autoPreview)
+    });
   }
 
-  getPdfLine({text='', style=''}) {
-    let result = analyzeTitle(text, this.props.body.label);
+  translateText(pdfDefinition, records = this.state.records) {
+    const settings = this.state.pdfSettings,
+      body = this.props.body, fields_state= this.state.fields;
 
-    const date = (new Date()).toLocaleDateString();
-    result = analyzeDate(result, date);
-    return {
-      text: result, style
-    };
-  }
-
-  setTextLine(target, source) {
-    const textObj = this.getPdfLine(source);
-    target.text = textObj.text;
-    target.style = textObj.style;
-  }
-
-  translateText(pdfDefinition) {
-    const settings = this.state.pdfSettings;
-    const fieldsName = this.state.fields.filter(field => field.selected).map(field => field.sqlname);
-
-    const content = [];
-
-    content.push(this.getPdfLine(settings.reportHead));
-    content.push(this.getPdfLine(settings.reportDesc));
-    content.push(analyzeRecordList(fieldsName, this.props.body.fields, this.state.records, settings.contents));
-    pdfDefinition.content = content;
-
-    this.setTextLine(pdfDefinition.header.columns[0], settings.pageHeader.left);
-    this.setTextLine(pdfDefinition.header.columns[1], settings.pageHeader.center);
-    this.setTextLine(pdfDefinition.header.columns[2], settings.pageHeader.right);
-
-    this.setTextLine(pdfDefinition.footer.columns[0], settings.pageFooter.left);
-    this.setTextLine(pdfDefinition.footer.columns[1], settings.pageFooter.center);
-    this.setTextLine(pdfDefinition.footer.columns[2], settings.pageFooter.right);
-
-    pdfDefinition.pageOrientation = settings.pageOrientation;
-    pdfDefinition.styles = settings.styles;
-    return pdfDefinition;
+    return translateText(pdfDefinition, {settings, records, body, fields_state});
   }
 
   preview() {
@@ -185,16 +145,12 @@ export default class PDFGenerator extends Component {
 
   }
 
-  download(name = this.state.headLabel) {
+  download(name = this.props.body.label) {
     this.setState({ downloading: true });
     const body = this.props.body;
 
-    body.param = {
-      offset: this.state.recordsStart - 1,
-      limit: this.state.limit
-    };
     ExplorerActions.loadRecordsByBody(body).then((data) => {
-      const dd = recordsToPdfDoc_barcode(this.state.fields, data.entities, name, this.state);
+      const dd = this.translateText(this.state.pdfDefinition, data.entities);
       if (dd) {
         pdfMake.createPdf(dd).download(name + '.pdf');
         this.setState({ downloading: false });
@@ -236,31 +192,6 @@ export default class PDFGenerator extends Component {
     return result;
   }
 
-  renderFields() {
-    const fields = this.state.fields;
-    let error;
-    if (!this.dataReady(false)) {
-      error = 'No Field Selected';
-    }
-
-    return (
-      <FormField label="Choose Fields" error={error}>
-        <Box pad={{horizontal: 'medium'}}>{
-          fields.map((field, index) => (
-            <Box margin={{top: 'small'}} key={index}>
-              <CheckBox checked={!!field.selected} label={getDisplayLabel(field)}
-                        onChange={() => {
-                          field.selected = !field.selected;
-                          this.setState({fields}, this.autoPreview);
-                        }}/>
-            </Box>
-          ))
-        }
-        </Box>
-      </FormField>
-    );
-  }
-
   returnStyleField({label, name, value, styles = this.state.pdfSettings.styles, data = Object.keys(styles), noInput=false}) {
     const styleName = noInput ? name : name + '.style';
     const styleValue = noInput ? value : value.style;
@@ -270,7 +201,7 @@ export default class PDFGenerator extends Component {
           <Box justify='between' direction='row'>
             <span>{label}</span>
             <Menu size='small' label={<span style={getPreviewStyle(styles[styleValue])}>{styleValue}</span>} dropAlign={{top: 'top', right: 'right'}}>
-             {data.map(s => <Anchor onClick={(event) => this.updatePDFSettings(event, s, styleName)}>
+             {data.map((s, index) => <Anchor key={index} onClick={(event) => this.updatePDFSettings(event, s, styleName)}>
               <span style={getPreviewStyle(styles[s])}>{s}</span>
               </Anchor>)}
             </Menu>
@@ -304,9 +235,6 @@ export default class PDFGenerator extends Component {
         new_style: Object.assign({}, init_style),
         pdfSettings: this.state.pdfSettings
       };
-      //const onClose = () => {
-      //
-      //};
 
       return (
         <Layer closer={true} onClose={() => this.setState(closeState, this.autoPreview)}>
@@ -320,8 +248,63 @@ export default class PDFGenerator extends Component {
     }
   }
 
+  renderNumberInput(props) {
+    return <NumberInputField state={this.state} updateValue={(event)=>this.updateValue(event)} {...props}/>;
+  }
+
+  renderExportLayer() {
+    const {recordsStart, limit, showExportLayer, total} = this.state;
+    if (showExportLayer) {
+      const getRecordNumber = () => {
+        if (recordsStart + limit > total) {
+          return total - recordsStart;
+        } else {
+          return limit;
+        }
+      };
+
+      return (
+        <Layer closer={true} onClose={() => this.setState({showExportLayer: false})}>
+          <Box flex={true} size='large'>
+            <Header><Title>Choose records to export</Title></Header>
+
+            <Form className='no-border strong-label'>
+              {this.renderNumberInput({
+                label: 'How many records do you want to export?',
+                name: 'limit',
+                min: 100,
+                max: 1000,
+                step: 100
+              })}
+              {this.renderNumberInput({
+                label: 'From which record do you want to export?',
+                name: 'recordsStart',
+                min: 1,
+                max: total - 1
+              })}
+            </Form>
+
+            <Box pad={{horizontal: 'medium'}}>
+              <Paragraph size='small'>{'You have '}<strong>{total}</strong>{' records in total.'}</Paragraph>
+              <Paragraph
+                size='small'>{`You will export records `}<strong>{`${recordsStart} ~ ${getRecordNumber() + recordsStart - 1}`}</strong></Paragraph>
+            </Box>
+
+            <Footer justify='end' pad={{vertical: 'medium'}}>
+              <Button label={`Export ${getRecordNumber()} records`} primary={true} strong={true} onClick={() => {
+                this.download();
+                this.setState({showExportLayer: false});
+              }}/>
+            </Footer>
+          </Box>
+        </Layer>
+      );
+    }
+  }
+
+
   render() {
-    const {mode, pdfDefinition, error, pdfSettings} = this.state;
+    const {mode, pdfDefinition, error, pdfSettings, loading} = this.state;
 
     return (
       <Box pad='small' flex={true}>
@@ -330,8 +313,9 @@ export default class PDFGenerator extends Component {
           <Menu direction="row" align="center" responsive={true}>
             <Anchor icon={<Code />} onClick={() => this.setState({ mode: mode == MODE.CODE ? MODE.DESIGN : MODE.CODE })} label={mode}/>
             <Anchor icon={<Brush />} onClick={() => this.setState({showLayer: 'new_style'})} label="Style Designer"/>
-            <Anchor icon={<Preview/>} onClick={this.preview} label='Preview'/>
-            <Anchor icon={<Download />} onClick={() => this.setState({ showExportLayer: true })} label='Export'/>
+            <Anchor icon={<Preview/>} disabled={loading} onClick={loading ? null : this.preview} label='Preview'/>
+            <Anchor icon={<Download />} disabled={loading} onClick={() => !loading && this.setState({showExportLayer: true})} label='Export'/>
+
             <Anchor label='Back' icon={<Close/>} onClick={() => this.props.back()}/>
           </Menu>
         </Header>
@@ -356,7 +340,6 @@ export default class PDFGenerator extends Component {
                     {this.returnTableStyleField(pdfSettings.contents)}
                   </Box>
                 </FormField>
-                {/*this.renderFields()*/}
                 <FormField label='Page Footer'>
                   <Box direction='row' pad='small'>
                     {this.returnStyleField({label: 'Left', name:"pageFooter.left", value:pdfSettings.pageFooter.left})}
@@ -377,8 +360,12 @@ export default class PDFGenerator extends Component {
           <div style={{ width: '50vw' }} id='pdfContainer' />
         </Box>
         {this.renderStyleLayer()}
+        {this.renderExportLayer()}
       </Box>
     );
   }
 }
 
+PDFGenerator.propTyps = {
+  body: PropTypes.object.required
+};
