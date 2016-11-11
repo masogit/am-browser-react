@@ -614,8 +614,10 @@ export default class Insight extends ComponentBase {
                           onClick={this._onPublicTab.bind(this, this.state.tabs[this.state.focusIndex])}/> }
                 </Menu>
               }
-              <CheckBox id="edit" label="Edit" checked={edit} onChange={this._toggleEdit.bind(this)}
-                        disabled={this.state.showPublic} toggle={true}/>
+              {
+                !this.state.showPublic &&
+                <CheckBox id="edit" label="Edit" checked={edit} onChange={this._toggleEdit.bind(this)} toggle={true}/>
+              }
             </Menu>
           }
           {
