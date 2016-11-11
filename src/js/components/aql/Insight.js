@@ -30,7 +30,7 @@ export default class Insight extends ComponentBase {
       }
     }];
     this.state = {
-      showPublic: false,
+      showPublic: true,
       publicTabs: [],
       focusTab: tabs[0],
       focusIndex: 0,
