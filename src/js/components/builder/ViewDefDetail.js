@@ -3,7 +3,7 @@ import ComponentBase from '../commons/ComponentBase';
 import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Split, Map, Icons} from 'grommet';
 const {Close, LinkUp: Up, LinkDown: Down, Ascend, Descend, Play, Checkmark, Duplicate, Download,
   CaretPrevious, More, Mail} = Icons.Base;
-import {isEmpty, startsWith} from 'lodash';
+import {isEmpty} from 'lodash';
 import AlertForm from '../../components/commons/AlertForm';
 import EditLayer from '../../components/commons/EditLayer';
 import ContentPlaceHolder from '../../components/commons/ContentPlaceHolder';
@@ -92,11 +92,34 @@ export default class ViewDefDetail extends ComponentBase {
     this.props.onValueChange(event.target.name.substring(2), event.suggestion);
   }
 
-  _onTripleStateChange(event, value) {
-    let path = event.currentTarget.name;
-    this.props.onValueChange(path.substring(2), value);
+  _posOrderBy(orderby, field) {
+    let fields = orderby.split(',');
+    let seq = fields.indexOf(field + ' desc') > -1 ? fields.indexOf(field + ' desc') : fields.indexOf(field);
+    if (orderby &&  seq> -1)
+      return seq + 1;
   }
 
+  _onTripleStateChange(event, value, orderby) {
+    let path = event.currentTarget.name;
+    let fields = orderby.split(',');
+    let pos = (fields.indexOf(value + ' desc') > -1) ? fields.indexOf(value + ' desc') : fields.indexOf(value);
+
+    if (!_.isEmpty(orderby) && value.indexOf('desc') > -1) {
+      pos = _.indexOf(fields, value.substring(0, value.indexOf(' desc')));
+      fields.push(value);
+    }
+    if (pos > -1)
+      fields.splice(pos, 1);
+    else
+      fields.push(value);
+
+    this.props.onValueChange(path.substring(2), fields.filter(field => !(field == '')).join(','));
+  }
+
+  _onDefaultStateChange(event, value, orderby, field) {
+    if (_.isEmpty(value))
+      this._onTripleStateChange(event, field, orderby);
+  }
   openAlert(type) {
     this.setState({
       alertForm: type
@@ -170,6 +193,7 @@ export default class ViewDefDetail extends ComponentBase {
   renderTemplateTable(selectedView, root, path, key) {
     let currentPath = root ? "" : path + ".";
     let selfView = selectedView;
+    let orderbyArray = selfView.body.orderby.split(',');
     // map, then filter out null elements, the index is correct; filter out PK fields, then map, the index is wrong.
     return selfView.body.fields.map((field, index) => {
       let fieldName = field.sqlname;
@@ -235,34 +259,36 @@ export default class ViewDefDetail extends ComponentBase {
                         }}/>
           </td>
           <td>
-            {(!selfView.body.orderby || selfView.body.orderby.trim() == "" || !startsWith(selfView.body.orderby, field.sqlname)) &&
-            <CheckBox id={`v.${currentPath}body.orderby`} name={`v.${currentPath}body.orderby`}
+            {(!selfView.body.orderby || _.indexOf(selfView.body.orderby, [""]) > -1 || !_.includes(orderbyArray, field.sqlname)) && !_.includes(orderbyArray, `${field.sqlname} desc`) && !_.includes(orderbyArray, field.sqlname) &&
+              <CheckBox id={`v.${currentPath}body.orderby`} name={`v.${currentPath}body.orderby`}
                       value={field.sqlname}
-                      checked={!!selfView.body.orderby && startsWith(selfView.body.orderby, field.sqlname)}
-                      disabled={!!selfView.body.orderby && !startsWith(selfView.body.orderby, field.sqlname)}
+                      checked={!!selfView.body.orderby && _.includes(orderbyArray, field.sqlname)}
+                      disabled={!_.isEmpty(selfView.body.orderby) && orderbyArray.length >= 3}
                       onChange={
                         (event) => {
-                          this._onTripleStateChange(event, field.sqlname);
+                          this._onTripleStateChange(event, field.sqlname, selfView.body.orderby);
                         }}/>
             }
-            {selfView.body.orderby && selfView.body.orderby == field.sqlname &&
+            {selfView.body.orderby && _.includes(orderbyArray, field.sqlname) &&
+              !_.includes(orderbyArray,`${field.sqlname} desc`) &&
             <a name={`v.${currentPath}body.orderby`}
                onClick={
                         (event) => {
-                          this._onTripleStateChange(event, `${field.sqlname} desc`);
+                          this._onTripleStateChange(event, `${field.sqlname} desc`, selfView.body.orderby);
                         }}>
               <Ascend size="small"/>
             </a>
             }
-            {selfView.body.orderby && selfView.body.orderby == `${field.sqlname} desc` &&
+            {selfView.body.orderby && _.includes(orderbyArray, `${field.sqlname} desc`) &&
             <a name={`v.${currentPath}body.orderby`}
                onClick={
                         (event) => {
-                          this._onTripleStateChange(event, "");
+                          this._onDefaultStateChange(event, "", selfView.body.orderby, field.sqlname);
                         }}>
               <Descend size="small"/>
             </a>
             }
+            {this._posOrderBy(selfView.body.orderby, field.sqlname)}
           </td>
           <td>
             <a id={`${currentPath}body.fields.${index}.del`} name={`${currentPath}body.fields.${index}`}

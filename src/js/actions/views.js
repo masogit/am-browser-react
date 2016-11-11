@@ -134,8 +134,11 @@ export function deleteTableRow(selectedView, path) {
     let groupBy = objectPath.get(clonedView, groupByPath);
     let sum = objectPath.get(clonedView, sumPath);
     let field = objectPath.get(clonedView, path);
-    if(field.sqlname == orderBy) {
-      objectPath.del(clonedView, orderByPath);
+    let orderByArray = orderBy.split(',');
+    let pos = _.includes(orderByArray, (field.sqlname + ' desc')) ? orderByArray.indexOf(field.sqlname + ' desc') : orderByArray.indexOf(field.sqlname);
+    if(pos > -1) {
+      orderByArray.splice(pos, 1);
+      clonedView.body.orderby = orderByArray.join(',');
     }
     if(field.sqlname == groupBy) {
       objectPath.del(clonedView, groupByPath);
@@ -280,4 +283,3 @@ export function loadTemplateTable(selectedViewId, selectedView) {
     //});
   };
 }
-
