@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react';
 import ComponentBase from '../commons/ComponentBase';
 import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Split, Map, Icons} from 'grommet';
 const {Close, LinkUp: Up, LinkDown: Down, Ascend, Descend, Play, Checkmark, Duplicate, Download,
-  CaretPrevious, More, Mail} = Icons.Base;
+  CaretPrevious, More, Mail, DocumentPdf} = Icons.Base;
 import {isEmpty} from 'lodash';
 import AlertForm from '../../components/commons/AlertForm';
 import EditLayer from '../../components/commons/EditLayer';
@@ -93,7 +93,7 @@ export default class ViewDefDetail extends ComponentBase {
   }
 
   _posOrderBy(orderby, field) {
-    let fields = orderby.split(',');
+    let fields = orderby ? orderby.split(',') : [];
     let seq = fields.indexOf(field + ' desc') > -1 ? fields.indexOf(field + ' desc') : fields.indexOf(field);
     if (orderby &&  seq> -1)
       return seq + 1;
@@ -193,7 +193,7 @@ export default class ViewDefDetail extends ComponentBase {
   renderTemplateTable(selectedView, root, path, key) {
     let currentPath = root ? "" : path + ".";
     let selfView = selectedView;
-    let orderbyArray = selfView.body.orderby.split(',');
+    let orderbyArray = selfView.body.orderby ? selfView.body.orderby.split(',') : [];
     // map, then filter out null elements, the index is correct; filter out PK fields, then map, the index is wrong.
     return selfView.body.fields.map((field, index) => {
       let fieldName = field.sqlname;
@@ -444,7 +444,7 @@ export default class ViewDefDetail extends ComponentBase {
           <Box>View Builder</Box>
           <Menu direction="row" align="center" responsive={true}>
             {renderAnchor({icon: <Play />, onClick: openPreview, label: 'Query', enable: table})}
-            {renderAnchor({icon: <Play />, onClick: this.printPdf, args: {body: selectedView.body}, label: 'PDF Generator', enable: table})}
+            {renderAnchor({icon: <DocumentPdf />, onClick: this.printPdf, args: {body: selectedView.body}, label: 'PDF Generator', enable: table})}
             {renderAnchor({icon: <Checkmark />, onClick: this.openAlert, args: 'save', label: 'Save', enable: selectedView.name && selectedView.category})}
             {renderAnchor({icon: <Close />, onClick: this.openAlert, args: 'delete', label: 'Delete', enable: selectedView._id})}
             <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }}>
