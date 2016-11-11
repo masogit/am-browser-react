@@ -560,29 +560,8 @@ export default class Insight extends ComponentBase {
     this.setState(this.state);
   }
 
-  _onPublic(targetTab) {
-    var isPublic = targetTab.public;
-    var alert = (<AlertForm onClose={this._closeAlert.bind(this)}
-                            title={'Confirmation for tab public'}
-                            desc={`${isPublic?'Cancel to public this tab':'Public this tab'}: ${targetTab.name}?`}
-                            onConfirm={this._onPublicTab.bind(this, targetTab)}/>);
-    this.setState({
-      alert: alert
-    });
-  }
-
   _onPublicTab(targetTab) {
     targetTab.public = !targetTab.public;
-    // let focusIndex = -1;
-    let tabs = this.state.tabs;
-    tabs.forEach((tab, index) => {
-      if (tab.name == targetTab.name) {
-        tab = targetTab;
-        return;
-      }
-    });
-    this.state.focusTab = targetTab;
-    this.state.tabs = tabs;
     this.setState(this.state);
   }
 
@@ -632,7 +611,7 @@ export default class Insight extends ComponentBase {
                   <Anchor icon={<Add />} onClick={this._addTab.bind(this)} label="Add Tab"/>
                   <Anchor icon={<Close />} onClick={() => this.state.tabs.length > 1 && this._onRemove(this.state.focusTab)} label="Delete Tab" disabled={this.state.tabs.length <= 1}/>
                   { this.checkAdmin() && <Anchor icon={<Group colorIndex={this.state.tabs[this.state.focusIndex].public ? '' : 'grey-4'} />} label="Public"
-                          onClick={this._onPublic.bind(this, this.state.tabs[this.state.focusIndex])}/> }
+                          onClick={this._onPublicTab.bind(this, this.state.tabs[this.state.focusIndex])}/> }
                 </Menu>
               }
               <CheckBox id="edit" label="Edit" checked={edit} onChange={this._toggleEdit.bind(this)}
