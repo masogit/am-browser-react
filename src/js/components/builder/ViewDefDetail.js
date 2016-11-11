@@ -378,18 +378,14 @@ export default class ViewDefDetail extends ComponentBase {
     const {selectedView, openPreview, categories, onSubmit, compact} = this.props;
 
     if (isEmpty(selectedView)) {
+      toggleSidebar(true);
       return <ContentPlaceHolder/>;
     }
 
     const {layer, alertForm, pdfGenerator} = this.state;
 
     if (pdfGenerator) {
-      return (
-        <PDFGenerator {...pdfGenerator} back={() => {
-          this.setState({pdfGenerator: null});
-          toggleSidebar(true);
-        }}/>
-      );
+      return <PDFGenerator {...pdfGenerator} back={() => this.setState({pdfGenerator: null})}/>;
     }
 
     let table;
