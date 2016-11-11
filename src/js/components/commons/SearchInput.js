@@ -77,7 +77,7 @@ export class LongSearchInput extends Component {
       <Header justify="between" direction={dir} full='horizontal' align='center'>
         <Box tag={tag} style={{marginBottom: marginBottom, marginRight: marginRight}}>{title || 'Global Record Search'}</Box>
         <Box flex={flex} direction='row'>
-          <input type="search" className="flex shadow" placeholder="Global Record search..." ref="input" size='120'
+          <input type="search" className="flex shadow" ref="input" size='120'
                  onKeyDown={this._onEnter.bind(this)} maxLength={50}/>
           <Box colorIndex='brand' pad={{vertical: 'small', horizontal: 'medium'}} className='button'
                onClick={()=>onSearch(this.refs.input.value.trim())}>
