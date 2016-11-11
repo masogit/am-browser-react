@@ -4,7 +4,7 @@ import {Box, Header, Icons, Anchor, Menu as GMenu, FormField, Form,
 const {Download, Close, Play: Preview, Code} = Icons.Base;
 import {loadRecordsByBody} from '../../actions/explorer';
 import { cloneDeep } from 'lodash';
-import { MODE, init_style, table_style, styles, defaultPDFDefinition,
+import { MODE, init_style, table_style, styles, defaultPDFDefinition, preview,
   getPreviewStyle, updateValue, translateText, format, download } from '../../util/pdfGenerator';
 import {Brush, StyleDesigner, ExportLayer} from './../commons/PDFWidgets';
 
@@ -63,14 +63,14 @@ export default class PDFGenerator extends Component {
     this.updatePDFSettings = this.updatePDFSettings.bind(this);
     this.updateCode = this.updateCode.bind(this);
     this._updateValue = this._updateValue.bind(this);
-    this.preview = this.preview.bind(this);
+    this._preview = this._preview.bind(this);
   }
 
   componentDidMount() {
-    this.preview();
+    this._preview();
 
     loadRecordsByBody(this.props.body).then((data) => {
-      this.setState({ records: data.entities, total: data.count }, this.preview);
+      this.setState({ records: data.entities, total: data.count }, this._preview);
     });
   }
 
@@ -80,7 +80,7 @@ export default class PDFGenerator extends Component {
       if (this.previewTimer) {
         clearTimeout(this.previewTimer);
       }
-      this.previewTimer = setTimeout(this.preview, 2000);
+      this.previewTimer = setTimeout(this._preview, 2000);
     }
   }
 
@@ -119,29 +119,13 @@ export default class PDFGenerator extends Component {
     return translateText(pdfDefinition, {settings, records, body, fields_state});
   }
 
-  preview() {
+  _preview() {
     let pdfDefinition = this.state.pdfDefinition;
     if (this.state.mode != MODE.CODE) {
       pdfDefinition = this._translateText(pdfDefinition);
     }
 
-    pdfMake.createPdf(cloneDeep(pdfDefinition)).getDataUrl((outDoc) => {
-      const lastPDF = document.getElementById('pdfV');
-      if (lastPDF) {
-        lastPDF.remove();
-      }
-
-      const pdfContent = document.createElement('embed');
-      pdfContent.id = 'pdfV';
-      pdfContent.width = '100%';
-      pdfContent.height = '100%';
-      pdfContent.src = outDoc;
-
-      document.getElementById('pdfContainer').appendChild(pdfContent);
-
-      this.setState({loading: false});
-    });
-
+    preview(cloneDeep(pdfDefinition), () => this.setState({loading: false}));
   }
 
   _download({recordsStart, limit}) {
@@ -231,7 +215,7 @@ export default class PDFGenerator extends Component {
           <Menu direction="row" align="center" responsive={true}>
             <Anchor icon={<Code />} onClick={() => this.setState({ mode: mode == MODE.CODE ? MODE.DESIGN : MODE.CODE })} label={mode}/>
             <Anchor icon={<Brush />} onClick={() => this.setState({showLayer: 'new_style'})} label="Style Designer"/>
-            <Anchor icon={<Preview/>} disabled={loading} onClick={loading ? null : this.preview} label='Preview'/>
+            <Anchor icon={<Preview/>} disabled={loading} onClick={loading ? null : this._preview} label='Preview'/>
             <Anchor icon={<Download />} disabled={loading} onClick={() => !loading && this.setState({showExportLayer: true})} label='Export'/>
             <Anchor label='Back' icon={<Close/>} onClick={() => this.props.back()}/>
           </Menu>

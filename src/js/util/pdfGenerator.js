@@ -256,17 +256,35 @@ const format = (pdfDefinition) => {
 
 const download = ({onBefore, props, getPDFDefinition, onDone}) => {
   onBefore();
-  const {body, name = body.label, recordsStart, limit} = props;
-  body.param = {
-    offset: recordsStart,
-    limit: limit
-  };
+  const {body, recordsStart: offset, limit, name = body.label} = props;
+  body.param = {offset,limit};
 
   loadRecordsByBody(body).then((data) => {
     const pdfDefinition = getPDFDefinition(data.entities);
     if (pdfDefinition) {
       pdfMake.createPdf(pdfDefinition).download(name + '.pdf');
       onDone();
+    }
+  });
+};
+
+const preview = (pdfDefinition, callBack) => {
+  pdfMake.createPdf(pdfDefinition).getDataUrl((outDoc) => {
+    const lastPDF = document.getElementById('pdfV');
+    if (lastPDF) {
+      lastPDF.remove();
+    }
+
+    const pdfContent = document.createElement('embed');
+    pdfContent.id = 'pdfV';
+    pdfContent.width = '100%';
+    pdfContent.height = '100%';
+    pdfContent.src = outDoc;
+
+    document.getElementById('pdfContainer').appendChild(pdfContent);
+
+    if (typeof callBack == 'function') {
+      callBack();
     }
   });
 };
@@ -282,5 +300,6 @@ export {
   updateValue,
   translateText,
   format,
-  download
+  download,
+  preview
 };

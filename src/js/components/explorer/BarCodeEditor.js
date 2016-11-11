@@ -4,7 +4,7 @@ const {Download, Close, Play: Preview} = Icons.Base;
 import {getDisplayLabel, getFieldStrVal} from '../../util/RecordFormat';
 import JsBarcode from 'jsbarcode';
 import {ExportLayer} from '../commons/PDFWidgets';
-import { updateValue, download } from '../../util/pdfGenerator';
+import { updateValue, download, preview } from '../../util/pdfGenerator';
 
 const barcodeType = [{
   name: 'CODE128',
@@ -177,12 +177,12 @@ export default class RecordList extends Component {
       showExportLayer: false
     };
     this._updateValue = this._updateValue.bind(this);
-    this.preview = this.preview.bind(this);
+    this._preview = this._preview.bind(this);
     this.dataReady = this.dataReady.bind(this);
   }
 
   componentDidMount() {
-    this.preview();
+    this._preview();
   }
 
   dataReady(loading = this.state.loading) {
@@ -200,7 +200,7 @@ export default class RecordList extends Component {
         clearTimeout(this.previewTimer);
       }
 
-      this.previewTimer = setTimeout(this.preview, 2000);
+      this.previewTimer = setTimeout(this._preview, 2000);
     }
   }
 
@@ -254,27 +254,11 @@ export default class RecordList extends Component {
     );
   }
 
-  preview(records = this.props.records.slice(0, this.state.previewCount)) {
+  _preview() {
+    const records = this.props.records.slice(0, this.state.previewCount);
     this.setState({loading: true});
     const dd = recordsToPdfDoc_barcode(this.state.fields, records, this.props.body.label, this.state);
-    if (dd) {
-      pdfMake.createPdf(dd).getDataUrl((outDoc) => {
-        const lastPDF = document.getElementById('pdfV');
-        if (lastPDF) {
-          lastPDF.remove();
-        }
-
-        const pdfContent = document.createElement('embed');
-        pdfContent.id = 'pdfV';
-        pdfContent.width = '100%';
-        pdfContent.height = '100%';
-        pdfContent.src = outDoc;
-
-        document.getElementById('pdfContainer').appendChild(pdfContent);
-
-        this.setState({loading: false});
-      });
-    }
+    preview(dd, () => this.setState({loading: false}));
   }
 
   _download({recordsStart, limit}) {
@@ -341,7 +325,7 @@ export default class RecordList extends Component {
         <Header justify='between'>
           <Box>PDF Generator</Box>
           <Menu direction="row" align="center" responsive={true}>
-            <Anchor icon={<Preview/>} disabled={previewDisabled} onClick={previewDisabled ? null : () => this.preview()} label='Preview'/>
+            <Anchor icon={<Preview/>} disabled={previewDisabled} onClick={previewDisabled ? null : this._preview} label='Preview'/>
             <Anchor icon={<Download />} disabled={downloadDisabled} onClick={downloadDisabled ? null : () => this.setState({showExportLayer: true})} label='Export'/>
             <Anchor label='Back' icon={<Close/>} onClick={() => this.props.back()}/>
           </Menu>
