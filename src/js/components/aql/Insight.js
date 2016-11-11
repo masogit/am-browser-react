@@ -49,7 +49,6 @@ export default class Insight extends ComponentBase {
     this._toggleDirection.bind(this);
     this._attachAQL.bind(this);
     this._toggleShowPublic.bind(this);
-    this._onPublic.bind(this);
   }
 
   componentDidMount() {
