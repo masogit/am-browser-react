@@ -70,22 +70,30 @@ class MarginDesigner extends Component {
 let idIndex = 0;
 class StyleDesigner extends Component {
   componentWillMount() {
+    const styleArray = [];
+    Object.keys(this.props.styles).map(name => {
+      const styleObj = this.props.styles[name];
+      styleObj.tempId = idIndex++;
+      styleArray.push(Object.assign({}, init_style, styleObj, {name}));
+    });
+
     this.state = {
-      styles: this.props.styles
+      styles: styleArray
     };
     this.updateValue = this.updateValue.bind(this);
     this.initStyle = this.initStyle.bind(this);
+    this._onClose = this._onClose.bind(this);
     this.initStyle();
-    this.styles = {};
-    Object.keys(this.state.styles).map(name => {
-      const styleObj = this.state.styles[name];
-      styleObj.tempId = idIndex;
-      this.styles[idIndex++] = Object.assign({}, init_style, styleObj, {name});
-    });
+    this.styles = _.cloneDeep(styleArray);
   }
 
   componentWillUnmount() {
-    this.props.onConfirm(this.state.styles);
+    if (this.state.styles.some(style => this.isChanged(style))) {
+      this.props.setCloseStatus(false);
+      this.setState({alert: true});
+    } else {
+      this._onClose();
+    }
   }
 
   initStyle() {
@@ -118,27 +126,27 @@ class StyleDesigner extends Component {
     return (
       <Box className='style-designer-sidebar'>
         <List >
-          {Object.keys(styles).map((key, index) => {
+          {styles.map((style, index) => {
             const onClick = () => {
               // add default styles
-              const newObj = Object.assign({}, init_style, styles[key]);
+              const newObj = Object.assign({}, init_style, style);
               this.setState({
-                styleObj: Object.assign(styles[key], newObj, {name: key})
+                styleObj: Object.assign(style, newObj, {name: style.name})
               });
             };
 
             const classNames = [];
-            if (styles[key].tempId == this.state.styleObj.tempId) {
+            if (style.tempId == this.state.styleObj.tempId) {
               classNames.push('active');
             }
 
-            if (this.isChanged(this.state.styleObj)) {
+            if (this.isChanged(style)) {
               classNames.push('editing');
             }
 
             return (
               <ListItem onClick={onClick} key={index} className={classNames.join(' ')}>
-                <label style={getPreviewStyle(styles[key], true)}>{key}</label>
+                <label style={getPreviewStyle(style, true)}>{style.name}</label>
               </ListItem>
             );
           })}
@@ -147,30 +155,51 @@ class StyleDesigner extends Component {
     );
   }
 
+  _onClose() {
+    const styles = {};
+    this.styles.map(style => {
+      const key = style.name;
+      delete style.name;
+      delete style.tempId;
+      styles[key] = style;
+    });
+    this.props.onConfirm(styles);
+  }
+
   isChanged(styleObj) {
-    return !_.isEqual(this.styles[styleObj.tempId], styleObj);
+    const origin = this.styles.filter(style => style.tempId == styleObj.tempId)[0];
+    return !_.isEqual(origin, styleObj);
   }
 
   _onSave(styleObj) {
-    const styles = this.state.styles;
-    const keys = Object.keys(styles);
-    for (let i = 0; i < keys.length; i++) {
-      if (styles[keys[i]].tempId == styleObj.tempId) {
-        delete styles[keys[i]];
-        styles[styleObj.name] = styleObj;
+    const styles = this.styles;
+    let isNew = true;
+    for (let i = 0; i < styles.length; i++) {
+      if (styles[i].tempId == styleObj.tempId) {
+        styles[i] = Object.assign(styles[i], styleObj);
+        isNew = false;
         break;
       }
     }
 
-    this.styles[styleObj.tempId] = _.cloneDeep(styleObj);
+    if (isNew) {
+      styleObj.tempId = idIndex++;
+      this.styles.push(_.cloneDeep(styleObj));
+      this.state.styles.push(_.cloneDeep(styleObj));
+    }
+
     this.setState({
       styles: this.state.styles
     });
   }
 
-  _onDelete(name) {
-    delete this.state.styles[name];
+  _onDelete(styleObj) {
+    const styles = this.state.styles.filter(style => style.tempId != styleObj.tempId);
+    this.styles = this.styles.filter(style => style.tempId != styleObj.tempId);
     this.initStyle();
+    this.setState({
+      styles
+    });
   }
 
   renderNumberInput(props) {
@@ -223,7 +252,7 @@ class StyleDesigner extends Component {
           <AlertForm onClose={() => this.setState({alert: false})}
             title='Leave Style Designer'
             desc='Do you want to leave without save your modifications?'
-            onConfirm={() => this.props.onConfirm(this.styles)}/>
+            onConfirm={this._onClose}/>
         }
       </Box>
     );

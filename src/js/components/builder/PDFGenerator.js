@@ -180,9 +180,17 @@ export default class PDFGenerator extends Component {
         pdfSettings: this.state.pdfSettings
       };
 
+      let readyToClose;
+      const onClose =() => {
+        if (readyToClose) {
+          this.setState(closeState, this.autoPreview);
+        }
+      };
+
       return (
-        <Layer closer={true} onClose={() => this.setState(closeState, this.autoPreview)}>
+        <Layer closer={true} onClose={onClose}>
           <StyleDesigner
+            setCloseStatus={(status) => readyToClose = status}
             styles={this.state.pdfSettings.styles}
             onConfirm={(styles) => {
               closeState.pdfSettings.styles = styles;
