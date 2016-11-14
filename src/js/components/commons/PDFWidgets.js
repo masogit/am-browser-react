@@ -5,7 +5,7 @@ import React, {Component} from 'react';
 import {Box, Header, FormField, Form, CheckBox, SVGIcon, Layer, Paragraph,
   Title, Button, Footer, NumberInput, List, ListItem, Label} from 'grommet';
 import {init_style, getPreviewStyle, updateValue} from '../../util/pdfGenerator';
-import AlertForm from './AlertForm';
+
 
 const Brush = (props) => (
   <SVGIcon viewBox="0 0 24 24" {...props}>
@@ -88,12 +88,13 @@ class StyleDesigner extends Component {
   }
 
   componentWillUnmount() {
-    if (this.state.styles.some(style => this.isChanged(style))) {
-      this.props.setCloseStatus(false);
-      this.setState({alert: true});
-    } else {
-      this._onClose();
-    }
+    //if (this.state.styles.some(style => this.isChanged(style))) {
+    //  this.props.setCloseStatus(false);
+    //  this.setState({alert: true});
+    //} else {
+    //  this._onClose();
+    //}
+    this._onClose();
   }
 
   initStyle() {
@@ -248,12 +249,6 @@ class StyleDesigner extends Component {
             </Footer>
           </Box>
         </Box>
-        {this.state.alert &&
-          <AlertForm onClose={() => this.setState({alert: false})}
-            title='Leave Style Designer'
-            desc='Do you want to leave without save your modifications?'
-            onConfirm={this._onClose}/>
-        }
       </Box>
     );
   }
