@@ -27,10 +27,6 @@ const _onMail = (view) => {
   }
 };
 
-const _onUpload = (upload) => {
-  upload.click();
-};
-
 const _onDownload = (view) => {
   if (view._id) {
     let blob = new Blob([JSON.stringify(view)], {type: "data:application/json;charset=utf-8"});
@@ -478,7 +474,9 @@ export default class ViewDefDetail extends ComponentBase {
               {renderAnchor({icon: <Duplicate />, onClick: this.openAlert, args: 'duplicate', label: 'Duplicate', enable: selectedView._id})}
               {selectedView._id && renderAnchor({icon: <Mail />, onClick: _onMail, args: selectedView, label: 'Mail', enable: selectedView._id})}
               {renderAnchor({icon: <Download />, onClick: _onDownload,args: selectedView , label: 'Download', enable: selectedView._id})}
-              {renderAnchor({icon: <Upload />, onClick: _onUpload, args: this.refs.upload, label: 'Upload', enable: !selectedView._id})}
+              {renderAnchor({icon: <Upload />, onClick: () => {
+                this.refs.upload.click();
+              }, label: 'Upload', enable: !selectedView._id})}
             </Menu>
           </Menu>
         </Header>
