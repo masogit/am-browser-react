@@ -67,6 +67,7 @@ class MarginDesigner extends Component {
   }
 }
 
+let idIndex = 0;
 class StyleDesigner extends Component {
   componentWillMount() {
     this.state = {
@@ -75,7 +76,12 @@ class StyleDesigner extends Component {
     this.updateValue = this.updateValue.bind(this);
     this.initStyle = this.initStyle.bind(this);
     this.initStyle();
-    this.styles = _.cloneDeep(this.state.styles);
+    this.styles = {};
+    Object.keys(this.state.styles).map(name => {
+      const styleObj = this.state.styles[name];
+      styleObj.tempId = idIndex;
+      this.styles[idIndex++] = Object.assign({}, init_style, styleObj, {name});
+    });
   }
 
   componentWillUnmount() {
@@ -121,8 +127,17 @@ class StyleDesigner extends Component {
               });
             };
 
+            const classNames = [];
+            if (styles[key].tempId == this.state.styleObj.tempId) {
+              classNames.push('active');
+            }
+
+            if (this.isChanged(this.state.styleObj)) {
+              classNames.push('editing');
+            }
+
             return (
-              <ListItem onClick={onClick} key={index} className={key == this.state.styleObj.name ? 'active' : ''}>
+              <ListItem onClick={onClick} key={index} className={classNames.join(' ')}>
                 <label style={getPreviewStyle(styles[key], true)}>{key}</label>
               </ListItem>
             );
@@ -132,19 +147,29 @@ class StyleDesigner extends Component {
     );
   }
 
-  isChanged(name, now) {
-    return _.isEqual(this.styles[name], now);
+  isChanged(styleObj) {
+    return !_.isEqual(this.styles[styleObj.tempId], styleObj);
   }
 
   _onSave(styleObj) {
-    this.state.styles[styleObj.name] = styleObj;
+    const styles = this.state.styles;
+    const keys = Object.keys(styles);
+    for (let i = 0; i < keys.length; i++) {
+      if (styles[keys[i]].tempId == styleObj.tempId) {
+        delete styles[keys[i]];
+        styles[styleObj.name] = styleObj;
+        break;
+      }
+    }
+
+    this.styles[styleObj.tempId] = _.cloneDeep(styleObj);
     this.setState({
       styles: this.state.styles
     });
   }
 
-  _onDelete(styleObj) {
-    delete this.state.styles[styleObj.name];
+  _onDelete(name) {
+    delete this.state.styles[name];
     this.initStyle();
   }
 
@@ -190,7 +215,7 @@ class StyleDesigner extends Component {
                 <Box pad={{horizontal: 'small'}}/>
                 <Button label="Delete" onClick={this._onDelete.bind(this, styleObj)} accent={true}/>
               </Box>
-              <Button label="Save" primary={true} onClick={styleObj.name ? () => this._onSave(styleObj) : null}/>
+              <Button label="Save" primary={true} onClick={(styleObj.name && this.isChanged(styleObj)) ? () => this._onSave(styleObj) : null}/>
             </Footer>
           </Box>
         </Box>
