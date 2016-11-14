@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react';
 import ComponentBase from '../commons/ComponentBase';
 import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Split, Map, Icons} from 'grommet';
 const {Close, LinkUp: Up, LinkDown: Down, Ascend, Descend, Play, Checkmark, Duplicate, Download,
-  CaretPrevious, More, Mail, DocumentPdf} = Icons.Base;
+  CaretPrevious, More, Mail, DocumentPdf, Upload} = Icons.Base;
 import {isEmpty} from 'lodash';
 import AlertForm from '../../components/commons/AlertForm';
 import EditLayer from '../../components/commons/EditLayer';
@@ -25,6 +25,10 @@ const _onMail = (view) => {
     let content = `URL: ${url}${br}Description: ${view.desc}`;
     window.open(`mailto:test@example.com?subject=${subject}&body=${content}`, '_self');
   }
+};
+
+const _onUpload = (upload) => {
+  upload.click();
 };
 
 const _onDownload = (view) => {
@@ -400,6 +404,27 @@ export default class ViewDefDetail extends ComponentBase {
     toggleSidebar(false);
   }
 
+  uploadJson(e) {
+    let jsonFile = e.target.files[0];
+    var reader = new FileReader();
+    reader.readAsBinaryString(jsonFile);
+    reader.onload = (e) => {
+      let json = JSON.parse(e.target.result);
+      if (this.isValidateView(json)) {
+        if (json._id)
+          json._id = null;
+
+        this.props.setSelectedView('', json);
+      } else {
+
+      }
+    };
+  }
+
+  isValidateView(json) {
+    return (json.name && json.category && json.body);
+  }
+
   render() {
     const {selectedView, openPreview, categories, onSubmit, compact} = this.props;
 
@@ -442,6 +467,7 @@ export default class ViewDefDetail extends ComponentBase {
         {this.getLayer(layer)}
         <Header justify="between" pad={{horizontal: 'medium'}}>
           <Box>View Builder</Box>
+          <input type="file" ref="upload" name="doc" accept=".json" onChange={this.uploadJson.bind(this)} style={{display: 'none'}}/>
           <Menu direction="row" align="center" responsive={true}>
             {renderAnchor({icon: <Play />, onClick: openPreview, label: 'Query', enable: table})}
             {renderAnchor({icon: <DocumentPdf />, onClick: this.printPdf, args: {body: selectedView.body}, label: 'PDF Generator', enable: table})}
@@ -451,15 +477,9 @@ export default class ViewDefDetail extends ComponentBase {
               {renderAnchor({icon: <Duplicate />, onClick: this.openAlert, args: 'duplicate', label: 'Duplicate', enable: selectedView._id})}
               {selectedView._id && renderAnchor({icon: <Mail />, onClick: _onMail, args: selectedView, label: 'Mail', enable: selectedView._id})}
               {renderAnchor({icon: <Download />, onClick: _onDownload,args: selectedView , label: 'Download', enable: selectedView._id})}
+              {renderAnchor({icon: <Upload />, onClick: _onUpload, args: this.refs.upload, label: 'Upload', enable: !selectedView._id})}
             </Menu>
           </Menu>
-          {/* upload form
-           <form method="post" encType="multipart/form-data" action="http://localhost:8080/coll/view">
-           <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
-           <input type="file" name="docFile" accept=".json" />
-           <input type="submit" />
-           </form>
-           */}
         </Header>
         <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'medium'}}>
           <Split flex="left" fixed={false} className='fixMinSizing'>
