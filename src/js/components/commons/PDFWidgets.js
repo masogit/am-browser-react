@@ -5,7 +5,7 @@ import React, {Component} from 'react';
 import {Box, Header, FormField, Form, CheckBox, SVGIcon, Layer, Paragraph,
   Title, Button, Footer, NumberInput, List, ListItem, Label} from 'grommet';
 import {init_style, getPreviewStyle, updateValue} from '../../util/pdfGenerator';
-
+import AlertForm from '../commons/AlertForm';
 
 const Brush = (props) => (
   <SVGIcon viewBox="0 0 24 24" {...props}>
@@ -73,7 +73,9 @@ class StyleDesigner extends Component {
     const styleArray = [];
     Object.keys(this.props.styles).map(name => {
       const styleObj = this.props.styles[name];
-      styleObj.tempId = idIndex++;
+      if (styleObj.tempId == undefined) {
+        styleObj.tempId = idIndex++;
+      }
       styleArray.push(Object.assign({}, init_style, styleObj, {name}));
     });
 
@@ -82,19 +84,19 @@ class StyleDesigner extends Component {
     };
     this.updateValue = this.updateValue.bind(this);
     this.initStyle = this.initStyle.bind(this);
-    this._onClose = this._onClose.bind(this);
     this.initStyle();
     this.styles = _.cloneDeep(styleArray);
   }
 
   componentWillUnmount() {
-    //if (this.state.styles.some(style => this.isChanged(style))) {
-    //  this.props.setCloseStatus(false);
-    //  this.setState({alert: true});
-    //} else {
-    //  this._onClose();
-    //}
-    this._onClose();
+    const styles = {};
+    this.styles.map(style => {
+      const key = style.name;
+      delete style.name;
+      delete style.tempId;
+      styles[key] = style;
+    });
+    this.props.onConfirm(styles);
   }
 
   initStyle() {
@@ -156,17 +158,6 @@ class StyleDesigner extends Component {
     );
   }
 
-  _onClose() {
-    const styles = {};
-    this.styles.map(style => {
-      const key = style.name;
-      delete style.name;
-      delete style.tempId;
-      styles[key] = style;
-    });
-    this.props.onConfirm(styles);
-  }
-
   isChanged(styleObj) {
     const origin = this.styles.filter(style => style.tempId == styleObj.tempId)[0];
     return !_.isEqual(origin, styleObj);
@@ -195,16 +186,32 @@ class StyleDesigner extends Component {
   }
 
   _onDelete(styleObj) {
-    const styles = this.state.styles.filter(style => style.tempId != styleObj.tempId);
-    this.styles = this.styles.filter(style => style.tempId != styleObj.tempId);
-    this.initStyle();
-    this.setState({
-      styles
-    });
+    if (styleObj.tempId < 0) {
+      this.setState({alert: 'CAN_NOT_DELETE'});
+    } else {
+      const styles = this.state.styles.filter(style => style.tempId != styleObj.tempId);
+      this.styles = this.styles.filter(style => style.tempId != styleObj.tempId);
+      this.initStyle();
+      this.setState({
+        styles
+      });
+    }
   }
 
   renderNumberInput(props) {
     return <NumberInputField state={this.state.styleObj} {...props} updateValue={this.updateValue}/>;
+  }
+
+  renderAlert() {
+    if (this.state.alert == 'CAN_NOT_DELETE') {
+      const onClose = () => this.setState({alert: ''});
+      return (
+        <AlertForm onClose={onClose}
+                 title='Can not delete'
+                 desc='Build in styles can not be deleted'
+                 onConfirm={onClose}/>
+      );
+    }
   }
 
   render() {
@@ -249,6 +256,7 @@ class StyleDesigner extends Component {
             </Footer>
           </Box>
         </Box>
+        {this.renderAlert()}
       </Box>
     );
   }

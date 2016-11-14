@@ -26,26 +26,32 @@ const styles = {
   header: {
     fontSize: 18,
     bold: true,
-    margin: [0, 0, 0, 10]
+    margin: [0, 0, 0, 10],
+    tempId: -1
   },
   subheader: {
     fontSize: 16,
     bold: true,
-    margin: [0, 10, 0, 15]
+    margin: [0, 10, 0, 15],
+    tempId: -2
   },
   text: {
-    fontSize: 12
+    fontSize: 12,
+    tempId: -3
   },
   tableFields: {
-    margin: [0, 20, 20, 15]
+    margin: [0, 20, 20, 15],
+    tempId: -4
   },
   tableExample: {
-    margin: [0, 5, 0, 15]
+    margin: [0, 5, 0, 15],
+    tempId: -5
   },
   tableHeader: {
     italics: true,
     fontSize: 13,
-    color: '#000000'
+    color: '#000000',
+    tempId: -6
   }
 };
 
