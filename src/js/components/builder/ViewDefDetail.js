@@ -415,8 +415,9 @@ export default class ViewDefDetail extends ComponentBase {
           json._id = null;
 
         this.props.setSelectedView('', json);
+        this.props.uploadViewSuccess();
       } else {
-
+        this.props.uploadViewFailed();
       }
     };
   }
@@ -467,7 +468,7 @@ export default class ViewDefDetail extends ComponentBase {
         {this.getLayer(layer)}
         <Header justify="between" pad={{horizontal: 'medium'}}>
           <Box>View Builder</Box>
-          <input type="file" ref="upload" name="doc" accept=".json" onChange={this.uploadJson.bind(this)} style={{display: 'none'}}/>
+          <input type="file" ref="upload" accept=".json" onChange={this.uploadJson.bind(this)} style={{display: 'none'}}/>
           <Menu direction="row" align="center" responsive={true}>
             {renderAnchor({icon: <Play />, onClick: openPreview, label: 'Query', enable: table})}
             {renderAnchor({icon: <DocumentPdf />, onClick: this.printPdf, args: {body: selectedView.body}, label: 'PDF Generator', enable: table})}
