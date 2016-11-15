@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import {Box, Header, Icons, Anchor, Menu, FormField, Form,
   RadioButton, Layer} from 'grommet';
-const {Download, Close, Play: Preview, Code} = Icons.Base;
+const {Download, Close, Play: Preview, Code, Checkmark} = Icons.Base;
 import {loadRecordsByBody} from '../../actions/explorer';
 import { cloneDeep } from 'lodash';
 import { MODE, init_style, table_style, styles, defaultPDFDefinition, preview,
@@ -13,11 +13,12 @@ Menu.propTypes.label = PropTypes.oneOfType([PropTypes.object, PropTypes.string])
 
 export default class PDFGenerator extends Component {
   componentWillMount() {
+    const {body: {fields}, records} = this.props;
     this.state = {
       pdfDefinition: defaultPDFDefinition,
       mode: MODE.DESIGN,
-      fields: this.props.body.fields,
-      records: [],
+      fields: fields,
+      records: records || [],
       pdfSettings: {
         styles: _.cloneDeep(styles),
         pageOrientation: 'portrait',
@@ -51,7 +52,7 @@ export default class PDFGenerator extends Component {
       recordsStart: 1,
       limit: 100,
       showExportLayer: false,
-      total: 0
+      total: records ? records.length : 0
     };
     this.updatePDFSettings = this.updatePDFSettings.bind(this);
     this.updateCode = this.updateCode.bind(this);
@@ -62,9 +63,11 @@ export default class PDFGenerator extends Component {
   componentDidMount() {
     this._preview();
 
-    loadRecordsByBody(this.props.body).then((data) => {
-      this.setState({ records: data.entities, total: data.count }, this._preview);
-    });
+    if (this.state.records.length == 0) {
+      loadRecordsByBody(this.props.body).then((data) => {
+        this.setState({records: data.entities, total: data.count}, this._preview);
+      });
+    }
   }
 
   autoPreview() {
@@ -209,27 +212,42 @@ export default class PDFGenerator extends Component {
   }
 
   render() {
-    const {mode, pdfDefinition, error, pdfSettings, loading} = this.state;
+    const {mode, pdfDefinition, error, pdfSettings, loading, category, name, _id} = this.state;
 
     return (
       <Box pad='small' flex={true}>
         <Header justify='between' size='small'>
-          <Box>PDF Generator</Box>
+          <Box pad={{horizontal: 'small'}}>PDF Template</Box>
           <Menu direction="row" align="center" responsive={true}>
             <Anchor icon={<Code />} onClick={() => this.setState({ mode: mode == MODE.CODE ? MODE.DESIGN : MODE.CODE })} label={mode}/>
             <Anchor icon={<Brush />} onClick={() => this.setState({showLayer: 'new_style'})} label="Style Designer"/>
             <Anchor icon={<Preview/>} disabled={loading} onClick={loading ? null : this._preview} label='Preview'/>
             <Anchor icon={<Download />} disabled={loading} onClick={() => !loading && this.setState({showExportLayer: true})} label='Export'/>
-            <Anchor label='Back' icon={<Close/>} onClick={() => this.props.back()}/>
+            <Anchor icon={<Checkmark />} onClick= {this.props.onSaveReport}
+                    label="Save" disabled = {!name || !category} />
+            <Anchor icon={<Close />} onClick= {this.props.onRemoveReport}
+                    label="Delete" disabled={!_id || !name || !category}/>
           </Menu>
         </Header>
         <Box flex={true} direction='row'>
           {mode == MODE.CODE ? <FormField error={error} className='code-panel'>
-            <textarea name='pdfDefinition' value={format(pdfDefinition)}
-                      onChange={this.updateCode}/>
+            <textarea name='pdfDefinition' value={format(pdfDefinition)} onChange={this.updateCode}/>
           </FormField> :
             <Box flex={true} style={{maxWidth: '50vw'}} direction='row'>
               <Form className='strong-label flex no-border'>
+                <Box direction='row' pad={{horizontal: 'medium'}}>
+                  <FormField>
+                    <Box direction='row'><span style={{color: '#ff0000', fontWeight: '400'}}>Name:</span>
+                      <input className='input-field' name='name' type="text" value={name} onChange={this._updateValue} maxLength='20'/>
+                    </Box>
+                  </FormField>
+                  <FormField>
+                    <Box direction='row'><span style={{color: '#ff0000', fontWeight: '400'}}>Category:</span>
+                      <input className='input-field' name='category' type="text" value={category} onChange={this._updateValue} maxLength='20'/>
+                    </Box>
+                  </FormField>
+                </Box>
+
                 <FormField label='Page Header'>
                   <Box direction='row' pad='small'>
                     {this.returnStyleField({label: 'Left', name:"pageHeader.left", value:pdfSettings.pageHeader.left})}

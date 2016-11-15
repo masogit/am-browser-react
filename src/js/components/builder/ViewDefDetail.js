@@ -11,7 +11,7 @@ import FieldTypes from '../../constants/FieldTypes';
 import {saveAs} from 'file-saver';
 import SearchInput from '../commons/SearchInput';
 import {bodyToMapData} from '../../util/util';
-import PDFGenerator from './PDFGenerator';
+import PDFGenerator from './../reports/PDFGenerator';
 import {toggleSidebar} from '../../actions/system';
 
 const _onMail = (view) => {

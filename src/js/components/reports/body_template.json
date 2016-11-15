@@ -1,0 +1,82 @@
+{
+  "fields": [
+    {
+      "ref-link": "schema/amComputer/field/AssetTag",
+      "user_type": "",
+      "size": 81,
+      "user_type_format": "",
+      "label": "Asset tag",
+      "sqlname": "AssetTag",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "Asset tag"
+    },
+    {
+      "ref-link": "schema/amComputer/field/TcpIpHostName",
+      "user_type": "",
+      "size": 256,
+      "user_type_format": "",
+      "label": "IP name",
+      "sqlname": "TcpIpHostName",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "IP name (unresolved IP address)",
+      "searchable": false
+    },
+    {
+      "ref-link": "schema/amComputer/field/TcpIpHostName",
+      "user_type": "",
+      "size": 256,
+      "user_type_format": "",
+      "label": "IP name",
+      "sqlname": "Parent.TcpIpHostName",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "IP name (unresolved IP address)",
+      "alias": "Parent Name"
+    },
+    {
+      "ref-link": "schema/amModel/field/Name",
+      "user_type": "",
+      "size": 129,
+      "user_type_format": "",
+      "label": "Name",
+      "sqlname": "Portfolio.Model.Name",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "Name of the model",
+      "alias": "Model"
+    },
+    {
+      "ref-link": "schema/amAsset/field/SerialNo",
+      "user_type": "",
+      "size": 129,
+      "user_type_format": "",
+      "label": "Serial #",
+      "sqlname": "Portfolio.Asset.SerialNo",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "Serial number",
+      "searchable": true,
+      "alias": "Serial No."
+    },
+    {
+      "ref-link": "schema/amComputer/field/ComputerType",
+      "user_type": "Custom Itemized List",
+      "size": 81,
+      "user_type_format": "amComputerType",
+      "label": "IT equipment type",
+      "sqlname": "ComputerType",
+      "type": "String",
+      "is_calc": false,
+      "long_desc": "IT equipment type",
+      "alias": "Computer Type"
+    }
+  ],
+  "orderby": "",
+  "filter": "Portfolio.User=currentuser",
+  "label": "IT equipment",
+  "sqlname": "amComputer",
+  "links": [],
+  "groupby": "Portfolio.Model.Name"
+}

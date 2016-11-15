@@ -8,6 +8,9 @@ import Close from 'grommet/components/icons/base/Close';
 import ContentPlaceHolder from '../../components/commons/ContentPlaceHolder';
 import _ from 'lodash';
 import { monitorEdit, dropCurrentPop } from '../../actions/system';
+import body from './body_template.json';
+import records from './records_template.json';
+import PDFGenerator from './PDFGenerator.js';
 
 export default class Reports extends Component {
 
@@ -15,12 +18,17 @@ export default class Reports extends Component {
     super();
     this.state = {
       reports:[],
-      categories: []
+      categories: [],
+      report: {
+
+      }
     };
     this.initReport={
       name: '',
       category: ''
     };
+
+    this._dropCurrentPop = this._dropCurrentPop.bind(this);
   }
 
   componentDidMount() {
@@ -83,12 +91,12 @@ export default class Reports extends Component {
   }
 
   _onNew() {
-    this.dropCurrentPop('Create a new report?', () =>{
+    this._dropCurrentPop('Create a new report?', () =>{
       this._initReport(() => monitorEdit(_.cloneDeep(this.state.report), this.state.report));
     });
   }
 
-  dropCurrentPop(title, onConfirm) {
+  _dropCurrentPop(title, onConfirm) {
     const originReport = this.state.reports.filter(report => report._id == this.state.report._id)[0];
     const currentReport = _.cloneDeep(this.state.report);
 
@@ -111,31 +119,9 @@ export default class Reports extends Component {
     return (
       <Box direction="row" flex={true}>
         <AMSideBar title='Reports' toolbar={toolbar} contents={contents} focus={focus}/>
-        {!_.isEmpty(this.state.report)? <Box flex={true}>
-          <Header justify="between" pad={{'horizontal': 'medium'}}>
-              <Box>Reports</Box>
-              <Menu direction="row" align="center" responsive={true}>
-                <Anchor link="#" icon={<Checkmark />}
-                      onClick= {() => this._onSaveReport()}
-                      label="Save" disabled = {!this.state.report.name || !this.state.report.category} />
-                <Anchor link="#" icon={<Close />}
-                      onClick= {() => this._onRemoveReport()}
-                      label="Delete" disabled={!this.state.report._id || !this.state.report.name || !this.state.report.category}/>
-              </Menu>
-          </Header>
-            <Box justify="between" className='header' pad={{horizontal: 'medium'}}>
-              <Form pad='none' compact={true}>
-                <FormField label="Report Name" htmlFor="Report_Name">
-                  <input id="Report_Name" type="text" name="name" value={this.state.report.name}
-                    onChange = {this._setFormValues.bind(this)}/>
-                </FormField>
-                <FormField label="Category" htmlFor="Report_Category">
-                  <input id="Report_Category" type="text" name="category" value={this.state.report.category}
-                              onChange = {this._setFormValues.bind(this)} />
-                </FormField>
-              </Form>
-            </Box>
-          </Box>
+        {!_.isEmpty(this.state.report)?
+          <PDFGenerator body={body} records={records} onSaveReport={this._onSaveReport}
+                        onRemoveReport={this._onRemoveReport}/>
           : <ContentPlaceHolder />
         }
       </Box>

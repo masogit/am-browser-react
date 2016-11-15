@@ -1,0 +1,90 @@
+[
+  {
+    "lComputerId": 121442,
+    "ref-link": "db/amComputer/121442",
+    "AssetTag": "DEMO-PHONE-0001",
+    "TcpIpHostName": "MD000001",
+    "Parent.TcpIpHostName": "",
+    "Portfolio.Model.Name": "HTC Desire S",
+    "Portfolio.Asset.SerialNo": "35530402958622601",
+    "ComputerType": "Smart Phone",
+    "Portfolio.seAssignment": {
+      "0": "In use"
+    },
+    "OperatingSystem": "Andriod 2.3.3",
+    "TcpIpDomain": "",
+    "CPUType": "Qualcomm QSD8250",
+    "lCPUSpeedMHz": 1000,
+    "lDiskSizeMb": 1200,
+    "lMemorySizeMb": 768,
+    "dtLastScan": null,
+    "dtNextScan": null,
+    "self": "MD000001"
+  },
+  {
+    "lComputerId": 134437,
+    "ref-link": "db/amComputer/134437",
+    "AssetTag": "DKT001155",
+    "TcpIpHostName": "CPU000155",
+    "Parent.TcpIpHostName": "",
+    "Portfolio.Model.Name": "Deskpro HP dx6050",
+    "Portfolio.Asset.SerialNo": "",
+    "ComputerType": "Desktop computers",
+    "Portfolio.seAssignment": {
+      "0": "In use"
+    },
+    "OperatingSystem": "",
+    "TcpIpDomain": "",
+    "CPUType": "AMD Athlon XP 3000",
+    "lCPUSpeedMHz": 1300,
+    "lDiskSizeMb": 80000,
+    "lMemorySizeMb": 512,
+    "dtLastScan": null,
+    "dtNextScan": null,
+    "self": "CPU000155"
+  },
+  {
+    "lComputerId": 134461,
+    "ref-link": "db/amComputer/134461",
+    "AssetTag": "DKT001156",
+    "TcpIpHostName": "CPU000156",
+    "Parent.TcpIpHostName": "",
+    "Portfolio.Model.Name": "Deskpro HP dx6050",
+    "Portfolio.Asset.SerialNo": "",
+    "ComputerType": "Desktop computers",
+    "Portfolio.seAssignment": {
+      "0": "In use"
+    },
+    "OperatingSystem": "",
+    "TcpIpDomain": "",
+    "CPUType": "AMD Athlon XP 3000",
+    "lCPUSpeedMHz": 1300,
+    "lDiskSizeMb": 80000,
+    "lMemorySizeMb": 512,
+    "dtLastScan": null,
+    "dtNextScan": null,
+    "self": "CPU000156"
+  },
+  {
+    "lComputerId": 134845,
+    "ref-link": "db/amComputer/134845",
+    "AssetTag": "SRV001222",
+    "TcpIpHostName": "srv-v-33",
+    "Parent.TcpIpHostName": "",
+    "Portfolio.Model.Name": "PROLIANT DL360 G2",
+    "Portfolio.Asset.SerialNo": "",
+    "ComputerType": "Computer servers",
+    "Portfolio.seAssignment": {
+      "0": "In use"
+    },
+    "OperatingSystem": "Windows XP",
+    "TcpIpDomain": "Bordeaux",
+    "CPUType": "Xeon Processor",
+    "lCPUSpeedMHz": 3200,
+    "lDiskSizeMb": 350480,
+    "lMemorySizeMb": 4096,
+    "dtLastScan": 1392872520,
+    "dtNextScan": 1395291780,
+    "self": "CPU000159"
+  }
+]
