@@ -82,9 +82,9 @@
   </build>
   <!-- keep below line scm for sonar scan -->
   <scm>
-    <connection>scm:git:ssh://git@16.103.38.75:7999/itam/am-browser.git</connection>
-    <developerConnection>scm:git:ssh://git@16.103.38.75:7999/itam/am-browser.git</developerConnection>
-    <url>http://16.103.38.75:7990/projects/ITAM/repos/am-browser/browse/src/js</url>
+    <connection>scm:https://github.hpe.com/AssetManager/am-browser</connection>
+    <developerConnection>scm:https://github.hpe.com/AssetManager/am-browser</developerConnection>
+    <url>https://github.hpe.com/AssetManager/am-browser</url>
   </scm>
   <repositories>
     <repository>

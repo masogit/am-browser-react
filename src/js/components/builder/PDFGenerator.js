@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import {Box, Header, Icons, Anchor, Menu as GMenu, FormField, Form,
+import {Box, Header, Icons, Anchor, Menu, FormField, Form,
   RadioButton, Layer} from 'grommet';
 const {Download, Close, Play: Preview, Code} = Icons.Base;
 import {loadRecordsByBody} from '../../actions/explorer';
@@ -7,16 +7,9 @@ import { cloneDeep } from 'lodash';
 import { MODE, init_style, table_style, styles, defaultPDFDefinition, preview,
   getPreviewStyle, updateValue, translateText, format, download } from '../../util/pdfGenerator';
 import {Brush, StyleDesigner, ExportLayer} from './../commons/PDFWidgets';
+import AlertForm from '../commons/AlertForm';
 
-class Menu extends GMenu {
-  render() {
-    return super.render();
-  }
-}
-
-Menu.propTypes = {
-  label: PropTypes.oneOfType([PropTypes.object, PropTypes.string])
-};
+Menu.propTypes.label = PropTypes.oneOfType([PropTypes.object, PropTypes.string]);
 
 export default class PDFGenerator extends Component {
   componentWillMount() {
@@ -180,9 +173,19 @@ export default class PDFGenerator extends Component {
         pdfSettings: this.state.pdfSettings
       };
 
+      const onClose =() => {
+        if (_.isEqual(this.styleDesigner.state.styles, this.styleDesigner.styles)) {
+          this.setState(closeState, this.autoPreview);
+        } else {
+          this.setState({alert: true});
+        }
+
+      };
+
       return (
-        <Layer closer={true} onClose={() => this.setState(closeState, this.autoPreview)}>
+        <Layer closer={true} onClose={onClose}>
           <StyleDesigner
+            ref={node=> this.styleDesigner = node}
             styles={this.state.pdfSettings.styles}
             onConfirm={(styles) => {
               closeState.pdfSettings.styles = styles;
@@ -261,6 +264,14 @@ export default class PDFGenerator extends Component {
         </Box>
         {this.renderStyleLayer()}
         {this.renderExportLayer()}
+
+        {this.state.alert &&
+        <AlertForm onClose={() => this.setState({alert: false})}
+                   title='Leave Style Designer'
+                   desc='Do you want to leave without save your modifications?'
+                   onCancel={() => this.setState({alert: false})}
+                   onConfirm={() => this.setState({showLayer: false})}/>
+        }
       </Box>
     );
   }
