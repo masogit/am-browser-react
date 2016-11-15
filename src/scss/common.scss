@@ -7,6 +7,11 @@
   visibility: hidden;
 }
 
+.icon-empty3 {
+  visibility: hidden;
+  margin-right: 9px !important;
+}
+
 .icon-side-sequence {
   font-size: 0.88em;
   margin-top: 6px;
@@ -166,4 +171,15 @@ th {
 
 .grommetux-background-color-index-neutral-1.shadow {
   box-shadow: 0 2px 4px rgba(0, 0, 17, 0.7);
+}
+
+.orderbyIcon-margin-left {
+  margin-left: 8px;
+}
+
+div .grommetux-menu__drop .grommetux-anchor {
+    padding: 8px 12px;
+    white-space: nowrap;
+    text-decoration: none;
+    width: 100%;
 }

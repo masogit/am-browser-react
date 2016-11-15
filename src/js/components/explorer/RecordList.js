@@ -179,8 +179,8 @@ export default class RecordList extends ComponentBase {
     }, this._getRecords);
   }
 
-  _showOrderByIcon(sqlname) {
-    let fields = this.state.param.orderby.split(',');
+  _showOrderByIcon(sqlname, orderby = '') {
+    let fields = orderby.split(',');
     let index = fields.indexOf(sqlname + ' desc') > -1 ? fields.indexOf(sqlname + ' desc') : fields.indexOf(sqlname);
     if (index > -1) {
       let orderby = fields[index].split(' ');
@@ -193,10 +193,10 @@ export default class RecordList extends ComponentBase {
         }
       }
     }else
-      return <EmptyIcon />;
+      return <EmptyIcon className='icon-empty3'/>;
   }
 
-  _posOrderby(orderby, field) {
+  _posOrderby(orderby = '', field) {
     let fields = orderby.split(',');
     let seq = fields.indexOf(field + ' desc') > -1 ? fields.indexOf(field + ' desc') : fields.indexOf(field);
     if (orderby &&  seq> -1)
@@ -394,17 +394,21 @@ export default class RecordList extends ComponentBase {
         label = label + ' [Quick search]';
       let isPrimary = field.searchable;
       return (
-        <Anchor key={`a_groupby_${index}`} icon={selected?<CheckboxSelected />:<Checkbox />}
-                label={label} primary={isPrimary} disabled={this.state.locked}
-                onClick={() => {
-                  if (!this.state.locked) {
-                    if (selected) {
-                      clearGroupBy(field.sqlname);
-                    } else {
-                      this._getGroupByData(field.sqlname);
+        <Box direction="row" align="center" key={`icon_${index}`}>
+          <Box direction="row" className='orderbyIcon-margin-left' >{!_.isEmpty(this.props.body.orderby) && this._showOrderByIcon(field.sqlname, this.props.body.orderby)}
+          <div className='icon-side-sequence'>{this._posOrderby(this.props.body.orderby, field.sqlname)}</div></Box>
+          <Anchor key={`a_groupby_${index}`} icon={selected?<CheckboxSelected />:<Checkbox />}
+                  label={label} primary={isPrimary} disabled={this.state.locked}
+                  onClick={() => {
+                    if (!this.state.locked) {
+                      if (selected) {
+                        clearGroupBy(field.sqlname);
+                      } else {
+                        this._getGroupByData(field.sqlname);
+                      }
                     }
-                  }
-                }}/>
+                  }}/>
+        </Box>
       );
     });
 
@@ -517,7 +521,7 @@ export default class RecordList extends ComponentBase {
                         label={Format.getDisplayLabel(field)} key={`fieldsheader_${index}`}
                         onClick={this._orderBy.bind(this, field.sqlname)}/>
               </h4>
-              {this._showOrderByIcon(field.sqlname)}
+              {this._showOrderByIcon(field.sqlname, this.state.param.orderby)}
               <div className='icon-side-sequence'>{this._posOrderby(this.state.param.orderby, field.sqlname)}</div>
             </Box>
           </th>
@@ -685,8 +689,14 @@ export default class RecordList extends ComponentBase {
           <Box direction='row' className='topology-background-color' pad='small' flex={false} margin={{bottom: 'small'}}>
             {filters.map((filter, index) => (
                 <Box direction='row' key={index}>
-                  <Box onClick={this._filterClear.bind(this, index)}><Close /></Box>
-                  <Box onClick={this._filterReuse.bind(this, filter)} pad={{horizontal: 'small'}}>{filter}</Box>
+                  {(this.state.param.showTopology && !_.isEmpty(this.state.record)) ?
+                      <Box pad={{horizontal: 'small'}}>{filter}
+                    </Box>
+                  : <Box direction='row'>
+                      <Box onClick={this._filterClear.bind(this, index)}><Close /></Box>
+                      <Box onClick={this._filterReuse.bind(this, filter)} pad={{horizontal: 'small'}}>{filter}</Box>
+                  </Box>
+                  }
                 </Box>
               )
             )}
