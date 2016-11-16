@@ -118,20 +118,20 @@ const defaultSettings = {
 };
 
 const analyzeRecordList = (filter, allFields, records, style = {layout: 'headerLineOnly', header: 'tableHeader', text: 'text'}) => {
-  let avalableFields = [];
+  let availableFields = [];
   if (filter.length > 0) {
     allFields.map(field => {
       for (let f of filter) {
         if (field.sqlname.toLowerCase() == f.toLowerCase()) {
-          avalableFields.push(field);
+          availableFields.push(field);
           break;
         }
       }
     });
   }
 
-  if (avalableFields.length == 0) {
-    avalableFields = allFields;
+  if (availableFields.length == 0) {
+    availableFields = allFields;
   }
 
   const body = [];
@@ -144,13 +144,13 @@ const analyzeRecordList = (filter, allFields, records, style = {layout: 'headerL
     }
   };
 
-  body.push(avalableFields.map((field, index) => (
+  body.push(availableFields.map((field, index) => (
   { text: getDisplayLabel(field), style: style.header }
   )));
 
   records.map((record) => {
     const row = [];
-    avalableFields.map((field, tdindex) => (
+    availableFields.map((field, tdindex) => (
       row.push({text: getFieldStrVal(record, field), style: style.text})
     ));
     body.push(row);
@@ -233,7 +233,8 @@ const setTextLine = (target, source, label) => {
 
 const translateText = (pdfDefinition, {settings, records, fields_state, body}) => {
   const {fields: fields_props = [], label = ''} = body;
-  const fieldsName = fields_state.filter(field => field.selected).map(field => field.sqlname);
+  //const fieldsName = fields_state.filter(field => field.selected).map(field => field.sqlname);
+  const fieldsName = fields_state.map(field => field.sqlname);
 
   const content = [];
 
@@ -305,21 +306,24 @@ const download = ({onBefore, props, getPDFDefinition, onDone}) => {
 
 const preview = (pdfDefinition, callBack) => {
   pdfMake.createPdf(pdfDefinition).getDataUrl((outDoc) => {
-    const lastPDF = document.getElementById('pdfV');
-    if (lastPDF) {
-      lastPDF.remove();
-    }
+    const pdfContainer = document.getElementById('pdfContainer');
+    if (pdfContainer) {
+      const lastPDF = document.getElementById('pdfV');
+      if (lastPDF) {
+        lastPDF.remove();
+      }
 
-    const pdfContent = document.createElement('embed');
-    pdfContent.id = 'pdfV';
-    pdfContent.width = '100%';
-    pdfContent.height = '100%';
-    pdfContent.src = outDoc;
+      const pdfContent = document.createElement('embed');
+      pdfContent.id = 'pdfV';
+      pdfContent.width = '100%';
+      pdfContent.height = '100%';
+      pdfContent.src = outDoc;
 
-    document.getElementById('pdfContainer').appendChild(pdfContent);
+      document.getElementById('pdfContainer').appendChild(pdfContent);
 
-    if (typeof callBack == 'function') {
-      callBack();
+      if (typeof callBack == 'function') {
+        callBack();
+      }
     }
   });
 };

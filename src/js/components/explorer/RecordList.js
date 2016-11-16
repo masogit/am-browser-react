@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react';
 import RecordDetail from './RecordDetail';
 import RecordTopology from './RecordTopology';
-import {Table, TableRow, Box, Anchor, Header, Menu, List, ListItem, Icons} from 'grommet';
+import {Table, TableRow, Box, Anchor, Header, Menu, List, ListItem, Icons, Layer} from 'grommet';
 const { Close, Ascend, Descend, Checkbox, Filter, Code, BarChart, LineChart, Aggregate,
    CheckboxSelected, Cluster, Menu: MenuIcon, DocumentPdf: Pdf, DocumentCsv: Csv}= Icons.Base;
 import Status from 'grommet/components/icons/Status';
@@ -14,7 +14,7 @@ import * as Format from '../../util/RecordFormat';
 import {hash, loadSetting, saveSetting} from '../../util/util';
 import cookies from 'js-cookie';
 import BarCodeEditor from './BarCodeEditor';
-import {toggleSidebar} from '../../actions/system';
+import PDFTemplate from '../reports/reports';
 
 const getFirstGroupby = (groupby) => {
   if (groupby && groupby.split('|').length > 0)
@@ -450,12 +450,15 @@ export default class RecordList extends ComponentBase {
           <Anchor icon={<Csv />} label="Download CSV"
                   disabled={numTotal < 1}
                   onClick={() => (numTotal > 0) && this._download('csv')}/>
-          <Anchor icon={<Pdf />} label="PDF Report"
+          <Anchor icon={<Pdf />} label="Download PDF"
                   disabled={numTotal < 1}
                   onClick={() => (numTotal > 0) && this._download('pdf')}/>
+          <Anchor icon={<Pdf />} label="PDF Report"
+                  disabled={numTotal < 1}
+                  onClick={() => (numTotal > 0) && this.printPdf.bind(this, {type: 'template', body: this.state.body, records: this.state.records})()}/>
           <Anchor icon={<Pdf />} label="Barcode"
                   disabled={numTotal < 1}
-                  onClick={() => (numTotal > 0) && this.printPdf.bind(this, {body: this.state.body, records: this.state.records, total: numTotal})()}/>
+                  onClick={() => (numTotal > 0) && this.printPdf.bind(this, {type: 'BarCode', body: this.state.body, records: this.state.records, total: numTotal})()}/>
         </Menu>
         <form name="Download" ref="downloadForm" method="post">
           <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
@@ -470,8 +473,22 @@ export default class RecordList extends ComponentBase {
 
   printPdf(pdfGenerator) {
     this.setState({pdfGenerator});
-    if (this.props.root) {
-      toggleSidebar(false);
+  }
+
+  renderPDFPreview() {
+    const pdfGenerator = this.state.pdfGenerator;
+    if (pdfGenerator.type == 'BarCode') {
+      return (
+        <Layer closer={true} onClose={() => this.setState({pdfGenerator: null})}>
+          <BarCodeEditor {...pdfGenerator}/>
+        </Layer>
+      );
+    } else {
+      return (
+        <Layer closer={true} onClose={() => this.setState({pdfGenerator: null})}>
+          <PDFTemplate {...pdfGenerator} fromView={true} />
+        </Layer>
+      );
     }
   }
 
@@ -659,7 +676,7 @@ export default class RecordList extends ComponentBase {
     const {record, pdfGenerator, param: {graphType, filters, showTopology}} = this.state;
 
     if (pdfGenerator) {
-      return <BarCodeEditor {...pdfGenerator} key='BarCodeEditor' back={() => this.setState({pdfGenerator: null})}/>;
+      return this.renderPDFPreview();
     } else {
       return (
         <Box flex={true} className='fixIEScrollBar'>

@@ -6,13 +6,15 @@ import Add from 'grommet/components/icons/base/Add';
 import ContentPlaceHolder from '../../components/commons/ContentPlaceHolder';
 import _ from 'lodash';
 import { monitorEdit, dropCurrentPop, stopMonitorEdit } from '../../actions/system';
-import body from './body_template.json';
-import records from './records_template.json';
+import example_body from './body_template.json';
+import example_records from './records_template.json';
 import PDFGenerator from './PDFGenerator.js';
 import {defaultSettings, defaultPDFDefinition} from '../../util/pdfGenerator';
 import cookies from 'js-cookie';
 
 const USER = cookies.get('user');
+const category_PUBLIC = 'Public';
+const category_PERSONAL = 'Personal';
 export default class Reports extends Component {
   componentWillMount() {
     this.state = {
@@ -23,8 +25,8 @@ export default class Reports extends Component {
 
     this.initReport = {
       name: '',
-      category: '',
-      isPublic: true,
+      category: this.props.fromView ? category_PERSONAL : category_PUBLIC,
+      isPublic: !this.props.fromView,
       user: USER,
       settings: defaultSettings
     };
@@ -32,6 +34,7 @@ export default class Reports extends Component {
     this._dropCurrentPop = this._dropCurrentPop.bind(this);
     this._onSaveReport = this._onSaveReport.bind(this);
     this._onRemoveReport = this._onRemoveReport.bind(this);
+    this._onDupReport = this._onDupReport.bind(this);
     this._initReport = this._initReport.bind(this);
   }
 
@@ -67,6 +70,17 @@ export default class Reports extends Component {
     });
   }
 
+  _onDupReport(report) {
+    this._dropCurrentPop('Duplicate a pdf template?', () => {
+      this._initReport(() => {
+        monitorEdit(_.cloneDeep(this.state.report), this.state.report);
+        report.category = category_PERSONAL;
+        report.isPublic = false;
+        this.setState({report});
+      });
+    });
+  }
+
   _onRemoveReport() {
     ReportActions.removeReport(this.state.report._id).then(id => {
       if (id) {
@@ -86,7 +100,7 @@ export default class Reports extends Component {
   }
 
   _onNew() {
-    this._dropCurrentPop('Create a new report?', () =>{
+    this._dropCurrentPop('Create a new pdf template?', () =>{
       this._initReport(() => monitorEdit(_.cloneDeep(this.state.report), this.state.report));
     });
   }
@@ -100,6 +114,7 @@ export default class Reports extends Component {
 
   render() {
     const {reports, report} = this.state;
+    const {fromView, body, records} = this.props;
 
     const toolbar = <Anchor icon={<Add />} label="New" onClick={this._onNew.bind(this)}/>;
     const contents = reports.map(rpt => ({
@@ -116,11 +131,11 @@ export default class Reports extends Component {
     const focus = report && {expand: report.category, selected: report._id};
 
     return (
-      <Box direction="row" flex={true}>
-        <AMSideBar title='Reports' toolbar={toolbar} contents={contents} focus={focus}/>
+      <Box direction="row" flex={true} pad={fromView ? 'small' : 'none'} style={{minWidth: '90vw', minHeight: '90vh'}}>
+        <AMSideBar title='Templates' toolbar={toolbar} contents={contents} focus={focus}/>
         {!_.isEmpty(report) ?
-          <PDFGenerator body={body} records={records} onSaveReport={this._onSaveReport}
-                        definition={defaultPDFDefinition}
+          <PDFGenerator body={body || example_body} records={records || example_records} onSaveReport={this._onSaveReport}
+                        definition={defaultPDFDefinition} onDupReport={this._onDupReport}
                         report={report} onRemoveReport={this._onRemoveReport} />
           : <ContentPlaceHolder />
         }

@@ -444,7 +444,6 @@ export default class ViewDefDetail extends ComponentBase {
           <Box>View Builder</Box>
           <Menu direction="row" align="center" responsive={true}>
             {renderAnchor({icon: <Play />, onClick: openPreview, label: 'Query', enable: table})}
-            {renderAnchor({icon: <Play />, onClick: this.printPdf, args: {body: selectedView.body}, label: 'PDF Generator', enable: table})}
             {renderAnchor({icon: <Checkmark />, onClick: this.openAlert, args: 'save', label: 'Save', enable: selectedView.name && selectedView.category})}
             {renderAnchor({icon: <Close />, onClick: this.openAlert, args: 'delete', label: 'Delete', enable: selectedView._id})}
             <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }}>

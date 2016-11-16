@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import {Box, Header, Icons, Anchor, Menu, FormField, Form,
   RadioButton, Layer} from 'grommet';
-const {Download, Close, Play: Preview, Code, Checkmark} = Icons.Base;
+const {Download, Close, Play: Preview, Code, Checkmark, Duplicate} = Icons.Base;
 import {loadRecordsByBody} from '../../actions/explorer';
 import { cloneDeep } from 'lodash';
 import { MODE, init_style, table_style, preview,
@@ -32,6 +32,7 @@ export default class PDFGenerator extends Component {
     this._updateValue = this._updateValue.bind(this);
     this._preview = this._preview.bind(this);
     this.isChanged = this.isChanged.bind(this);
+    this.onDuplicate = this.onDuplicate.bind(this);
     this.originReport = _.cloneDeep(report);
   }
 
@@ -47,11 +48,15 @@ export default class PDFGenerator extends Component {
 
   componentWillReceiveProps(nextProps) {
     const {body: {fields}, records, definition, report} = nextProps;
-    if (name !== this.state.name || category !== this.state.category) {
+    if (name !== this.state.name) {
       this.setState({
         fields, records, report, definition
-      });
-      this.originReport = _.cloneDeep(report);
+      }, this._preview);
+      if (report.isDuplicate) {
+        delete report.isDuplicate;
+      } else {
+        this.originReport = _.cloneDeep(report);
+      }
     }
   }
 
@@ -198,8 +203,18 @@ export default class PDFGenerator extends Component {
     return !_.isEqual(this.originReport, this.state.report);
   }
 
+  onDuplicate() {
+    const report = this.state.report;
+    const dupReport = _.cloneDeep(report);
+    dupReport._id = null;
+    dupReport.isDuplicate = true;
+    dupReport.name = report.name  + '_duplicate';
+    this.props.onDupReport(dupReport);
+  }
+
   render() {
-    const {mode, pdfDefinition, error, report: {settings, name, category, _id}, loading} = this.state;
+    const {mode, pdfDefinition, error, report, loading} = this.state;
+    const {settings, name, _id, isPublic} = report;
 
     return (
       <Box pad='small' flex={true}>
@@ -210,10 +225,11 @@ export default class PDFGenerator extends Component {
             <Anchor icon={<Brush />} onClick={() => this.setState({showLayer: 'new_style'})} label="Style Designer"/>
             <Anchor icon={<Preview/>} disabled={loading} onClick={loading ? null : this._preview} label='Preview'/>
             <Anchor icon={<Download />} disabled={loading} onClick={() => !loading && this.setState({showExportLayer: true})} label='Export'/>
-            <Anchor icon={<Checkmark />} onClick= {() => this.props.onSaveReport({settings, name, category})}
-                    label="Save" disabled = {!name || !category || !this.isChanged()} />
-            <Anchor icon={<Close />} onClick= {this.props.onRemoveReport}
-                    label="Delete" disabled={!_id}/>
+            <Anchor icon={<Duplicate />} onClick={this.onDuplicate} label="Duplicate" disabled={!_id} />
+            {!isPublic && <Anchor icon={<Checkmark />} onClick= {() => this.props.onSaveReport(this.state.report)}
+                    label="Save" disabled = {!name || !this.isChanged()} />}
+            {!isPublic && <Anchor icon={<Close />} onClick= {this.props.onRemoveReport}
+                    label="Delete" disabled={!_id}/>}
           </Menu>
         </Header>
         <Box flex={true} direction='row'>
@@ -222,18 +238,11 @@ export default class PDFGenerator extends Component {
           </FormField> :
             <Box flex={true} style={{maxWidth: '50vw'}} direction='row'>
               <Form className='strong-label flex no-border'>
-                <Box direction='row' pad={{horizontal: 'medium'}}>
-                  <FormField>
-                    <Box direction='row'><span style={{color: '#ff0000', fontWeight: '400'}}>Name:</span>
-                      <input className='input-field' name='report.name' type="text" value={name} onChange={this._updateValue} maxLength='20'/>
-                    </Box>
-                  </FormField>
-                  <FormField>
-                    <Box direction='row'><span style={{color: '#ff0000', fontWeight: '400'}}>Category:</span>
-                      <input className='input-field' name='report.category' type="text" value={category} onChange={this._updateValue} maxLength='20'/>
-                    </Box>
-                  </FormField>
-                </Box>
+                <FormField>
+                  <Box direction='row'><span style={{color: '#ff0000', fontWeight: '400'}}>Name:</span>
+                    <input className='input-field' name='report.name' type="text" value={name} onChange={this._updateValue} maxLength='20'/>
+                  </Box>
+                </FormField>
                 <FormField label='Page Header'>
                   <Box direction='row' pad='small'>
                     {this.returnStyleField({label: 'Left', name:"pageHeader.left", value:settings.pageHeader.left})}
@@ -264,7 +273,7 @@ export default class PDFGenerator extends Component {
               </Form>
             </Box>
           }
-          <div style={{ width: '50vw' }} id='pdfContainer' />
+          <div id='pdfContainer' />
         </Box>
         {this.renderStyleLayer()}
         {this.renderExportLayer()}

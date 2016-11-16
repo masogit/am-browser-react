@@ -327,18 +327,17 @@ export default class RecordList extends Component {
           <Menu direction="row" align="center" responsive={true}>
             <Anchor icon={<Preview/>} disabled={previewDisabled} onClick={previewDisabled ? null : this._preview} label='Preview'/>
             <Anchor icon={<Download />} disabled={downloadDisabled} onClick={downloadDisabled ? null : () => this.setState({showExportLayer: true})} label='Export'/>
-            <Anchor label='Back' icon={<Close/>} onClick={() => this.props.back()}/>
           </Menu>
         </Header>
-        <Box flex={true} direction='row'>
-          <Box flex={true} style={{maxWidth: '50vw'}} pad={{horizontal: 'medium'}} direction='row'>
+        <Box flex={true} direction='row' pad='none'>
+          <Box flex={true} style={{maxWidth: '50vw'}} direction='row'>
             <Form className='no-border strong-label'>
               {this.renderNumberInput('Preview Records', 'previewCount', 1, 5)}
               {this.renderFields()}
             </Form>
             {this.renderForm()}
           </Box>
-          <div style={{width: '50vw'}} id='pdfContainer'/>
+          <div id='pdfContainer'/>
           {this.renderExportLayer()}
         </Box>
         <canvas id='canvas' style={{display: 'none'}} />
