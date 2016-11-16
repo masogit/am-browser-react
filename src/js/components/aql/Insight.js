@@ -387,10 +387,10 @@ export default class Insight extends ComponentBase {
             return (
               dataMap ? // fix console error: cannot get aql of undefined.
                 <Box pad="large" key={index} className='box-graph'>
-                  <Header>
-                    <Anchor icon={<Search />} label={dataMap.aql.name}
-                            onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
-                  </Header>
+                  <Box justify="between" direction="row" colorIndex="light-2" style={{borderLeft: '4px solid #01A982'}}>
+                    <Box margin={{left: 'medium'}} justify="center"><Title>{dataMap.aql.name}</Title></Box>
+                    <Anchor icon={<Expand />} onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
+                  </Box>
                   <Box pad="large" align={(dataMap.aql.type=='meter')?'center':null}>
                     <Graph key={dataMap.aql._id} type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
                            onClick={(filter) => this._showViewRecords(filter, dataMap.aql.view)}/>
