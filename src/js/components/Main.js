@@ -56,7 +56,7 @@ class Indexer extends Component {
     }
     return (
       <App centered={false}>
-        <Box full='vertical' colorIndex="light-2">
+        <Box full='vertical'>
           {header}{alert}
           {this.props.children}
         </Box>
