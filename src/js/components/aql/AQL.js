@@ -11,22 +11,12 @@ import RecordListLayer from '../explorer/RecordListLayer';
 import ActionTab from '../commons/ActionTab';
 import AMSideBar from '../commons/AMSideBar';
 import * as Format from '../../util/RecordFormat';
-import Download from 'grommet/components/icons/base/Download';
-import More from 'grommet/components/icons/base/More';
-import Mail from 'grommet/components/icons/base/Mail';
-import Trash from 'grommet/components/icons/base/Trash';
 import {saveAs} from 'file-saver';
 import {monitorEdit, stopMonitorEdit, dropCurrentPop, showInfo} from '../../actions/system';
 import SearchInput from '../commons/SearchInput';
 import ComponentBase from '../commons/ComponentBase';
-import {
-  Anchor, Box, Form, FormField, Layer, Tabs, Table, TableRow, Header, Menu
-} from 'grommet';
-import Play from 'grommet/components/icons/base/Play';
-import Checkmark from 'grommet/components/icons/base/Checkmark';
-import Close from 'grommet/components/icons/base/Close';
-import Add from 'grommet/components/icons/base/Add';
-import Attachment from 'grommet/components/icons/base/Attachment';
+import { Anchor, Box, Form, FormField, Layer, Tabs, Table, TableRow, Header, Menu, Icons } from 'grommet';
+const { Play, Checkmark, Close, Add, Download, More, Mail, Trash, Attachment, Upload } = Icons.Base;
 import ActionLabel from '../commons/ActionLabel';
 import EditLayer from '../../components/commons/EditLayer';
 import ContentPlaceHolder from '../../components/commons/ContentPlaceHolder';
@@ -394,6 +384,28 @@ export default class AQL extends ComponentBase {
     dropCurrentPop(originAQL, currentAQL, this.initAQL, title, onConfirm);
   }
 
+  uploadJson(e) {
+    let jsonFile = e.target.files[0];
+    var reader = new FileReader();
+    reader.readAsBinaryString(jsonFile);
+    reader.onload = (e) => {
+      let json = JSON.parse(e.target.result);
+      if (this.isValidateView(json)) {
+        if (json._id)
+          json._id = null;
+
+        this._loadAQL(json);
+        AQLActions.uploadAQLSuccess();
+      } else {
+        AQLActions.uploadAQLFailed();
+      }
+    };
+  }
+
+  isValidateView(json) {
+    return (json.name && json.category && json.str);
+  }
+
   render() {
     const header = this.state.data.header.map((col) => <th key={col.Index}>{col.Name}</th>);
 
@@ -433,6 +445,7 @@ export default class AQL extends ComponentBase {
           {this.getAlertLayer(this.state.alertLayer)}
           <Header justify="between" pad={{'horizontal': 'medium'}}>
             <Box>AQL and Graph</Box>
+            <input type="file" ref="upload" accept=".json" onChange={this.uploadJson.bind(this)} style={{display: 'none'}}/>
             <Menu direction="row" align="center" responsive={true}>
               <Anchor link="#" icon={<Play />} onClick={() => this.state.aql.str && this._onQuery()} label="Query"
                       disabled={!this.state.aql.str}/>
@@ -451,6 +464,9 @@ export default class AQL extends ComponentBase {
                 <Anchor icon={<Download />}
                         onClick={() => this.state.aql._id && this._onDownload(this.state.aql)}
                         label="Download" disabled={!this.state.aql._id}/>
+                <Anchor icon={<Upload />}
+                        onClick={() => !this.state.aql._id && this.refs.upload.click()}
+                        label="Upload" disabled={this.state.aql._id}/>
                 <Anchor icon={<Attachment />} onClick={() => this.state.aql.str && this._selectView()}
                         disabled={!this.state.aql.str}
                         label={this.state.aql.view ? 'Attached view: ' + this.state.aql.view.name : 'Attach View'}/>
