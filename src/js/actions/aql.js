@@ -8,6 +8,14 @@ const dummy_promise = {
   then: () => {}
 };
 
+export function uploadAQLSuccess() {
+  store.dispatch({type: Types.RECEIVE_INFO, msg: "Upload AM Browser Graph successfully"});
+}
+
+export function uploadAQLFailed() {
+  store.dispatch({type: Types.RECEIVE_ERROR, msg: "Upload fail, it's not a valid AM Browser Graph"});
+}
+
 export function saveWall(wall) {
   return Rest.post(INSIGHT_DEF_URL, wall).then((res) => {
     if (res.text) {

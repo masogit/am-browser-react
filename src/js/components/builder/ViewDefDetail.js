@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react';
 import ComponentBase from '../commons/ComponentBase';
 import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Split, Map, Icons} from 'grommet';
 const {Close, LinkUp: Up, LinkDown: Down, Ascend, Descend, Play, Checkmark, Duplicate, Download,
-  CaretPrevious, More, Mail} = Icons.Base;
+  CaretPrevious, More, Mail, DocumentPdf, Upload} = Icons.Base;
 import {isEmpty} from 'lodash';
 import AlertForm from '../../components/commons/AlertForm';
 import EditLayer from '../../components/commons/EditLayer';
@@ -93,7 +93,7 @@ export default class ViewDefDetail extends ComponentBase {
   }
 
   _posOrderBy(orderby, field) {
-    let fields = orderby.split(',');
+    let fields = orderby ? orderby.split(',') : [];
     let seq = fields.indexOf(field + ' desc') > -1 ? fields.indexOf(field + ' desc') : fields.indexOf(field);
     if (orderby &&  seq> -1)
       return seq + 1;
@@ -193,7 +193,7 @@ export default class ViewDefDetail extends ComponentBase {
   renderTemplateTable(selectedView, root, path, key) {
     let currentPath = root ? "" : path + ".";
     let selfView = selectedView;
-    let orderbyArray = selfView.body.orderby.split(',');
+    let orderbyArray = selfView.body.orderby ? selfView.body.orderby.split(',') : [];
     // map, then filter out null elements, the index is correct; filter out PK fields, then map, the index is wrong.
     return selfView.body.fields.map((field, index) => {
       let fieldName = field.sqlname;
@@ -400,6 +400,28 @@ export default class ViewDefDetail extends ComponentBase {
     toggleSidebar(false);
   }
 
+  uploadJson(e) {
+    let jsonFile = e.target.files[0];
+    var reader = new FileReader();
+    reader.readAsBinaryString(jsonFile);
+    reader.onload = (e) => {
+      let json = JSON.parse(e.target.result);
+      if (this.isValidateView(json)) {
+        if (json._id)
+          json._id = null;
+
+        this.props.setSelectedView('', json);
+        this.props.uploadViewSuccess();
+      } else {
+        this.props.uploadViewFailed();
+      }
+    };
+  }
+
+  isValidateView(json) {
+    return (json.name && json.category && json.body);
+  }
+
   render() {
     const {selectedView, openPreview, categories, onSubmit, compact} = this.props;
 
@@ -442,6 +464,7 @@ export default class ViewDefDetail extends ComponentBase {
         {this.getLayer(layer)}
         <Header justify="between" pad={{horizontal: 'medium'}}>
           <Box>View Builder</Box>
+          <input type="file" ref="upload" accept=".json" onChange={this.uploadJson.bind(this)} style={{display: 'none'}}/>
           <Menu direction="row" align="center" responsive={true}>
             {renderAnchor({icon: <Play />, onClick: openPreview, label: 'Query', enable: table})}
             {renderAnchor({icon: <Checkmark />, onClick: this.openAlert, args: 'save', label: 'Save', enable: selectedView.name && selectedView.category})}
@@ -450,15 +473,11 @@ export default class ViewDefDetail extends ComponentBase {
               {renderAnchor({icon: <Duplicate />, onClick: this.openAlert, args: 'duplicate', label: 'Duplicate', enable: selectedView._id})}
               {selectedView._id && renderAnchor({icon: <Mail />, onClick: _onMail, args: selectedView, label: 'Mail', enable: selectedView._id})}
               {renderAnchor({icon: <Download />, onClick: _onDownload,args: selectedView , label: 'Download', enable: selectedView._id})}
+              {renderAnchor({icon: <Upload />, onClick: () => {
+                this.refs.upload.click();
+              }, label: 'Upload', enable: !selectedView._id})}
             </Menu>
           </Menu>
-          {/* upload form
-           <form method="post" encType="multipart/form-data" action="http://localhost:8080/coll/view">
-           <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
-           <input type="file" name="docFile" accept=".json" />
-           <input type="submit" />
-           </form>
-           */}
         </Header>
         <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'medium'}}>
           <Split flex="left" fixed={false} className='fixMinSizing'>

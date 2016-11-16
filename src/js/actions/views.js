@@ -26,6 +26,24 @@ function receiveViewsFailure(err) {
   };
 }
 
+export function uploadViewSuccess() {
+  return dispatch => {
+    dispatch({
+      type: types.RECEIVE_INFO,
+      msg: "Upload AM Browser View successfully"
+    });
+  };
+}
+
+export function uploadViewFailed() {
+  return dispatch => {
+    dispatch({
+      type: types.RECEIVE_ERROR,
+      msg: "Upload fail, it's not a valid AM Browser View"
+    });
+  };
+}
+
 export function loadViews(selectedViewId, currentPathName) {
   return dispatch => {
     dispatch(requestViews());
