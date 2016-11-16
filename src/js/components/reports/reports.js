@@ -1,38 +1,46 @@
 import React, {Component} from 'react';
-import { Box, Anchor, Header, Menu, Form, FormField} from 'grommet';
+import { Box, Anchor } from 'grommet';
 import AMSideBar from '../commons/AMSideBar';
 import * as ReportActions from '../../actions/reports';
-import Checkmark from 'grommet/components/icons/base/Checkmark';
 import Add from 'grommet/components/icons/base/Add';
-import Close from 'grommet/components/icons/base/Close';
 import ContentPlaceHolder from '../../components/commons/ContentPlaceHolder';
 import _ from 'lodash';
-import { monitorEdit, dropCurrentPop } from '../../actions/system';
+import { monitorEdit, dropCurrentPop, stopMonitorEdit } from '../../actions/system';
 import body from './body_template.json';
 import records from './records_template.json';
 import PDFGenerator from './PDFGenerator.js';
+import {defaultSettings, defaultPDFDefinition} from '../../util/pdfGenerator';
 
 export default class Reports extends Component {
-
-  constructor() {
-    super();
+  componentWillMount() {
     this.state = {
       reports:[],
       categories: [],
-      report: {
-
-      }
+      report: {}
     };
-    this.initReport={
+
+    this.initReport = {
       name: '',
-      category: ''
+      category: '',
+      //TODO: get user from cookie
+      user: '',
+      settings: defaultSettings
     };
 
     this._dropCurrentPop = this._dropCurrentPop.bind(this);
+    this._onSaveReport = this._onSaveReport.bind(this);
+    this._onRemoveReport = this._onRemoveReport.bind(this);
+    this._initReport = this._initReport.bind(this);
   }
 
   componentDidMount() {
     this._loadReports();
+  }
+
+  _initReport(callback) {
+    this.setState({
+      report: _.cloneDeep(this.initReport)
+    }, callback);
   }
 
   _loadReports() {
@@ -47,11 +55,12 @@ export default class Reports extends Component {
     });
   }
 
-  _onSaveReport() {
-    ReportActions.saveReport(this.state.report).then(id => {
+  _onSaveReport(report) {
+    ReportActions.saveReport(report).then(id => {
       if (id) {
-        this._loadReports(this);
-        this._initReport();
+        stopMonitorEdit();
+        this._loadReports();
+        this.state.report._id = id;
       }
     });
   }
@@ -60,34 +69,18 @@ export default class Reports extends Component {
     ReportActions.removeReport(this.state.report._id).then(id => {
       if (id) {
         this._loadReports();
-        this.setState({
-          report: this.initReport
-        });
+        this.setState({report: {}});
       }
     });
   }
 
-  _setFormValues(event) {
-    const val = event.target.value;
-    const path = event.target.name;
-    const obj = this.state.report;
-
-    obj[path] = val;
-    this.setState({report: obj});
-  }
   _querySelectedReport(report) {
     this.state.report = report;
     ReportActions.loadReport(report._id).then((res) => {
       this.setState({
         report: res
-      });
+      }, () => monitorEdit(_.cloneDeep(res), this.state.report));
     });
-  }
-
-  _initReport(callback) {
-    this.setState({
-      report: _.cloneDeep(this.initReport)
-    },callback);
   }
 
   _onNew() {
@@ -104,24 +97,29 @@ export default class Reports extends Component {
   }
 
   render() {
+    const {reports, report} = this.state;
+
     const toolbar = <Anchor icon={<Add />} label="New" onClick={this._onNew.bind(this)}/>;
-    const contents = this.state.reports.map((report) => ({
-      key: report._id,
-      groupby: report.category,
-      child: report.name,
-      search: report.name,
+    const contents = reports.map(rpt => ({
+      key: rpt._id,
+      groupby: rpt.category,
+      child: rpt.name,
+      search: rpt.name,
       onClick: () => {
-        this._querySelectedReport(report);
+        if (rpt._id != report._id) {
+          this._dropCurrentPop(`Open ${rpt.name}`, this._querySelectedReport.bind(this, rpt));
+        }
       }
     }));
-    const focus = this.state.report && {expand: this.state.report.category, selected: this.state.report._id};
+    const focus = report && {expand: report.category, selected: report._id};
 
     return (
       <Box direction="row" flex={true}>
         <AMSideBar title='Reports' toolbar={toolbar} contents={contents} focus={focus}/>
-        {!_.isEmpty(this.state.report)?
+        {!_.isEmpty(report) ?
           <PDFGenerator body={body} records={records} onSaveReport={this._onSaveReport}
-                        onRemoveReport={this._onRemoveReport}/>
+                        definition={defaultPDFDefinition}
+                        report={report} onRemoveReport={this._onRemoveReport} />
           : <ContentPlaceHolder />
         }
       </Box>

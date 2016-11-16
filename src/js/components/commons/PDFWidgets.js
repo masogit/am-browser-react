@@ -1,7 +1,7 @@
 /**
  * Created by huling on 11/10/2016.
  */
-import React, {Component} from 'react';
+import React, {Component, PropTypes} from 'react';
 import {Box, Header, FormField, Form, CheckBox, SVGIcon, Layer, Paragraph,
   Title, Button, Footer, NumberInput, List, ListItem, Label} from 'grommet';
 import {init_style, getPreviewStyle, updateValue} from '../../util/pdfGenerator';
@@ -25,7 +25,6 @@ const NumberInputField = ({state, label, name, updateValue, min, max, step = 1})
     </FormField>
   );
 };
-
 
 class MarginDesigner extends Component {
   componentWillMount() {
@@ -66,6 +65,11 @@ class MarginDesigner extends Component {
     );
   }
 }
+
+MarginDesigner.propTypes = {
+  updateValue: PropTypes.func
+};
+
 
 let idIndex = 0;
 class StyleDesigner extends Component {
@@ -262,6 +266,15 @@ class StyleDesigner extends Component {
   }
 }
 
+StyleDesigner.defaultProps = {
+  styles: {}
+};
+
+StyleDesigner.propTypes = {
+  styles: PropTypes.object,
+  onConfirm: PropTypes.func
+};
+
 const getRecordNumber = ({recordsStart, limit, total}) => {
   if (recordsStart + limit > total) {
     return total - recordsStart;
@@ -285,11 +298,11 @@ class ExportLayer extends Component {
   }
 
   render() {
-    const {onConfirm} = this.props;
+    const {onConfirm, onClose} = this.props;
     const {recordsStart, total} = this.state;
 
     return (
-      <Layer closer={true} onClose={() => this.setState({showExportLayer: false})}>
+      <Layer closer={true} onClose={onClose}>
         <Box flex={true} size='large'>
           <Header><Title>Choose records to export</Title></Header>
 
@@ -316,6 +329,11 @@ class ExportLayer extends Component {
     );
   }
 }
+
+ExportLayer.propTypes = {
+  onConfirm: PropTypes.func.required,
+  onClose: PropTypes.func.required
+};
 
 
 export {Brush, MarginDesigner, StyleDesigner, NumberInputField, ExportLayer};
