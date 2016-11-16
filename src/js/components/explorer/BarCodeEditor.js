@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Box, Form, FormField, Header, CheckBox, Icons, Anchor, Menu, RadioButton, NumberInput} from 'grommet';
-const {Download, Close, Play: Preview} = Icons.Base;
+const {Download, Play: Preview} = Icons.Base;
 import {getDisplayLabel, getFieldStrVal} from '../../util/RecordFormat';
 import JsBarcode from 'jsbarcode';
 import {ExportLayer} from '../commons/PDFWidgets';
