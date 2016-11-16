@@ -10,7 +10,9 @@ import body from './body_template.json';
 import records from './records_template.json';
 import PDFGenerator from './PDFGenerator.js';
 import {defaultSettings, defaultPDFDefinition} from '../../util/pdfGenerator';
+import cookies from 'js-cookie';
 
+const USER = cookies.get('user');
 export default class Reports extends Component {
   componentWillMount() {
     this.state = {
@@ -22,8 +24,8 @@ export default class Reports extends Component {
     this.initReport = {
       name: '',
       category: '',
-      //TODO: get user from cookie
-      user: '',
+      isPublic: true,
+      user: USER,
       settings: defaultSettings
     };
 
