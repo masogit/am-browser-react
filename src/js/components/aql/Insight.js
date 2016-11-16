@@ -9,8 +9,8 @@ import AlertForm from '../commons/AlertForm';
 import Graph from '../commons/Graph';
 import ComponentBase  from '../commons/ComponentBase';
 import ActionTab from '../commons/ActionTab';
-import {Anchor, Box, Button, CheckBox, Header, Menu, Table, TableRow, Layer, Carousel, RadioButton, Tabs, Icons} from 'grommet';
-const { Add, Close, Attachment, Checkmark, Search, Shift, More, Group } = Icons.Base;
+import {Anchor, Box, Button, CheckBox, Header, Title, Menu, Table, TableRow, Layer, Carousel, RadioButton, Tabs, Icons} from 'grommet';
+const { Add, Close, Attachment, Checkmark, Shift, More, Group, Expand } = Icons.Base;
 import AMSideBar from '../commons/AMSideBar';
 import AQL from './AQL';
 import _ from 'lodash';
@@ -314,13 +314,15 @@ export default class Insight extends ComponentBase {
 
         tabIdMap[tabName].dataIds.push(box.child._id);
         child = (
-          <Box justify="center" pad="medium" flex={true} className='box-graph'>
-            <Header>
-              <Anchor icon={<Search />} label={dataMap.aql.name}
-                      onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
-            </Header>
-            <Graph type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
+          <Box flex={true} className='box-graph'>
+            <Box justify="between" direction="row" colorIndex="light-2" style={{borderLeft: '4px solid #01A982'}}>
+              <Box margin={{left: 'medium'}} justify="center"><Title>{dataMap.aql.name}</Title></Box>
+              <Anchor icon={<Expand />} onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
+            </Box>
+            <Box pad="small" flex={true} justify="center">
+              <Graph type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
                    onClick={(filter) => this._showViewRecords(filter, dataMap.aql.view)}/>
+            </Box>
           </Box>
         );
       }
@@ -339,7 +341,7 @@ export default class Insight extends ComponentBase {
     }
 
     return (
-      <Box key={box.key} direction="column" separator={this.state.edit?'all':'none'} colorIndex="light-2" flex={true}>
+      <Box key={box.key} direction="column" separator={this.state.edit?'all':'none'} flex={true} pad="small">
         {this._buildActions(box, parent)}
         {child}
       </Box>
@@ -436,7 +438,7 @@ export default class Insight extends ComponentBase {
       }</TableRow>
     ));
     return (
-      <Box pad="large" colorIndex="light-2" flex={false}>
+      <Box pad="large" flex={false}>
         <Header>{aql.name}</Header>
         {aql.form instanceof Object &&
           <Box key={aql._id} pad="large" align={(aql.type=='meter')?'center':null}>
@@ -620,7 +622,7 @@ export default class Insight extends ComponentBase {
             </Menu>
           }
           {
-            id && this.showBack() && <Anchor icon={<Close />} label="Close" onClick={() => {
+            id /*&& this.showBack()*/ && <Anchor icon={<Close />} label="Close" onClick={() => {
               history.push('/insight');
               this._loadAQLs();
               this._loadWall();
