@@ -373,21 +373,23 @@ export default class Insight extends ComponentBase {
     }
     const dataIds = tabIdMap[tab.name].dataIds;
     return (
-      <Carousel ref='carousel' className='no-flex' pad="large">
+      <Carousel ref='carousel' className='no-flex'>
         {
           // dataIds contains a lot duplicated ids, and the last unique ids is the right order
           dataIds.slice(-_.uniq(dataIds).length).map((key, index)=> {
             const dataMap = this.state.data[key];
             return (
               dataMap ? // fix console error: cannot get aql of undefined.
-                <Box key={index} className='box-graph' colorIndex="light-1" separator="all">
-                  <Box justify="between" direction="row" colorIndex="light-2" style={{borderLeft: '4px solid #01A982'}}>
-                    <Box margin={{left: 'medium'}} justify="center"><Title>{dataMap.aql.name}</Title></Box>
-                    <Anchor icon={<Expand />} onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
-                  </Box>
-                  <Box pad="large" align={(dataMap.aql.type=='meter')?'center':null}>
-                    <Graph key={dataMap.aql._id} type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
-                           onClick={(filter) => this._showViewRecords(filter, dataMap.aql.view)}/>
+                <Box pad="medium">
+                  <Box key={index} className='box-graph' colorIndex="light-1" separator="all">
+                    <Box justify="between" direction="row" colorIndex="light-2" style={{borderLeft: '4px solid #01A982'}}>
+                      <Box margin={{left: 'medium'}} justify="center"><Title>{dataMap.aql.name}</Title></Box>
+                      <Anchor icon={<Expand />} onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
+                    </Box>
+                    <Box pad="large" align={(dataMap.aql.type=='meter')?'center':null}>
+                      <Graph key={dataMap.aql._id} type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
+                            onClick={(filter) => this._showViewRecords(filter, dataMap.aql.view)}/>
+                    </Box>
                   </Box>
                 </Box>
                 :
