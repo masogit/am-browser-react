@@ -15,7 +15,11 @@ class IndexerLogin extends ComponentBase {
     super();
     this._onSubmit = this._onSubmit.bind(this);
     this._onResponsive = this._onResponsive.bind(this);
-    this.state = {responsive: 'multiple', ambVersion: null};
+    this.state = {
+      responsive: 'multiple',
+      ambVersion: null,
+      loading: false
+    };
     this._isUnmount = false;
   }
 
@@ -25,6 +29,13 @@ class IndexerLogin extends ComponentBase {
         this.setState({ambVersion: res.about.ambVersion});
       }
     });
+  }
+
+  componentDidUpdate(nextProps, nextState) {
+    super.componentDidUpdate();
+    if (!this.locked && this.state.loading) {
+      this.setState({loading: false});
+    }
   }
 
   componentWillUnmount() {
@@ -41,7 +52,8 @@ class IndexerLogin extends ComponentBase {
     if (this.locked) {
       return;
     }
-    
+
+    this.setState({loading: true});
     if (fields.username) {
       this.acquireLock();
       this.props.dispatch(login(fields.username, fields.password));
@@ -77,7 +89,7 @@ class IndexerLogin extends ComponentBase {
         <Sidebar justify="center" align="center" pad="medium" size="large">
           <LoginForm
             title="Asset Manager Browser"
-            onSubmit={this._onSubmit}
+            onSubmit={this.state.loading ? null : this._onSubmit}
             errors={errors}
             usernameType='text'
             defaultValues={{
