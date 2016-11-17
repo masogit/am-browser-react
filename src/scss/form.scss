@@ -43,6 +43,10 @@
   .input-field {
     border-bottom: 1px solid rgba(0,0,0,0.15);
   }
+
+  .grommetux-box--direction-column > .grommetux-form-field {
+    width: calc(100% - 48px);
+  }
 }
 
 .strong-label {
@@ -78,11 +82,6 @@
   .grommetux-form-field {
     padding: 0;
     margin: 5px 24px;
-  }
-
-  .grommetux-box--direction-column > & {
-    width: calc(100% - 48px);
-
   }
 
   .grommetux-form-field__contents {
