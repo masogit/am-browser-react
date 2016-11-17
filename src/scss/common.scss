@@ -142,6 +142,11 @@ th {
   margin-right: 20px;
 }
 
+.app-name {
+  border-right: 2px solid rgba(0,0,0,0.4);
+  min-width: 290px;
+}
+
 .disabled,
 .disabled:hover {
   opacity: 0.3;
@@ -165,5 +170,5 @@ th {
 }
 
 .shadow {
-  box-shadow: 3px 3px 5px rgba(221, 221, 221, 0.7);
+  box-shadow: 3px 3px 17px rgba(196, 196, 196, 1);
 }

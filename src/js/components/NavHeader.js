@@ -36,8 +36,7 @@ export default class NavHeader extends Component {
     return (
       <Header fixed={true} size="medium" direction="row" justify="between" responsive={false} className='shadow'>
         <Box direction="row">
-          <Box margin={{horizontal: 'large'}} size="small" separator="right" responsive={false}
-              style={{borderRight: '2px solid rgba(0,0,0,0.4)', width: '290px'}}>
+          <Box margin={{horizontal: 'large'}} size="small" responsive={false} className="app-name">
             <Heading tag="h2" strong={true}>AM Browser</Heading>
           </Box>
           <Search placeHolder="Type anywhere to search" inline={true} iconAlign="start"/>

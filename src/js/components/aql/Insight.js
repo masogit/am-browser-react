@@ -367,19 +367,13 @@ export default class Insight extends ComponentBase {
   }
 
   _buildCarousel(tab) {
-    // disable animation, so Chart can be rendered correctly
-    setTimeout(()=> {
-      if (this.refs.carousel) {
-        this.refs.carousel.refs.carousel.className = this.refs.carousel.refs.carousel.className.replace('disable_animation', '');
-      }
-    }, 1000);
 
     if(!tabIdMap[tab.name] || !tabIdMap[tab.name].dataIds) { // prevent console error: cannot get dataIds of undefined.
       return null;
     }
     const dataIds = tabIdMap[tab.name].dataIds;
     return (
-      <Carousel ref='carousel' className='disable_animation no-flex'>
+      <Carousel ref='carousel' className='no-flex'>
         {
           // dataIds contains a lot duplicated ids, and the last unique ids is the right order
           dataIds.slice(-_.uniq(dataIds).length).map((key, index)=> {
@@ -439,7 +433,7 @@ export default class Insight extends ComponentBase {
     ));
     return (
       <Box pad="large" flex={false}>
-        <Header>{aql.name}</Header>
+        <Header><Title>{aql.name}</Title></Header>
         {aql.form instanceof Object &&
           <Box key={aql._id} pad="large" align={(aql.type=='meter')?'center':null}>
             <Graph type={aql.type} data={data} config={aql.form}
