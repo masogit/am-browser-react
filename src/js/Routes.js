@@ -2,7 +2,6 @@
 
 import Main from './components/Main';
 import Login from './components/Login';
-import Search from './components/explorer/Search';
 import RecordSearch from './components/explorer/RecordSearch';
 import Insight from './components/aql/Insight';
 import Explorer from './components/explorer/Explorer';
