@@ -12,10 +12,15 @@ export default class NavHeader extends Component {
     return this.props.path.indexOf(to) > -1 ? 'active' : '';
   }
 
+  onSearch(event) {
+    if (event.keyCode == 13 && event.target.value.trim())
+      history.push(`/search/${encodeURI(event.target.value)}`);
+  }
+
   render() {
     const defaultLinks = [
       // {to: '/home', text: 'Home'},
-      {to: '/search', text: 'Search'},
+      // {to: '/search', text: 'Search'},
       {to: '/insight', text: 'Insight'},
       {to: '/explorer', text: 'Viewer'},
       {to: '/views', text: 'Builder'},
@@ -39,7 +44,8 @@ export default class NavHeader extends Component {
           <Box margin={{horizontal: 'large'}} size="small" responsive={false} className="app-name">
             <Heading tag="h2" strong={true}>AM Browser</Heading>
           </Box>
-          <Search placeHolder="Type anywhere to search" inline={true} iconAlign="start"/>
+          <Search placeHolder="Type anywhere to search" inline={true} iconAlign="start"
+                  onKeyDown={this.onSearch.bind(this)}/>
         </Box>
         <Menu direction="row" align="center" responsive={true}>
           {

@@ -9,7 +9,6 @@ import Spinning from 'grommet/components/icons/Spinning';
 import {
   Anchor, Box, Header, Footer, Split, Table, TableRow, Tiles, Tile
 } from 'grommet';
-import {LongSearchInput} from '../commons/SearchInput';
 
 export default class RecordSearch extends ComponentBase {
   constructor() {
@@ -28,14 +27,18 @@ export default class RecordSearch extends ComponentBase {
   componentDidMount() {
     const keyword = this.props.params.keyword;
     this._onSearch(keyword);
-    this.refs.search.refs.input.value = keyword;
     this.loadViews = ExplorerAction.loadViews();
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    const keyword = this.props.params.keyword;
+    this._onSearch(keyword);
+  }
+
   _search(keyword) {
-    if (!this.acquireLock()) {
-      return;
-    }
+    // if (!this.acquireLock()) {
+    //   return;
+    // }
 
     //  Escaped for SQL. e.g. org.apache.commons.lang.StringEscapeUtils.escapeSql(String str).
     keyword = keyword.replace(/[']/g, '\'\'');
@@ -198,7 +201,6 @@ export default class RecordSearch extends ComponentBase {
 
     return (
       <Box flex={true} pad={{horizontal: "medium", vertical: 'small'}}>
-        <LongSearchInput onSearch={this._onSearch.bind(this)} ref='search'/>
         {this.state.warning ? <ContentPlaceHolder content={this.state.warning} />
           :
           <Split flex="right" fixed={false} className='flex'>
@@ -232,7 +234,7 @@ export default class RecordSearch extends ComponentBase {
             <Tiles flush={false} fill={true} className={`autoScroll ${cards.length > 10 ? 'fixIEScrollBar' : ''}`}>
               {
                 this.locked ? <Spinning /> : cards.map((record, index) => (
-                  <Tile key={index} align="start" colorIndex='light-2' pad={{ horizontal: 'small' }}>
+                  <Tile key={index} align="start" colorIndex='light-1' pad={{ horizontal: 'small' }}>
                     <Header size="small">{record.view.name}</Header>
                     <Box flex={true}>
                       <Anchor onClick={this._onClick.bind(this, record.view, record)}
