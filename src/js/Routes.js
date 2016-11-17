@@ -28,7 +28,6 @@ export const getRoutes = (headerNavs) => {
     const allRoutes = [
       {path: 'insight', component: Insight},
       {path: 'insight/:id', component: Insight},
-      {path: 'search', component: Search},
       {path: 'search/:keyword', component: RecordSearch},
       {path: 'explorer', component: Explorer},
       {path: 'explorer/:id', component: Explorer},
