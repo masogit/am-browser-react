@@ -341,7 +341,8 @@ export default class Insight extends ComponentBase {
     }
 
     return (
-      <Box key={box.key} direction="column" separator={this.state.edit?'all':'none'} flex={true} pad="small">
+      <Box key={box.key} direction="column" separator={this.state.edit?'all':'none'} flex={true}
+           pad={(box.child instanceof Array) ? "none" : "small"}>
         {this._buildActions(box, parent)}
         {child}
       </Box>
