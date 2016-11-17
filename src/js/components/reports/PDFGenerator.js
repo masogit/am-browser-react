@@ -48,7 +48,7 @@ export default class PDFGenerator extends Component {
 
   componentWillReceiveProps(nextProps) {
     const {body: {fields}, records, definition, report} = nextProps;
-    if (name !== this.state.name) {
+    if (report._id !== this.state.report._id) {
       this.setState({
         fields, records, report, definition
       }, this._preview);
@@ -163,7 +163,7 @@ export default class PDFGenerator extends Component {
       const closeState = {
         showLayer: null,
         new_style: Object.assign({}, init_style),
-        settings: this.state.report.settings
+        report: this.state.report
       };
 
       const onClose =() => {
@@ -215,7 +215,7 @@ export default class PDFGenerator extends Component {
   render() {
     const {mode, pdfDefinition, error, report, loading} = this.state;
     const {settings, name, _id, isPublic} = report;
-
+    const canEdit = this.props.root || !isPublic;
     return (
       <Box pad='small' flex={true}>
         <Header justify='between' size='small'>
@@ -225,10 +225,10 @@ export default class PDFGenerator extends Component {
             <Anchor icon={<Brush />} onClick={() => this.setState({showLayer: 'new_style'})} label="Style Designer"/>
             <Anchor icon={<Preview/>} disabled={loading} onClick={loading ? null : this._preview} label='Preview'/>
             <Anchor icon={<Download />} disabled={loading} onClick={() => !loading && this.setState({showExportLayer: true})} label='Export'/>
-            <Anchor icon={<Duplicate />} onClick={this.onDuplicate} label="Duplicate" disabled={!_id} />
-            {!isPublic && <Anchor icon={<Checkmark />} onClick= {() => this.props.onSaveReport(this.state.report)}
+            <Anchor icon={<Duplicate />} onClick={_id ? this.onDuplicate : null} label="Duplicate" disabled={!_id} />
+            {canEdit && <Anchor icon={<Checkmark />} onClick= {() => name && this.isChanged() && this.props.onSaveReport(this.state.report)}
                     label="Save" disabled = {!name || !this.isChanged()} />}
-            {!isPublic && <Anchor icon={<Close />} onClick= {this.props.onRemoveReport}
+            {canEdit && <Anchor icon={<Close />} onClick= {_id ? this.props.onRemoveReport : null}
                     label="Delete" disabled={!_id}/>}
           </Menu>
         </Header>

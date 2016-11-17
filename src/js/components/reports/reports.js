@@ -74,7 +74,7 @@ export default class Reports extends Component {
     this._dropCurrentPop('Duplicate a pdf template?', () => {
       this._initReport(() => {
         monitorEdit(_.cloneDeep(this.state.report), this.state.report);
-        report.category = category_PERSONAL;
+        report.category = this.props.fromView ? category_PERSONAL : category_PUBLIC;
         report.isPublic = false;
         this.setState({report});
       });
@@ -135,7 +135,7 @@ export default class Reports extends Component {
         <AMSideBar title='Templates' toolbar={toolbar} contents={contents} focus={focus}/>
         {!_.isEmpty(report) ?
           <PDFGenerator body={body || example_body} records={records || example_records} onSaveReport={this._onSaveReport}
-                        definition={defaultPDFDefinition} onDupReport={this._onDupReport}
+                        definition={defaultPDFDefinition} onDupReport={this._onDupReport} root={!fromView}
                         report={report} onRemoveReport={this._onRemoveReport} />
           : <ContentPlaceHolder />
         }
