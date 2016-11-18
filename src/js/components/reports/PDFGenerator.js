@@ -52,12 +52,8 @@ export default class PDFGenerator extends Component {
       this.setState({
         fields, records, report, definition
       }, this._preview);
-      if (report.isDuplicate) {
-        delete report.isDuplicate;
-      } else {
-        this.originReport = _.cloneDeep(report);
-      }
     }
+    this.originReport = _.cloneDeep(report);
   }
 
   autoPreview() {
@@ -199,23 +195,22 @@ export default class PDFGenerator extends Component {
     }
   }
 
-  isChanged() {
-    return !_.isEqual(this.originReport, this.state.report);
-  }
-
   onDuplicate() {
     const report = this.state.report;
     const dupReport = _.cloneDeep(report);
     dupReport._id = null;
-    dupReport.isDuplicate = true;
     dupReport.name = report.name  + '_duplicate';
-    this.props.onDupReport(dupReport);
+    this.props.onDupReport(dupReport, this.resetOrigin);
+  }
+
+  isChanged() {
+    return this.props.isChanged || !_.isEqual(this.originReport, this.state.report);
   }
 
   render() {
     const {mode, pdfDefinition, error, report, loading} = this.state;
-    const {settings, name, _id, isPublic} = report;
-    const canEdit = this.props.root || !isPublic;
+    const {settings, name, _id} = report;
+    const canEdit = this.props.root || !report.public;
     return (
       <Box pad='small' flex={true}>
         <Header justify='between' size='small'>
@@ -226,7 +221,7 @@ export default class PDFGenerator extends Component {
             <Anchor icon={<Preview/>} disabled={loading} onClick={loading ? null : this._preview} label='Preview'/>
             <Anchor icon={<Download />} disabled={loading} onClick={() => !loading && this.setState({showExportLayer: true})} label='Export'/>
             <Anchor icon={<Duplicate />} onClick={_id ? this.onDuplicate : null} label="Duplicate" disabled={!_id} />
-            {canEdit && <Anchor icon={<Checkmark />} onClick= {() => name && this.isChanged() && this.props.onSaveReport(this.state.report)}
+            {canEdit && <Anchor icon={<Checkmark />} onClick= {() => name && this.isChanged() && this.props.onSaveReport(report)}
                     label="Save" disabled = {!name || !this.isChanged()} />}
             {canEdit && <Anchor icon={<Close />} onClick= {_id ? this.props.onRemoveReport : null}
                     label="Delete" disabled={!_id}/>}

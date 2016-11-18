@@ -10,9 +10,7 @@ import example_body from './body_template.json';
 import example_records from './records_template.json';
 import PDFGenerator from './PDFGenerator.js';
 import {defaultSettings, defaultPDFDefinition} from '../../util/pdfGenerator';
-import cookies from 'js-cookie';
 
-const USER = cookies.get('user');
 const category_PUBLIC = 'Public';
 const category_PERSONAL = 'Personal';
 export default class Reports extends Component {
@@ -26,8 +24,7 @@ export default class Reports extends Component {
     this.initReport = {
       name: '',
       category: this.props.fromView ? category_PERSONAL : category_PUBLIC,
-      isPublic: !this.props.fromView,
-      user: USER,
+      public: !this.props.fromView,
       settings: defaultSettings
     };
 
@@ -36,6 +33,9 @@ export default class Reports extends Component {
     this._onRemoveReport = this._onRemoveReport.bind(this);
     this._onDupReport = this._onDupReport.bind(this);
     this._initReport = this._initReport.bind(this);
+    this.isChanged = this.isChanged.bind(this);
+    this.resetOrigin = this.resetOrigin.bind(this);
+    //this.originReport = _.cloneDeep(this.initReport);
   }
 
   componentDidMount() {
@@ -60,22 +60,23 @@ export default class Reports extends Component {
     });
   }
 
-  _onSaveReport(report) {
+  _onSaveReport(report, callback) {
     ReportActions.saveReport(report).then(id => {
       if (id) {
         stopMonitorEdit();
         this._loadReports();
         this.state.report._id = id;
+        this.setState({report: this.state.report}, this.resetOrigin);
       }
     });
   }
 
-  _onDupReport(report) {
+  _onDupReport(report, callback) {
     this._dropCurrentPop('Duplicate a pdf template?', () => {
       this._initReport(() => {
-        monitorEdit(_.cloneDeep(this.state.report), this.state.report);
+        this.resetOrigin();
         report.category = this.props.fromView ? category_PERSONAL : category_PUBLIC;
-        report.isPublic = false;
+        report.public = !this.props.fromView;
         this.setState({report});
       });
     });
@@ -91,18 +92,28 @@ export default class Reports extends Component {
   }
 
   _querySelectedReport(report) {
-    this.state.report = report;
+    this.originReport = _.cloneDeep(report);
     ReportActions.loadReport(report._id).then((res) => {
       this.setState({
         report: res
-      }, () => monitorEdit(_.cloneDeep(res), this.state.report));
+      }, this.resetOrigin);
     });
   }
 
   _onNew() {
     this._dropCurrentPop('Create a new pdf template?', () =>{
-      this._initReport(() => monitorEdit(_.cloneDeep(this.state.report), this.state.report));
+      this._initReport(this.resetOrigin);
     });
+  }
+
+  isChanged() {
+    return !_.isEqual(this.originReport, this.state.report);
+  }
+
+  resetOrigin() {
+    const report = this.state.report;
+    this.originReport = _.cloneDeep(report);
+    monitorEdit(this.originReport, report);
   }
 
   _dropCurrentPop(title, onConfirm) {
@@ -135,7 +146,7 @@ export default class Reports extends Component {
         <AMSideBar title='Templates' toolbar={toolbar} contents={contents} focus={focus}/>
         {!_.isEmpty(report) ?
           <PDFGenerator body={body || example_body} records={records || example_records} onSaveReport={this._onSaveReport}
-                        definition={defaultPDFDefinition} onDupReport={this._onDupReport} root={!fromView}
+                        definition={defaultPDFDefinition} onDupReport={this._onDupReport} root={!fromView} isChanged={this.isChanged()}
                         report={report} onRemoveReport={this._onRemoveReport} />
           : <ContentPlaceHolder />
         }

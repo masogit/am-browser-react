@@ -109,7 +109,6 @@ exports.init = function (dbFolder) {
           logger.info("[server]", `The db folder '${dbFolder}' was created.`);
         }
       });
-
     }
   });
 };
@@ -165,8 +164,10 @@ exports.find = function (req, res) {
       if (err)
         logger.error("[tingo]", err);
       else {
-        if (collectionName == 'insight' || collectionName == 'report') {
-          documents = documents.filter(doc => doc.user = req.session.user)
+        if (collectionName == 'report') {
+          documents = documents.filter(doc => doc.public || doc.user == req.session.user);
+        } else if (collectionName == 'wall') {
+          //documents = documents.filter(doc => doc.user == req.session.user || doc.tabs.filter(tab => tab.public));
         }
         if (download)
           JSONDownloader(res, documents, collectionName + '.json');
@@ -189,7 +190,7 @@ function findBy (collectionName, filter) {
       resolve(documents);
     });
   });
-};
+}
 
 exports.findBy = findBy;
 
@@ -201,7 +202,7 @@ exports.upsert = function (req, res) {
 
   // Validation then save or update
   var validator = new Validator();
-  var error = validator.document(collectionName, obj, req.session);
+  var error = validator.document(collectionName, obj, {session: req.session});
   if (typeof error == 'string') {  // Simple String error
     logger.error(`[tingo]`, error);
     res.status(400).send(error);
@@ -245,10 +246,18 @@ exports.delete = function (req, res) {
   var collectionName = req.params.collection;
   var id = req.params.id;
 
-  db.collection(collectionName).remove({ _id: id }, function (err, result) {
-    if (err)
-      logger.error("[tingo]", err);
-    res.send(id);
+  // Validation when delete
+  var validator = new Validator();
+  validator.document(collectionName, {_id: id}, {type: 'delete', rightIndex: req.session.rights.index}).then(error => {
+    if (!error) {
+      db.collection(collectionName).remove({_id: id}, function (err, result) {
+        if (err)
+          logger.error("[tingo]", err);
+        res.send(id);
+      });
+    } else {
+      res.status(401).send(error);
+    }
   });
 };
 
