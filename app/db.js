@@ -21,24 +21,28 @@ function migrate() {
     db = new Engine.Db(config.db_folder, {});
     logger.info("[Migrating]", 'Loading data from folder: ' + config.db_folder);
     db.collections((error, collections) => {
-      var promises = [];
-      collections.forEach((coll) => {
-        var collName = coll.collectionName;
-        promises.push(
-          new Promise((res, rej) => {
-            db.collection(collName).find({}).toArray(function (err, documents) {
-              logger.info("[Migrating]", "Exporting collection: " + collName + ", records: " + documents.length);
-              if (err)
-                rej(err);
-              else {
-                var obj = {};
-                obj[collName] = [...documents];
-                res(obj);
-              }
-            });
-          })
-        );
-      });
+      if (error) {
+        logger.error("[Migrating]", error);
+      } else {
+        var promises = [];
+        collections.forEach((coll) => {
+          var collName = coll.collectionName;
+          promises.push(
+            new Promise((res, rej) => {
+              db.collection(collName).find({}).toArray(function (err, documents) {
+                logger.info("[Migrating]", "Exporting collection: " + collName + ", records: " + documents.length);
+                if (err)
+                  rej(err);
+                else {
+                  var obj = {};
+                  obj[collName] = [...documents];
+                  res(obj);
+                }
+              });
+            })
+          );
+        });
+      }
 
       Promise.all(promises).then((collections) => {
         db.close();
