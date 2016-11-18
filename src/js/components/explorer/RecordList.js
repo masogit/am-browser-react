@@ -54,7 +54,7 @@ const init = (props) => {
     locked: false,
     showGraph: true,
     body: props.body,
-    pdfGenerator: null
+    pdfSettings: null
   };
 
 };
@@ -196,7 +196,7 @@ export default class RecordList extends ComponentBase {
       return <EmptyIcon className='icon-empty3'/>;
   }
 
-  _posOrderby(orderby = '', field) {
+  _posOrderby(orderby = '', field = '') {
     let fields = orderby.split(',');
     let seq = fields.indexOf(field + ' desc') > -1 ? fields.indexOf(field + ' desc') : fields.indexOf(field);
     if (orderby &&  seq> -1)
@@ -475,22 +475,22 @@ export default class RecordList extends ComponentBase {
     );
   }
 
-  printPdf(pdfGenerator) {
-    this.setState({pdfGenerator});
+  printPdf(pdfSettings) {
+    this.setState({pdfSettings});
   }
 
   renderPDFPreview() {
-    const pdfGenerator = this.state.pdfGenerator;
-    if (pdfGenerator.type == 'BarCode') {
+    const pdfSettings = this.state.pdfSettings;
+    if (pdfSettings.type == 'BarCode') {
       return (
-        <Layer closer={true} onClose={() => this.setState({pdfGenerator: null})}>
-          <BarCodeEditor {...pdfGenerator}/>
+        <Layer closer={true} onClose={() => this.setState({pdfSettings: null})}>
+          <BarCodeEditor {...pdfSettings}/>
         </Layer>
       );
     } else {
       return (
-        <Layer closer={true} onClose={() => this.setState({pdfGenerator: null})}>
-          <PDFTemplate {...pdfGenerator} fromView={true} />
+        <Layer closer={true} onClose={() => this.setState({pdfSettings: null})}>
+          <PDFTemplate {...pdfSettings} fromView={true} />
         </Layer>
       );
     }
@@ -677,9 +677,9 @@ export default class RecordList extends ComponentBase {
   }
 
   render() {
-    const {record, pdfGenerator, param: {graphType, filters, showTopology}} = this.state;
+    const {record, pdfSettings, param: {graphType, filters, showTopology}} = this.state;
 
-    if (pdfGenerator) {
+    if (pdfSettings) {
       return this.renderPDFPreview();
     } else {
       return (

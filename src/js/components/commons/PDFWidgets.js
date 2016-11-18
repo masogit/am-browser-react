@@ -4,7 +4,7 @@
 import React, {Component, PropTypes} from 'react';
 import {Box, Header, FormField, Form, CheckBox, SVGIcon, Layer, Paragraph,
   Title, Button, Footer, NumberInput, List, ListItem, Label} from 'grommet';
-import {init_style, getPreviewStyle, updateValue} from '../../util/pdfGenerator';
+import {init_style, getPreviewStyle, updateValue} from '../../util/pdfDesigner';
 import AlertForm from '../commons/AlertForm';
 
 const Brush = (props) => (

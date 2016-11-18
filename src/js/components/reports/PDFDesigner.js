@@ -5,13 +5,13 @@ const {Download, Close, Play: Preview, Code, Checkmark, Duplicate} = Icons.Base;
 import {loadRecordsByBody} from '../../actions/explorer';
 import { cloneDeep } from 'lodash';
 import { MODE, init_style, table_style, preview,
-  getPreviewStyle, updateValue, translateText, format, download } from '../../util/pdfGenerator';
+  getPreviewStyle, updateValue, translateText, format, download } from '../../util/pdfDesigner';
 import {Brush, StyleDesigner, ExportLayer} from './../commons/PDFWidgets';
 import AlertForm from '../commons/AlertForm';
 
 Menu.propTypes.label = PropTypes.oneOfType([PropTypes.object, PropTypes.string]);
 
-export default class PDFGenerator extends Component {
+export default class PDFDesigner extends Component {
   componentWillMount() {
     const {body: {fields}, records, report, definition} = this.props;
     this.state = {
@@ -284,7 +284,7 @@ export default class PDFGenerator extends Component {
   }
 }
 
-PDFGenerator.propTyps = {
+PDFDesigner.propTyps = {
   body: PropTypes.object.required,
   records: PropTypes.array,
   settings: PropTypes.object.required,

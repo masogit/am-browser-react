@@ -11,7 +11,7 @@ import FieldTypes from '../../constants/FieldTypes';
 import {saveAs} from 'file-saver';
 import SearchInput from '../commons/SearchInput';
 import {bodyToMapData} from '../../util/util';
-import PDFGenerator from './../reports/PDFGenerator';
+import PDFDesigner from './../reports/PDFDesigner';
 import {toggleSidebar} from '../../actions/system';
 
 const _onMail = (view) => {
@@ -395,8 +395,8 @@ export default class ViewDefDetail extends ComponentBase {
     return title && <AlertForm onClose={this.closeAlertForm} title={title} onConfirm={onConfirm}/>;
   }
 
-  printPdf(pdfGenerator) {
-    this.setState({pdfGenerator});
+  printPdf(pdfSettings) {
+    this.setState({pdfSettings});
     toggleSidebar(false);
   }
 
@@ -430,10 +430,10 @@ export default class ViewDefDetail extends ComponentBase {
       return <ContentPlaceHolder/>;
     }
 
-    const {layer, alertForm, pdfGenerator} = this.state;
+    const {layer, alertForm, pdfSettings} = this.state;
 
-    if (pdfGenerator) {
-      return <PDFGenerator {...pdfGenerator} back={() => this.setState({pdfGenerator: null})}/>;
+    if (pdfSettings) {
+      return <PDFDesigner {...pdfSettings} back={() => this.setState({pdfSettings: null})}/>;
     }
 
     let table;

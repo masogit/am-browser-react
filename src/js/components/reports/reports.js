@@ -8,8 +8,8 @@ import _ from 'lodash';
 import { monitorEdit, dropCurrentPop, stopMonitorEdit } from '../../actions/system';
 import example_body from './body_template.json';
 import example_records from './records_template.json';
-import PDFGenerator from './PDFGenerator.js';
-import {defaultSettings, defaultPDFDefinition} from '../../util/pdfGenerator';
+import PDFGenerator from './PDFDesigner.js';
+import {defaultSettings, defaultPDFDefinition} from '../../util/pdfDesigner';
 
 const category_PUBLIC = 'Public';
 const category_PERSONAL = 'Personal';
