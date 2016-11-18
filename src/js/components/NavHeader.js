@@ -2,9 +2,9 @@
 
 import React, {Component} from 'react';
 import {Link} from 'react-router';
-import {Header, Title, Menu } from 'grommet';
+import {Box, Header, Heading, Menu, Search} from 'grommet';
 import SessionMenu from './SessionMenu/MenuContainer';
-import {dropCurrentPop_stopMonitor, toggleSidebar} from '../actions/system';
+import {dropCurrentPop_stopMonitor} from '../actions/system';
 import history from '../RouteHistory';
 
 export default class NavHeader extends Component {
@@ -12,10 +12,15 @@ export default class NavHeader extends Component {
     return this.props.path.indexOf(to) > -1 ? 'active' : '';
   }
 
+  onSearch(event) {
+    if (event.keyCode == 13 && event.target.value.trim())
+      history.push(`/search/${encodeURI(event.target.value)}`);
+  }
+
   render() {
     const defaultLinks = [
       // {to: '/home', text: 'Home'},
-      {to: '/search', text: 'Search'},
+      // {to: '/search', text: 'Search'},
       {to: '/insight', text: 'Insight'},
       {to: '/explorer', text: 'Viewer'},
       {to: '/report', text: 'Reports'},
@@ -35,10 +40,14 @@ export default class NavHeader extends Component {
     }
 
     return (
-      <Header fixed={true} size="medium" full="horizontal" direction="row" justify="between" colorIndex="neutral-1" responsive={false} className='shadow'>
-        <Title>
-          <img src="img/favicon.png" className='logo' onClick={toggleSidebar}/> AM Browser
-        </Title>
+      <Header fixed={true} size="medium" direction="row" justify="between" responsive={false} className='shadow'>
+        <Box direction="row">
+          <Box margin={{horizontal: 'large'}} size="small" responsive={false} className="app-name">
+            <Heading tag="h2" strong={true}>AM Browser</Heading>
+          </Box>
+          <Search placeHolder="Type anywhere to search" inline={true} iconAlign="start"
+                  onKeyDown={this.onSearch.bind(this)}/>
+        </Box>
         <Menu direction="row" align="center" responsive={true}>
           {
             links.map((link, index) => (

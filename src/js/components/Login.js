@@ -86,7 +86,7 @@ class IndexerLogin extends ComponentBase {
     return (
       <Split flex="left" onResponsive={this._onResponsive}>
         {image}
-        <Sidebar justify="center" align="center" pad="medium" size="large">
+        <Sidebar justify="center" align="center" pad="medium" size="large" colorIndex="light-1">
           <LoginForm
             title="Asset Manager Browser"
             onSubmit={this.state.loading ? null : this._onSubmit}

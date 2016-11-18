@@ -2,7 +2,6 @@
 
 import Main from './components/Main';
 import Login from './components/Login';
-import Search from './components/explorer/Search';
 import RecordSearch from './components/explorer/RecordSearch';
 import Insight from './components/aql/Insight';
 import Explorer from './components/explorer/Explorer';
@@ -27,13 +26,12 @@ export const getRoutes = (headerNavs) => {
   const routes = [{path: 'login', component: Login}];
   if (headerNavs) {
     const allRoutes = [
-      {path: 'search', component: Search},
+      {path: 'insight', component: Insight},
+      {path: 'insight/:id', component: Insight},
       {path: 'search/:keyword', component: RecordSearch},
       {path: 'explorer', component: Explorer},
       {path: 'explorer/:id', component: Explorer},
       {path: 'report', component: Report},
-      {path: 'insight', component: Insight},
-      {path: 'insight/:id', component: Insight},
       {path: 'tbd', component: TBD},
       {path: 'ucmdbAdapter', component: UCMDBAdapterContainer},
       {path: 'ucmdbAdapter(/:pointName)(/:tabName)(/:integrationJobName)', component: UCMDBAdapterContainer},
@@ -60,7 +58,7 @@ export const getRoutes = (headerNavs) => {
 
   routes.push({
     path: '*',
-    component: Search,
+    component: Insight,
     onEnter: (nextState, replaceState) => {
       var goToLink = routes[0].path;
       if (headerNavs) {
