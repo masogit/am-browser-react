@@ -9,15 +9,15 @@ var coll = require('./constants').collections;
 
 module.exports = function () {
 
-  this.document = function (documentName, document) {
-    return this[documentName](document);
+  this.document = function (documentName, document, session) {
+    return this[documentName](document, session);
   };
 
   // register validate document
   this.view = (document) => view(document);
   this.aql = (document) => aql(document);
   this.wall = (document) => wall(document);
-  this.report = (document) => report(document);
+  this.report = (document, session) => report(document, session);
 };
 
 /************ Unit validation functions *************/
@@ -44,15 +44,26 @@ function view(obj) {
   });
 }
 
-function report(obj) {
+function report(obj, session) {
   // existing validation
   if (invalidLength(obj.name, 1, 100))
     return "Report's name is required, limit length: 1 to 100!";
   if (invalidLength(obj.category, 1, 100))
     return "Report's category is required, limit length: 1 to 100!";
 
+  //check only admin can save public
+  if (session.rights.index >= 1 && obj.isPublic) {
+    return "Only admin can save public PDF template!";
+  }
+
   // check duplicate
-  return db.findBy(coll.report, {name: {'$regex' : `^${obj.name.trim()}$`, '$options' : 'i'}, category: {'$regex' : `^${obj.category.trim()}$`, '$options' : 'i'}}).then((documents) => {
+  const rules = {
+    name: {'$regex': `^${obj.name.trim()}$`, '$options': 'i'},
+    category: {'$regex': `^${obj.category.trim()}$`, '$options': 'i'},
+    user: {'$regex': `^${session.user.trim()}$`, '$options': 'i'}
+  };
+
+  return db.findBy(coll.report, rules).then((documents) => {
     if (documents.length > 0 && documents[0]._id != obj._id)
       return "Report name can not duplicate in same category!";
     else
@@ -150,8 +161,13 @@ function aql(aql) {
   if (error = form(form))
     return error;
 
+  const rules = {
+    name: {'$regex': `^${aql.name.trim()}$`, '$options': 'i'},
+    category: {'$regex': `^${aql.category.trim()}$`, '$options': 'i'}
+  };
+
   // check duplicate
-  return db.findBy(coll.graph, {name: {'$regex' : `^${aql.name.trim()}$`, '$options' : 'i'}, category: {'$regex' : `^${aql.category.trim()}$`, '$options' : 'i'}}).then((documents) => {
+  return db.findBy(coll.graph, rules).then((documents) => {
     if (documents.length > 0 && documents[0]._id != aql._id)
       return "Graph name can not duplicate in same category!";
     else
