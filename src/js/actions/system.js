@@ -83,7 +83,7 @@ export function lwssoPreAuthenticate(retry) {
   };
 }
 
-export function login(username, password, retry) {
+export function login(username, password, callback, retry) {
   return function (dispatch) {
     const auth = 'Basic ' + new Buffer(`${username}:${password}`).toString('base64');
     return Rest.post(LOGIN_DEF_URL)
@@ -108,7 +108,7 @@ export function login(username, password, retry) {
             } else if (err.status == 403 && message.indexOf('invalid csrf token') > -1) {
               message = 'Invalid csrf token';
               if (!retry) {
-                login(username, password, true)(dispatch);
+                login(username, password, callback, true)(dispatch);
                 retrying = true;
               }
             }
@@ -120,7 +120,7 @@ export function login(username, password, retry) {
             dispatch(loginFailure({message: 'Login failed. ' + message}));
           }
         }
-      });
+      }).then(callback);
   };
 }
 
