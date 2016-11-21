@@ -39,6 +39,12 @@ const styles = {
     fontSize: 12,
     tempId: -3
   },
+  tableTitle: {
+    italics: true,
+    fontSize: 13,
+    color: '#000000',
+    tempId: -7
+  },
   tableFields: {
     margin: [0, 20, 20, 15],
     tempId: -4
@@ -52,6 +58,12 @@ const styles = {
     fontSize: 13,
     color: '#000000',
     tempId: -6
+  },
+  fieldTitle: {
+    italics: true,
+    fontSize: 13,
+    color: '#000000',
+    tempId: -7
   }
 };
 
@@ -166,10 +178,10 @@ const analyzeRecordList = (title, filter, allFields, records, style) => {
   return genTable({title, records, fields: availableFields, style});
 };
 
-function getLinkData(link, pdf_link = []) {
+function getLinkData(link, pdf_link = [], style = {subheader: 'subheader', layout: 'headerLineOnly', header: 'tableHeader', text: 'text', title: 'tableHeader'}) {
   const title = link.label;
   const fields = link.body.fields;
-  link.body.param = {};
+  link.body.param = {limit: 1};
 
   return loadRecordsByBody(link.body).then(data => {
     const links = link.body.links;
@@ -178,7 +190,7 @@ function getLinkData(link, pdf_link = []) {
       const pdf_ol = [];
 
       pdf_link.push({
-        text: `${title} (${data.count})`, style: 'subheader'
+        text: `${title} (${data.count})`, style: style.subheader
       });
 
       pdf_link.push({
@@ -187,9 +199,9 @@ function getLinkData(link, pdf_link = []) {
       });
 
       data.entities.map((record) => {
-        let summary = {
+        const summary = {
           stack: [
-            {text: record.self, style: 'tableHeader'},
+            {text: record.self, style: style.tableHeader},
             {
               alignment: 'justify',
               columns: genSummary(record, fields)
@@ -227,11 +239,12 @@ function getLinkBody(link, record) {
   return body;
 }
 
-function genSummary(record, fields) {
-  var pdf_header = [{}, {}];
-
+function genSummary(record, fields, columns = 2) {
+  //const pdf_header = new Array(columns).fill({});
+  const pdf_header = [];
+  _.times(columns, pdf_header.push({}));
   fields.forEach((field, index) => {
-    var column = !(index % 2) ? pdf_header[0] : pdf_header[1];
+    const column = pdf_header[index % columns];
     if (!column.table)
       Object.assign(column, {
         layout: 'noBorders',
@@ -339,7 +352,17 @@ const translateText = (pdfDefinition, {settings, records, fields_state, body, re
   const promiseList = [];
   if (links && links.length > 0) {
 
-    content.push(genSummary(record, fields_props));
+    const summary = {
+      stack: [
+        {text: record.self, style: settings.fieldTitle},
+        {
+          alignment: 'justify',
+          columns: genSummary(record, fields_props)
+        }
+      ],
+      margin: [0, 0, 0, 40]
+    };
+    content.push(summary);
 
     links.forEach(link => {
       promiseList.push(getLinkData({...link, param: {}}, content));
