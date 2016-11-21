@@ -62,11 +62,15 @@ export default class ViewDefDetail extends ComponentBase {
   }
 
   _onChange(event, value) {
-    let path = event.target.name; // why not 'event.target.id'? because of radio button.
-    if (event.target.type == "checkbox") {
-      this.props.onValueChange(path.substring(2), value ? event.target.checked && value || '' : event.target.checked);
+    let eTarget = event.target ? event.target : event;
+    let path = eTarget.name; // why not 'event.target.id'? because of radio button.
+    let type = eTarget.type;
+    let eventValue = eTarget.value;
+
+    if (type == "checkbox") {
+      this.props.onValueChange(path.substring(2), value ? eTarget.checked && value || '' : eTarget.checked);
     } else {
-      this.props.onValueChange(path.substring(2), event.target.value);
+      this.props.onValueChange(path.substring(2), eventValue);
     }
   }
 
@@ -363,11 +367,13 @@ export default class ViewDefDetail extends ComponentBase {
   getLayer(type) {
     if (type == 'description') {
       return (
-        <EditLayer
-          onChange={this._onChange.bind(this)}
-          value={this.props.selectedView.desc}
+        <EditLayer value={this.props.selectedView.desc}
           label='Description' name='v.desc'
-          onClose={this._onClose.bind(this)} />
+          onClose={this._onClose.bind(this)}
+          onConfirm={event => {
+            this._onClose();
+            this._onChange(event);
+          }} />
       );
     }
   }
