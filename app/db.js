@@ -3,6 +3,7 @@ var db;
 const fs = require('fs');
 var logger = require('./logger.js');
 var Validator = require('./validator.js');
+var collections = require('./constants').collections;
 const config = require('./config');
 
 process.argv.forEach(function (val, index, array) {
@@ -16,81 +17,66 @@ process.argv.forEach(function (val, index, array) {
 
 function migrate() {
   logger.info("[Migrating]", 'Migrating from file to mongodb');
-  var promise = new Promise((resolve, reject) => {
-    Engine = require('tingodb')();
-    db = new Engine.Db(config.db_folder, {});
-    logger.info("[Migrating]", 'Loading data from folder: ' + config.db_folder);
-    db.collections((error, collections) => {
-      if (error) {
-        logger.error("[Migrating]", error);
-      } else {
-        var promises = [];
-        collections.forEach((coll) => {
-          var collName = coll.collectionName;
-          promises.push(
-            new Promise((res, rej) => {
-              db.collection(collName).find({}).toArray(function (err, documents) {
-                logger.info("[Migrating]", "Exporting collection: " + collName + ", records: " + documents.length);
-                if (err)
-                  rej(err);
-                else {
-                  var obj = {};
-                  obj[collName] = [...documents];
-                  res(obj);
-                }
-              });
-            })
-          );
-        });
-      }
 
-      Promise.all(promises).then((collections) => {
-        db.close();
-        var MongoClient = require('mongodb').MongoClient;
-        var authUrl = `${config.mongo.username}:${config.mongo.password}@`;
-        var url = `mongodb://${config.mongo.username ? authUrl : ''}${config.mongo.server}:${config.mongo.port}/${config.mongo.db}`;
-        logger.info("[Migrating]", 'Connecting mongodb: ' + url);
-        MongoClient.connect(url, function(err, ambdb) {
-          if(!err) {
-            logger.info("[Migrating]", `Mongodb ${config.mongo.server} connected`);
-            var promises = [];
-            collections.forEach((collection) => {
-              var collName = Object.keys(collection)[0];
-              var records = collection[collName];
-              records.forEach((record) => {
-                promises.push(
-                  new Promise((resolve, reject) => {
-                    ambdb.collection(collName).update({_id: record._id}, record, {upsert: true}, function (err, result) {
-                      if (err)
-                        reject(err);
-                      else
-                        resolve({});
-                    });
-                  })
-                );
-              });
-            });
-
-            Promise.all(promises).then((records) => {
-              logger.info("[Migrating]", `${records.length} record(s) already be imported successfully. `);
-              ambdb.close();
-            }, (reason) => {
-              logger.error("[Migrating]", reason);
-            });
-          } else {
-            logger.error("[Migrating]", err);
+  Engine = require('tingodb')();
+  db = new Engine.Db(config.db_folder, {});
+  logger.info("[Migrating]", 'Loading data from folder: ' + config.db_folder);
+  var promises = [];
+  Object.keys(collections).forEach((key) => {
+    var collName = collections[key];
+    promises.push(
+      new Promise((res, rej) => {
+        db.collection(collName).find({}).toArray(function (err, documents) {
+          logger.info("[Migrating]", "Exporting collection: " + collName + ", records: " + documents.length);
+          if (err)
+            rej(err);
+          else {
+            var obj = {};
+            obj[collName] = [...documents];
+            res(obj);
           }
         });
-      });
-
-      if(error) {
-        reject(error);
-      }
-    });
+      })
+    );
   });
 
-  promise.then((data) => {
-    logger.info(data);
+  Promise.all(promises).then((collections) => {
+    db.close();
+    var MongoClient = require('mongodb').MongoClient;
+    var authUrl = `${config.mongo.username}:${config.mongo.password}@`;
+    var url = `mongodb://${config.mongo.username ? authUrl : ''}${config.mongo.server}:${config.mongo.port}/${config.mongo.db}`;
+    logger.info("[Migrating]", 'Connecting mongodb: ' + url);
+    MongoClient.connect(url, function(err, ambdb) {
+      if(!err) {
+        logger.info("[Migrating]", `Mongodb ${config.mongo.server} connected`);
+        var promises = [];
+        collections.forEach((collection) => {
+          var collName = Object.keys(collection)[0];
+          var records = collection[collName];
+          records.forEach((record) => {
+            promises.push(
+              new Promise((resolve, reject) => {
+                ambdb.collection(collName).update({_id: record._id}, record, {upsert: true}, function (err, result) {
+                  if (err)
+                    reject(err);
+                  else
+                    resolve({});
+                });
+              })
+            );
+          });
+        });
+
+        Promise.all(promises).then((records) => {
+          logger.info("[Migrating]", `${records.length} record(s) already be imported successfully. `);
+          ambdb.close();
+        }, (reason) => {
+          logger.error("[Migrating]", reason);
+        });
+      } else {
+        logger.error("[Migrating]", err);
+      }
+    });
   }, (reason) => {
     logger.error("[Migrating]", reason);
   });
