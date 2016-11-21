@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react';
 import RecordDetail from './RecordDetail';
 import RecordTopology from './RecordTopology';
-import {Table, TableRow, Box, Anchor, Header, Menu, List, ListItem, Icons} from 'grommet';
+import {Table, TableRow, Box, Anchor, Header, Menu, List, ListItem, Icons, Layer} from 'grommet';
 const { Close, Ascend, Descend, Checkbox, Filter, Code, BarChart, LineChart, Aggregate,
    CheckboxSelected, Cluster, Menu: MenuIcon, DocumentPdf: Pdf, DocumentCsv: Csv}= Icons.Base;
 import Status from 'grommet/components/icons/Status';
@@ -14,7 +14,7 @@ import * as Format from '../../util/RecordFormat';
 import {hash, loadSetting, saveSetting} from '../../util/util';
 import cookies from 'js-cookie';
 import BarCodeEditor from './BarCodeEditor';
-import {toggleSidebar} from '../../actions/system';
+import PDFTemplate from '../reports/reports';
 
 const getFirstGroupby = (groupby) => {
   if (groupby && groupby.split('|').length > 0)
@@ -54,7 +54,7 @@ const init = (props) => {
     locked: false,
     showGraph: true,
     body: props.body,
-    pdfGenerator: null
+    pdfSettings: null
   };
 
 };
@@ -184,8 +184,8 @@ export default class RecordList extends ComponentBase {
     }, this._getRecords);
   }
 
-  _showOrderByIcon(sqlname) {
-    let fields = this.state.param.orderby.split(',');
+  _showOrderByIcon(sqlname, orderby = '') {
+    let fields = orderby.split(',');
     let index = fields.indexOf(sqlname + ' desc') > -1 ? fields.indexOf(sqlname + ' desc') : fields.indexOf(sqlname);
     if (index > -1) {
       let orderby = fields[index].split(' ');
@@ -198,10 +198,10 @@ export default class RecordList extends ComponentBase {
         }
       }
     }else
-      return <EmptyIcon />;
+      return <EmptyIcon className='icon-empty3'/>;
   }
 
-  _posOrderby(orderby, field) {
+  _posOrderby(orderby = '', field = '') {
     let fields = orderby.split(',');
     let seq = fields.indexOf(field + ' desc') > -1 ? fields.indexOf(field + ' desc') : fields.indexOf(field);
     if (orderby &&  seq> -1)
@@ -399,17 +399,21 @@ export default class RecordList extends ComponentBase {
         label = label + ' [Quick search]';
       let isPrimary = field.searchable;
       return (
-        <Anchor key={`a_groupby_${index}`} icon={selected?<CheckboxSelected />:<Checkbox />}
-                label={label} primary={isPrimary} disabled={this.state.locked}
-                onClick={() => {
-                  if (!this.state.locked) {
-                    if (selected) {
-                      clearGroupBy(field.sqlname);
-                    } else {
-                      this._getGroupByData(field.sqlname);
+        <Box direction="row" align="center" key={`icon_${index}`}>
+          <Box direction="row" className='orderbyIcon-margin-left' >{!_.isEmpty(this.props.body.orderby) && this._showOrderByIcon(field.sqlname, this.props.body.orderby)}
+          <div className='icon-side-sequence'>{this._posOrderby(this.props.body.orderby, field.sqlname)}</div></Box>
+          <Anchor key={`a_groupby_${index}`} icon={selected?<CheckboxSelected />:<Checkbox />}
+                  label={label} primary={isPrimary} disabled={this.state.locked}
+                  onClick={() => {
+                    if (!this.state.locked) {
+                      if (selected) {
+                        clearGroupBy(field.sqlname);
+                      } else {
+                        this._getGroupByData(field.sqlname);
+                      }
                     }
-                  }
-                }}/>
+                  }}/>
+        </Box>
       );
     });
 
@@ -455,12 +459,15 @@ export default class RecordList extends ComponentBase {
           <Anchor icon={<Csv />} label="Download CSV"
                   disabled={numTotal < 1}
                   onClick={() => (numTotal > 0) && this._download('csv')}/>
-          <Anchor icon={<Pdf />} label="PDF Report"
+          <Anchor icon={<Pdf />} label="Download PDF"
                   disabled={numTotal < 1}
                   onClick={() => (numTotal > 0) && this._download('pdf')}/>
+          <Anchor icon={<Pdf />} label="PDF Report"
+                  disabled={numTotal < 1}
+                  onClick={() => (numTotal > 0) && this.printPdf.bind(this, {type: 'template', body: this.state.body, records: this.state.records})()}/>
           <Anchor icon={<Pdf />} label="Barcode"
                   disabled={numTotal < 1}
-                  onClick={() => (numTotal > 0) && this.printPdf.bind(this, {body: this.state.body, records: this.state.records, total: numTotal})()}/>
+                  onClick={() => (numTotal > 0) && this.printPdf.bind(this, {type: 'BarCode', body: this.state.body, records: this.state.records, total: numTotal})()}/>
         </Menu>
         <form name="Download" ref="downloadForm" method="post">
           <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
@@ -473,10 +480,24 @@ export default class RecordList extends ComponentBase {
     );
   }
 
-  printPdf(pdfGenerator) {
-    this.setState({pdfGenerator});
-    if (this.props.root) {
-      toggleSidebar(false);
+  printPdf(pdfSettings) {
+    this.setState({pdfSettings});
+  }
+
+  renderPDFPreview() {
+    const pdfSettings = this.state.pdfSettings;
+    if (pdfSettings.type == 'BarCode') {
+      return (
+        <Layer closer={true} onClose={() => this.setState({pdfSettings: null})}>
+          <BarCodeEditor {...pdfSettings}/>
+        </Layer>
+      );
+    } else {
+      return (
+        <Layer closer={true} onClose={() => this.setState({pdfSettings: null})}>
+          <PDFTemplate {...pdfSettings} fromView={true} />
+        </Layer>
+      );
     }
   }
 
@@ -505,7 +526,7 @@ export default class RecordList extends ComponentBase {
                         label={Format.getDisplayLabel(field)} key={`fieldsheader_${index}`}
                         onClick={this._orderBy.bind(this, field.sqlname)}/>
               </h4>
-              {this._showOrderByIcon(field.sqlname)}
+              {this._showOrderByIcon(field.sqlname, this.state.param.orderby)}
               <div className='icon-side-sequence'>{this._posOrderby(this.state.param.orderby, field.sqlname)}</div>
             </Box>
           </th>
@@ -661,10 +682,10 @@ export default class RecordList extends ComponentBase {
   }
 
   render() {
-    const {record, pdfGenerator, param: {graphType, filters, showTopology}} = this.state;
+    const {record, pdfSettings, param: {graphType, filters, showTopology}} = this.state;
 
-    if (pdfGenerator) {
-      return <BarCodeEditor {...pdfGenerator} key='BarCodeEditor' back={() => this.setState({pdfGenerator: null})}/>;
+    if (pdfSettings) {
+      return this.renderPDFPreview();
     } else {
       return (
         <Box flex={true} className='fixIEScrollBar'>
@@ -673,8 +694,14 @@ export default class RecordList extends ComponentBase {
           <Box direction='row' className='topology-background-color' pad='small' flex={false} margin={{bottom: 'small'}}>
             {filters.map((filter, index) => (
                 <Box direction='row' key={index}>
-                  <Box onClick={this._filterClear.bind(this, index)}><Close /></Box>
-                  <Box onClick={this._filterReuse.bind(this, filter)} pad={{horizontal: 'small'}}>{filter}</Box>
+                  {(this.state.param.showTopology && !_.isEmpty(this.state.record)) ?
+                      <Box pad={{horizontal: 'small'}}>{filter}
+                    </Box>
+                  : <Box direction='row'>
+                      <Box onClick={this._filterClear.bind(this, index)}><Close /></Box>
+                      <Box onClick={this._filterReuse.bind(this, filter)} pad={{horizontal: 'small'}}>{filter}</Box>
+                  </Box>
+                  }
                 </Box>
               )
             )}

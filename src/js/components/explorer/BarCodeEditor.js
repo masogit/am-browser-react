@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import {Box, Form, FormField, Header, CheckBox, Icons, Anchor, Menu, RadioButton, NumberInput} from 'grommet';
-const {Download, Close, Play: Preview} = Icons.Base;
+const {Download, Play: Preview} = Icons.Base;
 import {getDisplayLabel, getFieldStrVal} from '../../util/RecordFormat';
 import JsBarcode from 'jsbarcode';
 import {ExportLayer} from '../commons/PDFWidgets';
-import { updateValue, download, preview } from '../../util/pdfGenerator';
+import { updateValue, download, preview } from '../../util/pdfDesigner';
 
 const barcodeType = [{
   name: 'CODE128',
@@ -323,22 +323,21 @@ export default class RecordList extends Component {
     return (
       <Box pad='small' flex={true}>
         <Header justify='between'>
-          <Box>PDF Generator</Box>
+          <Box>PDF Template</Box>
           <Menu direction="row" align="center" responsive={true}>
             <Anchor icon={<Preview/>} disabled={previewDisabled} onClick={previewDisabled ? null : this._preview} label='Preview'/>
             <Anchor icon={<Download />} disabled={downloadDisabled} onClick={downloadDisabled ? null : () => this.setState({showExportLayer: true})} label='Export'/>
-            <Anchor label='Back' icon={<Close/>} onClick={() => this.props.back()}/>
           </Menu>
         </Header>
-        <Box flex={true} direction='row'>
-          <Box flex={true} style={{maxWidth: '50vw'}} pad={{horizontal: 'medium'}} direction='row'>
+        <Box flex={true} direction='row' pad='none'>
+          <Box flex={true} style={{maxWidth: '50vw'}} direction='row'>
             <Form className='no-border strong-label'>
               {this.renderNumberInput('Preview Records', 'previewCount', 1, 5)}
               {this.renderFields()}
             </Form>
             {this.renderForm()}
           </Box>
-          <div style={{width: '50vw'}} id='pdfContainer'/>
+          <div id='pdfContainer'/>
           {this.renderExportLayer()}
         </Box>
         <canvas id='canvas' style={{display: 'none'}} />

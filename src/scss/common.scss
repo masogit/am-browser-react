@@ -7,6 +7,11 @@
   visibility: hidden;
 }
 
+.icon-empty3 {
+  visibility: hidden;
+  margin-right: 9px !important;
+}
+
 .icon-side-sequence {
   font-size: 0.88em;
   margin-top: 6px;
@@ -142,6 +147,11 @@ th {
   margin-right: 20px;
 }
 
+.app-name {
+  border-right: 2px solid rgba(0,0,0,0.4);
+  min-width: 290px;
+}
+
 .disabled,
 .disabled:hover {
   opacity: 0.3;
@@ -160,10 +170,25 @@ th {
   overflow: hidden;
 }
 
-.grommetux-background-color-index-light-2 {
+.grommetux-background-color-index-light-1 {
   box-shadow: 3px 3px 5px rgba(221, 221, 221, 0.7);
 }
 
-.grommetux-background-color-index-neutral-1.shadow {
-  box-shadow: 0 2px 4px rgba(0, 0, 17, 0.7);
+.shadow {
+  box-shadow: 3px 3px 17px rgba(196, 196, 196, 1);
+}
+
+.orderbyIcon-margin-left {
+  margin-left: 8px;
+}
+
+div .grommetux-menu__drop .grommetux-anchor {
+    padding: 8px 12px;
+    white-space: nowrap;
+    text-decoration: none;
+    width: 100%;
+}
+
+.grommetux-header {
+  min-height: 64px;
 }

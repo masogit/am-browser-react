@@ -5,4 +5,9 @@
 import Edit from 'grommet/components/icons/base/Edit';
 import React from 'react';
 
-export default () => <Edit className='icon-empty'/>;
+const cls = 'icon-empty';
+const EmptyIcon = ({className = cls}) => (
+  <Edit className = {className} />
+);
+
+export default EmptyIcon;

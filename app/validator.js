@@ -9,14 +9,21 @@ var coll = require('./constants').collections;
 
 module.exports = function () {
 
-  this.document = function (documentName, document) {
-    return this[documentName](document);
+  // default type is save or update
+  this.document = function (documentName, document, options = {}) {
+    if (options.type) {
+      return this[documentName + '_' + options.type](document, options);
+    } else {
+      return this[documentName](document, options);
+    }
   };
 
   // register validate document
   this.view = (document) => view(document);
   this.aql = (document) => aql(document);
   this.wall = (document) => wall(document);
+  this.report = (document, {session}) => report(document, session);
+  this.report_delete = (document, {rightIndex}) => report_delete(document, rightIndex);
 };
 
 /************ Unit validation functions *************/
@@ -40,6 +47,44 @@ function view(obj) {
       return "View name can not duplicate in same category!";
     else
       return null;
+  });
+}
+
+function report(obj, session) {
+
+  // existing validation
+  if (invalidLength(obj.name, 1, 100))
+    return "Report's name is required, limit length: 1 to 100!";
+  if (invalidLength(obj.category, 1, 100))
+    return "Report's category is required, limit length: 1 to 100!";
+
+  //check only admin can save public
+  if (session.rights.index >= 1 && obj.public) {
+    return `Only admin can save public PDF template!`;
+  }
+
+  // check duplicate
+  const rules = {
+    name: {'$regex': `^${obj.name.trim()}$`, '$options': 'i'},
+    category: {'$regex': `^${obj.category.trim()}$`, '$options': 'i'},
+    user: {'$regex': `^${session.user.trim()}$`, '$options': 'i'}
+  };
+
+  return db.findBy(coll.report, rules).then((documents) => {
+    if (documents.length > 0 && documents[0]._id != obj._id)
+      return "Report name can not duplicate in same category!";
+    else
+      return null;
+  });
+}
+
+function report_delete(obj, rightIndex) {
+  return db.findBy(coll.report, { _id: obj._id }).then((documents) => {
+    //check only admin can delete public
+    if (documents.length > 0 && documents[0].public && rightIndex >= 1) {
+      return `Only admin can delete public PDF template!`;
+    }
+    return null;
   });
 }
 
@@ -133,8 +178,13 @@ function aql(aql) {
   if (error = form(form))
     return error;
 
+  const rules = {
+    name: {'$regex': `^${aql.name.trim()}$`, '$options': 'i'},
+    category: {'$regex': `^${aql.category.trim()}$`, '$options': 'i'}
+  };
+
   // check duplicate
-  return db.findBy(coll.graph, {name: {'$regex' : `^${aql.name.trim()}$`, '$options' : 'i'}, category: {'$regex' : `^${aql.category.trim()}$`, '$options' : 'i'}}).then((documents) => {
+  return db.findBy(coll.graph, rules).then((documents) => {
     if (documents.length > 0 && documents[0]._id != aql._id)
       return "Graph name can not duplicate in same category!";
     else

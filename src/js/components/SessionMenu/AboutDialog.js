@@ -212,7 +212,7 @@ export default class About extends Component {
           <ActionTab title="All Versions" onClick={this.getVersions.bind(this)}>
             {versionList}
           </ActionTab>
-          <ActionTab title="Online Users" onClick={this.getVersions.bind(this)}>
+          <ActionTab title="Online Users" onClick={() => this.setState({ activeIndex: 2 })}>
             {this.renderOnlineUser()}
           </ActionTab>
         </Tabs>

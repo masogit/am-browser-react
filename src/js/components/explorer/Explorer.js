@@ -12,8 +12,7 @@ export default class Explorer extends Component {
     super();
     this.state = {
       view: null,
-      navigation: null,
-      pdfGenerator: null
+      navigation: null
     };
   }
 

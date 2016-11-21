@@ -2,7 +2,7 @@
 
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { login, initAbout, loginFailure } from '../actions/system';
+import { login } from '../actions/system';
 import Split from 'grommet/components/Split';
 import {Section, Label, Sidebar, LoginForm, Footer} from 'grommet';
 import ComponentBase from './commons/ComponentBase';
@@ -15,20 +15,22 @@ class IndexerLogin extends ComponentBase {
     super();
     this._onSubmit = this._onSubmit.bind(this);
     this._onResponsive = this._onResponsive.bind(this);
-    this.state = {responsive: 'multiple', ambVersion: null};
-    this._isUnmount = false;
-  }
-
-  componentDidMount() {
-    initAbout().then((res) => {
-      if (!this._isUnmount) {
-        this.setState({ambVersion: res.about.ambVersion});
+    this.state = {
+      responsive: 'multiple',
+      ambVersion: null,
+      loading: false,
+      error: {
+        message: ''
       }
-    });
+    };
   }
 
-  componentWillUnmount() {
-    this._isUnmount = true;
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.session.error) {
+      const error = this.state.error;
+      error.message = nextProps.session.error.message;
+      this.setState({error});
+    }
   }
 
   _onResponsive(responsive) {
@@ -41,43 +43,38 @@ class IndexerLogin extends ComponentBase {
     if (this.locked) {
       return;
     }
-    
+
+    this.setState({loading: true, error: {}});
     if (fields.username) {
       this.acquireLock();
-      this.props.dispatch(login(fields.username, fields.password));
+      this.props.dispatch(login(fields.username, fields.password, () => this.setState({loading: false})));
     } else {
-      this.props.dispatch(loginFailure({message: 'Please type your user name'}));
+      this.setState({
+        loading: false,
+        error: {
+          message: 'Please type your user name'
+        }
+      });
     }
   }
 
   render() {
-    const { session } = this.props;
+    const { error: loginError, responsive, loading, ambVersion } = this.state;
 
     var image;
-    if ('multiple' === this.state.responsive) {
+    if ('multiple' === responsive) {
       image = <Section pad="none" texture="url(img/login.jpg)" full={true}/>;
     }
 
-    var loginError = session.error;
-    var errors = [];
-    if (loginError) {
-      var message;
-      var resolution;
-      message = loginError.message;
-      if (loginError.resolution) {
-        resolution = loginError.resolution;
-      }
-      errors.push(message);
-      errors.push(resolution);
-    }
+    const errors = [loginError.message, loginError.resolution];
 
     return (
       <Split flex="left" onResponsive={this._onResponsive}>
         {image}
-        <Sidebar justify="center" align="center" pad="medium" size="large">
+        <Sidebar justify="center" align="center" pad="medium" size="large" colorIndex="light-1">
           <LoginForm
             title="Asset Manager Browser"
-            onSubmit={this._onSubmit}
+            onSubmit={loading ? null : this._onSubmit}
             errors={errors}
             usernameType='text'
             defaultValues={{
@@ -87,7 +84,7 @@ class IndexerLogin extends ComponentBase {
           <Footer justify="between">
             <HPELogo size="large"/>
             <Label>
-              {this.state.ambVersion}
+              {ambVersion}
             </Label>
           </Footer>
         </Sidebar>

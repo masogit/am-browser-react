@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react';
 import ComponentBase from '../commons/ComponentBase';
 import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Split, Map, Icons} from 'grommet';
 const {Close, LinkUp: Up, LinkDown: Down, Ascend, Descend, Play, Checkmark, Duplicate, Download,
-  CaretPrevious, More, Mail, DocumentPdf, Upload} = Icons.Base;
+  CaretPrevious, More, Mail, Upload} = Icons.Base;
 import {isEmpty} from 'lodash';
 import AlertForm from '../../components/commons/AlertForm';
 import EditLayer from '../../components/commons/EditLayer';
@@ -11,7 +11,7 @@ import FieldTypes from '../../constants/FieldTypes';
 import {saveAs} from 'file-saver';
 import SearchInput from '../commons/SearchInput';
 import {bodyToMapData} from '../../util/util';
-import PDFGenerator from './PDFGenerator';
+import PDFDesigner from './../reports/PDFDesigner';
 import {toggleSidebar} from '../../actions/system';
 
 const _onMail = (view) => {
@@ -25,10 +25,6 @@ const _onMail = (view) => {
     let content = `URL: ${url}${br}Description: ${view.desc}`;
     window.open(`mailto:test@example.com?subject=${subject}&body=${content}`, '_self');
   }
-};
-
-const _onUpload = (upload) => {
-  upload.click();
 };
 
 const _onDownload = (view) => {
@@ -399,8 +395,8 @@ export default class ViewDefDetail extends ComponentBase {
     return title && <AlertForm onClose={this.closeAlertForm} title={title} onConfirm={onConfirm}/>;
   }
 
-  printPdf(pdfGenerator) {
-    this.setState({pdfGenerator});
+  printPdf(pdfSettings) {
+    this.setState({pdfSettings});
     toggleSidebar(false);
   }
 
@@ -415,8 +411,9 @@ export default class ViewDefDetail extends ComponentBase {
           json._id = null;
 
         this.props.setSelectedView('', json);
+        this.props.uploadViewSuccess();
       } else {
-
+        this.props.uploadViewFailed();
       }
     };
   }
@@ -433,10 +430,10 @@ export default class ViewDefDetail extends ComponentBase {
       return <ContentPlaceHolder/>;
     }
 
-    const {layer, alertForm, pdfGenerator} = this.state;
+    const {layer, alertForm, pdfSettings} = this.state;
 
-    if (pdfGenerator) {
-      return <PDFGenerator {...pdfGenerator} back={() => this.setState({pdfGenerator: null})}/>;
+    if (pdfSettings) {
+      return <PDFDesigner {...pdfSettings} back={() => this.setState({pdfSettings: null})}/>;
     }
 
     let table;
@@ -467,17 +464,18 @@ export default class ViewDefDetail extends ComponentBase {
         {this.getLayer(layer)}
         <Header justify="between" pad={{horizontal: 'medium'}}>
           <Box>View Builder</Box>
-          <input type="file" ref="upload" name="doc" accept=".json" onChange={this.uploadJson.bind(this)} style={{display: 'none'}}/>
+          <input type="file" ref="upload" accept=".json" onChange={this.uploadJson.bind(this)} style={{display: 'none'}}/>
           <Menu direction="row" align="center" responsive={true}>
             {renderAnchor({icon: <Play />, onClick: openPreview, label: 'Query', enable: table})}
-            {renderAnchor({icon: <DocumentPdf />, onClick: this.printPdf, args: {body: selectedView.body}, label: 'PDF Generator', enable: table})}
             {renderAnchor({icon: <Checkmark />, onClick: this.openAlert, args: 'save', label: 'Save', enable: selectedView.name && selectedView.category})}
             {renderAnchor({icon: <Close />, onClick: this.openAlert, args: 'delete', label: 'Delete', enable: selectedView._id})}
             <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }}>
               {renderAnchor({icon: <Duplicate />, onClick: this.openAlert, args: 'duplicate', label: 'Duplicate', enable: selectedView._id})}
               {selectedView._id && renderAnchor({icon: <Mail />, onClick: _onMail, args: selectedView, label: 'Mail', enable: selectedView._id})}
               {renderAnchor({icon: <Download />, onClick: _onDownload,args: selectedView , label: 'Download', enable: selectedView._id})}
-              {renderAnchor({icon: <Upload />, onClick: _onUpload, args: this.refs.upload, label: 'Upload', enable: !selectedView._id})}
+              {renderAnchor({icon: <Upload />, onClick: () => {
+                this.refs.upload.click();
+              }, label: 'Upload', enable: !selectedView._id})}
             </Menu>
           </Menu>
         </Header>

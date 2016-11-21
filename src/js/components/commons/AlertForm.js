@@ -24,7 +24,7 @@ export default class AlertForm extends Component {
   }
 
   render() {
-    const {desc, title, status, onClose, onConfirm, full} = this.props;
+    const {desc, title, status, onClose, onConfirm, full, onCancel} = this.props;
     return (
       <Box flex={false}>
         {status ?
@@ -41,9 +41,12 @@ export default class AlertForm extends Component {
                 <p>
                   {desc}
                 </p>
-                <Footer>
+                <Footer justify='between'>
                   {onConfirm &&
                     <Button label="Confirm" primary={true} strong={true} onClick={this._onClick.bind(this)}/>
+                  }
+                  {onCancel &&
+                  <Button label="Cancel" strong={true} onClick={onCancel}/>
                   }
                 </Footer>
               </Form>
@@ -57,6 +60,7 @@ export default class AlertForm extends Component {
 
 AlertForm.propTypes = {
   onClose: PropTypes.func.isRequired,
+  onCancel: PropTypes.func,
   onConfirm: PropTypes.func.isRequired,
   title: PropTypes.string,
   desc: PropTypes.string,

@@ -24,4 +24,13 @@
 
 .style-designer-sidebar {
   height: 525px;
+
+  .grommetux-list-item.editing {
+    border-color: #ffd144;
+  }
+}
+
+#pdfContainer {
+  width: 825px;
+  max-width: 50vw;
 }

@@ -3,6 +3,7 @@ var db;
 const fs = require('fs');
 var logger = require('./logger.js');
 var Validator = require('./validator.js');
+var collections = require('./constants').collections;
 const config = require('./config');
 
 process.argv.forEach(function (val, index, array) {
@@ -16,77 +17,66 @@ process.argv.forEach(function (val, index, array) {
 
 function migrate() {
   logger.info("[Migrating]", 'Migrating from file to mongodb');
-  var promise = new Promise((resolve, reject) => {
-    Engine = require('tingodb')();
-    db = new Engine.Db(config.db_folder, {});
-    logger.info("[Migrating]", 'Loading data from folder: ' + config.db_folder);
-    db.collections((error, collections) => {
-      var promises = [];
-      collections.forEach((coll) => {
-        var collName = coll.collectionName;
-        promises.push(
-          new Promise((res, rej) => {
-            db.collection(collName).find({}).toArray(function (err, documents) {
-              logger.info("[Migrating]", "Exporting collection: " + collName + ", records: " + documents.length);
-              if (err)
-                rej(err);
-              else {
-                var obj = {};
-                obj[collName] = [...documents];
-                res(obj);
-              }
-            });
-          })
-        );
-      });
 
-      Promise.all(promises).then((collections) => {
-        db.close();
-        var MongoClient = require('mongodb').MongoClient;
-        var authUrl = `${config.mongo.username}:${config.mongo.password}@`;
-        var url = `mongodb://${config.mongo.username ? authUrl : ''}${config.mongo.server}:${config.mongo.port}/${config.mongo.db}`;
-        logger.info("[Migrating]", 'Connecting mongodb: ' + url);
-        MongoClient.connect(url, function(err, ambdb) {
-          if(!err) {
-            logger.info("[Migrating]", `Mongodb ${config.mongo.server} connected`);
-            var promises = [];
-            collections.forEach((collection) => {
-              var collName = Object.keys(collection)[0];
-              var records = collection[collName];
-              records.forEach((record) => {
-                promises.push(
-                  new Promise((resolve, reject) => {
-                    ambdb.collection(collName).update({_id: record._id}, record, {upsert: true}, function (err, result) {
-                      if (err)
-                        reject(err);
-                      else
-                        resolve({});
-                    });
-                  })
-                );
-              });
-            });
-
-            Promise.all(promises).then((records) => {
-              logger.info("[Migrating]", `${records.length} record(s) already be imported successfully. `);
-              ambdb.close();
-            }, (reason) => {
-              logger.error("[Migrating]", reason);
-            });
-          } else {
-            logger.error("[Migrating]", err);
+  Engine = require('tingodb')();
+  db = new Engine.Db(config.db_folder, {});
+  logger.info("[Migrating]", 'Loading data from folder: ' + config.db_folder);
+  var promises = [];
+  Object.keys(collections).forEach((key) => {
+    var collName = collections[key];
+    promises.push(
+      new Promise((res, rej) => {
+        db.collection(collName).find({}).toArray(function (err, documents) {
+          logger.info("[Migrating]", "Exporting collection: " + collName + ", records: " + documents.length);
+          if (err)
+            rej(err);
+          else {
+            var obj = {};
+            obj[collName] = [...documents];
+            res(obj);
           }
         });
-      });
-
-      if(error) {
-        reject(error);
-      }
-    });
+      })
+    );
   });
 
-  promise.then((data) => {
-    logger.info(data);
+  Promise.all(promises).then((collections) => {
+    db.close();
+    var MongoClient = require('mongodb').MongoClient;
+    var authUrl = `${config.mongo.username}:${config.mongo.password}@`;
+    var url = `mongodb://${config.mongo.username ? authUrl : ''}${config.mongo.server}:${config.mongo.port}/${config.mongo.db}`;
+    logger.info("[Migrating]", 'Connecting mongodb: ' + url);
+    MongoClient.connect(url, function(err, ambdb) {
+      if(!err) {
+        logger.info("[Migrating]", `Mongodb ${config.mongo.server} connected`);
+        var promises = [];
+        collections.forEach((collection) => {
+          var collName = Object.keys(collection)[0];
+          var records = collection[collName];
+          records.forEach((record) => {
+            promises.push(
+              new Promise((resolve, reject) => {
+                ambdb.collection(collName).update({_id: record._id}, record, {upsert: true}, function (err, result) {
+                  if (err)
+                    reject(err);
+                  else
+                    resolve({});
+                });
+              })
+            );
+          });
+        });
+
+        Promise.all(promises).then((records) => {
+          logger.info("[Migrating]", `${records.length} record(s) already be imported successfully. `);
+          ambdb.close();
+        }, (reason) => {
+          logger.error("[Migrating]", reason);
+        });
+      } else {
+        logger.error("[Migrating]", err);
+      }
+    });
   }, (reason) => {
     logger.error("[Migrating]", reason);
   });
@@ -109,7 +99,6 @@ exports.init = function (dbFolder) {
           logger.info("[server]", `The db folder '${dbFolder}' was created.`);
         }
       });
-
     }
   });
 };
@@ -151,7 +140,7 @@ exports.find = function (req, res) {
   var filter = (config.db_type == 'mongo' && req.query.filter) ? JSON.parse(req.query.filter) : {};
 
   if (id)
-    db.collection(collectionName).findOne(Object.assign({_id: id}, filter), function (err, document) {
+    db.collection(collectionName).findOne(Object.assign({ _id: id }, filter), function (err, document) {
       if (err)
         logger.error("[tingo]", err);
       else if (download)
@@ -159,16 +148,24 @@ exports.find = function (req, res) {
       else
         res.json(document);
     });
-  else
-    db.collection(collectionName).find(filter).toArray(function (err, documents) {
+  else {
+    var result = db.collection(collectionName);
+    result.find(filter).toArray(function (err, documents) {
       if (err)
         logger.error("[tingo]", err);
-      else if (download)
-        JSONDownloader(res, documents, collectionName + '.json');
-      else
-        res.json(documents);
+      else {
+        if (collectionName == 'report') {
+          documents = documents.filter(doc => doc.public || doc.user == req.session.user);
+        } else if (collectionName == 'wall') {
+          //documents = documents.filter(doc => doc.user == req.session.user || doc.tabs.filter(tab => tab.public));
+        }
+        if (download)
+          JSONDownloader(res, documents, collectionName + '.json');
+        else
+          res.json(documents);
+      }
     });
-
+  }
 };
 
 // tingodb Find by filter
@@ -183,7 +180,7 @@ function findBy (collectionName, filter) {
       resolve(documents);
     });
   });
-};
+}
 
 exports.findBy = findBy;
 
@@ -195,7 +192,7 @@ exports.upsert = function (req, res) {
 
   // Validation then save or update
   var validator = new Validator();
-  var error = validator.document(collectionName, obj);
+  var error = validator.document(collectionName, obj, {session: req.session});
   if (typeof error == 'string') {  // Simple String error
     logger.error(`[tingo]`, error);
     res.status(400).send(error);
@@ -211,7 +208,8 @@ exports.upsert = function (req, res) {
         if (!obj._id)
           obj._id = (Math.random() + 1).toString(36).substring(7);
 
-        db.collection(collectionName).update({_id: obj._id}, obj, {upsert: true}, function (err, result) {
+        // add date
+        db.collection(collectionName).update({_id: obj._id, user: req.session.user}, obj, {upsert: true}, function (err, result) {
           if (err)
             logger.error("[tingo]", err);
           res.send(obj._id);
@@ -237,10 +235,19 @@ exports.upsert = function (req, res) {
 exports.delete = function (req, res) {
   var collectionName = req.params.collection;
   var id = req.params.id;
-  db.collection(collectionName).remove([{_id: id}], function (err, result) {
-    if (err)
-      logger.error("[tingo]", err);
-    res.send(id);
+
+  // Validation when delete
+  var validator = new Validator();
+  validator.document(collectionName, {_id: id}, {type: 'delete', rightIndex: req.session.rights.index}).then(error => {
+    if (!error) {
+      db.collection(collectionName).remove({_id: id}, function (err, result) {
+        if (err)
+          logger.error("[tingo]", err);
+        res.send(id);
+      });
+    } else {
+      res.status(401).send(error);
+    }
   });
 };
 

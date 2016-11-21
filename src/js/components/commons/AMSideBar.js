@@ -8,8 +8,8 @@ import GroupList from './GroupList';
 import GroupListItem from './GroupListItem';
 import EmptyIcon from './EmptyIcon';
 import {connect} from 'react-redux';
-import ChapterPrevious from 'grommet/components/icons/base/ChapterPrevious';
-import ChapterNext from 'grommet/components/icons/base/ChapterNext';
+import ChapterPrevious from 'grommet/components/icons/base/CaretPrevious';
+import ChapterNext from 'grommet/components/icons/base/CaretNext';
 import {toggleSidebar} from '../../actions/system';
 
 class AMSideBar extends Component {
@@ -44,7 +44,7 @@ class AMSideBar extends Component {
     if (!showSidebar) {
       return (
         <Sidebar fixed={true} full={false} style={{minHeight: '100%', width: '50px'}}
-                 colorIndex={colorIndex || 'light-2'}>
+                 colorIndex={colorIndex || 'light-1'}>
           <Box style={{overflow: 'visible'}} className='fixMinSizing'>
             <Header justify="between" pad='small' onClick={toggleSidebar}>
               <ChapterNext />
@@ -86,7 +86,7 @@ class AMSideBar extends Component {
     }
 
     return (
-      <Sidebar fixed={true} full={false} style={{minHeight: '100%'}} colorIndex={colorIndex || 'light-2'} pad={pad} margin={margin}>
+      <Sidebar fixed={true} full={false} style={{minHeight: '100%'}} colorIndex={colorIndex || 'light-1'} pad={pad} margin={margin}>
         <Box style={{overflow: 'visible'}} className='fixMinSizing'>
           <Header justify="between" pad='small'>
             {toggle == false ? this.state.title

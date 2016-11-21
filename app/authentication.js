@@ -12,7 +12,7 @@ const checkRight = (req, level) => {
 
 module.exports = {
   isAuthenticated: (req, res, next) => {
-    if (req.originalUrl.indexOf(modules.insight) > -1) {
+    if (req.originalUrl.indexOf(modules.insight) > -1 || req.originalUrl.indexOf(modules.report) > -1) {
       checkRight(req, rights.power);
     } else {
       checkRight(req, rights.admin);
