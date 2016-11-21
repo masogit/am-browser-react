@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import * as SAMActions from '../../actions/sam';
-import {Box, Split} from 'grommet';
+import {Box} from 'grommet';
+import RecordListLayer from '../explorer/RecordListLayer';
 import Card from '../commons/Card';
 import RecordList from '../explorer/RecordList';
 import history from '../../RouteHistory';
@@ -179,9 +180,15 @@ export default class SAMContainer extends Component {
     });
   }
 
+  _onClose() {
+    this.setState({
+      software: null
+    });
+  }
+
   render() {
     return (
-      <Box flex={true} direction="row" align={!this.state.product ? 'center' : 'start'} justify={!this.state.product ? 'center' : 'start'} className='autoScroll'>
+      <Box flex={true} direction="row" align={!this.state.product ? 'center' : 'start'} justify={!this.state.product ? 'center' : 'start'}>
         <Box flex={!this.state.product} style={this.state.product && {'width': '260px'}} pad={{horizontal: "small"}}>
           {
             this.state.vendor &&
@@ -194,15 +201,13 @@ export default class SAMContainer extends Component {
             <Card {...this.state.product}/>
             {
               this.state.license &&
-              <Split>
-                <RecordList body={this.state.license} title="Version" allFields={true} onClick={(record) => this.renderSoftware(record)} noCache={true}/>
-                {
-                  this.state.software &&
-                  <RecordList body={this.state.software} title="Computer" allFields={true} noCache={true} graphType='distribution'/>
-                }
-              </Split>
+              <RecordList body={this.state.license} title="Version" allFields={true} onClick={(record) => this.renderSoftware(record)} noCache={true}/>
             }
           </Box>
+        }
+        {
+          this.state.software &&
+          <RecordListLayer body={this.state.software} title="Computer" onClose={this._onClose.bind(this)} allFields={true} noCache={true}/>
         }
       </Box>
     );
