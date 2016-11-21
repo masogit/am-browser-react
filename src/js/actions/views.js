@@ -148,7 +148,7 @@ export function deleteTableRow(selectedView, path) {
     let orderByPath = bodyPath.concat(".orderby");
     let groupByPath = bodyPath.concat(".groupby");
     let sumPath = bodyPath.concat(".sum");
-    let orderBy = objectPath.get(clonedView, orderByPath);
+    let orderBy = objectPath.get(clonedView, orderByPath) || '';
     let groupBy = objectPath.get(clonedView, groupByPath);
     let sum = objectPath.get(clonedView, sumPath);
     let field = objectPath.get(clonedView, path);

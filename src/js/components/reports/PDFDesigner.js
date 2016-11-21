@@ -96,24 +96,32 @@ export default class PDFDesigner extends Component {
 
   _translateText(pdfDefinition, records = this.state.records) {
     const settings = this.state.report.settings,
-      body = this.props.body, fields_state= this.state.fields;
-    return translateText(pdfDefinition, {settings, records, body, fields_state});
+      body = this.props.body, fields_state= this.state.fields,
+      links = this.props.links;
+    if (links && links.length > 0) {
+      records = [];
+    }
+
+    return translateText(pdfDefinition, {settings, records, body, fields_state, record: this.props.record, links:this.props.links});
   }
 
   _preview() {
     let pdfDefinition = this.state.pdfDefinition;
     if (this.state.mode != MODE.CODE) {
-      pdfDefinition = this._translateText(pdfDefinition);
+      this._translateText(pdfDefinition).then(data => {
+        preview(cloneDeep(data), () => this.setState({loading: false}));
+      });
+    } else {
+      preview(cloneDeep(pdfDefinition), () => this.setState({loading: false}));
     }
-
-    preview(cloneDeep(pdfDefinition), () => this.setState({loading: false}));
   }
 
   _download({recordsStart, limit}) {
     const onBefore = () => this.setState({downloading: true});
     const props = {recordsStart, limit, body: this.props.body};
-    const getPDFDefinition = (data) =>  this._translateText(this.state.pdfDefinition, data);
+    const getPDFDefinition = (data) => this._translateText(this.state.pdfDefinition, data);
     const onDone = () => this.setState({downloading: false});
+    // TODO: update to use promise
     download({onBefore, props, getPDFDefinition, onDone});
   }
 
@@ -213,7 +221,7 @@ export default class PDFDesigner extends Component {
     return (
       <Box pad='small' flex={true}>
         <Header justify='between' size='small'>
-          <Box pad={{horizontal: 'small'}}>PDF Template</Box>
+          <Box pad={{horizontal: 'small'}}>PDF Template</Box>1
           <Menu direction="row" align="center" responsive={true}>
             <Anchor icon={<Code />} onClick={() => this.setState({ mode: mode == MODE.CODE ? MODE.DESIGN : MODE.CODE })} label={mode}/>
             <Anchor icon={<Brush />} onClick={() => this.setState({showLayer: 'new_style'})} label="Style Designer"/>
@@ -286,6 +294,8 @@ export default class PDFDesigner extends Component {
 PDFDesigner.propTyps = {
   body: PropTypes.object.required,
   records: PropTypes.array,
+  record: PropTypes.object,
+  links: PropTypes.array,
   settings: PropTypes.object.required,
   definition: PropTypes.object.required
 };

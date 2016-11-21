@@ -9,7 +9,7 @@ import _ from 'lodash';
 import { monitorEdit, dropCurrentPop, stopMonitorEdit } from '../../actions/system';
 import example_body from './body_template.json';
 import example_records from './records_template.json';
-import PDFGenerator from './PDFDesigner.js';
+import PDFDesigner from './PDFDesigner.js';
 import {defaultSettings, defaultPDFDefinition} from '../../util/pdfDesigner';
 import * as ExplorerActions from '../../actions/explorer';
 
@@ -138,7 +138,7 @@ export default class Reports extends ComponentBase {
 
   render() {
     const {reports, report} = this.state;
-    const {fromView, body = example_body, records = example_records, isDetail, links} = this.props;
+    const {fromView, body = example_body, records = example_records, isDetail, links, record} = this.props;
 
     const toolbar = <Anchor icon={<Add />} label="New" onClick={this._onNew.bind(this)}/>;
     const contents = reports.map(rpt => ({
@@ -158,7 +158,7 @@ export default class Reports extends ComponentBase {
       <Box direction="row" flex={true} pad={fromView ? 'small' : 'none'} style={{minWidth: '90vw', minHeight: '90vh'}}>
         <AMSideBar title='Templates' toolbar={toolbar} contents={contents} focus={focus}/>
         {!_.isEmpty(report) ?
-          <PDFGenerator body={body} records={records} onSaveReport={this._onSaveReport}
+          <PDFDesigner body={body} records={records} onSaveReport={this._onSaveReport} links={links} record={record}
                         definition={defaultPDFDefinition} onDupReport={this._onDupReport} root={!fromView} isChanged={this.isChanged()}
                         report={report} onRemoveReport={this._onRemoveReport} isDetail={isDetail} />
           : <ContentPlaceHolder />
@@ -176,6 +176,7 @@ Reports.propTyps = {
   body: PropTypes.object.required,
   records: PropTypes.array,
   settings: PropTypes.object.required,
+  record: PropTypes.object,
   definition: PropTypes.object.required,
   isDetail: PropTypes.bool.required
 };

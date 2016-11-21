@@ -4,47 +4,48 @@
 import {getDisplayLabel, getFieldStrVal } from './RecordFormat';
 import {loadRecordsByBody, getQueryByBody} from '../actions/explorer';
 
-function getLinkData(link, pdf_link) {
+function getLinkData(link, pdf_link = []) {
   let label = link.label;
   let fields = link.body.fields;
+  link.body.param = {limit: 1};
 
-  loadRecordsByBody(link.body).then(data => {
-    let links = link.body.links;
+  return loadRecordsByBody(link.body).then(data => {
+    const links = link.body.links;
+    const promises = [];
     if (links && links.length > 0) {
+      const pdf_ol = [];
+
       pdf_link.push({
         text: `${label} (${data.count})`, style: 'subheader'
       });
-      let pdf_ol = [];
+
       pdf_link.push({
         ol: pdf_ol,
         margin: [20, 0, 0, 0]
       });
 
-      let promises = [];  // create promise for each record
       data.entities.map((record) => {
-        promises.push(new Promise((res, rej) => {
-          let summary = {
-            stack: [
-              {text: record.self, style: 'tableHeader'},
-              {
-                alignment: 'justify',
-                columns: genSummary(record, fields)
-              }
-            ],
-            margin: [0, 0, 0, 40]
-          };
-          pdf_ol.push(summary);
+        let summary = {
+          stack: [
+            {text: record.self, style: 'tableHeader'},
+            {
+              alignment: 'justify',
+              columns: genSummary(record, fields)
+            }
+          ],
+          margin: [0, 0, 0, 40]
+        };
+        pdf_ol.push(summary);
 
-          let link_promises = [];
-          links.forEach((sub_link) => {
-            sub_link.body.params = getQueryByBody(getLinkBody(sub_link, record));
-            link_promises.push(getLinkData(sub_link, summary.stack));
-          });
-        }));
+        links.forEach((sub_link) => {
+          sub_link.body.params = getQueryByBody(getLinkBody(sub_link, record));
+          promises.push(getLinkData(sub_link, summary.stack));
+        });
       });
     } else {
       pdf_link.push(genTable({label, records: data.entities, fields}, {length: 0}));
     }
+    return Promise.all(promises);
   });
 }
 
@@ -132,6 +133,7 @@ function genTbody(records, fields, max) {
   return tbody;
 }
 
+/*
 // Generate pdf content from records
 function recordsToPdfDoc(fields, records, reportLabel, param, data) {
   var max = { length: 0 };
@@ -214,7 +216,9 @@ function getGroupbyDisplayLabel(fields, sqlname) {
     return getDisplayLabel(groupby);
   }
 }
+*/
 
 export {
-  getLinkData
+  getLinkData,
+  genSummary
 };

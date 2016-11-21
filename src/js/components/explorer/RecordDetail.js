@@ -105,7 +105,7 @@ export default class RecordDetail extends Component {
       <Layer closer={true} align="right" onClose={this.props.onClose}>
         <Tabs justify="start" activeIndex={0}>
           <ActionTab title={this.props.body.label}>
-            <Header justify="end">1
+            <Header justify="end">
               <Anchor icon={<Pdf />} label="PDF Template" onClick={this.showPDFDesigner}/>
               <Anchor icon={<Pdf />} label="PDF Report" onClick={() => this._download('1vM')}/>
               <form name="Download" ref="downloadForm" method="post">

@@ -1,9 +1,9 @@
 /**
  * Created by huling on 11/10/2016.
  */
-import {getDisplayLabel, getFieldStrVal } from './RecordFormat';
-import {loadRecordsByBody} from '../actions/explorer';
-import {getLinkData} from './pdfDesigner_record';
+import { getDisplayLabel, getFieldStrVal } from './RecordFormat';
+import { loadRecordsByBody } from '../actions/explorer';
+import { getLinkData, genSummary } from './pdfDesigner_record';
 
 const MODE = {
   CODE: 'Code',
@@ -232,7 +232,7 @@ const setTextLine = (target, source, label) => {
   target.style = textObj.style;
 };
 
-const translateText = (pdfDefinition, {settings, records, fields_state, body, links}) => {
+const translateText = (pdfDefinition, {settings, records, fields_state, body, record, links}) => {
   const {fields: fields_props = [], label = ''} = body;
   //const fieldsName = fields_state.filter(field => field.selected).map(field => field.sqlname);
   const fieldsName = fields_state.map(field => field.sqlname);
@@ -245,25 +245,31 @@ const translateText = (pdfDefinition, {settings, records, fields_state, body, li
     content.push(analyzeRecordList(fieldsName, fields_props, records, settings.contents));
   }
 
-  if (links.length > 0) {
+  const promiseList = [];
+  if (links && links.length > 0) {
+
+    content.push(genSummary(record, fields_props));
+
     links.forEach(link => {
-      getLinkData(link, content);
+      promiseList.push(getLinkData({...link, param: {}}, content));
     });
   }
 
-  pdfDefinition.content = content;
+  return Promise.all(promiseList).then(() => {
+    pdfDefinition.content = content;
 
-  setTextLine(pdfDefinition.header.columns[0], settings.pageHeader.left, label);
-  setTextLine(pdfDefinition.header.columns[1], settings.pageHeader.center, label);
-  setTextLine(pdfDefinition.header.columns[2], settings.pageHeader.right, label);
+    setTextLine(pdfDefinition.header.columns[0], settings.pageHeader.left, label);
+    setTextLine(pdfDefinition.header.columns[1], settings.pageHeader.center, label);
+    setTextLine(pdfDefinition.header.columns[2], settings.pageHeader.right, label);
 
-  setTextLine(pdfDefinition.footer.columns[0], settings.pageFooter.left, label);
-  setTextLine(pdfDefinition.footer.columns[1], settings.pageFooter.center, label);
-  setTextLine(pdfDefinition.footer.columns[2], settings.pageFooter.right, label);
+    setTextLine(pdfDefinition.footer.columns[0], settings.pageFooter.left, label);
+    setTextLine(pdfDefinition.footer.columns[1], settings.pageFooter.center, label);
+    setTextLine(pdfDefinition.footer.columns[2], settings.pageFooter.right, label);
 
-  pdfDefinition.pageOrientation = settings.pageOrientation;
-  pdfDefinition.styles = settings.styles;
-  return pdfDefinition;
+    pdfDefinition.pageOrientation = settings.pageOrientation;
+    pdfDefinition.styles = settings.styles;
+    return pdfDefinition;
+  });
 };
 
 const format = (pdfDefinition) => {
