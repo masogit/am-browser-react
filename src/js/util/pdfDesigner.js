@@ -2,8 +2,7 @@
  * Created by huling on 11/10/2016.
  */
 import { getDisplayLabel, getFieldStrVal } from './RecordFormat';
-import { loadRecordsByBody } from '../actions/explorer';
-import { getLinkData, genSummary } from './pdfDesigner_record';
+import { loadRecordsByBody, getQueryByBody } from '../actions/explorer';
 
 const MODE = {
   CODE: 'Code',
@@ -118,7 +117,36 @@ const defaultSettings = {
   }
 };
 
-const analyzeRecordList = (filter, allFields, records, style = {layout: 'headerLineOnly', header: 'tableHeader', text: 'text'}) => {
+const genTable = ({title, records, fields, style = {layout: 'headerLineOnly', header: 'tableHeader', text: 'text', title: 'tableHeader'}}) => {
+  if (!records)
+    return [];
+
+  const body = [];
+  body.push(fields.map((field, index) => (
+  {text: getDisplayLabel(field), style: style.header}
+  )));
+
+  records.map((record) => {
+    const row = [];
+    fields.map((field, tdindex) => (
+      row.push({text: getFieldStrVal(record, field), style: style.text})
+    ));
+    body.push(row);
+  });
+
+  return [{
+    text: `${title} (${records.length})`, style: style.title
+  }, {
+    style: style.style,
+    table: {
+      headerRows: 1,
+      body: body
+    },
+    layout: style.layout
+  }];
+};
+
+const analyzeRecordList = (title, filter, allFields, records, style) => {
   let availableFields = [];
   if (filter.length > 0) {
     allFields.map(field => {
@@ -135,30 +163,93 @@ const analyzeRecordList = (filter, allFields, records, style = {layout: 'headerL
     availableFields = allFields;
   }
 
-  const body = [];
-  const table = {
-    layout: style.layout,
-    style: style.style,
-    table: {
-      headerRows: 1,
-      body: body
+  return genTable({title, records, fields: availableFields, style});
+};
+
+function getLinkData(link, pdf_link = []) {
+  const title = link.label;
+  const fields = link.body.fields;
+  link.body.param = {};
+
+  return loadRecordsByBody(link.body).then(data => {
+    const links = link.body.links;
+    const promises = [];
+    if (links && links.length > 0) {
+      const pdf_ol = [];
+
+      pdf_link.push({
+        text: `${title} (${data.count})`, style: 'subheader'
+      });
+
+      pdf_link.push({
+        ol: pdf_ol,
+        margin: [20, 0, 0, 0]
+      });
+
+      data.entities.map((record) => {
+        let summary = {
+          stack: [
+            {text: record.self, style: 'tableHeader'},
+            {
+              alignment: 'justify',
+              columns: genSummary(record, fields)
+            }
+          ],
+          margin: [0, 0, 0, 40]
+        };
+        pdf_ol.push(summary);
+
+        links.forEach((sub_link) => {
+          sub_link.body.params = getQueryByBody(getLinkBody(sub_link, record));
+          promises.push(getLinkData(sub_link, summary.stack));
+        });
+      });
+    } else {
+      pdf_link.push(genTable({title, records: data.entities, fields}));
     }
-  };
+    return Promise.all(promises);
+  });
+}
 
-  body.push(availableFields.map((field, index) => (
-  { text: getDisplayLabel(field), style: style.header }
-  )));
+function getLinkBody(link, record) {
+  var body = Object.assign({}, link.body);
 
-  records.map((record) => {
-    const row = [];
-    availableFields.map((field, tdindex) => (
-      row.push({text: getFieldStrVal(record, field), style: style.text})
-    ));
-    body.push(row);
+  let AQL = "";
+  if (link.src_field) {
+    var relative_path = link.src_field.relative_path;
+    var src_field = relative_path ? relative_path + '.' + link.src_field.sqlname : link.src_field.sqlname;
+    if (record[src_field]) {
+      AQL = `${link.dest_field.sqlname}=${record[src_field]}`;
+    }
+  }
+
+  body.filter = body.filter ? `(${body.filter}) AND ${AQL}` : AQL;
+  return body;
+}
+
+function genSummary(record, fields) {
+  var pdf_header = [{}, {}];
+
+  fields.forEach((field, index) => {
+    var column = !(index % 2) ? pdf_header[0] : pdf_header[1];
+    if (!column.table)
+      Object.assign(column, {
+        layout: 'noBorders',
+        style: 'tableFields',
+        table: {
+          widths: ['auto', '*'],
+          body:[]
+        }
+      });
+
+    column.table.body.push([
+      {text: getDisplayLabel(field), bold: true},
+      getFieldStrVal(record, field, true)
+    ]);
   });
 
-  return table;
-};
+  return pdf_header;
+}
 
 const analyzeTitle = (text, title) => {
   if (text.toLowerCase().includes('@title')) {
@@ -242,7 +333,7 @@ const translateText = (pdfDefinition, {settings, records, fields_state, body, re
   content.push(getPdfLine(label, settings.reportHead));
   content.push(getPdfLine(label, settings.reportDesc));
   if (records.length > 0) {
-    content.push(analyzeRecordList(fieldsName, fields_props, records, settings.contents));
+    content.push(analyzeRecordList(body.label, fieldsName, fields_props, records, settings.contents));
   }
 
   const promiseList = [];
@@ -357,5 +448,7 @@ export {
   format,
   download,
   preview,
-  defaultSettings
+  defaultSettings,
+  getLinkData,
+  genSummary
 };

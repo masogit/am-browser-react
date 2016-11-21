@@ -221,7 +221,7 @@ export default class PDFDesigner extends Component {
     return (
       <Box pad='small' flex={true}>
         <Header justify='between' size='small'>
-          <Box pad={{horizontal: 'small'}}>PDF Template</Box>1
+          <Box pad={{horizontal: 'small'}}>PDF Template</Box>
           <Menu direction="row" align="center" responsive={true}>
             <Anchor icon={<Code />} onClick={() => this.setState({ mode: mode == MODE.CODE ? MODE.DESIGN : MODE.CODE })} label={mode}/>
             <Anchor icon={<Brush />} onClick={() => this.setState({showLayer: 'new_style'})} label="Style Designer"/>
