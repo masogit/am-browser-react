@@ -97,7 +97,6 @@ export default class PDFDesigner extends Component {
   _translateText(pdfDefinition, records = this.state.records) {
     const settings = this.state.report.settings,
       body = this.props.body, fields_state= this.state.fields;
-
     return translateText(pdfDefinition, {settings, records, body, fields_state});
   }
 

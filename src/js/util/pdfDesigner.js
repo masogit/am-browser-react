@@ -3,6 +3,7 @@
  */
 import {getDisplayLabel, getFieldStrVal } from './RecordFormat';
 import {loadRecordsByBody} from '../actions/explorer';
+import {getLinkData} from './pdfDesigner_record';
 
 const MODE = {
   CODE: 'Code',
@@ -231,7 +232,7 @@ const setTextLine = (target, source, label) => {
   target.style = textObj.style;
 };
 
-const translateText = (pdfDefinition, {settings, records, fields_state, body}) => {
+const translateText = (pdfDefinition, {settings, records, fields_state, body, links}) => {
   const {fields: fields_props = [], label = ''} = body;
   //const fieldsName = fields_state.filter(field => field.selected).map(field => field.sqlname);
   const fieldsName = fields_state.map(field => field.sqlname);
@@ -240,7 +241,16 @@ const translateText = (pdfDefinition, {settings, records, fields_state, body}) =
 
   content.push(getPdfLine(label, settings.reportHead));
   content.push(getPdfLine(label, settings.reportDesc));
-  content.push(analyzeRecordList(fieldsName, fields_props, records, settings.contents));
+  if (records.length > 0) {
+    content.push(analyzeRecordList(fieldsName, fields_props, records, settings.contents));
+  }
+
+  if (links.length > 0) {
+    links.forEach(link => {
+      getLinkData(link, content);
+    });
+  }
+
   pdfDefinition.content = content;
 
   setTextLine(pdfDefinition.header.columns[0], settings.pageHeader.left, label);

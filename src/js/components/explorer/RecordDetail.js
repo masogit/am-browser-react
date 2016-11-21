@@ -6,16 +6,19 @@ import { Anchor, Layer, Tabs, Table, TableRow, Header } from 'grommet';
 import Pdf from 'grommet/components/icons/base/DocumentPdf';
 import * as Format from '../../util/RecordFormat';
 import cookies from 'js-cookie';
+import PDFTemplate from '../reports/reports';
 
 export default class RecordDetail extends Component {
 
   constructor() {
     super();
     this.state = {
-      record: null,
       body: null,
-      links: []
+      links: [],
+      pdfSettings: null
     };
+    this.showPDFDesigner = this.showPDFDesigner.bind(this);
+    this.renderPDFPreview = this.renderPDFPreview.bind(this);
   }
 
   componentDidMount() {
@@ -79,13 +82,31 @@ export default class RecordDetail extends Component {
     this.refs.downloadForm.submit();
   }
 
+  showPDFDesigner() {
+    this.setState({pdfSettings: {body: this.props.body}});
+  }
+
+  renderPDFPreview() {
+    const pdfSettings = this.state.pdfSettings;
+    if (!pdfSettings) {
+      return;
+    }
+
+    return (
+      <Layer closer={true} onClose={() => this.setState({pdfSettings: null})}>
+        <PDFTemplate {...pdfSettings} fromView={true} links={this.state.links} record={this.props.record}/>
+      </Layer>
+    );
+  }
+
   render() {
 
     return (
       <Layer closer={true} align="right" onClose={this.props.onClose}>
         <Tabs justify="start" activeIndex={0}>
           <ActionTab title={this.props.body.label}>
-            <Header justify="end">
+            <Header justify="end">1
+              <Anchor icon={<Pdf />} label="PDF Template" onClick={this.showPDFDesigner}/>
               <Anchor icon={<Pdf />} label="PDF Report" onClick={() => this._download('1vM')}/>
               <form name="Download" ref="downloadForm" method="post">
                 <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
@@ -132,6 +153,7 @@ export default class RecordDetail extends Component {
             })
           }
         </Tabs>
+        {this.renderPDFPreview()}
       </Layer>
     );
   }
