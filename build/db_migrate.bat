@@ -13,7 +13,8 @@ if %ERRORLEVEL% EQU 0 (
   echo.
   goto end
 )
-"%SCRIPTPATH%\node\nodejs\node.exe" app/db migrate
+cd /d %SCRIPTPATH%
+"%SCRIPTPATH%node\nodejs\node.exe" "%SCRIPTPATH%app/db.js" migrate
 if %ERRORLEVEL% NEQ 0 goto errorInfo
 goto end
 :errorInfo
