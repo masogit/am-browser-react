@@ -2,7 +2,7 @@
 
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { login, initAbout } from '../actions/system';
+import { login } from '../actions/system';
 import Split from 'grommet/components/Split';
 import {Section, Label, Sidebar, LoginForm, Footer} from 'grommet';
 import ComponentBase from './commons/ComponentBase';
