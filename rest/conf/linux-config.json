@@ -7,6 +7,6 @@
   "SERVER": "(local)",
   "Database": "AMDemo96en",
   "Tomcat": "8.0.36",
-  "Release_WS": "20160811.044354-462",
+  "Release_WS": "",
   "Release_CPP": "20160811.053027-788"
 }
