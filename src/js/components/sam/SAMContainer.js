@@ -119,19 +119,26 @@ export default class SAMContainer extends Component {
   }
 
   renderSoftware(record) {
+    console.log(record);
     let filter = record['SoftInstQuery.memQueryText'];
     let table = record['SoftInstQuery.TableName'];
     let parent = '';
 
     switch(record['SoftInstQuery.TableName']) {
       case 'amSoftInstall':
-        parent = 'ParentPortfolio';
+        parent = 'ParentPortfolio.Computer';
         break;
       case 'amMonitoredApp':
-        parent = 'MonParentPortfolio';
+        parent = 'MonParentPortfolio.Computer';
         break;
       case 'amMonSWComp':
-        parent = 'MonApp.MonParentPortfolio';
+        parent = 'MonApp.MonParentPortfolio.Computer';
+        break;
+      case 'amIBMConsPoints':
+        parent = 'Computer';
+        break;
+      case 'amPortfolio':
+        parent = 'SoftInstall.ParentPortfolio.Computer';
         break;
       default:
         filter = `seType=0 AND bMissing=0 AND seType=0 AND Model.Name='${record.Name}'`;
@@ -145,30 +152,30 @@ export default class SAMContainer extends Component {
       "fields": [
         {
           "alias": "Computer",
-          "sqlname": parent + ".Computer.TcpIpHostName"
+          "sqlname": parent + ".TcpIpHostName"
         },
         {
           "alias": "IPAddress",
-          "sqlname": parent + ".Computer.TcpIpAddress"
+          "sqlname": parent + ".TcpIpAddress"
         },
         {
           "alias": "Model",
-          "sqlname": parent + ".Computer.Portfolio.Model.Name"
+          "sqlname": parent + ".Portfolio.Model.Name"
         },
         // {
         //   "alias": "User",
-        //   "sqlname": "ParentPortfolio.Computer.Portfolio.User.Name"
+        //   "sqlname": "ParentPortfolio.Portfolio.User.Name"
         // },
         {
           "alias": "Type",
-          "sqlname": parent + ".Computer.ComputerType"
+          "sqlname": parent + ".ComputerType"
         },
         {
           "alias": "Assignment",
-          "sqlname": parent + ".Computer.Portfolio.seAssignment"
+          "sqlname": parent + ".Portfolio.seAssignment"
         }
       ],
-      "groupby": `${parent}.Computer.ComputerType|${parent}.Computer.Portfolio.Model.Name`
+      "groupby": `${parent}.ComputerType|${parent}.Portfolio.Model.Name`
     };
 
     this.setState({

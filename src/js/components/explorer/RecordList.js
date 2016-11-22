@@ -688,7 +688,7 @@ export default class RecordList extends ComponentBase {
       return this.renderPDFPreview();
     } else {
       return (
-        <Box flex={true} className='fixIEScrollBar'>
+        <Box flex={true}>
           {this.renderToolBox()}
           {filters.length > 0 &&
           <Box direction='row' className='topology-background-color' pad='small' flex={false} margin={{bottom: 'small'}}>
@@ -707,7 +707,7 @@ export default class RecordList extends ComponentBase {
             )}
           </Box>
           }
-          <Box flex={true} direction={graphType=='legend' ? 'row' : 'column'} className='fixMinSizing fixIEScrollBar'>
+          <Box flex={true} direction={graphType=='legend' ? 'row' : 'column'} className='fixMinSizing'>
             {!(showTopology && record) && this.renderGraph()}
             <Box flex={true} pad={graphType=='legend' ? 'none' : {vertical: 'small'}} direction='row'>
               <Box className='topology-background-color' flex={true} pad='small'>
