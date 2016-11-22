@@ -6,7 +6,7 @@ import {
   Form,
   Footer,
   Header,
-  Notification
+  Toast
 } from 'grommet';
 
 export default class AlertForm extends Component {
@@ -28,7 +28,7 @@ export default class AlertForm extends Component {
     return (
       <Box flex={false}>
         {status ?
-          <Notification status={status} message={desc} onClose={onClose} closer={true}/>
+          <Toast status={status} onClose={onClose}>{desc}</Toast>
         :
           <Layer onClose={onClose} closer={true} {...this.props}>
             <Box full={full} justify="center">
@@ -67,4 +67,3 @@ AlertForm.propTypes = {
   full: PropTypes.oneOf([true, 'horizontal', 'vertical', false]),
   align: PropTypes.oneOf(['center', 'top', 'bottom', 'left', 'right'])
 };
-
