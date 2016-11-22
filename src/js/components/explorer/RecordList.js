@@ -702,7 +702,7 @@ export default class RecordList extends ComponentBase {
             )}
           </Box>
           }
-          <Box flex={true} direction={graphType=='legend' ? 'row' : 'column'} className='fixMinSizing fixIEScrollBar'>
+          <Box flex={true} direction={graphType=='legend' ? 'row' : 'column'} className='fixMinSizing'>
             {!(showTopology && record) && this.renderGraph()}
             <Box flex={true} pad={graphType=='legend' ? 'none' : {vertical: 'small'}} direction='row'>
               <Box className='topology-background-color' flex={true} pad='small'>

@@ -5,8 +5,8 @@ const {Download, Close, Play: Preview, Code, Checkmark, Duplicate} = Icons.Base;
 import {loadRecordsByBody} from '../../actions/explorer';
 import { cloneDeep } from 'lodash';
 import { MODE, init_style, table_style, preview,
-  getPreviewStyle, updateValue, translateText, format, download } from '../../util/pdfDesigner';
-import {Brush, StyleDesigner, ExportLayer} from './../commons/PDFWidgets';
+  getPreviewStyle, updateValue, translateText, download } from '../../util/pdfDesigner';
+import {Brush, StyleDesigner, ExportLayer, NumberInputField} from './../commons/PDFWidgets';
 import AlertForm from '../commons/AlertForm';
 
 Menu.propTypes.label = PropTypes.oneOfType([PropTypes.object, PropTypes.string]);
@@ -31,6 +31,7 @@ export default class PDFDesigner extends Component {
     this.updateCode = this.updateCode.bind(this);
     this._updateValue = this._updateValue.bind(this);
     this._preview = this._preview.bind(this);
+    this.autoPreview = this.autoPreview.bind(this);
     this.isChanged = this.isChanged.bind(this);
     this.onDuplicate = this.onDuplicate.bind(this);
     this.originReport = _.cloneDeep(report);
@@ -48,7 +49,7 @@ export default class PDFDesigner extends Component {
 
   componentWillReceiveProps(nextProps) {
     const {body: {fields}, records, definition, report} = nextProps;
-    if (report._id !== this.state.report._id) {
+    if (!report._id || report._id !== this.state.report._id) {
       this.setState({
         fields, records, report, definition
       }, this._preview);
@@ -148,6 +149,7 @@ export default class PDFDesigner extends Component {
   returnTableStyleField({layout, style, header, text}) {
     return (
       <FormField label='Content Table'>
+        {this.returnStyleField({label: 'Title', name:"contents.tableTitle", value:this.state.report.settings.contents.tableTitle})}
         <Box direction='row' pad={{horizontal: 'small'}}>
           {this.returnStyleField({label:'Layout:', name: 'contents.layout', value: layout, data: table_style, noInput: true})}
           {this.returnStyleField({label:'Style:', name: 'contents.style', value: style, noInput: true})}
@@ -156,6 +158,19 @@ export default class PDFDesigner extends Component {
           {this.returnStyleField({label:'Header:', name: 'contents.header', value: header, noInput: true})}
           {this.returnStyleField({label:'Text:', name: 'contents.text', value: text, noInput: true})}
         </Box>
+      </FormField>
+    );
+  }
+
+  returnFieldBlockStyleField(fieldBlock) {
+    return (
+      <FormField label='Field Block'>
+        {this.returnStyleField({label: 'Title', name:"fieldBlock.fieldTitle", value: fieldBlock.fieldTitle})}
+        <Box direction='row' pad={{horizontal: 'small'}}>
+          {this.returnStyleField({label:'Label:', name: 'fieldBlock.label', value: fieldBlock.label, noInput: true})}
+          {this.returnStyleField({label:'Value:', name: 'fieldBlock.value', value: fieldBlock.value, noInput: true})}
+        </Box>
+        <NumberInputField state={fieldBlock} label='Columns' name='column' updateValue={(event) => this._updateValue(event, {state: fieldBlock, callback: this.autoPreview})} min={1} max={3}/>
       </FormField>
     );
   }
@@ -218,6 +233,7 @@ export default class PDFDesigner extends Component {
     const {mode, pdfDefinition, error, report, loading} = this.state;
     const {settings, name, _id} = report;
     const canEdit = this.props.root || !report.public;
+
     return (
       <Box pad='small' flex={true}>
         <Header justify='between' size='small'>
@@ -236,7 +252,7 @@ export default class PDFDesigner extends Component {
         </Header>
         <Box flex={true} direction='row'>
           {mode == MODE.CODE ? <FormField error={error} className='code-panel'>
-            <textarea name='pdfDefinition' value={format(pdfDefinition)} onChange={this.updateCode}/>
+            <textarea name='pdfDefinition' value={JSON.stringify(pdfDefinition, null, ' ')} onChange={this.updateCode}/>
           </FormField> :
             <Box flex={true} style={{maxWidth: '50vw'}} direction='row'>
               <Form className='strong-label flex no-border'>
@@ -257,6 +273,7 @@ export default class PDFDesigner extends Component {
                     {this.returnStyleField({label: 'Header', name:"reportHead", value:settings.reportHead})}
                     {this.returnStyleField({label: 'Descriptions', name:"reportDesc", value:settings.reportDesc})}
                     {this.returnTableStyleField(settings.contents)}
+                    {this.returnFieldBlockStyleField(settings.fieldBlock)}
                   </Box>
                 </FormField>
                 <FormField label='Page Footer'>

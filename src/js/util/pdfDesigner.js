@@ -11,7 +11,7 @@ const MODE = {
 
 const init_style = {
   name: '',
-  fontSize: 16,
+  fontSize: 13,
   bold: false,
   margin: [0, 0, 0, 0],
   color: '#000000',
@@ -24,46 +24,81 @@ const table_style = [
 
 const styles = {
   header: {
-    fontSize: 18,
     bold: true,
     margin: [0, 0, 0, 10],
+    italics: false,
+    fontSize: 18,
+    color: '#000000',
     tempId: -1
   },
   subheader: {
     fontSize: 16,
     bold: true,
+    italics: false,
     margin: [0, 10, 0, 15],
+    color: '#000000',
     tempId: -2
   },
   text: {
+    margin: [0, 0, 0, 0],
+    bold: false,
+    italics: false,
     fontSize: 12,
+    color: '#000000',
     tempId: -3
   },
   tableTitle: {
-    italics: true,
-    fontSize: 13,
+    margin: [0, 10, 0, 10],
+    bold: true,
+    italics: false,
+    fontSize: 16,
     color: '#000000',
-    tempId: -7
-  },
-  tableFields: {
-    margin: [0, 20, 20, 15],
     tempId: -4
   },
-  tableExample: {
-    margin: [0, 5, 0, 15],
+  tableFields: {
+    bold: false,
+    margin: [0, 20, 20, 15],
+    italics: false,
+    fontSize: 13,
+    color: '#000000',
     tempId: -5
   },
-  tableHeader: {
-    italics: true,
+  tableExample: {
+    bold: false,
+    margin: [0, 5, 0, 15],
+    italics: false,
     fontSize: 13,
     color: '#000000',
     tempId: -6
   },
-  fieldTitle: {
+  tableHeader: {
+    bold: false,
+    margin: [0, 0, 0, 0],
     italics: true,
     fontSize: 13,
     color: '#000000',
     tempId: -7
+  },
+  fieldTitle: {
+    margin: [0, 0, 0, 0],
+    italics: true,
+    fontSize: 15,
+    color: '#000000',
+    bold: true,
+    tempId: -8
+  },
+  fieldLabel: {
+    italics: false,
+    fontSize: 12,
+    color: '#000000',
+    bold: true,
+    tempId: -9
+  },
+  fieldValue: {
+    italics: false,
+    fontSize: 12,
+    color: '#000000',
+    tempId: -10
   }
 };
 
@@ -112,7 +147,20 @@ const defaultSettings = {
     style: 'tableExample',
     layout: 'headerLineOnly',
     header: 'tableHeader',
-    text: 'text'
+    text: 'text',
+    tableTitle: {
+      style: 'tableTitle',
+      text: '@tableTitle'
+    }
+  },
+  fieldBlock: {
+    label: 'fieldLabel',
+    value: 'fieldValue',
+    column: 2,
+    fieldTitle: {
+      style: 'fieldTitle',
+      text: '@linkTitle'
+    }
   },
   reportDesc: {
     text: '',
@@ -129,7 +177,7 @@ const defaultSettings = {
   }
 };
 
-const genTable = ({title, records, fields, style = {layout: 'headerLineOnly', header: 'tableHeader', text: 'text', title: 'tableHeader'}}) => {
+const genTable = ({title, records, fields, style = {layout: 'headerLineOnly', header: 'tableHeader', text: 'text', tableTitle: {style: 'tableTitle'}}}) => {
   if (!records)
     return [];
 
@@ -147,7 +195,7 @@ const genTable = ({title, records, fields, style = {layout: 'headerLineOnly', he
   });
 
   return [{
-    text: `${title} (${records.length})`, style: style.title
+    text: `${title} (${records.length})`, style: style.tableTitle.style
   }, {
     style: style.style,
     table: {
@@ -178,8 +226,9 @@ const analyzeRecordList = (title, filter, allFields, records, style) => {
   return genTable({title, records, fields: availableFields, style});
 };
 
-function getLinkData(link, pdf_link = [], style = {subheader: 'subheader', layout: 'headerLineOnly', header: 'tableHeader', text: 'text', title: 'tableHeader'}) {
-  const title = link.label;
+function getLinkData(link, pdf_link = [], style = {tableHeader: 'tableHeader', contents: {tableTitle: {style: 'tableTitle'}},fieldBlock: {fieldTitle: {style: 'fieldTitle', text: ''}}}) {
+  const title = style.contents.tableTitle.text ? analyzeTitle(style.contents.tableTitle.text, link.label, '@tableTitle') : link.label;
+
   const fields = link.body.fields;
   link.body.param = {limit: 1};
 
@@ -190,7 +239,7 @@ function getLinkData(link, pdf_link = [], style = {subheader: 'subheader', layou
       const pdf_ol = [];
 
       pdf_link.push({
-        text: `${title} (${data.count})`, style: style.subheader
+        text: `${title} (${data.count})`, style: style.contents.tableTitle.style
       });
 
       pdf_link.push({
@@ -201,10 +250,10 @@ function getLinkData(link, pdf_link = [], style = {subheader: 'subheader', layou
       data.entities.map((record) => {
         const summary = {
           stack: [
-            {text: record.self, style: style.tableHeader},
+            {text: style.fieldBlock.fieldTitle.text ? analyzeTitle(style.fieldBlock.fieldTitle.text, record.self, '@linkTitle') : record.self, style: style.fieldBlock.fieldTitle.style},
             {
               alignment: 'justify',
-              columns: genSummary(record, fields)
+              columns: genSummary(record, fields, style.fieldBlock)
             }
           ],
           margin: [0, 0, 0, 40]
@@ -213,7 +262,7 @@ function getLinkData(link, pdf_link = [], style = {subheader: 'subheader', layou
 
         links.forEach((sub_link) => {
           sub_link.body.params = getQueryByBody(getLinkBody(sub_link, record));
-          promises.push(getLinkData(sub_link, summary.stack));
+          promises.push(getLinkData(sub_link, summary.stack, style));
         });
       });
     } else {
@@ -239,10 +288,11 @@ function getLinkBody(link, record) {
   return body;
 }
 
-function genSummary(record, fields, columns = 2) {
+function genSummary(record, fields, style = {column: 2, label: 'fieldLabel', value: 'fieldValue'}) {
+  const columns = style.column;
   //const pdf_header = new Array(columns).fill({});
   const pdf_header = [];
-  _.times(columns, pdf_header.push({}));
+  _.times(columns, () => pdf_header.push({}));
   fields.forEach((field, index) => {
     const column = pdf_header[index % columns];
     if (!column.table)
@@ -256,20 +306,17 @@ function genSummary(record, fields, columns = 2) {
       });
 
     column.table.body.push([
-      {text: getDisplayLabel(field), bold: true},
-      getFieldStrVal(record, field, true)
+      {text: getDisplayLabel(field), style: style.label},
+      {text: getFieldStrVal(record, field, true), style: style.value}
     ]);
   });
 
   return pdf_header;
 }
 
-const analyzeTitle = (text, title) => {
-  if (text.toLowerCase().includes('@title')) {
-    return text.replace(/@title/gi, title);
-  }
-
-  return text;
+const analyzeTitle = (text, title, placehoder= '@title') => {
+  const reg = new RegExp(placehoder, 'gi');
+  return text.replace(reg, title);
 };
 
 const analyzeDate = (text, date) => {
@@ -346,7 +393,7 @@ const translateText = (pdfDefinition, {settings, records, fields_state, body, re
   content.push(getPdfLine(label, settings.reportHead));
   content.push(getPdfLine(label, settings.reportDesc));
   if (records.length > 0) {
-    content.push(analyzeRecordList(body.label, fieldsName, fields_props, records, settings.contents));
+    content.push(analyzeRecordList(analyzeTitle(settings.contents.tableTitle.text, body.label, '@tableTitle'), fieldsName, fields_props, records, settings.contents));
   }
 
   const promiseList = [];
@@ -354,10 +401,10 @@ const translateText = (pdfDefinition, {settings, records, fields_state, body, re
 
     const summary = {
       stack: [
-        {text: record.self, style: settings.fieldTitle},
+        {text: record.self, style: settings.fieldBlock.fieldTitle.style},
         {
           alignment: 'justify',
-          columns: genSummary(record, fields_props)
+          columns: genSummary(record, fields_props, settings.fieldBlock)
         }
       ],
       margin: [0, 0, 0, 40]
@@ -365,7 +412,7 @@ const translateText = (pdfDefinition, {settings, records, fields_state, body, re
     content.push(summary);
 
     links.forEach(link => {
-      promiseList.push(getLinkData({...link, param: {}}, content));
+      promiseList.push(getLinkData({...link, param: {}}, content, settings));
     });
   }
 
@@ -384,40 +431,6 @@ const translateText = (pdfDefinition, {settings, records, fields_state, body, re
     pdfDefinition.styles = settings.styles;
     return pdfDefinition;
   });
-};
-
-const format = (pdfDefinition) => {
-  if (typeof pdfDefinition == 'string') {
-    return pdfDefinition;
-  }
-  const text = JSON.stringify(pdfDefinition);
-  let spliters = 0, result = '', inArray = false, splitted = false;
-  for (let char of text) {
-    result += char;
-    if (char == '[') {
-      inArray = true;
-    } else if (char == ']') {
-      inArray = false;
-    }
-    if (splitted) {
-      splitted = false;
-      continue;
-    }
-
-    if (char == '{') {
-      result += '\n' + '\t'.repeat(++spliters);
-      splitted = true;
-    } else if (char == '}') {
-      result = result.slice(0, -1);
-      result += '\n' + '\t'.repeat(--spliters);
-      result += char;
-    } else if (char == ',' && !inArray) {
-      result += '\n' + '\t'.repeat(spliters);
-      splitted = true;
-    }
-  }
-
-  return result;
 };
 
 const download = ({onBefore, props, getPDFDefinition, onDone}) => {
@@ -468,7 +481,6 @@ export {
   getPreviewStyle,
   updateValue,
   translateText,
-  format,
   download,
   preview,
   defaultSettings,

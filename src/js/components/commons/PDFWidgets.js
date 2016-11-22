@@ -13,12 +13,12 @@ const Brush = (props) => (
   </SVGIcon>
 );
 
-const NumberInputField = ({state, label, name, updateValue, min, max, step = 1}) => {
+const NumberInputField = ({state, label, name, updateValue, min, max, step = 1, compact = false}) => {
   //https://gist.github.com/Candy374/80bf411ff286f6785eb80a9098f01c39
   return (
     <FormField label={
           <Box justify='between' direction='row'>
-            <Label margin='none'>{label}</Label>
+            {compact ? <span>{label}</span> : <Label margin='none'>{label}</Label>}
           </Box>}>
       <NumberInput className='number-input-label' name={name} type="range" min={min} max={max} step={step} value={state[name]} onChange={updateValue}/>
       <input name={name} type="range" min={min} max={max} step={step} value={state[name]} onChange={updateValue}/>
