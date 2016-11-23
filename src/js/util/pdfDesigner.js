@@ -177,6 +177,13 @@ const defaultSettings = {
   }
 };
 
+const GLOBAL_VARIABLES = {
+  TABLE_TITLE: '@tableTitle',
+  LINK_TITLE: '@linkTitle',
+  DATE: '@date',
+  TITLE: '@title'
+};
+
 const genTable = ({title, records, fields, style = {layout: 'headerLineOnly', header: 'tableHeader', text: 'text', tableTitle: {style: 'tableTitle'}}}) => {
   if (!records)
     return [];
@@ -227,7 +234,7 @@ const analyzeRecordList = (title, filter, allFields, records, style) => {
 };
 
 function getLinkData(link, pdf_link = [], style = {tableHeader: 'tableHeader', contents: {tableTitle: {style: 'tableTitle'}},fieldBlock: {fieldTitle: {style: 'fieldTitle', text: ''}}}) {
-  const title = style.contents.tableTitle.text ? analyzeTitle(style.contents.tableTitle.text, link.label, '@tableTitle') : link.label;
+  const title = style.contents.tableTitle.text ? analyzeTitle(style.contents.tableTitle.text, link.label, GLOBAL_VARIABLES.TABLE_TITLE) : link.label;
 
   const fields = link.body.fields;
 
@@ -249,7 +256,7 @@ function getLinkData(link, pdf_link = [], style = {tableHeader: 'tableHeader', c
       data.entities.map((record) => {
         const summary = {
           stack: [
-            {text: style.fieldBlock.fieldTitle.text ? analyzeTitle(style.fieldBlock.fieldTitle.text, record.self, '@linkTitle') : record.self, style: style.fieldBlock.fieldTitle.style},
+            {text: style.fieldBlock.fieldTitle.text ? analyzeTitle(style.fieldBlock.fieldTitle.text, record.self, GLOBAL_VARIABLES.LINK_TITLE) : record.self, style: style.fieldBlock.fieldTitle.style},
             {
               alignment: 'justify',
               columns: genSummary(record, fields, style.fieldBlock)
@@ -297,13 +304,13 @@ function genSummary(record, fields, style = {column: 2, label: 'fieldLabel', val
   return pdf_header;
 }
 
-const analyzeTitle = (text, title, placehoder= '@title') => {
+const analyzeTitle = (text, title, placehoder= GLOBAL_VARIABLES.TITLE) => {
   const reg = new RegExp(placehoder, 'gi');
   return text.replace(reg, title);
 };
 
 const analyzeDate = (text, date) => {
-  if (text.toLowerCase().includes('@date')) {
+  if (text.toLowerCase().includes(GLOBAL_VARIABLES.DATE)) {
     return text.replace(/@date/gi, date);
   }
 
@@ -375,7 +382,7 @@ const translateText = (pdfDefinition, {settings, records, fields_state, body, re
   content.push(getPdfLine(label, settings.reportHead));
   content.push(getPdfLine(label, settings.reportDesc));
   if (records.length > 0) {
-    content.push(analyzeRecordList(analyzeTitle(settings.contents.tableTitle.text, body.label, '@tableTitle'), fieldsName, fields_props, records, settings.contents));
+    content.push(analyzeRecordList(analyzeTitle(settings.contents.tableTitle.text, body.label, GLOBAL_VARIABLES.TABLE_TITLE), fieldsName, fields_props, records, settings.contents));
   }
 
   const promiseList = [];
