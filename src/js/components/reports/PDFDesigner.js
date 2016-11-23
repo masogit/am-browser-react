@@ -266,8 +266,10 @@ export default class PDFDesigner extends Component {
     return this.props.isChanged || !_.isEqual(this.originReport, this.state.report);
   }
 
-  uploadLogo() {
-
+  uploadLogo(src) {
+    this.state.report.settings.images = {};
+    this.state.report.settings.images[GLOBAL_VARIABLES.LOGO] = src;
+    this.setState({report: this.state.report}, this.autoPreview);
   }
 
   render() {
@@ -362,7 +364,7 @@ export default class PDFDesigner extends Component {
                                  onChange={(event) => this.updatePDFSettings(event, 'landscape')}/>
 
                   </Box>
-                  <UploadWidget accept=".ico" onChange={this.uploadLogo.bind(this)}/>/>
+                  <UploadWidget accept=".jpg" onChange={this.uploadLogo.bind(this)}/>/>
                 </FormField>
               </Form>
             </Box>

@@ -180,7 +180,6 @@ const updateValue = (event, {state, callback, val = event.target.value, name = e
 
 const getPdfLine = (label, {text='', style=''}) => {
   let result = analyzeTitle(text, label);
-
   const date = (new Date()).toLocaleDateString();
   result = analyzeDate(result, date);
   return {
@@ -188,10 +187,23 @@ const getPdfLine = (label, {text='', style=''}) => {
   };
 };
 
+const analyzeLogo = (width=100, height=100) => {
+  return {
+    image: GLOBAL_VARIABLES.LOGO,
+    width, height
+  };
+};
+
 const setTextLine = (target, source, label) => {
-  const textObj = getPdfLine(label, source);
-  target.text = textObj.text;
-  target.style = textObj.style;
+  const text = source.text;
+  const textParts = text.split(GLOBAL_VARIABLES.LOGO);
+  if (textParts.length == 1) {
+    const textObj = getPdfLine(label, source);
+    target.text = textObj.text;
+    target.style = textObj.style;
+  } else {
+    target = analyzeLogo();
+  }
 };
 
 const translateText = (pdfDefinition, {settings, records, fields_state, body, record, links, param}) => {
@@ -233,13 +245,14 @@ const translateText = (pdfDefinition, {settings, records, fields_state, body, re
     setTextLine(pdfDefinition.header.columns[0], settings.pageHeader.left, label);
     setTextLine(pdfDefinition.header.columns[1], settings.pageHeader.center, label);
     setTextLine(pdfDefinition.header.columns[2], settings.pageHeader.right, label);
-
+    content.push(analyzeLogo());
     setTextLine(pdfDefinition.footer.columns[0], settings.pageFooter.left, label);
     setTextLine(pdfDefinition.footer.columns[1], settings.pageFooter.center, label);
     setTextLine(pdfDefinition.footer.columns[2], settings.pageFooter.right, label);
 
     pdfDefinition.pageOrientation = settings.pageOrientation;
     pdfDefinition.styles = settings.styles;
+    pdfDefinition.images = settings.images;
     return pdfDefinition;
   });
 };
