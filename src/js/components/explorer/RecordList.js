@@ -683,7 +683,7 @@ export default class RecordList extends ComponentBase {
       return this.renderPDFPreview();
     } else {
       return (
-        <Box flex={true} className='fixIEScrollBar'>
+        <Box flex={true}>
           {this.renderToolBox()}
           {filters.length > 0 &&
           <Box direction='row' className='topology-background-color' pad='small' flex={false} margin={{bottom: 'small'}}>
