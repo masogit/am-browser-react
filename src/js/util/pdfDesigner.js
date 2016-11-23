@@ -2,7 +2,7 @@
  * Created by huling on 11/10/2016.
  */
 import { getDisplayLabel, getFieldStrVal } from './RecordFormat';
-import { loadRecordsByBody, getQueryByBody } from '../actions/explorer';
+import { loadRecordsByBody } from '../actions/explorer';
 
 const MODE = {
   CODE: 'Code',
@@ -230,7 +230,6 @@ function getLinkData(link, pdf_link = [], style = {tableHeader: 'tableHeader', c
   const title = style.contents.tableTitle.text ? analyzeTitle(style.contents.tableTitle.text, link.label, '@tableTitle') : link.label;
 
   const fields = link.body.fields;
-  link.body.param = {limit: 10, offset: 0};
 
   return loadRecordsByBody(link.body).then(data => {
     const links = link.body.links;
@@ -261,7 +260,7 @@ function getLinkData(link, pdf_link = [], style = {tableHeader: 'tableHeader', c
         pdf_ol.push(summary);
 
         links.forEach((sub_link) => {
-          sub_link.body.params = getQueryByBody(getLinkBody(sub_link, record));
+          sub_link.body.param = link.body.param;
           promises.push(getLinkData(sub_link, summary.stack, style));
         });
       });
@@ -270,22 +269,6 @@ function getLinkData(link, pdf_link = [], style = {tableHeader: 'tableHeader', c
     }
     return Promise.all(promises);
   });
-}
-
-function getLinkBody(link, record) {
-  var body = Object.assign({}, link.body);
-
-  let AQL = "";
-  if (link.src_field) {
-    var relative_path = link.src_field.relative_path;
-    var src_field = relative_path ? relative_path + '.' + link.src_field.sqlname : link.src_field.sqlname;
-    if (record[src_field]) {
-      AQL = `${link.dest_field.sqlname}=${record[src_field]}`;
-    }
-  }
-
-  body.filter = body.filter ? `(${body.filter}) AND ${AQL}` : AQL;
-  return body;
 }
 
 function genSummary(record, fields, style = {column: 2, label: 'fieldLabel', value: 'fieldValue'}) {
@@ -383,9 +366,8 @@ const setTextLine = (target, source, label) => {
   target.style = textObj.style;
 };
 
-const translateText = (pdfDefinition, {settings, records, fields_state, body, record, links}) => {
+const translateText = (pdfDefinition, {settings, records, fields_state, body, record, links, param}) => {
   const {fields: fields_props = [], label = ''} = body;
-  //const fieldsName = fields_state.filter(field => field.selected).map(field => field.sqlname);
   const fieldsName = fields_state.map(field => field.sqlname);
 
   const content = [];
@@ -412,7 +394,8 @@ const translateText = (pdfDefinition, {settings, records, fields_state, body, re
     content.push(summary);
 
     links.forEach(link => {
-      promiseList.push(getLinkData({...link, param: {}}, content, settings));
+      link.body.param = param;
+      promiseList.push(getLinkData(link, content, settings));
     });
   }
 

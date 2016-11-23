@@ -304,7 +304,7 @@ class ExportComponent extends Component {
     return (
       <Layer closer={true} onClose={onClose}>
         <Box flex={true} size='large'>
-          <Header><Title>Choose records to export</Title></Header>
+          <Header><Title>Export records settings</Title></Header>
 
           <Form className='no-border strong-label'>
             {records.limit && <NumberInputField state={this.state} updateValue={(event)=> this._updateValue(event)}
@@ -335,35 +335,32 @@ ExportComponent.propTypes = {
   onClose: PropTypes.func.isRequired
 };
 
-class ExportLayer extends ExportComponent {
-  render() {
-    const records = {
-      limit: {
-        title: 'How many records do you want to export?'
-      },
-      start: { },
-      getExportLabel: (state) => `Export ${getRecordNumber(state) + 1} records`,
-      showDescriptions: true
-    };
+const ExportLayer = (props) => {
+  const records = {
+    limit: {
+      title: 'How many records do you want to export?'
+    },
+    start: { },
+    getExportLabel: (state) =>`Export ${getRecordNumber(state) + 1} records`,
+    showDescriptions: true
+  };
 
-    return (
-      <ExportComponent {...this.props} records={records} onClick={({recordsStart, limit}) => this.props.onConfirm({recordsStart, limit})}/>
-    );
-  }
-}
+  return (
+    <ExportComponent {...props} records={records} onClick={({recordsStart, limit}) => props.onConfirm({recordsStart, limit})}/>
+  );
+};
 
-class ExportLayerForDetail extends Component {
-  render() {
-    const records = {
-      limit: {
-        title: 'How many records do you want to export for each link?'
-      },
-      getExportLabel: () => 'Export'
-    };
+const ExportLayerForDetail = (props) => {
+  const records = {
+    limit: {
+      title: 'Records you want to export for each link:'
+    },
+    getExportLabel: (state) => 'Export'
+  };
 
-    return <ExportComponent {...this.props} records={records} onClick={({limit}) => this.props.onConfirm({limit})}/>;
-  }
-}
+  return <ExportComponent {...props} records={records} onClick={({limit}) => props.onConfirm({recordsStart: 0, limit})}/>;
+};
+
 
 export {Brush, MarginDesigner, StyleDesigner, NumberInputField, ExportLayer, ExportLayerForDetail};
 

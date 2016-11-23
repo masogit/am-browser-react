@@ -95,7 +95,7 @@ export default class PDFDesigner extends Component {
     });
   }
 
-  _translateText(pdfDefinition, records = this.state.records, param = {limit: 100, offset: 0}) {
+  _translateText(pdfDefinition, records = this.state.records, param = {limit: 10, offset: 0}) {
     const settings = this.state.report.settings,
       body = this.props.body, fields_state= this.state.fields,
       links = this.props.links;
@@ -103,11 +103,12 @@ export default class PDFDesigner extends Component {
       records = [];
     }
 
-    return translateText(pdfDefinition, {settings, records, body, fields_state, record: this.props.record, links:this.props.links});
+    return translateText(pdfDefinition, {settings, records, body, fields_state, record: this.props.record, links:this.props.links, param});
   }
 
   _preview() {
     let pdfDefinition = this.state.pdfDefinition;
+    this.setState({loading: true});
     if (this.state.mode != MODE.CODE) {
       this._translateText(pdfDefinition).then(data => {
         preview(cloneDeep(data), () => this.setState({loading: false}));
@@ -118,10 +119,10 @@ export default class PDFDesigner extends Component {
   }
 
   _download({recordsStart, limit}) {
-    const onBefore = () => this.setState({downloading: true});
+    const onBefore = () => this.setState({loading: true});
     const props = {recordsStart, limit, body: this.props.body};
-    const getPDFDefinition = (data) => this._translateText(this.state.pdfDefinition, data, limit);
-    const onDone = () => this.setState({downloading: false});
+    const getPDFDefinition = (data) => this._translateText(this.state.pdfDefinition, data, {offset: recordsStart, limit});
+    const onDone = () => this.setState({loading: false});
 
     download({onBefore, props, getPDFDefinition, onDone});
   }
