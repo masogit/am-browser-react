@@ -230,7 +230,7 @@ function getLinkData(link, pdf_link = [], style = {tableHeader: 'tableHeader', c
   const title = style.contents.tableTitle.text ? analyzeTitle(style.contents.tableTitle.text, link.label, '@tableTitle') : link.label;
 
   const fields = link.body.fields;
-  link.body.param = {limit: 1};
+  link.body.param = {limit: 10, offset: 0};
 
   return loadRecordsByBody(link.body).then(data => {
     const links = link.body.links;
@@ -440,9 +440,16 @@ const download = ({onBefore, props, getPDFDefinition, onDone}) => {
 
   loadRecordsByBody(body).then((data) => {
     const pdfDefinition = getPDFDefinition(data.entities);
-    if (pdfDefinition) {
-      pdfMake.createPdf(pdfDefinition).download(name + '.pdf');
-      onDone();
+    if (pdfDefinition instanceof Promise) {
+      pdfDefinition.then(data => {
+        pdfMake.createPdf(data).download(name + '.pdf');
+        onDone();
+      });
+    } else {
+      if (pdfDefinition) {
+        pdfMake.createPdf(pdfDefinition).download(name + '.pdf');
+        onDone();
+      }
     }
   });
 };

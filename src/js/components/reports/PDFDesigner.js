@@ -6,7 +6,7 @@ import {loadRecordsByBody} from '../../actions/explorer';
 import { cloneDeep } from 'lodash';
 import { MODE, init_style, table_style, preview,
   getPreviewStyle, updateValue, translateText, download } from '../../util/pdfDesigner';
-import {Brush, StyleDesigner, ExportLayer, NumberInputField} from './../commons/PDFWidgets';
+import {Brush, StyleDesigner, ExportLayer, NumberInputField, ExportLayerForDetail} from './../commons/PDFWidgets';
 import AlertForm from '../commons/AlertForm';
 
 Menu.propTypes.label = PropTypes.oneOfType([PropTypes.object, PropTypes.string]);
@@ -40,11 +40,11 @@ export default class PDFDesigner extends Component {
   componentDidMount() {
     this._preview();
 
-    if (this.state.records.length == 0) {
-      loadRecordsByBody(this.props.body).then((data) => {
-        this.setState({records: data.entities, total: data.count}, this._preview);
-      });
-    }
+    const body = this.props.body;
+    body.param = {limit: 10, offset: 0};
+    loadRecordsByBody(body).then((data) => {
+      this.setState({records: data.entities, total: data.count}, this._preview);
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -95,7 +95,7 @@ export default class PDFDesigner extends Component {
     });
   }
 
-  _translateText(pdfDefinition, records = this.state.records) {
+  _translateText(pdfDefinition, records = this.state.records, param = {limit: 100, offset: 0}) {
     const settings = this.state.report.settings,
       body = this.props.body, fields_state= this.state.fields,
       links = this.props.links;
@@ -120,9 +120,9 @@ export default class PDFDesigner extends Component {
   _download({recordsStart, limit}) {
     const onBefore = () => this.setState({downloading: true});
     const props = {recordsStart, limit, body: this.props.body};
-    const getPDFDefinition = (data) => this._translateText(this.state.pdfDefinition, data);
+    const getPDFDefinition = (data) => this._translateText(this.state.pdfDefinition, data, limit);
     const onDone = () => this.setState({downloading: false});
-    // TODO: update to use promise
+
     download({onBefore, props, getPDFDefinition, onDone});
   }
 
@@ -238,7 +238,16 @@ export default class PDFDesigner extends Component {
       };
 
       const onClose = () => this.setState({showExportLayer: false});
-      return <ExportLayer onConfirm={onConfirm} onClose={onClose} recordsStart={recordsStart} total={total} limit={limit}/>;
+      if (this.props.record) {
+        return (<ExportLayerForDetail
+                  onConfirm={onConfirm}
+                  total={1000} recordsStart={0}
+                  limit={limit} onClose={onClose}/>);
+      } else {
+        return (<ExportLayer onConfirm={onConfirm}
+                             recordsStart={recordsStart} total={total}
+                             limit={limit} onClose={onClose} />);
+      }
     }
   }
 
@@ -266,7 +275,7 @@ export default class PDFDesigner extends Component {
       <Box pad={{horizontal: 'small'}} flex={true}>
         <Header justify='between' size='small'>
           <Box direction='row' align='center' className='no-border'>
-            <Box style={{color: '#ff0000', whiteSpace: 'nowrap'}}>{`PDF Template Name:`}</Box>
+            <Box style={{color: '#ff0000'}}>Name:</Box>
             <FormField>
               <input className='input-field' name='report.name' type="text" value={name} onChange={this._updateValue}
                    maxLength='20'/>
@@ -367,10 +376,10 @@ export default class PDFDesigner extends Component {
 }
 
 PDFDesigner.propTyps = {
-  body: PropTypes.object.required,
+  body: PropTypes.object.isRequired,
   records: PropTypes.array,
   record: PropTypes.object,
   links: PropTypes.array,
-  settings: PropTypes.object.required,
-  definition: PropTypes.object.required
+  settings: PropTypes.object.isRequired,
+  definition: PropTypes.object.isRequired
 };

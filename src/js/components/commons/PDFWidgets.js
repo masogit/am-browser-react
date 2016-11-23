@@ -283,7 +283,7 @@ const getRecordNumber = ({recordsStart, limit, total}) => {
   }
 };
 
-class ExportLayer extends Component {
+class ExportComponent extends Component {
   componentWillMount() {
     this.state = {
       recordsStart: this.props.recordsStart,
@@ -298,8 +298,8 @@ class ExportLayer extends Component {
   }
 
   render() {
-    const {onConfirm, onClose} = this.props;
-    const {recordsStart, total} = this.state;
+    const {onClick, onClose, records} = this.props;
+    const {recordsStart, limit, total} = this.state;
 
     return (
       <Layer closer={true} onClose={onClose}>
@@ -307,22 +307,22 @@ class ExportLayer extends Component {
           <Header><Title>Choose records to export</Title></Header>
 
           <Form className='no-border strong-label'>
-            <NumberInputField state={this.state} updateValue={(event)=> this._updateValue(event)}
-                              label='How many records do you want to export?'
-                              name='limit' min={100} max={1000} step={100}/>
-            <NumberInputField state={this.state} updateValue={(event)=> this._updateValue(event)}
+            {records.limit && <NumberInputField state={this.state} updateValue={(event)=> this._updateValue(event)}
+                              label={records.limit.title}
+                              name='limit' min={100} max={1000} step={100}/>}
+            {records.start && <NumberInputField state={this.state} updateValue={(event)=> this._updateValue(event)}
                               label='From which record do you want to export?'
-                              name='recordsStart' min={1} max={total}/>
+                              name='recordsStart' min={1} max={total}/>}
           </Form>
+          {records.showDescriptions &&
           <Box pad={{horizontal: 'medium'}}>
             <Paragraph size='small'>{'You have '}<strong>{total}</strong>{' records in total.'}</Paragraph>
             <Paragraph
               size='small'>{`You will export records `}<strong>{`${recordsStart} ~ ${getRecordNumber(this.state) + recordsStart}`}</strong></Paragraph>
-          </Box>
-
+          </Box>}
           <Footer justify='end' pad={{vertical: 'medium'}}>
-            <Button label={`Export ${getRecordNumber(this.state) + 1} records`} primary={true} strong={true}
-                    onClick={() => onConfirm({recordsStart: this.state.recordsStart - 1, limit: this.state.limit})}/>
+            <Button label={records.getExportLabel(this.state)} primary={true} strong={true}
+                    onClick={() => onClick({recordsStart: recordsStart - 1, limit})}/>
           </Footer>
         </Box>
       </Layer>
@@ -330,11 +330,40 @@ class ExportLayer extends Component {
   }
 }
 
-ExportLayer.propTypes = {
-  onConfirm: PropTypes.func.required,
-  onClose: PropTypes.func.required
+ExportComponent.propTypes = {
+  onConfirm: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired
 };
 
+class ExportLayer extends ExportComponent {
+  render() {
+    const records = {
+      limit: {
+        title: 'How many records do you want to export?'
+      },
+      start: { },
+      getExportLabel: (state) => `Export ${getRecordNumber(state) + 1} records`,
+      showDescriptions: true
+    };
 
-export {Brush, MarginDesigner, StyleDesigner, NumberInputField, ExportLayer};
+    return (
+      <ExportComponent {...this.props} records={records} onClick={({recordsStart, limit}) => this.props.onConfirm({recordsStart, limit})}/>
+    );
+  }
+}
+
+class ExportLayerForDetail extends Component {
+  render() {
+    const records = {
+      limit: {
+        title: 'How many records do you want to export for each link?'
+      },
+      getExportLabel: () => 'Export'
+    };
+
+    return <ExportComponent {...this.props} records={records} onClick={({limit}) => this.props.onConfirm({limit})}/>;
+  }
+}
+
+export {Brush, MarginDesigner, StyleDesigner, NumberInputField, ExportLayer, ExportLayerForDetail};
 
