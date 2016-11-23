@@ -12,7 +12,10 @@ module.exports = function () {
   // default type is save or update
   this.document = function (documentName, document, options = {}) {
     if (options.type) {
-      return this[documentName + '_' + options.type](document, options);
+      if (this[documentName + '_' + options.type])
+        return this[documentName + '_' + options.type](document, options);
+      else
+        return {then: (callback) => callback()};
     } else {
       return this[documentName](document, options);
     }
