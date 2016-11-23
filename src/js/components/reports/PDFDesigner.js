@@ -4,10 +4,12 @@ import {Box, Header, Icons, Anchor, Menu, FormField, Form,
 const {Download, Close, Play: Preview, Code, Checkmark, Duplicate} = Icons.Base;
 import {loadRecordsByBody} from '../../actions/explorer';
 import { cloneDeep } from 'lodash';
-import { MODE, init_style, table_style, preview,
+import { preview,
   getPreviewStyle, updateValue, translateText, download } from '../../util/pdfDesigner';
+import {MODE, init_style, table_style, GLOBAL_VARIABLES} from '../../constants/PDFDesigner';
 import {Brush, StyleDesigner, ExportLayer, NumberInputField, ExportLayerForDetail} from './../commons/PDFWidgets';
 import AlertForm from '../commons/AlertForm';
+import {UploadWidget} from '../commons/Widgets';
 
 Menu.propTypes.label = PropTypes.oneOfType([PropTypes.object, PropTypes.string]);
 
@@ -264,6 +266,10 @@ export default class PDFDesigner extends Component {
     return this.props.isChanged || !_.isEqual(this.originReport, this.state.report);
   }
 
+  uploadLogo() {
+
+  }
+
   render() {
     const {mode, pdfDefinition, error, report, loading} = this.state;
     const {settings, name, _id} = report;
@@ -356,6 +362,7 @@ export default class PDFDesigner extends Component {
                                  onChange={(event) => this.updatePDFSettings(event, 'landscape')}/>
 
                   </Box>
+                  <UploadWidget accept=".ico" onChange={this.uploadLogo.bind(this)}/>/>
                 </FormField>
               </Form>
             </Box>

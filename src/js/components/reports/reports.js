@@ -10,7 +10,7 @@ import { monitorEdit, dropCurrentPop, stopMonitorEdit } from '../../actions/syst
 import example_body from './body_template.json';
 import example_records from './records_template.json';
 import PDFDesigner from './PDFDesigner.js';
-import {defaultSettings, defaultPDFDefinition} from '../../util/pdfDesigner';
+import {defaultSettings, defaultPDFDefinition} from '../../constants/PDFDesigner';
 import * as ExplorerActions from '../../actions/explorer';
 
 const category_PUBLIC = 'Public';
