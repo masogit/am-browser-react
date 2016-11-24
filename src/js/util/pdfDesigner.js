@@ -34,27 +34,7 @@ const genTable = ({title, records, fields, style = {layout: 'headerLineOnly', he
   }];
 };
 
-const analyzeRecordList = (title, filter, allFields, records, style) => {
-  let availableFields = [];
-  if (filter.length > 0) {
-    allFields.map(field => {
-      for (let f of filter) {
-        if (field.sqlname.toLowerCase() == f.toLowerCase()) {
-          availableFields.push(field);
-          break;
-        }
-      }
-    });
-  }
-
-  if (availableFields.length == 0) {
-    availableFields = allFields;
-  }
-
-  return genTable({title, records, fields: availableFields, style});
-};
-
-function getLinkData(link, pdf_link = [], style = {tableHeader: 'tableHeader', contents: {tableTitle: {style: 'tableTitle'}},fieldBlock: {fieldTitle: {style: 'fieldTitle', text: ''}}}) {
+const getLinkData = (link, pdf_link = [], style = {tableHeader: 'tableHeader', contents: {tableTitle: {style: 'tableTitle'}},fieldBlock: {fieldTitle: {style: 'fieldTitle', text: ''}}}) => {
   const title = style.contents.tableTitle.text ? replaceTableTitle(style.contents.tableTitle.text, link.label) : link.label;
 
   const fields = link.body.fields;
@@ -97,48 +77,6 @@ function getLinkData(link, pdf_link = [], style = {tableHeader: 'tableHeader', c
     }
     return Promise.all(promises);
   });
-}
-
-function genSummary(record, fields, style = {column: 2, label: 'fieldLabel', value: 'fieldValue'}) {
-  const columns = style.column;
-  //const pdf_header = new Array(columns).fill({});
-  const pdf_header = [];
-  _.times(columns, () => pdf_header.push({}));
-  fields.forEach((field, index) => {
-    const column = pdf_header[index % columns];
-    if (!column.table)
-      Object.assign(column, {
-        layout: 'noBorders',
-        style: 'tableFields',
-        table: {
-          widths: ['auto', '*'],
-          body:[]
-        }
-      });
-
-    column.table.body.push([
-      {text: getDisplayLabel(field), style: style.label},
-      {text: getFieldStrVal(record, field, true), style: style.value}
-    ]);
-  });
-
-  return pdf_header;
-}
-
-const getPreviewStyle = (style = null, ignoreMargin = false) => {
-  const previewStyle = {};
-  if (style) {
-    const {bold=false, italics=false, color='#000000', margin=[0, 0, 0, 0], fontSize=16} = style;
-    previewStyle.fontWeight = bold ? 'bold' : 'normal';
-    previewStyle.fontStyle = italics ? 'italic' : 'normal';
-    previewStyle.fontSize = fontSize;
-    previewStyle.color = color;
-
-    if (!ignoreMargin) {
-      previewStyle.margin = margin.slice(1).join('px ') + 'px ' + margin[0] + 'px';
-    }
-  }
-  return previewStyle;
 };
 
 const updateValue = (event, {state, callback, val = event.target.value, name = event.target.name, type = event.target.type}) => {
@@ -165,6 +103,69 @@ const updateValue = (event, {state, callback, val = event.target.value, name = e
   }
 };
 
+
+const analyzeRecordList = (title, filter, allFields, records, style) => {
+  let availableFields = [];
+  if (filter.length > 0) {
+    allFields.map(field => {
+      for (let f of filter) {
+        if (field.sqlname.toLowerCase() == f.toLowerCase()) {
+          availableFields.push(field);
+          break;
+        }
+      }
+    });
+  }
+
+  if (availableFields.length == 0) {
+    availableFields = allFields;
+  }
+
+  return genTable({title, records, fields: availableFields, style});
+};
+
+const genSummary = (record, fields, style = {column: 2, label: 'fieldLabel', value: 'fieldValue'}) => {
+  const columns = style.column;
+  //const pdf_header = new Array(columns).fill({});
+  const pdf_header = [];
+  _.times(columns, () => pdf_header.push({}));
+  fields.forEach((field, index) => {
+    const column = pdf_header[index % columns];
+    if (!column.table)
+      Object.assign(column, {
+        layout: 'noBorders',
+        style: 'tableFields',
+        table: {
+          widths: ['auto', '*'],
+          body:[]
+        }
+      });
+
+    column.table.body.push([
+      {text: getDisplayLabel(field), style: style.label},
+      {text: getFieldStrVal(record, field, true), style: style.value}
+    ]);
+  });
+
+  return pdf_header;
+};
+
+const getPreviewStyle = (style = null, ignoreMargin = false) => {
+  const previewStyle = {};
+  if (style) {
+    const {bold=false, italics=false, color='#000000', margin=[0, 0, 0, 0], fontSize=16} = style;
+    previewStyle.fontWeight = bold ? 'bold' : 'normal';
+    previewStyle.fontStyle = italics ? 'italic' : 'normal';
+    previewStyle.fontSize = fontSize;
+    previewStyle.color = color;
+
+    if (!ignoreMargin) {
+      previewStyle.margin = margin.slice(1).join('px ') + 'px ' + margin[0] + 'px';
+    }
+  }
+  return previewStyle;
+};
+
 const replaceText = (originText, replacer, placehoder) => {
   const reg = new RegExp(placehoder, 'gi');
   return originText.replace(reg, replacer);
@@ -177,31 +178,57 @@ const replaceLinkTitle = (originText, replacer) => replaceText(originText, repla
 const replaceDate = (originText) => replaceText(originText, (new Date()).toLocaleDateString(), GLOBAL_VARIABLES.DATE);
 
 const replaceLogo = (originText, style) => {
-  const [leftText, rightText] = originText.split(GLOBAL_VARIABLES.LOGO);
+  if (originText.indexOf(GLOBAL_VARIABLES.LOGO) > -1) {
+    const [leftText = '', rightText = ''] = originText.split(GLOBAL_VARIABLES.LOGO);
 
-  return {
-    alignment: 'justify',
-    columns: [{
-      "text": leftText,
-      "style": style,
-      "alignment": "right"
-    }, {
+    const columns = [];
+    if (leftText) {
+      columns.push({
+        "text": leftText,
+        "style": style,
+        "alignment": "right"
+      });
+    }
+
+    columns.push({
       "image": GLOBAL_VARIABLES.LOGO,
       "width": 20,
       "height": 20
-    }, {
-      "text": rightText,
-      "style": style,
-      "alignment": "left"
-    }]
-  };
+    });
+
+    if (rightText) {
+      columns.push({
+        "text": rightText,
+        "style": style,
+        "alignment": "left"
+      });
+    }
+
+    return {
+      alignment: 'left',
+      columns: columns
+    };
+  } else {
+    return {
+      text: originText,
+      style: style
+    };
+  }
 };
 
 const getColumns = (originSource) => {
   return Object.keys(originSource).map(key => {
     const source = originSource[key];
-    const text = replaceDate(source.text);
+    let text = replaceDate(source.text);
     const logoIndex = text.indexOf(GLOBAL_VARIABLES.LOGO);
+    if (key == 'left') {
+      text = text + ' ';
+    }
+
+    if (key == 'right') {
+      text = ' ' + text;
+    }
+
     let newObj;
     if (logoIndex == -1) {
       newObj = Object.assign({}, source, {text});
@@ -214,13 +241,13 @@ const getColumns = (originSource) => {
 };
 
 const translateText = (pdfDefinition, {settings, records, fields_state, body, record, links, param}) => {
-  const {fields: fields_props = []} = body;
+  const {fields: fields_props = [], label = ''} = body;
   const fieldsName = fields_state.map(field => field.sqlname);
 
   const content = [];
 
-  //content.push(replaceLogo(replaceTitle(settings.reportHead.text, label), settings.reportHead.style));
-  //content.push(replaceLogo(replaceTitle(settings.reportDesc.text, label), settings.reportDesc.style));
+  content.push(replaceLogo(replaceTitle(settings.reportHead.text, label), settings.reportHead.style));
+  content.push(replaceLogo(replaceTitle(settings.reportDesc.text, label), settings.reportDesc.style));
 
   if (records.length > 0) {
     content.push(analyzeRecordList(replaceTableTitle(settings.contents.tableTitle.text, body.label), fieldsName, fields_props, records, settings.contents));
