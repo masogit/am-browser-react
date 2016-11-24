@@ -301,7 +301,7 @@ export default class PDFDesigner extends Component {
           </Box>
           <Menu direction="row" align="center" responsive={true}>
             <UploadWidget accept=".jpg,.png" label='Logo' onChange={this.uploadLogo.bind(this)}/>
-            <img id='logo' width='24px' height='24px'/>
+            <img id='logo' height='24px'/>
             <Anchor icon={<Code />} onClick={() => this.setState({ mode: mode == MODE.CODE ? MODE.DESIGN : MODE.CODE })}
                     label={mode}/>
             <Anchor icon={<Brush />} onClick={() => this.setState({showLayer: 'new_style'})} label="Style Designer"/>
@@ -324,26 +324,26 @@ export default class PDFDesigner extends Component {
               <Form className={formClasses}>
                 <FormField label='Page Header'>
                   <Box direction='row' pad={{horizontal:'small'}}>
-                    {this.returnStyleField({label: 'Left', name: "pageHeader.left", value: settings.pageHeader.left, placeHolder: '@date or @title'})}
+                    {this.returnStyleField({label: 'Left', name: "pageHeader.left", value: settings.pageHeader.left, placeHolder: '@date or @logo'})}
                     {this.returnStyleField({
                       label: 'Center',
                       name: "pageHeader.center",
                       value: settings.pageHeader.center,
-                      placeHolder: '@date or @title'
+                      placeHolder: '@date or @logo'
                     })}
                     {this.returnStyleField({
                       label: 'Right',
                       name: "pageHeader.right",
                       value: settings.pageHeader.right,
-                      placeHolder: '@date or @title'
+                      placeHolder: '@date or @logo'
                     })}
                   </Box>
                 </FormField>
                 <FormField label='Report Body'>
                   <Box pad={{horizontal:'small'}}>
                     <Box direction='row'>
-                      {this.returnStyleField({label: 'Header', name: "reportHead", value: settings.reportHead, placeHolder: '@date or @title'})}
-                      {this.returnStyleField({label: 'Descriptions', name: "reportDesc", value: settings.reportDesc, placeHolder: '@date or @title'})}
+                      {this.returnStyleField({label: 'Header', name: "reportHead", value: settings.reportHead, placeHolder: '@date or @logo or @title'})}
+                      {this.returnStyleField({label: 'Descriptions', name: "reportDesc", value: settings.reportDesc, placeHolder: '@date or @logo or @title'})}
                     </Box>
                     {this.returnTableStyleField(settings.contents)}
                     {this.returnFieldBlockStyleField(settings.fieldBlock)}
@@ -351,16 +351,18 @@ export default class PDFDesigner extends Component {
                 </FormField>
                 <FormField label='Page Footer'>
                   <Box direction='row' pad={{horizontal:'small'}}>
-                    {this.returnStyleField({label: 'Left', name: "pageFooter.left", value: settings.pageFooter.left})}
+                    {this.returnStyleField({label: 'Left', name: "pageFooter.left", value: settings.pageFooter.left, placeHolder: '@date or @logo'})}
                     {this.returnStyleField({
                       label: 'Center',
                       name: "pageFooter.center",
-                      value: settings.pageFooter.center
+                      value: settings.pageFooter.center,
+                      placeHolder: '@date or @logo'
                     })}
                     {this.returnStyleField({
                       label: 'Right',
                       name: "pageFooter.right",
-                      value: settings.pageFooter.right
+                      value: settings.pageFooter.right,
+                      placeHolder: '@date or @logo'
                     })}
                   </Box>
                 </FormField>

@@ -191,9 +191,9 @@ const replaceLogo = (originText, style) => {
     }
 
     columns.push({
-      "image": GLOBAL_VARIABLES.LOGO,
+      "image": GLOBAL_VARIABLES.LOGO/*,
       "width": 20,
-      "height": 20
+      "height": 20*/
     });
 
     if (rightText) {
@@ -246,8 +246,8 @@ const translateText = (pdfDefinition, {settings, records, fields_state, body, re
 
   const content = [];
 
-  content.push(replaceLogo(replaceTitle(settings.reportHead.text, label), settings.reportHead.style));
-  content.push(replaceLogo(replaceTitle(settings.reportDesc.text, label), settings.reportDesc.style));
+  content.push(replaceLogo(replaceDate(replaceTitle(settings.reportHead.text, label)), settings.reportHead.style));
+  content.push(replaceLogo(replaceDate(replaceTitle(settings.reportDesc.text, label)), settings.reportDesc.style));
 
   if (records.length > 0) {
     content.push(analyzeRecordList(replaceTableTitle(settings.contents.tableTitle.text, body.label), fieldsName, fields_props, records, settings.contents));

@@ -11,7 +11,7 @@ class UploadWidget extends Component {
     var reader = new FileReader();
     if (this.props.accept.includes('.json')) {
       reader.readAsBinaryString(file);
-    } else if (this.props.accept.includes('.jpg')) {
+    } else if (this.props.accept.match(/\.(jpg|png)$/i)) {
       reader.readAsDataURL(file);
     } else {
       throw 'Can not upload this type of file';
