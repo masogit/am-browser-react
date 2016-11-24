@@ -172,7 +172,8 @@ const defaultSettings = {
   reportHead:  {
     text: '@title',
     style: 'header'
-  }
+  },
+  images: {}
 };
 
 const GLOBAL_VARIABLES = {

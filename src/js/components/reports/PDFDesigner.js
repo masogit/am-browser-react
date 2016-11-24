@@ -47,6 +47,7 @@ export default class PDFDesigner extends Component {
     loadRecordsByBody(body).then((data) => {
       this.setState({records: data.entities, total: data.count}, this._preview);
     });
+    this.updatePic();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -54,9 +55,16 @@ export default class PDFDesigner extends Component {
     if (!report._id || report._id !== this.state.report._id) {
       this.setState({
         fields, records, report, definition
-      }, this._preview);
+      }, () => {
+        this.updatePic();
+        this._preview();
+      });
     }
     this.originReport = _.cloneDeep(report);
+  }
+
+  updatePic(src = this.state.report.settings.images[GLOBAL_VARIABLES.LOGO]) {
+    document.getElementById('logo').src = src;
   }
 
   autoPreview() {
@@ -270,6 +278,7 @@ export default class PDFDesigner extends Component {
     this.state.report.settings.images = {};
     this.state.report.settings.images[GLOBAL_VARIABLES.LOGO] = src;
     this.setState({report: this.state.report}, this.autoPreview);
+    this.updatePic(src);
   }
 
   render() {
@@ -291,6 +300,8 @@ export default class PDFDesigner extends Component {
             </FormField>
           </Box>
           <Menu direction="row" align="center" responsive={true}>
+            <UploadWidget accept=".jpg,.png" label='Logo' onChange={this.uploadLogo.bind(this)}/>
+            <img id='logo' width='24px' height='24px'/>
             <Anchor icon={<Code />} onClick={() => this.setState({ mode: mode == MODE.CODE ? MODE.DESIGN : MODE.CODE })}
                     label={mode}/>
             <Anchor icon={<Brush />} onClick={() => this.setState({showLayer: 'new_style'})} label="Style Designer"/>
@@ -364,7 +375,6 @@ export default class PDFDesigner extends Component {
                                  onChange={(event) => this.updatePDFSettings(event, 'landscape')}/>
 
                   </Box>
-                  <UploadWidget accept=".jpg" onChange={this.uploadLogo.bind(this)}/>/>
                 </FormField>
               </Form>
             </Box>

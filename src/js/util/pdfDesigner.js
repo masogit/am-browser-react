@@ -55,7 +55,7 @@ const analyzeRecordList = (title, filter, allFields, records, style) => {
 };
 
 function getLinkData(link, pdf_link = [], style = {tableHeader: 'tableHeader', contents: {tableTitle: {style: 'tableTitle'}},fieldBlock: {fieldTitle: {style: 'fieldTitle', text: ''}}}) {
-  const title = style.contents.tableTitle.text ? analyzeTitle(style.contents.tableTitle.text, link.label, GLOBAL_VARIABLES.TABLE_TITLE) : link.label;
+  const title = style.contents.tableTitle.text ? replaceTableTitle(style.contents.tableTitle.text, link.label) : link.label;
 
   const fields = link.body.fields;
 
@@ -77,7 +77,7 @@ function getLinkData(link, pdf_link = [], style = {tableHeader: 'tableHeader', c
       data.entities.map((record) => {
         const summary = {
           stack: [
-            {text: style.fieldBlock.fieldTitle.text ? analyzeTitle(style.fieldBlock.fieldTitle.text, record.self, GLOBAL_VARIABLES.LINK_TITLE) : record.self, style: style.fieldBlock.fieldTitle.style},
+            {text: style.fieldBlock.fieldTitle.text ? replaceLinkTitle(style.fieldBlock.fieldTitle.text, record.self) : record.self, style: style.fieldBlock.fieldTitle.style},
             {
               alignment: 'justify',
               columns: genSummary(record, fields, style.fieldBlock)
@@ -125,19 +125,6 @@ function genSummary(record, fields, style = {column: 2, label: 'fieldLabel', val
   return pdf_header;
 }
 
-const analyzeTitle = (text, title, placehoder= GLOBAL_VARIABLES.TITLE) => {
-  const reg = new RegExp(placehoder, 'gi');
-  return text.replace(reg, title);
-};
-
-const analyzeDate = (text, date) => {
-  if (text.toLowerCase().includes(GLOBAL_VARIABLES.DATE)) {
-    return text.replace(/@date/gi, date);
-  }
-
-  return text;
-};
-
 const getPreviewStyle = (style = null, ignoreMargin = false) => {
   const previewStyle = {};
   if (style) {
@@ -178,61 +165,65 @@ const updateValue = (event, {state, callback, val = event.target.value, name = e
   }
 };
 
-const getPdfLine = (label, {text='', style=''}) => {
-  let result = analyzeTitle(text, label);
-  const date = (new Date()).toLocaleDateString();
-  result = analyzeDate(result, date);
+const replaceText = (originText, replacer, placehoder) => {
+  const reg = new RegExp(placehoder, 'gi');
+  return originText.replace(reg, replacer);
+};
+
+const replaceTitle = (originText, replacer) => replaceText(originText, replacer, GLOBAL_VARIABLES.TITLE);
+const replaceTableTitle = (originText, replacer) => replaceText(originText, replacer, GLOBAL_VARIABLES.TABLE_TITLE);
+const replaceLinkTitle = (originText, replacer) => replaceText(originText, replacer, GLOBAL_VARIABLES.LINK_TITLE);
+
+const replaceDate = (originText) => replaceText(originText, (new Date()).toLocaleDateString(), GLOBAL_VARIABLES.DATE);
+
+const replaceLogo = (originText, style) => {
+  const [leftText, rightText] = originText.split(GLOBAL_VARIABLES.LOGO);
+
   return {
-    text: result, style
+    alignment: 'justify',
+    columns: [{
+      "text": leftText,
+      "style": style,
+      "alignment": "right"
+    }, {
+      "image": GLOBAL_VARIABLES.LOGO,
+      "width": 20,
+      "height": 20
+    }, {
+      "text": rightText,
+      "style": style,
+      "alignment": "left"
+    }]
   };
 };
 
-const analyzeLogo = (width=100, height=100, margin = [0, 5, 0, 0]) => {
-  return {
-    image: GLOBAL_VARIABLES.LOGO,
-    width, height
-  };
-};
-
-const setPageColumns = (block, originSource, label) => {
-  const newCol = [];
-  const logoText = GLOBAL_VARIABLES.LOGO;
-  Object.keys(originSource).map((key, index) => {
+const getColumns = (originSource) => {
+  return Object.keys(originSource).map(key => {
     const source = originSource[key];
-    const text = (key != 'left' ? ' ' : '') + source.text + (key != 'right' ? ' ' : '');
-    const logoIndex = text.indexOf(logoText);
+    const text = replaceDate(source.text);
+    const logoIndex = text.indexOf(GLOBAL_VARIABLES.LOGO);
+    let newObj;
     if (logoIndex == -1) {
-      const textObj = getPdfLine(label, source);
-      newCol.push(textObj);
+      newObj = Object.assign({}, source, {text});
     } else {
-      const [leftText, rightText] = text.split(logoText);
-      if (key != 'left' || leftText) {
-        const leftObj = getPdfLine(label, Object.assign({}, source, {text: leftText}));
-        leftObj.alignment = 'right';
-        newCol.push(leftObj);
-      }
-
-      newCol.push(analyzeLogo(20, 20));
-      if (key != 'right' || rightText) {
-        const rightObj = getPdfLine(label, Object.assign({}, source, {text: rightText}));
-        rightObj.alignment = 'left';
-        newCol.push(rightObj);
-      }
+      newObj = replaceLogo(text, source.style);
     }
+    newObj.alignment = key;
+    return newObj;
   });
-  block.columns = newCol;
 };
 
 const translateText = (pdfDefinition, {settings, records, fields_state, body, record, links, param}) => {
-  const {fields: fields_props = [], label = ''} = body;
+  const {fields: fields_props = []} = body;
   const fieldsName = fields_state.map(field => field.sqlname);
 
   const content = [];
 
-  content.push(getPdfLine(label, settings.reportHead));
-  content.push(getPdfLine(label, settings.reportDesc));
+  //content.push(replaceLogo(replaceTitle(settings.reportHead.text, label), settings.reportHead.style));
+  //content.push(replaceLogo(replaceTitle(settings.reportDesc.text, label), settings.reportDesc.style));
+
   if (records.length > 0) {
-    content.push(analyzeRecordList(analyzeTitle(settings.contents.tableTitle.text, body.label, GLOBAL_VARIABLES.TABLE_TITLE), fieldsName, fields_props, records, settings.contents));
+    content.push(analyzeRecordList(replaceTableTitle(settings.contents.tableTitle.text, body.label), fieldsName, fields_props, records, settings.contents));
   }
 
   const promiseList = [];
@@ -259,8 +250,9 @@ const translateText = (pdfDefinition, {settings, records, fields_state, body, re
   return Promise.all(promiseList).then(() => {
     pdfDefinition.content = content;
 
-    setPageColumns(pdfDefinition.header, settings.pageHeader, label);
-    setPageColumns(pdfDefinition.footer, settings.pageFooter, label);
+    pdfDefinition.header.columns = getColumns(settings.pageHeader);
+    pdfDefinition.footer.columns = getColumns(settings.pageFooter);
+
     pdfDefinition.pageOrientation = settings.pageOrientation;
     pdfDefinition.styles = settings.styles;
     pdfDefinition.images = settings.images;
