@@ -43,16 +43,16 @@ const getData = (type) => {
 };
 
 export default class MyAsset extends ComponentBase {
-  constructor() {
-    super();
+
+  componentWillMount() {
+    const name = this.props.params.name;
     this.state = {
       loading: true,
-      type: 'Summary',
+      type: name || 'Summary',
       views: [],
       navs:[]
     };
-  }
-  componentWillMount() {
+
     this.acquireLock();
     // Load specified category, if no 'My Assets', use default json
     const filter = {filter: JSON.stringify({category: CATEGORY_MY_ASSETS})};
