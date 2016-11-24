@@ -95,6 +95,7 @@ export function login(username, password, callback, retry) {
         } else {
           dispatch(loginFailure({message: res.text}));
         }
+        return null;
       }, err => {
         if (err) {
           let message = err.response ? err.response.text : '', retrying = false;
@@ -120,6 +121,7 @@ export function login(username, password, callback, retry) {
             dispatch(loginFailure({message: 'Login failed. ' + message}));
           }
         }
+        return null;
       }).then(callback);
   };
 }

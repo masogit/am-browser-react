@@ -116,7 +116,7 @@ module.exports = function (app) {
       if (req.headers['x-api-version']) {
         res.sendStatus(401); // if the request is from rest, won't send file
       } else {
-        res.redirect(config.node_base);
+        res.sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));
       }
     } else {
       req.session.expires = new Date(Date.now() + session_max_age * 60 * 1000);
@@ -210,6 +210,6 @@ module.exports = function (app) {
     if (enable_csrf) {
       res.cookie('csrf-token', req.csrfToken());
     }
-    res.redirect(config.node_base);
+    res.sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));
   });
 };
