@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react';
 import ComponentBase from '../commons/ComponentBase';
 import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Split, Map, Icons} from 'grommet';
 const {Close, LinkUp: Up, LinkDown: Down, Ascend, Descend, Play, Checkmark, Duplicate, Download,
-  CaretPrevious, More, Mail, Upload} = Icons.Base;
+  CaretPrevious, More, Mail} = Icons.Base;
 import {isEmpty} from 'lodash';
 import AlertForm from '../../components/commons/AlertForm';
 import EditLayer from '../../components/commons/EditLayer';
