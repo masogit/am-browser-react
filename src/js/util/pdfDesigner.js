@@ -187,23 +187,40 @@ const getPdfLine = (label, {text='', style=''}) => {
   };
 };
 
-const analyzeLogo = (width=100, height=100) => {
+const analyzeLogo = (width=100, height=100, margin = [0, 5, 0, 0]) => {
   return {
     image: GLOBAL_VARIABLES.LOGO,
     width, height
   };
 };
 
-const setTextLine = (target, source, label) => {
-  const text = source.text;
-  const textParts = text.split(GLOBAL_VARIABLES.LOGO);
-  if (textParts.length == 1) {
-    const textObj = getPdfLine(label, source);
-    target.text = textObj.text;
-    target.style = textObj.style;
-  } else {
-    target = analyzeLogo();
-  }
+const setPageColumns = (block, originSource, label) => {
+  const newCol = [];
+  const logoText = GLOBAL_VARIABLES.LOGO;
+  Object.keys(originSource).map((key, index) => {
+    const source = originSource[key];
+    const text = (key != 'left' ? ' ' : '') + source.text + (key != 'right' ? ' ' : '');
+    const logoIndex = text.indexOf(logoText);
+    if (logoIndex == -1) {
+      const textObj = getPdfLine(label, source);
+      newCol.push(textObj);
+    } else {
+      const [leftText, rightText] = text.split(logoText);
+      if (key != 'left' || leftText) {
+        const leftObj = getPdfLine(label, Object.assign({}, source, {text: leftText}));
+        leftObj.alignment = 'right';
+        newCol.push(leftObj);
+      }
+
+      newCol.push(analyzeLogo(20, 20));
+      if (key != 'right' || rightText) {
+        const rightObj = getPdfLine(label, Object.assign({}, source, {text: rightText}));
+        rightObj.alignment = 'left';
+        newCol.push(rightObj);
+      }
+    }
+  });
+  block.columns = newCol;
 };
 
 const translateText = (pdfDefinition, {settings, records, fields_state, body, record, links, param}) => {
@@ -242,14 +259,8 @@ const translateText = (pdfDefinition, {settings, records, fields_state, body, re
   return Promise.all(promiseList).then(() => {
     pdfDefinition.content = content;
 
-    setTextLine(pdfDefinition.header.columns[0], settings.pageHeader.left, label);
-    setTextLine(pdfDefinition.header.columns[1], settings.pageHeader.center, label);
-    setTextLine(pdfDefinition.header.columns[2], settings.pageHeader.right, label);
-    content.push(analyzeLogo());
-    setTextLine(pdfDefinition.footer.columns[0], settings.pageFooter.left, label);
-    setTextLine(pdfDefinition.footer.columns[1], settings.pageFooter.center, label);
-    setTextLine(pdfDefinition.footer.columns[2], settings.pageFooter.right, label);
-
+    setPageColumns(pdfDefinition.header, settings.pageHeader, label);
+    setPageColumns(pdfDefinition.footer, settings.pageFooter, label);
     pdfDefinition.pageOrientation = settings.pageOrientation;
     pdfDefinition.styles = settings.styles;
     pdfDefinition.images = settings.images;
