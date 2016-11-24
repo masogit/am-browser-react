@@ -99,7 +99,7 @@ export default class MyAsset extends ComponentBase {
     if (this.locked)
       return <Box flex={true} align="center" justify="center"><Spinning /></Box>;
 
-    const recordBody = this.state.views ? this.getViewBody(this.state.type) : getData(this.state.type);
+    const recordBody = this.state.views.length > 0 ? this.getViewBody(this.state.type) : getData(this.state.type);
     const viewNames = this.state.navs.length > 0 ? this.state.navs : navs;
     const summary = viewNames.map((obj, index) => {
       const dataName = obj.key + 'Data';
