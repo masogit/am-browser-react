@@ -322,7 +322,8 @@ function getHeadNav(rights) {
     aql: rights.index < 1,
     views: rights.index < 1,
     'views/:id': rights.index < 1,
-    my: rights.index < 3
+    my: rights.index < 3,
+    'my/:name': rights.index < 3
   };
 }
 
