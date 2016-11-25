@@ -148,9 +148,16 @@ th {
 }
 
 .app-name {
-  border-right: 2px solid rgba(0,0,0,0.4);
+  position: relative;
   min-width: 290px;
+  h2:after {
+    content: "|";
+    position: absolute;
+    right: 0;
+    font-weight: 300;
+  }
 }
+
 
 .disabled,
 .disabled:hover {
@@ -187,8 +194,4 @@ div .grommetux-menu__drop .grommetux-anchor {
     white-space: nowrap;
     text-decoration: none;
     width: 100%;
-}
-
-.grommetux-header {
-  min-height: 64px;
 }

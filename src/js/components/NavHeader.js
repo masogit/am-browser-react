@@ -84,10 +84,8 @@ export default class NavHeader extends Component {
       });
     }
 
-    //<Menu inline={false} align="center" responsive={true} lable=''
-    //      icon={<Box pad={{vertical:'small'}} className={this.getActive(['report', 'views', 'aql'])}>Builder</Box>}>
     return (
-      <Header fixed={true} ref='header' size="medium" direction="row" justify="between" responsive={false}
+      <Header fixed={true} ref='header' size="small" direction="row" justify="between" responsive={false}
               className='shadow'>
         <Box direction="row">
           <Box margin={{horizontal: 'large'}} size="small" responsive={false} className="app-name">
