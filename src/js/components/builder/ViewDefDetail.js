@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import ComponentBase from '../commons/ComponentBase';
-import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Split, Map, Icons} from 'grommet';
+import {Markdown, Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Split, Map, Icons} from 'grommet';
 const {Close, LinkUp: Up, LinkDown: Down, Ascend, Descend, Play, Checkmark, Duplicate, Download,
   CaretPrevious, More, Mail} = Icons.Base;
 import {isEmpty} from 'lodash';
@@ -490,7 +490,7 @@ export default class ViewDefDetail extends ComponentBase {
               }
               {table}
             </Box>
-            <Box pad={table ? 'small' : 'none'}>
+            <Box pad={table ? {horizontal: 'small', vertical: 'none'} : 'none'}>
               <Form onSubmit={onSubmit} compact={compact}>
                 <FormField label="Name">
                   <input id="v.name" name="v.name" type="text" onChange={this._onChange}
@@ -505,6 +505,9 @@ export default class ViewDefDetail extends ComponentBase {
                                suggestions={categories} onDOMChange={this._onChange}
                                onSelect={this._setCategory}/>
                 </FormField>
+                <Box pad={{vertical: 'medium'}}>
+                  <Markdown content="All views under **My Assets** Category will replace Out-Of-Box *My Assets* module" />
+                </Box>
               </Form>
             </Box>
             {selectedView && selectedView.name && this.getAlertLayer(alertForm, selectedView.name)}
