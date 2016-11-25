@@ -1,7 +1,7 @@
 var util = require('util');
 var db = require('./db.js');
 var logger = require('./logger.js');
-var REST = require('./rest.js');
+var rest = require('./rest.js').rest;
 var Export_file = require('./export_file.js');
 var sessionUtil = require('./sessionUtil.js');
 var config = require('./config.js');
@@ -57,17 +57,7 @@ module.exports = function (app) {
     }
   });
 
-  var conn = {
-    server: rest_server + ":" + rest_port,
-    session_max_age: session_max_age,
-    jwt_max_age: jwt_max_age,
-    enable_csrf: enable_csrf,
-    enable_lwsso: enable_lwsso,
-    context: config.base + config.version
-  };
-
-  var rest = new REST(conn);
-  var export_file = new Export_file(conn);
+  var export_file = new Export_file(config.rest_conn);
 
   apiProxy.on('error', function (e, req, res) {
     logger.error(`[proxy] [${req.sessionID}] [error] ${req.method} ${req.originalUrl}`, util.inspect(e));
