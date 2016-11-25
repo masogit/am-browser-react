@@ -98,7 +98,7 @@ export default class ViewsDefList extends Component {
     }
 
     return (
-      <AMSideBar title='Views Builder' toolbar={toolbar} contents={contents} focus={focus}/>
+      <AMSideBar title='Views' toolbar={toolbar} contents={contents} focus={focus}/>
     );
   }
 }

@@ -1,0 +1,22 @@
+.header-menu {
+  &.grommetux-button--plain>span:not(.grommetux-button__icon):first-child {
+    margin-left: 0;
+  }
+
+  &.grommetux-button:focus:not(.grommetux-button--disabled) {
+    border-color: inherit;
+    box-shadow: none;
+  }
+
+  &.grommetux-menu:focus:not(.grommetux-menu--expanded):after {
+    box-shadow: none;
+    border: none;
+  }
+
+  .grommetux-button__icon {
+    visibility: hidden;
+    padding-left: 0;
+    padding-right: 0;
+    width: 0;
+  }
+}
