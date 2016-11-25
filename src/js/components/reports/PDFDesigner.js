@@ -57,7 +57,7 @@ export default class PDFDesigner extends Component {
         fields, records, report, definition
       }, () => {
         this.updatePic();
-        this._preview();
+        this.autoPreview();
       });
     }
     this.originReport = _.cloneDeep(report);
@@ -69,7 +69,6 @@ export default class PDFDesigner extends Component {
 
   autoPreview() {
     if (!this.state.loading) {
-      this.setState({ loading: true });
       if (this.previewTimer) {
         clearTimeout(this.previewTimer);
       }
