@@ -14,7 +14,7 @@ import UCMDBAdapterContainer from './components/ucmdbAdapter/UCMDBAdapterPoint';
 var rootPath = "/";
 
 const indexRoute = {component: Main};
-const DEFAULT_PATH = '/search';
+const DEFAULT_PATH = '/insight';
 
 let postLoginPath = DEFAULT_PATH;
 export const getPostLoginPath = () => postLoginPath;
@@ -46,7 +46,7 @@ export const getRoutes = (headerNavs) => {
         routes.push(route);
       } else {
         routes.push({
-          path: route.path,
+          path: 'my',
           component: MyAssets
         });
       }

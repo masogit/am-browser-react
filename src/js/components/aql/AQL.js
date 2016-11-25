@@ -228,9 +228,9 @@ export default class AQL extends ComponentBase {
   }
 
   _setFormValues(event) {
-    const val = event.target.value;
+    const val = event.target ? event.target.value : event.value;
 
-    const path = event.target.name;
+    const path = event.target ? event.target.name : event.name;
     const obj = this.state.aql;
     let graphData = this.state.graphData;
     let data = this.state.data;
@@ -365,10 +365,11 @@ export default class AQL extends ComponentBase {
       return <RecordListLayer body={type.args.body} title={type.args.name} onClose={this._onClose.bind(this)}/>;
     } else if (type == 'aql_str') {
       return (
-        <EditLayer onChange={this._setFormValues.bind(this)}
-                  label='Input AM Query Language (AQL)' name='str'
+        <EditLayer label='Input AM Query Language (AQL)' name='str'
                   value={this.state.aql.str}
-                  onClose={() => {
+                  onClose={this._onClose}
+                  onConfirm={event => {
+                    this._setFormValues(event);
                     this._onClose();
                     this._onQuery();
                   }} />
@@ -550,4 +551,3 @@ export default class AQL extends ComponentBase {
     );
   }
 }
-

@@ -1,19 +1,21 @@
-import React, {Component} from 'react';
+import React, { PropTypes} from 'react';
 import { Box, Anchor } from 'grommet';
 import AMSideBar from '../commons/AMSideBar';
 import * as ReportActions from '../../actions/reports';
 import Add from 'grommet/components/icons/base/Add';
 import ContentPlaceHolder from '../../components/commons/ContentPlaceHolder';
+import ComponentBase from '../../components/commons/ComponentBase';
 import _ from 'lodash';
 import { monitorEdit, dropCurrentPop, stopMonitorEdit } from '../../actions/system';
 import example_body from './body_template.json';
 import example_records from './records_template.json';
-import PDFGenerator from './PDFDesigner.js';
-import {defaultSettings, defaultPDFDefinition} from '../../util/pdfDesigner';
+import PDFDesigner from './PDFDesigner.js';
+import {defaultSettings, defaultPDFDefinition} from '../../constants/PDFDesigner';
+import * as ExplorerActions from '../../actions/explorer';
 
 const category_PUBLIC = 'Public';
 const category_PERSONAL = 'Personal';
-export default class Reports extends Component {
+export default class Reports extends ComponentBase {
   componentWillMount() {
     this.state = {
       reports:[],
@@ -35,7 +37,7 @@ export default class Reports extends Component {
     this._initReport = this._initReport.bind(this);
     this.isChanged = this.isChanged.bind(this);
     this.resetOrigin = this.resetOrigin.bind(this);
-    //this.originReport = _.cloneDeep(this.initReport);
+    this.getLinkRecords = this.getLinkRecords.bind(this);
   }
 
   componentDidMount() {
@@ -123,9 +125,20 @@ export default class Reports extends Component {
     dropCurrentPop(originReport, currentReport, this.initReport, title, onConfirm);
   }
 
+  getLinkRecords() {
+    const links = this.props.links;
+    links.map(link => {
+      this.addPromise(ExplorerActions.loadRecordsByBody(link.body));
+    });
+
+    Promise.all(this.promiseList).then(result => {
+      console.log(result);
+    });
+  }
+
   render() {
     const {reports, report} = this.state;
-    const {fromView, body, records} = this.props;
+    const {fromView, body = example_body, records = example_records, isDetail, links, record} = this.props;
 
     const toolbar = <Anchor icon={<Add />} label="New" onClick={this._onNew.bind(this)}/>;
     const contents = reports.map(rpt => ({
@@ -145,12 +158,25 @@ export default class Reports extends Component {
       <Box direction="row" flex={true} pad={fromView ? 'small' : 'none'} style={{minWidth: '90vw', minHeight: '90vh'}}>
         <AMSideBar title='Templates' toolbar={toolbar} contents={contents} focus={focus}/>
         {!_.isEmpty(report) ?
-          <PDFGenerator body={body || example_body} records={records || example_records} onSaveReport={this._onSaveReport}
+          <PDFDesigner body={body} records={records} onSaveReport={this._onSaveReport} links={links} record={record}
                         definition={defaultPDFDefinition} onDupReport={this._onDupReport} root={!fromView} isChanged={this.isChanged()}
-                        report={report} onRemoveReport={this._onRemoveReport} />
+                        report={report} onRemoveReport={this._onRemoveReport} isDetail={isDetail} />
           : <ContentPlaceHolder />
         }
       </Box>
     );
   }
 }
+
+Reports.defaultProps = {
+  isDetail: false
+};
+
+Reports.propTyps = {
+  body: PropTypes.object.required,
+  records: PropTypes.array,
+  settings: PropTypes.object.required,
+  record: PropTypes.object,
+  definition: PropTypes.object.required,
+  isDetail: PropTypes.bool.required
+};

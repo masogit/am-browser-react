@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react';
 import ComponentBase from '../commons/ComponentBase';
 import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Split, Map, Icons} from 'grommet';
 const {Close, LinkUp: Up, LinkDown: Down, Ascend, Descend, Play, Checkmark, Duplicate, Download,
-  CaretPrevious, More, Mail, Upload} = Icons.Base;
+  CaretPrevious, More, Mail} = Icons.Base;
 import {isEmpty} from 'lodash';
 import AlertForm from '../../components/commons/AlertForm';
 import EditLayer from '../../components/commons/EditLayer';
@@ -13,6 +13,7 @@ import SearchInput from '../commons/SearchInput';
 import {bodyToMapData} from '../../util/util';
 import PDFDesigner from './../reports/PDFDesigner';
 import {toggleSidebar} from '../../actions/system';
+import {UploadWidget} from '../commons/Widgets';
 
 const _onMail = (view) => {
   if (view._id) {
@@ -62,11 +63,15 @@ export default class ViewDefDetail extends ComponentBase {
   }
 
   _onChange(event, value) {
-    let path = event.target.name; // why not 'event.target.id'? because of radio button.
-    if (event.target.type == "checkbox") {
-      this.props.onValueChange(path.substring(2), value ? event.target.checked && value || '' : event.target.checked);
+    let eTarget = event.target ? event.target : event;
+    let path = eTarget.name; // why not 'event.target.id'? because of radio button.
+    let type = eTarget.type;
+    let eventValue = eTarget.value;
+
+    if (type == "checkbox") {
+      this.props.onValueChange(path.substring(2), value ? eTarget.checked && value || '' : eTarget.checked);
     } else {
-      this.props.onValueChange(path.substring(2), event.target.value);
+      this.props.onValueChange(path.substring(2), eventValue);
     }
   }
 
@@ -363,11 +368,13 @@ export default class ViewDefDetail extends ComponentBase {
   getLayer(type) {
     if (type == 'description') {
       return (
-        <EditLayer
-          onChange={this._onChange.bind(this)}
-          value={this.props.selectedView.desc}
+        <EditLayer value={this.props.selectedView.desc}
           label='Description' name='v.desc'
-          onClose={this._onClose.bind(this)} />
+          onClose={this._onClose.bind(this)}
+          onConfirm={event => {
+            this._onClose();
+            this._onChange(event);
+          }} />
       );
     }
   }
@@ -400,22 +407,18 @@ export default class ViewDefDetail extends ComponentBase {
     toggleSidebar(false);
   }
 
-  uploadJson(e) {
-    let jsonFile = e.target.files[0];
-    var reader = new FileReader();
-    reader.readAsBinaryString(jsonFile);
-    reader.onload = (e) => {
-      let json = JSON.parse(e.target.result);
-      if (this.isValidateView(json)) {
-        if (json._id)
-          json._id = null;
+  uploadJson(result) {
+    let json = JSON.parse(result);
+    if (this.isValidateView(json)) {
+      if (json._id)
+        json._id = null;
 
-        this.props.setSelectedView('', json);
-        this.props.uploadViewSuccess();
-      } else {
-        this.props.uploadViewFailed();
-      }
-    };
+      this.props.setSelectedView('', json);
+      this.props.uploadViewSuccess();
+      this.menu.setState({state: 'collapsed'});
+    } else {
+      this.props.uploadViewFailed();
+    }
   }
 
   isValidateView(json) {
@@ -464,18 +467,15 @@ export default class ViewDefDetail extends ComponentBase {
         {this.getLayer(layer)}
         <Header justify="between" pad={{horizontal: 'medium'}}>
           <Box>View Builder</Box>
-          <input type="file" ref="upload" accept=".json" onChange={this.uploadJson.bind(this)} style={{display: 'none'}}/>
           <Menu direction="row" align="center" responsive={true}>
             {renderAnchor({icon: <Play />, onClick: openPreview, label: 'Query', enable: table})}
             {renderAnchor({icon: <Checkmark />, onClick: this.openAlert, args: 'save', label: 'Save', enable: selectedView.name && selectedView.category})}
             {renderAnchor({icon: <Close />, onClick: this.openAlert, args: 'delete', label: 'Delete', enable: selectedView._id})}
-            <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }}>
+            <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }} closeOnClick={false} ref={node => this.menu = node}>
               {renderAnchor({icon: <Duplicate />, onClick: this.openAlert, args: 'duplicate', label: 'Duplicate', enable: selectedView._id})}
               {selectedView._id && renderAnchor({icon: <Mail />, onClick: _onMail, args: selectedView, label: 'Mail', enable: selectedView._id})}
               {renderAnchor({icon: <Download />, onClick: _onDownload,args: selectedView , label: 'Download', enable: selectedView._id})}
-              {renderAnchor({icon: <Upload />, onClick: () => {
-                this.refs.upload.click();
-              }, label: 'Upload', enable: !selectedView._id})}
+              <UploadWidget enable={!selectedView._id} accept=".json" onChange={this.uploadJson.bind(this)}/>
             </Menu>
           </Menu>
         </Header>

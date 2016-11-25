@@ -4,10 +4,12 @@ import {Box, Header, Icons, Anchor, Menu, FormField, Form,
 const {Download, Close, Play: Preview, Code, Checkmark, Duplicate} = Icons.Base;
 import {loadRecordsByBody} from '../../actions/explorer';
 import { cloneDeep } from 'lodash';
-import { MODE, init_style, table_style, preview,
-  getPreviewStyle, updateValue, translateText, format, download } from '../../util/pdfDesigner';
-import {Brush, StyleDesigner, ExportLayer} from './../commons/PDFWidgets';
+import { preview,
+  getPreviewStyle, updateValue, translateText, download } from '../../util/pdfDesigner';
+import {MODE, init_style, table_style, GLOBAL_VARIABLES} from '../../constants/PDFDesigner';
+import {Brush, StyleDesigner, ExportLayer, NumberInputField, ExportLayerForDetail} from './../commons/PDFWidgets';
 import AlertForm from '../commons/AlertForm';
+import {UploadWidget} from '../commons/Widgets';
 
 Menu.propTypes.label = PropTypes.oneOfType([PropTypes.object, PropTypes.string]);
 
@@ -31,6 +33,7 @@ export default class PDFDesigner extends Component {
     this.updateCode = this.updateCode.bind(this);
     this._updateValue = this._updateValue.bind(this);
     this._preview = this._preview.bind(this);
+    this.autoPreview = this.autoPreview.bind(this);
     this.isChanged = this.isChanged.bind(this);
     this.onDuplicate = this.onDuplicate.bind(this);
     this.originReport = _.cloneDeep(report);
@@ -39,26 +42,33 @@ export default class PDFDesigner extends Component {
   componentDidMount() {
     this._preview();
 
-    if (this.state.records.length == 0) {
-      loadRecordsByBody(this.props.body).then((data) => {
-        this.setState({records: data.entities, total: data.count}, this._preview);
-      });
-    }
+    const body = this.props.body;
+    body.param = {limit: 10, offset: 0};
+    loadRecordsByBody(body).then((data) => {
+      this.setState({records: data.entities, total: data.count}, this._preview);
+    });
+    this.updatePic();
   }
 
   componentWillReceiveProps(nextProps) {
     const {body: {fields}, records, definition, report} = nextProps;
-    if (report._id !== this.state.report._id) {
+    if (!report._id || report._id !== this.state.report._id) {
       this.setState({
         fields, records, report, definition
-      }, this._preview);
+      }, () => {
+        this.updatePic();
+        this.autoPreview();
+      });
     }
     this.originReport = _.cloneDeep(report);
   }
 
+  updatePic(src = this.state.report.settings.images[GLOBAL_VARIABLES.LOGO]) {
+    document.getElementById('logo').src = src;
+  }
+
   autoPreview() {
     if (!this.state.loading) {
-      this.setState({ loading: true });
       if (this.previewTimer) {
         clearTimeout(this.previewTimer);
       }
@@ -94,31 +104,39 @@ export default class PDFDesigner extends Component {
     });
   }
 
-  _translateText(pdfDefinition, records = this.state.records) {
+  _translateText(pdfDefinition, records = this.state.records, param = {limit: 10, offset: 0}) {
     const settings = this.state.report.settings,
-      body = this.props.body, fields_state= this.state.fields;
+      body = this.props.body, fields_state= this.state.fields,
+      links = this.props.links;
+    if (links && links.length > 0) {
+      records = [];
+    }
 
-    return translateText(pdfDefinition, {settings, records, body, fields_state});
+    return translateText(pdfDefinition, {settings, records, body, fields_state, record: this.props.record, links:this.props.links, param});
   }
 
   _preview() {
     let pdfDefinition = this.state.pdfDefinition;
+    this.setState({loading: true});
     if (this.state.mode != MODE.CODE) {
-      pdfDefinition = this._translateText(pdfDefinition);
+      this._translateText(pdfDefinition).then(data => {
+        preview(cloneDeep(data), () => this.setState({loading: false}));
+      });
+    } else {
+      preview(cloneDeep(pdfDefinition), () => this.setState({loading: false}));
     }
-
-    preview(cloneDeep(pdfDefinition), () => this.setState({loading: false}));
   }
 
   _download({recordsStart, limit}) {
-    const onBefore = () => this.setState({downloading: true});
+    const onBefore = () => this.setState({loading: true});
     const props = {recordsStart, limit, body: this.props.body};
-    const getPDFDefinition = (data) =>  this._translateText(this.state.pdfDefinition, data);
-    const onDone = () => this.setState({downloading: false});
+    const getPDFDefinition = (data) => this._translateText(this.state.pdfDefinition, data, {offset: recordsStart, limit});
+    const onDone = () => this.setState({loading: false});
+
     download({onBefore, props, getPDFDefinition, onDone});
   }
 
-  returnStyleField({label, name, value, styles = this.state.report.settings.styles, data = Object.keys(styles), noInput=false}) {
+  returnStyleField({label, name, value, placeHolder, styles = this.state.report.settings.styles, data = Object.keys(styles), noInput=false}) {
     const styleName = noInput ? name : name + '.style';
     const styleValue = noInput ? value : value.style;
 
@@ -132,7 +150,7 @@ export default class PDFDesigner extends Component {
               </Anchor>)}
             </Menu>
           </Box>}>
-        {!noInput && <input name={name + '.text'} type="text" onChange={this.updatePDFSettings}
+        {!noInput && <input name={name + '.text'} type="text" onChange={this.updatePDFSettings} placeholder={placeHolder}
                value={value.text} style={getPreviewStyle(styles[value.style], true)}/>}
       </FormField>
     );
@@ -140,14 +158,53 @@ export default class PDFDesigner extends Component {
 
   returnTableStyleField({layout, style, header, text}) {
     return (
-      <FormField label='Content Table'>
-        <Box direction='row' pad={{horizontal: 'small'}}>
-          {this.returnStyleField({label:'Layout:', name: 'contents.layout', value: layout, data: table_style, noInput: true})}
-          {this.returnStyleField({label:'Style:', name: 'contents.style', value: style, noInput: true})}
+      <FormField label='Table'>
+        <Box pad={{horizontal: 'small'}}>
+          {this.returnStyleField({
+            label: 'Title',
+            name: "contents.tableTitle",
+            value: this.state.report.settings.contents.tableTitle,
+            placeHolder: '@tableTitle'
+          })}
+
+          <Box direction='row'>
+            {this.returnStyleField({
+              label: 'Layout:',
+              name: 'contents.layout',
+              value: layout,
+              data: table_style,
+              noInput: true
+            })}
+            {this.returnStyleField({label: 'Style:', name: 'contents.style', value: style, noInput: true})}
+          </Box>
+          <Box direction='row'>
+            {this.returnStyleField({label: 'Header:', name: 'contents.header', value: header, noInput: true})}
+            {this.returnStyleField({label: 'Text:', name: 'contents.text', value: text, noInput: true})}
+          </Box>
         </Box>
-        <Box direction='row' pad={{horizontal: 'small'}}>
-          {this.returnStyleField({label:'Header:', name: 'contents.header', value: header, noInput: true})}
-          {this.returnStyleField({label:'Text:', name: 'contents.text', value: text, noInput: true})}
+      </FormField>
+    );
+  }
+
+  returnFieldBlockStyleField(fieldBlock) {
+    return (
+      <FormField label='Field Block'>
+        <Box pad={{horizontal: 'medium'}}>
+          <Box direction='row'>
+            {this.returnStyleField({
+              label: 'Title',
+              name: "fieldBlock.fieldTitle",
+              value: fieldBlock.fieldTitle,
+              placeHolder: '@linkTitle'
+            })}
+            <NumberInputField state={fieldBlock} label='Columns' name='column'
+                              updateValue={(event) => this._updateValue(event, {state: fieldBlock, callback: this.autoPreview})}
+                              min={1} max={3} compact={true}/>
+          </Box>
+          <Box direction='row'>
+            {this.returnStyleField({label: 'Label:', name: 'fieldBlock.label', value: fieldBlock.label, noInput: true})}
+            {this.returnStyleField({label: 'Value:', name: 'fieldBlock.value', value: fieldBlock.value, noInput: true})}
+          </Box>
         </Box>
       </FormField>
     );
@@ -191,7 +248,16 @@ export default class PDFDesigner extends Component {
       };
 
       const onClose = () => this.setState({showExportLayer: false});
-      return <ExportLayer onConfirm={onConfirm} onClose={onClose} recordsStart={recordsStart} total={total} limit={limit}/>;
+      if (this.props.record) {
+        return (<ExportLayerForDetail
+                  onConfirm={onConfirm}
+                  total={1000} recordsStart={0}
+                  limit={limit} onClose={onClose}/>);
+      } else {
+        return (<ExportLayer onConfirm={onConfirm}
+                             recordsStart={recordsStart} total={total}
+                             limit={limit} onClose={onClose} />);
+      }
     }
   }
 
@@ -207,68 +273,114 @@ export default class PDFDesigner extends Component {
     return this.props.isChanged || !_.isEqual(this.originReport, this.state.report);
   }
 
+  uploadLogo(src) {
+    this.state.report.settings.images = {};
+    this.state.report.settings.images[GLOBAL_VARIABLES.LOGO] = src;
+    this.setState({report: this.state.report}, this.autoPreview);
+    this.updatePic(src);
+  }
+
   render() {
     const {mode, pdfDefinition, error, report, loading} = this.state;
     const {settings, name, _id} = report;
-    const canEdit = this.props.root || !report.public;
+    const root = this.props.root;
+    const canEdit = root || !report.public;
+    let formClasses = 'strong-label flex no-border background-';
+    formClasses += root ? 'white' : 'grey';
+
     return (
-      <Box pad='small' flex={true}>
+      <Box pad={{horizontal: 'small'}} flex={true}>
         <Header justify='between' size='small'>
-          <Box pad={{horizontal: 'small'}}>PDF Template</Box>
+          <Box direction='row' align='center' className='no-border'>
+            <Box style={{color: '#ff0000'}}>Name:</Box>
+            <FormField>
+              <input className='input-field' name='report.name' type="text" value={name} onChange={this._updateValue}
+                   maxLength='20'/>
+            </FormField>
+          </Box>
           <Menu direction="row" align="center" responsive={true}>
-            <Anchor icon={<Code />} onClick={() => this.setState({ mode: mode == MODE.CODE ? MODE.DESIGN : MODE.CODE })} label={mode}/>
+            <UploadWidget accept=".jpg,.png" label='Logo' onChange={this.uploadLogo.bind(this)}/>
+            <img id='logo' height='24px'/>
+            <Anchor icon={<Code />} onClick={() => this.setState({ mode: mode == MODE.CODE ? MODE.DESIGN : MODE.CODE })}
+                    label={mode}/>
             <Anchor icon={<Brush />} onClick={() => this.setState({showLayer: 'new_style'})} label="Style Designer"/>
             <Anchor icon={<Preview/>} disabled={loading} onClick={loading ? null : this._preview} label='Preview'/>
-            <Anchor icon={<Download />} disabled={loading} onClick={() => !loading && this.setState({showExportLayer: true})} label='Export'/>
-            <Anchor icon={<Duplicate />} onClick={_id ? this.onDuplicate : null} label="Duplicate" disabled={!_id} />
-            {canEdit && <Anchor icon={<Checkmark />} onClick= {() => name && this.isChanged() && this.props.onSaveReport(report)}
-                    label="Save" disabled = {!name || !this.isChanged()} />}
-            {canEdit && <Anchor icon={<Close />} onClick= {_id ? this.props.onRemoveReport : null}
-                    label="Delete" disabled={!_id}/>}
+            <Anchor icon={<Download />} disabled={loading}
+                    onClick={() => !loading && this.setState({showExportLayer: true})} label='Export'/>
+            <Anchor icon={<Duplicate />} onClick={_id ? this.onDuplicate : null} label="Duplicate" disabled={!_id}/>
+            {canEdit &&
+            <Anchor icon={<Checkmark />} onClick={() => name && this.isChanged() && this.props.onSaveReport(report)}
+                    label="Save" disabled={!name || !this.isChanged()}/>}
+            {canEdit && <Anchor icon={<Close />} onClick={_id ? this.props.onRemoveReport : null}
+                                label="Delete" disabled={!_id}/>}
           </Menu>
         </Header>
-        <Box flex={true} direction='row'>
+        <Box flex={true} direction='row' margin={{bottom: 'small'}}>
           {mode == MODE.CODE ? <FormField error={error} className='code-panel'>
-            <textarea name='pdfDefinition' value={format(pdfDefinition)} onChange={this.updateCode}/>
+            <textarea name='pdfDefinition' value={JSON.stringify(pdfDefinition, null, ' ')} onChange={this.updateCode}/>
           </FormField> :
-            <Box flex={true} style={{maxWidth: '50vw'}} direction='row'>
-              <Form className='strong-label flex no-border'>
-                <FormField>
-                  <Box direction='row'><span style={{color: '#ff0000', fontWeight: '400'}}>Name:</span>
-                    <input className='input-field' name='report.name' type="text" value={name} onChange={this._updateValue} maxLength='20'/>
-                  </Box>
-                </FormField>
+            <Box flex={true} style={{maxWidth: '50vw'}} direction='row' className='autoScroll'>
+              <Form className={formClasses}>
                 <FormField label='Page Header'>
-                  <Box direction='row' pad='small'>
-                    {this.returnStyleField({label: 'Left', name:"pageHeader.left", value:settings.pageHeader.left})}
-                    {this.returnStyleField({label: 'Center', name:"pageHeader.center", value:settings.pageHeader.center})}
-                    {this.returnStyleField({label: 'Right', name:"pageHeader.right", value:settings.pageHeader.right})}
+                  <Box direction='row' pad={{horizontal:'small'}}>
+                    {this.returnStyleField({label: 'Left', name: "pageHeader.left", value: settings.pageHeader.left, placeHolder: '@date or @logo'})}
+                    {this.returnStyleField({
+                      label: 'Center',
+                      name: "pageHeader.center",
+                      value: settings.pageHeader.center,
+                      placeHolder: '@date or @logo'
+                    })}
+                    {this.returnStyleField({
+                      label: 'Right',
+                      name: "pageHeader.right",
+                      value: settings.pageHeader.right,
+                      placeHolder: '@date or @logo'
+                    })}
                   </Box>
                 </FormField>
                 <FormField label='Report Body'>
-                  <Box pad='small'>
-                    {this.returnStyleField({label: 'Header', name:"reportHead", value:settings.reportHead})}
-                    {this.returnStyleField({label: 'Descriptions', name:"reportDesc", value:settings.reportDesc})}
+                  <Box pad={{horizontal:'small'}}>
+                    <Box direction='row'>
+                      {this.returnStyleField({label: 'Header', name: "reportHead", value: settings.reportHead, placeHolder: '@date or @logo or @title'})}
+                      {this.returnStyleField({label: 'Descriptions', name: "reportDesc", value: settings.reportDesc, placeHolder: '@date or @logo or @title'})}
+                    </Box>
                     {this.returnTableStyleField(settings.contents)}
+                    {this.returnFieldBlockStyleField(settings.fieldBlock)}
                   </Box>
                 </FormField>
                 <FormField label='Page Footer'>
-                  <Box direction='row' pad='small'>
-                    {this.returnStyleField({label: 'Left', name:"pageFooter.left", value:settings.pageFooter.left})}
-                    {this.returnStyleField({label: 'Center', name:"pageFooter.center", value:settings.pageFooter.center})}
-                    {this.returnStyleField({label: 'Right', name:"pageFooter.right", value:settings.pageFooter.right})}
+                  <Box direction='row' pad={{horizontal:'small'}}>
+                    {this.returnStyleField({label: 'Left', name: "pageFooter.left", value: settings.pageFooter.left, placeHolder: '@date or @logo'})}
+                    {this.returnStyleField({
+                      label: 'Center',
+                      name: "pageFooter.center",
+                      value: settings.pageFooter.center,
+                      placeHolder: '@date or @logo'
+                    })}
+                    {this.returnStyleField({
+                      label: 'Right',
+                      name: "pageFooter.right",
+                      value: settings.pageFooter.right,
+                      placeHolder: '@date or @logo'
+                    })}
                   </Box>
                 </FormField>
-                <FormField label="Page Orientation" className='multi-check'>
-                  <RadioButton id='pageOrientation' name='pageOrientation' label='portrait'
-                               checked={settings.pageOrientation == 'portrait'} onChange={(event) => this.updatePDFSettings(event, 'portrait')}/>
-                  <RadioButton id='pageOrientation' name='pageOrientation' label='landscape'
-                               checked={settings.pageOrientation == 'landscape'} onChange={(event) => this.updatePDFSettings(event, 'landscape')}/>
+
+                <FormField label="Page Orientation">
+                  <Box pad={{vertical: 'small',horizontal: 'large'}} direction='row'>
+                    <RadioButton id='pageOrientation' name='pageOrientation' label='portrait'
+                                 checked={settings.pageOrientation == 'portrait'}
+                                 onChange={(event) => this.updatePDFSettings(event, 'portrait')}/>
+                    <RadioButton id='pageOrientation' name='pageOrientation' label='landscape'
+                                 checked={settings.pageOrientation == 'landscape'}
+                                 onChange={(event) => this.updatePDFSettings(event, 'landscape')}/>
+
+                  </Box>
                 </FormField>
               </Form>
             </Box>
           }
-          <div id='pdfContainer' />
+          <div id='pdfContainer'/>
         </Box>
         {this.renderStyleLayer()}
         {this.renderExportLayer()}
@@ -285,8 +397,10 @@ export default class PDFDesigner extends Component {
 }
 
 PDFDesigner.propTyps = {
-  body: PropTypes.object.required,
+  body: PropTypes.object.isRequired,
   records: PropTypes.array,
-  settings: PropTypes.object.required,
-  definition: PropTypes.object.required
+  record: PropTypes.object,
+  links: PropTypes.array,
+  settings: PropTypes.object.isRequired,
+  definition: PropTypes.object.isRequired
 };
