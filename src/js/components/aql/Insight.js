@@ -9,7 +9,7 @@ import AlertForm from '../commons/AlertForm';
 import Graph from '../commons/Graph';
 import ComponentBase  from '../commons/ComponentBase';
 import ActionTab from '../commons/ActionTab';
-import {Anchor, Box, Button, CheckBox, Header, Title, Menu, Table, TableRow, Layer, Carousel, RadioButton, Tabs, Icons} from 'grommet';
+import {Anchor, Box, Button, CheckBox, Header, Title, Menu, Table, TableRow, Layer, Carousel, RadioButton, Tabs, Icons, Label} from 'grommet';
 const { Add, Close, Attachment, Checkmark, Shift, More, Group, Expand } = Icons.Base;
 import AMSideBar from '../commons/AMSideBar';
 import AQL from './AQL';
@@ -268,6 +268,21 @@ export default class Insight extends ComponentBase {
     });
   }
 
+  renderBox({boxProps, graphStyle, dataMap}) {
+    return (
+      <Box {...boxProps} className='box-graph' colorIndex="light-1">
+        <Box justify="between" direction="row">
+          <Box pad={{horizontal: 'medium'}} className='left-border' justify="center"><Label margin='none'>{dataMap.aql.name}</Label></Box>
+          <Box pad='small' onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}><Expand /></Box>
+        </Box>
+        <Box {...graphStyle}>
+          <Graph type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
+                 onClick={(filter) => this._showViewRecords(filter, dataMap.aql.view)}/>
+        </Box>
+      </Box>
+    );
+  }
+
   _getAQLLayer(box, parent) {
     const contents = this.state.aqls.map((aql) => ({
       key: aql._id,
@@ -313,18 +328,7 @@ export default class Insight extends ComponentBase {
         }
 
         tabIdMap[tabName].dataIds.push(box.child._id);
-        child = (
-          <Box flex={true} className='box-graph' colorIndex="light-1" separator="all">
-            <Box justify="between" direction="row" colorIndex="light-2" style={{borderLeft: '4px solid #01A982'}}>
-              <Box margin={{left: 'medium'}} justify="center"><Title>{dataMap.aql.name}</Title></Box>
-              <Anchor icon={<Expand />} onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
-            </Box>
-            <Box pad="small" flex={true} justify="center">
-              <Graph type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
-                   onClick={(filter) => this._showViewRecords(filter, dataMap.aql.view)}/>
-            </Box>
-          </Box>
-        );
+        child = this.renderBox({boxProps: {flex: true}, graphStyle: {pad: "small", flex:true, justify: "center"}, dataMap});
       }
     } else if (this.state.edit) {
       child = (
@@ -378,23 +382,12 @@ export default class Insight extends ComponentBase {
         {
           // dataIds contains a lot duplicated ids, and the last unique ids is the right order
           dataIds.slice(-_.uniq(dataIds).length).map((key, index)=> {
-            const dataMap = this.state.data[key];
-            return (
-              dataMap ? // fix console error: cannot get aql of undefined.
-                <Box pad="medium">
-                  <Box key={index} className='box-graph' colorIndex="light-1" separator="all">
-                    <Box justify="between" direction="row" colorIndex="light-2" style={{borderLeft: '4px solid #01A982'}}>
-                      <Box margin={{left: 'medium'}} justify="center"><Title>{dataMap.aql.name}</Title></Box>
-                      <Anchor icon={<Expand />} onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}/>
-                    </Box>
-                    <Box pad="large" align={(dataMap.aql.type=='meter')?'center':null}>
-                      <Graph key={dataMap.aql._id} type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
-                            onClick={(filter) => this._showViewRecords(filter, dataMap.aql.view)}/>
-                    </Box>
-                  </Box>
-                </Box>
-                :
-                null
+            const dataMap = this.state.data[key] || false;
+            return dataMap && // fix console error: cannot get aql of undefined.
+              (
+              <Box pad="medium" key={index}>
+                {this.renderBox({graphStyle: {pad: "large", align:(dataMap.aql.type=='meter')?'center':null}, dataMap})}
+              </Box>
             );
           })
         }
