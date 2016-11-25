@@ -8,6 +8,14 @@ import {dropCurrentPop_stopMonitor} from '../actions/system';
 import history from '../RouteHistory';
 
 export default class NavHeader extends Component {
+  componentDidMount() {
+    setTimeout(this.refs.header._onResize, 200);
+  }
+
+  componentDidUpdate() {
+    setTimeout(this.refs.header._onResize, 200);
+  }
+
   getActive(to) {
     return this.props.path.indexOf(to) > -1 ? 'active' : '';
   }
@@ -40,7 +48,7 @@ export default class NavHeader extends Component {
     }
 
     return (
-      <Header fixed={true} size="medium" direction="row" justify="between" responsive={false} className='shadow'>
+      <Header fixed={true} ref='header' size="medium"  direction="row" justify="between" responsive={false} className='shadow'>
         <Box direction="row">
           <Box margin={{horizontal: 'large'}} size="small" responsive={false} className="app-name">
             <Heading tag="h2" strong={true}>AM Browser</Heading>
