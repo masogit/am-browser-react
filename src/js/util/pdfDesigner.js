@@ -35,7 +35,7 @@ const genTable = ({title, records, fields, style = {layout: 'headerLineOnly', he
 };
 
 const getLinkData = (link, pdf_link = [], style = {tableHeader: 'tableHeader', contents: {tableTitle: {style: 'tableTitle'}},fieldBlock: {fieldTitle: {style: 'fieldTitle', text: ''}}}) => {
-  const title = style.contents.tableTitle.text ? replaceTableTitle(style.contents.tableTitle.text, link.label) : link.label;
+  const title = style.contents.tableTitle.text ? replacer(style.contents.tableTitle.text, link.label, replaceTableTitle) : link.label;
 
   const fields = link.body.fields;
 
@@ -57,7 +57,7 @@ const getLinkData = (link, pdf_link = [], style = {tableHeader: 'tableHeader', c
       data.entities.map((record) => {
         const summary = {
           stack: [
-            {text: style.fieldBlock.fieldTitle.text ? replaceLinkTitle(style.fieldBlock.fieldTitle.text, record.self) : record.self, style: style.fieldBlock.fieldTitle.style},
+            {text: style.fieldBlock.fieldTitle.text ? replacer(style.fieldBlock.fieldTitle.text, record.self, replaceLinkTitle) : record.self, style: style.fieldBlock.fieldTitle.style},
             {
               alignment: 'justify',
               columns: genSummary(record, fields, style.fieldBlock)
@@ -166,6 +166,14 @@ const getPreviewStyle = (style = null, ignoreMargin = false) => {
   return previewStyle;
 };
 
+const replacer = (originText, replacer,...func) => {
+  if (typeof replacer == 'string' ) {
+    replacer = [replacer];
+  }
+
+  return func.reduce((current, pre, index) => pre(current, replacer[index]), originText);
+};
+
 const replaceText = (originText, replacer, placehoder) => {
   const reg = new RegExp(placehoder, 'gi');
   return originText.replace(reg, replacer);
@@ -246,11 +254,11 @@ const translateText = (pdfDefinition, {settings, records, fields_state, body, re
 
   const content = [];
 
-  content.push(replaceLogo(replaceDate(replaceTitle(settings.reportHead.text, label)), settings.reportHead.style));
-  content.push(replaceLogo(replaceDate(replaceTitle(settings.reportDesc.text, label)), settings.reportDesc.style));
+  content.push(replacer(settings.reportHead.text, [label, null, settings.reportHead.style], replaceTitle, replaceDate, replaceLogo));
+  content.push(replacer(settings.reportDesc.text, [label, null, settings.reportDesc.style], replaceTitle, replaceDate, replaceLogo));
 
   if (records.length > 0) {
-    content.push(analyzeRecordList(replaceTableTitle(settings.contents.tableTitle.text, body.label), fieldsName, fields_props, records, settings.contents));
+    content.push(analyzeRecordList(replacer(settings.contents.tableTitle.text, body.label, replaceTableTitle), fieldsName, fields_props, records, settings.contents));
   }
 
   const promiseList = [];
