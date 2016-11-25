@@ -10,12 +10,6 @@ import {dropCurrentPop_stopMonitor} from '../actions/system';
 import history from '../RouteHistory';
 
 export default class NavHeader extends Component {
-  componentWillMount() {
-    this.state = {
-      display: 'none'
-    };
-  }
-
   componentDidMount() {
     setTimeout(this.refs.header._onResize, 200);
   }
@@ -40,20 +34,8 @@ export default class NavHeader extends Component {
       history.push(`/search/${encodeURI(event.target.value)}`);
   }
 
-  onClick() {
-    if (this.state.display != 'none') {
-      //this.refs.build.setState({state: 'collapsed'});
-      this.setState({display: 'none'});
-    } else {
-      //this.refs.build.setState({state: 'expanded'});
-      this.setState({display: 'block'});
-    }
-  };
-
   render() {
     const defaultLinks = [
-      // {to: '/home', text: 'Home'},
-      // {to: '/search', text: 'Search'},
       {to: '/insight', text: 'Insight'},
       {to: '/explorer', text: 'Viewer'},
       {to: '/ucmdbAdapter', text: 'Adapter'}
