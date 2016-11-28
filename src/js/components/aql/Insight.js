@@ -268,7 +268,7 @@ export default class Insight extends ComponentBase {
     });
   }
 
-  renderBox({boxProps, graphStyle, dataMap}) {
+  renderGraphBox({boxProps, graphStyle, dataMap}) {
     return (
       <Box {...boxProps} className='box-graph' colorIndex="light-1">
         <Box justify="between" direction="row">
@@ -328,7 +328,7 @@ export default class Insight extends ComponentBase {
         }
 
         tabIdMap[tabName].dataIds.push(box.child._id);
-        child = this.renderBox({boxProps: {flex: true}, graphStyle: {pad: "small", flex:true, justify: "center"}, dataMap});
+        child = this.renderGraphBox({boxProps: {flex: true}, graphStyle: {pad: "small", flex:true, justify: "center"}, dataMap});
       }
     } else if (this.state.edit) {
       child = (
@@ -386,7 +386,7 @@ export default class Insight extends ComponentBase {
             return dataMap && // fix console error: cannot get aql of undefined.
               (
               <Box pad="medium" key={index}>
-                {this.renderBox({graphStyle: {pad: "large", align:(dataMap.aql.type=='meter')?'center':null}, dataMap})}
+                {this.renderGraphBox({graphStyle: {pad: "large", align:(dataMap.aql.type=='meter')?'center':null}, dataMap})}
               </Box>
             );
           })

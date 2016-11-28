@@ -2,8 +2,8 @@
 
 import React, {Component} from 'react';
 import {Link} from 'react-router';
-import Grommet from 'grommet';
-const {Box, Header, Heading, Menu, Search, Anchor } = Grommet;
+import { Box, Header, Heading, Menu, Search, Anchor, Icons } from 'grommet';
+
 
 import SessionMenu from './SessionMenu/MenuContainer';
 import {dropCurrentPop_stopMonitor} from '../actions/system';
@@ -91,7 +91,7 @@ export default class NavHeader extends Component {
             <Menu inline={false} dropAlign={{right: 'right'}} responsive={true} className={'header-menu ' + this.getActive(['report', 'views', 'aql'])} label='Builder'>
               {
                 builderLinks.map((link, index) => {
-                  const Icon = Grommet.Icons.Base[link.icon];
+                  const Icon = Icons.Base[link.icon];
                   return (
                     <Anchor key={index} to={link.to} label={link.text} icon={<Icon />}
                             onClick={e => {
