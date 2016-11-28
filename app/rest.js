@@ -6,8 +6,9 @@ var rights = require('./constants').rights;
 var logger = require('./logger');
 var cookiesUtil = require('./cookiesUtil');
 
-module.exports = function (am) {
 
+function AMREST() {
+  var am = config.rest_conn;
   this.login = function (req, res) {
     var url = "http://${server}${context}${ref-link}";
 
@@ -253,12 +254,47 @@ module.exports = function (am) {
     });
   };
 
+  this.checkAqlSyntax = function (session, aql, callback) {
+    var url = "http://${server}${context}${ref-link}";
+
+    var args = {
+      path: {
+        server: am.server,
+        context: am.context,
+        "ref-link": '/actions/aqlcheck'
+      },
+      parameters: {
+        aql: aql
+      },
+      headers: {
+        //Accept: "application/json",
+        "X-Authorization": session.jwt.secret
+      }
+    };
+
+    return new Promise((resolve, reject) => {
+      client.get(url, args, (data, response) => {
+        if (data.status == "0" && data.message == "ok") {
+          resolve(data);
+        } else {
+          reject(data);
+        }
+      }).on('error', function (err) {
+        reject(err);
+      });
+    })
+  };
+
   this.slack = slack;
   this.live_net_work = live_net_work;
   this.getOnlineUser = function(req, res) {
     res.json(sessionUtil.userTracking.get());
   };
 };
+
+module.exports = {
+  rest: new AMREST()
+}
 
 var slackProcess;
 if (config.slack_url) {
@@ -322,7 +358,8 @@ function getHeadNav(rights) {
     aql: rights.index < 1,
     views: rights.index < 1,
     'views/:id': rights.index < 1,
-    my: rights.index < 3
+    my: rights.index < 3,
+    'my/:name': rights.index < 3
   };
 }
 

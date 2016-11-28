@@ -1,8 +1,8 @@
 import {AM_DB_DEF_URL, VIEW_DEF_URL, DOWNLOAD_DEF_URL, UCMDB_DEF_URL} from '../constants/ServiceConfig';
 import Rest from '../util/grommet-rest-promise';
 
-export function loadViews() {
-  return Rest.get(VIEW_DEF_URL).then((res) => {
+export function loadViews(filter) {
+  return Rest.get(VIEW_DEF_URL, filter).then((res) => {
     return res.body;
   }, (err) => {
     //console.log(err.response ? err.response.text : err);

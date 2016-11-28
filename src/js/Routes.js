@@ -37,7 +37,8 @@ export const getRoutes = (headerNavs) => {
       {path: 'aql', component: AQL},
       {path: 'views', component: ViewDefListContainer},
       {path: 'views/:id', component: ViewDefListContainer},
-      {path: 'my', component: MyAssets}
+      {path: 'my', component: MyAssets},
+      {path: 'my/:name', component: MyAssets}
     ];
 
     allRoutes.map(route => {
