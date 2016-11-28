@@ -138,7 +138,7 @@ export default class Reports extends ComponentBase {
 
   render() {
     const {reports, report} = this.state;
-    const {fromView, body = example_body, records = example_records, isDetail, links, record} = this.props;
+    const {fromView, body = example_body, records = example_records, isDetail, links, record, groupByData} = this.props;
 
     const toolbar = <Anchor icon={<Add />} label="New" onClick={this._onNew.bind(this)}/>;
     const contents = reports.map(rpt => ({
@@ -160,7 +160,7 @@ export default class Reports extends ComponentBase {
         {!_.isEmpty(report) ?
           <PDFDesigner body={body} records={records} onSaveReport={this._onSaveReport} links={links} record={record}
                         definition={defaultPDFDefinition} onDupReport={this._onDupReport} root={!fromView} isChanged={this.isChanged()}
-                        report={report} onRemoveReport={this._onRemoveReport} isDetail={isDetail} />
+                        report={report} onRemoveReport={this._onRemoveReport} isDetail={isDetail} groupByData={groupByData} />
           : <ContentPlaceHolder />
         }
       </Box>

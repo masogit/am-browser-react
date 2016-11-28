@@ -14,7 +14,7 @@ import * as Format from '../../util/RecordFormat';
 import {hash, loadSetting, saveSetting} from '../../util/util';
 import cookies from 'js-cookie';
 import BarCodeEditor from './BarCodeEditor';
-import PDFTemplate from '../reports/reports';
+import Reports from '../reports/reports';
 
 const getFirstGroupby = (groupby) => {
   if (groupby && groupby.split('|').length > 0)
@@ -456,13 +456,10 @@ export default class RecordList extends ComponentBase {
                   onClick={() => (numTotal > 0) && this._download('csv')}/>
           <Anchor icon={<Pdf />} label="Download PDF"
                   disabled={numTotal < 1}
-                  onClick={() => (numTotal > 0) && this._download('pdf')}/>
-          <Anchor icon={<Pdf />} label="PDF Report"
+                  onClick={() => (numTotal > 0) && this.printPdf('template')}/>
+          <Anchor icon={<Pdf />} label="Print Barcode"
                   disabled={numTotal < 1}
-                  onClick={() => (numTotal > 0) && this.printPdf.bind(this, {type: 'template', body: this.state.body, records: this.state.records})()}/>
-          <Anchor icon={<Pdf />} label="Barcode"
-                  disabled={numTotal < 1}
-                  onClick={() => (numTotal > 0) && this.printPdf.bind(this, {type: 'BarCode', body: this.state.body, records: this.state.records, total: numTotal})()}/>
+                  onClick={() => (numTotal > 0) && this.printPdf('BarCode')}/>
         </Menu>
         <form name="Download" ref="downloadForm" method="post">
           <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
@@ -475,8 +472,9 @@ export default class RecordList extends ComponentBase {
     );
   }
 
-  printPdf(pdfSettings) {
-    this.setState({pdfSettings});
+  printPdf(type) {
+    const {body, records, graphData, numTotal} = this.state;
+    this.setState({pdfSettings: {type, body, records, total: numTotal, groupByData: graphData}});
   }
 
   renderPDFPreview() {
@@ -490,7 +488,7 @@ export default class RecordList extends ComponentBase {
     } else {
       return (
         <Layer closer={true} onClose={() => this.setState({pdfSettings: null})}>
-          <PDFTemplate {...pdfSettings} fromView={true} />
+          <Reports {...pdfSettings} fromView={true} />
         </Layer>
       );
     }
