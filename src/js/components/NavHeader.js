@@ -76,7 +76,7 @@ export default class NavHeader extends Component {
           <Search placeHolder="Type anywhere to search" inline={true} iconAlign="start"
                   onKeyDown={this.onSearch.bind(this)}/>
         </Box>
-        <Menu direction="row" align="center" responsive={true}>
+        <Menu direction="row" align="center">
           {
             links.map((link, index) => (
               <Link key={index} to={link.to}
@@ -88,7 +88,7 @@ export default class NavHeader extends Component {
                     }}>{link.text}</Link>))
           }
           {builderLinks.length > 0 &&
-            <Menu inline={false} dropAlign={{right: 'right'}} responsive={true} className={'header-menu ' + this.getActive(['report', 'views', 'aql'])} label='Builder'>
+            <Menu inline={false} dropAlign={{right: 'right'}} className={'header-menu ' + this.getActive(['report', 'views', 'aql'])} label='Builder'>
               {
                 builderLinks.map((link, index) => {
                   const Icon = Icons.Base[link.icon];

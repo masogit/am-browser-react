@@ -4,24 +4,16 @@ import {
 } from 'grommet';
 
 export default class GroupListItem extends Component {
-
-  constructor() {
-    super();
-  }
-
-  componentDidMount() {
-  }
-
   render() {
+    const { onClick, children } = this.props;
     return (
-      <ListItem {...this.props} pad='small' separator='none'>
-        {this.props.children}
+      <ListItem onClick={onClick} pad='small' separator='none'>
+        {children}
       </ListItem>
     );
   }
 }
 
 GroupListItem.propTypes = {
-  groupby: PropTypes.string.isRequired,
-  search: PropTypes.string
+  onClick: PropTypes.func
 };

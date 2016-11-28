@@ -1,6 +1,7 @@
 .header-menu {
   &.grommetux-button--plain>span:not(.grommetux-button__icon):first-child {
     margin-left: 0;
+    margin-right: 0;
   }
 
   &.grommetux-button:focus:not(.grommetux-button--disabled) {

@@ -3,7 +3,9 @@ import {
   Anchor,
   Box,
   List,
-  ListItem
+  ListItem,
+  FormField,
+  Form
 } from 'grommet';
 import Next from 'grommet/components/icons/base/Next';
 import Down from 'grommet/components/icons/base/Down';
@@ -104,11 +106,13 @@ export default class GroupList extends Component {
       <Box direction="column" className='fixMinSizing' flex={true}>
         {
           this.props.searchable &&
-          <Box pad={{horizontal: 'small'}} flex={false}>
+          <Form pad={{horizontal: 'small'}}>
+            <FormField>
             <SearchInput placeHolder="Search..."  suggestions={this._getSuggestions(children)}
                          onDOMChange={this._onSearch.bind(this)}
                          onSelect={this._selectSuggestion.bind(this)}/>
-          </Box>
+            </FormField>
+          </Form>
         }
         <Box className='autoScroll fixIEScrollBar' margin={{vertical: 'small'}}>
         {this.props.loading ? <ListItem separator="none"><Spinning /></ListItem>
@@ -118,7 +122,7 @@ export default class GroupList extends Component {
             return (
               <Box key={i} direction="column" flex={false}>
                 <List>
-                  <ListItem pad='small' {...this.props} justify="between" direction="row" separator="none"
+                  <ListItem pad='small' justify="between" direction="row" separator="none"
                             responsive={false} onClick={this._expandToggle.bind(this, key)}>
                     <Anchor href="#" label={key} icon={(expand===key)?<Down />:<Next />}/>
                     {grouped[key].length}
@@ -141,6 +145,10 @@ export default class GroupList extends Component {
 }
 
 GroupList.propTypes = {
-  searchable: PropTypes.bool
+  searchable: PropTypes.bool,
+  selectable: PropTypes.bool,
+  loading: PropTypes.bool,
+  focus: PropTypes.object,
+  updateTitle: PropTypes.func
 };
 
