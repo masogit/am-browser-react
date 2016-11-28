@@ -34,7 +34,9 @@
   .grommetux-form-field {
     border: none;
     overflow: hidden;
+    background-color: inherit;
   }
+
   .grommetux-menu.grommetux-menu--controlled {
     display: flex;
     align-items: center;
@@ -74,6 +76,26 @@
   .grommetux-menu__control {
     .grommetux-menu__control-label {
       font-weight: normal;
+    }
+  }
+
+  &.background-grey, &.background-white {
+    margin-right: 10px;
+    .grommetux-form-field, .grommetux-form-field__label {
+      background: #f5f5f5;
+    }
+
+    & > .grommetux-form-field {
+      margin-top: 5px;
+      &:first-child {
+        margin: 0;
+      }
+    }
+  }
+
+  &.background-white {
+    .grommetux-form-field, .grommetux-form-field__label {
+      background: #fff;
     }
   }
 }

@@ -6,13 +6,17 @@
  */
 var db = require('./db.js');
 var coll = require('./constants').collections;
+var rest = require('./rest.js').rest;
 
 module.exports = function () {
 
   // default type is save or update
   this.document = function (documentName, document, options = {}) {
     if (options.type) {
-      return this[documentName + '_' + options.type](document, options);
+      if (this[documentName + '_' + options.type])
+        return this[documentName + '_' + options.type](document, options);
+      else
+        return {then: (callback) => callback()};
     } else {
       return this[documentName](document, options);
     }
@@ -20,7 +24,7 @@ module.exports = function () {
 
   // register validate document
   this.view = (document) => view(document);
-  this.aql = (document) => aql(document);
+  this.aql = (document, options) => checkAqlSyntax(document, options);
   this.wall = (document) => wall(document);
   this.report = (document, {session}) => report(document, session);
   this.report_delete = (document, {rightIndex}) => report_delete(document, rightIndex);
@@ -162,6 +166,13 @@ function link(obj) {
   return null;
 }
 
+function checkAqlSyntax(document, options) {
+  return rest.checkAqlSyntax(options.session, document.str).then((data) => {
+    return aql(document);
+  }).catch((err) => {
+    return err.message;
+  });
+}
 function aql(aql) {
   // existing validation
   if (invalidLength(aql.name, 1, 100))

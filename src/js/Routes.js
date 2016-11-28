@@ -11,12 +11,11 @@ import ViewDefListContainer from './components/builder/ViewDefListContainer';
 import AQL from './components/aql/AQL';
 import TBD from 'grommet/components/TBD';
 import MyAssets from './components/MyAssets/MyAssets';
-import UnAuthorized from './components/error/UnAuthorized';
 import UCMDBAdapterContainer from './components/ucmdbAdapter/UCMDBAdapterPoint';
 var rootPath = "/";
 
 const indexRoute = {component: Main};
-const DEFAULT_PATH = '/search';
+const DEFAULT_PATH = '/insight';
 
 let postLoginPath = DEFAULT_PATH;
 export const getPostLoginPath = () => postLoginPath;
@@ -40,6 +39,7 @@ export const getRoutes = (headerNavs) => {
       {path: 'views', component: ViewDefListContainer},
       {path: 'views/:id', component: ViewDefListContainer},
       {path: 'my', component: MyAssets},
+      {path: 'my/:name', component: MyAssets},
       {path: 'sam', component: SAM},
       {path: 'sam/:id', component: SAM}
     ];
@@ -49,8 +49,8 @@ export const getRoutes = (headerNavs) => {
         routes.push(route);
       } else {
         routes.push({
-          path: route.path,
-          component: UnAuthorized
+          path: 'my',
+          component: MyAssets
         });
       }
     });

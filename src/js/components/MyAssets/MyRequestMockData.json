@@ -1,6 +1,6 @@
 {
   "orderby": "",
-  "filter": "",
+  "filter": "User=currentuser",
   "label": "Requests",
   "sqlname": "amRequest",
   "fields": [

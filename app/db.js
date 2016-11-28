@@ -208,8 +208,11 @@ exports.upsert = function (req, res) {
         if (!obj._id)
           obj._id = (Math.random() + 1).toString(36).substring(7);
 
+        // save user
+        obj.user = req.session.user;
+
         // add date
-        db.collection(collectionName).update({_id: obj._id, user: req.session.user}, obj, {upsert: true}, function (err, result) {
+        db.collection(collectionName).update({_id: obj._id}, obj, {upsert: true}, function (err, result) {
           if (err)
             logger.error("[tingo]", err);
           res.send(obj._id);

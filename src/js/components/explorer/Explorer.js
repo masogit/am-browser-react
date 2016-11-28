@@ -5,6 +5,7 @@ import RecordList from './RecordList';
 import Box from 'grommet/components/Box';
 import AMSideBar from '../commons/AMSideBar';
 import ContentPlaceHolder from '../commons/ContentPlaceHolder';
+import { CATEGORY_MY_ASSETS } from '../../constants/ServiceConfig';
 
 export default class Explorer extends Component {
 
@@ -25,7 +26,10 @@ export default class Explorer extends Component {
     } else {
       ExplorerActions.loadViews().then(views => {
         if (views) {
-          const content = views.map((view, key) => ({
+          let excludeMyAssets = views.filter((view) => {
+            return view.category != CATEGORY_MY_ASSETS;
+          });
+          const content = excludeMyAssets.map((view, key) => ({
             key: view._id,
             groupby: view.category,
             onClick: this.queryView.bind(this, view),
