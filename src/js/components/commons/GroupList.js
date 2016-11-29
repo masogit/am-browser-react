@@ -4,8 +4,7 @@ import {
   Box,
   List,
   ListItem,
-  FormField,
-  Form
+  FormField
 } from 'grommet';
 import Next from 'grommet/components/icons/base/Next';
 import Down from 'grommet/components/icons/base/Down';
@@ -106,13 +105,13 @@ export default class GroupList extends Component {
       <Box direction="column" className='fixMinSizing' flex={true}>
         {
           this.props.searchable &&
-          <Form pad={{horizontal: 'small'}}>
+          <Box pad={{horizontal: 'small'}}>
             <FormField>
-            <SearchInput placeHolder="Search..."  suggestions={this._getSuggestions(children)}
-                         onDOMChange={this._onSearch.bind(this)}
-                         onSelect={this._selectSuggestion.bind(this)}/>
+              <SearchInput placeHolder="Search..." suggestions={this._getSuggestions(children)}
+                           onDOMChange={this._onSearch.bind(this)}
+                           onSelect={this._selectSuggestion.bind(this)}/>
             </FormField>
-          </Form>
+          </Box>
         }
         <Box className='autoScroll fixIEScrollBar' margin={{vertical: 'small'}}>
         {this.props.loading ? <ListItem separator="none"><Spinning /></ListItem>

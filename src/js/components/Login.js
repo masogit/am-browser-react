@@ -4,7 +4,7 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { login } from '../actions/system';
 import Split from 'grommet/components/Split';
-import {Section, Label, Sidebar, LoginForm, Footer, Box} from 'grommet';
+import {Section, Label, Sidebar, LoginForm, Footer} from 'grommet';
 import ComponentBase from './commons/ComponentBase';
 import HPELogo from './HPELogo';
 import cookies from 'js-cookie';

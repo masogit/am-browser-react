@@ -63,7 +63,7 @@ class AMSideBar extends Component {
             contents.map((listItem, index) => (
               <GroupListItem key={listItem.key || index} {...listItem} responsive={false}>
                 <EmptyIcon />
-                <Box justify='between' direction="row" full='horizontal' responsive={false}>
+                <Box justify='between' direction="row" responsive={false} flex={true}>
                   {listItem.child}
                   {listItem.icon}
                 </Box>
