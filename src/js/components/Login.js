@@ -4,7 +4,7 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { login } from '../actions/system';
 import Split from 'grommet/components/Split';
-import {Section, Label, Sidebar, LoginForm, Footer} from 'grommet';
+import {Section, Label, Sidebar, LoginForm, Footer, Box} from 'grommet';
 import ComponentBase from './commons/ComponentBase';
 import HPELogo from './HPELogo';
 import cookies from 'js-cookie';
@@ -63,7 +63,7 @@ class IndexerLogin extends ComponentBase {
 
     var image;
     if ('multiple' === responsive) {
-      image = <Section pad="none" texture="url(img/login.jpg)" full={true}/>;
+      image = <Section pad="none" texture="url(img/login.jpg)" full='vertical'/>;
     }
 
     const errors = [loginError.message, loginError.resolution];
@@ -71,9 +71,10 @@ class IndexerLogin extends ComponentBase {
     return (
       <Split flex="left" onResponsive={this._onResponsive}>
         {image}
-        <Sidebar justify="center" align="center" pad="medium" size="large" colorIndex="light-1">
+        <Sidebar justify="center" align="center" pad='medium' size="large" colorIndex="light-1">
           <LoginForm
-            title="Asset Manager Browser"
+            align='center'
+            title='Asset Manager Browser'
             onSubmit={loading ? null : this._onSubmit}
             errors={errors}
             usernameType='text'
