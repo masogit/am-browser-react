@@ -2,7 +2,8 @@
  * Created by huling on 5/22/2016.
  */
 import React, {Component, PropTypes} from 'react';
-import {Chart, Legend, Meter, Distribution, Table, TableRow} from 'grommet';
+import {Chart, Legend, Distribution, Table, TableRow} from 'grommet';
+import Legned_Meter from './Legend_Meter';
 
 const assignObjectProp = (from, to, propName) => {
   if (from[propName]) {
@@ -135,54 +136,66 @@ export default class Graph extends Component {
   }
 
   _gen_meter(form, data, onClick) {
-    const meter = {
-      important: form.important || 0,
-      threshold: form.threshold || 0,
-      type: form.type,
-      series_col: form.series_col,
-      series: [],
-      col_unit: form.col_unit,
-      size: form.size,
-      vertical: form.vertical,
-      stacked: form.stacked,
-      units: form.units
-    };
-
-    if (form.series_col) {
-      data.rows.filter((row, index) => {
-        const value = row[form.series_col] / 1.0;
-        if (!isNaN(value)) {
-          const label = form.col_unit ? '' + row[form.col_unit] : '';
-          const filter = this._getFullCol(row, data.header);
-          const mainFilterKey = form.col_unit || form.series_col;
-          const mainFilterValue = form.col_unit ? label : value;
-          meter.series.push({
-            colorIndex: 'graph-' + (index % 8 + 1),
-            label,
-            value,
-            index,
-            onClick: onClick && onClick.bind(this, {
-              key: data.header[mainFilterKey].Name,
-              value: mainFilterValue
-            }, filter)
-          });
-        }
-      });
-
-      assignObjectProp(form, meter, 'max');
-      assignObjectProp(form, meter, 'min');
-      assignObjectProp(form, meter, 'value');
-
-      // gen legend
-      if (form.legend && form.legend.position) {
-        meter.legend = {
-          position: form.legend.position,
-          total: form.legend.total
-        };
-      }
-    }
-
-    return meter;
+    return {form, data, onClick};
+    //const meter = {
+    //  //important: form.important || 0,
+    //  //threshold: form.threshold || 0,
+    //  //type: form.type,
+    //  //series_col: form.series_col,
+    //  //series: [],
+    //  //col_unit: form.col_unit,
+    //  //size: form.size,
+    //  //vertical: form.vertical,
+    //  //stacked: form.stacked,
+    //  //units: form.units
+    //  active: true,
+    //  activeIndex: form.activeIndex,
+    //  label: form.label,
+    //  max: form.max,
+    //  min: form.min,
+    //  onActive: form.onActive,
+    //  series: [],
+    //  size: form.size,
+    //  stacked: form.stacked,
+    //  tabIndex: form.tabIndex,
+    //  threshold: form.threshold,
+    //  thresholds: form.thresholds,
+    //  type: form.type,
+    //  value: form.value,
+    //  vertical: form.vertical,
+    //  responsive: form.responsive
+    //};
+    //
+    //if (form.series_col) {
+    //  data.rows.filter((row, index) => {
+    //    const value = row[form.series_col] / 1.0;
+    //    if (!isNaN(value)) {
+    //      const label = form.col_unit ? '' + row[form.col_unit] : '';
+    //      const filter = this._getFullCol(row, data.header);
+    //      const mainFilterKey = form.col_unit || form.series_col;
+    //      const mainFilterValue = form.col_unit ? label : value;
+    //      meter.series.push({
+    //        colorIndex: 'graph-' + (index % 8 + 1),
+    //        label,
+    //        value,
+    //        onClick: onClick && onClick.bind(this, {
+    //          key: data.header[mainFilterKey].Name,
+    //          value: mainFilterValue
+    //        }, filter)
+    //      });
+    //    }
+    //  });
+    //
+    //  // gen legend
+    //  if (form.legend && form.legend.position) {
+    //    meter.legend = {
+    //      position: form.legend.position,
+    //      total: form.legend.total
+    //    };
+    //  }
+    //}
+    //
+    //return meter;
   }
 
   _gen_legend(form, data, onClick) {
@@ -254,22 +267,17 @@ export default class Graph extends Component {
 
     if (data && data.rows.length > 0) {
       const graph = this['_gen_' + type](config, data, onClick);
-      if (graph.series.length > 0) {
-        switch (type) {
-          case 'chart':
-            return <Chart {...graph} className={classes}/>;
-          case 'meter':
-            delete graph.series_col;
-            delete graph.col_unit;
-            return <Meter {...graph} className={classes}/>;
-          case 'distribution':
-            return <Distribution {...graph} className={classes}/>;
-          case 'legend': {
-            return <Legend {...graph} className={classes}/>;
-          }
-        }
-      } else {
-        return <div/>;
+      switch (type) {
+        case 'chart':
+          return <Chart {...graph} className={classes}/>;
+        case 'meter':
+          return <Legned_Meter {...graph} className={classes}/>;
+        case 'distribution':
+          return <Distribution {...graph} className={classes}/>;
+        case 'legend':
+          return <Legend {...graph} className={classes}/>;
+        default :
+          return <div/>;
       }
     } else
       return <div/>;
