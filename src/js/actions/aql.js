@@ -113,13 +113,13 @@ export function queryAQL(str) {
     // get where start from WHERE (not include WHERE, where is optional)
     aql.where = (idx_WHERE < 0) ? "" : str.substring(idx_WHERE).trim();
 
-    var query = AM_AQL_DEF_URL + aql.tableName + "/" + aql.fields;
+    var query = AM_AQL_DEF_URL + "?aql=SELECT " + aql.fields + " FROM " + aql.tableName;
     if (aql.where) {
       query += " " + encodeURI(aql.where);
     }
 
     return Rest.get(query).then((res) => {
-      return simpleAQLResult(res.body.Query);
+      return simpleAQLResult(res.body);
     }, (err) => {
       if (err.status == 404) {
         errorMessage = 'Can not get response from rest server, please check your AQL string';
@@ -131,39 +131,28 @@ export function queryAQL(str) {
   }
 }
 
-function simpleAQLResult(Query) {
+function simpleAQLResult(result) {
   var data = {
     table: "",
     header: [],
     rows: []
   };
 
-  data.table = Query.Schema.Content;
+  data.table = result.content;
 
-  if (Query.Schema.Column instanceof Array) {
-    data.header = Query.Schema.Column;
-  } else {
-    data.header.push(Query.Schema.Column);
-  }
+  data.header = data.header.concat(result.schema);
 
-
-  if (Query.Result.Row instanceof Array) {  // Multiple rows
-    for (let index in Query.Result.Row) {
-      let row = Query.Result.Row[index];
+  if (result.entities instanceof Array) {  // Multiple rows
+    for (let index in result.entities) {
+      let row = result.entities[index];
       var cols = [];
-      if (row.Column instanceof Array) {
-        row.Column.forEach((col) => {
-          if (col.content)
-            cols.push(col.content);
-          else
-            cols.push('');
-        });
-      } else {
-        if (row.Column.content)
-          cols.push(row.Column.content);
-        else
-          cols.push('');
-      }
+      Object.values(row).forEach((col) => {
+        if (col instanceof Object) {
+          cols.push(col.Value);
+        } else {
+          cols.push(col);
+        }
+      });
       if (cols.length > 0)
         data.rows.push(cols);
 
@@ -176,23 +165,6 @@ function simpleAQLResult(Query) {
         break;
       }
     }
-  } else if (Query.Result.Row && Query.Result.Row.Column instanceof Array) {  // Only one row
-    var cols = [];
-    Query.Result.Row.Column.forEach((col) => {
-      if (col.content)
-        cols.push(col.content);
-      else
-        cols.push('');
-    });
-    if (cols.length > 0)
-      data.rows.push(cols);
-
-  } else {  // Only one row and one column
-    var cols = [];
-    if (Query.Result.Row && Query.Result.Row.Column.content)
-      cols.push(Query.Result.Row.Column.content);
-    if (cols.length > 0)
-      data.rows.push(cols);
   }
 
   if (data.rows[0] && data.header.length !== data.rows[0].length) {
