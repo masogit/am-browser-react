@@ -97,7 +97,8 @@ var express;
 //var timestamp = dateformat(new Date(), 'yyyymmddHHMM');
 //var timestamp = Math.floor(new Date().getTime()/1000);
 var timestamp = new Date().toISOString().substring(0, 10);
-var currentId = (parseInt(version.id)+1).toString();
+//var currentId = (parseInt(version.id)+1).toString();
+var currentId = version.id;
 console.log("currentId is " + currentId);
 
 gulp.task('set-webpack-alias', () => {
