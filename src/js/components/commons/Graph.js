@@ -21,7 +21,7 @@ export default class Graph extends Component {
   }
 
   _gen_chart(form, data, onClick) {
-    const {xAxis: {placement: xAxisPlacement}, legend: {position: legendPosition}, units, type, smooth, size, points} = form;
+    const {xAxis: {placement: xAxisPlacement}, legend: {position: legendPosition, direction: legendDirection = 'row'}, type, smooth, size, points} = form;
     const chart = {
       points,
       size,
@@ -34,51 +34,52 @@ export default class Graph extends Component {
 
     if (form.series_col.length > 0 || (form.series && form.series.length > 0)) {
       // gen series
-      //const series = form.series_col.map(index => []);
-      const series = [];
-      const legendSeries = [];
+      const legendSeries = _.times(form.series_col.length, () => []);
+      const chartsValues = _.times(form.series_col.length, () => []);
 
       data.rows.map((row, i) => {
-        const value = row[form.series_col] / 1.0;
-
         const xAxisLabel = form.xAxis_col ? row[form.xAxis_col] : i;
-        series.push(value);
+        const values = [];
+        form.series_col.map((seriesIndex, index) => {
+          const value = row[seriesIndex] / 1.0;
+          chartsValues[index].push(value);
 
-        const legend = {
-          value,
-          label: xAxisLabel,
-          colorIndex: 'graph-' + (i % 8 + 1)
-        };
+          const legend = {
+            value,
+            label: xAxisLabel,
+            colorIndex: 'graph-' + (i % 8 + 1)
+          };
 
-        if (!isNaN(value)) {
-          let val = row[form.xAxis_col];
-          let filter = this._getFullCol(row, data.header);
-          let mainFilterKey = form.label || form.xAxis_col;
-          let mainFilterValue = form.label ? label : val;
-          if (mainFilterKey && onClick) {
-            legend.onClick = () => {
-              onClick({
-                key: data.header[mainFilterKey].Name,
-                value: mainFilterValue
-              }, filter);
-            };
+          if (!isNaN(value)) {
+            let val = row[form.xAxis_col];
+            let filter = this._getFullCol(row, data.header);
+            let mainFilterKey = form.label || form.xAxis_col;
+            let mainFilterValue = form.label ? label : val;
+            if (mainFilterKey && onClick) {
+              legend.onClick = () => {
+                onClick({
+                  key: data.header[mainFilterKey].Name,
+                  value: mainFilterValue
+                }, filter);
+              };
+            }
           }
-        }
 
-        legendSeries.push(legend);
+          legendSeries[index].push(legend);
+          values.push(value);
+        });
 
         // gen xAxis
         if (xAxisPlacement) {
-          xAxisLabels.push({label: xAxisLabel, displayValue: value, index: i});
+          xAxisLabels.push({label: xAxisLabel, displayValue: values[0], index: i});
         }
       });
 
-      chart.chartsValues = [series];
+      chart.chartsValues = chartsValues;
       if (legendPosition) {
         chart.legendPosition = legendPosition;
         chart.legendSeries = legendSeries;
-        chart.showLegendTotal = true;
-        chart.units = units;
+        chart.legendDirection = legendDirection;
       }
 
       chart.xAxisLabels = xAxisLabels;
@@ -89,88 +90,8 @@ export default class Graph extends Component {
     assignObjectProp(form, chart, 'legendPosition');
     assignObjectProp(form, chart, 'threshold');
     assignObjectProp(form, chart, 'important');
+    assignObjectProp(form, chart, 'units');
     return chart;
-    //const chart = {
-    //  important: form.important || 0,
-    //  threshold: form.threshold || 0,
-    //  type: form.type || 'bar',
-    //  size: form.size || 'medium',
-    //  points: form.points || false,
-    //  segmented: form.segmented || false,
-    //  smooth: form.smooth || false,
-    //  sparkline: form.sparkline || false,
-    //  units: form.units || '',
-    //  xAxis_col: form.xAxis_col || '',
-    //  series_col: form.series_col || [],
-    //  series: []
-    //};
-    //
-    //if (form.series_col.length > 0 || (form.series && form.series.length > 0)) {
-    //  if (form.xAxis) {
-    //    form.xAxis.data = [];
-    //  }
-    //
-    //  // gen series
-    //  const series = form.series_col.map(index => ({
-    //    label: '' + data.header[index].Name,
-    //    values: [],
-    //    index
-    //  }));
-    //
-    //  data.rows.map((row, i) => {
-    //    series.forEach(item => {
-    //      const value = row[item.index] / 1.0;
-    //      if (!isNaN(value)) {
-    //        let seriesItem = [i, value];
-    //        if (form.type === 'bar') {
-    //          let val = row[form.xAxis_col];
-    //          let filter = this._getFullCol(row, data.header);
-    //          let mainFilterKey = form.label || form.xAxis_col;
-    //          let mainFilterValue = form.label ? label : val;
-    //          if (mainFilterKey)
-    //            seriesItem.onClick = onClick && onClick.bind(this, {
-    //              key: data.header[mainFilterKey].Name,
-    //              value: mainFilterValue
-    //            }, filter);
-    //        }
-    //        item.values.push(seriesItem);
-    //      }
-    //    });
-    //
-    //    // gen xAxis
-    //    if (form.xAxis) {
-    //      const xAxisLabel = form.xAxis_col ? row[form.xAxis_col] : i;
-    //      form.xAxis.data.push({ "label": '' + xAxisLabel, "value": i });
-    //    }
-    //  });
-    //  chart.series = series.length > 0 ? series : form.series;
-    //
-    //  assignObjectProp(form, chart, 'max');
-    //  assignObjectProp(form, chart, 'min');
-    //
-    //  // gen legend
-    //  if (form.legend && form.legend.position) {
-    //    chart.legend = {
-    //      position: form.legend.position,
-    //      total: form.legend.total
-    //    };
-    //  }
-    //
-    //  if (form.xAxis && form.xAxis.placement) {
-    //    chart.xAxis = form.xAxis;
-    //  }
-    //}
-    //
-    //chart.showLegendTotal = true;
-    //chart.xAxisPlacement="bottom";
-    //chart.legendPosition="overlay";
-    //chart.legendSeries=[];
-    //chart.values = [16, 11, 30, 51, 38];
-    //
-    //chart.xAxisLabels = [{label: "Computer Hardware", index: 0}, {label: "Computer Servers", index: 1},
-    //  {label: "Desktop computers", index: 2}, {label: "Smart Phone", index: 3}, {label: "Virtual Machine", index: 4}];
-    //
-    //return chart;
   }
 
   _getFullCol(row, header) {

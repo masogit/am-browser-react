@@ -482,7 +482,7 @@ export default class AQL extends ComponentBase {
               {
                 validData &&
                 <Box style={{position: 'relative'}} flex={false}>
-                  <Tabs activeIndex={activeIndex} initialIndex={activeIndex} justify='start'>
+                  <Tabs activeIndex={activeIndex} justify='start'>
                     <ActionTab title="Chart" onClick={this._genGraph.bind(this, null, 'chart')} ref='chart'>
                       <ChartForm {...currentAql} {...graphData} genGraph={this._genGraph.bind(this)}
                                                                                data={data}/>

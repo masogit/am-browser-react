@@ -123,10 +123,11 @@ class LegendChart extends Component {
       size,
       xAxisPlacement,
       legendPosition,
-      legendSeries,
+      legendSeries = [],
+      legendDirection,
       units = '',
       chartsValues = [],
-      xAxisLabels,
+      xAxisLabels = [],
       max,
       min,
       points,
@@ -152,17 +153,17 @@ class LegendChart extends Component {
 
     const count = this.getCountNum(chartsValues);
     const activeIndex = this.state.activeIndex;
-    const label = activeIndex ? xAxisLabels[activeIndex].displayValue + units: '';
-    const legend = legendSeries && this.renderLegend(legendSeries, units, activeIndex);
-    let direction = 'row';
+    const label = xAxisLabels[activeIndex] ? xAxisLabels[activeIndex].displayValue + units: '';
+    const legend = legendSeries.length > 0 && legendSeries.map(series => this.renderLegend(series, units, activeIndex));
+    let [direction, legendDir] = ['row', 'column'];
     if (legendPosition == 'top' || legendPosition == 'bottom') {
-      direction = 'column';
+      [legendDir, direction] = ['row', 'column'];
     }
 
     if (legendPosition == 'left' || legendPosition == 'top') {
-      top_left_Legend = legend;
-    } else {
-      bottom_right_Legend = legend;
+      top_left_Legend = <Box direction={legendDirection || legendDir}>{legend}</Box>;
+    } else if (legendPosition == 'right' || legendPosition == 'bottom') {
+      bottom_right_Legend = <Box direction={legendDirection || legendDir}>{legend}</Box>;
     }
 
     return (
@@ -177,6 +178,7 @@ class LegendChart extends Component {
               <Marker
                 count={count}
                 index={activeIndex}
+                value={activeIndex}
                 vertical
                 colorIndex={markerColorIndex || getColorIndex(1)}/>
               <MarkerLabel
@@ -189,9 +191,9 @@ class LegendChart extends Component {
                 count={count}
                 activeIndex={activeIndex}
                 onActive={this.handleActive}
-                onClick={() => {
-                  if(activeIndex) {
-                    legendSeries[activeIndex].onClick();
+                onClick={(a, b, c) => {
+                  if(activeIndex && legendSeries.length > 0) {
+                    legendSeries[0][activeIndex].onClick();
                   }
                 }}
                 />
@@ -223,7 +225,7 @@ LegendChart.propTypes = {
   chartsValues: ChartsValuesPropType,
   className: PropTypes.string,
   points: PropTypes.bool,
-  legendSeries: SeriesPropType,
+  legendSeries: PropTypes.arrayOf(SeriesPropType),
   legendPosition: PropTypes.oneOf(['top', 'bottom', 'left', 'right']),
   markerColorIndex: PropTypes.string,
   max: PropTypes.number,
@@ -237,7 +239,7 @@ LegendChart.propTypes = {
     label: PropTypes.string.isRequired,
     index: PropTypes.number.isRequired
   })),
-  xAxisPlacement: PropTypes.oneOf(['top', 'bottom'])
+  xAxisPlacement: PropTypes.oneOf(['top', 'bottom', ''])
 
 };
 

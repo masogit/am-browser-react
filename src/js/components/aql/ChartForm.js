@@ -85,6 +85,10 @@ export default class ChartForm extends GraphForm {
         {value: 'top', text: 'top'},
         {value: 'bottom', text: 'bottom'}
       ],
+      legend_direction: [
+        {value: 'row', text: 'horizontal'},
+        {value: 'column', text: 'vertical'}
+      ],
       xAxis_placement: [
         {value: '', text: ''},
         {value: 'top', text: 'top'},
@@ -117,6 +121,9 @@ export default class ChartForm extends GraphForm {
       type: 'SelectField'
     }, {
       name: 'legend.position',
+      type: 'SelectField'
+    }, {
+      name: 'legend.direction',
       type: 'SelectField'
     }, {
       label: 'Legend units',
