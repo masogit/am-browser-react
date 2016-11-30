@@ -2,8 +2,12 @@
  * Created by huling on 5/22/2016.
  */
 import React, {Component, PropTypes} from 'react';
-import {Chart, Legend, Distribution, Table, TableRow} from 'grommet';
-import Legned_Meter from './Legend_Meter';
+import { Legend, Distribution, Table, TableRow} from 'grommet';
+import Legend_Meter from './Legend_Meter';
+import LegendChart from './Legend_Chart';
+
+//import {LegendChart} from '@hpe/chang-e-ui';
+//import LegendChart from './Legend_Chart';
 
 const assignObjectProp = (from, to, propName) => {
   if (from[propName]) {
@@ -17,78 +21,156 @@ export default class Graph extends Component {
   }
 
   _gen_chart(form, data, onClick) {
+    const {xAxis: {placement: xAxisPlacement}, legend: {position: legendPosition}, units, type, smooth, size, points} = form;
     const chart = {
-      important: form.important || 0,
-      threshold: form.threshold || 0,
-      type: form.type || 'bar',
-      size: form.size || 'medium',
-      points: form.points || false,
-      segmented: form.segmented || false,
-      smooth: form.smooth || false,
-      sparkline: form.sparkline || false,
-      units: form.units || '',
-      xAxis_col: form.xAxis_col || '',
-      series_col: form.series_col || [],
-      series: []
+      points,
+      size,
+      smooth,
+      type,
+      xAxisPlacement
     };
 
-    if (form.series_col.length > 0 || (form.series && form.series.length > 0)) {
-      if (form.xAxis) {
-        form.xAxis.data = [];
-      }
+    const xAxisLabels = [];
 
+    if (form.series_col.length > 0 || (form.series && form.series.length > 0)) {
       // gen series
-      const series = form.series_col.map(index => ({
-        label: '' + data.header[index].Name,
-        values: [],
-        index
-      }));
+      //const series = form.series_col.map(index => []);
+      const series = [];
+      const legendSeries = [];
 
       data.rows.map((row, i) => {
-        series.forEach(item => {
-          const value = row[item.index] / 1.0;
-          if (!isNaN(value)) {
-            let seriesItem = [i, value];
-            if (form.type === 'bar') {
-              let val = row[form.xAxis_col];
-              let filter = this._getFullCol(row, data.header);
-              let mainFilterKey = form.label || form.xAxis_col;
-              let mainFilterValue = form.label ? label : val;
-              if (mainFilterKey)
-                seriesItem.onClick = onClick && onClick.bind(this, {
-                  key: data.header[mainFilterKey].Name,
-                  value: mainFilterValue
-                }, filter);
-            }
-            item.values.push(seriesItem);
+        const value = row[form.series_col] / 1.0;
+
+        const xAxisLabel = form.xAxis_col ? row[form.xAxis_col] : i;
+        series.push(value);
+
+        const legend = {
+          value,
+          label: xAxisLabel,
+          colorIndex: 'graph-' + (i % 8 + 1)
+        };
+
+        if (!isNaN(value)) {
+          let val = row[form.xAxis_col];
+          let filter = this._getFullCol(row, data.header);
+          let mainFilterKey = form.label || form.xAxis_col;
+          let mainFilterValue = form.label ? label : val;
+          if (mainFilterKey && onClick) {
+            legend.onClick = () => {
+              onClick({
+                key: data.header[mainFilterKey].Name,
+                value: mainFilterValue
+              }, filter);
+            };
           }
-        });
+        }
+
+        legendSeries.push(legend);
 
         // gen xAxis
-        if (form.xAxis) {
-          const xAxisLabel = form.xAxis_col ? row[form.xAxis_col] : i;
-          form.xAxis.data.push({ "label": '' + xAxisLabel, "value": i });
+        if (xAxisPlacement) {
+          xAxisLabels.push({label: xAxisLabel, displayValue: value, index: i});
         }
       });
-      chart.series = series.length > 0 ? series : form.series;
 
-      assignObjectProp(form, chart, 'max');
-      assignObjectProp(form, chart, 'min');
-
-      // gen legend
-      if (form.legend && form.legend.position) {
-        chart.legend = {
-          position: form.legend.position,
-          total: form.legend.total
-        };
+      chart.chartsValues = [series];
+      if (legendPosition) {
+        chart.legendPosition = legendPosition;
+        chart.legendSeries = legendSeries;
+        chart.showLegendTotal = true;
+        chart.units = units;
       }
 
-      if (form.xAxis && form.xAxis.placement) {
-        chart.xAxis = form.xAxis;
-      }
+      chart.xAxisLabels = xAxisLabels;
+
     }
-
+    assignObjectProp(form, chart, 'max');
+    assignObjectProp(form, chart, 'min:');
+    assignObjectProp(form, chart, 'legendPosition');
+    assignObjectProp(form, chart, 'threshold');
+    assignObjectProp(form, chart, 'important');
     return chart;
+    //const chart = {
+    //  important: form.important || 0,
+    //  threshold: form.threshold || 0,
+    //  type: form.type || 'bar',
+    //  size: form.size || 'medium',
+    //  points: form.points || false,
+    //  segmented: form.segmented || false,
+    //  smooth: form.smooth || false,
+    //  sparkline: form.sparkline || false,
+    //  units: form.units || '',
+    //  xAxis_col: form.xAxis_col || '',
+    //  series_col: form.series_col || [],
+    //  series: []
+    //};
+    //
+    //if (form.series_col.length > 0 || (form.series && form.series.length > 0)) {
+    //  if (form.xAxis) {
+    //    form.xAxis.data = [];
+    //  }
+    //
+    //  // gen series
+    //  const series = form.series_col.map(index => ({
+    //    label: '' + data.header[index].Name,
+    //    values: [],
+    //    index
+    //  }));
+    //
+    //  data.rows.map((row, i) => {
+    //    series.forEach(item => {
+    //      const value = row[item.index] / 1.0;
+    //      if (!isNaN(value)) {
+    //        let seriesItem = [i, value];
+    //        if (form.type === 'bar') {
+    //          let val = row[form.xAxis_col];
+    //          let filter = this._getFullCol(row, data.header);
+    //          let mainFilterKey = form.label || form.xAxis_col;
+    //          let mainFilterValue = form.label ? label : val;
+    //          if (mainFilterKey)
+    //            seriesItem.onClick = onClick && onClick.bind(this, {
+    //              key: data.header[mainFilterKey].Name,
+    //              value: mainFilterValue
+    //            }, filter);
+    //        }
+    //        item.values.push(seriesItem);
+    //      }
+    //    });
+    //
+    //    // gen xAxis
+    //    if (form.xAxis) {
+    //      const xAxisLabel = form.xAxis_col ? row[form.xAxis_col] : i;
+    //      form.xAxis.data.push({ "label": '' + xAxisLabel, "value": i });
+    //    }
+    //  });
+    //  chart.series = series.length > 0 ? series : form.series;
+    //
+    //  assignObjectProp(form, chart, 'max');
+    //  assignObjectProp(form, chart, 'min');
+    //
+    //  // gen legend
+    //  if (form.legend && form.legend.position) {
+    //    chart.legend = {
+    //      position: form.legend.position,
+    //      total: form.legend.total
+    //    };
+    //  }
+    //
+    //  if (form.xAxis && form.xAxis.placement) {
+    //    chart.xAxis = form.xAxis;
+    //  }
+    //}
+    //
+    //chart.showLegendTotal = true;
+    //chart.xAxisPlacement="bottom";
+    //chart.legendPosition="overlay";
+    //chart.legendSeries=[];
+    //chart.values = [16, 11, 30, 51, 38];
+    //
+    //chart.xAxisLabels = [{label: "Computer Hardware", index: 0}, {label: "Computer Servers", index: 1},
+    //  {label: "Desktop computers", index: 2}, {label: "Smart Phone", index: 3}, {label: "Virtual Machine", index: 4}];
+    //
+    //return chart;
   }
 
   _getFullCol(row, header) {
@@ -255,7 +337,7 @@ export default class Graph extends Component {
   render() {
     const {type, config, onClick, data, className} = this.props;
 
-    let classes = ['hiddenScroll', 'no-flex'];
+    let classes = ['hiddenScroll candy'];
     if (className) {
       classes.push(className);
     }
@@ -269,9 +351,9 @@ export default class Graph extends Component {
       const graph = this['_gen_' + type](config, data, onClick);
       switch (type) {
         case 'chart':
-          return <Chart {...graph} className={classes}/>;
+          return <LegendChart {...graph} className={classes}/>;
         case 'meter':
-          return <Legned_Meter {...graph} className={classes}/>;
+          return <Legend_Meter {...graph} className={classes}/>;
         case 'distribution':
           return <Distribution {...graph} className={classes}/>;
         case 'legend':

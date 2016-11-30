@@ -477,8 +477,8 @@ export default class AQL extends ComponentBase {
               </Menu>
             </Menu>
           </Header>
-          <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'medium'}} direction='row'>
-            <Box className='fixMinSizing' flex={true}>
+          <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'small'}} direction='row'>
+            <Box className='fixMinSizing' flex={true} pad={{horizontal: 'small'}}>
               {
                 validData &&
                 <Box style={{position: 'relative'}} flex={false}>
@@ -521,30 +521,28 @@ export default class AQL extends ComponentBase {
               </Box>
               {layer && this.popupLayer(layer)}
             </Box>
-            <Box justify="between" className='header' pad={{horizontal: 'small'}}>
-              <Form pad='none' compact={true}>
-                <FormField label="AQL Name" htmlFor="AQL_Name">
-                  <input id="AQL_Name" type="text" name="name" value={currentAql.name}
-                         onChange={this._setFormValues.bind(this)}/>
+            <Form fill={true}>
+              <FormField label="AQL Name" htmlFor="AQL_Name">
+                <input id="AQL_Name" type="text" name="name" value={currentAql.name}
+                       onChange={this._setFormValues.bind(this)}/>
+              </FormField>
+              <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_STR">
+                  <textarea id="AQL_STR" value={currentAql.str} rows={10} onChange={this._updateAQLStr.bind(this)}
+                            onClick={this._updateAQLStr.bind(this)}/>
+              </FormField>
+              <FormField label="Category" htmlFor="AQL_Category">
+                <SearchInput id="AQL_Category" type="text" name="category" value={currentAql.category}
+                             onDOMChange={this._setFormValues.bind(this)} suggestions={categories}
+                             onSelect={this._setCategory.bind(this)}/>
+              </FormField>
+              {
+                currentAql.view &&
+                <FormField label="Linked to" htmlFor="AQL_LinkTo">
+                  <ActionLabel label={`View: ${currentAql.view.name}`}
+                               icon={<Trash/>} onClick={this._removeView.bind(this)}/>
                 </FormField>
-                <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_STR">
-                    <textarea id="AQL_STR" value={currentAql.str} rows={10} onChange={this._updateAQLStr.bind(this)}
-                              onClick={this._updateAQLStr.bind(this)}/>
-                </FormField>
-                <FormField label="Category" htmlFor="AQL_Category">
-                  <SearchInput id="AQL_Category" type="text" name="category" value={currentAql.category}
-                               onDOMChange={this._setFormValues.bind(this)} suggestions={categories}
-                               onSelect={this._setCategory.bind(this)}/>
-                </FormField>
-                {
-                  currentAql.view &&
-                  <FormField label="Linked to" htmlFor="AQL_LinkTo">
-                    <ActionLabel label={`View: ${currentAql.view.name}`}
-                                 icon={<Trash/>} onClick={this._removeView.bind(this)}/>
-                  </FormField>
-                }
-              </Form>
-            </Box>
+              }
+            </Form>
           </Box>
         </Box>
           : <ContentPlaceHolder/>
