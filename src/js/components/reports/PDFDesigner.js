@@ -105,14 +105,13 @@ export default class PDFDesigner extends Component {
   }
 
   _translateText(pdfDefinition, records = this.state.records, param = {limit: 10, offset: 0}) {
-    const settings = this.state.report.settings,
-      body = this.props.body, fields_state= this.state.fields,
-      links = this.props.links;
+    const {body, links, groupByData, record} = this.props;
+    const {report: {settings}, fields: fields_state} = this.state;
     if (links && links.length > 0) {
       records = [];
     }
 
-    return translateText(pdfDefinition, {settings, records, body, fields_state, record: this.props.record, links:this.props.links, param});
+    return translateText(pdfDefinition, {settings, records, body, fields_state, record, links, param, groupByData});
   }
 
   _preview() {
