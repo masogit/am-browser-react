@@ -154,9 +154,9 @@ module.exports = function (app) {
     apiProxy.web(req, res, { target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}${config.version}/db` });
   });
 
-  app.use('/am/aql', function (req, res) {
+  app.use('/am/query', function (req, res) {
     // TODO: need to take care of https
-    apiProxy.web(req, res, { target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}/aql` });
+    apiProxy.web(req, res, { target: `${rest_protocol}://${rest_server}:${rest_port}${config.rest_conn.context}/query` });
   });
 
   app.use('/am/schema', function (req, res) {

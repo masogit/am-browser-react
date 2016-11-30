@@ -74,6 +74,19 @@
       </fileset>
     </classpath>
   </taskdef>
+  <taskdef name="amrandkey" classname="com.peregrine.ac.password.ant.AMRandomKey">
+    <classpath id="pwdClasspath">
+      <pathelement path="${ant.tasks.amcrypt}"/>
+      <fileset dir="${ant.tasks.amcrypt}">
+        <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${commons.path}">
+        <include name="commons-codec.jar"/>
+        <include name="commons-logging.jar"/>
+        <include name="secretshare-1.4.1.jar"/>
+      </fileset>
+    </classpath>
+  </taskdef>
 
   <if>
     <os family="windows"/>
@@ -253,6 +266,10 @@
 
 
     </if>
+    
+    <amrandkey firstPbkdf2PasswordFile="${TEMP.PBKDF2.Password.First.File}" secondPbkdf2PasswordFile="${TEMP.PBKDF2.Password.Second.File}" property="TEMP.RandKey" />
+    <propertycopy property="JWT.token.key" from="TEMP.RandKey" override="true"/>
+    
     <xmltask source="${tmp}/working/web.xml">
       <call path="/:web-app/:env-entry" inheritAll="true">
         <param name="name" path="child::*[2]/text()" default="" />

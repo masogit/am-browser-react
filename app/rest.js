@@ -71,11 +71,11 @@ function AMREST() {
             res.end();
           } else {
             // get detail rights
-            var aqlUrl = "http://${server}${context}/aql/${tables}/${fields} WHERE ${clause}";
+            var aqlUrl = "http://${server}${context}/query?aql=SELECT ${fields} FROM ${tables} WHERE ${clause}";
             args = {
               path: {
                 server: am.server,
-                context: config.base,
+                context: config.rest_conn.context ,
                 tables: "amMasterProfile MP,amRelEmplMProf REM",
                 fields: "MP.SQLName",
                 clause: `MP.lMProfileId=REM.lMProfileId AND REM.lEmplDeptId=${empId}`
@@ -88,15 +88,10 @@ function AMREST() {
 
             client.get(aqlUrl, args, (data, response) => {
               // get user right defined in AM
-              if (data.Query && data.Query.Result.Row) {
-                var row = data.Query.Result.Row;
-                if (!row.length) {
-                  am_rights.push(row.Column.content);
-                } else {
-                  row.forEach(data => {
-                    am_rights.push(data.Column.content);
-                  });
-                }
+              if (data.entities && data.entities.length > 0) {
+                data.entities.forEach((row) => {
+                  am_rights.push(row.SQLName);
+                });
               }
 
               // match am_rights and amb rights
@@ -166,11 +161,11 @@ function AMREST() {
           res.end();
         } else {
           // get detail rights
-          var aqlUrl = "http://${server}${context}/aql/${tables}/${fields} WHERE ${clause}";
+          var aqlUrl = "http://${server}${context}/query?aql=SELECT ${fields} FROM ${tables} WHERE ${clause}";
           args = {
             path: {
               server: am.server,
-              context: config.base,
+              context: config.rest_conn.context,
               tables: "amMasterProfile MP,amRelEmplMProf REM",
               fields: "MP.SQLName",
               clause: `MP.lMProfileId=REM.lMProfileId AND REM.lEmplDeptId=${empId}`
@@ -183,15 +178,11 @@ function AMREST() {
 
           client.get(aqlUrl, args, (data, response) => {
             // get user right defined in AM
-            if (data.Query.Result.Row) {
-              var row = data.Query.Result.Row;
-              if (!row.length) {
-                am_rights.push(row.Column.content);
-              } else {
-                row.forEach(data => {
-                  am_rights.push(data.Column.content);
-                });
-              }
+            // get user right defined in AM
+            if (data.entities && data.entities.length > 0) {
+              data.entities.forEach((row) => {
+                am_rights.push(row.SQLName);
+              });
             }
 
             // match am_rights and amb rights
