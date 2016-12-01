@@ -3,11 +3,8 @@
  */
 import React, {Component, PropTypes} from 'react';
 import { Legend, Distribution, Table, TableRow} from 'grommet';
-import Legend_Meter from './Legend_Meter';
+import LegendMeter from './Legend_Meter';
 import LegendChart from './Legend_Chart';
-
-//import {LegendChart} from '@hpe/chang-e-ui';
-//import LegendChart from './Legend_Chart';
 
 const assignObjectProp = (from, to, propName) => {
   if (from[propName]) {
@@ -75,15 +72,13 @@ export default class Graph extends Component {
         }
       });
 
-      form.series_col.map(col => titles.push(data.header[col].Name));
+      form.series_col.map(col => titles.push(data.header[col] ? data.header[col].Name : ''));
 
       chart.chartsValues = chartsValues;
-      if (legendPosition) {
-        chart.legendPosition = legendPosition;
-        chart.legendSeries = legendSeries;
-        chart.legendTitles = titles;
-        chart.legendDirection = legendDirection;
-      }
+      chart.legendPosition = legendPosition;
+      chart.legendSeries = legendSeries;
+      chart.legendTitles = titles;
+      chart.legendDirection = legendDirection;
 
       chart.xAxisLabels = xAxisLabels;
 
@@ -123,7 +118,6 @@ export default class Graph extends Component {
           const mainFilterKey = form.label || form.series_col;
           const mainFilterValue = form.label ? label : value;
           distribution.series.push({
-            colorIndex: 'graph-' + (index % 8 + 1),
             label,
             value,
             index,
@@ -142,66 +136,58 @@ export default class Graph extends Component {
   }
 
   _gen_meter(form, data, onClick) {
-    return {form, data, onClick};
-    //const meter = {
-    //  //important: form.important || 0,
-    //  //threshold: form.threshold || 0,
-    //  //type: form.type,
-    //  //series_col: form.series_col,
-    //  //series: [],
-    //  //col_unit: form.col_unit,
-    //  //size: form.size,
-    //  //vertical: form.vertical,
-    //  //stacked: form.stacked,
-    //  //units: form.units
-    //  active: true,
-    //  activeIndex: form.activeIndex,
-    //  label: form.label,
-    //  max: form.max,
-    //  min: form.min,
-    //  onActive: form.onActive,
-    //  series: [],
-    //  size: form.size,
-    //  stacked: form.stacked,
-    //  tabIndex: form.tabIndex,
-    //  threshold: form.threshold,
-    //  thresholds: form.thresholds,
-    //  type: form.type,
-    //  value: form.value,
-    //  vertical: form.vertical,
-    //  responsive: form.responsive
-    //};
-    //
-    //if (form.series_col) {
-    //  data.rows.filter((row, index) => {
-    //    const value = row[form.series_col] / 1.0;
-    //    if (!isNaN(value)) {
-    //      const label = form.col_unit ? '' + row[form.col_unit] : '';
-    //      const filter = this._getFullCol(row, data.header);
-    //      const mainFilterKey = form.col_unit || form.series_col;
-    //      const mainFilterValue = form.col_unit ? label : value;
-    //      meter.series.push({
-    //        colorIndex: 'graph-' + (index % 8 + 1),
-    //        label,
-    //        value,
-    //        onClick: onClick && onClick.bind(this, {
-    //          key: data.header[mainFilterKey].Name,
-    //          value: mainFilterValue
-    //        }, filter)
-    //      });
-    //    }
-    //  });
-    //
-    //  // gen legend
-    //  if (form.legend && form.legend.position) {
-    //    meter.legend = {
-    //      position: form.legend.position,
-    //      total: form.legend.total
-    //    };
-    //  }
-    //}
-    //
-    //return meter;
+    //const {xAxis: {placement: xAxisPlacement} type, smooth, size, points} = form;
+
+    const { type, units, size, legend: {position: legendPosition, direction: legendDirection = 'row'}, series_col} = form;
+    const meter = {
+      size,
+      type,
+      units,
+      legendPosition,
+      legendDirection
+    };
+
+    const series = [];
+
+    assignObjectProp(form, meter, 'threshold');
+    assignObjectProp(form, meter, 'thresholds');
+    assignObjectProp(form, meter, 'stacked');
+    assignObjectProp(form, meter, 'vertical');
+    assignObjectProp(form, meter, 'important');
+    assignObjectProp(form, meter, 'max');
+    assignObjectProp(form, meter, 'min');
+
+    if (series_col) {
+      data.rows.filter((row, index) => {
+        const value = row[series_col] / 1.0;
+        if (!isNaN(value)) {
+          const label = form.col_unit ? '' + row[form.col_unit] : '';
+          const filter = this._getFullCol(row, data.header);
+          const mainFilterKey = form.col_unit || form.series_col;
+          const mainFilterValue = form.col_unit ? label : value;
+          series.push({
+            label,
+            value,
+            onClick: onClick && onClick.bind(this, {
+              key: data.header[mainFilterKey].Name,
+              value: mainFilterValue
+            }, filter)
+          });
+        }
+      });
+
+      // gen legend
+      if (legendPosition) {
+        meter.legendPosition = legendPosition;
+        meter.legendSeries = series;
+        meter.legendTitle = data.header[series_col] && data.header[series_col].Name;
+        meter.legendDirection = legendDirection;
+      }
+
+      meter.meterSeries = series;
+    }
+
+    return meter;
   }
 
   _gen_legend(form, data, onClick) {
@@ -222,7 +208,6 @@ export default class Graph extends Component {
           const mainFilterKey = form.label || form.series_col;
           const mainFilterValue = form.label ? label : value;
           legend.series.push({
-            colorIndex: 'graph-' + (index % 8 + 1),
             label,
             value,
             index,
@@ -277,7 +262,7 @@ export default class Graph extends Component {
         case 'chart':
           return <LegendChart {...graph} className={classes}/>;
         case 'meter':
-          return <Legend_Meter {...graph} className={classes}/>;
+          return <LegendMeter {...graph} className={classes}/>;
         case 'distribution':
           return <Distribution {...graph} className={classes}/>;
         case 'legend':

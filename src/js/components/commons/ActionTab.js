@@ -79,5 +79,6 @@ export default class ActionTab extends Tab {
 
 ActionTab.propTypes = {
   onClick: PropTypes.func,
+  onEdit: PropTypes.bool,
   disabled: PropTypes.bool
 };

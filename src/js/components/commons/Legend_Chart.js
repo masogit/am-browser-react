@@ -16,14 +16,7 @@ const {
   HotSpots
   } = chart;
 
-const getColorIndex = index => {
-  switch(index % 4 + 1) {
-    case 1: return 'brand';
-    case 2: return 'accent-2';
-    case 3: return 'accent-3';
-    case 4: return 'warning';
-  }
-};
+import {setColorIndex, getColorIndex} from '../../util/charts';
 
 class LegendChart extends Component {
   constructor(props) {
@@ -97,25 +90,14 @@ class LegendChart extends Component {
     return null;
   };
 
-  renderLegend(legendSeries, units, activeIndex, titles, index) {
-    let series = null;
+  renderLegend(series, units, activeIndex, titles, index) {
     const title = titles[index];
-    if (legendSeries) {
-      series = legendSeries.map(item => {
-        if (!item.colorIndex) {
-          item.colorIndex = getColorIndex(index);
-        }
-        return item;
-      });
-    } else {
-      return null;
-    }
 
     return (
       <Box pad='small' justify='end' key={index}>
         <Label truncate={true} margin='none'>{title}</Label>
         <Legend
-          series={series}
+          series={setColorIndex(series, index)}
           total={true}
           units={units}
           activeIndex={activeIndex}
@@ -199,7 +181,7 @@ class LegendChart extends Component {
           <Chart vertical full ref='chart'>
             {topPanel}
             <Layers>
-              {this.renderMetaGraphs(chartsValues, type, activeIndex || important, max, min, points, smooth)}
+              {this.renderMetaGraphs(chartsValues, type, activeIndex != undefined ? activeIndex : important, max, min, points, smooth)}
               {threshold && <Marker colorIndex='critical' value={threshold} />}
               <Marker
                 count={count}

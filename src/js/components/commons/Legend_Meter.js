@@ -1,75 +1,129 @@
-/**
- * Created by huling on 11/29/2016.
- */
-import React, {Component} from 'react';
-import {/*Legend,*/ Meter, Box} from 'grommet';
+// @flow weak
+import React, { Component, PropTypes } from 'react';
 
-export class AMMeter extends Component {
-  render() {
-    const {form, data, onClick} = this.props;
-    const meter = {
-      //important: form.important || 0,
-      //threshold: form.threshold || 0,
-      //type: form.type,
-      //series_col: form.series_col,
-      //series: [],
-      //col_unit: form.col_unit,
-      //size: form.size,
-      //vertical: form.vertical,
-      //stacked: form.stacked,
-      //units: form.units
-      active: true,
-      activeIndex: form.activeIndex,
-      label: form.label,
-      max: form.max,
-      min: form.min,
-      onActive: form.onActive,
-      series: [],
-      size: form.size,
-      stacked: form.stacked,
-      tabIndex: form.tabIndex,
-      threshold: form.threshold,
-      thresholds: form.thresholds,
-      type: form.type,
-      value: form.value,
-      vertical: form.vertical,
-      responsive: form.responsive
+import { Box, Meter, Value} from 'grommet';
+import {setColorIndex} from '../../util/charts';
+import Legend from './Legend';
+
+class LegendMeter extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      activeIndex: null
     };
+    this.handleActive = this.handleActive.bind(this);
+  }
 
-    if (form.series_col) {
-      data.rows.filter((row, index) => {
-        const value = row[form.series_col] / 1.0;
-        if (!isNaN(value)) {
-          const label = form.col_unit ? '' + row[form.col_unit] : '';
-          const filter = this._getFullCol(row, data.header);
-          const mainFilterKey = form.col_unit || form.series_col;
-          const mainFilterValue = form.col_unit ? label : value;
-          meter.series.push({
-            colorIndex: 'graph-' + (index % 8 + 1),
-            label,
-            value,
-            onClick: onClick && onClick.bind(this, {
-              key: data.header[mainFilterKey].Name,
-              value: mainFilterValue
-            }, filter)
-          });
-        }
-      });
+  handleActive (index) {
+    this.setState({ activeIndex: index });
+  };
 
-      // gen legend
-      if (form.legend && form.legend.position) {
-        meter.legend = {
-          position: form.legend.position,
-          total: form.legend.total
-        };
-      }
+  renderLegend (props) {
+    return (
+      <Legend justify='start' pad='medium' flex={false} {...props} onActive={this.handleActive}/>
+    );
+  };
+
+  renderValue (meterSeries, activeIndex, units) {
+    const valueObj = meterSeries[activeIndex] || {};
+
+    const value = valueObj.value;
+    const label = valueObj.label;
+    const onClick = valueObj.onClick;
+
+    return (
+      <Value
+        value={value}
+        units={value ? units : ''}
+        align="center"
+        label={label}
+        onClick={onClick}
+        />
+    );
+  };
+
+  render() {
+    const {
+      className,
+      type,
+      size,
+      units,
+      meterSeries = [],
+      legendPosition,
+      legendTitle,
+      legendSeries,
+      threshold,
+      stacked,
+      vertical,
+      max,
+      min,
+      thresholds,
+      important
+      } = this.props;
+
+    const activeIndex = this.state.activeIndex;
+    let [direction, meterDir] = ['row', 'column'];
+    if (legendPosition == 'top' || legendPosition == 'bottom') {
+      [meterDir, direction] = ['row', 'column'];
+    }
+
+    let top_left_Legend = null;
+    let bottom_right_Legend = null;
+    const legend = legendPosition && legendSeries.length > 0 && this.renderLegend({series: legendSeries, units, activeIndex, title: legendTitle, size});
+    if (legendPosition == 'left' || legendPosition == 'top') {
+      top_left_Legend = legend;
+    } else if (legendPosition == 'right' || legendPosition == 'bottom') {
+      bottom_right_Legend = legend;
     }
 
     return (
-      <Box>
-        <Meter {...meter} />
-      </Box>
+      meterSeries.length > 0 &&
+        <Box direction={direction} className={className}>
+          {top_left_Legend}
+          <Box direction={meterDir} align='center'>
+            <Meter
+              type={type} label={false} series={setColorIndex(meterSeries)}
+              stacked={stacked} activeIndex={activeIndex != undefined ? activeIndex : important} size={size}
+              threshold={threshold} vertical={vertical}
+              onActive={this.handleActive} max={max} min={min}
+              thresholds={thresholds}
+              />
+            {this.renderValue(meterSeries, activeIndex, units)}
+          </Box>
+          {bottom_right_Legend}
+        </Box>
     );
-
   }
 }
+
+const SeriesPropType = PropTypes.arrayOf(PropTypes.shape({
+  label: PropTypes.string.isRequired,
+  value: PropTypes.number.isRequired,
+  onClick: PropTypes.func,
+  colorIndex: PropTypes.string
+}));
+
+LegendMeter.defaultProps = {
+  showLegendTotal: true
+};
+
+LegendMeter.propTypes = {
+  className: PropTypes.string,
+  meterSeries: SeriesPropType,
+  legendSeries: SeriesPropType,
+  legendTitle: PropTypes.string,
+  showLegendTotal: PropTypes.bool,
+  stacked: PropTypes.bool,
+  vertical: PropTypes.bool,
+  type: PropTypes.oneOf(['bar', 'arc', 'circle', 'spiral']),
+  legendPosition: PropTypes.oneOf(['top', 'bottom', 'left', 'right']),
+  units: PropTypes.string,
+  max: PropTypes.number,
+  min: PropTypes.number,
+  important: PropTypes.number,
+  threshold: PropTypes.number,
+  thresholds: SeriesPropType,
+  size: PropTypes.oneOf(['small', 'medium', 'large'])
+};
+
+export default LegendMeter;
