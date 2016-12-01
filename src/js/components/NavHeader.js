@@ -73,7 +73,7 @@ export default class NavHeader extends Component {
           <Box margin={{horizontal: 'large'}} size="small" responsive={false} className="app-name">
             <Heading tag="h2" strong={true}>AM Browser</Heading>
           </Box>
-          <Search placeHolder="Type anywhere to search" inline={true} iconAlign="start"
+          <Search placeHolder="Type to search" inline={true} iconAlign="start"
                   onKeyDown={this.onSearch.bind(this)}/>
         </Box>
         <Menu direction="row" align="center">
