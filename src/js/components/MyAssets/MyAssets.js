@@ -56,7 +56,10 @@ export default class MyAsset extends ComponentBase {
     this.acquireLock();
     // Load specified category, if no 'My Assets', use default json
     const filter = {filter: JSON.stringify({category: CATEGORY_MY_ASSETS})};
-    ExplorerActions.loadViews(filter).then((views)=> {
+    ExplorerActions.loadViews(filter).then((records)=> {
+      const views = records.filter((view) => {
+        return view.category == CATEGORY_MY_ASSETS;
+      });
       this.setState({ views });
       if (views instanceof Array && views.length > 0) {
         views.forEach((view, index) => {
