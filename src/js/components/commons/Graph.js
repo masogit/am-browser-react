@@ -2,9 +2,10 @@
  * Created by huling on 5/22/2016.
  */
 import React, {Component, PropTypes} from 'react';
-import { Legend, Table, TableRow} from 'grommet';
+import { Table, TableRow} from 'grommet';
 import LegendMeter from './Legend_Meter';
 import LegendChart from './Legend_Chart';
+import Legend from './Legend';
 import LegendDistribution from './Legend_Distribution';
 
 const assignObjectProp = (from, to, propName) => {
