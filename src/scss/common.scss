@@ -206,4 +206,8 @@ div .grommetux-menu__drop .grommetux-anchor {
   button {
     font-size: inherit;
   }
+
+  & .grommetux-tab {
+    padding: 0 3px;
+  }
 }

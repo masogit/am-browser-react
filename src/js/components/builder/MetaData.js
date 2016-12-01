@@ -1,6 +1,6 @@
 import React from 'react';
 import ComponentBase from '../commons/ComponentBase';
-import { Anchor, Box, Tabs, Tab, ListItem, FormField } from 'grommet';
+import { Anchor, Box, Tabs, Tab, ListItem, Form, FormField } from 'grommet';
 import SearchInput from '../commons/SearchInput';
 import Notes from 'grommet/components/icons/base/Notes';
 import LinkNext from 'grommet/components/icons/base/LinkNext';
@@ -346,11 +346,13 @@ class MetaData extends ComponentBase {
     };
     return (
       <Box flex={true} className='fixMinSizing fixIEScrollBar'>
-        <FormField>
-          <SearchInput value={this.state.searchText} placeHolder="Search fields and links..."
-                     onDOMChange={this._onSearch}/>
-        </FormField>
-        <Box pad={{vertical: 'small'}} className='fixMinSizing autoScroll'>
+        <Form fill={true}>
+          <FormField>
+            <SearchInput value={this.state.searchText} placeHolder="Search fields and links..."
+                      onDOMChange={this._onSearch}/>
+          </FormField>
+        </Form>
+        <Box pad={{vertical: 'small'}} className="fixMinSizing autoScroll">
           {entities.length > 0 &&
           <ReactList
             itemRenderer={renderEntityItem}
