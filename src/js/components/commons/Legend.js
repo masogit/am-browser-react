@@ -5,6 +5,7 @@
 import React, {Component} from 'react';
 import {Box, Legend, Label} from 'grommet';
 import {setColorIndex} from '../../util/charts';
+import {pick} from 'grommet/utils/Props';
 
 export default class AMLegend extends Component {
   render() {
@@ -13,16 +14,10 @@ export default class AMLegend extends Component {
       return null;
     }
 
-    const props = Object.assign({}, this.props);
-    delete props.series;
-    delete props.units;
-    delete props.activeIndex;
-    delete props.total;
-    delete props.onActive;
-    delete props.title;
+    const boxProps = pick(this.props, Object.keys(Box.propTypes));
 
     return (
-      <Box {...props}>
+      <Box {...boxProps}>
         <Label truncate={true} margin='none'>{title}</Label>
         <Legend
           series={setColorIndex(series)}

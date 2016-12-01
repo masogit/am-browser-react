@@ -116,7 +116,7 @@ LegendMeter.propTypes = {
   stacked: PropTypes.bool,
   vertical: PropTypes.bool,
   type: PropTypes.oneOf(['bar', 'arc', 'circle', 'spiral']),
-  legendPosition: PropTypes.oneOf(['top', 'bottom', 'left', 'right']),
+  legendPosition: PropTypes.oneOf(['top', 'bottom', 'left', 'right', '']),
   units: PropTypes.string,
   max: PropTypes.number,
   min: PropTypes.number,

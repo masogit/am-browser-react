@@ -2,9 +2,10 @@
  * Created by huling on 5/22/2016.
  */
 import React, {Component, PropTypes} from 'react';
-import { Legend, Distribution, Table, TableRow} from 'grommet';
+import { Legend, Table, TableRow} from 'grommet';
 import LegendMeter from './Legend_Meter';
 import LegendChart from './Legend_Chart';
+import LegendDistribution from './Legend_Distribution';
 
 const assignObjectProp = (from, to, propName) => {
   if (from[propName]) {
@@ -100,16 +101,16 @@ export default class Graph extends Component {
   }
 
   _gen_distribution(form, data, onClick) {
+    const {legend = {}, size, units, series_col, important} = form;
+    const  {position: legendPosition, direction: legendDirection = 'row'} = legend;
     const distribution = {
-      size: form.size,
-      units: form.units,
-      legendTotal: form.legendTotal,
-      series_col: form.series_col,
-      full: false,
-      series: []
+      size,
+      units
     };
 
-    if (form.series_col) {
+    const series = [];
+
+    if (series_col) {
       data.rows.map((row, index) => {
         const value = row[form.series_col] / 1.0;
         if (!isNaN(value)) {
@@ -117,9 +118,10 @@ export default class Graph extends Component {
           const filter = this._getFullCol(row, data.header);
           const mainFilterKey = form.label || form.series_col;
           const mainFilterValue = form.label ? label : value;
-          distribution.series.push({
+          series.push({
             label,
             value,
+            important: form.series_col == important,
             index,
             onClick: onClick && onClick.bind(this, {
               key: data.header[mainFilterKey].Name,
@@ -129,15 +131,18 @@ export default class Graph extends Component {
         }
       });
 
-      distribution.legend = !!(form.units || form.legendTotal);
+      distribution.legendPosition = legendPosition;
+      distribution.distributionSeries = series;
+      distribution.legendSeries = series;
+      distribution.legendTitle = data.header[series_col] && data.header[series_col].Name;
+      distribution.legendDirection = legendDirection;
+
     }
 
     return distribution;
   }
 
   _gen_meter(form, data, onClick) {
-    //const {xAxis: {placement: xAxisPlacement} type, smooth, size, points} = form;
-
     const { type, units, size, legend: {position: legendPosition, direction: legendDirection = 'row'}, series_col} = form;
     const meter = {
       size,
@@ -264,7 +269,7 @@ export default class Graph extends Component {
         case 'meter':
           return <LegendMeter {...graph} className={classes}/>;
         case 'distribution':
-          return <Distribution {...graph} className={classes}/>;
+          return <LegendDistribution {...graph} className={classes}/>;
         case 'legend':
           return <Legend {...graph} className={classes}/>;
         default :
