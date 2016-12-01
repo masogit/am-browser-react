@@ -33,6 +33,9 @@ export default class RecordSearch extends ComponentBase {
   componentDidUpdate(prevProps, prevState) {
     const keyword = this.props.params.keyword;
     this._onSearch(keyword);
+    if (this.refs.table) {
+      this.refs.table.setState({small: false});
+    }
   }
 
   _search(keyword) {
@@ -204,7 +207,7 @@ export default class RecordSearch extends ComponentBase {
         {this.state.warning ? <ContentPlaceHolder content={this.state.warning} />
           :
           <Split flex="right" fixed={false} className='flex'>
-            <Table>
+            <Table ref='table'>
               <thead>
                 <tr>
                   <th>View</th>
