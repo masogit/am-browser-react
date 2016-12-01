@@ -82,6 +82,7 @@ class LegendMeter extends Component {
           {top_left_Legend}
           <Box direction={meterDir} align='center'>
             <Meter
+              className={type == 'bar' && meterSeries.length > 4 ? ' grommetux-meter--count-4' : ''}
               type={type} label={false} series={setColorIndex(meterSeries)}
               stacked={stacked} activeIndex={activeIndex != undefined ? activeIndex : important} size={size}
               threshold={threshold} vertical={vertical}
