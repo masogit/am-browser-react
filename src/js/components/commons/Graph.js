@@ -47,8 +47,7 @@ export default class Graph extends Component {
 
           const legend = {
             value,
-            label: xAxisLabel,
-            colorIndex: 'graph-' + (i % 8 + 1)
+            label: xAxisLabel
           };
 
           if (!isNaN(value)) {
@@ -72,7 +71,7 @@ export default class Graph extends Component {
 
         // gen xAxis
         if (xAxisPlacement) {
-          xAxisLabels.push({label: xAxisLabel, displayValue: values[0], index: i});
+          xAxisLabels.push({label: xAxisLabel, displayValue: values, index: i});
         }
       });
 

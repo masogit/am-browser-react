@@ -16,7 +16,14 @@ const {
   HotSpots
   } = chart;
 
-const getColorIndex = index => 'graph-' + (index % 8 + 1);
+const getColorIndex = index => {
+  switch(index % 4 + 1) {
+    case 1: return 'brand';
+    case 2: return 'accent-2';
+    case 3: return 'accent-3';
+    case 4: return 'warning';
+  }
+};
 
 class LegendChart extends Component {
   constructor(props) {
@@ -66,7 +73,7 @@ class LegendChart extends Component {
       }
 
       for (let i = 0; i < data.length; i += 1) {
-        const colorIndex = this.props.legendSeries ? this.props.legendSeries[i].colorIndex : getColorIndex(i);
+        const colorIndex = getColorIndex(i);
         metaGraphs.push(<ChartGraph
           key={i}
           values={data[i]}
@@ -90,10 +97,11 @@ class LegendChart extends Component {
     return null;
   };
 
-  renderLegend(legendSeries, units, activeIndex, title) {
+  renderLegend(legendSeries, units, activeIndex, titles, index) {
     let series = null;
+    const title = titles[index];
     if (legendSeries) {
-      series = legendSeries.map((item, index) => {
+      series = legendSeries.map(item => {
         if (!item.colorIndex) {
           item.colorIndex = getColorIndex(index);
         }
@@ -104,7 +112,7 @@ class LegendChart extends Component {
     }
 
     return (
-      <Box pad='small' justify='end'>
+      <Box pad='small' justify='end' key={index}>
         <Label truncate={true} margin='none'>{title}</Label>
         <Legend
           series={series}
@@ -114,6 +122,23 @@ class LegendChart extends Component {
           onActive={this.handleActive}
           />
       </Box>
+    );
+  }
+
+  renderMarkLabel(count, activeIndex, xAxisLabels, units) {
+    const series = xAxisLabels[activeIndex] ? xAxisLabels[activeIndex].displayValue.map((value, i) => ({
+      label: '',
+      value,
+      units,
+      colorIndex: getColorIndex(i)
+    })) : [{label: '', value: '', units: ''}];
+    return (
+      <MarkerLabel
+        align='start'
+        count={count}
+        index={activeIndex}
+        vertical
+        label={<Box><Legend series={series}/></Box>}/>
     );
   }
 
@@ -155,8 +180,7 @@ class LegendChart extends Component {
 
     const count = this.getCountNum(chartsValues);
     const activeIndex = this.state.activeIndex;
-    const label = xAxisLabels[activeIndex] ? xAxisLabels[activeIndex].displayValue + units: '';
-    const legend = legendSeries.length > 0 && legendSeries.map((series, index) => this.renderLegend(series, units, activeIndex, legendTitles[index]));
+    const legend = legendSeries.length > 0 && legendSeries.map((series, index) => this.renderLegend(series, units, activeIndex, legendTitles, index));
     let [direction, legendDir] = ['row', 'column'];
     if (legendPosition == 'top' || legendPosition == 'bottom') {
       [legendDir, direction] = ['row', 'column'];
@@ -183,12 +207,7 @@ class LegendChart extends Component {
                 value={activeIndex}
                 vertical
                 colorIndex={markerColorIndex || getColorIndex(1)}/>
-              <MarkerLabel
-                align='start'
-                count={count}
-                index={activeIndex}
-                vertical
-                label={<Label>{label}</Label>}/>
+              {this.renderMarkLabel(count, activeIndex, xAxisLabels, units)}
               <HotSpots
                 count={count}
                 activeIndex={activeIndex}
