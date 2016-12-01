@@ -261,7 +261,7 @@ export default class Graph extends Component {
   render() {
     const {type, config, onClick, data, className} = this.props;
 
-    let classes = ['hiddenScroll candy'];
+    let classes = ['hiddenScroll'];
     if (className) {
       classes.push(className);
     }

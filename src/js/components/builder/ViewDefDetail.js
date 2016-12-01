@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import ComponentBase from '../commons/ComponentBase';
-import {Markdown, Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Split, Map, Icons} from 'grommet';
+import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Map, Icons} from 'grommet';
 const {Close, LinkUp: Up, LinkDown: Down, Ascend, Descend, Play, Checkmark, Duplicate, Download,
   CaretPrevious, More, Mail} = Icons.Base;
 import {isEmpty} from 'lodash';
@@ -426,7 +426,7 @@ export default class ViewDefDetail extends ComponentBase {
   }
 
   render() {
-    const {selectedView, openPreview, categories, onSubmit, compact} = this.props;
+    const {selectedView, openPreview, categories, onSubmit} = this.props;
 
     if (isEmpty(selectedView)) {
       toggleSidebar(true);
@@ -479,19 +479,16 @@ export default class ViewDefDetail extends ComponentBase {
             </Menu>
           </Menu>
         </Header>
-        <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'medium'}}>
-          <Split flex="left" fixed={false} className='fixMinSizing'>
+        <Box pad={{horizontal: 'medium'}} direction="row">
             <Box flex={true}>
               {
                 selectedView.body.sqlname &&
-                <Box className='hiddenScroll' flex={false}>
-                  <Map vertical={true} className='grid' data={bodyToMapData(selectedView.body)}/>
-                </Box>
+                <Map vertical={true} className='grid' data={bodyToMapData(selectedView.body)}/>
               }
-              {table}
+              <Box className="autoScroll">{table}</Box>
             </Box>
-            <Box pad={table ? {horizontal: 'small', vertical: 'none'} : 'none'}>
-              <Form onSubmit={onSubmit} compact={compact}>
+            <Box pad={{horizontal: 'small', vertical: 'none'}}>
+              <Form onSubmit={onSubmit} fill={true}>
                 <FormField label="Name">
                   <input id="v.name" name="v.name" type="text" onChange={this._onChange}
                          value={selectedView.name}/>
@@ -505,13 +502,12 @@ export default class ViewDefDetail extends ComponentBase {
                                suggestions={categories} onDOMChange={this._onChange}
                                onSelect={this._setCategory}/>
                 </FormField>
-                <Box pad={{vertical: 'medium'}}>
-                  <Markdown content="All views under **My Assets** Category will replace Out-Of-Box *My Assets* module" />
-                </Box>
               </Form>
+              <Box pad="small" style={{width: '235px'}}>
+                <p>All views under <strong>My Assets</strong> Category will replace Out-Of-Box My Assets module</p>
+              </Box>
             </Box>
             {selectedView && selectedView.name && this.getAlertLayer(alertForm, selectedView.name)}
-          </Split>
         </Box>
       </Box>
     );
