@@ -22,7 +22,7 @@ class LegendDistribution extends Component {
   }
 
   renderLegend(props) {
-    return <Legend justify='start' pad='medium' flex={false} {...props} onActive={this.handleActive}/>
+    return <Legend justify='start' pad='medium' flex={false} {...props} onActive={this.handleActive}/>;
   }
 
   render() {

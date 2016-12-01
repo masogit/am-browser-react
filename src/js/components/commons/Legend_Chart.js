@@ -30,7 +30,9 @@ class LegendChart extends Component {
   }
 
   componentDidUpdate() {
-    this.refs.chart._onResize();
+    if (this.refs.chart) {
+      this.refs.chart._onResize();
+    }
   }
 
   handleActive (index) {
