@@ -90,7 +90,7 @@ class LegendChart extends Component {
     return null;
   };
 
-  renderLegend(legendSeries, units, activeIndex) {
+  renderLegend(legendSeries, units, activeIndex, title) {
     let series = null;
     if (legendSeries) {
       series = legendSeries.map((item, index) => {
@@ -105,6 +105,7 @@ class LegendChart extends Component {
 
     return (
       <Box pad='small' justify='end'>
+        <Label truncate={true} margin='none'>{title}</Label>
         <Legend
           series={series}
           total={true}
@@ -125,6 +126,7 @@ class LegendChart extends Component {
       legendPosition,
       legendSeries = [],
       legendDirection,
+      legendTitles,
       units = '',
       chartsValues = [],
       xAxisLabels = [],
@@ -154,7 +156,7 @@ class LegendChart extends Component {
     const count = this.getCountNum(chartsValues);
     const activeIndex = this.state.activeIndex;
     const label = xAxisLabels[activeIndex] ? xAxisLabels[activeIndex].displayValue + units: '';
-    const legend = legendSeries.length > 0 && legendSeries.map(series => this.renderLegend(series, units, activeIndex));
+    const legend = legendSeries.length > 0 && legendSeries.map((series, index) => this.renderLegend(series, units, activeIndex, legendTitles[index]));
     let [direction, legendDir] = ['row', 'column'];
     if (legendPosition == 'top' || legendPosition == 'bottom') {
       [legendDir, direction] = ['row', 'column'];

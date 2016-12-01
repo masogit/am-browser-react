@@ -30,9 +30,10 @@ export default class Graph extends Component {
       xAxisPlacement
     };
 
-    const xAxisLabels = [];
 
     if (form.series_col.length > 0 || (form.series && form.series.length > 0)) {
+      const xAxisLabels = [];
+      const titles = [];
       // gen series
       const legendSeries = _.times(form.series_col.length, () => []);
       const chartsValues = _.times(form.series_col.length, () => []);
@@ -75,10 +76,13 @@ export default class Graph extends Component {
         }
       });
 
+      form.series_col.map(col => titles.push(data.header[col].Name));
+
       chart.chartsValues = chartsValues;
       if (legendPosition) {
         chart.legendPosition = legendPosition;
         chart.legendSeries = legendSeries;
+        chart.legendTitles = titles;
         chart.legendDirection = legendDirection;
       }
 
