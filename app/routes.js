@@ -93,7 +93,11 @@ module.exports = function (app) {
   app.get('/am/logout', rest.logout);
   // AM LWSSO Login
   if (enable_lwsso) {
-    app.post('/am/lwssoLogin', rest.lwssoLogin);
+    app.post('/am/lwssoLogin', function (req, res) {
+      if (req.cookies && req.cookies.LWSSO_COOKIE_KEY) {
+        rest.lwssoLogin(req, res);
+      }
+    });
 
   }
   app.all("/*", function (req, res, next) {
