@@ -79,7 +79,7 @@ class IndexerLogin extends ComponentBase {
             errors={errors}
             usernameType='text'
             defaultValues={{
-              username: cookies.get('user'),
+              username: cookies.get('user') || '',
               rememberMe: true
             }}/>
           <Footer justify="between">
