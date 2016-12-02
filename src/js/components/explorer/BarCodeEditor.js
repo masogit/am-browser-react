@@ -5,6 +5,7 @@ import {getDisplayLabel, getFieldStrVal} from '../../util/RecordFormat';
 import JsBarcode from 'jsbarcode';
 import {ExportLayer} from '../commons/PDFWidgets';
 import { updateValue, download, preview } from '../../util/pdfDesigner';
+import {loadSetting, saveSetting} from '../../util/util';
 
 const barcodeType = [{
   name: 'CODE128',
@@ -156,6 +157,8 @@ const recordsToPdfDoc_barcode = (fields, records, reportLabel, param) => {
   };
 };
 
+const localStorageKey = "Barcode";
+
 export default class RecordList extends Component {
   componentWillMount() {
     this.state = {
@@ -176,6 +179,8 @@ export default class RecordList extends Component {
       limit: 100,
       showExportLayer: false
     };
+    const localStorageValue = loadSetting(localStorageKey);
+    Object.assign(this.state, localStorageValue);
     this._updateValue = this._updateValue.bind(this);
     this._preview = this._preview.bind(this);
     this.dataReady = this.dataReady.bind(this);
@@ -183,6 +188,18 @@ export default class RecordList extends Component {
 
   componentDidMount() {
     this._preview();
+  }
+
+  componentWillUnmount() {
+    let localStorageValue = Object.assign({}, this.state);
+
+    delete localStorageValue.fields;
+    delete localStorageValue.previewCount;
+    delete localStorageValue.recordsStart;
+    delete localStorageValue.limit;
+    delete localStorageValue.showExportLayer;
+
+    saveSetting(localStorageKey, localStorageValue);
   }
 
   dataReady(loading = this.state.loading) {
@@ -205,9 +222,9 @@ export default class RecordList extends Component {
   }
 
   _updateValue(event, val = event.target.value) {
-    updateValue(event, {val, 
-      name: event.target.name, 
-      state: this.state, 
+    updateValue(event, {val,
+      name: event.target.name,
+      state: this.state,
       callback: ()=> this.setState(this.state, this.autoPreview)
     });
   }
