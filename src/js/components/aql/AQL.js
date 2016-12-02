@@ -409,7 +409,7 @@ export default class AQL extends ComponentBase {
 
   render() {
     const {data, aqls, aql: currentAql, alertLayer, graphData, layer, categories} = this.state;
-    const header = data.header.map((col) => <th key={col.Index}>{col.Name}</th>);
+    const header = data.header.map((col, index) => <th key={index}>{col.Name}</th>);
 
     const rows = data.rows.map((row, index) => (
       <TableRow key={index}>{

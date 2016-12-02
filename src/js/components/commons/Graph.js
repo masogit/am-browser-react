@@ -157,7 +157,7 @@ export default class Graph extends Component {
   _gen_legend(form, data, onClick) {
     const {series_col, label, title} = form;
     const legend = cloneObj(form);
-
+    delete legend.size;
     const series = [];
 
     if (series_col) {

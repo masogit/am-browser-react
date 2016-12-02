@@ -33,7 +33,7 @@ class LegendDistribution extends Component {
       legendPosition,
       legendTitle,
       legendSeries,
-      distributionSeries
+      distributionSeries = []
       } = this.props;
 
     const activeIndex = this.state.activeIndex;
