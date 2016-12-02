@@ -21,14 +21,14 @@ const getFullCol = (row, header) => {
   }));
 };
 
-const setOnClick = (obj, value, onClick, row, header, valueIndex, headerIndex = valueIndex) => {
+const setOnClick = (obj, value, onClick, row, header, index) => {
   if (!isNaN(value)) {
     const filter = getFullCol(row, header);
     if (onClick) {
       obj.onClick = () => {
         onClick({
-          key: header[headerIndex].Name,
-          value: row[valueIndex]
+          key: header[index].Name,
+          value: row[index]
         }, filter);
       };
     }
@@ -67,7 +67,7 @@ export default class Graph extends Component {
             label: xAxisLabel
           };
 
-          setOnClick(legend, value, onClick, row, data.header, xAxis_col, label);
+          setOnClick(legend, value, onClick, row, data.header, label || xAxis_col || seriesIndex);
 
           legendSeries[index].push(legend);
           values.push(value);
@@ -118,7 +118,7 @@ export default class Graph extends Component {
           important: series_col == important
         };
 
-        setOnClick(legend, value, onClick, row, data.header, series_col, label);
+        setOnClick(legend, value, onClick, row, data.header, label || series_col);
         series.push(legend);
       });
 
@@ -156,7 +156,7 @@ export default class Graph extends Component {
           value
         };
 
-        setOnClick(legend, value, onClick, row, data.header, series_col, col_unit);
+        setOnClick(legend, value, onClick, row, data.header, col_unit || series_col);
         series.push(legend);
       });
 
@@ -200,7 +200,7 @@ export default class Graph extends Component {
           value
         };
 
-        setOnClick(legend, value, onClick, row, data.header, series_col, label);
+        setOnClick(legend, value, onClick, row, data.header, label || series_col);
         series.push(legend);
       });
     }

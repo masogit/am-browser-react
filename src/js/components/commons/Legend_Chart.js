@@ -197,7 +197,7 @@ class LegendChart extends Component {
                 activeIndex={activeIndex}
                 onActive={this.handleActive}
                 onClick={(a, b, c) => {
-                  if(activeIndex && legendSeries.length > 0) {
+                  if(Number.isInteger(activeIndex) && legendSeries.length > 0) {
                     legendSeries[0][activeIndex].onClick();
                   }
                 }}
