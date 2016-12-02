@@ -35,18 +35,49 @@ const setOnClick = (obj, value, onClick, row, header, index) => {
   }
 };
 
+const setSeriesItem = (seriesIndex, onClick, row, header, index, text) => {
+  const value = row[seriesIndex] / 1.0;
+
+  const legend = {
+    value,
+    label: '' + text
+  };
+
+  setOnClick(legend, value, onClick, row, header, index || seriesIndex);
+  return legend;
+};
+
+const cloneObj = form => {
+  const { xAxis = {}, legend={},  type, size, min = 0, max = 100, important = 0 } = form;
+  const { position: legendPosition, direction: legendDirection = 'row' } = legend;
+  const { placement: xAxisPlacement } = xAxis;
+  const chart = {
+    size,
+    type,
+    xAxisPlacement,
+    max,
+    min,
+    important,
+    legendPosition,
+    legendDirection
+  };
+
+  assignObjectProp(form, chart, 'threshold');
+  assignObjectProp(form, chart, 'thresholds');
+  assignObjectProp(form, chart, 'points');
+  assignObjectProp(form, chart, 'smooth');
+  assignObjectProp(form, chart, 'units');
+  assignObjectProp(form, chart, 'stacked');
+  assignObjectProp(form, chart, 'vertical');
+  assignObjectProp(form, chart, 'col_unit');
+
+  return chart;
+};
+
 export default class Graph extends Component {
   _gen_chart(form, data, onClick) {
-    const {xAxis: {placement: xAxisPlacement}, legend: {position: legendPosition, direction: legendDirection = 'row'},
-      type, smooth, size, points, series_col = [], series, xAxis_col, label} = form;
-    const chart = {
-      points,
-      size,
-      smooth,
-      type,
-      xAxisPlacement
-    };
-
+    const { series_col = [], series, xAxis_col, label} = form;
+    const chart = cloneObj(form);
 
     if (series_col.length > 0 || (series && series.length > 0)) {
       const xAxisLabels = [];
@@ -60,75 +91,42 @@ export default class Graph extends Component {
         const values = [];
         form.series_col.map((seriesIndex, index) => {
           const value = row[seriesIndex] / 1.0;
-          chartsValues[index].push(value);
-
-          const legend = {
-            value,
-            label: xAxisLabel
-          };
-
-          setOnClick(legend, value, onClick, row, data.header, label || xAxis_col || seriesIndex);
-
+          const legend = setSeriesItem(seriesIndex, onClick, row, data.header, label || xAxis_col, xAxisLabel);
           legendSeries[index].push(legend);
+
+          chartsValues[index].push(value);
           values.push(value);
         });
 
         // gen xAxis
-        if (xAxisPlacement) {
-          xAxisLabels.push({label: xAxisLabel, displayValue: values, index: i});
-        }
+        xAxisLabels.push({label: xAxisLabel, displayValue: values, index: i});
       });
 
       series_col.map(col => titles.push(data.header[col] ? data.header[col].Name : ''));
 
       chart.chartsValues = chartsValues;
-      chart.legendPosition = legendPosition;
       chart.legendSeries = legendSeries;
       chart.legendTitles = titles;
-      chart.legendDirection = legendDirection;
-
       chart.xAxisLabels = xAxisLabels;
-
     }
-    assignObjectProp(form, chart, 'max');
-    assignObjectProp(form, chart, 'min:');
-    assignObjectProp(form, chart, 'legendPosition');
-    assignObjectProp(form, chart, 'threshold');
-    assignObjectProp(form, chart, 'important');
-    assignObjectProp(form, chart, 'units');
     return chart;
   }
 
   _gen_distribution(form, data, onClick) {
-    const {legend = {}, size, units, series_col, important, label} = form;
-    const  {position: legendPosition, direction: legendDirection = 'row'} = legend;
-    const distribution = {
-      size,
-      units
-    };
+    const {series_col, important, label} = form;
+    const distribution = cloneObj(form);
 
     const series = [];
 
     if (series_col) {
-      data.rows.forEach((row, index) => {
-        const value = row[series_col] / 1.0;
-        const legend = {
-          label: row[label] || '',
-          value,
-          important: series_col == important
-        };
-
-        setOnClick(legend, value, onClick, row, data.header, label || series_col);
+      data.rows.forEach(row  => {
+        const legend = setSeriesItem(series_col, onClick, row, data.header, label, row[label] || '');
+        legend.important = series_col == important;
         series.push(legend);
       });
 
-      if (legendPosition) {
-        distribution.legendPosition = legendPosition;
-        distribution.legendSeries = series;
-        distribution.legendTitle = data.header[series_col] && data.header[series_col].Name;
-        distribution.legendDirection = legendDirection;
-      }
-
+      distribution.legendSeries = series;
+      distribution.legendTitle = data.header[series_col] && data.header[series_col].Name;
       distribution.distributionSeries = series;
     }
 
@@ -136,76 +134,41 @@ export default class Graph extends Component {
   }
 
   _gen_meter(form, data, onClick) {
-    const { type, units, size, col_unit,
-      legend: {position: legendPosition, direction: legendDirection = 'row'}, series_col} = form;
-    const meter = {
-      size,
-      type,
-      units,
-      legendPosition,
-      legendDirection
-    };
+    const { col_unit, series_col} = form;
+    const meter = cloneObj(form);
 
     const series = [];
 
     if (series_col) {
-      data.rows.forEach((row, index) => {
-        const value = row[series_col] / 1.0;
-        const legend = {
-          label: col_unit ? '' + row[col_unit] : '',
-          value
-        };
-
-        setOnClick(legend, value, onClick, row, data.header, col_unit || series_col);
+      data.rows.forEach(row => {
+        const legend = setSeriesItem(series_col, onClick, row, data.header, col_unit, row[col_unit] || '');
         series.push(legend);
       });
 
       // gen legend
-      if (legendPosition) {
-        meter.legendPosition = legendPosition;
-        meter.legendSeries = series;
-        meter.legendTitle = data.header[series_col] && data.header[series_col].Name;
-        meter.legendDirection = legendDirection;
-      }
-
+      meter.legendSeries = series;
+      meter.legendTitle = data.header[series_col] && data.header[series_col].Name;
       meter.meterSeries = series;
     }
-
-    assignObjectProp(form, meter, 'threshold');
-    assignObjectProp(form, meter, 'thresholds');
-    assignObjectProp(form, meter, 'stacked');
-    assignObjectProp(form, meter, 'vertical');
-    assignObjectProp(form, meter, 'important');
-    assignObjectProp(form, meter, 'max');
-    assignObjectProp(form, meter, 'min');
 
     return meter;
   }
 
   _gen_legend(form, data, onClick) {
-    const {series_col, col_unit, units, total, label = ''} = form;
-    const legend = {
-      col_unit,
-      units,
-      total
-    };
+    const {series_col, label, title} = form;
+    const legend = cloneObj(form);
 
     const series = [];
 
     if (series_col) {
-      data.rows.forEach((row, index) => {
-        const value = row[series_col] / 1.0;
-        const legend = {
-          label: row[label] || label,
-          value
-        };
-
-        setOnClick(legend, value, onClick, row, data.header, label || series_col);
+      data.rows.forEach(row => {
+        const legend = setSeriesItem(series_col, onClick, row, data.header, label, row[label] || '');
         series.push(legend);
       });
     }
 
     legend.series = series;
+    legend.title = title;
     return legend;
   }
 
