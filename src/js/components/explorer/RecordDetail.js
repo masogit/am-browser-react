@@ -2,10 +2,10 @@ import React, {Component, PropTypes} from 'react';
 import RecordList from './RecordList';
 import ActionTab from '../commons/ActionTab';
 import * as ExplorerActions from '../../actions/explorer';
-import { Anchor, Layer, Tabs, Table, TableRow, Header } from 'grommet';
+import { Anchor, Layer, Tabs, Table, TableRow, Header, Box, List, ListItem } from 'grommet';
+import Close from 'grommet/components/icons/base/Close';
 import Pdf from 'grommet/components/icons/base/DocumentPdf';
 import * as Format from '../../util/RecordFormat';
-import cookies from 'js-cookie';
 import PDFTemplate from '../reports/reports';
 
 export default class RecordDetail extends Component {
@@ -43,6 +43,24 @@ export default class RecordDetail extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    if (nextProps.record != this.props.record) {
+      let links = this._linksProcessing(nextProps.choosenRecord, nextProps.record);
+      this.setState({
+        links: links
+      });
+    }
+
+  }
+
+  _linksProcessing(body, record) {
+    if (body.links) {
+      let bodyClone = _.cloneDeep(body);
+      bodyClone.links.forEach((link) => {
+        link.body = this._getLinkBody(link, record);
+      });
+      return bodyClone.links;
+    }
+    return [];
   }
 
 
@@ -77,11 +95,6 @@ export default class RecordDetail extends Component {
       });
   }
 
-  _download(type) {
-    this.refs.downloadForm.action = ExplorerActions.getDownloadQuery(this.props.body.sqlname) + `?type=${type}`;
-    this.refs.downloadForm.submit();
-  }
-
   showPDFDesigner() {
     this.setState({pdfSettings: {body: this.props.body}});
   }
@@ -99,21 +112,13 @@ export default class RecordDetail extends Component {
     );
   }
 
-  render() {
-
+  _renderDetailInList() {
     return (
       <Layer closer={true} align="right" onClose={this.props.onClose}>
         <Tabs justify="start" activeIndex={0}>
           <ActionTab title={this.props.body.label}>
             <Header justify="end">
               <Anchor icon={<Pdf />} label="Download PDF" onClick={this.showPDFDesigner}/>
-              <form name="Download" ref="downloadForm" method="post">
-                <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
-                <input type="hidden" name="record" value={JSON.stringify(this.props.record)} />
-                <input type="hidden" name="links" value={JSON.stringify(this.state.links)} />
-                <input type="hidden" name="fields" value={JSON.stringify(this.props.body.fields)}/>
-                <input type="hidden" name="label" value={this.props.title || this.props.body.label} />
-              </form>
             </Header>
             <Table>
               <thead>
@@ -155,6 +160,51 @@ export default class RecordDetail extends Component {
         {this.renderPDFPreview()}
       </Layer>
     );
+  }
+
+  _renderDetailInTopology() {
+    const body = this.props.choosenRecord;
+
+    return (
+      <Box className='topology-background-color autoScroll' flex={false}>
+        <Header justify='between'>
+            {body.label}
+            <Anchor icon={<Close />} onClick={this.props.onClose} justify='end'/>
+        </Header>
+        <Box justify='center' pad={{horizontal: 'small'}} flex={false}>
+          <List>
+            <ListItem>
+              <Header justify='end'>
+                <Anchor icon={<Pdf />} label="Download PDF" onClick={this.showPDFDesigner}/>
+              </Header>
+            </ListItem>
+            {
+              body.fields.map((field, index) => {
+                return (
+                  <ListItem key={index} justify="between">
+                    <span>
+                      {field.label}
+                    </span>
+                    <Box pad={{horizontal: 'medium'}} />
+                    <span className="secondary">
+                      {Format.getFieldStrVal(this.props.record, field)}
+                    </span>
+                  </ListItem>
+                );
+              })
+            }
+          </List>
+        </Box>
+        {this.renderPDFPreview()}
+      </Box>
+    );
+  }
+
+  render() {
+    if (this.props.showTopology)
+      return this._renderDetailInTopology();
+    else
+      return this._renderDetailInList();
   }
 }
 

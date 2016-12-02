@@ -40,9 +40,7 @@ var localeData = getLocaleData(messages, locale);
 
 import cookies from 'js-cookie';
 
-if (cookies.get('LWSSO_COOKIE_KEY')) {
-  store.dispatch(lwssoPreAuthenticate());
-}
+store.dispatch(lwssoPreAuthenticate());
 
 if (cookies.get('headerNavs')) {
   store.dispatch(init(cookies.get('user'), cookies.get('headerNavs')));
