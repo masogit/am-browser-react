@@ -14,13 +14,31 @@ const assignObjectProp = (from, to, propName) => {
   }
 };
 
-export default class Graph extends Component {
-  constructor() {
-    super();
-  }
+const getFullCol = (row, header) => {
+  return row.map((value, index) => ({
+    key: header[index].Name,
+    value
+  }));
+};
 
+const setOnClick = (obj, value, onClick, row, header, valueIndex, headerIndex = valueIndex) => {
+  if (!isNaN(value)) {
+    const filter = getFullCol(row, header);
+    if (onClick) {
+      obj.onClick = () => {
+        onClick({
+          key: header[headerIndex].Name,
+          value: row[valueIndex]
+        }, filter);
+      };
+    }
+  }
+};
+
+export default class Graph extends Component {
   _gen_chart(form, data, onClick) {
-    const {xAxis: {placement: xAxisPlacement}, legend: {position: legendPosition, direction: legendDirection = 'row'}, type, smooth, size, points} = form;
+    const {xAxis: {placement: xAxisPlacement}, legend: {position: legendPosition, direction: legendDirection = 'row'},
+      type, smooth, size, points, series_col = [], series, xAxis_col, label} = form;
     const chart = {
       points,
       size,
@@ -30,7 +48,7 @@ export default class Graph extends Component {
     };
 
 
-    if (form.series_col.length > 0 || (form.series && form.series.length > 0)) {
+    if (series_col.length > 0 || (series && series.length > 0)) {
       const xAxisLabels = [];
       const titles = [];
       // gen series
@@ -49,20 +67,7 @@ export default class Graph extends Component {
             label: xAxisLabel
           };
 
-          if (!isNaN(value)) {
-            let val = row[form.xAxis_col];
-            let filter = this._getFullCol(row, data.header);
-            let mainFilterKey = form.label || form.xAxis_col;
-            let mainFilterValue = form.label ? label : val;
-            if (mainFilterKey && onClick) {
-              legend.onClick = () => {
-                onClick({
-                  key: data.header[mainFilterKey].Name,
-                  value: mainFilterValue
-                }, filter);
-              };
-            }
-          }
+          setOnClick(legend, value, onClick, row, data.header, xAxis_col, label);
 
           legendSeries[index].push(legend);
           values.push(value);
@@ -74,7 +79,7 @@ export default class Graph extends Component {
         }
       });
 
-      form.series_col.map(col => titles.push(data.header[col] ? data.header[col].Name : ''));
+      series_col.map(col => titles.push(data.header[col] ? data.header[col].Name : ''));
 
       chart.chartsValues = chartsValues;
       chart.legendPosition = legendPosition;
@@ -94,15 +99,8 @@ export default class Graph extends Component {
     return chart;
   }
 
-  _getFullCol(row, header) {
-    return row.map((value, index) => ({
-      key: header[index].Name,
-      value
-    }));
-  }
-
   _gen_distribution(form, data, onClick) {
-    const {legend = {}, size, units, series_col, important} = form;
+    const {legend = {}, size, units, series_col, important, label} = form;
     const  {position: legendPosition, direction: legendDirection = 'row'} = legend;
     const distribution = {
       size,
@@ -112,39 +110,34 @@ export default class Graph extends Component {
     const series = [];
 
     if (series_col) {
-      data.rows.map((row, index) => {
-        const value = row[form.series_col] / 1.0;
-        if (!isNaN(value)) {
-          const label = form.label ? '' + row[form.label] : '';
-          const filter = this._getFullCol(row, data.header);
-          const mainFilterKey = form.label || form.series_col;
-          const mainFilterValue = form.label ? label : value;
-          series.push({
-            label,
-            value,
-            important: form.series_col == important,
-            index,
-            onClick: onClick && onClick.bind(this, {
-              key: data.header[mainFilterKey].Name,
-              value: mainFilterValue
-            }, filter)
-          });
-        }
+      data.rows.forEach((row, index) => {
+        const value = row[series_col] / 1.0;
+        const legend = {
+          label: row[label] || '',
+          value,
+          important: series_col == important
+        };
+
+        setOnClick(legend, value, onClick, row, data.header, series_col, label);
+        series.push(legend);
       });
 
-      distribution.legendPosition = legendPosition;
-      distribution.distributionSeries = series;
-      distribution.legendSeries = series;
-      distribution.legendTitle = data.header[series_col] && data.header[series_col].Name;
-      distribution.legendDirection = legendDirection;
+      if (legendPosition) {
+        distribution.legendPosition = legendPosition;
+        distribution.legendSeries = series;
+        distribution.legendTitle = data.header[series_col] && data.header[series_col].Name;
+        distribution.legendDirection = legendDirection;
+      }
 
+      distribution.distributionSeries = series;
     }
 
     return distribution;
   }
 
   _gen_meter(form, data, onClick) {
-    const { type, units, size, legend: {position: legendPosition, direction: legendDirection = 'row'}, series_col} = form;
+    const { type, units, size, col_unit,
+      legend: {position: legendPosition, direction: legendDirection = 'row'}, series_col} = form;
     const meter = {
       size,
       type,
@@ -155,31 +148,16 @@ export default class Graph extends Component {
 
     const series = [];
 
-    assignObjectProp(form, meter, 'threshold');
-    assignObjectProp(form, meter, 'thresholds');
-    assignObjectProp(form, meter, 'stacked');
-    assignObjectProp(form, meter, 'vertical');
-    assignObjectProp(form, meter, 'important');
-    assignObjectProp(form, meter, 'max');
-    assignObjectProp(form, meter, 'min');
-
     if (series_col) {
-      data.rows.filter((row, index) => {
+      data.rows.forEach((row, index) => {
         const value = row[series_col] / 1.0;
-        if (!isNaN(value)) {
-          const label = form.col_unit ? '' + row[form.col_unit] : '';
-          const filter = this._getFullCol(row, data.header);
-          const mainFilterKey = form.col_unit || form.series_col;
-          const mainFilterValue = form.col_unit ? label : value;
-          series.push({
-            label,
-            value,
-            onClick: onClick && onClick.bind(this, {
-              key: data.header[mainFilterKey].Name,
-              value: mainFilterValue
-            }, filter)
-          });
-        }
+        const legend = {
+          label: col_unit ? '' + row[col_unit] : '',
+          value
+        };
+
+        setOnClick(legend, value, onClick, row, data.header, series_col, col_unit);
+        series.push(legend);
       });
 
       // gen legend
@@ -193,39 +171,41 @@ export default class Graph extends Component {
       meter.meterSeries = series;
     }
 
+    assignObjectProp(form, meter, 'threshold');
+    assignObjectProp(form, meter, 'thresholds');
+    assignObjectProp(form, meter, 'stacked');
+    assignObjectProp(form, meter, 'vertical');
+    assignObjectProp(form, meter, 'important');
+    assignObjectProp(form, meter, 'max');
+    assignObjectProp(form, meter, 'min');
+
     return meter;
   }
 
   _gen_legend(form, data, onClick) {
+    const {series_col, col_unit, units, total, label = ''} = form;
     const legend = {
-      series_col: form.series_col,
-      series: [],
-      col_unit: form.col_unit,
-      units: form.units,
-      total: form.total
+      col_unit,
+      units,
+      total
     };
 
-    if (form.series_col) {
-      data.rows.filter((row, index) => {
-        const value = row[form.series_col] / 1.0;
-        if (!isNaN(value)) {
-          const label = form.label ? '' + row[form.label] : '';
-          const filter = this._getFullCol(row, data.header);
-          const mainFilterKey = form.label || form.series_col;
-          const mainFilterValue = form.label ? label : value;
-          legend.series.push({
-            label,
-            value,
-            index,
-            onClick: onClick && onClick.bind(this, {
-              key: data.header[mainFilterKey].Name,
-              value: mainFilterValue
-            }, filter)
-          });
-        }
+    const series = [];
+
+    if (series_col) {
+      data.rows.forEach((row, index) => {
+        const value = row[series_col] / 1.0;
+        const legend = {
+          label: row[label] || label,
+          value
+        };
+
+        setOnClick(legend, value, onClick, row, data.header, series_col, label);
+        series.push(legend);
       });
     }
 
+    legend.series = series;
     return legend;
   }
 
@@ -273,11 +253,10 @@ export default class Graph extends Component {
           return <LegendDistribution {...graph} className={classes}/>;
         case 'legend':
           return <Legend {...graph} className={classes}/>;
-        default :
-          return <div/>;
       }
-    } else
-      return <div/>;
+    }
+
+    return null;
   }
 }
 
