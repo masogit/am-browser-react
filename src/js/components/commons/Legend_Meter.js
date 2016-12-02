@@ -9,7 +9,7 @@ class LegendMeter extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeIndex: null
+      activeIndex: 0
     };
     this.handleActive = this.handleActive.bind(this);
   }
@@ -61,7 +61,7 @@ class LegendMeter extends Component {
       important
       } = this.props;
 
-    const activeIndex = this.state.activeIndex;
+    const activeIndex = this.state.activeIndex != undefined ? this.state.activeIndex : important;
     let [direction, meterDir] = ['row', 'column'];
     if (legendPosition == 'top' || legendPosition == 'bottom') {
       [meterDir, direction] = ['row', 'column'];
@@ -84,7 +84,7 @@ class LegendMeter extends Component {
             <Meter
               className={type == 'bar' && meterSeries.length > 4 ? ' grommetux-meter--count-4' : ''}
               type={type} label={false} series={setColorIndex(meterSeries)}
-              stacked={stacked} activeIndex={activeIndex != undefined ? activeIndex : important} size={size}
+              stacked={stacked} activeIndex={activeIndex} size={size}
               threshold={threshold} vertical={vertical}
               onActive={this.handleActive} max={max} min={min}
               thresholds={thresholds}

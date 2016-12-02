@@ -22,7 +22,7 @@ class LegendChart extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeIndex: null
+      activeIndex: 0
     };
     this.handleActive = this.handleActive.bind(this);
     this.onClick = this.onClick.bind(this);
@@ -163,7 +163,7 @@ class LegendChart extends Component {
     }
 
     const count = this.getCountNum(chartsValues);
-    const activeIndex = this.state.activeIndex;
+    const activeIndex = this.state.activeIndex != undefined ? this.state.activeIndex : important;
     const legend = legendSeries.length > 0 && legendSeries.map((series, index) => this.renderLegend(series, units, activeIndex, legendTitles, index));
     let [direction, legendDir] = ['row', 'column'];
     if (legendPosition == 'top' || legendPosition == 'bottom') {
@@ -183,7 +183,7 @@ class LegendChart extends Component {
           <Chart vertical full ref='chart'>
             {topPanel}
             <Layers>
-              {this.renderMetaGraphs(chartsValues, type, activeIndex != undefined ? activeIndex : important, max, min, points, smooth)}
+              {this.renderMetaGraphs(chartsValues, type, activeIndex, max, min, points, smooth)}
               {threshold && <Marker colorIndex='critical' value={threshold} />}
               <Marker
                 count={count}

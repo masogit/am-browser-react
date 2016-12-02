@@ -12,7 +12,7 @@ class LegendDistribution extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeIndex: null
+      activeIndex: 0
     };
     this.handleActive = this.handleActive.bind(this);
   }

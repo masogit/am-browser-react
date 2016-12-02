@@ -15,10 +15,16 @@ export default class AMLegend extends Component {
     }
 
     const boxProps = pick(this.props, Object.keys(Box.propTypes));
+    let titleComp;
+    if (typeof title == 'string') {
+      titleComp = <Label truncate={true} margin='none'>{title}</Label>;
+    } else {
+      titleComp = title;
+    }
 
     return (
       <Box {...boxProps}>
-        <Label truncate={true} margin='none'>{title}</Label>
+        {titleComp}
         <Legend
           series={setColorIndex(series)}
           total={total}
