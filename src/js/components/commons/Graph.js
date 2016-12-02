@@ -244,16 +244,19 @@ export default class Graph extends Component {
 
     if (data && data.rows.length > 0) {
       const graph = this['_gen_' + type](config, data, onClick);
+      let Chart;
       switch (type) {
         case 'chart':
-          return <LegendChart {...graph} className={classes}/>;
+          Chart = LegendChart; break;
         case 'meter':
-          return <LegendMeter {...graph} className={classes}/>;
+          Chart = LegendMeter; break;
         case 'distribution':
-          return <LegendDistribution {...graph} className={classes}/>;
+          Chart = LegendDistribution; break;
         case 'legend':
-          return <Legend {...graph} className={classes}/>;
+          Chart = Legend; break;
       }
+
+      return <Chart {...graph} className={classes}/>;
     }
 
     return null;
