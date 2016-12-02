@@ -27,7 +27,7 @@ const setOnClick = (obj, value, onClick, row, header, index) => {
     if (onClick) {
       obj.onClick = () => {
         onClick({
-          key: header[index].Name,
+          key: header[index].Content,
           value: row[index]
         }, filter);
       };
