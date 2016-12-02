@@ -2,9 +2,10 @@ import React, {PropTypes} from 'react';
 import RecordDetail from './RecordDetail';
 import RecordTopology from './RecordTopology';
 import {Table, TableRow, Box, Anchor, Header, Menu, List, ListItem, Icons, Layer} from 'grommet';
-const { Close, Ascend, Descend, Checkbox, Filter, Code, BarChart, LineChart, Aggregate,
+const { Close, Ascend, Descend, Checkbox, Filter, BarChart, LineChart, Aggregate,
    CheckboxSelected, Cluster, Menu: MenuIcon, DocumentPdf: Pdf, DocumentCsv: Csv}= Icons.Base;
 import Status from 'grommet/components/icons/Status';
+import SearchInputWithTags from '../commons/SearchInputWithTags';
 import * as ExplorerActions from '../../actions/explorer';
 import * as AQLActions from '../../actions/aql';
 import Graph from '../commons/Graph';
@@ -50,6 +51,7 @@ const init = (props) => {
       limit: props.limit || 30,
       filters: props.filters || []
     },
+    reusedFilters: "",
     onMoreLock: false,
     locked: false,
     showGraph: true,
@@ -209,22 +211,16 @@ export default class RecordList extends ComponentBase {
     });
   }
 
-  _filterAdd(event) {
-    // press '/' switch AQL input
-    if (event.target.value.trim() == '/') {
-      this._toggleAQLInput();
-      event.target.value = "";
-    }
-
+  _filterAdd(event, searches=this.state.searchFields, aqlInput=false, aqlQuery="") {
     // press enter to build AQL filter
     if (event.keyCode === 13 && event.target.value.trim()) {
-      if (this.state.param.aqlInput) {
-        this._aqlFilterAdd();
+      if (aqlInput) {
+        this._aqlFilterAdd(aqlQuery);
       } else {
         var param = this.state.param;
         if (param.filters.indexOf(event.target.value) == -1) {
           var aql = this.props.body.fields.filter((field) => {
-            return field.searchable;
+            return field.searchable && searches.indexOf(field.label) > -1;
           }).map((field) => {
             return field.sqlname + " like '%" + event.target.value.trim() + "%'";
           }).join(' OR ');
@@ -239,7 +235,7 @@ export default class RecordList extends ComponentBase {
         }
       }
     } else {
-      if (!this.state.param.aqlInput) {
+      if (!aqlInput) {
         if (event.target.value.trim() == "")
           this.setState({
             filtered: null
@@ -267,8 +263,8 @@ export default class RecordList extends ComponentBase {
     return this.getDisplayFields().map((field, index) => Format.getFieldStrVal(obj, field));
   }
 
-  _aqlFilterAdd(filter) {
-    let searchValue = filter || this.refs.search.value;
+  _aqlFilterAdd(filter, aqlQuery="") {
+    let searchValue = filter || aqlQuery;
     if (searchValue) {
       searchValue = searchValue.trim();
       let param = this.state.param;
@@ -321,12 +317,16 @@ export default class RecordList extends ComponentBase {
   _filterReuse(filter) {
     let param = this.state.param;
     param.aqlInput = true;
-    this.setState({param: param});
-    var search = this.refs.search.value.trim();
-    if (search && search !== filter)
-      this.refs.search.value += ' AND ' + filter;
+
+    let reusedFilters = this.state.reusedFilters || filter;
+    if(reusedFilters !== filter)
+      reusedFilters += 'AND ' + filter;
     else
-      this.refs.search.value = filter;
+      reusedFilters = filter;
+    this.setState({
+      param: param,
+      reusedFilters: reusedFilters
+    });
   }
 
   _viewDetailClose(event) {
@@ -418,20 +418,14 @@ export default class RecordList extends ComponentBase {
   }
 
   renderToolBox() {
-    const {filtered, searchFields, records, locked, loading, numTotal, timeQuery, numColumn, param: {aqlInput, allFields, showTopology}} = this.state;
+    const {filtered, searchFields, records, locked, loading, numTotal, timeQuery, numColumn, param: {allFields, showTopology}, reusedFilters} = this.state;
     const resultRecords = filtered ? filtered : records;
-    const aqlWhere = "press / input AQL where statement";
-    const quickSearch = searchFields ? `press Enter to quick search in ${searchFields}; ${aqlWhere}` : aqlWhere;
-    const placeholder = aqlInput ? "input AQL where statement…" : quickSearch;
 
     return (
       <Header justify="between" pad='none'>
         {this.props.title && <Box margin={{right: 'small'}}>{this.props.title}</Box>}
-        <input type="text" className={aqlInput ? 'aql flex shadow' : 'flex shadow'} ref="search"
-               placeholder={placeholder} disabled={locked} onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
-        <Box colorIndex={aqlInput ? 'accent-3' : 'brand'} onClick={this._toggleAQLInput.bind(this)} pad='small' className='button'>
-          <Code />
-        </Box>
+        <SearchInputWithTags searchFields={searchFields} reusedFilters={reusedFilters}
+          onSearch={(this._filterAdd.bind(this))} locked={locked} onChange={this._filterAdd.bind(this)} />
         <Box direction="column" margin={{left: 'small'}}>
           <Anchor onClick={this._getMoreRecords.bind(this)} disabled={loading}>
             <Box style={{fontSize: '70%', fontWeight: 'bold'}}>
