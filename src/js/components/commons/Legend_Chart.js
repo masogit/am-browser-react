@@ -16,7 +16,7 @@ const {
   HotSpots
   } = chart;
 
-import {setColorIndex, getColorIndex} from '../../util/charts';
+import {setColorIndex, getColorIndex, resizeBar} from '../../util/charts';
 
 class LegendChart extends Component {
   constructor(props) {
@@ -27,11 +27,15 @@ class LegendChart extends Component {
     this.handleActive = this.handleActive.bind(this);
     this.onClick = this.onClick.bind(this);
     this.getCountNum = this.getCountNum.bind(this);
+    this.nodes = [];
   }
 
   componentDidUpdate() {
     if (this.refs.chart) {
       this.refs.chart._onResize();
+      this.nodes.forEach(node => {
+        resizeBar(node, this.props.chartsValues[0].length);
+      });
     }
   }
 
@@ -70,15 +74,14 @@ class LegendChart extends Component {
       for (let i = 0; i < data.length; i += 1) {
         const colorIndex = getColorIndex(i);
         metaGraphs.push(<ChartGraph
-          key={i}
-          values={data[i]}
-          activeIndex={activeIndex}
-          colorIndex={colorIndex}
-          max={max}
-          min={min}
-          points={points}
-          smooth={smooth}
-          className={type== 'bar' ? 'bar' : ''}
+          key={i} values={data[i]} activeIndex={activeIndex}
+          colorIndex={colorIndex} max={max} min={min}
+          points={points} smooth={smooth}
+          ref={node => {
+            if (node && type === 'bar') {
+              this.nodes.push(node);
+            }
+          }}
           />);
       }
     }
@@ -178,7 +181,7 @@ class LegendChart extends Component {
 
     return (
     chartsValues.length > 0 &&
-        <Box direction={direction} className={className}>
+        <Box direction={direction} className={className + (type == 'bar' ? ' hide-HotSpots' : '')}>
           {top_left_Legend}
           <Chart vertical full ref='chart'>
             {topPanel}
@@ -196,7 +199,7 @@ class LegendChart extends Component {
                 count={count}
                 activeIndex={activeIndex}
                 onActive={this.handleActive}
-                onClick={(a, b, c) => {
+                onClick={() => {
                   if(Number.isInteger(activeIndex) && legendSeries.length > 0) {
                     legendSeries[0][activeIndex].onClick();
                   }

@@ -28,3 +28,10 @@
     top: 10px;
   }
 }
+
+.hide-HotSpots {
+  circle {
+    fill: transparent !important;
+    stroke: transparent !important;
+  }
+}
