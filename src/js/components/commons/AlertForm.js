@@ -43,10 +43,10 @@ export default class AlertForm extends Component {
                 </p>
                 <Footer justify='between'>
                   {onConfirm &&
-                    <Button label="Confirm" primary={true} strong={true} onClick={this._onClick.bind(this)}/>
+                    <Button label="Confirm" primary={true} onClick={this._onClick.bind(this)}/>
                   }
                   {onCancel &&
-                  <Button label="Cancel" strong={true} onClick={onCancel}/>
+                  <Button label="Cancel" onClick={onCancel}/>
                   }
                 </Footer>
               </Form>
