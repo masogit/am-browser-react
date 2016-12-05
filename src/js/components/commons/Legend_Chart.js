@@ -30,12 +30,17 @@ class LegendChart extends Component {
     this.nodes = [];
   }
 
+  componentDidMount() {
+    this.nodes.forEach(node => {
+      setTimeout(() => {
+        resizeBar(node, this.props.chartsValues[0].length);
+      }, 200);
+    });
+  }
+
   componentDidUpdate() {
     if (this.refs.chart) {
       this.refs.chart._onResize();
-      this.nodes.forEach(node => {
-        resizeBar(node, this.props.chartsValues[0].length);
-      });
     }
   }
 
