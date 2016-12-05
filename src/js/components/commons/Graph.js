@@ -48,15 +48,13 @@ const setSeriesItem = (seriesIndex, onClick, row, header, index, text) => {
 };
 
 const cloneObj = form => {
-  const { xAxis = {}, legend={},  type, size, min = 0, max = 100, important = 0 } = form;
+  const { xAxis = {}, legend={},  type, size, important = 0 } = form;
   const { position: legendPosition, direction: legendDirection = 'row' } = legend;
   const { placement: xAxisPlacement } = xAxis;
   const chart = {
     size,
     type,
     xAxisPlacement,
-    max,
-    min,
     important,
     legendPosition,
     legendDirection
@@ -70,6 +68,8 @@ const cloneObj = form => {
   assignObjectProp(form, chart, 'stacked');
   assignObjectProp(form, chart, 'vertical');
   assignObjectProp(form, chart, 'col_unit');
+  assignObjectProp(form, chart, 'min');
+  assignObjectProp(form, chart, 'max');
 
   return chart;
 };

@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import ComponentBase from '../commons/ComponentBase';
-import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Map, Icons} from 'grommet';
+import {Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Map, Icons, Title} from 'grommet';
 const {Close, LinkUp: Up, LinkDown: Down, Ascend, Descend, Play, Checkmark, Duplicate, Download,
   CaretPrevious, More, Mail} = Icons.Base;
 import {isEmpty} from 'lodash';
@@ -475,7 +475,7 @@ export default class ViewDefDetail extends ComponentBase {
       <Box flex={true}>
         {this.getLayer(layer)}
         <Header justify="between" pad={{horizontal: 'medium'}}>
-          <Box>View Builder</Box>
+          <Title>View Builder</Title>
           <Menu direction="row" align="center" responsive={true}>
             {renderAnchor({icon: <Play />, onClick: openPreview, label: 'Query', enable: table})}
             {renderAnchor({icon: <Checkmark />, onClick: this.openAlert, args: 'save', label: 'Save', enable: selectedView.name && selectedView.category})}
