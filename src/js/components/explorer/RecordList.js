@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react';
 import RecordDetail from './RecordDetail';
 import RecordTopology from './RecordTopology';
-import {Table, TableRow, Box, Anchor, Header, Menu, Icons, Layer} from 'grommet';
+import {Table, TableRow, Box, Anchor, Header, Menu, Icons, Layer, Title} from 'grommet';
 const { Close, Ascend, Descend, Checkbox, Filter, Code, BarChart, LineChart, Aggregate,
    CheckboxSelected, Cluster, Menu: MenuIcon, DocumentPdf: Pdf, DocumentCsv: Csv}= Icons.Base;
 import Status from 'grommet/components/icons/Status';
@@ -429,7 +429,7 @@ export default class RecordList extends ComponentBase {
 
     return (
       <Header justify="between" pad='none'>
-        {this.props.title && <Box margin={{right: 'small'}}>{this.props.title}</Box>}
+        {this.props.title && <Title margin={{right: 'small'}}>{this.props.title}</Title>}
         <input type="text" className={aqlInput ? 'aql flex shadow' : 'flex shadow'} ref="search"
                placeholder={placeholder} disabled={locked} onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
         <Box colorIndex={aqlInput ? 'accent-3' : 'brand'} onClick={this._toggleAQLInput.bind(this)} pad='small' className='button'>
