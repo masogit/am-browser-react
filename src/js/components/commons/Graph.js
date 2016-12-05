@@ -48,7 +48,7 @@ const setSeriesItem = (seriesIndex, onClick, row, header, index, text) => {
 };
 
 const cloneObj = form => {
-  const { xAxis = {}, legend={},  type, size, min, max, important = 0 } = form;
+  const { xAxis = {}, legend={},  type, size, important = 0 } = form;
   const { position: legendPosition, direction: legendDirection = 'row' } = legend;
   const { placement: xAxisPlacement } = xAxis;
   const chart = {
