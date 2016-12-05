@@ -318,7 +318,7 @@ const translateText = (pdfDefinition, {settings, records, fields_state, body, re
   }
 
   const promiseList = [];
-  if (links && links.length > 0) {
+  if ((links && links.length > 0) || record) {
 
     const summary = {
       stack: [

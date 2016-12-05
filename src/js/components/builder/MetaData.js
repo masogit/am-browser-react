@@ -1,10 +1,6 @@
 import React from 'react';
 import ComponentBase from '../commons/ComponentBase';
-import Anchor from 'grommet/components/Anchor';
-import Box from 'grommet/components/Box';
-import Tabs from 'grommet/components/Tabs';
-import Tab from 'grommet/components/Tab';
-import ListItem from 'grommet/components/ListItem';
+import { Anchor, Box, Tabs, Tab, ListItem, Form, FormField } from 'grommet';
 import SearchInput from '../commons/SearchInput';
 import Notes from 'grommet/components/icons/base/Notes';
 import LinkNext from 'grommet/components/icons/base/LinkNext';
@@ -350,9 +346,13 @@ class MetaData extends ComponentBase {
     };
     return (
       <Box flex={true} className='fixMinSizing fixIEScrollBar'>
-        <SearchInput value={this.state.searchText} placeHolder="Search fields and links..."
-                     onDOMChange={this._onSearch}/>
-        <Box pad={{vertical: 'small'}} className='fixMinSizing autoScroll'>
+        <Form fill={true}>
+          <FormField>
+            <SearchInput value={this.state.searchText} placeHolder="Search fields and links..."
+                      onDOMChange={this._onSearch}/>
+          </FormField>
+        </Form>
+        <Box pad={{vertical: 'small'}} className="fixMinSizing autoScroll">
           {entities.length > 0 &&
           <ReactList
             itemRenderer={renderEntityItem}
@@ -364,7 +364,7 @@ class MetaData extends ComponentBase {
           {entities.length == 0 && !rows.entities &&
             // ref='tabs' activeIndex={this.refs.tabs && this.refs.tabs.state.activeInde
             // this can be deleted, if we use grommet build which later then 8.18/2016
-          <Tabs justify="start" style={{border:"1px solid #000"}} ref='tabs' activeIndex={this.refs.tabs && this.refs.tabs.state.activeIndex}>
+          <Tabs justify="start" ref='tabs' activeIndex={this.refs.tabs && this.refs.tabs.state.activeIndex} className="amb-schema">
             <Tab title={`1-M Links (${m2mLinks.length})`}>
               <ReactList itemRenderer={(index, key) => renderLinks(index, key, m2mLinks)}
                          length={m2mLinks.length}

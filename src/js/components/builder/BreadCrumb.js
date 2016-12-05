@@ -18,7 +18,7 @@ class BreadCrumb extends Component {
     let elements = this.props.elements;
     let breadcrumbs = elements.map((element, index) => {
       if (index == 0) {
-        return (<Anchor key={index} icon={<Home />} label={`${element.label}(${element.sqlname})`}
+        return (<Anchor key={index} icon={<Home />} label={`${element.label}`}
                         onClick={this._onDetailClick.bind(this, index)}/>);
       } else if (index == elements.length - 1) {
         return <Anchor key={index} icon={<Next />} label={element.sqlname} disabled={true}/>;

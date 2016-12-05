@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react';
 import RecordDetail from './RecordDetail';
 import RecordTopology from './RecordTopology';
-import {Table, TableRow, Box, Anchor, Header, Menu, List, ListItem, Icons, Layer} from 'grommet';
+import {Table, TableRow, Box, Anchor, Header, Menu, Icons, Layer} from 'grommet';
 const { Close, Ascend, Descend, Checkbox, Filter, Code, BarChart, LineChart, Aggregate,
    CheckboxSelected, Cluster, Menu: MenuIcon, DocumentPdf: Pdf, DocumentCsv: Csv}= Icons.Base;
 import Status from 'grommet/components/icons/Status';
@@ -333,7 +333,10 @@ export default class RecordList extends ComponentBase {
     if (event) {
       event.preventDefault();
     }
-    this.setState({record: null});
+    this.setState({
+      record: null,
+      body: this.props.body
+    });
     return true;
   }
 
@@ -568,32 +571,7 @@ export default class RecordList extends ComponentBase {
     }
 
     if (this.state.param.showTopology) {
-      const body = this.state.body;
-      return (
-        <Box className='topology-background-color autoScroll' flex={false}>
-          <Box align='end' onClick={() => this.setState({record: null})} pad='small'><Close /></Box>
-          <Box justify='center' pad={{horizontal: 'small'}} flex={true}>
-            <List>
-              <ListItem><Header>{body.label}</Header></ListItem>
-              {
-                body.fields.map((field, index) => {
-                  return (
-                    <ListItem key={index} justify="between">
-                      <span>
-                        {field.label}
-                      </span>
-                      <Box pad={{horizontal: 'medium'}}/>
-                      <span className="secondary">
-                        {Format.getFieldStrVal(record, field)}
-                      </span>
-                    </ListItem>
-                  );
-                })
-              }
-            </List>
-          </Box>
-        </Box>
-      );
+      return <RecordDetail body={this.props.body} record={record} onClose={this._viewDetailClose.bind(this)} choosenRecord={this.state.body} showTopology={this.state.param.showTopology}/>;
     } else {
       return <RecordDetail body={this.props.body} record={record} onClose={this._viewDetailClose.bind(this)}/>;
     }

@@ -408,9 +408,10 @@ export default class AQL extends ComponentBase {
   }
 
   render() {
-    const header = this.state.data.header.map((col) => <th key={col.Index}>{col.Name}</th>);
+    const {data, aqls, aql: currentAql, alertLayer, graphData, layer, categories} = this.state;
+    const header = data.header.map((col, index) => <th key={index}>{col.Name}</th>);
 
-    const rows = this.state.data.rows.map((row, index) => (
+    const rows = data.rows.map((row, index) => (
       <TableRow key={index}>{
         row.map((col, i) => <td key={i}>{col}</td>)
       }</TableRow>
@@ -424,11 +425,11 @@ export default class AQL extends ComponentBase {
     };
 
     const toolbar = <Anchor icon={<Add />} onClick={this._onNew.bind(this)} label="New"/>;
-    const contents = this.state.aqls.map((aql) => ({
+    const contents = aqls.map((aql) => ({
       key: aql._id,
       groupby: aql.category,
       onClick: () => {
-        if (aql._id != this.state.aql._id) {
+        if (aql._id != currentAql._id) {
           this.dropCurrentPop(`Open ${aql.name}`, this._loadAQL.bind(this, aql));
         }
       },
@@ -436,64 +437,65 @@ export default class AQL extends ComponentBase {
       child: aql.name
     }));
 
-    const focus = this.state.aql && {expand: this.state.aql.category, selected: this.state.aql._id};
-    const validData = this.state.data.rows.length > 0 && this.state.data.header.length === this.state.data.rows[0].length;
-    const activeIndex = validData ? getIndex(this.state.aql.type) : 0;
+    const focus = currentAql && {expand: currentAql.category, selected: currentAql._id};
+    const validData = data.rows.length > 0 && data.header.length === data.rows[0].length;
+    const activeIndex = validData ? getIndex(currentAql.type) : 0;
+    const hasId = Boolean(currentAql._id);
+    const hasStr = Boolean(currentAql.str);
+    const hasName = Boolean(currentAql.name);
+    const hasCategory = Boolean(currentAql.category);
+
     return (
       <Box direction="row" flex={true}>
         <AMSideBar title='Graphs' toolbar={toolbar} contents={contents} focus={focus}/>
-        {!_.isEmpty(this.state.aql) ? <Box flex={true}>
-          {this.getAlertLayer(this.state.alertLayer)}
+        {!_.isEmpty(currentAql) ? <Box flex={true}>
+          {this.getAlertLayer(alertLayer)}
           <Header justify="between" pad={{'horizontal': 'medium'}}>
             <Box>AQL and Graph</Box>
             <input type="file" ref="upload" accept=".json" onChange={this.uploadJson.bind(this)} style={{display: 'none'}}/>
             <Menu direction="row" align="center" responsive={true}>
-              <Anchor link="#" icon={<Play />} onClick={() => this.state.aql.str && this._onQuery()} label="Query"
-                      disabled={!this.state.aql.str}/>
-              <Anchor link="#" icon={<Checkmark />}
-                      onClick={() => this.state.aql.str && this.state.aql.name && this.state.aql.category && this._onSave()}
-                      label="Save"
-                      disabled={!this.state.aql.str || !this.state.aql.name || !this.state.aql.category}/>
-              <Anchor link="#" icon={<Close />} onClick={() => this.state.aql._id && this._onDelete()} label="Delete"
-                      disabled={!this.state.aql._id}/>
+              <Anchor icon={<Play />} onClick={() => hasStr && this._onQuery()} label="Query" disabled={!hasStr}/>
+              <Anchor icon={<Checkmark />} onClick={() => hasStr && hasName && hasCategory && this._onSave()}
+                      label="Save" disabled={!hasStr || !hasName || !hasCategory}/>
+              <Anchor icon={<Close />} onClick={() => hasId && this._onDelete()} label="Delete" disabled={!hasId}/>
               <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }}>
                 {
-                  this.state.aql._id &&
-                  <Anchor icon={<Mail />} onClick={() => this.state.aql._id && this._onMail(this.state.aql)}
-                          label="Mail" disabled={!this.state.aql._id}/>
+                  hasId &&
+                  <Anchor icon={<Mail />} onClick={() => hasId && this._onMail(currentAql)}
+                          label="Mail" disabled={!hasId}/>
                 }
                 <Anchor icon={<Download />}
-                        onClick={() => this.state.aql._id && this._onDownload(this.state.aql)}
-                        label="Download" disabled={!this.state.aql._id}/>
+                        onClick={() => hasId && this._onDownload(currentAql)}
+                        label="Download" disabled={!hasId}/>
                 <Anchor icon={<Upload />}
-                        onClick={() => !this.state.aql._id && this.refs.upload.click()}
-                        label="Upload" disabled={this.state.aql._id}/>
-                <Anchor icon={<Attachment />} onClick={() => this.state.aql.str && this._selectView()}
-                        disabled={!this.state.aql.str}
-                        label={this.state.aql.view ? 'Attached view: ' + this.state.aql.view.name : 'Attach View'}/>
+                        onClick={() => !hasId && this.refs.upload.click()}
+                        label="Upload" disabled={hasId}/>
+                <Anchor icon={<Attachment />} onClick={() => hasStr && this._selectView()}
+                        disabled={!hasStr}
+                        label={currentAql.view ? 'Attached view: ' + currentAql.view.name : 'Attach View'}/>
                 <Anchor icon={<Add />} label="Widgets" onClick={this._selectReports.bind(this)}/>
               </Menu>
             </Menu>
           </Header>
-          <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'medium'}} direction='row'>
-            <Box className='fixMinSizing' flex={true}>
+          <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'small'}} direction='row'>
+            <Box className='fixMinSizing' flex={true} pad={{horizontal: 'small'}}>
               {
                 validData &&
                 <Box style={{position: 'relative'}} flex={false}>
-                  <Tabs activeIndex={activeIndex} initialIndex={activeIndex} justify='start'>
+                  <Tabs activeIndex={activeIndex} justify='start'>
                     <ActionTab title="Chart" onClick={this._genGraph.bind(this, null, 'chart')} ref='chart'>
-                      <ChartForm {...this.state.aql} {...this.state.graphData} genGraph={this._genGraph.bind(this)}
-                                                                               data={this.state.data}/>
+                      <ChartForm {...currentAql} {...graphData} genGraph={this._genGraph.bind(this)}
+                                                                               data={data}/>
                     </ActionTab>
                     <ActionTab title="Meter" onClick={this._genGraph.bind(this, null, 'meter')} ref='meter'>
-                      <MeterForm {...this.state.aql} {...this.state.graphData} genGraph={this._genGraph.bind(this)}
-                                                                               data={this.state.data}/>
+                      <MeterForm {...currentAql} {...graphData} genGraph={this._genGraph.bind(this)}
+                                                                               data={data}/>
                     </ActionTab>
                     <ActionTab title="Distribution" onClick={this._genGraph.bind(this, null, 'distribution')}
                                ref='distribution'>
-                      <DistributionForm {...this.state.aql} {...this.state.graphData}
+                      <DistributionForm {...currentAql} {...graphData}
                         genGraph={this._genGraph.bind(this)}
-                        data={this.state.data}/>
+                        data={data}/>
                     </ActionTab>
                     {
                       /*<Tab title="Value"/>
@@ -503,10 +505,10 @@ export default class AQL extends ComponentBase {
                 </Box>
               }
               <Box pad={{vertical: 'small'}}>
-                {validData && this.state.aql.form && !_.isEmpty(this.state.aql.form) && this.state.aql.type &&
+                {validData && currentAql.form && !_.isEmpty(currentAql.form) && currentAql.type &&
                 <Box flex={false} className='grid' margin={{vertical: 'small'}}>
-                  <Graph type={this.state.aql.type} data={this.state.data} config={this.state.aql.form}
-                         onClick={(filter) => this._showViewRecords(filter, this.state.aql.view)}/>
+                  <Graph type={currentAql.type} data={data} config={currentAql.form}
+                         onClick={(filter) => this._showViewRecords(filter, currentAql.view)}/>
                 </Box>}
                 <Table>
                   <thead>
@@ -517,32 +519,30 @@ export default class AQL extends ComponentBase {
                   </tbody>
                 </Table>
               </Box>
-              {this.state.layer && this.popupLayer(this.state.layer)}
+              {layer && this.popupLayer(layer)}
             </Box>
-            <Box justify="between" className='header' pad={{horizontal: 'small'}}>
-              <Form pad='none' compact={true}>
-                <FormField label="AQL Name" htmlFor="AQL_Name">
-                  <input id="AQL_Name" type="text" name="name" value={this.state.aql.name}
-                         onChange={this._setFormValues.bind(this)}/>
+            <Form fill={true}>
+              <FormField label="AQL Name" htmlFor="AQL_Name">
+                <input id="AQL_Name" type="text" name="name" value={currentAql.name}
+                       onChange={this._setFormValues.bind(this)}/>
+              </FormField>
+              <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_STR">
+                  <textarea id="AQL_STR" value={currentAql.str} rows={10} onChange={this._updateAQLStr.bind(this)}
+                            onClick={this._updateAQLStr.bind(this)}/>
+              </FormField>
+              <FormField label="Category" htmlFor="AQL_Category">
+                <SearchInput id="AQL_Category" type="text" name="category" value={currentAql.category}
+                             onDOMChange={this._setFormValues.bind(this)} suggestions={categories}
+                             onSelect={this._setCategory.bind(this)}/>
+              </FormField>
+              {
+                currentAql.view &&
+                <FormField label="Linked to" htmlFor="AQL_LinkTo">
+                  <ActionLabel label={`View: ${currentAql.view.name}`}
+                               icon={<Trash/>} onClick={this._removeView.bind(this)}/>
                 </FormField>
-                <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_STR">
-                    <textarea id="AQL_STR" value={this.state.aql.str} rows={10} onChange={this._updateAQLStr.bind(this)}
-                              onClick={this._updateAQLStr.bind(this)}/>
-                </FormField>
-                <FormField label="Category" htmlFor="AQL_Category">
-                  <SearchInput id="AQL_Category" type="text" name="category" value={this.state.aql.category}
-                               onDOMChange={this._setFormValues.bind(this)} suggestions={this.state.categories}
-                               onSelect={this._setCategory.bind(this)}/>
-                </FormField>
-                {
-                  this.state.aql.view &&
-                  <FormField label="Linked to" htmlFor="AQL_LinkTo">
-                    <ActionLabel label={`View: ${this.state.aql.view.name}`}
-                                 icon={<Trash/>} onClick={this._removeView.bind(this)}/>
-                  </FormField>
-                }
-              </Form>
-            </Box>
+              }
+            </Form>
           </Box>
         </Box>
           : <ContentPlaceHolder/>

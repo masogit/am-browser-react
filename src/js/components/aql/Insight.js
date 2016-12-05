@@ -565,7 +565,7 @@ export default class Insight extends ComponentBase {
       content = data && data[id] && this._renderSingleAQL(data[id]);
     } else {
       content = (
-        <Tabs justify='center' className='flex' activeIndex={this.state.focusIndex} initialIndex={this.state.focusIndex}>{
+        <Tabs justify='center' className='flex' activeIndex={this.state.focusIndex}>{
           showedTabs.map((tab, index) => (
             <ActionTab ref={tab.name} title={tab.name} key={tab.name} onClick={this._setFocusTab.bind(this, tab, index)}
                        onEdit={edit} onDoubleClick={this.state.edit ? this._onUpdateTitle.bind(this, tab) : null}>

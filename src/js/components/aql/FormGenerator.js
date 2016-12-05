@@ -5,11 +5,11 @@ import {
 import _ from 'lodash';
 import objectPath from 'object-path';
 
-const SelectField = ({label, name, value, onChange, options}) => {
+const SelectField = ({label, name, value, onChange, options, key}) => {
   const optionsComp = options.map(option=>
-    <option key={option.value} value={option.value}>{option.text}</option>);
+    <option key={key} value={option.value}>{option.text}</option>);
   return (
-    <FormField label={label} key={label}>
+    <FormField label={label} key={key}>
       <select name={name} value={value} onChange={onChange}>
         {optionsComp}
       </select>
@@ -186,7 +186,7 @@ export default class GraphForm extends Component {
     const basic = genOptions(basicOptions, this, this.state.type, selections);
 
     return (
-      <Box separator='bottom'>
+      <Box separator='bottom' flex={true}>
         {showBasic && basic[0]}
         <Form className='vertical-form'>
           {showBasic && basic.slice(1)}
