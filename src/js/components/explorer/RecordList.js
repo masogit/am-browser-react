@@ -428,7 +428,7 @@ export default class RecordList extends ComponentBase {
     const placeholder = aqlInput ? "input AQL where statement…" : quickSearch;
 
     return (
-      <Header justify="between" pad='none'>
+      <Header justify="between" pad='none' fixed={!this.props.root}>
         {this.props.title && <Title margin={{right: 'small'}}>{this.props.title}</Title>}
         <input type="text" className={aqlInput ? 'aql flex shadow' : 'flex shadow'} ref="search"
                placeholder={placeholder} disabled={locked} onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
