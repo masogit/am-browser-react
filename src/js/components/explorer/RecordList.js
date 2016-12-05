@@ -435,7 +435,7 @@ export default class RecordList extends ComponentBase {
         <Box colorIndex={aqlInput ? 'accent-3' : 'brand'} onClick={this._toggleAQLInput.bind(this)} pad='small' className='button'>
           <Code />
         </Box>
-        <Box direction="column" margin={{left: 'small'}}>
+        <Menu direction="column" margin={{left: 'small'}}>
           <Anchor onClick={this._getMoreRecords.bind(this)} disabled={loading}>
             <Box style={{fontSize: '70%', fontWeight: 'bold'}}>
               {(loading?'...':resultRecords.length) + '/' + numTotal}
@@ -444,7 +444,7 @@ export default class RecordList extends ComponentBase {
           <Box style={{fontSize: '60%'}} align="end">
             {`${timeQuery}ms`}
           </Box>
-        </Box>
+        </Menu>
         <Menu icon={<Filter />} flex={false}>
           {this.renderGroupBy()}
         </Menu>
