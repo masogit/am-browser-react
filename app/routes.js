@@ -152,6 +152,15 @@ module.exports = function (app) {
       export_file.list(req, res);
   });
 
+  //check AQL syntax
+  app.use('/am/checkAqlSyntax', function(req, res) {
+    rest.checkAqlSyntax(req.session, req.query.str).then((data) => {
+      res.send(true);
+    }).catch((err) => {
+      res.send(err.message);
+    });
+  });
+
   // Proxy the backend rest service /rs/db -> /am/db
   app.use('/am/db', function (req, res) {
     // TODO: need to take care of https
