@@ -7,6 +7,7 @@ import Close from 'grommet/components/icons/base/Close';
 import Pdf from 'grommet/components/icons/base/DocumentPdf';
 import * as Format from '../../util/RecordFormat';
 import PDFTemplate from '../reports/reports';
+import {cloneDeep} from 'lodash';
 
 export default class RecordDetail extends Component {
 
@@ -26,13 +27,12 @@ export default class RecordDetail extends Component {
 
     if (this.props.body.links)
       this.props.body.links.forEach((bodyLink) => {
-        let link = Object.assign({}, bodyLink);
-        var body = this._getLinkBody(link, this.props.record);
-        if (body.filter) {
-          ExplorerActions.getCount(body).then(records => {
+        const link = cloneDeep(bodyLink);
+        link.body.filter = ExplorerActions.getLinkFilter(link, this.props.record);
+        if (link.body.filter) {
+          ExplorerActions.getCount(link.body).then(records => {
             link.count = records.count;
-            link.body = body;
-            var links = this.state.links;
+            const links = this.state.links;
             links.push(link);
             this.setState({
               links: links
@@ -56,28 +56,11 @@ export default class RecordDetail extends Component {
     if (body.links) {
       let bodyClone = _.cloneDeep(body);
       bodyClone.links.forEach((link) => {
-        link.body = this._getLinkBody(link, record);
+        link.body.filter = ExplorerActions.getLinkFilter(link, record);
       });
       return bodyClone.links;
     }
     return [];
-  }
-
-
-  _getLinkBody(link, record) {
-    var body = Object.assign({}, link.body);
-
-    let AQL = "";
-    if (link.src_field) {
-      var relative_path = link.src_field.relative_path;
-      var src_field = relative_path ? relative_path + '.' + link.src_field.sqlname : link.src_field.sqlname;
-      if (record[src_field]) {
-        AQL = `${link.dest_field.sqlname}=${record[src_field]}`;
-      }
-    }
-
-    body.filter = body.filter ? `(${body.filter}) AND ${AQL}` : AQL;
-    return body;
   }
 
   _getUCMDBURL(fields) {

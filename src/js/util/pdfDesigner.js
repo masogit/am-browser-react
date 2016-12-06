@@ -2,7 +2,7 @@
  * Created by huling on 11/10/2016.
  */
 import { getDisplayLabel, getFieldStrVal } from './RecordFormat';
-import { loadRecordsByBody } from '../actions/explorer';
+import { loadRecordsByBody, getQueryByBody, getLinkFilter } from '../actions/explorer';
 import {GLOBAL_VARIABLES} from '../constants/PDFDesigner';
 
 const genTable = ({title, records, fields, style = {layout: 'headerLineOnly', header: 'tableHeader', text: 'text', tableTitle: {style: 'tableTitle'}}}) => {
@@ -73,6 +73,9 @@ const getLinkData = (link, pdf_link = [], style = {tableHeader: 'tableHeader', c
         pdf_ol.push(summary);
 
         links.forEach((sub_link) => {
+          if (!sub_link.body.filter) {
+            sub_link.body.filter = getLinkFilter(sub_link, record);
+          }
           sub_link.body.param = link.body.param;
           promises.push(getLinkData(sub_link, summary.stack, style));
         });

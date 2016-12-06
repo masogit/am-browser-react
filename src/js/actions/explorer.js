@@ -150,3 +150,15 @@ export const setMessage = (messages, view, time, num) => {
   }
 };
 
+export function getLinkFilter(link, record) {
+  let AQL = "";
+  if (link.src_field) {
+    var relative_path = link.src_field.relative_path;
+    var src_field = relative_path ? relative_path + '.' + link.src_field.sqlname : link.src_field.sqlname;
+    if (record[src_field]) {
+      AQL = `${link.dest_field.sqlname}=${record[src_field]}`;
+    }
+  }
+
+  return link.body.filter ? `(${link.body.filter}) AND ${AQL}` : AQL;
+}
