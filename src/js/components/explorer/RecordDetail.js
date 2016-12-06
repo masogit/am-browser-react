@@ -159,7 +159,7 @@ export default class RecordDetail extends Component {
         <Box justify='center' pad={{horizontal: 'small'}} flex={false}>
           <List>
             <ListItem>
-              <Header justify='end'>
+              <Header justify='end' size='small'>
                 <Anchor icon={<Pdf />} label="Download PDF" onClick={this.showPDFDesigner}/>
               </Header>
             </ListItem>
@@ -168,7 +168,7 @@ export default class RecordDetail extends Component {
                 return (
                   <ListItem key={index} justify="between">
                     <span>
-                      {field.label}
+                      {Format.getDisplayLabel(field)}
                     </span>
                     <Box pad={{horizontal: 'medium'}} />
                     <span className="secondary">
