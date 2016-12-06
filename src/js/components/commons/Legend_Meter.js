@@ -28,7 +28,7 @@ class LegendMeter extends Component {
     const valueObj = meterSeries[activeIndex] || {};
 
     const value = valueObj.value;
-    const label = valueObj.label;
+    const label = valueObj.label || <Box pad='small'/>;
     const onClick = valueObj.onClick;
 
     return (
