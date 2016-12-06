@@ -435,7 +435,8 @@ export default class ViewDefDetail extends ComponentBase {
   }
 
   render() {
-    const {selectedView, openPreview, categories, onSubmit} = this.props;
+    const {selectedView, openPreview, onSubmit} = this.props;
+    const categories = this.props.categories ? this.props.categories.sort() : [];
 
     if (isEmpty(selectedView)) {
       toggleSidebar(true);
