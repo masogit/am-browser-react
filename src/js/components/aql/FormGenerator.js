@@ -5,11 +5,11 @@ import {
 import _ from 'lodash';
 import objectPath from 'object-path';
 
-const SelectField = ({label, name, value, onChange, options, key}) => {
-  const optionsComp = options.map(option=>
-    <option key={key} value={option.value}>{option.text}</option>);
+const SelectField = ({label, name, value, onChange, options}) => {
+  const optionsComp = options.map((option, index)=>
+    <option key={index} value={option.value}>{option.text}</option>);
   return (
-    <FormField label={label} key={key}>
+    <FormField label={label} key={name}>
       <select name={name} value={value} onChange={onChange}>
         {optionsComp}
       </select>
@@ -71,7 +71,7 @@ const NumberField = ({label, name, value, onChange}) => (
 // -- value
 // if ignored it will be this.state.distribute.name
 const genOptions = (optionsArray, form, fromType, selections) => {
-  return optionsArray.map(({label, name, value, options, type}) => {
+  return optionsArray.map(({label, name, value, options, type}, index) => {
     if (_.includes(name, '.')) {
       const [name1, name2] = name.split('.');
       label = label || (name1.charAt(0).toUpperCase() + name1.slice(1) + ' ' + name2);
@@ -85,7 +85,7 @@ const genOptions = (optionsArray, form, fromType, selections) => {
 
     if (type === 'SelectField') {
       return (
-        <SelectField key={name} label={label} name={name} value={value} options={options}
+        <SelectField key={index} label={label} name={name} value={value} options={options}
                      onChange={form._setFormValues.bind(form)}/>
       );
     } else if (type === 'InputField') {

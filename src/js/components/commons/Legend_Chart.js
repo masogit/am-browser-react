@@ -140,7 +140,6 @@ class LegendChart extends Component {
       type,
       size,
       xAxisPlacement,
-      legendPosition,
       legendSeries = [],
       legendDirection,
       legendTitles,
@@ -155,6 +154,12 @@ class LegendChart extends Component {
       threshold,
       important
       } = this.props;
+
+    // handle history data
+    let legendPosition = this.props.legendPosition;
+    if (legendPosition == 'overlay' || legendPosition == 'after') {
+      legendPosition = 'right';
+    }
 
     /* Note: Segmented property is dropped.......*/
     let topPanel = null;
@@ -239,7 +244,7 @@ LegendChart.propTypes = {
   className: PropTypes.string,
   points: PropTypes.bool,
   legendSeries: PropTypes.arrayOf(SeriesPropType),
-  legendPosition: PropTypes.oneOf(['top', 'bottom', 'left', 'right', '']),
+  legendPosition: PropTypes.oneOf(['top', 'bottom', 'left', 'right', '', 'overlay', 'after']),
   markerColorIndex: PropTypes.string,
   max: PropTypes.number,
   min: PropTypes.number,
