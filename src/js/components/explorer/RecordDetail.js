@@ -117,37 +117,39 @@ export default class RecordDetail extends Component {
       <Layer closer={true} align="right" onClose={this.props.onClose}>
         <Tabs justify="start" activeIndex={0}>
           <ActionTab title={this.props.body.label}>
-            <Header justify="end">
-              <Anchor icon={<Pdf />} label="Download PDF" onClick={this.showPDFDesigner}/>
-            </Header>
-            <Table>
-              <thead>
-              <tr>
-                <th>Field</th>
-                <th>Value</th>
-              </tr>
-              </thead>
-              <tbody>
-              {
-                this.props.body.fields.map((field, index) => {
-                  return (
-                    <TableRow key={index}>
-                      <td>{Format.getDisplayLabel(field)}</td>
-                      <td>
-                        {Format.getFieldStrVal(this.props.record, field)}
-                        {
-                          field.sqlname.indexOf('GlobalId') > -1 && this.props.record[field.sqlname] &&
-                          <Anchor href={`${this.state.ucmdb}${this.props.record[field.sqlname]}`}
-                                  target="_blank"
-                                  label={`Open UCMDB Browser`} primary={true}/>
-                        }
-                      </td>
-                    </TableRow>
-                  );
-                })
-              }
-              </tbody>
-            </Table>
+            <Box flex={true}>
+              <Header justify="end">
+                <Anchor icon={<Pdf />} label="Download PDF" onClick={this.showPDFDesigner}/>
+              </Header>
+              <Table>
+                <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                {
+                  this.props.body.fields.map((field, index) => {
+                    return (
+                      <TableRow key={index}>
+                        <td>{Format.getDisplayLabel(field)}</td>
+                        <td>
+                          {Format.getFieldStrVal(this.props.record, field)}
+                          {
+                            field.sqlname.indexOf('GlobalId') > -1 && this.props.record[field.sqlname] &&
+                            <Anchor href={`${this.state.ucmdb}${this.props.record[field.sqlname]}`}
+                                    target="_blank"
+                                    label={`Open UCMDB Browser`} primary={true}/>
+                          }
+                        </td>
+                      </TableRow>
+                    );
+                  })
+                }
+                </tbody>
+              </Table>
+            </Box>
           </ActionTab>
           {
             this.state.links.map((link, index) => {
