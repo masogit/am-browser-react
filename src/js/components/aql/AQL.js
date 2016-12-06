@@ -119,8 +119,13 @@ export default class AQL extends ComponentBase {
     }));
   }
 
-  _onQuery() {
-    this.addPromise(AQLActions.queryAQL(this.state.aql.str).then((data) => {
+  _onQuery(needCheck) {
+    let queryFunc = AQLActions.queryAQL;
+    if (needCheck) {
+      queryFunc = AQLActions.queryAQLWithCheck;
+    }
+
+    this.addPromise(queryFunc(this.state.aql.str).then((data) => {
       if (data) {
         if (data.rows.length == 0) {
           showInfo('No records found for this AQL');
@@ -371,7 +376,7 @@ export default class AQL extends ComponentBase {
                   onConfirm={event => {
                     this._setFormValues(event);
                     this._onClose();
-                    this._onQuery();
+                    this._onQuery(true);
                   }} />
       );
     }
@@ -454,7 +459,7 @@ export default class AQL extends ComponentBase {
             <Box>AQL and Graph</Box>
             <input type="file" ref="upload" accept=".json" onChange={this.uploadJson.bind(this)} style={{display: 'none'}}/>
             <Menu direction="row" align="center" responsive={true}>
-              <Anchor icon={<Play />} onClick={() => hasStr && this._onQuery()} label="Query" disabled={!hasStr}/>
+              <Anchor icon={<Play />} onClick={() => hasStr && this._onQuery(true)} label="Query" disabled={!hasStr}/>
               <Anchor icon={<Checkmark />} onClick={() => hasStr && hasName && hasCategory && this._onSave()}
                       label="Save" disabled={!hasStr || !hasName || !hasCategory}/>
               <Anchor icon={<Close />} onClick={() => hasId && this._onDelete()} label="Delete" disabled={!hasId}/>

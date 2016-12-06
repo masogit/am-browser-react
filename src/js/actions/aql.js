@@ -98,7 +98,7 @@ function checkAqlSyntax(str) {
   });
 }
 
-function _queryAQL(str) {
+export function queryAQL(str) {
   if (!str) {
     return dummy_promise;
   }
@@ -119,8 +119,8 @@ function _queryAQL(str) {
   });
 }
 
-export function queryAQL(str) {
-  return checkAqlSyntax(str).then(_queryAQL);
+export function queryAQLWithCheck(str) {
+  return checkAqlSyntax(str).then(queryAQL);
 }
 
 function simpleAQLResult(result) {
@@ -159,12 +159,5 @@ function simpleAQLResult(result) {
     }
   }
 
-  // random pick
-  if (data.rows[0] && data.header.length !== data.rows[0].length) {
-    store.dispatch({
-      type: Types.RECEIVE_WARNING,
-      msg: 'AQL str is invalid: query columns is inconsistent with return columns.'
-    });
-  }
   return data;
 }
