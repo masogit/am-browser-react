@@ -59,6 +59,13 @@ const init = (props) => {
 
 };
 
+const posOrderby = (orderby = '', field = '') => {
+  let fields = orderby.split(',');
+  let seq = fields.indexOf(field + ' desc') > -1 ? fields.indexOf(field + ' desc') : fields.indexOf(field);
+  if (orderby &&  seq> -1)
+    return seq + 1;
+};
+
 export default class RecordList extends ComponentBase {
   componentWillMount() {
     this.state = init(this.props);
@@ -179,28 +186,25 @@ export default class RecordList extends ComponentBase {
     }, this._getRecords);
   }
 
-  _showOrderByIcon(sqlname, orderby = '') {
-    let fields = orderby.split(',');
+  _showOrderByIcon(sqlname, orderByParam = '') {
+    let fields = orderByParam.split(',');
     let index = fields.indexOf(sqlname + ' desc') > -1 ? fields.indexOf(sqlname + ' desc') : fields.indexOf(sqlname);
+
     if (index > -1) {
-      let orderby = fields[index].split(' ');
-
-      if (orderby[0] == sqlname) {
-        if (orderby[1] == 'desc') {
-          return <Descend />;
+      const orderBy = fields[index].split(' ');
+      const icon = [];
+      if (orderBy[0] == sqlname) {
+        if (orderBy[1] == 'desc') {
+          icon.push(<Descend key='rl_icon'/>);
         } else {
-          return <Ascend />;
+          icon.push(<Ascend key='rl_icon'/>);
         }
+        icon.push(<div className='icon-side-sequence' key='rl_index'>{posOrderby(orderByParam, sqlname)}</div>);
+        return <Box direction='row' align='center'>{icon}</Box>;
       }
-    }else
+    } else {
       return <EmptyIcon className='icon-empty3'/>;
-  }
-
-  _posOrderby(orderby = '', field = '') {
-    let fields = orderby.split(',');
-    let seq = fields.indexOf(field + ' desc') > -1 ? fields.indexOf(field + ' desc') : fields.indexOf(field);
-    if (orderby &&  seq> -1)
-      return seq + 1;
+    }
   }
 
   _viewDetailShow(record) {
@@ -398,8 +402,9 @@ export default class RecordList extends ComponentBase {
       let isPrimary = field.searchable;
       return (
         <Box direction="row" align="center" key={`icon_${index}`}>
-          <Box direction="row" className='orderbyIcon-margin-left' >{!_.isEmpty(this.props.body.orderby) && this._showOrderByIcon(field.sqlname, this.props.body.orderby)}
-          <div className='icon-side-sequence'>{this._posOrderby(this.props.body.orderby, field.sqlname)}</div></Box>
+          <Box direction="row" className='orderbyIcon-margin-left' >
+            {!_.isEmpty(this.props.body.orderby) && this._showOrderByIcon(field.sqlname, this.props.body.orderby)}
+          </Box>
           <Anchor key={`a_groupby_${index}`} icon={selected?<CheckboxSelected />:<Checkbox />}
                   label={label} primary={isPrimary} disabled={this.state.locked}
                   onClick={() => {
@@ -445,7 +450,7 @@ export default class RecordList extends ComponentBase {
             {`${timeQuery}ms`}
           </Box>
         </Menu>
-        <Menu icon={<Filter />} flex={false}>
+        <Menu icon={<Filter />}>
           {this.renderGroupBy()}
         </Menu>
         <Anchor icon={<Cluster colorIndex={showTopology?'brand': ''}/>}
@@ -517,13 +522,10 @@ export default class RecordList extends ComponentBase {
         return this.getDisplayFields().map((field, index) => (
           <th key={index} className={this.state.locked ? 'disabled' : ''}>
             <Box direction='row'>
-              <h4>
-                <Anchor reverse={true}
-                        label={Format.getDisplayLabel(field)} key={`fieldsheader_${index}`}
-                        onClick={this._orderBy.bind(this, field.sqlname)}/>
-              </h4>
+              <Box onClick={this._orderBy.bind(this, field.sqlname)}>
+                {Format.getDisplayLabel(field)}
+              </Box>
               {this._showOrderByIcon(field.sqlname, this.state.param.orderby)}
-              <div className='icon-side-sequence'>{this._posOrderby(this.state.param.orderby, field.sqlname)}</div>
             </Box>
           </th>
         ));
