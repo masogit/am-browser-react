@@ -239,7 +239,7 @@ LegendChart.propTypes = {
   className: PropTypes.string,
   points: PropTypes.bool,
   legendSeries: PropTypes.arrayOf(SeriesPropType),
-  legendPosition: PropTypes.oneOf(['top', 'bottom', 'left', 'right']),
+  legendPosition: PropTypes.oneOf(['top', 'bottom', 'left', 'right', '']),
   markerColorIndex: PropTypes.string,
   max: PropTypes.number,
   min: PropTypes.number,
@@ -249,7 +249,7 @@ LegendChart.propTypes = {
   type: PropTypes.oneOf(['bar', 'line', 'area']),
   units: PropTypes.string,
   xAxisLabels: PropTypes.arrayOf(PropTypes.shape({
-    label: PropTypes.string.isRequired,
+    label: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     index: PropTypes.number.isRequired
   })),
   xAxisPlacement: PropTypes.oneOf(['top', 'bottom', ''])
