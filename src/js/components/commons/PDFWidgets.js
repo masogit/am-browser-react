@@ -321,7 +321,7 @@ class ExportComponent extends Component {
               size='small'>{`You will export records `}<strong>{`${recordsStart} ~ ${getRecordNumber(this.state) + recordsStart}`}</strong></Paragraph>
           </Box>}
           <Footer justify='end' pad={{vertical: 'medium'}}>
-            <Button label={records.getExportLabel(this.state)} primary={true} strong={true}
+            <Button label={records.getExportLabel(this.state)} primary={true}
                     onClick={() => onClick({recordsStart: recordsStart - 1, limit})}/>
           </Footer>
         </Box>
