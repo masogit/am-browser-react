@@ -419,15 +419,17 @@ export default class RecordList extends ComponentBase {
   }
 
   renderToolBox() {
-    const {filtered, searchFields, records, locked, loading, numTotal, timeQuery, numColumn, param: {aqlInput, allFields, showTopology}} = this.state;
+    const {editMode, body, title, root} = this.props;
+    const {filtered, searchFields, records, locked, loading, numTotal, timeQuery, numColumn,
+      param: {aqlInput, allFields, showTopology}, graphData} = this.state;
     const resultRecords = filtered ? filtered : records;
     const aqlWhere = "press / input AQL where statement";
     const quickSearch = searchFields ? `press Enter to quick search in ${searchFields}; ${aqlWhere}` : aqlWhere;
     const placeholder = aqlInput ? "input AQL where statement…" : quickSearch;
 
     return (
-      <Header justify="between" pad='none' fixed={!this.props.root}>
-        {this.props.title && <Title margin={{right: 'small'}}>{this.props.title}</Title>}
+      <Header justify="between" pad='none' fixed={!root}>
+        {title && <Title margin={{right: 'small'}}>{title}</Title>}
         <input type="text" className={aqlInput ? 'aql flex shadow' : 'flex shadow'} ref="search"
                placeholder={placeholder} disabled={locked} onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
         <Box colorIndex={aqlInput ? 'accent-3' : 'brand'} onClick={this._toggleAQLInput.bind(this)} pad='small' className='button'>
@@ -450,11 +452,11 @@ export default class RecordList extends ComponentBase {
                 onClick={this._toggleShowTopology.bind(this)}/>
         <Menu icon={<MenuIcon />} dropAlign={{ right: 'right', top: 'top' }}>
           {!showTopology && <Anchor icon={allFields?<CheckboxSelected />:<Checkbox />} label="Full columns"
-                  onClick={() => (this.props.body.fields.length > numColumn) && this._toggleAllFields()}
-                  disabled={this.props.body.fields.length <= numColumn}/>}
+                  onClick={() => (body.fields.length > numColumn) && this._toggleAllFields()}
+                  disabled={body.fields.length <= numColumn}/>}
           <Anchor icon={<Csv />} label="Download CSV"
-                  disabled={numTotal < 1}
-                  onClick={() => (numTotal > 0) && this._download('csv')}/>
+                  disabled={numTotal < 1 || editMode}
+                  onClick={() => (numTotal > 0) && !editMode && this._download('csv')}/>
           <Anchor icon={<Pdf />} label="Download PDF"
                   disabled={numTotal < 1}
                   onClick={() => (numTotal > 0) && this.printPdf('template')}/>
@@ -464,10 +466,10 @@ export default class RecordList extends ComponentBase {
         </Menu>
         <form name="Download" ref="downloadForm" method="post">
           <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
-          <input type="hidden" name="param" value={JSON.stringify(ExplorerActions.getQueryByBody(Object.assign({}, this.props.body, {param: this.state.param})))}/>
-          <input type="hidden" name="fields" value={JSON.stringify(this.props.body.fields)}/>
-          <input type="hidden" name="graphData" value={JSON.stringify(this.state.graphData)} />
-          <input type="hidden" name="label" value={this.props.title || this.props.body.label} />
+          <input type="hidden" name="param" value={JSON.stringify(ExplorerActions.getQueryByBody(Object.assign({}, body, {param: this.state.param})))}/>
+          <input type="hidden" name="fields" value={JSON.stringify(body.fields)}/>
+          <input type="hidden" name="graphData" value={JSON.stringify(graphData)} />
+          <input type="hidden" name="label" value={title || body.label} />
         </form>
       </Header>
     );

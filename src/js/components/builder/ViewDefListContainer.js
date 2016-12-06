@@ -142,7 +142,10 @@ class ViewDefListContainer extends Component {
                        onClickTableTitle={this._onClickTableTitle}
                        {...boundActionCreators}/>
         {preview && selectedView && selectedView.body &&
-        <RecordListLayer onClose={boundActionCreators.closePreview.bind(this)} body={selectedView.body} title={selectedView.name}/>}
+        <RecordListLayer onClose={boundActionCreators.closePreview.bind(this)}
+                         body={selectedView.body}
+                         title={selectedView.name}
+                         editMode={!_.isEqual(selectedView, this.originView)}/>}
       </Box>
     );
   }
