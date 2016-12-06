@@ -212,7 +212,7 @@ function AMREST() {
     logger.info(`[user] [${req.sessionID || '-'}]`, (req.session && req.session.user ? req.session.user : "user") + " logout.");
     const username = req.session.user;
     sessionUtil.userTracking.remove(req.session.id);
-    req.session.regenerate((err)=> {});
+    req.session.destroy(err => {});
     res.clearCookie('headerNavs');
     res.json({});
     if (username) {
@@ -273,7 +273,7 @@ function AMREST() {
       }).on('error', function (err) {
         reject(err);
       });
-    })
+    });
   };
 
   this.slack = slack;
@@ -281,11 +281,11 @@ function AMREST() {
   this.getOnlineUser = function(req, res) {
     res.json(sessionUtil.userTracking.get());
   };
-};
+}
 
 module.exports = {
   rest: new AMREST()
-}
+};
 
 var slackProcess;
 if (config.slack_url) {
