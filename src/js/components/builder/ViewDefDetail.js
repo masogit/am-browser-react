@@ -12,9 +12,10 @@ import {saveAs} from 'file-saver';
 import SearchInput from '../commons/SearchInput';
 import {bodyToMapData} from '../../util/util';
 import PDFDesigner from './../reports/PDFDesigner';
-import {toggleSidebar} from '../../actions/system';
+import {toggleSidebar, showWarning} from '../../actions/system';
 import {posOrderby} from '../../actions/explorer';
 import {UploadWidget} from '../commons/Widgets';
+import {isEqual} from 'lodash';
 
 const _onMail = (view) => {
   if (view._id) {
@@ -29,10 +30,12 @@ const _onMail = (view) => {
   }
 };
 
-const _onDownload = (view) => {
-  if (view._id) {
+const _onDownload = (view, originView) => {
+  if (view._id && isEqual(view, originView)) {
     let blob = new Blob([JSON.stringify(view)], {type: "data:application/json;charset=utf-8"});
     saveAs(blob, (view.name || view.body.sqlname || 'view') + ".json");
+  } else {
+    showWarning('You have unsaved data, please save it before download.');
   }
 };
 
@@ -429,7 +432,7 @@ export default class ViewDefDetail extends ComponentBase {
   }
 
   render() {
-    const {selectedView, openPreview, categories, onSubmit} = this.props;
+    const {selectedView, openPreview, categories, onSubmit, originView} = this.props;
 
     if (isEmpty(selectedView)) {
       toggleSidebar(true);
@@ -477,7 +480,7 @@ export default class ViewDefDetail extends ComponentBase {
             <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }} closeOnClick={false} ref={node => this.menu = node}>
               {renderAnchor({icon: <Duplicate />, onClick: this.openAlert, args: 'duplicate', label: 'Duplicate', enable: selectedView._id})}
               {selectedView._id && renderAnchor({icon: <Mail />, onClick: _onMail, args: selectedView, label: 'Mail', enable: selectedView._id})}
-              {renderAnchor({icon: <Download />, onClick: _onDownload,args: selectedView , label: 'Download', enable: selectedView._id})}
+              {renderAnchor({icon: <Download />, onClick: () => _onDownload(selectedView, originView),args: selectedView , label: 'Download', enable: selectedView._id})}
               <UploadWidget enable={!selectedView._id} accept=".json" onChange={this.uploadJson.bind(this)}/>
             </Menu>
           </Menu>

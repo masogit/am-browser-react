@@ -45,6 +45,8 @@ class ViewDefListContainer extends Component {
         let selectedView = views.filter(view => view._id == nextId)[0];
 
         SystemActions.monitorEdit(selectedView, 'views.selectedView');
+        //this.selectedView_origin = _.cloneDeep(selectedView);
+        this.originView = selectedView;
         this.props.actions.setSelectedView(nextId, selectedView);
       }
 
@@ -72,8 +74,9 @@ class ViewDefListContainer extends Component {
   }
 
   _onSaveSuccess() {
-    let {selectedViewId} = this.props;
+    let {selectedViewId, selectedView} = this.props;
     if (selectedViewId) {
+      this.originView = selectedView;
       //history.push("/views/" + selectedViewId);
       this.props.actions.loadViews(selectedViewId, this.props.location.pathname).then((res) => {
         history.push("/views/" + selectedViewId);
@@ -123,10 +126,11 @@ class ViewDefListContainer extends Component {
     let boundActionCreators2 = bindActionCreators(SystemActions, dispatch);
     return (
       <Box direction="row" flex={true}>
-        <ViewDefList views={views} isFetchingViewList={isFetchingViewList} ref='viewDefList'
+        <ViewDefList views={views} isFetchingViewList={isFetchingViewList} ref='viewDefList' originView={this.originView}
                      selectedView={selectedView} {...boundActionCreators} {...boundActionCreators2}/>
 
         <ViewDefDetail selectedView={selectedView} categories={this.categories} compact={true}
+                       originView={this.originView}
                        onValueChange={this._onValueChange}
                        onSubmit={this._onSubmit}
                        onSaveSuccess={this._onSaveSuccess}
