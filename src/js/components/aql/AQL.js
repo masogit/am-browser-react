@@ -526,7 +526,7 @@ export default class AQL extends ComponentBase {
               </Box>
               {layer && this.popupLayer(layer)}
             </Box>
-            <Form fill={true}>
+            <Form compact={true}>
               <FormField label="AQL Name" htmlFor="AQL_Name">
                 <input id="AQL_Name" type="text" name="name" value={currentAql.name}
                        onChange={this._setFormValues.bind(this)}/>

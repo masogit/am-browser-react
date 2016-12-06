@@ -497,7 +497,7 @@ export default class ViewDefDetail extends ComponentBase {
               <Box className="autoScroll">{table}</Box>
             </Box>
             <Box pad={{horizontal: 'small', vertical: 'none'}}>
-              <Form onSubmit={onSubmit} fill={true}>
+              <Form onSubmit={onSubmit} compact={true}>
                 <FormField label="Name">
                   <input id="v.name" name="v.name" type="text" onChange={this._onChange}
                          value={selectedView.name}/>
