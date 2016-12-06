@@ -87,7 +87,7 @@ class AMSideBar extends Component {
 
     return (
       <Sidebar fixed={true} full={false} style={{minHeight: '100%'}} colorIndex={colorIndex || 'light-1'} pad={pad} margin={margin}>
-        <Box style={{overflow: 'visible'}} className='fixMinSizing'>
+        <Box style={{overflow: 'visible'}} className='fixMinSizing' flex={true}>
           <Header justify="between" pad='small'>
             {toggle == false ? this.state.title
               : (<Anchor icon={<ChapterPrevious/>} onClick={toggleSidebar} label={this.state.title}
