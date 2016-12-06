@@ -59,13 +59,6 @@ const init = (props) => {
 
 };
 
-const posOrderby = (orderby = '', field = '') => {
-  let fields = orderby.split(',');
-  let seq = fields.indexOf(field + ' desc') > -1 ? fields.indexOf(field + ' desc') : fields.indexOf(field);
-  if (orderby &&  seq> -1)
-    return seq + 1;
-};
-
 export default class RecordList extends ComponentBase {
   componentWillMount() {
     this.state = init(this.props);
@@ -199,7 +192,7 @@ export default class RecordList extends ComponentBase {
         } else {
           icon.push(<Ascend key='rl_icon'/>);
         }
-        icon.push(<div className='icon-side-sequence' key='rl_index'>{posOrderby(orderByParam, sqlname)}</div>);
+        icon.push(<div className='icon-side-sequence' key='rl_index'>{ExplorerActions.posOrderby(orderByParam, sqlname)}</div>);
         return <Box direction='row' align='center'>{icon}</Box>;
       }
     } else {

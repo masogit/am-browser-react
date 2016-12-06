@@ -13,6 +13,7 @@ import SearchInput from '../commons/SearchInput';
 import {bodyToMapData} from '../../util/util';
 import PDFDesigner from './../reports/PDFDesigner';
 import {toggleSidebar} from '../../actions/system';
+import {posOrderby} from '../../actions/explorer';
 import {UploadWidget} from '../commons/Widgets';
 
 const _onMail = (view) => {
@@ -104,13 +105,6 @@ export default class ViewDefDetail extends ComponentBase {
 
   _setCategory(event) {
     this.props.onValueChange(event.target.name.substring(2), event.suggestion);
-  }
-
-  _posOrderBy(orderby, field) {
-    let fields = orderby ? orderby.split(',') : [];
-    let seq = fields.indexOf(field + ' desc') > -1 ? fields.indexOf(field + ' desc') : fields.indexOf(field);
-    if (orderby &&  seq> -1)
-      return seq + 1;
   }
 
   _onTripleStateChange(event, value, orderby) {
@@ -302,7 +296,7 @@ export default class ViewDefDetail extends ComponentBase {
               <Descend size="small"/>
             </a>
             }
-            {this._posOrderBy(selfView.body.orderby, field.sqlname)}
+            {posOrderby(selfView.body.orderby, field.sqlname)}
           </td>
           <td>
             <a id={`${currentPath}body.fields.${index}.del`} name={`${currentPath}body.fields.${index}`}

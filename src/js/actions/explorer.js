@@ -162,3 +162,10 @@ export function getLinkFilter(link, record) {
 
   return link.body.filter ? `(${link.body.filter}) AND ${AQL}` : AQL;
 }
+
+export function posOrderby(orderby = '', field = '') {
+  let fields = orderby.split(',');
+  let seq = fields.indexOf(field + ' desc') > -1 ? fields.indexOf(field + ' desc') : fields.indexOf(field);
+  if (orderby &&  seq> -1)
+    return seq + 1;
+}
