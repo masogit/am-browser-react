@@ -43,9 +43,9 @@ export default class NavHeader extends Component {
 
 
     const builderDefaultLinks = [
-      {to: '/report', text: 'Template', icon: 'DocumentPdf'},
       {to: '/views', text: 'View', icon: 'Resources'},
-      {to: '/aql', text: 'Graph', icon: 'LineChart'}
+      {to: '/aql', text: 'Graph', icon: 'LineChart'},
+      {to: '/report', text: 'Template', icon: 'DocumentPdf'}
     ];
 
     const links = [];
