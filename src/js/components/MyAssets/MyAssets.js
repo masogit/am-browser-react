@@ -132,7 +132,7 @@ export default class MyAsset extends ComponentBase {
         </Box>
         <Box full='horizontal' pad={{horizontal: 'small'}} justify='center'>
           {
-            recordBody ? <RecordList body={recordBody} noCache={true} showTopology={true}/>
+            recordBody ? <RecordList body={recordBody} showTopology={true}/>
               : <Tiles flush={false} className='justify-around' colorIndex='light-1'>{summary}</Tiles>
           }
         </Box>
