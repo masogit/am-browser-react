@@ -419,7 +419,7 @@ export default class RecordList extends ComponentBase {
   }
 
   renderToolBox() {
-    const {editMode, body, title, root} = this.props;
+    const {editMode, body, title} = this.props;
     const {filtered, searchFields, records, locked, loading, numTotal, timeQuery, numColumn,
       param: {aqlInput, allFields, showTopology}, graphData} = this.state;
     const resultRecords = filtered ? filtered : records;

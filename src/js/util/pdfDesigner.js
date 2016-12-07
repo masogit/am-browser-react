@@ -2,7 +2,7 @@
  * Created by huling on 11/10/2016.
  */
 import { getDisplayLabel, getFieldStrVal } from './RecordFormat';
-import { loadRecordsByBody, getQueryByBody, getLinkFilter } from '../actions/explorer';
+import { loadRecordsByBody, getLinkFilter } from '../actions/explorer';
 import {GLOBAL_VARIABLES} from '../constants/PDFDesigner';
 
 const genTable = ({title, records, fields, style = {layout: 'headerLineOnly', header: 'tableHeader', text: 'text', tableTitle: {style: 'tableTitle'}}}) => {
