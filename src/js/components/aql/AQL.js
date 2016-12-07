@@ -20,6 +20,19 @@ import ActionLabel from '../commons/ActionLabel';
 import EditLayer from '../../components/commons/EditLayer';
 import ContentPlaceHolder from '../../components/commons/ContentPlaceHolder';
 
+const ALERT_TYPE = {
+  REMOVE: 'remove',
+  DELETE: 'delete',
+  SAVE: 'save'
+};
+
+const LAYER_TYPE = {
+  AQL_STR: 'aql_str',
+  VIEW: 'view',
+  REPORTS: 'reports',
+  RECORDS: 'records'
+};
+
 export default class AQL extends ComponentBase {
   constructor() {
     super();
@@ -34,7 +47,9 @@ export default class AQL extends ComponentBase {
       },
       graphData: {}
     };
-    this._onClose = this._onClose.bind(this);
+    this.closeLayer = this.closeLayer.bind(this);
+    this.alert = this.alert.bind(this);
+    this.openLayer = this.openLayer.bind(this);
     this.initAQL = {
       str: '',
       name: '',
@@ -62,21 +77,18 @@ export default class AQL extends ComponentBase {
   }
 
   _loadViews() {
-    ExplorerActions.loadViews().then(data => {
+    this.addPromise(ExplorerActions.loadViews().then(data => {
       this.setState({
         views: data
       });
-    });
+    }));
   }
 
   _loadAQLs() {
     this.addPromise(AQLActions.loadAQLs().then((data) => {
-      let categories = _.uniq(data.map((aql) => {
-        return aql.category;
-      }));
       this.setState({
         aqls: data,
-        categories: categories
+        categories: _.uniq(data.map((aql) => aql.category))
       });
     }));
   }
@@ -150,12 +162,6 @@ export default class AQL extends ComponentBase {
     });
   }
 
-  _removeAlertLayer() {
-    this.setState({
-      alertLayer: null
-    });
-  }
-
   _removeAQL() {
     AQLActions.removeAQL(this.state.aql._id).then(id => {
       if (id) {
@@ -166,34 +172,30 @@ export default class AQL extends ComponentBase {
     });
   }
 
-  _removeView() {
-    this.setState({ alertLayer: 'remove_view' });
+  closeAlert() {
+    this.alert(null);
   }
 
-  _onDelete() {
-    this.setState({alertLayer: 'delete'});
-  }
-
-  _onSave() {
-    this.setState({alertLayer: 'save'});
+  alert(type) {
+    this.setState({ alertLayer: type });
   }
 
   getAlertLayer(type) {
     let title, desc, onConfirm;
     switch (type) {
-      case 'remove_view' : {
+      case ALERT_TYPE.REMOVE : {
         title = 'Remove attached view?';
         desc = 'View name: ' + this.state.aql.view.name;
         onConfirm = ()=> this.state.aql.view=null;
         break;
       }
-      case 'delete': {
+      case ALERT_TYPE.DELETE: {
         title = 'Delete AQL: ' + this.state.aql.name;
         desc = 'AQL string: ' +this.state.aql.str;
         onConfirm = this._removeAQL.bind(this);
         break;
       }
-      case 'save': {
+      case ALERT_TYPE.SAVE: {
         title = 'Save AQL: ' + this.state.aql.name + '?';
         desc = 'AQL string: ' + this.state.aql.str;
         onConfirm = this._onSaveAQL.bind(this);
@@ -201,7 +203,7 @@ export default class AQL extends ComponentBase {
       }
     }
 
-    return title && <AlertForm title={title} desc={desc} onConfirm={onConfirm} onClose={this._removeAlertLayer.bind(this)}/>;
+    return title && <AlertForm title={title} desc={desc} onConfirm={onConfirm} onClose={this.closeAlert.bind(this)}/>;
   }
 
   _loadOOBAQL(report) {
@@ -211,7 +213,7 @@ export default class AQL extends ComponentBase {
       aql.name = report.Name;
       aql.category = 'OOB';
       this.setState({aql: aql}, this._onQuery());
-    }, this._onClose());
+    }, this.closeLayer());
   }
 
   _setFormValues(event) {
@@ -266,34 +268,6 @@ export default class AQL extends ComponentBase {
     });
   }
 
-  _selectView() {
-    this.setState({
-      layer: 'view'
-    });
-  }
-
-  _selectReports() {
-    this.setState({
-      layer: 'reports'
-    });
-  }
-
-  _showViewRecords(filter, viewInAQL) {
-    if (viewInAQL && viewInAQL._id)
-      ExplorerActions.loadView(viewInAQL._id).then((view) => {
-        var body = view.body;
-        var newFilter = Format.getFilterFromField(view.body.fields, filter);
-        body.filter = (body.filter) ? `(${body.filter} AND ${newFilter})` : newFilter;
-
-        this.setState({
-          layer: {
-            type: 'records',
-            args: {body, name: view.name}
-          }
-        });
-      });
-  }
-
   _getFieldStrVal(val) {
     if (val instanceof Object)
       val = val[Object.keys(val)[0]];
@@ -308,19 +282,33 @@ export default class AQL extends ComponentBase {
     });
   }
 
-  _onClose() {
-    this.setState({
-      layer: null
-    });
+  closeLayer() {
+    this.openLayer(null);
   }
 
-  _updateAQLStr() {
-    this.setState({layer: 'aql_str'});
+  _showViewRecords(filter, viewInAQL) {
+    if (viewInAQL && viewInAQL._id)
+      ExplorerActions.loadView(viewInAQL._id).then((view) => {
+        var body = view.body;
+        var newFilter = Format.getFilterFromField(view.body.fields, filter);
+        body.filter = (body.filter) ? `(${body.filter} AND ${newFilter})` : newFilter;
+
+        this.setState({
+          layer: {
+            type: LAYER_TYPE.RECORDS,
+            args: {body, name: view.name}
+          }
+        });
+      });
+  }
+
+  openLayer(type) {
+    this.setState({layer: type});
   }
 
   popupLayer(type) {
     const {reports, views} = this.state;
-    if (type == 'reports') {
+    if (type == LAYER_TYPE.REPORTS) {
       const contents = reports.entities && reports.entities.map((report) => ({
         key: report['ref-link'],
         groupby: this._getFieldStrVal(report.seType),
@@ -330,11 +318,11 @@ export default class AQL extends ComponentBase {
       }));
 
       return (
-        <Layer onClose={this._onClose} closer={true} align="left" flush={true}>
+        <Layer onClose={this.closeLayer} closer={true} align="left" flush={true}>
           <AMSideBar title='AQL Selector' contents={contents} colorIndex='light-1' toggle={false} margin={{horizontal: 'medium'}} pad={{vertical: 'small'}}/>
         </Layer>
       );
-    } else if (type == 'view') {
+    } else if (type == LAYER_TYPE.VIEW) {
       const contents = views.map((view) => ({
         key: view._id,
         groupby: view.category,
@@ -344,20 +332,20 @@ export default class AQL extends ComponentBase {
       }));
 
       return (
-        <Layer onClose={this._onClose} closer={true} align="left" flush={true}>
+        <Layer onClose={this.closeLayer} closer={true} align="left" flush={true}>
           <AMSideBar title='Views Selector' contents={contents} colorIndex='light-1' toggle={false} margin={{horizontal: 'medium'}} pad={{vertical: 'small'}}/>
         </Layer>
       );
-    } else if (typeof type == 'object' && type.type == 'records') {
-      return <RecordListLayer body={type.args.body} title={type.args.name} onClose={this._onClose.bind(this)}/>;
-    } else if (type == 'aql_str') {
+    } else if (typeof type == 'object' && type.type == LAYER_TYPE.RECORDS) {
+      return <RecordListLayer body={type.args.body} title={type.args.name} onClose={this.closeLayer}/>;
+    } else if (type == LAYER_TYPE.AQL_STR) {
       return (
         <EditLayer label='Input AM Query Language (AQL)' name='str'
                   value={this.state.aql.str}
-                  onClose={this._onClose}
+                  onClose={this.closeLayer}
                   onConfirm={event => {
                     this._setFormValues(event);
-                    this._onClose();
+                    this.closeLayer();
                     this._onQuery(true);
                   }} />
       );
@@ -442,9 +430,9 @@ export default class AQL extends ComponentBase {
             <input type="file" ref="upload" accept=".json" onChange={this.uploadJson.bind(this)} style={{display: 'none'}}/>
             <Menu direction="row" align="center" responsive={true}>
               <Anchor icon={<Play />} onClick={() => hasStr && this._onQuery(true)} label="Query" disabled={!hasStr}/>
-              <Anchor icon={<Checkmark />} onClick={() => hasStr && hasName && hasCategory && this._onSave()}
+              <Anchor icon={<Checkmark />} onClick={() => hasStr && hasName && hasCategory && this.alert(ALERT_TYPE.SAVE)}
                       label="Save" disabled={!hasStr || !hasName || !hasCategory}/>
-              <Anchor icon={<Close />} onClick={() => hasId && this._onDelete()} label="Delete" disabled={!hasId}/>
+              <Anchor icon={<Close />} onClick={() => hasId && this.alert(ALERT_TYPE.DELETE)} label="Delete" disabled={!hasId}/>
               <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }}>
                 {
                   hasId &&
@@ -457,10 +445,10 @@ export default class AQL extends ComponentBase {
                 <Anchor icon={<Upload />}
                         onClick={() => !hasId && this.refs.upload.click()}
                         label="Upload" disabled={hasId}/>
-                <Anchor icon={<Attachment />} onClick={() => hasStr && this._selectView()}
+                <Anchor icon={<Attachment />} onClick={() => hasStr && this.openLayer(LAYER_TYPE.VIEW)}
                         disabled={!hasStr}
                         label={currentAql.view ? 'Attached view: ' + currentAql.view.name : 'Attach View'}/>
-                <Anchor icon={<Add />} label="Widgets" onClick={this._selectReports.bind(this)}/>
+                <Anchor icon={<Add />} label="Widgets" onClick={() => this.openLayer(LAYER_TYPE.REPORTS)}/>
               </Menu>
             </Menu>
           </Header>
@@ -514,8 +502,8 @@ export default class AQL extends ComponentBase {
                        onChange={this._setFormValues.bind(this)}/>
               </FormField>
               <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_STR">
-                  <textarea id="AQL_STR" value={currentAql.str} rows={10} onChange={this._updateAQLStr.bind(this)}
-                            onClick={this._updateAQLStr.bind(this)}/>
+                  <textarea id="AQL_STR" value={currentAql.str} rows={10} onChange={() => this.openLayer(LAYER_TYPE.AQL_STR)}
+                            onClick={() => this.openLayer(LAYER_TYPE.AQL_STR)}/>
               </FormField>
               <FormField label="Category" htmlFor="AQL_Category">
                 <SearchInput id="AQL_Category" type="text" name="category" value={currentAql.category}
@@ -526,7 +514,7 @@ export default class AQL extends ComponentBase {
                 currentAql.view &&
                 <FormField label="Linked to" htmlFor="AQL_LinkTo">
                   <ActionLabel label={`View: ${currentAql.view.name}`}
-                               icon={<Trash/>} onClick={this._removeView.bind(this)}/>
+                               icon={<Trash/>} onClick={() => this.alert(ALERT_TYPE.REMOVE)}/>
                 </FormField>
               }
             </Form>
