@@ -7,8 +7,9 @@ import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
 import RecordListLayer from '../explorer/RecordListLayer';
 import * as Format from '../../util/RecordFormat';
+import {updateValue} from '../../util/util';
 import {monitorEdit, stopMonitorEdit, dropCurrentPop, showInfo, onDownload, onMail} from '../../actions/system';
-import { Anchor, Box, Form, FormField, Layer, Tabs, Table, TableRow, Header, Menu, Icons } from 'grommet';
+import { Anchor, Box, Form, FormField, Layer, Tabs, Table, TableRow, Icons } from 'grommet';
 const { Add, Trash, Attachment } = Icons.Base;
 import {ActionLabel,EditLayer, ContentPlaceHolder, ActionTab, AMSideBar, SearchInput,
   ComponentBase, Graph, AlertForm, UploadWidget, AMHeader} from '../commons';
@@ -30,6 +31,13 @@ const isValidateView = (json) => {
   return (json.name && json.category && json.str);
 };
 
+const getFieldStrVal = (val) => {
+  if (val instanceof Object) {
+    val = val[Object.keys(val)[0]];
+  }
+  return val;
+};
+
 export default class AQL extends ComponentBase {
   constructor() {
     super();
@@ -47,6 +55,7 @@ export default class AQL extends ComponentBase {
     this.closeLayer = this.closeLayer.bind(this);
     this.alert = this.alert.bind(this);
     this.openLayer = this.openLayer.bind(this);
+    this._updateValue = this._updateValue.bind(this);
     this.initAQL = {
       str: '',
       name: '',
@@ -213,24 +222,12 @@ export default class AQL extends ComponentBase {
     }, this.closeLayer());
   }
 
-  _setFormValues(event) {
-    const val = event.target ? event.target.value : event.value;
-
-    const path = event.target ? event.target.name : event.name;
-    const obj = this.state.aql;
-    let graphData = this.state.graphData;
-    let data = this.state.data;
-    obj[path] = val;
-    if (path === 'str' && !_.isEmpty(obj.form)) {
-      // when AQL change, reset data, form and graphData
-      obj.form = null;
-      data = {
-        header: [],
-        rows: []
-      };
-      graphData = {};
-    }
-    this.setState({aql: obj, graphData: graphData, data: data});
+  _updateValue(event, val) {
+    updateValue(event, {
+      val: val,
+      state: this.state.aql,
+      callback: () => this.setState({aql: this.state.aql})
+    });
   }
 
   _genGraph(form, type) {
@@ -265,20 +262,6 @@ export default class AQL extends ComponentBase {
     });
   }
 
-  _getFieldStrVal(val) {
-    if (val instanceof Object)
-      val = val[Object.keys(val)[0]];
-    return val;
-  }
-
-  _setCategory(event) {
-    var aql = this.state.aql;
-    aql.category = event.suggestion;
-    this.setState({
-      aql: aql
-    });
-  }
-
   closeLayer() {
     this.openLayer(null);
   }
@@ -304,11 +287,11 @@ export default class AQL extends ComponentBase {
   }
 
   popupLayer(type) {
-    const {reports, views} = this.state;
+    const {reports, views, aql} = this.state;
     if (type == LAYER_TYPE.REPORTS) {
       const contents = reports.entities && reports.entities.map((report) => ({
         key: report['ref-link'],
-        groupby: this._getFieldStrVal(report.seType),
+        groupby: getFieldStrVal(report.seType),
         onClick: this._loadOOBAQL.bind(this, report),
         search: report.Name,
         child: report.Name
@@ -341,7 +324,19 @@ export default class AQL extends ComponentBase {
                   value={this.state.aql.str}
                   onClose={this.closeLayer}
                   onConfirm={event => {
-                    this._setFormValues(event);
+                    this._updateValue(event);
+
+                    if (!_.isEmpty(aql.form)) {
+                      // when AQL change, reset data, form and graphData
+                      aql.form = null;
+                      const data = {
+                        header: [],
+                        rows: []
+                      };
+
+                      this.setState({aql: aql, graphData: {}, data: data});
+                    }
+
                     this.closeLayer();
                     this._onQuery(true);
                   }} />
@@ -413,22 +408,41 @@ export default class AQL extends ComponentBase {
                      uploadProps={uploadProps}/>);
   }
 
-  render() {
-    const {data, aqls, aql: currentAql, alertLayer, graphData, layer, categories} = this.state;
-    const header = data.header.map((col, index) => <th key={index}>{col.Name}</th>);
-
-    const rows = data.rows.map((row, index) => (
-      <TableRow key={index}>{
-        row.map((col, i) => <td key={i}>{col}</td>)
-      }</TableRow>
-    ));
-
+  renderGraphForm(currentAql, data, graphData) {
     const getIndex = (type) => {
       if (type === 'chart') return 0;
       if (type === 'meter') return 1;
       if (type === 'distribution') return 2;
       return 0;
     };
+
+    const activeIndex = getIndex(currentAql.type) || 0;
+
+    return (
+      <Box style={{position: 'relative'}} flex={false}>
+        <Tabs activeIndex={activeIndex} justify='start'>
+          <ActionTab title="Chart" onClick={this._genGraph.bind(this, null, 'chart')} ref='chart'>
+            <ChartForm {...currentAql} {...graphData}
+              genGraph={this._genGraph.bind(this)}
+              data={data}/>
+          </ActionTab>
+          <ActionTab title="Meter" onClick={this._genGraph.bind(this, null, 'meter')} ref='meter'>
+            <MeterForm {...currentAql} {...graphData} genGraph={this._genGraph.bind(this)}
+                                                      data={data}/>
+          </ActionTab>
+          <ActionTab title="Distribution" onClick={this._genGraph.bind(this, null, 'distribution')}
+                     ref='distribution'>
+            <DistributionForm {...currentAql} {...graphData}
+              genGraph={this._genGraph.bind(this)}
+              data={data}/>
+          </ActionTab>
+        </Tabs>
+      </Box>
+    );
+  }
+
+  render() {
+    const {data, aqls, aql: currentAql, alertLayer, graphData, layer, categories} = this.state;
 
     const toolbar = <Anchor icon={<Add />} onClick={this._onNew.bind(this)} label="New"/>;
     const contents = aqls.map((aql) => ({
@@ -445,7 +459,6 @@ export default class AQL extends ComponentBase {
 
     const focus = currentAql && {expand: currentAql.category, selected: currentAql._id};
     const validData = data.rows.length > 0 && data.header.length === data.rows[0].length;
-    const activeIndex = validData ? getIndex(currentAql.type) : 0;
 
     return (
       <Box direction="row" flex={true}>
@@ -456,29 +469,7 @@ export default class AQL extends ComponentBase {
           <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'small'}} direction='row'>
             <Box className='fixMinSizing' flex={true} pad={{horizontal: 'small'}}>
               {
-                validData &&
-                <Box style={{position: 'relative'}} flex={false}>
-                  <Tabs activeIndex={activeIndex} justify='start'>
-                    <ActionTab title="Chart" onClick={this._genGraph.bind(this, null, 'chart')} ref='chart'>
-                      <ChartForm {...currentAql} {...graphData} genGraph={this._genGraph.bind(this)}
-                                                                               data={data}/>
-                    </ActionTab>
-                    <ActionTab title="Meter" onClick={this._genGraph.bind(this, null, 'meter')} ref='meter'>
-                      <MeterForm {...currentAql} {...graphData} genGraph={this._genGraph.bind(this)}
-                                                                               data={data}/>
-                    </ActionTab>
-                    <ActionTab title="Distribution" onClick={this._genGraph.bind(this, null, 'distribution')}
-                               ref='distribution'>
-                      <DistributionForm {...currentAql} {...graphData}
-                        genGraph={this._genGraph.bind(this)}
-                        data={data}/>
-                    </ActionTab>
-                    {
-                      /*<Tab title="Value"/>
-                       <Tab title="WorldMap"/>*/
-                    }
-                  </Tabs>
-                </Box>
+                validData && this.renderGraphForm(currentAql, data, graphData)
               }
               <Box pad={{vertical: 'small'}}>
                 {validData && currentAql.form && !_.isEmpty(currentAql.form) && currentAql.type &&
@@ -487,29 +478,33 @@ export default class AQL extends ComponentBase {
                          onClick={(filter) => this._showViewRecords(filter, currentAql.view)}/>
                 </Box>}
                 <Table>
-                  <thead>
-                  <tr>{header}</tr>
-                  </thead>
+                  <thead><tr>
+                    {data.header.map((col, index) => <th key={index}>{col.Name}</th>)}
+                  </tr></thead>
                   <tbody>
-                  {rows}
+                    {data.rows.map((row, index) => (
+                      <TableRow key={index}>{
+                        row.map((col, i) => <td key={i}>{col}</td>)
+                      }</TableRow>
+                    ))}
                   </tbody>
                 </Table>
               </Box>
               {layer && this.popupLayer(layer)}
             </Box>
             <Form compact={true}>
-              <FormField label="AQL Name" htmlFor="AQL_Name">
-                <input id="AQL_Name" type="text" name="name" value={currentAql.name}
-                       onChange={this._setFormValues.bind(this)}/>
+              <FormField label="AQL Name">
+                <input type="text" name="name" value={currentAql.name}
+                       onChange={this._updateValue}/>
               </FormField>
               <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_STR">
-                  <textarea id="AQL_STR" value={currentAql.str} rows={10} onChange={() => this.openLayer(LAYER_TYPE.AQL_STR)}
+                  <textarea value={currentAql.str} rows={10} onChange={() => this.openLayer(LAYER_TYPE.AQL_STR)}
                             onClick={() => this.openLayer(LAYER_TYPE.AQL_STR)}/>
               </FormField>
               <FormField label="Category" htmlFor="AQL_Category">
-                <SearchInput id="AQL_Category" type="text" name="category" value={currentAql.category}
-                             onDOMChange={this._setFormValues.bind(this)} suggestions={categories.sort()}
-                             onSelect={this._setCategory.bind(this)}/>
+                <SearchInput type="text" name="category" value={currentAql.category}
+                             onDOMChange={this._updateValue} suggestions={categories.sort()}
+                             onSelect={event => this._updateValue(event, event.suggestion)}/>
               </FormField>
               {
                 currentAql.view &&

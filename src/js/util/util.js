@@ -60,3 +60,32 @@ export function saveSetting(key, value) {
     localStorage.setItem(storageName, JSON.stringify(settings));
   }
 }
+
+export function updateValue(event, props) {
+  let {state, callback,
+    val = event.target ? event.target.value : event.value,
+    name = event.target ? event.target.name : event.name,
+    type = event.target ? event.target.type : event.type} = props;
+
+  if (type == 'range' || type == 'number') {
+    val = parseInt(val);
+  } else if (type == 'checkbox') {
+    val = event.target.checked;
+  }
+
+  if (name.indexOf('.') > -1) {
+    const nameParts = name.split('.');
+    nameParts.reduce((state, key, index) => {
+      if (index == nameParts.length - 1) {
+        state[key] = val;
+      }
+      return state[key];
+    }, state);
+  } else {
+    state[name] = val;
+  }
+
+  if (typeof callback == 'function') {
+    callback();
+  }
+}

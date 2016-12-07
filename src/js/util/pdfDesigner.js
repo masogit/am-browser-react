@@ -4,6 +4,7 @@
 import { getDisplayLabel, getFieldStrVal } from './RecordFormat';
 import { loadRecordsByBody, getLinkFilter } from '../actions/explorer';
 import {GLOBAL_VARIABLES} from '../constants/PDFDesigner';
+import {updateValue} from './util';
 
 const genTable = ({title, records, fields, style = {layout: 'headerLineOnly', header: 'tableHeader', text: 'text', tableTitle: {style: 'tableTitle'}}}) => {
   if (!records)
@@ -86,31 +87,6 @@ const getLinkData = (link, pdf_link = [], style = {tableHeader: 'tableHeader', c
     return Promise.all(promises);
   });
 };
-
-const updateValue = (event, {state, callback, val = event.target.value, name = event.target.name, type = event.target.type}) => {
-  if (type == 'range' || type == 'number') {
-    val = parseInt(val);
-  } else if (type == 'checkbox') {
-    val = event.target.checked;
-  }
-
-  if (name.indexOf('.') > -1) {
-    const nameParts = name.split('.');
-    nameParts.reduce((state, key, index) => {
-      if (index == nameParts.length - 1) {
-        state[key] = val;
-      }
-      return state[key];
-    }, state);
-  } else {
-    state[name] = val;
-  }
-
-  if (typeof callback == 'function') {
-    callback();
-  }
-};
-
 
 const analyzeRecordList = (title, filter, allFields, records, style, param, groupByData) => {
   let availableFields = [];

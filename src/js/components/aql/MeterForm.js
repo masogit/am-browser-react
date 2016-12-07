@@ -22,7 +22,7 @@ export default class MeterForm extends GraphForm {
         },
         important: 0,
         threshold: 0,
-        max: 0,
+        max: 100,
         min: 0,
         vertical: false,
         stacked: false,
