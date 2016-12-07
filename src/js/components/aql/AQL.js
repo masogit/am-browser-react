@@ -66,13 +66,13 @@ export default class AQL extends ComponentBase {
 
   componentDidMount() {
     // load reports
-    this.addPromise(AQLActions.loadReports().then(data => {
+   /* this.addPromise(AQLActions.loadReports().then(data => {
       if (data) {
         this.setState({
           reports: data
         });
       }
-    }));
+    }));*/
 
     // load views
     this.addPromise(ExplorerActions.loadViews().then(data => {
@@ -217,22 +217,6 @@ export default class AQL extends ComponentBase {
     }, this.closeLayer());
   }
 
-  _attachView(view) {
-    var aql = this.state.aql;
-    aql.view = {
-      _id: view._id,
-      name: view.name
-    };
-    this.setState({
-      aql: aql,
-      layer: null
-    });
-  }
-
-  closeLayer() {
-    this.openLayer(null);
-  }
-
   _showViewRecords(filter, viewInAQL) {
     if (viewInAQL && viewInAQL._id)
       ExplorerActions.loadView(viewInAQL._id).then((view) => {
@@ -249,6 +233,10 @@ export default class AQL extends ComponentBase {
       });
   }
 
+  closeLayer() {
+    this.openLayer(null);
+  }
+
   openLayer(type) {
     this.setState({layer: type});
   }
@@ -257,12 +245,12 @@ export default class AQL extends ComponentBase {
     const {reports, views, aql} = this.state;
     if (type == LAYER_TYPE.REPORTS) {
       const contents = reports.entities && reports.entities.map((report) => ({
-          key: report['ref-link'],
-          groupby: getFieldStrVal(report.seType),
-          onClick: this._loadOOBAQL.bind(this, report),
-          search: report.Name,
-          child: report.Name
-        }));
+        key: report['ref-link'],
+        groupby: getFieldStrVal(report.seType),
+        onClick: this._loadOOBAQL.bind(this, report),
+        search: report.Name,
+        child: report.Name
+      }));
 
       return (
         <Layer onClose={this.closeLayer} closer={true} align="left" flush={true}>
@@ -271,10 +259,21 @@ export default class AQL extends ComponentBase {
         </Layer>
       );
     } else if (type == LAYER_TYPE.VIEW) {
+      const attachView = (view) => {
+        this.state.aql.view = {
+          _id: view._id,
+          name: view.name
+        };
+        this.setState({
+          aql: this.state.aql,
+          layer: null
+        });
+      };
+
       const contents = views.map((view) => ({
         key: view._id,
         groupby: view.category,
-        onClick: this._attachView.bind(this, view),
+        onClick: () => attachView(view),
         search: view.name,
         child: view.name
       }));
@@ -383,21 +382,17 @@ export default class AQL extends ComponentBase {
                      uploadProps={uploadProps}/>);
   }
 
-  _updateValue(event, val) {
+  _updateValue(event, val, state = this.state.aql) {
     updateValue(event, {
       val: val,
-      state: this.state.aql,
+      state: state,
       callback: () => this.setState({aql: this.state.aql})
     });
   }
 
   _updateGraphData(event, val) {
     const aql = this.state.aql;
-    updateValue(event, {
-      val: val,
-      state: aql[aql.type],
-      callback: () => this.setState({aql: aql})
-    });
+    this._updateValue(event, val, aql[aql.type]);
   }
 
   renderGraphForm(currentAql, data) {
@@ -407,8 +402,6 @@ export default class AQL extends ComponentBase {
       if (type === 'distribution') return 2;
       return 0;
     };
-
-    const activeIndex = getIndex(currentAql.type) || 0;
 
     const updateType = type => {
       const aql = this.state.aql;
@@ -424,7 +417,7 @@ export default class AQL extends ComponentBase {
 
     return (
       <Box style={{position: 'relative'}} flex={false}>
-        <Tabs activeIndex={activeIndex} justify='start'>
+        <Tabs activeIndex={getIndex(currentAql.type)} justify='start'>
           <ActionTab title="Chart" onClick={() => updateType('chart')} ref='chart'>
             <ChartForm chart={currentAql.chart} data={data}  genGraph={this._updateGraphData}
                        setInitSetting={(settings) => setInitSetting('chart', settings)} />
