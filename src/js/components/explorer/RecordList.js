@@ -39,7 +39,7 @@ const init = (props) => {
     record: null,
     searchFields: searchFields,
     graphData: null,
-    param: (!props.noCache && loadSetting(hash(Object.assign({},props.body, {filter: ''})))) || {
+    param: (props.cache && loadSetting(hash(Object.assign({},props.body, {filter: ''})))) || {
       showTopology: props.showTopology != undefined ? props.showTopology : false,
       graphType: props.graphType || "legend",
       allFields: props.allField || false,
@@ -71,7 +71,7 @@ export default class RecordList extends ComponentBase {
   }
 
   componentWillUnmount() {
-    if (!this.props.noCache) {
+    if (this.props.cache) {
       saveSetting(hash(Object.assign({}, this.props.body, {filter: ''})), this.state.param);
     }
   }
