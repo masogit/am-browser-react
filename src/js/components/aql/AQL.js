@@ -3,22 +3,15 @@ import _ from 'lodash';
 import ChartForm from './ChartForm';
 import MeterForm from './MeterForm';
 import DistributionForm from './DistributionForm';
-import Graph from './../commons/Graph';
-import AlertForm from './../commons/AlertForm';
 import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
 import RecordListLayer from '../explorer/RecordListLayer';
-import ActionTab from '../commons/ActionTab';
-import AMSideBar from '../commons/AMSideBar';
 import * as Format from '../../util/RecordFormat';
 import {monitorEdit, stopMonitorEdit, dropCurrentPop, showInfo, onDownload, onMail} from '../../actions/system';
-import SearchInput from '../commons/SearchInput';
-import ComponentBase from '../commons/ComponentBase';
 import { Anchor, Box, Form, FormField, Layer, Tabs, Table, TableRow, Header, Menu, Icons } from 'grommet';
-const { Play, Checkmark, Close, Add, Download, More, Mail, Trash, Attachment, Upload } = Icons.Base;
-import ActionLabel from '../commons/ActionLabel';
-import EditLayer from '../../components/commons/EditLayer';
-import ContentPlaceHolder from '../../components/commons/ContentPlaceHolder';
+const { Play, Checkmark, Close, Add, Download, More, Mail, Trash, Attachment } = Icons.Base;
+import {ActionLabel,EditLayer, ContentPlaceHolder, ActionTab, AMSideBar, SearchInput,
+  ComponentBase, Graph, AlertForm, UploadWidget} from '../commons';
 
 const ALERT_TYPE = {
   REMOVE: 'remove',
@@ -31,6 +24,10 @@ const LAYER_TYPE = {
   VIEW: 'view',
   REPORTS: 'reports',
   RECORDS: 'records'
+};
+
+const isValidateView = (json) => {
+  return (json.name && json.category && json.str);
 };
 
 export default class AQL extends ComponentBase {
@@ -360,26 +357,18 @@ export default class AQL extends ComponentBase {
     dropCurrentPop(originAQL, currentAQL, this.initAQL, title, onConfirm);
   }
 
-  uploadJson(e) {
-    let jsonFile = e.target.files[0];
-    var reader = new FileReader();
-    reader.readAsBinaryString(jsonFile);
-    reader.onload = (e) => {
-      let json = JSON.parse(e.target.result);
-      if (this.isValidateView(json)) {
-        if (json._id)
-          json._id = null;
+  uploadJson(result) {
+    let json = JSON.parse(result);
+    if (isValidateView(json)) {
+      if (json._id)
+        json._id = null;
 
-        this._loadAQL(json);
-        AQLActions.uploadAQLSuccess();
-      } else {
-        AQLActions.uploadAQLFailed();
-      }
-    };
-  }
-
-  isValidateView(json) {
-    return (json.name && json.category && json.str);
+      this._loadAQL(json);
+      this.menu.setState({state: 'collapsed'});
+      AQLActions.uploadAQLSuccess();
+    } else {
+      AQLActions.uploadAQLFailed();
+    }
   }
 
   render() {
@@ -427,13 +416,12 @@ export default class AQL extends ComponentBase {
           {this.getAlertLayer(alertLayer)}
           <Header justify="between" pad={{'horizontal': 'medium'}}>
             <Box>AQL and Graph</Box>
-            <input type="file" ref="upload" accept=".json" onChange={this.uploadJson.bind(this)} style={{display: 'none'}}/>
             <Menu direction="row" align="center" responsive={true}>
               <Anchor icon={<Play />} onClick={() => hasStr && this._onQuery(true)} label="Query" disabled={!hasStr}/>
               <Anchor icon={<Checkmark />} onClick={() => hasStr && hasName && hasCategory && this.alert(ALERT_TYPE.SAVE)}
                       label="Save" disabled={!hasStr || !hasName || !hasCategory}/>
               <Anchor icon={<Close />} onClick={() => hasId && this.alert(ALERT_TYPE.DELETE)} label="Delete" disabled={!hasId}/>
-              <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }}>
+              <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }} closeOnClick={hasId} ref={node => this.menu = node}>
                 {
                   hasId &&
                   <Anchor icon={<Mail />} onClick={() => hasId && onMail(currentAql, 'Graph', 'insight')}
@@ -442,9 +430,7 @@ export default class AQL extends ComponentBase {
                 <Anchor icon={<Download />}
                         onClick={() => hasId && onDownload(currentAql, currentAql.name || 'graph')}
                         label="Download" disabled={!hasId}/>
-                <Anchor icon={<Upload />}
-                        onClick={() => !hasId && this.refs.upload.click()}
-                        label="Upload" disabled={hasId}/>
+                <UploadWidget enable={!hasId} accept=".json" onChange={this.uploadJson.bind(this)}/>
                 <Anchor icon={<Attachment />} onClick={() => hasStr && this.openLayer(LAYER_TYPE.VIEW)}
                         disabled={!hasStr}
                         label={currentAql.view ? 'Attached view: ' + currentAql.view.name : 'Attach View'}/>
