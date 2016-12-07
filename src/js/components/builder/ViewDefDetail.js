@@ -477,7 +477,7 @@ export default class ViewDefDetail extends ComponentBase {
             {renderAnchor({icon: <Play />, onClick: openPreview, label: 'Query', enable: table})}
             {renderAnchor({icon: <Checkmark />, onClick: this.openAlert, args: 'save', label: 'Save', enable: selectedView.name && selectedView.category})}
             {renderAnchor({icon: <Close />, onClick: this.openAlert, args: 'delete', label: 'Delete', enable: selectedView._id})}
-            <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }} closeOnClick={selectedView._id} ref={node => this.menu = node}>
+            <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }} closeOnClick={!!selectedView._id} ref={node => this.menu = node}>
               {renderAnchor({icon: <Duplicate />, onClick: this.openAlert, args: 'duplicate', label: 'Duplicate', enable: selectedView._id})}
               {selectedView._id && renderAnchor({icon: <Mail />, onClick: _onMail, args: selectedView, label: 'Mail', enable: selectedView._id})}
               {renderAnchor({icon: <Download />, onClick: () => !editMode && _onDownload(selectedView), args: selectedView , label: 'Download', enable: selectedView._id && !editMode})}
