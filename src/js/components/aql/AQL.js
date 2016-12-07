@@ -124,23 +124,26 @@ export default class AQL extends ComponentBase {
   }
 
   _onQuery(needCheck) {
-    let queryFunc = AQLActions.queryAQL;
-    if (needCheck) {
-      queryFunc = AQLActions.queryAQLWithCheck;
-    }
-
-    this.addPromise(queryFunc(this.state.aql.str).then((data) => {
-      if (data) {
-        if (data.rows.length == 0) {
-          showInfo('No records found for this AQL');
-        } else {
-          this.setState({
-            aql: this.state.aql,
-            data
-          });
-        }
+    const str = this.state.aql.str;
+    if (str) {
+      let queryFunc = AQLActions.queryAQL;
+      if (needCheck) {
+        queryFunc = AQLActions.queryAQLWithCheck;
       }
-    }));
+
+      this.addPromise(queryFunc(str).then((data) => {
+        if (data) {
+          if (data.rows.length == 0) {
+            showInfo('No records found for this AQL');
+          } else {
+            this.setState({
+              aql: this.state.aql,
+              data
+            });
+          }
+        }
+      }));
+    }
   }
 
   _onSaveAQL() {
@@ -184,7 +187,7 @@ export default class AQL extends ComponentBase {
       case ALERT_TYPE.REMOVE : {
         title = 'Remove attached view?';
         desc = 'View name: ' + view.name;
-        onConfirm = () => view = null;
+        onConfirm = () => this.state.aql.view = null;
         break;
       }
       case ALERT_TYPE.DELETE: {
