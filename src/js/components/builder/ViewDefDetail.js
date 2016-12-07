@@ -8,34 +8,13 @@ import AlertForm from '../../components/commons/AlertForm';
 import EditLayer from '../../components/commons/EditLayer';
 import ContentPlaceHolder from '../../components/commons/ContentPlaceHolder';
 import FieldTypes from '../../constants/FieldTypes';
-import {saveAs} from 'file-saver';
 import SearchInput from '../commons/SearchInput';
 import {bodyToMapData} from '../../util/util';
 import PDFDesigner from './../reports/PDFDesigner';
-import {toggleSidebar} from '../../actions/system';
+import {toggleSidebar, onMail, onDownload} from '../../actions/system';
 import {posOrderby} from '../../actions/explorer';
 import {UploadWidget} from '../commons/Widgets';
 import {isEqual} from 'lodash';
-
-const _onMail = (view) => {
-  if (view._id) {
-    let br = "%0D%0A";
-    let subject = `AM Browser View: ${view.name}`;
-    if (!window.location.origin) {
-      window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
-    }
-    let url = window.location.origin + '/explorer/' + view._id;
-    let content = `URL: ${url}${br}Description: ${view.desc}`;
-    window.open(`mailto:test@example.com?subject=${subject}&body=${content}`, '_self');
-  }
-};
-
-const _onDownload = (view) => {
-  if (view._id) {
-    let blob = new Blob([JSON.stringify(view)], {type: "data:application/json;charset=utf-8"});
-    saveAs(blob, (view.name || view.body.sqlname || 'view') + ".json");
-  }
-};
 
 const isNumber = (field) => {
   return FieldTypes.number.indexOf(field.type) > -1 && !field.user_type;
@@ -480,8 +459,10 @@ export default class ViewDefDetail extends ComponentBase {
             {renderAnchor({icon: <Close />, onClick: this.openAlert, args: 'delete', label: 'Delete', enable: selectedView._id})}
             <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }} closeOnClick={!!selectedView._id} ref={node => this.menu = node}>
               {renderAnchor({icon: <Duplicate />, onClick: this.openAlert, args: 'duplicate', label: 'Duplicate', enable: selectedView._id})}
-              {selectedView._id && renderAnchor({icon: <Mail />, onClick: _onMail, args: selectedView, label: 'Mail', enable: selectedView._id})}
-              {renderAnchor({icon: <Download />, onClick: () => !editMode && _onDownload(selectedView), args: selectedView , label: 'Download', enable: selectedView._id && !editMode})}
+              {selectedView._id && renderAnchor({icon: <Mail />, onClick: () => onMail(selectedView, 'View', 'explorer', `Description: ${selectedView.desc}`),
+                args: selectedView, label: 'Mail', enable: selectedView._id})}
+              {renderAnchor({icon: <Download />, onClick: () => !editMode && onDownload(selectedView, selectedView.name || selectedView.body.sqlname || 'view'),
+                args: selectedView , label: 'Download', enable: selectedView._id && !editMode})}
               <UploadWidget enable={!selectedView._id} accept=".json" onChange={this.uploadJson.bind(this)}/>
             </Menu>
           </Menu>

@@ -11,8 +11,7 @@ import RecordListLayer from '../explorer/RecordListLayer';
 import ActionTab from '../commons/ActionTab';
 import AMSideBar from '../commons/AMSideBar';
 import * as Format from '../../util/RecordFormat';
-import {saveAs} from 'file-saver';
-import {monitorEdit, stopMonitorEdit, dropCurrentPop, showInfo} from '../../actions/system';
+import {monitorEdit, stopMonitorEdit, dropCurrentPop, showInfo, onDownload, onMail} from '../../actions/system';
 import SearchInput from '../commons/SearchInput';
 import ComponentBase from '../commons/ComponentBase';
 import { Anchor, Box, Form, FormField, Layer, Tabs, Table, TableRow, Header, Menu, Icons } from 'grommet';
@@ -22,7 +21,6 @@ import EditLayer from '../../components/commons/EditLayer';
 import ContentPlaceHolder from '../../components/commons/ContentPlaceHolder';
 
 export default class AQL extends ComponentBase {
-
   constructor() {
     super();
     this.state = {
@@ -50,11 +48,6 @@ export default class AQL extends ComponentBase {
     this._loadViews();
     this._loadAQLs();
     this._loadInToolReport();
-  }
-
-  _onDownload(obj) {
-    let blob = new Blob([JSON.stringify(obj)], {type: "data:application/json;charset=utf-8"});
-    saveAs(blob, (obj.name || 'graph') + ".json");
   }
 
   _initAQL(callback) {
@@ -155,17 +148,6 @@ export default class AQL extends ComponentBase {
     this.dropCurrentPop('Create a new AQL?', () => {
       this._initAQL(() => monitorEdit(_.cloneDeep(this.state.aql), this.state.aql));
     });
-  }
-
-  _onMail(aql) {
-    // let br = "%0D%0A";
-    let subject = `AM Browser Graph: ${aql.name}`;
-    if (!window.location.origin) {
-      window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
-    }
-    let url = window.location.origin + '/insight/' + aql._id;
-    let content = `URL: ${url}`;
-    window.open(`mailto:test@example.com?subject=${subject}&body=${content}`, '_self');
   }
 
   _removeAlertLayer() {
@@ -466,11 +448,11 @@ export default class AQL extends ComponentBase {
               <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }}>
                 {
                   hasId &&
-                  <Anchor icon={<Mail />} onClick={() => hasId && this._onMail(currentAql)}
+                  <Anchor icon={<Mail />} onClick={() => hasId && onMail(currentAql, 'Graph', 'insight')}
                           label="Mail" disabled={!hasId}/>
                 }
                 <Anchor icon={<Download />}
-                        onClick={() => hasId && this._onDownload(currentAql)}
+                        onClick={() => hasId && onDownload(currentAql, currentAql.name || 'graph')}
                         label="Download" disabled={!hasId}/>
                 <Anchor icon={<Upload />}
                         onClick={() => !hasId && this.refs.upload.click()}
