@@ -9,9 +9,9 @@ import RecordListLayer from '../explorer/RecordListLayer';
 import * as Format from '../../util/RecordFormat';
 import {monitorEdit, stopMonitorEdit, dropCurrentPop, showInfo, onDownload, onMail} from '../../actions/system';
 import { Anchor, Box, Form, FormField, Layer, Tabs, Table, TableRow, Header, Menu, Icons } from 'grommet';
-const { Play, Checkmark, Close, Add, Download, More, Mail, Trash, Attachment } = Icons.Base;
+const { Add, Trash, Attachment } = Icons.Base;
 import {ActionLabel,EditLayer, ContentPlaceHolder, ActionTab, AMSideBar, SearchInput,
-  ComponentBase, Graph, AlertForm, UploadWidget} from '../commons';
+  ComponentBase, Graph, AlertForm, UploadWidget, AMHeader} from '../commons';
 
 const ALERT_TYPE = {
   REMOVE: 'remove',
@@ -357,18 +357,60 @@ export default class AQL extends ComponentBase {
     dropCurrentPop(originAQL, currentAQL, this.initAQL, title, onConfirm);
   }
 
-  uploadJson(result) {
+  uploadJson(result, closeMenu) {
     let json = JSON.parse(result);
     if (isValidateView(json)) {
       if (json._id)
         json._id = null;
 
       this._loadAQL(json);
-      this.menu.setState({state: 'collapsed'});
+      closeMenu();
       AQLActions.uploadAQLSuccess();
     } else {
       AQLActions.uploadAQLFailed();
     }
+  }
+
+  renderHeader(currentAql) {
+    const hasId = Boolean(currentAql._id);
+    const hasStr = Boolean(currentAql.str);
+    const hasName = Boolean(currentAql.name);
+    const hasCategory = Boolean(currentAql.category);
+
+    const buttons = [
+      { id: 'Query', onClick: () => this._onQuery(true), enable: hasStr },
+      {
+        id: 'Save',
+        onClick: () => this.alert(ALERT_TYPE.SAVE),
+        enable: !(!hasStr || !hasName || !hasCategory)
+      },
+      { id: 'Delete', onClick: () => this.alert(ALERT_TYPE.DELETE), enable: hasId}
+    ];
+
+    const subMenuButtons = [{
+      id: 'Mail', onClick: () => onMail(currentAql, 'Graph', 'insight'),
+      enable: hasId, hide: !hasId
+    },
+      {
+        id: 'Download',
+        onClick: () => onDownload(currentAql, currentAql.name || 'graph'),
+        enable: hasId
+      }, {
+        icon: <Attachment />,
+        onClick: () => this.openLayer(LAYER_TYPE.VIEW),
+        enable: hasStr,
+        label: currentAql.view ? 'Attached view: ' + currentAql.view.name : 'Attach View'
+      }
+    ];
+
+    const uploadProps = {
+      enable: !hasId,
+      accept: '.json',
+      onChange: this.uploadJson
+    };
+
+    return (<AMHeader title='AQL and Graph' buttons={buttons} subMenuButtons={subMenuButtons}
+                     uploadProps={uploadProps}/>);
   }
 
   render() {
@@ -404,40 +446,13 @@ export default class AQL extends ComponentBase {
     const focus = currentAql && {expand: currentAql.category, selected: currentAql._id};
     const validData = data.rows.length > 0 && data.header.length === data.rows[0].length;
     const activeIndex = validData ? getIndex(currentAql.type) : 0;
-    const hasId = Boolean(currentAql._id);
-    const hasStr = Boolean(currentAql.str);
-    const hasName = Boolean(currentAql.name);
-    const hasCategory = Boolean(currentAql.category);
 
     return (
       <Box direction="row" flex={true}>
         <AMSideBar title='Graphs' toolbar={toolbar} contents={contents} focus={focus}/>
         {!_.isEmpty(currentAql) ? <Box flex={true}>
           {this.getAlertLayer(alertLayer)}
-          <Header justify="between" pad={{'horizontal': 'medium'}}>
-            <Box>AQL and Graph</Box>
-            <Menu direction="row" align="center" responsive={true}>
-              <Anchor icon={<Play />} onClick={() => hasStr && this._onQuery(true)} label="Query" disabled={!hasStr}/>
-              <Anchor icon={<Checkmark />} onClick={() => hasStr && hasName && hasCategory && this.alert(ALERT_TYPE.SAVE)}
-                      label="Save" disabled={!hasStr || !hasName || !hasCategory}/>
-              <Anchor icon={<Close />} onClick={() => hasId && this.alert(ALERT_TYPE.DELETE)} label="Delete" disabled={!hasId}/>
-              <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }} closeOnClick={hasId} ref={node => this.menu = node}>
-                {
-                  hasId &&
-                  <Anchor icon={<Mail />} onClick={() => hasId && onMail(currentAql, 'Graph', 'insight')}
-                          label="Mail" disabled={!hasId}/>
-                }
-                <Anchor icon={<Download />}
-                        onClick={() => hasId && onDownload(currentAql, currentAql.name || 'graph')}
-                        label="Download" disabled={!hasId}/>
-                <UploadWidget enable={!hasId} accept=".json" onChange={this.uploadJson.bind(this)}/>
-                <Anchor icon={<Attachment />} onClick={() => hasStr && this.openLayer(LAYER_TYPE.VIEW)}
-                        disabled={!hasStr}
-                        label={currentAql.view ? 'Attached view: ' + currentAql.view.name : 'Attach View'}/>
-                <Anchor icon={<Add />} label="Widgets" onClick={() => this.openLayer(LAYER_TYPE.REPORTS)}/>
-              </Menu>
-            </Menu>
-          </Header>
+          {this.renderHeader(currentAql)}
           <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'small'}} direction='row'>
             <Box className='fixMinSizing' flex={true} pad={{horizontal: 'small'}}>
               {

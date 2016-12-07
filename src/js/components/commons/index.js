@@ -21,6 +21,7 @@ import PDFWidgets from './PDFWidgets';
 import SearchInput from './SearchInput';
 import Textarea from './Textarea';
 import {UploadWidget} from './Widgets';
+import AMHeader from './AMHeader';
 
 export {
   ActionLabel,
@@ -42,5 +43,6 @@ export {
   PDFWidgets,
   SearchInput,
   Textarea,
-  UploadWidget
+  UploadWidget,
+  AMHeader
 };
