@@ -62,15 +62,18 @@ export function saveSetting(key, value) {
 }
 
 export function updateValue(event, props) {
-  let {state, callback,
-    val = event.target ? event.target.value : event.value,
+  const {state, callback,
     name = event.target ? event.target.name : event.name,
     type = event.target ? event.target.type : event.type} = props;
 
-  if (type == 'range' || type == 'number') {
-    val = parseInt(val);
-  } else if (type == 'checkbox') {
-    val = event.target.checked;
+  let val = props.val;
+  if (!val) {
+    val = event.target ? event.target.value : event.value;
+    if (type == 'range' || type == 'number') {
+      val = parseInt(val);
+    } else if (type == 'checkbox') {
+      val = event.target.checked;
+    }
   }
 
   if (name.indexOf('.') > -1) {

@@ -111,36 +111,16 @@ const genOptions = (optionsArray, form, fromType, selections) => {
 export default class GraphForm extends Component {
   componentWillMount() {
     const type = this.state.type;
-
-    let form;
-    if (this.props[type]) {
-      form = Object.assign({}, this.state[type], this.props[type]);
+    const chartSettings = this.props[type];
+    if (chartSettings) {
+      this.state[type] = chartSettings;
     } else {
-      this._init();
-      form = this.state[type];
+      this.state[type] = this._init();
+      this.props.setInitSetting(this.state[type]);
     }
-    const newState = this.initState();
-    newState[type] = form;
-    //if (type === 'chart' ? form.series_col.length > 0 : form.series_col) {
-    //  this.setState(newState, this.props.genGraph(form, this.state.type));
-    //}
-    this.setState(newState, () => {
-      if (type === 'chart' ? form.series_col.length > 0 : form.series_col) {
-        this.props.genGraph(form, this.state.type);
-      }
-    });
-  }
 
-  componentWillReceiveProps(nextProps) {
-    if (!nextProps[this.state.type]) {
-      this._init();
-    }
-  }
-
-  initState(state = {}) {
-    state.showBasic = this.state.showBasic == undefined ? true : this.state.showBasic;
-    state.showAdvance = this.state.showAdvance == undefined ? false : this.state.showAdvance;
-    return state;
+    this.state.showBasic = this.state.showBasic == undefined ? true : this.state.showBasic;
+    this.state.showAdvance = this.state.showAdvance == undefined ? false : this.state.showAdvance;
   }
 
   _setFormValues(event) {
@@ -148,16 +128,6 @@ export default class GraphForm extends Component {
     const type = this.state.type;
     const path = event.target.name;
     const obj = this.state[type];
-    const newState = this.initState();
-
-    if (event.target.type === 'checkbox' || event.target.type === 'radio') {
-      val = event.target.checked;
-    } else if (event.target.type === 'number') {
-      val = event.target.value / 1;
-    } else {
-      val = event.target.value;
-    }
-
     if (path === 'series_col') {
       if (type === 'chart') {
         if (event.target.checked === true) {
@@ -172,11 +142,7 @@ export default class GraphForm extends Component {
       }
       val = obj.series_col;
     }
-
-    objectPath.set(obj, path, val);
-
-    newState[type] = obj;
-    this.setState(newState, this.props.genGraph(obj, type));
+    this.props.genGraph(event, val);
   }
 
   render(basicOptions, advanceOptions, selections) {

@@ -32,7 +32,7 @@ class LegendDistribution extends Component {
       units,
       legendPosition,
       legendTitle,
-      legendSeries,
+      legendSeries = [],
       distributionSeries = []
       } = this.props;
 
