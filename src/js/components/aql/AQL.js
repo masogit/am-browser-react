@@ -537,7 +537,7 @@ export default class AQL extends ComponentBase {
               </FormField>
               <FormField label="Category" htmlFor="AQL_Category">
                 <SearchInput id="AQL_Category" type="text" name="category" value={currentAql.category}
-                             onDOMChange={this._setFormValues.bind(this)} suggestions={categories}
+                             onDOMChange={this._setFormValues.bind(this)} suggestions={categories.sort()}
                              onSelect={this._setCategory.bind(this)}/>
               </FormField>
               {
