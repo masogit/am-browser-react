@@ -3,7 +3,7 @@ import React, {PropTypes} from 'react';
 import {Box, Form, FormField, CheckBox, Table, Anchor, Map, Icons} from 'grommet';
 const {Close, LinkUp: Up, LinkDown: Down, Ascend, Descend, CaretPrevious} = Icons.Base;
 import {isEmpty, isEqual} from 'lodash';
-import {AlertForm, EditLayer, ContentPlaceHolder, SearchInput, UploadWidget, ComponentBase, AMHeader } from '../commons';
+import {AlertForm, EditLayer, ContentPlaceHolder, SearchInput, ComponentBase, AMHeader } from '../commons';
 import FieldTypes from '../../constants/FieldTypes';
 import {bodyToMapData} from '../../util/util';
 import PDFDesigner from './../reports/PDFDesigner';
@@ -19,7 +19,7 @@ const updateTableSize = () => {
   }
 };
 
-const isValidateView = json => json.name && json.category && json.body
+const isValidateView = json => json.name && json.category && json.body;
 
 export default class ViewDefDetail extends ComponentBase {
 

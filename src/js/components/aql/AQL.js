@@ -12,7 +12,7 @@ import {monitorEdit, stopMonitorEdit, dropCurrentPop, showInfo, onDownload, onMa
 import { Anchor, Box, Form, FormField, Layer, Tabs, Table, TableRow, Icons } from 'grommet';
 const { Add, Trash, Attachment } = Icons.Base;
 import {ActionLabel,EditLayer, ContentPlaceHolder, ActionTab, AMSideBar, SearchInput,
-  ComponentBase, Graph, AlertForm, UploadWidget, AMHeader} from '../commons';
+  ComponentBase, Graph, AlertForm, AMHeader} from '../commons';
 
 const ALERT_TYPE = {
   REMOVE: 'remove',
@@ -313,7 +313,7 @@ export default class AQL extends ComponentBase {
                      clearGraphSetting();
                      this.closeLayer();
                      this._onQuery(true);
-                  }}/>
+                   }}/>
       );
     }
   }

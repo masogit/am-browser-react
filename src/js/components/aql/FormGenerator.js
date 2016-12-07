@@ -3,7 +3,6 @@ import {
   CheckBox, Form, FormField, NumberInput, Box, RadioButton
 } from 'grommet';
 import _ from 'lodash';
-import objectPath from 'object-path';
 
 const SelectField = ({label, name, value, onChange, options}) => {
   const optionsComp = options.map((option, index)=>
