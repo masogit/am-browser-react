@@ -299,12 +299,15 @@ export default class AQL extends ComponentBase {
 
         if (aql.meter) {
           aql.meter.series_col = "";
+          aql.meter.condition = {};
         }
         if (aql.chart) {
           aql.chart.series_col = [];
+          aql.chart.condition = {};
         }
         if (aql.distribution) {
           aql.distribution.series_col = "";
+          aql.distribution.condition = {};
         }
         this.setState({aql: aql, data: data});
       };
@@ -427,7 +430,7 @@ export default class AQL extends ComponentBase {
       <Box style={{position: 'relative'}} flex={false}>
         <Tabs activeIndex={getIndex(currentAql.type)} justify='start'>
           <ActionTab title="Chart" onClick={() => updateType('chart')} ref='chart'>
-            <ChartForm chart={currentAql.chart} data={data}  genGraph={this._updateGraphData}
+            <ChartForm chart={currentAql.chart} data={data} genGraph={this._updateGraphData}
                        setInitSetting={(settings) => setInitSetting('chart', settings)} />
           </ActionTab>
           <ActionTab title="Meter" onClick={() => updateType('meter')} ref='meter'>
@@ -474,7 +477,7 @@ export default class AQL extends ComponentBase {
         )
       });
 
-      if (data && currentAql[type]) {
+      if (currentAql[type]) {
         const condition = currentAql[type].condition || {};
         const index = (() => {
           if (type == 'chart') return currentAql[type].xAxis_col;
@@ -483,10 +486,10 @@ export default class AQL extends ComponentBase {
         })() || 0;
 
         if (!condition.key) {
-          condition.key = data.header[index].Name;
+          condition.key = data ? data.header[index].Name : '';
         }
         if (!condition.value) {
-          condition.value = data.header[index].Name;
+          condition.value = data ? data.header[index].Name : '';
         }
 
         viewFields.push({
@@ -503,7 +506,7 @@ export default class AQL extends ComponentBase {
             label: 'Value column',
             content: (
               <select name='condition.value' value={condition.value} onChange={this._updateGraphData}>
-                {data.header.map((item, index) => <option key={index} value={item.Name}>{item.Name}</option>)}
+                {data && data.header.map((item, index) => <option key={index} value={item.Name}>{item.Name}</option>)}
               </select>
             )
           }
@@ -554,9 +557,7 @@ export default class AQL extends ComponentBase {
           {this.renderHeader(currentAql)}
           <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'small'}} direction='row'>
             <Box className='fixMinSizing' flex={true} pad={{horizontal: 'small'}}>
-              {
-                validData && this.renderGraphForm(currentAql, data)
-              }
+              {this.renderGraphForm(currentAql, data)}
               <Box pad={{vertical: 'small'}}>
                 {validData && data && currentAql.type && currentAql[currentAql.type] &&
                 <Box flex={false} className='grid' margin={{vertical: 'small'}}>
