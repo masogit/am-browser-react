@@ -23,7 +23,8 @@ export default class ChartForm extends GraphForm {
         size: 'medium',
         legend: {
           position: '',
-          units: ''
+          units: '',
+          total: true
         },
         important: 0,
         threshold: 0,
@@ -78,17 +79,6 @@ export default class ChartForm extends GraphForm {
         {value: 'large', text: 'large'},
         {value: 'sparkline', text: 'sparkline'}
       ],
-      legend_position: [
-        {value: '', text: ''},
-        {value: 'right', text: 'right'},
-        {value: 'left', text: 'left'},
-        {value: 'top', text: 'top'},
-        {value: 'bottom', text: 'bottom'}
-      ],
-      legend_direction: [
-        {value: 'row', text: 'horizontal'},
-        {value: 'column', text: 'vertical'}
-      ],
       xAxis_placement: [
         {value: '', text: ''},
         {value: 'top', text: 'top'},
@@ -119,16 +109,6 @@ export default class ChartForm extends GraphForm {
       name: 'xAxis_col',
       options: xAxis_col_options,
       type: 'SelectField'
-    }, {
-      name: 'legend.position',
-      type: 'SelectField'
-    }, {
-      name: 'legend.direction',
-      type: 'SelectField'
-    }, {
-      label: 'Legend units',
-      name: 'units',
-      type: 'InputField'
     }];
 
     const advanceOptions = [{
@@ -138,14 +118,14 @@ export default class ChartForm extends GraphForm {
       name: 'threshold',
       type: 'NumberField'
     }, {
+      name: 'points',
+      type: 'SwitchField'
+    }, {
       name: 'max',
       type: 'NumberField'
     }, {
       name: 'min',
       type: 'NumberField'
-    }, {
-      name: 'points',
-      type: 'SwitchField'
     }];
 
     if (this.state.chart.type === 'line' || this.state.chart.type === 'area') {

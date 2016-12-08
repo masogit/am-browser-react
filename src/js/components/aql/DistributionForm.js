@@ -13,9 +13,12 @@ export default class DistributionForm extends GraphForm {
         series_col: '',
         series: [],
         size: 'medium', //small|medium|large
-        legendTotal: false,
-        full: true,
-        units: ''
+        legend: {
+          position: '',
+          total: true,
+          units: ''
+        },
+        full: true
       },
       type: 'distribution'
     };
@@ -54,13 +57,6 @@ export default class DistributionForm extends GraphForm {
         {value: 'small', text: 'small'},
         {value: 'medium', text: 'medium'},
         {value: 'large', text: 'large'}
-      ],
-      legend_position: [
-        {value: '', text: ''},
-        {value: 'right', text: 'right'},
-        {value: 'left', text: 'left'},
-        {value: 'top', text: 'top'},
-        {value: 'bottom', text: 'bottom'}
       ]
     };
 
@@ -74,13 +70,6 @@ export default class DistributionForm extends GraphForm {
     }, {
       name: 'size',
       type: 'SelectField'
-    }, {
-      name: 'legend.position',
-      type: 'SelectField'
-    }, {
-      label: 'Legend units',
-      name: 'units',
-      type: 'InputField'
     }];
 
     return super.render(basicOptions, [], selections);
