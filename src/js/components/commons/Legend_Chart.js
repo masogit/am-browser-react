@@ -31,11 +31,6 @@ class LegendChart extends Component {
   }
 
   componentDidMount() {
-    if (this.refs.chart) {
-      this.refs.chart._onResize();
-      this.refs.chart2._onResize();
-    }
-
     this.nodes.forEach(node => {
       setTimeout(() => {
         resizeBar(node, this.props.chartsValues[0].length);
@@ -48,6 +43,11 @@ class LegendChart extends Component {
       this.refs.chart._onResize();
       this.refs.chart2._onResize();
     }
+    this.nodes.forEach(node => {
+      setTimeout(() => {
+        resizeBar(node, this.props.chartsValues[0].length);
+      }, 200);
+    });
   }
 
   handleActive (index) {
