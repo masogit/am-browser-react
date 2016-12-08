@@ -3,6 +3,7 @@
 import Rest from '../util/grommet-rest-promise';
 import * as Types from '../constants/ActionTypes';
 import store from '../store';
+import {saveAs} from 'file-saver';
 import {
   CSRF_DEF_URL,
   ABOUT_DEF_URL,
@@ -265,4 +266,26 @@ export function getOnlineUser() {
     .then(res => {
       return res.body || [];
     });
+}
+
+export function onMail(obj, subject, urlLocation, secondLine) {
+  if (obj._id) {
+    const fullSubject = `AM Browser ${subject}: ${obj.name}`;
+    if (!window.location.origin) {
+      window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
+    }
+    const url = `${window.location.origin}/${urlLocation}/${obj._id}`;
+    let content = `URL: ${url}`;
+    if (secondLine) {
+      content += '%0D%0A' + secondLine;
+    }
+    window.open(`mailto:test@example.com?subject=${fullSubject}&body=${content}`, '_self');
+  }
+}
+
+export function onDownload(obj, name) {
+  if (obj._id) {
+    let blob = new Blob([JSON.stringify(obj)], {type: "data:application/json;charset=utf-8"});
+    saveAs(blob, name + ".json");
+  }
 }

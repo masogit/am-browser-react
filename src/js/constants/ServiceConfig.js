@@ -12,7 +12,8 @@ export const REPORT_DEF_URL = "/coll/report/";
 // AM REST SERVICE
 export const AM_DEF_URL = "/am/";
 export const AM_DB_DEF_URL = "/am/db/";
-export const AM_AQL_DEF_URL = "/am/aql/";
+export const AM_AQL_DEF_URL = "/am/query";
+export const AM_AQL_VALIDATION_URL = "/am/checkAqlSyntax";
 export const AM_SCHEMA_DEF_URL = "/am/schema";
 
 // AMB SERVICE

@@ -31,7 +31,7 @@ export default class EditLayer extends Component {
                 <textarea id={this.state.name} rows='5' name={this.state.name} value={this.state.value} onChange={this._onChange.bind(this)} ref="textArea"/>
           </FormField>
           <Footer justify='end' pad={{vertical: 'medium'}}>
-            <Button label="Confirm" primary={true} strong={true} onClick={() => (this.props.onConfirm(this.refs.textArea))}/>
+            <Button label="Confirm" primary={true} onClick={() => (this.props.onConfirm(this.refs.textArea))}/>
           </Footer>
         </Box>
       </Layer>

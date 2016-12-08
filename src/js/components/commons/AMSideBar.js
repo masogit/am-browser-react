@@ -63,7 +63,7 @@ class AMSideBar extends Component {
             contents.map((listItem, index) => (
               <GroupListItem key={listItem.key || index} {...listItem} responsive={false}>
                 <EmptyIcon />
-                <Box justify='between' direction="row" full='horizontal' responsive={false}>
+                <Box justify='between' direction="row" responsive={false} flex={true}>
                   {listItem.child}
                   {listItem.icon}
                 </Box>
@@ -87,7 +87,7 @@ class AMSideBar extends Component {
 
     return (
       <Sidebar fixed={true} full={false} style={{minHeight: '100%'}} colorIndex={colorIndex || 'light-1'} pad={pad} margin={margin}>
-        <Box style={{overflow: 'visible'}} className='fixMinSizing'>
+        <Box style={{overflow: 'visible'}} className='fixMinSizing' flex={true}>
           <Header justify="between" pad='small'>
             {toggle == false ? this.state.title
               : (<Anchor icon={<ChapterPrevious/>} onClick={toggleSidebar} label={this.state.title}

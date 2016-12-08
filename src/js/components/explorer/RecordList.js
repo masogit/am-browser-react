@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react';
 import RecordDetail from './RecordDetail';
 import RecordTopology from './RecordTopology';
-import {Table, TableRow, Box, Anchor, Header, Menu, List, ListItem, Icons, Layer} from 'grommet';
+import {Table, TableRow, Box, Anchor, Header, Menu, Icons, Layer, Title} from 'grommet';
 const { Close, Ascend, Descend, Checkbox, Filter, Code, BarChart, LineChart, Aggregate,
    CheckboxSelected, Cluster, Menu: MenuIcon, DocumentPdf: Pdf, DocumentCsv: Csv}= Icons.Base;
 import Status from 'grommet/components/icons/Status';
@@ -14,7 +14,7 @@ import * as Format from '../../util/RecordFormat';
 import {hash, loadSetting, saveSetting} from '../../util/util';
 import cookies from 'js-cookie';
 import BarCodeEditor from './BarCodeEditor';
-import PDFTemplate from '../reports/reports';
+import Reports from '../reports/reports';
 
 const getFirstGroupby = (groupby) => {
   if (groupby && groupby.split('|').length > 0)
@@ -39,7 +39,7 @@ const init = (props) => {
     record: null,
     searchFields: searchFields,
     graphData: null,
-    param: (!props.noCache && loadSetting(hash(Object.assign({},props.body, {filter: ''})))) || {
+    param: (props.cache && loadSetting(hash(Object.assign({},props.body, {filter: ''})))) || {
       showTopology: props.showTopology != undefined ? props.showTopology : false,
       graphType: props.graphType || "legend",
       allFields: props.allField || false,
@@ -76,7 +76,7 @@ export default class RecordList extends ComponentBase {
   }
 
   componentWillUnmount() {
-    if (!this.props.noCache) {
+    if (this.props.cache) {
       saveSetting(hash(Object.assign({}, this.props.body, {filter: ''})), this.state.param);
     }
   }
@@ -184,28 +184,25 @@ export default class RecordList extends ComponentBase {
     }, this._getRecords);
   }
 
-  _showOrderByIcon(sqlname, orderby = '') {
-    let fields = orderby.split(',');
+  _showOrderByIcon(sqlname, orderByParam = '') {
+    let fields = orderByParam.split(',');
     let index = fields.indexOf(sqlname + ' desc') > -1 ? fields.indexOf(sqlname + ' desc') : fields.indexOf(sqlname);
+
     if (index > -1) {
-      let orderby = fields[index].split(' ');
-
-      if (orderby[0] == sqlname) {
-        if (orderby[1] == 'desc') {
-          return <Descend />;
+      const orderBy = fields[index].split(' ');
+      const icon = [];
+      if (orderBy[0] == sqlname) {
+        if (orderBy[1] == 'desc') {
+          icon.push(<Descend key='rl_icon'/>);
         } else {
-          return <Ascend />;
+          icon.push(<Ascend key='rl_icon'/>);
         }
+        icon.push(<div className='icon-side-sequence' key='rl_index'>{ExplorerActions.posOrderby(orderByParam, sqlname)}</div>);
+        return <Box direction='row' align='center'>{icon}</Box>;
       }
-    }else
+    } else {
       return <EmptyIcon className='icon-empty3'/>;
-  }
-
-  _posOrderby(orderby = '', field = '') {
-    let fields = orderby.split(',');
-    let seq = fields.indexOf(field + ' desc') > -1 ? fields.indexOf(field + ' desc') : fields.indexOf(field);
-    if (orderby &&  seq> -1)
-      return seq + 1;
+    }
   }
 
   _viewDetailShow(record) {
@@ -338,7 +335,10 @@ export default class RecordList extends ComponentBase {
     if (event) {
       event.preventDefault();
     }
-    this.setState({record: null});
+    this.setState({
+      record: null,
+      body: this.props.body
+    });
     return true;
   }
 
@@ -400,8 +400,9 @@ export default class RecordList extends ComponentBase {
       let isPrimary = field.searchable;
       return (
         <Box direction="row" align="center" key={`icon_${index}`}>
-          <Box direction="row" className='orderbyIcon-margin-left' >{!_.isEmpty(this.props.body.orderby) && this._showOrderByIcon(field.sqlname, this.props.body.orderby)}
-          <div className='icon-side-sequence'>{this._posOrderby(this.props.body.orderby, field.sqlname)}</div></Box>
+          <Box direction="row" className='orderbyIcon-margin-left' >
+            {!_.isEmpty(this.props.body.orderby) && this._showOrderByIcon(field.sqlname, this.props.body.orderby)}
+          </Box>
           <Anchor key={`a_groupby_${index}`} icon={selected?<CheckboxSelected />:<Checkbox />}
                   label={label} primary={isPrimary} disabled={this.state.locked}
                   onClick={() => {
@@ -423,7 +424,9 @@ export default class RecordList extends ComponentBase {
   }
 
   renderToolBox() {
-    const {filtered, searchFields, records, locked, loading, numTotal, timeQuery, numColumn, param: {aqlInput, allFields, showTopology}} = this.state;
+    const {editMode, body, title} = this.props;
+    const {filtered, searchFields, records, locked, loading, numTotal, timeQuery, numColumn,
+      param: {aqlInput, allFields, showTopology}, graphData} = this.state;
     const resultRecords = filtered ? filtered : records;
     const aqlWhere = "press / input AQL where statement";
     const quickSearch = searchFields ? `press Enter to quick search in ${searchFields}; ${aqlWhere}` : aqlWhere;
@@ -431,13 +434,13 @@ export default class RecordList extends ComponentBase {
 
     return (
       <Header justify="between" pad='none'>
-        {this.props.title && <Box margin={{right: 'small'}}>{this.props.title}</Box>}
+        {title && <Title margin={{right: 'small'}}>{title}</Title>}
         <input type="text" className={aqlInput ? 'aql flex shadow' : 'flex shadow'} ref="search"
                placeholder={placeholder} disabled={locked} onKeyDown={this._filterAdd.bind(this)} onChange={this._filterAdd.bind(this)}/>
         <Box colorIndex={aqlInput ? 'accent-3' : 'brand'} onClick={this._toggleAQLInput.bind(this)} pad='small' className='button'>
           <Code />
         </Box>
-        <Box direction="column" margin={{left: 'small'}}>
+        <Menu direction="column" margin={{left: 'small'}}>
           <Anchor onClick={this._getMoreRecords.bind(this)} disabled={loading}>
             <Box style={{fontSize: '70%', fontWeight: 'bold'}}>
               {(loading?'...':resultRecords.length) + '/' + numTotal}
@@ -446,42 +449,40 @@ export default class RecordList extends ComponentBase {
           <Box style={{fontSize: '60%'}} align="end">
             {`${timeQuery}ms`}
           </Box>
-        </Box>
-        <Menu icon={<Filter />} flex={false}>
+        </Menu>
+        <Menu icon={<Filter />}>
           {this.renderGroupBy()}
         </Menu>
         <Anchor icon={<Cluster colorIndex={showTopology?'brand': ''}/>}
                 onClick={this._toggleShowTopology.bind(this)}/>
         <Menu icon={<MenuIcon />} dropAlign={{ right: 'right', top: 'top' }}>
           {!showTopology && <Anchor icon={allFields?<CheckboxSelected />:<Checkbox />} label="Full columns"
-                  onClick={() => (this.props.body.fields.length > numColumn) && this._toggleAllFields()}
-                  disabled={this.props.body.fields.length <= numColumn}/>}
+                  onClick={() => (body.fields.length > numColumn) && this._toggleAllFields()}
+                  disabled={body.fields.length <= numColumn}/>}
           <Anchor icon={<Csv />} label="Download CSV"
-                  disabled={numTotal < 1}
-                  onClick={() => (numTotal > 0) && this._download('csv')}/>
+                  disabled={numTotal < 1 || editMode}
+                  onClick={() => (numTotal > 0) && !editMode && this._download('csv')}/>
           <Anchor icon={<Pdf />} label="Download PDF"
                   disabled={numTotal < 1}
-                  onClick={() => (numTotal > 0) && this._download('pdf')}/>
-          <Anchor icon={<Pdf />} label="PDF Report"
+                  onClick={() => (numTotal > 0) && this.printPdf('template')}/>
+          <Anchor icon={<Pdf />} label="Print Barcode"
                   disabled={numTotal < 1}
-                  onClick={() => (numTotal > 0) && this.printPdf.bind(this, {type: 'template', body: this.state.body, records: this.state.records})()}/>
-          <Anchor icon={<Pdf />} label="Barcode"
-                  disabled={numTotal < 1}
-                  onClick={() => (numTotal > 0) && this.printPdf.bind(this, {type: 'BarCode', body: this.state.body, records: this.state.records, total: numTotal})()}/>
+                  onClick={() => (numTotal > 0) && this.printPdf('BarCode')}/>
         </Menu>
         <form name="Download" ref="downloadForm" method="post">
           <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
-          <input type="hidden" name="param" value={JSON.stringify(ExplorerActions.getQueryByBody(Object.assign({}, this.props.body, {param: this.state.param})))}/>
-          <input type="hidden" name="fields" value={JSON.stringify(this.props.body.fields)}/>
-          <input type="hidden" name="graphData" value={JSON.stringify(this.state.graphData)} />
-          <input type="hidden" name="label" value={this.props.title || this.props.body.label} />
+          <input type="hidden" name="param" value={JSON.stringify(ExplorerActions.getQueryByBody(Object.assign({}, body, {param: this.state.param})))}/>
+          <input type="hidden" name="fields" value={JSON.stringify(body.fields)}/>
+          <input type="hidden" name="graphData" value={JSON.stringify(graphData)} />
+          <input type="hidden" name="label" value={title || body.label} />
         </form>
       </Header>
     );
   }
 
-  printPdf(pdfSettings) {
-    this.setState({pdfSettings});
+  printPdf(type) {
+    const {body, records, graphData, numTotal} = this.state;
+    this.setState({pdfSettings: {type, body, records, total: numTotal, groupByData: graphData}});
   }
 
   renderPDFPreview() {
@@ -495,7 +496,7 @@ export default class RecordList extends ComponentBase {
     } else {
       return (
         <Layer closer={true} onClose={() => this.setState({pdfSettings: null})}>
-          <PDFTemplate {...pdfSettings} fromView={true} />
+          <Reports {...pdfSettings} fromView={true} />
         </Layer>
       );
     }
@@ -521,13 +522,10 @@ export default class RecordList extends ComponentBase {
         return this.getDisplayFields().map((field, index) => (
           <th key={index} className={this.state.locked ? 'disabled' : ''}>
             <Box direction='row'>
-              <h4>
-                <Anchor reverse={true}
-                        label={Format.getDisplayLabel(field)} key={`fieldsheader_${index}`}
-                        onClick={this._orderBy.bind(this, field.sqlname)}/>
-              </h4>
+              <Box onClick={this._orderBy.bind(this, field.sqlname)}>
+                {Format.getDisplayLabel(field)}
+              </Box>
               {this._showOrderByIcon(field.sqlname, this.state.param.orderby)}
-              <div className='icon-side-sequence'>{this._posOrderby(this.state.param.orderby, field.sqlname)}</div>
             </Box>
           </th>
         ));
@@ -552,8 +550,8 @@ export default class RecordList extends ComponentBase {
       };
 
       return (
-        <Box colorIndex='light-1' pad='small' flex={true} className='fixMinSizing'>
-          <Table selectable={true} className='autoScroll'
+        <Box colorIndex='light-1' pad='small' flex={true}>
+          <Table selectable={true} className='autoScroll fixIEScrollBar'
                  onMore={this.state.onMoreLock || this.state.filtered ? null : this._getMoreRecords.bind(this)}>
             <thead>
             <tr>
@@ -575,32 +573,7 @@ export default class RecordList extends ComponentBase {
     }
 
     if (this.state.param.showTopology) {
-      const body = this.state.body;
-      return (
-        <Box className='topology-background-color autoScroll' flex={false}>
-          <Box align='end' onClick={() => this.setState({record: null})} pad='small'><Close /></Box>
-          <Box justify='center' pad={{horizontal: 'small'}} flex={true}>
-            <List>
-              <ListItem><Header>{body.label}</Header></ListItem>
-              {
-                body.fields.map((field, index) => {
-                  return (
-                    <ListItem key={index} justify="between">
-                      <span>
-                        {field.label}
-                      </span>
-                      <Box pad={{horizontal: 'medium'}}/>
-                      <span className="secondary">
-                        {Format.getFieldStrVal(record, field)}
-                      </span>
-                    </ListItem>
-                  );
-                })
-              }
-            </List>
-          </Box>
-        </Box>
-      );
+      return <RecordDetail body={this.props.body} record={record} onClose={this._viewDetailClose.bind(this)} choosenRecord={this.state.body} showTopology={this.state.param.showTopology}/>;
     } else {
       return <RecordDetail body={this.props.body} record={record} onClose={this._viewDetailClose.bind(this)}/>;
     }

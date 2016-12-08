@@ -57,8 +57,10 @@ export default class DistributionForm extends GraphForm {
       ],
       legend_position: [
         {value: '', text: ''},
-        {value: 'overlay', text: 'overlay'},
-        {value: 'after', text: 'after'}
+        {value: 'right', text: 'right'},
+        {value: 'left', text: 'left'},
+        {value: 'top', text: 'top'},
+        {value: 'bottom', text: 'bottom'}
       ]
     };
 
@@ -73,17 +75,13 @@ export default class DistributionForm extends GraphForm {
       name: 'size',
       type: 'SelectField'
     }, {
+      name: 'legend.position',
+      type: 'SelectField'
+    }, {
       label: 'Legend units',
       name: 'units',
       type: 'InputField'
-    }, {
-      label: 'Show legend total',
-      name: 'legendTotal',
-      type: 'SwitchField'
-    }/*, {
-      name: 'full',
-      type: 'SwitchField'
-    }*/];
+    }];
 
     return super.render(basicOptions, [], selections);
   }

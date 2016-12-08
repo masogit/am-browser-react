@@ -37,11 +37,6 @@
 }
 
 /** IE11: */
-/*@media screen and (-ms-high-contrast:active), all and (-ms-high-contrast:none)*/
-.grommetux-header--small {
-    height: auto;
-}
-
 .fixIEScrollBar {
   flex-grow: 1;
   flex-basis: 0;
@@ -150,11 +145,14 @@ th {
 .app-name {
   position: relative;
   min-width: 290px;
-  h2:after {
-    content: "|";
-    position: absolute;
-    right: 0;
-    font-weight: 300;
+  h2 {
+    margin: 0;
+    &:after {
+      content: "|";
+      position: absolute;
+      right: 0;
+      font-weight: 300;
+    }
   }
 }
 
@@ -194,4 +192,22 @@ div .grommetux-menu__drop .grommetux-anchor {
     white-space: nowrap;
     text-decoration: none;
     width: 100%;
+}
+
+.flex {
+  flex: 1;
+}
+
+.no-flex {
+  flex: 0;
+}
+
+.amb-schema {
+  button {
+    font-size: inherit;
+  }
+
+  & .grommetux-tab {
+    padding: 0 3px;
+  }
 }

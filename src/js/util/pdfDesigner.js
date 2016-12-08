@@ -2,8 +2,9 @@
  * Created by huling on 11/10/2016.
  */
 import { getDisplayLabel, getFieldStrVal } from './RecordFormat';
-import { loadRecordsByBody } from '../actions/explorer';
+import { loadRecordsByBody, getLinkFilter } from '../actions/explorer';
 import {GLOBAL_VARIABLES} from '../constants/PDFDesigner';
+import {updateValue} from './util';
 
 const genTable = ({title, records, fields, style = {layout: 'headerLineOnly', header: 'tableHeader', text: 'text', tableTitle: {style: 'tableTitle'}}}) => {
   if (!records)
@@ -22,16 +23,21 @@ const genTable = ({title, records, fields, style = {layout: 'headerLineOnly', he
     body.push(row);
   });
 
-  return [{
-    text: `${title} (${records.length})`, style: style.tableTitle.style
-  }, {
+  const table = [];
+  if (title) {
+    table.push({text: `${title} (${records.length})`, style: style.tableTitle.style});
+  }
+
+  table.push({
     style: style.style,
     table: {
       headerRows: 1,
       body: body
     },
     layout: style.layout
-  }];
+  });
+
+  return table;
 };
 
 const getLinkData = (link, pdf_link = [], style = {tableHeader: 'tableHeader', contents: {tableTitle: {style: 'tableTitle'}},fieldBlock: {fieldTitle: {style: 'fieldTitle', text: ''}}}) => {
@@ -68,6 +74,9 @@ const getLinkData = (link, pdf_link = [], style = {tableHeader: 'tableHeader', c
         pdf_ol.push(summary);
 
         links.forEach((sub_link) => {
+          if (!sub_link.body.filter) {
+            sub_link.body.filter = getLinkFilter(sub_link, record);
+          }
           sub_link.body.param = link.body.param;
           promises.push(getLinkData(sub_link, summary.stack, style));
         });
@@ -79,32 +88,7 @@ const getLinkData = (link, pdf_link = [], style = {tableHeader: 'tableHeader', c
   });
 };
 
-const updateValue = (event, {state, callback, val = event.target.value, name = event.target.name, type = event.target.type}) => {
-  if (type == 'range' || type == 'number') {
-    val = parseInt(val);
-  } else if (type == 'checkbox') {
-    val = event.target.checked;
-  }
-
-  if (name.indexOf('.') > -1) {
-    const nameParts = name.split('.');
-    nameParts.reduce((state, key, index) => {
-      if (index == nameParts.length - 1) {
-        state[key] = val;
-      }
-      return state[key];
-    }, state);
-  } else {
-    state[name] = val;
-  }
-
-  if (typeof callback == 'function') {
-    callback();
-  }
-};
-
-
-const analyzeRecordList = (title, filter, allFields, records, style) => {
+const analyzeRecordList = (title, filter, allFields, records, style, param, groupByData) => {
   let availableFields = [];
   if (filter.length > 0) {
     allFields.map(field => {
@@ -121,8 +105,58 @@ const analyzeRecordList = (title, filter, allFields, records, style) => {
     availableFields = allFields;
   }
 
-  return genTable({title, records, fields: availableFields, style});
+
+  return recordsToPdfDoc(title, allFields, records, groupByData, style);
 };
+
+const getGroupbyDisplayLabel = (fields, sqlname) => {
+  if (sqlname) {
+    let groupby = fields.filter((field) => field.sqlname == sqlname)[0];
+
+    return getDisplayLabel(groupby);
+  }
+};
+
+
+// Generate pdf content from records
+function recordsToPdfDoc(title, fields, records, data, style) {
+  // Groupby
+  const groupby = [];
+  const groupTables = [];
+  if (data && data.rows) {
+    data.rows.forEach((row) => {
+      groupby.push([{ul: [(row[0] ? row[0] : '<empty>')]}, row[1]]);
+      const sub_records = records.filter((record) => {
+        let val = record[data.header[0].Content];
+        if (val instanceof Object)
+          val = val[Object.keys(val)[0]];
+        return val == row[0];
+      });
+
+      // fields remove the groupby
+      const newFields = fields.filter((field) => field.sqlname != data.header[0].Content);
+      //const title = (row[0] ? row[0] : '<empty>') + ' (' + row[1] + ')';
+      groupTables.push(genTable({title: row[0], records: sub_records, fields: newFields, style}));
+    });
+  }
+
+  const contents = [
+    data ? { text: 'Statistics by ' + getGroupbyDisplayLabel(fields, data.header[0].Content), style: style.header} : '',
+    groupby.length > 0 ? {
+      table: {
+        body: groupby
+      },
+      layout: 'noBorders'
+    } : ''];
+
+  if (data && groupTables.length > 0) {
+    contents.push(groupTables);
+  } else {
+    contents.push(genTable({title, records, fields, style}));
+  }
+
+  return contents;
+}
 
 const genSummary = (record, fields, style = {column: 2, label: 'fieldLabel', value: 'fieldValue'}) => {
   const columns = style.column;
@@ -248,7 +282,7 @@ const getColumns = (originSource) => {
   });
 };
 
-const translateText = (pdfDefinition, {settings, records, fields_state, body, record, links, param}) => {
+const translateText = (pdfDefinition, {settings, records, fields_state, body, record, links, param, groupByData}) => {
   const {fields: fields_props = [], label = ''} = body;
   const fieldsName = fields_state.map(field => field.sqlname);
 
@@ -258,11 +292,12 @@ const translateText = (pdfDefinition, {settings, records, fields_state, body, re
   content.push(replacer(settings.reportDesc.text, [label, null, settings.reportDesc.style], replaceTitle, replaceDate, replaceLogo));
 
   if (records.length > 0) {
-    content.push(analyzeRecordList(replacer(settings.contents.tableTitle.text, body.label, replaceTableTitle), fieldsName, fields_props, records, settings.contents));
+    const title = replacer(settings.contents.tableTitle.text, body.label, replaceTableTitle);
+    content.push(analyzeRecordList(title, fieldsName, fields_props, records, settings.contents, param, groupByData));
   }
 
   const promiseList = [];
-  if (links && links.length > 0) {
+  if ((links && links.length > 0) || record) {
 
     const summary = {
       stack: [

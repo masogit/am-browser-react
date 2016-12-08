@@ -97,7 +97,8 @@ var express;
 //var timestamp = dateformat(new Date(), 'yyyymmddHHMM');
 //var timestamp = Math.floor(new Date().getTime()/1000);
 var timestamp = new Date().toISOString().substring(0, 10);
-var currentId = (parseInt(version.id)+1).toString();
+//var currentId = (parseInt(version.id)+1).toString();
+var currentId = version.id;
 console.log("currentId is " + currentId);
 
 gulp.task('set-webpack-alias', () => {
@@ -176,10 +177,10 @@ gulp.task('clean-download-ws', function () {
 gulp.task('download-metadata-xml', ['clean-download-ws'], function () {
   console.log('Download ws/binary metadata xml');
   // download ws metadata xml
-  var download_ws_metadata = download(config.Nexus + 'com/hp/am/java/ac.ws/MAIN-SNAPSHOT/maven-metadata.xml')
+  var download_ws_metadata = download(config.Nexus + 'com/hp/am/java/ac.ws/' + config.Snapshot + '-SNAPSHOT/maven-metadata.xml')
     .pipe(gulp.dest('./rest/downloads/ws'));
   // download x64 binary metadata xml
-  var download_x64_metadata = download(config.Nexus + 'com/hp/am/cpp/binary/MAIN-SNAPSHOT/maven-metadata.xml')
+  var download_x64_metadata = download(config.Nexus + 'com/hp/am/cpp/binary/' + config.Snapshot + '-SNAPSHOT/maven-metadata.xml')
     .pipe(gulp.dest('./rest/downloads/x64'));
   // download openssl metadata xml
   var download_openssl_metadata = download(config.Nexus3rd + 'com/hp/am/3rd/openssl/maven-metadata.xml')
@@ -225,17 +226,29 @@ gulp.task('parse-metadata-xml', ['download-metadata-xml'], function () {
 
 gulp.task('download-ws', ['parse-metadata-xml'], function () {
   console.log('Download ws and x64 binary');
+  // get latest ws war
   var ws_json = require('./rest/downloads/ws/json/maven-metadata.json');
-  var ws_version_info = ws_json.metadata.versioning[0].snapshot[0].timestamp + '-' + ws_json.metadata.versioning[0].snapshot[0].buildNumber;
-  if (config.Release_WS) {
-    ws_version_info = config.Release_WS;
+  var ws_latest_version = config.Snapshot + '-' + ws_json.metadata.versioning[0].snapshot[0].timestamp + '-' + ws_json.metadata.versioning[0].snapshot[0].buildNumber;
+  var ws_version_info = '';
+  var snapshotWsVersion = ws_json.metadata.versioning[0].snapshotVersions[0].snapshotVersion;
+  for (var i = 0; i < snapshotWsVersion.length; i++) {
+    if (snapshotWsVersion[i].extension && snapshotWsVersion[i].extension[0] == 'war' &&snapshotWsVersion[i].value && snapshotWsVersion[i].value[0] == ws_latest_version) {
+      if (snapshotWsVersion[i].classifier && snapshotWsVersion[i].classifier[0] == 'signed') {
+        ws_version_info = snapshotWsVersion[i].value[0] + '-' + 'signed' + '.' + snapshotWsVersion[i].extension[0];
+      } else {
+        ws_version_info = snapshotWsVersion[i].value[0] + '.' + snapshotWsVersion[i].extension[0];
+      }
+    }
   }
-  var ws_url = config.Nexus + 'com/hp/am/java/ac.ws/MAIN-SNAPSHOT/ac.ws-MAIN-'
-    + ws_version_info + '.war';
+  if (config.Release_WS) {
+    ws_version_info = config.Snapshot + '-' + config.Release_WS + '.war';
+  }
+  var ws_url = config.Nexus + 'com/hp/am/java/ac.ws/' + config.Snapshot + '-SNAPSHOT/ac.ws-'
+    + ws_version_info;
   console.log('Ws url is : ' + ws_url);
+  // get CPP binary filtered by Classifier defined in configuration
   var x64_json = require('./rest/downloads/x64/json/maven-metadata.json');
-  var x64_version_info = "";
-  var x64_url = "";
+  var x64_version_info = '';
   var snapshotVersion = x64_json.metadata.versioning[0].snapshotVersions[0].snapshotVersion;
   for (var i = 0; i < snapshotVersion.length; i++) {
     if (snapshotVersion[i].classifier && snapshotVersion[i].classifier[0] == config.Classifier) {
@@ -243,9 +256,9 @@ gulp.task('download-ws', ['parse-metadata-xml'], function () {
     }
   }
   if (config.Release_CPP) {
-    x64_version_info = 'MAIN-' + config.Release_CPP + '-' + config.Classifier + '.zip';
+    x64_version_info = config.Snapshot + '-' + config.Release_CPP + '-' + config.Classifier + '.zip';
   }
-  x64_url = config.Nexus + 'com/hp/am/cpp/binary/MAIN-SNAPSHOT/binary-' +　x64_version_info;
+  var x64_url = config.Nexus + 'com/hp/am/cpp/binary/' + config.Snapshot + '-SNAPSHOT/binary-' +　x64_version_info;
   console.log('x64 binary url is : ' + x64_url);
   var openssl_json = require('./rest/downloads/openssl/json/maven-metadata.json');
   var openssl_url = config.Nexus3rd + 'com/hp/am/3rd/openssl/'
@@ -435,10 +448,10 @@ gulp.task('clean-download-ws-linux', function () {
 gulp.task('download-metadata-xml-linux', ['clean-download-ws-linux'], function () {
   console.log('Download ws/binary metadata xml');
   // download ws metadata xml
-  var download_ws_metadata = download(linuxConfig.Nexus + 'com/hp/am/java/ac.ws/MAIN-SNAPSHOT/maven-metadata.xml')
+  var download_ws_metadata = download(linuxConfig.Nexus + 'com/hp/am/java/ac.ws/' + config.Snapshot + '-SNAPSHOT/maven-metadata.xml')
     .pipe(gulp.dest('./rest/downloads/ws'));
   // download x64 binary metadata xml
-  var download_x64_metadata = download(linuxConfig.Nexus + 'com/hp/am/cpp/binary/MAIN-SNAPSHOT/maven-metadata.xml')
+  var download_x64_metadata = download(linuxConfig.Nexus + 'com/hp/am/cpp/binary/' + config.Snapshot + '-SNAPSHOT/maven-metadata.xml')
     .pipe(gulp.dest('./rest/downloads/x64'));
   // download openssl metadata xml
   var download_openssl_metadata = download(linuxConfig.Nexus3rd + 'com/hp/am/3rd/openssl/maven-metadata.xml')
@@ -484,17 +497,29 @@ gulp.task('parse-metadata-xml-linux', ['download-metadata-xml-linux'], function 
 
 gulp.task('download-ws-linux', ['parse-metadata-xml-linux'], function () {
   console.log('Download ws and x64 binary');
+  // get latest ws war
   var ws_json = require('./rest/downloads/ws/json/maven-metadata.json');
-  var ws_version_info = ws_json.metadata.versioning[0].snapshot[0].timestamp + '-' + ws_json.metadata.versioning[0].snapshot[0].buildNumber;
-  if (linuxConfig.Release_WS) {
-    ws_version_info = linuxConfig.Release_WS;
+  var ws_latest_version = config.Snapshot + '-' + ws_json.metadata.versioning[0].snapshot[0].timestamp + '-' + ws_json.metadata.versioning[0].snapshot[0].buildNumber;
+  var ws_version_info = '';
+  var snapshotWsVersion = ws_json.metadata.versioning[0].snapshotVersions[0].snapshotVersion;
+  for (var i = 0; i < snapshotWsVersion.length; i++) {
+    if (snapshotWsVersion[i].extension && snapshotWsVersion[i].extension[0] == 'war' &&snapshotWsVersion[i].value && snapshotWsVersion[i].value[0] == ws_latest_version) {
+      if (snapshotWsVersion[i].classifier && snapshotWsVersion[i].classifier[0] == 'signed') {
+        ws_version_info = snapshotWsVersion[i].value[0] + '-' + 'signed' + '.' + snapshotWsVersion[i].extension[0];
+      } else {
+        ws_version_info = snapshotWsVersion[i].value[0] + '.' + snapshotWsVersion[i].extension[0];
+      }
+    }
   }
-  var ws_url = linuxConfig.Nexus + 'com/hp/am/java/ac.ws/MAIN-SNAPSHOT/ac.ws-MAIN-'
-    + ws_version_info + '.war';
+  if (linuxConfig.Release_WS) {
+    ws_version_info = config.Snapshot + '-' + linuxConfig.Release_WS + '.war';
+  }
+  var ws_url = linuxConfig.Nexus + 'com/hp/am/java/ac.ws/' + config.Snapshot + '-SNAPSHOT/ac.ws-'
+    + ws_version_info;
   console.log('Ws url is : ' + ws_url);
+  // get CPP binary filtered by Classifier defined in configuration
   var x64_json = require('./rest/downloads/x64/json/maven-metadata.json');
-  var x64_version_info = "";
-  var x64_url = "";
+  var x64_version_info = '';
   var snapshotVersion = x64_json.metadata.versioning[0].snapshotVersions[0].snapshotVersion;
   for (var i = 0; i < snapshotVersion.length; i++) {
     if (snapshotVersion[i].classifier && snapshotVersion[i].classifier[0] == linuxConfig.Classifier) {
@@ -502,9 +527,9 @@ gulp.task('download-ws-linux', ['parse-metadata-xml-linux'], function () {
     }
   }
   if (linuxConfig.Release_CPP) {
-    x64_version_info = 'MAIN-' + linuxConfig.Release_CPP + '-' + linuxConfig.Classifier + '.zip';
+    x64_version_info = config.Snapshot + '-' + linuxConfig.Release_CPP + '-' + linuxConfig.Classifier + '.zip';
   }
-  x64_url = linuxConfig.Nexus + 'com/hp/am/cpp/binary/MAIN-SNAPSHOT/binary-' +　x64_version_info;
+  var x64_url = linuxConfig.Nexus + 'com/hp/am/cpp/binary/' + config.Snapshot + '-SNAPSHOT/binary-' +　x64_version_info;
   console.log('x64 binary url is : ' + x64_url);
   var openssl_json = require('./rest/downloads/openssl/json/maven-metadata.json');
   var openssl_url = linuxConfig.Nexus3rd + 'com/hp/am/3rd/openssl/'

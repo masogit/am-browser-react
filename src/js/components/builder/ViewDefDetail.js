@@ -1,45 +1,25 @@
 import React, {PropTypes} from 'react';
-import ComponentBase from '../commons/ComponentBase';
-import {Markdown, Box, Form, FormField, Header, CheckBox, Menu, Table, Anchor, Split, Map, Icons} from 'grommet';
-const {Close, LinkUp: Up, LinkDown: Down, Ascend, Descend, Play, Checkmark, Duplicate, Download,
-  CaretPrevious, More, Mail} = Icons.Base;
-import {isEmpty} from 'lodash';
-import AlertForm from '../../components/commons/AlertForm';
-import EditLayer from '../../components/commons/EditLayer';
-import ContentPlaceHolder from '../../components/commons/ContentPlaceHolder';
+
+import {Box, Form, FormField, CheckBox, Table, Anchor, Map, Icons} from 'grommet';
+const {Close, LinkUp: Up, LinkDown: Down, Ascend, Descend, CaretPrevious} = Icons.Base;
+import {isEmpty, isEqual} from 'lodash';
+import {AlertForm, EditLayer, ContentPlaceHolder, SearchInput, ComponentBase, AMHeader } from '../commons';
 import FieldTypes from '../../constants/FieldTypes';
-import {saveAs} from 'file-saver';
-import SearchInput from '../commons/SearchInput';
 import {bodyToMapData} from '../../util/util';
 import PDFDesigner from './../reports/PDFDesigner';
-import {toggleSidebar} from '../../actions/system';
-import {UploadWidget} from '../commons/Widgets';
+import {toggleSidebar, onMail, onDownload} from '../../actions/system';
+import {posOrderby} from '../../actions/explorer';
 
-const _onMail = (view) => {
-  if (view._id) {
-    let br = "%0D%0A";
-    let subject = `AM Browser View: ${view.name}`;
-    if (!window.location.origin) {
-      window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
-    }
-    let url = window.location.origin + '/explorer/' + view._id;
-    let content = `URL: ${url}${br}Description: ${view.desc}`;
-    window.open(`mailto:test@example.com?subject=${subject}&body=${content}`, '_self');
+const isNumber = field => FieldTypes.number.indexOf(field.type) > -1 && !field.user_type;
+
+const updateTableSize = () => {
+  const elements = document.getElementsByClassName('grommetux-table');
+  for (let i = 0; i < elements.length; i++) {
+    elements[i].className = elements[i].className.replace('grommetux-table--small', '');
   }
 };
 
-const _onDownload = (view) => {
-  if (view._id) {
-    let blob = new Blob([JSON.stringify(view)], {type: "data:application/json;charset=utf-8"});
-    saveAs(blob, (view.name || view.body.sqlname || 'view') + ".json");
-  }
-};
-
-const isNumber = (field) => {
-  return FieldTypes.number.indexOf(field.type) > -1 && !field.user_type;
-};
-
-
+const isValidateView = json => json.name && json.category && json.body;
 
 export default class ViewDefDetail extends ComponentBase {
 
@@ -56,10 +36,15 @@ export default class ViewDefDetail extends ComponentBase {
     this._onDelete = this._onDelete.bind(this);
     this._setCategory = this._setCategory.bind(this);
     this.printPdf = this.printPdf.bind(this);
+    this.uploadJson = this.uploadJson.bind(this);
     this.state = {
       mainFilter: false,
       alertForm: null
     };
+  }
+
+  componentDidUpdate() {
+    setTimeout(updateTableSize, 200);
   }
 
   _onChange(event, value) {
@@ -95,13 +80,6 @@ export default class ViewDefDetail extends ComponentBase {
 
   _setCategory(event) {
     this.props.onValueChange(event.target.name.substring(2), event.suggestion);
-  }
-
-  _posOrderBy(orderby, field) {
-    let fields = orderby ? orderby.split(',') : [];
-    let seq = fields.indexOf(field + ' desc') > -1 ? fields.indexOf(field + ' desc') : fields.indexOf(field);
-    if (orderby &&  seq> -1)
-      return seq + 1;
   }
 
   _onTripleStateChange(event, value, orderby) {
@@ -293,7 +271,7 @@ export default class ViewDefDetail extends ComponentBase {
               <Descend size="small"/>
             </a>
             }
-            {this._posOrderBy(selfView.body.orderby, field.sqlname)}
+            {posOrderby(selfView.body.orderby, field.sqlname)}
           </td>
           <td>
             <a id={`${currentPath}body.fields.${index}.del`} name={`${currentPath}body.fields.${index}`}
@@ -407,26 +385,59 @@ export default class ViewDefDetail extends ComponentBase {
     toggleSidebar(false);
   }
 
-  uploadJson(result) {
+  uploadJson(result, closeMenu) {
     let json = JSON.parse(result);
-    if (this.isValidateView(json)) {
+    if (isValidateView(json)) {
       if (json._id)
         json._id = null;
 
       this.props.setSelectedView('', json);
       this.props.uploadViewSuccess();
-      this.menu.setState({state: 'collapsed'});
+      closeMenu();
     } else {
       this.props.uploadViewFailed();
     }
   }
 
-  isValidateView(json) {
-    return (json.name && json.category && json.body);
+  renderHeader(selectedView, enablePlay) {
+    const editMode = !isEqual(selectedView, this.props.originView);
+    const buttons = [
+      { id: 'Query', onClick: this.props.openPreview, enable: enablePlay },
+      {
+        id: 'Save',
+        onClick: this.openAlert,
+        args: 'save',
+        enable: selectedView.name && selectedView.category
+      },
+      { id: 'Delete', onClick: this.openAlert, args: 'delete', enable: selectedView._id }
+    ];
+
+    const subMenuButtons = [
+      { id: 'Duplicate', onClick: this.openAlert, args: 'duplicate', enable: selectedView._id},
+      {
+        id: 'Mail', onClick: () => onMail(selectedView, 'View', 'explorer', `Description: ${selectedView.desc}`),
+        args: selectedView, enable: selectedView._id, hide: !selectedView._id
+      },
+      {
+        id: 'Download',
+        onClick: () => !editMode && onDownload(selectedView, selectedView.name || selectedView.body.sqlname || 'view'),
+        args: selectedView,
+        enable: selectedView._id && !editMode
+      }
+    ];
+
+    const uploadProps = {
+      enable: !selectedView._id,
+      accept: '.json',
+      onChange: this.uploadJson
+    };
+
+    return <AMHeader title='View Builder' buttons={buttons} subMenuButtons={subMenuButtons} uploadProps={uploadProps}/>;
   }
 
   render() {
-    const {selectedView, openPreview, categories, onSubmit, compact} = this.props;
+    const {selectedView, onSubmit} = this.props;
+    const categories = this.props.categories ? this.props.categories.sort() : [];
 
     if (isEmpty(selectedView)) {
       toggleSidebar(true);
@@ -458,40 +469,20 @@ export default class ViewDefDetail extends ComponentBase {
       table = this.renderTable(title, filter, selectedView, true, '', selectedView.body.sqlname);
     }
 
-    const renderAnchor = ({icon, onClick, args, enable, label}) => {
-      return (<Anchor icon={icon} label={label} disabled={!enable} onClick={() => enable && onClick(args)}/>);
-    };
-
     return (
       <Box flex={true}>
         {this.getLayer(layer)}
-        <Header justify="between" pad={{horizontal: 'medium'}}>
-          <Box>View Builder</Box>
-          <Menu direction="row" align="center" responsive={true}>
-            {renderAnchor({icon: <Play />, onClick: openPreview, label: 'Query', enable: table})}
-            {renderAnchor({icon: <Checkmark />, onClick: this.openAlert, args: 'save', label: 'Save', enable: selectedView.name && selectedView.category})}
-            {renderAnchor({icon: <Close />, onClick: this.openAlert, args: 'delete', label: 'Delete', enable: selectedView._id})}
-            <Menu icon={<More />} dropAlign={{ right: 'right', top: 'top' }} closeOnClick={false} ref={node => this.menu = node}>
-              {renderAnchor({icon: <Duplicate />, onClick: this.openAlert, args: 'duplicate', label: 'Duplicate', enable: selectedView._id})}
-              {selectedView._id && renderAnchor({icon: <Mail />, onClick: _onMail, args: selectedView, label: 'Mail', enable: selectedView._id})}
-              {renderAnchor({icon: <Download />, onClick: _onDownload,args: selectedView , label: 'Download', enable: selectedView._id})}
-              <UploadWidget enable={!selectedView._id} accept=".json" onChange={this.uploadJson.bind(this)}/>
-            </Menu>
-          </Menu>
-        </Header>
-        <Box className='autoScroll fixIEScrollBar' pad={{horizontal: 'medium'}}>
-          <Split flex="left" fixed={false} className='fixMinSizing'>
+        {this.renderHeader(selectedView, table)}
+        <Box pad={{horizontal: 'medium'}} direction="row">
             <Box flex={true}>
               {
                 selectedView.body.sqlname &&
-                <Box className='hiddenScroll' flex={false}>
-                  <Map vertical={true} className='grid' data={bodyToMapData(selectedView.body)}/>
-                </Box>
+                <Map vertical={true} className='grid' data={bodyToMapData(selectedView.body)}/>
               }
-              {table}
+              <Box className="autoScroll">{table}</Box>
             </Box>
-            <Box pad={table ? {horizontal: 'small', vertical: 'none'} : 'none'}>
-              <Form onSubmit={onSubmit} compact={compact}>
+            <Box pad={{horizontal: 'small', vertical: 'none'}}>
+              <Form onSubmit={onSubmit} compact={true}>
                 <FormField label="Name">
                   <input id="v.name" name="v.name" type="text" onChange={this._onChange}
                          value={selectedView.name}/>
@@ -505,13 +496,12 @@ export default class ViewDefDetail extends ComponentBase {
                                suggestions={categories} onDOMChange={this._onChange}
                                onSelect={this._setCategory}/>
                 </FormField>
-                <Box pad={{vertical: 'medium'}}>
-                  <Markdown content="All views under **My Assets** Category will replace Out-Of-Box *My Assets* module" />
-                </Box>
               </Form>
+              <Box pad="small" style={{width: '235px'}}>
+                <p>All views under <strong>My Assets</strong> Category will replace Out-Of-Box My Assets module</p>
+              </Box>
             </Box>
             {selectedView && selectedView.name && this.getAlertLayer(alertForm, selectedView.name)}
-          </Split>
         </Box>
       </Box>
     );

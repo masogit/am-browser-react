@@ -56,7 +56,10 @@ export default class MyAsset extends ComponentBase {
     this.acquireLock();
     // Load specified category, if no 'My Assets', use default json
     const filter = {filter: JSON.stringify({category: CATEGORY_MY_ASSETS})};
-    ExplorerActions.loadViews(filter).then((views)=> {
+    ExplorerActions.loadViews(filter).then((records)=> {
+      const views = records.filter((view) => {
+        return view.category == CATEGORY_MY_ASSETS;
+      });
       this.setState({ views });
       if (views instanceof Array && views.length > 0) {
         views.forEach((view, index) => {
@@ -106,7 +109,7 @@ export default class MyAsset extends ComponentBase {
       const data = this.state[dataName];
 
       return (
-        <Tile colorIndex='light-2' key={index}>
+        <Tile colorIndex='light-2' key={index} pad="large">
           <Header size='small' justify='center'>{obj.key}</Header>
           {(data && typeof data == 'string') ? data :
           <Graph type='legend' data={this.state[dataName]} config={config} onClick={() => this.setState({type: obj.key})}/>}
@@ -129,7 +132,7 @@ export default class MyAsset extends ComponentBase {
         </Box>
         <Box full='horizontal' pad={{horizontal: 'small'}} justify='center'>
           {
-            recordBody ? <RecordList body={recordBody} noCache={true} showTopology={true}/>
+            recordBody ? <RecordList body={recordBody} showTopology={true}/>
               : <Tiles flush={false} className='justify-around' colorIndex='light-1'>{summary}</Tiles>
           }
         </Box>

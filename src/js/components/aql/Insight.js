@@ -480,7 +480,7 @@ export default class Insight extends ComponentBase {
 
   _addTab() {
     let namePrefix = 'Tab_';
-    let maxIndex = 1;
+    let maxIndex = 0;
     this.state.tabs.forEach(tab => {
       if (tab.name.indexOf(namePrefix) == 0) {
         let index = tab.name.substr(namePrefix.length) / 1;
@@ -565,7 +565,7 @@ export default class Insight extends ComponentBase {
       content = data && data[id] && this._renderSingleAQL(data[id]);
     } else {
       content = (
-        <Tabs justify='center' className='flex' activeIndex={this.state.focusIndex} initialIndex={this.state.focusIndex}>{
+        <Tabs justify='center' className='flex' activeIndex={this.state.focusIndex}>{
           showedTabs.map((tab, index) => (
             <ActionTab ref={tab.name} title={tab.name} key={tab.name} onClick={this._setFocusTab.bind(this, tab, index)}
                        onEdit={edit} onDoubleClick={this.state.edit ? this._onUpdateTitle.bind(this, tab) : null}>
@@ -580,7 +580,7 @@ export default class Insight extends ComponentBase {
     return (
       <Box full="horizontal">
         <Header justify="between" pad={{'horizontal': 'medium'}}>
-          <Box>Insight</Box>
+          <Title>Insight</Title>
           {
             !id &&
             <Menu direction="row" align="center" responsive={true}>

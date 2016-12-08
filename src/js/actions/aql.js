@@ -1,4 +1,4 @@
-import {GRAPH_DEF_URL, INSIGHT_DEF_URL, AM_DB_DEF_URL, AM_AQL_DEF_URL} from '../constants/ServiceConfig';
+import {GRAPH_DEF_URL, INSIGHT_DEF_URL, AM_DB_DEF_URL, AM_AQL_DEF_URL, AM_AQL_VALIDATION_URL} from '../constants/ServiceConfig';
 import Rest from '../util/grommet-rest-promise';
 import store from '../store';
 import * as Types from '../constants/ActionTypes';
@@ -85,85 +85,66 @@ export function loadReports() {
   });
 }
 
-export function queryAQL(str) {
-  var aql = {
-    tableName: "",
-    where: "",
-    fields: ""
-  };
-
-  let errorMessage;
-  // get key word position
-  // todo: check if AQL can contain multipule key words
-  var idx_SELECT = str.toLowerCase().indexOf("select");
-  var idx_FROM = str.toLowerCase().indexOf("from");
-  var idx_WHERE = str.toLowerCase().indexOf("where");
-
-  if (idx_SELECT < 0 || idx_FROM < 0) {
-    errorMessage =  "AQL is invalid! Can not query data for Graph";
-    store.dispatch({type: Types.RECEIVE_ERROR, msg: errorMessage});
-    return dummy_promise;
-  } else {
-    // get fields from SELECT .. FROM
-    aql.fields = str.substring(idx_SELECT + 6, idx_FROM).trim();
-
-    // get tableName from FROM .. WHERE (WHERE is optional)
-    aql.tableName = (idx_WHERE > -1) ? str.substring(idx_FROM + 4, idx_WHERE).trim() : str.substring(idx_FROM + 4).trim();
-
-    // get where start from WHERE (not include WHERE, where is optional)
-    aql.where = (idx_WHERE < 0) ? "" : str.substring(idx_WHERE).trim();
-
-    var query = AM_AQL_DEF_URL + aql.tableName + "/" + aql.fields;
-    if (aql.where) {
-      query += " " + encodeURI(aql.where);
+function checkAqlSyntax(str) {
+  return Rest.get(AM_AQL_VALIDATION_URL, {str: encodeURI(str)}).then(res => {
+    if (!res.body) {
+      store.dispatch({type: Types.RECEIVE_ERROR, msg: res.text});
+    } else {
+      return str;
     }
-
-    return Rest.get(query).then((res) => {
-      return simpleAQLResult(res.body.Query);
-    }, (err) => {
-      if (err.status == 404) {
-        errorMessage = 'Can not get response from rest server, please check your AQL string';
-      } else {
-        errorMessage = err.rawResponse || (err.response && err.response.text || err.toString());
-      }
-      store.dispatch({type: Types.RECEIVE_ERROR, msg: errorMessage});
-    });
-  }
+  }, err => {
+    const errorMessage = err.rawResponse || (err.response && err.response.text || err.toString());
+    store.dispatch({type: Types.RECEIVE_ERROR, msg: errorMessage});
+  });
 }
 
-function simpleAQLResult(Query) {
+export function queryAQL(str) {
+  if (!str) {
+    return dummy_promise;
+  }
+
+  let errorMessage;
+
+  var query = AM_AQL_DEF_URL + "?aql=" + str;
+
+  return Rest.get(query).then((res) => {
+    return simpleAQLResult(res.body);
+  }, (err) => {
+    if (err.status == 404) {
+      errorMessage = 'Can not get response from rest server, please check your AQL string';
+    } else {
+      errorMessage = err.rawResponse || (err.response && err.response.text || err.toString());
+    }
+    store.dispatch({type: Types.RECEIVE_ERROR, msg: errorMessage});
+  });
+}
+
+export function queryAQLWithCheck(str) {
+  return checkAqlSyntax(str).then(queryAQL);
+}
+
+function simpleAQLResult(result) {
   var data = {
     table: "",
     header: [],
     rows: []
   };
 
-  data.table = Query.Schema.Content;
+  data.table = result.content;
 
-  if (Query.Schema.Column instanceof Array) {
-    data.header = Query.Schema.Column;
-  } else {
-    data.header.push(Query.Schema.Column);
-  }
+  data.header = data.header.concat(result.schema);
 
-
-  if (Query.Result.Row instanceof Array) {  // Multiple rows
-    for (let index in Query.Result.Row) {
-      let row = Query.Result.Row[index];
+  if (result.entities instanceof Array) {  // Multiple rows
+    for (let index in result.entities) {
+      let row = result.entities[index];
       var cols = [];
-      if (row.Column instanceof Array) {
-        row.Column.forEach((col) => {
-          if (col.content)
-            cols.push(col.content);
-          else
-            cols.push('');
-        });
-      } else {
-        if (row.Column.content)
-          cols.push(row.Column.content);
-        else
-          cols.push('');
-      }
+      Object.values(row).forEach((col) => {
+        if (col instanceof Object) {
+          cols.push(col.Value);
+        } else {
+          cols.push(col);
+        }
+      });
       if (cols.length > 0)
         data.rows.push(cols);
 
@@ -176,30 +157,7 @@ function simpleAQLResult(Query) {
         break;
       }
     }
-  } else if (Query.Result.Row && Query.Result.Row.Column instanceof Array) {  // Only one row
-    var cols = [];
-    Query.Result.Row.Column.forEach((col) => {
-      if (col.content)
-        cols.push(col.content);
-      else
-        cols.push('');
-    });
-    if (cols.length > 0)
-      data.rows.push(cols);
-
-  } else {  // Only one row and one column
-    var cols = [];
-    if (Query.Result.Row && Query.Result.Row.Column.content)
-      cols.push(Query.Result.Row.Column.content);
-    if (cols.length > 0)
-      data.rows.push(cols);
   }
 
-  if (data.rows[0] && data.header.length !== data.rows[0].length) {
-    store.dispatch({
-      type: Types.RECEIVE_WARNING,
-      msg: 'AQL str is invalid: query columns is inconsistent with return columns.'
-    });
-  }
   return data;
 }

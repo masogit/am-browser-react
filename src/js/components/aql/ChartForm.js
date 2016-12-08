@@ -23,16 +23,13 @@ export default class ChartForm extends GraphForm {
         size: 'medium',
         legend: {
           position: '',
-          units: '',
-          total: false
+          units: ''
         },
         important: 0,
         threshold: 0,
-        max: 0,
+        max: 100,
         min: 0,
-        points: false,
-        segmented: false,
-        sparkline: false
+        points: false
       }
     };
   }
@@ -74,14 +71,23 @@ export default class ChartForm extends GraphForm {
         {value: 'line', text: 'line'}
       ],
       size: [
+        {value: 'xxsmall', text: 'xxsmall'},
+        {value: 'xsmall', text: 'xsmall'},
         {value: 'small', text: 'small'},
         {value: 'medium', text: 'medium'},
-        {value: 'large', text: 'large'}
+        {value: 'large', text: 'large'},
+        {value: 'sparkline', text: 'sparkline'}
       ],
       legend_position: [
         {value: '', text: ''},
-        {value: 'overlay', text: 'overlay'},
-        {value: 'after', text: 'after'}
+        {value: 'right', text: 'right'},
+        {value: 'left', text: 'left'},
+        {value: 'top', text: 'top'},
+        {value: 'bottom', text: 'bottom'}
+      ],
+      legend_direction: [
+        {value: 'row', text: 'horizontal'},
+        {value: 'column', text: 'vertical'}
       ],
       xAxis_placement: [
         {value: '', text: ''},
@@ -117,13 +123,12 @@ export default class ChartForm extends GraphForm {
       name: 'legend.position',
       type: 'SelectField'
     }, {
+      name: 'legend.direction',
+      type: 'SelectField'
+    }, {
       label: 'Legend units',
       name: 'units',
       type: 'InputField'
-    }, {
-      label: 'Show legend total',
-      name: 'legend.total',
-      type: 'SwitchField'
     }];
 
     const advanceOptions = [{
@@ -140,12 +145,6 @@ export default class ChartForm extends GraphForm {
       type: 'NumberField'
     }, {
       name: 'points',
-      type: 'SwitchField'
-    }, {
-      name: 'segmented',
-      type: 'SwitchField'
-    }, {
-      name: 'sparkline',
       type: 'SwitchField'
     }];
 

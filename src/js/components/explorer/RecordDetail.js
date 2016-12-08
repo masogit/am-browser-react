@@ -2,11 +2,12 @@ import React, {Component, PropTypes} from 'react';
 import RecordList from './RecordList';
 import ActionTab from '../commons/ActionTab';
 import * as ExplorerActions from '../../actions/explorer';
-import { Anchor, Layer, Tabs, Table, TableRow, Header } from 'grommet';
+import { Anchor, Layer, Tabs, Table, TableRow, Header, Box, List, ListItem } from 'grommet';
+import Close from 'grommet/components/icons/base/Close';
 import Pdf from 'grommet/components/icons/base/DocumentPdf';
 import * as Format from '../../util/RecordFormat';
-import cookies from 'js-cookie';
 import PDFTemplate from '../reports/reports';
+import {cloneDeep} from 'lodash';
 
 export default class RecordDetail extends Component {
 
@@ -26,13 +27,12 @@ export default class RecordDetail extends Component {
 
     if (this.props.body.links)
       this.props.body.links.forEach((bodyLink) => {
-        let link = Object.assign({}, bodyLink);
-        var body = this._getLinkBody(link, this.props.record);
-        if (body.filter) {
-          ExplorerActions.getCount(body).then(records => {
+        const link = cloneDeep(bodyLink);
+        link.body.filter = ExplorerActions.getLinkFilter(link, this.props.record);
+        if (link.body.filter) {
+          ExplorerActions.getCount(link.body).then(records => {
             link.count = records.count;
-            link.body = body;
-            var links = this.state.links;
+            const links = this.state.links;
             links.push(link);
             this.setState({
               links: links
@@ -43,23 +43,24 @@ export default class RecordDetail extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-  }
-
-
-  _getLinkBody(link, record) {
-    var body = Object.assign({}, link.body);
-
-    let AQL = "";
-    if (link.src_field) {
-      var relative_path = link.src_field.relative_path;
-      var src_field = relative_path ? relative_path + '.' + link.src_field.sqlname : link.src_field.sqlname;
-      if (record[src_field]) {
-        AQL = `${link.dest_field.sqlname}=${record[src_field]}`;
-      }
+    if (nextProps.record != this.props.record) {
+      let links = this._linksProcessing(nextProps.choosenRecord, nextProps.record);
+      this.setState({
+        links: links
+      });
     }
 
-    body.filter = body.filter ? `(${body.filter}) AND ${AQL}` : AQL;
-    return body;
+  }
+
+  _linksProcessing(body, record) {
+    if (body.links) {
+      let bodyClone = _.cloneDeep(body);
+      bodyClone.links.forEach((link) => {
+        link.body.filter = ExplorerActions.getLinkFilter(link, record);
+      });
+      return bodyClone.links;
+    }
+    return [];
   }
 
   _getUCMDBURL(fields) {
@@ -75,11 +76,6 @@ export default class RecordDetail extends Component {
           });
         }
       });
-  }
-
-  _download(type) {
-    this.refs.downloadForm.action = ExplorerActions.getDownloadQuery(this.props.body.sqlname) + `?type=${type}`;
-    this.refs.downloadForm.submit();
   }
 
   showPDFDesigner() {
@@ -99,50 +95,44 @@ export default class RecordDetail extends Component {
     );
   }
 
-  render() {
-
+  _renderDetailInList() {
     return (
       <Layer closer={true} align="right" onClose={this.props.onClose}>
         <Tabs justify="start" activeIndex={0}>
           <ActionTab title={this.props.body.label}>
-            <Header justify="end">
-              <Anchor icon={<Pdf />} label="PDF Template" onClick={this.showPDFDesigner}/>
-              <form name="Download" ref="downloadForm" method="post">
-                <input type="hidden" name="_csrf" value={cookies.get('csrf-token')}/>
-                <input type="hidden" name="record" value={JSON.stringify(this.props.record)} />
-                <input type="hidden" name="links" value={JSON.stringify(this.state.links)} />
-                <input type="hidden" name="fields" value={JSON.stringify(this.props.body.fields)}/>
-                <input type="hidden" name="label" value={this.props.title || this.props.body.label} />
-              </form>
-            </Header>
-            <Table>
-              <thead>
-              <tr>
-                <th>Field</th>
-                <th>Value</th>
-              </tr>
-              </thead>
-              <tbody>
-              {
-                this.props.body.fields.map((field, index) => {
-                  return (
-                    <TableRow key={index}>
-                      <td>{Format.getDisplayLabel(field)}</td>
-                      <td>
-                        {Format.getFieldStrVal(this.props.record, field)}
-                        {
-                          field.sqlname.indexOf('GlobalId') > -1 && this.props.record[field.sqlname] &&
-                          <Anchor href={`${this.state.ucmdb}${this.props.record[field.sqlname]}`}
-                                  target="_blank"
-                                  label={`Open UCMDB Browser`} primary={true}/>
-                        }
-                      </td>
-                    </TableRow>
-                  );
-                })
-              }
-              </tbody>
-            </Table>
+            <Box flex={true}>
+              <Header justify="end">
+                <Anchor icon={<Pdf />} label="Download PDF" onClick={this.showPDFDesigner}/>
+              </Header>
+              <Table>
+                <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                {
+                  this.props.body.fields.map((field, index) => {
+                    return (
+                      <TableRow key={index}>
+                        <td>{Format.getDisplayLabel(field)}</td>
+                        <td>
+                          {Format.getFieldStrVal(this.props.record, field)}
+                          {
+                            field.sqlname.indexOf('GlobalId') > -1 && this.props.record[field.sqlname] &&
+                            <Anchor href={`${this.state.ucmdb}${this.props.record[field.sqlname]}`}
+                                    target="_blank"
+                                    label={`Open UCMDB Browser`} primary={true}/>
+                          }
+                        </td>
+                      </TableRow>
+                    );
+                  })
+                }
+                </tbody>
+              </Table>
+            </Box>
           </ActionTab>
           {
             this.state.links.map((link, index) => {
@@ -155,6 +145,51 @@ export default class RecordDetail extends Component {
         {this.renderPDFPreview()}
       </Layer>
     );
+  }
+
+  _renderDetailInTopology() {
+    const body = this.props.choosenRecord;
+
+    return (
+      <Box className='topology-background-color autoScroll' flex={false}>
+        <Header justify='between'>
+            {body.label}
+            <Anchor icon={<Close />} onClick={this.props.onClose} justify='end'/>
+        </Header>
+        <Box justify='center' pad={{horizontal: 'small'}} flex={false}>
+          <List>
+            <ListItem>
+              <Header justify='end' size='small'>
+                <Anchor icon={<Pdf />} label="Download PDF" onClick={this.showPDFDesigner}/>
+              </Header>
+            </ListItem>
+            {
+              body.fields.map((field, index) => {
+                return (
+                  <ListItem key={index} justify="between">
+                    <span>
+                      {Format.getDisplayLabel(field)}
+                    </span>
+                    <Box pad={{horizontal: 'medium'}} />
+                    <span className="secondary">
+                      {Format.getFieldStrVal(this.props.record, field)}
+                    </span>
+                  </ListItem>
+                );
+              })
+            }
+          </List>
+        </Box>
+        {this.renderPDFPreview()}
+      </Box>
+    );
+  }
+
+  render() {
+    if (this.props.showTopology)
+      return this._renderDetailInTopology();
+    else
+      return this._renderDetailInList();
   }
 }
 

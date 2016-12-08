@@ -18,7 +18,7 @@ class UploadWidget extends Component {
     }
 
     reader.onload = (e) => {
-      this.props.onChange(e.target.result);
+      this.props.onChange(e.target.result, this.props.closeMenu);
     };
   }
 
