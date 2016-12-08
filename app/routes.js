@@ -36,7 +36,9 @@ module.exports = function (app) {
   }
 
   var httpProxy = require('http-proxy');
-  var apiProxy = httpProxy.createProxyServer();
+  var apiProxy = httpProxy.createProxyServer({
+    proxyTimeout: config.rest_conn.proxy_timeout
+  });
 
   apiProxy.on('proxyReq', function (proxyReq, req, res) {
     // add jwt check for LWSSO jwt may not exist
@@ -61,6 +63,7 @@ module.exports = function (app) {
 
   apiProxy.on('error', function (e, req, res) {
     logger.error(`[proxy] [${req.sessionID}] [error] ${req.method} ${req.originalUrl}`, util.inspect(e));
+    res.status(500).end();
   });
 
   app.get('/am/csrf', function (req, res) {
