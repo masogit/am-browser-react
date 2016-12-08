@@ -546,7 +546,7 @@ export default class RecordList extends ComponentBase {
 
       return (
         <Box colorIndex='light-1' pad='small' flex={true}>
-          <Table selectable={true} className='autoScroll fixIEScrollBar'
+          <Table selectable={true} className={`autoScroll ${this.props.root?'':'fixIEScrollBar'}`}
                  onMore={this.state.onMoreLock || this.state.filtered ? null : this._getMoreRecords.bind(this)}>
             <thead>
             <tr>
