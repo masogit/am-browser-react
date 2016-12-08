@@ -107,6 +107,32 @@ const genOptions = (optionsArray, form, fromType, selections) => {
   });
 };
 
+const legendOptions = [{
+  name: 'legend.position',
+  type: 'SelectField'
+}, {
+  label: 'Legend units',
+  name: 'units',
+  type: 'InputField'
+}, {
+  name: 'legend.total',
+  type: 'SwitchField'
+}];
+
+const legendSelections = {
+  legend_position: [
+    {value: '', text: ''},
+    {value: 'right', text: 'right'},
+    {value: 'left', text: 'left'},
+    {value: 'top', text: 'top'},
+    {value: 'bottom', text: 'bottom'}
+  ],
+  legend_direction: [
+    {value: 'row', text: 'horizontal'},
+    {value: 'column', text: 'vertical'}
+  ]
+};
+
 export default class GraphForm extends Component {
   componentWillMount() {
     const type = this.state.type;
@@ -145,27 +171,36 @@ export default class GraphForm extends Component {
   }
 
   render(basicOptions, advanceOptions, selections) {
-    const showBasic = this.state.showBasic;
-    const showAdvance = this.state.showAdvance;
-    const advance = genOptions(advanceOptions, this, this.state.type, selections);
-    const basic = genOptions(basicOptions, this, this.state.type, selections);
+    const {showBasic, showAdvance, type} = this.state;
 
+    const advance = genOptions(advanceOptions, this, type, selections);
+    const basic = genOptions(basicOptions, this, type, selections);
+    if (legendOptions.length < 4 && Array.isArray(this.state[type].series_col) && this.state[type].series_col.length > 1) {
+      legendOptions.splice(1, 0, {
+        name: 'legend.direction',
+        type: 'SelectField'
+      });
+    }
+
+    const legend = genOptions(legendOptions, this, type, legendSelections);
+
+    const settings = [];
+    if (showBasic) {
+      settings.push([basic[0]]);
+      settings.push(basic.slice(1));
+    }
+    if (showAdvance) {
+      settings.push(advance);
+      settings.push(legend);
+    }
     return (
       <Box separator='bottom' flex={true}>
-        {showBasic && basic[0]}
-        <Form className='vertical-form'>
-          {showBasic && basic.slice(1)}
-        </Form>
-        <Form className='vertical-form'>
-          {showAdvance && advance}
-        </Form>
+        {settings.map((setting, index) => <Form className='vertical-form' key={index}>{setting}</Form>)}
         <Box className='toggle' direction='row'>
           <CheckBox label='Basic' checked={this.state.showBasic} value={this.state.showBasic}
                     onChange={() => this.setState({showBasic: !showBasic})}/>
-          {advance.length > 0 &&
-            <CheckBox label='Advance' checked={this.state.showAdvance} value={this.state.showAdvance}
-                      onChange={() => this.setState({showAdvance: !showAdvance})}/>
-          }
+          <CheckBox label='Advance' checked={this.state.showAdvance} value={this.state.showAdvance}
+                    onChange={() => this.setState({showAdvance: !showAdvance})}/>
         </Box>
       </Box>
     );

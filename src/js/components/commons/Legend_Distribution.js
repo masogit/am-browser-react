@@ -33,6 +33,7 @@ class LegendDistribution extends Component {
       legendPosition,
       legendTitle,
       legendSeries = [],
+      legendTotal,
       distributionSeries = []
       } = this.props;
 
@@ -45,7 +46,8 @@ class LegendDistribution extends Component {
         series: legendSeries,
         units,
         title: legendTitle,
-        activeIndex
+        activeIndex,
+        total: legendTotal
       });
 
     let direction = 'row';

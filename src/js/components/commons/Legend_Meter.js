@@ -52,6 +52,7 @@ class LegendMeter extends Component {
       legendPosition,
       legendTitle,
       legendSeries = [],
+      legendTotal,
       threshold,
       stacked,
       vertical,
@@ -69,7 +70,7 @@ class LegendMeter extends Component {
 
     let top_left_Legend = null;
     let bottom_right_Legend = null;
-    const legend = legendPosition && legendSeries.length > 0 && this.renderLegend({series: legendSeries, units, activeIndex, title: legendTitle, size});
+    const legend = legendPosition && legendSeries.length > 0 && this.renderLegend({series: legendSeries, units, activeIndex, title: legendTitle, size, total: legendTotal});
     if (legendPosition == 'left' || legendPosition == 'top') {
       top_left_Legend = legend;
     } else if (legendPosition == 'right' || legendPosition == 'bottom') {

@@ -18,7 +18,7 @@ export default class MeterForm extends GraphForm {
         legend: {
           position: '', //right|bottom|inline
           units: '',
-          total: false
+          total: true
         },
         important: 0,
         threshold: 0,
@@ -69,13 +69,6 @@ export default class MeterForm extends GraphForm {
         {value: 'small', text: 'small'},
         {value: 'medium', text: 'medium'},
         {value: 'large', text: 'large'}
-      ],
-      legend_position: [
-        {value: '', text: ''},
-        {value: 'right', text: 'right'},
-        {value: 'left', text: 'left'},
-        {value: 'top', text: 'top'},
-        {value: 'bottom', text: 'bottom'}
       ]
     };
 
@@ -94,13 +87,6 @@ export default class MeterForm extends GraphForm {
     }, {
       name: 'size',
       type: 'SelectField'
-    }, {
-      name: 'legend.position',
-      type: 'SelectField'
-    }, {
-      label: 'Legend units',
-      name: 'units',
-      type: 'InputField'
     }];
 
     const advanceOptions = [{

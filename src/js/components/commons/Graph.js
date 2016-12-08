@@ -51,7 +51,7 @@ const setSeriesItem = (seriesIndex, onClick, row, header, index, text, condition
 
 const cloneObj = form => {
   const { xAxis = {}, legend={},  type, size, important = 0 } = form;
-  const { position: legendPosition, direction: legendDirection = 'row' } = legend;
+  const { position: legendPosition, direction: legendDirection = 'row', total: legendTotal } = legend;
   const { placement: xAxisPlacement } = xAxis;
   const chart = {
     size,
@@ -59,7 +59,8 @@ const cloneObj = form => {
     xAxisPlacement,
     important,
     legendPosition,
-    legendDirection
+    legendDirection,
+    legendTotal
   };
 
   assignObjectProp(form, chart, 'threshold');
