@@ -30,8 +30,9 @@ export default class NavHeader extends Component {
   }
 
   onSearch(event) {
-    if (event.keyCode == 13 && event.target.value.trim())
-      history.push(`/search/${encodeURI(event.target.value)}`);
+    if (event.keyCode == 13 && event.target.value.trim()) {
+      history.push(`/search/${encodeURIComponent(event.target.value)}`);
+    }
   }
 
   render() {
