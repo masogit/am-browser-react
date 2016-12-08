@@ -7,8 +7,8 @@ export default class SearchInputWithTags extends Component {
 
   constructor(props) {
     super(props);
-    let fields = this.props.searchFields.split(',');
-    let searchTags = fields.map(field => ({label: field.trim(), disabled: false}));
+    let fields = this.props.searchFields ? this.props.searchFields.split(',') : [];
+    let searchTags = fields ? fields.map(field => ({label: field.trim(), disabled: false})) : [];
 
     this.state = {
       searchFields: this.props.searchFields,
@@ -56,6 +56,8 @@ export default class SearchInputWithTags extends Component {
       searchTags: searchTags,
       searchFields: searchFields
     });
+    if (!searchFields)
+      this._toggleAQLInput();
   }
 
   _toggleAQLInput() {
@@ -78,8 +80,10 @@ export default class SearchInputWithTags extends Component {
   }
 
   renderTagButtons(tags) {
+    const {aqlInput} = this.state;
+
     return (tags && tags.map(tag => {
-      return <Button label={tag.label} onClick={() => (this._resetSearchTags(tag))} primary={!tag.disabled} key={`tb-tag-${tag.label}`}/>;
+      return <Button label={tag.label} onClick={() => (!aqlInput && this._resetSearchTags(tag))} primary={!tag.disabled && !aqlInput} key={`tb-tag-${tag.label}`}/>;
     }));
   }
 
@@ -87,7 +91,7 @@ export default class SearchInputWithTags extends Component {
     const {searchFields, searchTags} = this.state;
     const onSearch = this.props.onSearch;
     const aqlWhere = "press / input AQL where statement";
-    const quickSearch = searchTags ? `press Enter to quick search in ${searchFields}; ${aqlWhere}` : aqlWhere;
+    const quickSearch = searchFields ? `press Enter to quick search in ${searchFields}; ${aqlWhere}` : aqlWhere;
     const placeholder = this.state.aqlInput ? "input AQL where statement…" : quickSearch;
 
     return (
@@ -97,7 +101,7 @@ export default class SearchInputWithTags extends Component {
                onKeyDown={(event) => (onSearch(event, this.state.searchFields, this.state.aqlInput, this.refs.search.value.trim()))}
                onChange={this.onChange.bind(this)}/>
              <Box justify="center" direction="row" flex={true} className="input-with-tag-buttons">
-               {searchFields && this.renderTagButtons(searchTags)}
+               {(searchTags.length > 0) && this.renderTagButtons(searchTags)}
                <Button icon={<Code />} primary={!this.state.aqlInput} onClick={this._toggleAQLInput.bind(this)}/>
         </Box>
       </Box>

@@ -43,13 +43,13 @@ export default class RecordSearch extends ComponentBase {
     }
   }
 
-  _search(keyword) {
+  _search(input) {
     // if (!this.acquireLock()) {
     //   return;
     // }
 
     //  Escaped for SQL. e.g. org.apache.commons.lang.StringEscapeUtils.escapeSql(String str).
-    keyword = keyword.replace(/[']/g, '\'\'');
+    let keyword = input.replace(/[']/g, '\'\'');
     keyword = encodeURI(keyword);
     this.setState({
       messages: {},
@@ -154,7 +154,7 @@ export default class RecordSearch extends ComponentBase {
       return;
     }
 
-    const pathname = `/search/${encodeURI(keyword)}`;
+    const pathname = `/search/${encodeURIComponent(keyword)}`;
     if (location.pathname == decodeURI(pathname) && this.doNotNeedSearch(location.pathname)) {
       if (!this.state.buttonDisabled) {
         this.setState({
