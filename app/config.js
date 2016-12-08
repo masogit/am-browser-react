@@ -17,6 +17,7 @@ var enable_csrf = process.env.AMB_NODE_CSRF || properties.get('node.enable_csrf'
 var enable_lwsso = process.env.AMB_NODE_LWSSO || properties.get('node.enable_lwsso');
 var session_max_age = process.env.AMB_SESSION_MAX_AGE || properties.get('node.session_max_age');
 var jwt_max_age = process.env.AMB_JWT_MAX_AGE || properties.get('rest.jwt_max_age');
+var proxy_timeout = process.env.PROXY_TIMEOUT || properties.get('rest.proxy_timeout');
 
 module.exports = {
   session_secret: properties.get('node.session_secret'),
@@ -71,6 +72,7 @@ module.exports = {
   rest_conn: {
     server: rest_server + ":" + rest_port,
     session_max_age: session_max_age,
+    proxy_timeout: proxy_timeout,
     jwt_max_age: jwt_max_age,
     enable_csrf: enable_csrf,
     enable_lwsso: enable_lwsso,
