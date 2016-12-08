@@ -339,6 +339,8 @@ function getHeadNav(rights) {
     search: rights.index < 2,
     'search/:keyword': rights.index < 2,
     insight: rights.index < 2,
+    sam: rights.index < 2,
+    'sam/:id': rights.index < 2,
     'insight/:id': rights.index < 3,
     explorer: rights.index < 2,
     'explorer/:id': rights.index < 3,
@@ -379,3 +381,4 @@ function live_net_work(req, res) {
     res.end(errMsg);
   });
 }
+

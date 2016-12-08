@@ -4,6 +4,7 @@ import Main from './components/Main';
 import Login from './components/Login';
 import RecordSearch from './components/explorer/RecordSearch';
 import Insight from './components/aql/Insight';
+import SAM from './components/sam/SAMContainer';
 import Explorer from './components/explorer/Explorer';
 import Report from './components/reports/reports';
 import ViewDefListContainer from './components/builder/ViewDefListContainer';
@@ -38,7 +39,9 @@ export const getRoutes = (headerNavs) => {
       {path: 'views', component: ViewDefListContainer},
       {path: 'views/:id', component: ViewDefListContainer},
       {path: 'my', component: MyAssets},
-      {path: 'my/:name', component: MyAssets}
+      {path: 'my/:name', component: MyAssets},
+      {path: 'sam', component: SAM},
+      {path: 'sam/:id', component: SAM}
     ];
 
     allRoutes.map(route => {
