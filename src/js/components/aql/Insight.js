@@ -17,6 +17,9 @@ import _ from 'lodash';
 
 import cookies from 'js-cookie';
 
+
+const getID = () => (Math.random() + 1).toString(36).substring(7);
+
 let tabIdMap = {};
 export default class Insight extends ComponentBase {
 
@@ -73,6 +76,9 @@ export default class Insight extends ComponentBase {
     if (box.child && box.child._id) {
       this.addPromise(AQLActions.loadAQL(box.child._id).then((aql)=> {
         if (!this.state.data[aql._id]) {
+          if(!aql[aql.type]) {
+            aql[aql.type] = aql.form; //handle old data
+          }
           this._queryData(aql);
         }
       }));
@@ -196,35 +202,31 @@ export default class Insight extends ComponentBase {
     });
   }
 
-  _getID() {
-    return (Math.random() + 1).toString(36).substring(7);
-  }
-
   _addBox(box, parent) {
     if (!box.child)
       box.child = [{
-        key: this._getID(),
+        key: getID(),
         direction: 'row',
         child: null
       }, {
-        key: this._getID(),
+        key: getID(),
         direction: 'row',
         child: null
       }];
     else if (box.child instanceof Array)
       box.child.push({
-        key: this._getID(),
+        key: getID(),
         direction: 'row',
         child: null
       });
     else {
       var child = box.child;
       box.child = [{
-        key: this._getID(),
+        key: getID(),
         direction: 'row',
         child: child
       }, {
-        key: this._getID(),
+        key: getID(),
         direction: 'row',
         child: null
       }];
@@ -276,7 +278,7 @@ export default class Insight extends ComponentBase {
           <Box pad='small' onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}><Expand /></Box>
         </Box>
         <Box {...graphStyle}>
-          <Graph type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql.form}
+          <Graph type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql[dataMap.aql.type]}
                  onClick={(filter) => this._showViewRecords(filter, dataMap.aql.view)}/>
         </Box>
       </Box>
@@ -312,7 +314,7 @@ export default class Insight extends ComponentBase {
 
     // Handle old box no key or number key
     if (!box.key || !isNaN(box.key))
-      box.key = this._getID();
+      box.key = getID();
 
     if (box.child) {
       if (box.child instanceof Array) {
@@ -430,9 +432,9 @@ export default class Insight extends ComponentBase {
     return (
       <Box pad="large" flex={false}>
         <Header><Title>{aql.name}</Title></Header>
-        {aql.form instanceof Object &&
+        {aql[aql.type] instanceof Object &&
           <Box key={aql._id} pad="large" align={(aql.type=='meter')?'center':null}>
-            <Graph type={aql.type} data={data} config={aql.form}
+            <Graph type={aql.type} data={data} config={aql[aql.type]}
                   onClick={(filter) => this._showViewRecords(filter, aql.view)}/>
           </Box>
         }

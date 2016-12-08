@@ -108,6 +108,10 @@ export default class AQL extends ComponentBase {
     if (!aql[aql.type]) {
       aql[aql.type] = aql.form; // try to get data from the old form
     }
+    if (!aql[aql.type].condition) {
+      aql[aql.type].condition = {};
+    }
+
     this.setState({
       aql: {...aql},
       data: {
@@ -405,7 +409,11 @@ export default class AQL extends ComponentBase {
 
     const updateType = type => {
       const aql = this.state.aql;
+      if (aql[type] && !aql[type].condition) {
+        aql[type].condition = aql[aql.type].condition;
+      }
       aql.type = type;
+
       this.setState({aql: aql});
     };
 
@@ -432,6 +440,90 @@ export default class AQL extends ComponentBase {
           </ActionTab>
         </Tabs>
       </Box>
+    );
+  }
+
+  renderBasicForm(currentAql, categories, data) {
+    const {name, str, category, view, type} = currentAql;
+    const fields = [{
+      label: 'AQL Name',
+      content: <input type="text" name="name" value={name} onChange={this._updateValue}/>
+    }, {
+      label: 'Input AM Query Language (AQL)',
+      content: (
+        <textarea value={str} rows={10} onChange={() => this.openLayer(LAYER_TYPE.AQL_STR)}
+                  onClick={() => this.openLayer(LAYER_TYPE.AQL_STR)}/>
+      )
+    }, {
+      label: 'Category',
+      content: (
+        <SearchInput type="text" name="category" value={category}
+                     onDOMChange={this._updateValue} suggestions={categories.sort()}
+                     onSelect={event => this._updateValue(event, event.suggestion)}/>
+      )
+    }];
+
+    let viewComp;
+    if (view) {
+      const viewFields = [];
+      viewFields.push({
+        label: 'View',
+        content: (
+          <ActionLabel label={`Link to: ${currentAql.view.name}`} icon={<Trash/>}
+                       onClick={() => this.alert(ALERT_TYPE.REMOVE)}/>
+        )
+      });
+
+      if (data && currentAql[type]) {
+        const condition = currentAql[type].condition || {};
+        const index = (() => {
+          if (type == 'chart') return currentAql[type].xAxis_col;
+          if (type == 'meter') return currentAql[type].col_unit;
+          if (type == 'distribution') return currentAql[type].label;
+        })() || 0;
+
+        if (!condition.key) {
+          condition.key = data.header[index].Name;
+        }
+        if (!condition.value) {
+          condition.value = data.header[index].Name;
+        }
+
+        viewFields.push({
+          label: 'Key',
+          content: (
+            <input type="text" name="condition.key"
+                   value={condition.key}
+                   onChange={this._updateGraphData}/>
+          )
+        });
+
+        viewFields.push(
+          {
+            label: 'Value column',
+            content: (
+              <select name='condition.value' value={condition.value} onChange={this._updateGraphData}>
+                {data.header.map((item, index) => <option key={index} value={item.Name}>{item.Name}</option>)}
+              </select>
+            )
+          }
+        );
+      }
+
+      viewComp = (
+        <Box separator='all'>
+          <Form className='no-border'>
+            {viewFields.map(({label, content}, index) => <FormField label={label} key={index}>{content}</FormField>)}
+          </Form>
+        </Box>
+      );
+    }
+
+    return (
+      <Form compact={true}>
+        {fields.map(({label, content}, index) => <FormField label={label} key={index}>{content}</FormField>)}
+        {viewComp}
+      </Form>
     );
   }
 
@@ -486,28 +578,7 @@ export default class AQL extends ComponentBase {
               </Box>
               {layer && this.popupLayer(layer)}
             </Box>
-            <Form compact={true}>
-              <FormField label="AQL Name">
-                <input type="text" name="name" value={currentAql.name}
-                       onChange={this._updateValue}/>
-              </FormField>
-              <FormField label="Input AM Query Language (AQL)" htmlFor="AQL_STR">
-                  <textarea value={currentAql.str} rows={10} onChange={() => this.openLayer(LAYER_TYPE.AQL_STR)}
-                            onClick={() => this.openLayer(LAYER_TYPE.AQL_STR)}/>
-              </FormField>
-              <FormField label="Category" htmlFor="AQL_Category">
-                <SearchInput type="text" name="category" value={currentAql.category}
-                             onDOMChange={this._updateValue} suggestions={categories.sort()}
-                             onSelect={event => this._updateValue(event, event.suggestion)}/>
-              </FormField>
-              {
-                currentAql.view &&
-                <FormField label="Linked to" htmlFor="AQL_LinkTo">
-                  <ActionLabel label={`View: ${currentAql.view.name}`}
-                               icon={<Trash/>} onClick={() => this.alert(ALERT_TYPE.REMOVE)}/>
-                </FormField>
-              }
-            </Form>
+            {this.renderBasicForm(currentAql, categories, validData && data)}
           </Box>
         </Box>
           : <ContentPlaceHolder/>

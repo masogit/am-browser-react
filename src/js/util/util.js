@@ -82,7 +82,12 @@ export function updateValue(event, props) {
       if (index == nameParts.length - 1) {
         state[key] = val;
       }
-      return state[key];
+      if (!state[key]) {
+        console.log(`[update value] Can not find ${key} in state!`);
+        return {};
+      } else {
+        return state[key];
+      }
     }, state);
   } else {
     state[name] = val;
