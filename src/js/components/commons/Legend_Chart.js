@@ -35,12 +35,17 @@ class LegendChart extends Component {
       setTimeout(() => {
         resizeBar(node, this.props.chartsValues[0].length);
       }, 200);
+
+      setTimeout(() => {
+        resizeBar(node, this.props.chartsValues[0].length);
+      }, 400);
     });
   }
 
   componentDidUpdate() {
     if (this.refs.chart) {
       this.refs.chart._onResize();
+      this.refs.chart2._onResize();
     }
   }
 
@@ -117,9 +122,9 @@ class LegendChart extends Component {
     );
   }
 
-  renderMarkLabel(count, activeIndex, xAxisLabels, units) {
+  renderMarkLabel(count, activeIndex, xAxisLabels, units, titles) {
     const series = xAxisLabels[activeIndex] ? xAxisLabels[activeIndex].displayValue.map((value, i) => ({
-      label: '',
+      label: titles[i],
       value,
       units,
       colorIndex: getColorIndex(i)
@@ -146,7 +151,7 @@ class LegendChart extends Component {
       units = '',
       chartsValues = [],
       xAxisLabels = [],
-      max,
+      max = 100,
       min,
       points,
       smooth,
@@ -162,17 +167,17 @@ class LegendChart extends Component {
     }
 
     /* Note: Segmented property is dropped.......*/
-    let topPanel = null;
-    let bottomPanel = null;
+    let topAxis = null;
+    let bottomAxis = null;
     let top_left_Legend = null;
     let bottom_right_Legend = null;
 
     const axisPanel = this.renderAxisLabels(xAxisLabels);
 
     if (xAxisPlacement === 'top') {
-      topPanel = axisPanel;
+      topAxis = axisPanel;
     } else if (xAxisPlacement === 'bottom') {
-      bottomPanel = axisPanel;
+      bottomAxis = axisPanel;
     }
 
     const count = this.getCountNum(chartsValues);
@@ -190,21 +195,28 @@ class LegendChart extends Component {
     }
 
     return (
-    chartsValues.length > 0 &&
-        <Box direction={direction} className={className + (type == 'bar' ? ' hide-HotSpots' : '')}>
-          {top_left_Legend}
-          <Chart vertical full ref='chart'>
-            {topPanel}
+      chartsValues.length > 0 &&
+      <Box direction={direction} className={className + (type == 'bar' ? ' hide-HotSpots' : '')}>
+        {top_left_Legend}
+        <Chart ref='chart' full>
+          <Axis count={5}
+                labels={[{"index": 2, "label": Math.floor(max/2)}, {"index": 4, "label": '' + max}]}
+                vertical={true}/>
+          <Chart vertical full ref='chart2'>
+            <Base height={size} width="full"/>
+            {topAxis}
             <Layers>
+              <Marker colorIndex='graph-2' vertical value={0}/>
               {this.renderMetaGraphs(chartsValues, type, activeIndex, max, min, points, smooth)}
-              {threshold && <Marker colorIndex='critical' value={threshold} />}
+              {threshold && <Marker colorIndex='critical' value={threshold}/>}
+              {xAxisPlacement && <Marker colorIndex='graph-2' value={0}/>}
               <Marker
                 count={count}
                 index={activeIndex}
                 value={activeIndex}
                 vertical
                 colorIndex={markerColorIndex || getColorIndex(1)}/>
-              {this.renderMarkLabel(count, activeIndex, xAxisLabels, units)}
+              {this.renderMarkLabel(count, activeIndex, xAxisLabels, units, legendTitles)}
               <HotSpots
                 count={count}
                 activeIndex={activeIndex}
@@ -216,11 +228,11 @@ class LegendChart extends Component {
                 }}
                 />
             </Layers>
-            <Base height={size} width="full" />
-            {bottomPanel}
+            {bottomAxis}
           </Chart>
-          {bottom_right_Legend}
-        </Box>
+        </Chart>
+        {bottom_right_Legend}
+      </Box>
     );
   }
 
