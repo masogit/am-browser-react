@@ -21,18 +21,23 @@ export default class RecordSearch extends ComponentBase {
       warning: '',
       buttonDisabled: true
     };
+    this.keyword = '';
     this.lastSearchTime = {};
   }
 
   componentDidMount() {
     const keyword = this.props.params.keyword;
+    this.keyword = keyword;
     this._onSearch(keyword);
     this.loadViews = ExplorerAction.loadViews();
   }
 
   componentDidUpdate(prevProps, prevState) {
     const keyword = this.props.params.keyword;
-    this._onSearch(keyword);
+    if(this.keyword != keyword) {
+      this.keyword = keyword;
+      this._onSearch(keyword);
+    }
     if (this.refs.table) {
       this.refs.table.setState({small: false});
     }
