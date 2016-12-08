@@ -198,9 +198,9 @@ class LegendChart extends Component {
     }
 
     if (legendPosition == 'left' || legendPosition == 'top') {
-      top_left_Legend = <Box direction={legendDirection || legendDir} flex={false}>{legend}</Box>;
+      top_left_Legend = <Box direction={legendDirection || legendDir} align='center' justify='center' flex={false}>{legend}</Box>;
     } else if (legendPosition == 'right' || legendPosition == 'bottom') {
-      bottom_right_Legend = legendPosition && <Box direction={legendDirection || legendDir} flex={false}>{legend}</Box>;
+      bottom_right_Legend = legendPosition && <Box direction={legendDirection || legendDir} align='center' justify='center' flex={false}>{legend}</Box>;
     }
 
     return (
