@@ -22,6 +22,8 @@ base = /AssetManagerWebService/rs
 version = /v1
 # 60 minutes
 jwt_max_age = 60
+# 2 minutes
+proxy_timeout = 120000
 
 [ucmdb]
 adapter = true
