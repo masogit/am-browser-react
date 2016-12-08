@@ -183,10 +183,10 @@ function aql(aql) {
     return "AQL is required!";
   if (['chart', 'meter', 'distribution'].indexOf(aql.type) < 0)
     return "type must in: chart, meter, distribution!";
-  if (!aql.form)
-    return "Need Graph form!";
+  if (!aql[aql.type])
+    return "Need Graph settings!";
 
-  if (error = form(form))
+  if (error = form(aql[aql.type]))
     return error;
 
   const rules = {
@@ -203,8 +203,8 @@ function aql(aql) {
   });
 }
 
-function form(form) {
-  // TODO validate form
+function form(chartSettings) {
+  // TODO validate graph settings
 
   return null;
 }
