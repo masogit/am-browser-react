@@ -338,12 +338,22 @@ class MetaData extends ComponentBase {
     fields = fields.sort(sortSqlName);
     let renderFieldItem = (index, key) => {
       let row = fields[index];
-      return (
-        <ListItem separator="none" key={key} pad="none">
-          <Anchor icon={<Notes />} onClick={this._onChange.bind(this, row)} label={row.sqlname}/>
-        </ListItem>
-      );
+      if (!row.sqlname.startsWith('cf_')) {
+        return (
+          <ListItem separator="none" key={key} pad="none">
+            <Anchor icon={<Notes />} onClick={this._onChange.bind(this, row)} label={row.sqlname}/>
+          </ListItem>
+        );
+      } else {
+        return (
+          <ListItem separator="none" key={key} pad="none">
+            <Notes />
+            <Box margin={{left: 'small'}} style={{textDecoration: 'line-through'}}>{row.sqlname}</Box>
+          </ListItem>
+        );
+      }
     };
+
     return (
       <Box flex={true} className='fixMinSizing fixIEScrollBar'>
         <Form compact={true}>
@@ -352,7 +362,7 @@ class MetaData extends ComponentBase {
                       onDOMChange={this._onSearch}/>
           </FormField>
         </Form>
-        <Box pad={{vertical: 'small'}} className="fixMinSizing autoScroll">
+        <Box pad={{vertical: 'small'}} className="autoScroll">
           {entities.length > 0 &&
           <ReactList
             itemRenderer={renderEntityItem}

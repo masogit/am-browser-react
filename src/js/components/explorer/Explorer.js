@@ -62,7 +62,7 @@ export default class Explorer extends Component {
       focus.selected = view._id;
       content = (
         <Box margin={{horizontal: 'small'}} flex={true}>
-          <RecordList body={view.body} title={view.name} root={true}/>
+          <RecordList body={view.body} title={view.name} root={true} cache={true}/>
         </Box>
       );
     } else {
@@ -80,4 +80,3 @@ export default class Explorer extends Component {
     );
   }
 }
-

@@ -3,13 +3,12 @@ import {
   CheckBox, Form, FormField, NumberInput, Box, RadioButton
 } from 'grommet';
 import _ from 'lodash';
-import objectPath from 'object-path';
 
-const SelectField = ({label, name, value, onChange, options, key}) => {
-  const optionsComp = options.map(option=>
-    <option key={key} value={option.value}>{option.text}</option>);
+const SelectField = ({label, name, value, onChange, options}) => {
+  const optionsComp = options.map((option, index)=>
+    <option key={index} value={option.value}>{option.text}</option>);
   return (
-    <FormField label={label} key={key}>
+    <FormField label={label} key={name}>
       <select name={name} value={value} onChange={onChange}>
         {optionsComp}
       </select>
@@ -71,7 +70,7 @@ const NumberField = ({label, name, value, onChange}) => (
 // -- value
 // if ignored it will be this.state.distribute.name
 const genOptions = (optionsArray, form, fromType, selections) => {
-  return optionsArray.map(({label, name, value, options, type}) => {
+  return optionsArray.map(({label, name, value, options, type}, index) => {
     if (_.includes(name, '.')) {
       const [name1, name2] = name.split('.');
       label = label || (name1.charAt(0).toUpperCase() + name1.slice(1) + ' ' + name2);
@@ -85,7 +84,7 @@ const genOptions = (optionsArray, form, fromType, selections) => {
 
     if (type === 'SelectField') {
       return (
-        <SelectField key={name} label={label} name={name} value={value} options={options}
+        <SelectField key={index} label={label} name={name} value={value} options={options}
                      onChange={form._setFormValues.bind(form)}/>
       );
     } else if (type === 'InputField') {
@@ -111,36 +110,16 @@ const genOptions = (optionsArray, form, fromType, selections) => {
 export default class GraphForm extends Component {
   componentWillMount() {
     const type = this.state.type;
-
-    let form;
-    if (this.props[type]) {
-      form = Object.assign({}, this.state[type], this.props[type]);
+    const chartSettings = this.props[type];
+    if (chartSettings) {
+      this.state[type] = chartSettings;
     } else {
-      this._init();
-      form = this.state[type];
+      this.state[type] = this._init();
+      this.props.setInitSetting(this.state[type]);
     }
-    const newState = this.initState();
-    newState[type] = form;
-    //if (type === 'chart' ? form.series_col.length > 0 : form.series_col) {
-    //  this.setState(newState, this.props.genGraph(form, this.state.type));
-    //}
-    this.setState(newState, () => {
-      if (type === 'chart' ? form.series_col.length > 0 : form.series_col) {
-        this.props.genGraph(form, this.state.type);
-      }
-    });
-  }
 
-  componentWillReceiveProps(nextProps) {
-    if (!nextProps[this.state.type]) {
-      this._init();
-    }
-  }
-
-  initState(state = {}) {
-    state.showBasic = this.state.showBasic == undefined ? true : this.state.showBasic;
-    state.showAdvance = this.state.showAdvance == undefined ? false : this.state.showAdvance;
-    return state;
+    this.state.showBasic = this.state.showBasic == undefined ? true : this.state.showBasic;
+    this.state.showAdvance = this.state.showAdvance == undefined ? false : this.state.showAdvance;
   }
 
   _setFormValues(event) {
@@ -148,16 +127,6 @@ export default class GraphForm extends Component {
     const type = this.state.type;
     const path = event.target.name;
     const obj = this.state[type];
-    const newState = this.initState();
-
-    if (event.target.type === 'checkbox' || event.target.type === 'radio') {
-      val = event.target.checked;
-    } else if (event.target.type === 'number') {
-      val = event.target.value / 1;
-    } else {
-      val = event.target.value;
-    }
-
     if (path === 'series_col') {
       if (type === 'chart') {
         if (event.target.checked === true) {
@@ -172,11 +141,7 @@ export default class GraphForm extends Component {
       }
       val = obj.series_col;
     }
-
-    objectPath.set(obj, path, val);
-
-    newState[type] = obj;
-    this.setState(newState, this.props.genGraph(obj, type));
+    this.props.genGraph(event, val);
   }
 
   render(basicOptions, advanceOptions, selections) {

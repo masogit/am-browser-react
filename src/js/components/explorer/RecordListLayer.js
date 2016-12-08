@@ -4,10 +4,11 @@ import {Layer, Box}from 'grommet';
 
 export default class RecordListLayer extends Component {
   render() {
+    const {onClose, body, title, editMode} = this.props;
     return (
-      <Layer onClose={this.props.onClose} closer={!!this.props.onClose} flush={true} align="center">
+      <Layer onClose={onClose} closer={!!onClose} flush={true} align="center">
         <Box full={true} pad="large" style={{minHeight: '90vh'}}>
-          <RecordList body={this.props.body} title={this.props.title}/>
+          <RecordList body={body} title={title} editMode={editMode}/>
         </Box>
       </Layer>
     );
@@ -17,5 +18,6 @@ export default class RecordListLayer extends Component {
 RecordList.propTypes = {
   title: PropTypes.string,
   body: PropTypes.object.isRequired,
-  onClose: PropTypes.func
+  onClose: PropTypes.func,
+  editMode: PropTypes.bool
 };

@@ -480,7 +480,7 @@ export default class Insight extends ComponentBase {
 
   _addTab() {
     let namePrefix = 'Tab_';
-    let maxIndex = 1;
+    let maxIndex = 0;
     this.state.tabs.forEach(tab => {
       if (tab.name.indexOf(namePrefix) == 0) {
         let index = tab.name.substr(namePrefix.length) / 1;
