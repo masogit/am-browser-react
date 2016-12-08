@@ -35,10 +35,6 @@ class LegendChart extends Component {
       setTimeout(() => {
         resizeBar(node, this.props.chartsValues[0].length);
       }, 200);
-
-      setTimeout(() => {
-        resizeBar(node, this.props.chartsValues[0].length);
-      }, 400);
     });
   }
 
@@ -151,8 +147,8 @@ class LegendChart extends Component {
       units = '',
       chartsValues = [],
       xAxisLabels = [],
-      max = 100,
-      min,
+      max: originMax,
+      min: originMin,
       points,
       smooth,
       markerColorIndex,
@@ -160,6 +156,14 @@ class LegendChart extends Component {
       important
       } = this.props;
 
+    let max = originMax;
+    let min = originMin;
+    if (!max) {
+      max = Math.max(...chartsValues.map(values => Math.max(...values)));
+    }
+    if (!min) {
+      min = Math.min(...chartsValues.map(values => Math.min(...values)));
+    }
     // handle history data
     let legendPosition = this.props.legendPosition;
     if (legendPosition == 'overlay' || legendPosition == 'after') {
@@ -199,9 +203,8 @@ class LegendChart extends Component {
       <Box direction={direction} className={className + (type == 'bar' ? ' hide-HotSpots' : '')}>
         {top_left_Legend}
         <Chart ref='chart' full>
-          <Axis count={5}
-                labels={[{"index": 2, "label": Math.floor(max/2)}, {"index": 4, "label": '' + max}]}
-                vertical={true}/>
+          <Axis count={5} vertical={true}
+                labels={[{"index": 0, "label": min}, {"index": 2, "label": Math.floor(max/2)}, {"index": 4, "label": max}]} />
           <Chart vertical full ref='chart2'>
             <Base height={size} width="full"/>
             {topAxis}
