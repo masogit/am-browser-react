@@ -51,7 +51,7 @@ class LegendMeter extends Component {
       meterSeries = [],
       legendPosition,
       legendTitle,
-      legendSeries,
+      legendSeries = [],
       threshold,
       stacked,
       vertical,
