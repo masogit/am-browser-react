@@ -208,13 +208,13 @@ export default class SAMContainer extends Component {
             <Card {...this.state.product}/>
             {
               this.state.license &&
-              <RecordList body={this.state.license} title="Version" allFields={true} onClick={(record) => this.renderSoftware(record)} noCache={true}/>
+              <RecordList body={this.state.license} title="Version" allFields={true} onClick={(record) => this.renderSoftware(record)} root={true}/>
             }
           </Box>
         }
         {
           this.state.software &&
-          <RecordListLayer body={this.state.software} title="Computer" onClose={this._onClose.bind(this)} allFields={true} noCache={true}/>
+          <RecordListLayer body={this.state.software} title="Computer" onClose={this._onClose.bind(this)} allFields={true}/>
         }
       </Box>
     );
