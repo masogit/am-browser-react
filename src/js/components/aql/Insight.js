@@ -388,7 +388,7 @@ export default class Insight extends ComponentBase {
     }
     const dataIds = tabIdMap[tab.name].dataIds;
     return (
-      <Carousel ref='carousel' className='no-flex'>
+      <Carousel ref='carousel' className='flex'>
         {
           // dataIds contains a lot duplicated ids, and the last unique ids is the right order
           dataIds.slice(-_.uniq(dataIds).length).map((key, index)=> {
