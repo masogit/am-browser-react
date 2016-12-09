@@ -34,11 +34,11 @@ class MarginDesigner extends Component {
 
   _updateValue(event) {
     const value = [parseInt(this.left.value), parseInt(this.top.value), parseInt(this.right.value), parseInt(this.bottom.value)];
-    this.props.updateValue(event, value, 'margin', 'text');
+    this.props.updateValue(event, value, 'margin');
   }
 
   renderInput(refName, value) {
-    return (<input type='number' ref={node=> this[refName] = node} min={0} max={64} value={value} onChange={this._updateValue}/>);
+    return (<input type='number' className='grommetux-input' ref={node=> this[refName] = node} min={0} max={64} value={value} onChange={this._updateValue}/>);
   }
 
   render() {
@@ -108,10 +108,11 @@ class StyleDesigner extends Component {
     this.setState({styleObj: Object.assign({}, init_style)});
   }
 
-  _updateValue(event, val) {
+  _updateValue(event, val, name) {
     const styleObj = this.state.styleObj;
     updateValue(event, {
       val: val,
+      name: name,
       state: styleObj,
       callback: () => this.setState({styleObj: styleObj})
     });
