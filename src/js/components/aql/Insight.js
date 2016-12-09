@@ -603,8 +603,11 @@ export default class Insight extends ComponentBase {
                   <Anchor icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>
                   <Anchor icon={<Add />} onClick={this._addTab.bind(this)} label="Add Tab"/>
                   <Anchor icon={<Close />} onClick={() => this.state.tabs.length > 1 && this._onRemove(this.state.focusTab)} label="Delete Tab" disabled={this.state.tabs.length <= 1}/>
-                  { this.checkAdmin() && <Anchor icon={<Group colorIndex={this.state.tabs[this.state.focusIndex].public ? '' : 'grey-4'} />} label="Public"
-                          onClick={this._onPublicTab.bind(this, this.state.tabs[this.state.focusIndex])}/> }
+                  {
+                    this.checkAdmin() &&
+                    <Anchor label="Public" icon={<Group />} primary={this.state.tabs[this.state.focusIndex].public}
+                            onClick={this._onPublicTab.bind(this, this.state.tabs[this.state.focusIndex])}/>
+                  }
                 </Menu>
               }
               {
