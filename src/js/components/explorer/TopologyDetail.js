@@ -4,7 +4,6 @@
 import React, {Component, PropTypes} from 'react';
 import * as ExplorerActions from '../../actions/explorer';
 import {Topology, Box}from 'grommet';
-//const Parts = Topology.Parts;
 const Part = Topology.Part;
 const Label = Topology.Label;
 import More from 'grommet/components/icons/base/More';
