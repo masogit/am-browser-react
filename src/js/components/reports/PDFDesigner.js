@@ -137,7 +137,10 @@ export default class PDFDesigner extends Component {
 
   returnStyleField({label, name, value, placeHolder, styles = this.state.report.settings.styles, data = Object.keys(styles), noInput=false}) {
     const styleName = noInput ? name : name + '.style';
-    const styleValue = noInput ? value : value.style;
+    let styleValue = noInput ? value : value.style;
+    if (!noInput && data.indexOf(styleValue) == -1) {
+      styleValue = 'text'; // if the style name can not be found, use text as default
+    }
 
     const fieldLabel = (
       <Box justify='between' direction='row'>

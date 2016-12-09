@@ -4,7 +4,8 @@
 import React, {Component, PropTypes} from 'react';
 import {Box, Header, FormField, Form, CheckBox, SVGIcon, Layer, Paragraph,
   Title, Button, Footer, NumberInput, List, ListItem, Label} from 'grommet';
-import {init_style, getPreviewStyle, updateValue} from '../../util/pdfDesigner';
+import {getPreviewStyle, updateValue} from '../../util/pdfDesigner';
+import {init_style} from '../../constants/PDFDesigner';
 import AlertForm from '../commons/AlertForm';
 
 const Brush = (props) => (
@@ -203,6 +204,7 @@ class StyleDesigner extends Component {
 
   render() {
     const { styleObj }= this.state;
+    const isOOBStyle = styleObj.tempId < 0;
     return (
       <Box flex={true}>
         <Header direction='row' justify='between'>
@@ -217,9 +219,12 @@ class StyleDesigner extends Component {
               </FormField>
               <FormField>
                 <Box direction='row' align='center' justify='between' pad='medium'>
-                  <Box direction='row'><Label margin='none' style={{color: '#ff0000', fontWeight: '400'}}>Name:</Label>
-                    <input className='input-field' name='name' type="text" value={styleObj.name} onChange={this._updateValue}
-                           autoFocus={true} maxLength='20'/>
+                  <Box direction='row'><Label margin='none' style={isOOBStyle ? {} : {color: '#ff0000', fontWeight: '400'}}>Name:</Label>
+                    {isOOBStyle ? <Label margin='none'>{styleObj.name}</Label> :
+                      <input className='input-field' name='name' type="text" value={styleObj.name}
+                             onChange={this._updateValue}
+                             autoFocus={true} maxLength='20'/>
+                    }
                   </Box>
                   <label><Label>Color:</Label><input type='color' name='color' value={styleObj.color} onChange={this._updateValue}/></label>
                   <CheckBox checked={styleObj.bold} name='bold' toggle={true}
@@ -239,7 +244,7 @@ class StyleDesigner extends Component {
               <Box direction='row'>
                 <Button label="New" onClick={this.initStyle}/>
                 <Box pad={{horizontal: 'small'}}/>
-                <Button label="Delete" onClick={this._onDelete.bind(this, styleObj)} accent={true}/>
+                <Button label="Delete" onClick={isOOBStyle ? null : this._onDelete.bind(this, styleObj)} accent={true}/>
               </Box>
               <Button label="Save" primary={true} onClick={(styleObj.name && this.isChanged(styleObj)) ? () => this._onSave(styleObj) : null}/>
             </Footer>
