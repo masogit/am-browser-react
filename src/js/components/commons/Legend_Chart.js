@@ -169,6 +169,7 @@ class LegendChart extends Component {
     }
     if (!min) {
       min = Math.min(...chartsValues.map(values => Math.min(...values)));
+      min = Math.min(min, 0);
     }
     // handle history data
     let legendPosition = this.props.legendPosition;

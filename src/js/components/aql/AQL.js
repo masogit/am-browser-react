@@ -472,7 +472,7 @@ export default class AQL extends ComponentBase {
       viewFields.push({
         label: 'View',
         content: (
-          <ActionLabel label={`Link to: ${currentAql.view.name}`} icon={<Trash/>}
+          <ActionLabel label={currentAql.view.name} icon={<Trash/>}
                        onClick={() => this.alert(ALERT_TYPE.REMOVE)}/>
         )
       });
