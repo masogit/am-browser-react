@@ -140,8 +140,21 @@ export default class GraphForm extends Component {
     if (chartSettings) {
       this.state[type] = chartSettings;
     } else {
-      this.state[type] = this._init();
+      this._init();
       this.props.setInitSetting(this.state[type]);
+
+      this.state.showBasic = this.state.showBasic == undefined ? true : this.state.showBasic;
+      this.state.showAdvance = this.state.showAdvance == undefined ? false : this.state.showAdvance;
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const type = this.state.type;
+    if(!nextProps[type]) {
+      this._init();
+      this.props.setInitSetting(this.state[type]);
+    } else {
+      this.state[type] = nextProps[type];
     }
 
     this.state.showBasic = this.state.showBasic == undefined ? true : this.state.showBasic;
@@ -172,6 +185,10 @@ export default class GraphForm extends Component {
 
   render(basicOptions, advanceOptions, selections) {
     const {showBasic, showAdvance, type} = this.state;
+
+    if (!showBasic && !showAdvance) {
+      return null;
+    }
 
     const advance = genOptions(advanceOptions, this, type, selections);
     const basic = genOptions(basicOptions, this, type, selections);
