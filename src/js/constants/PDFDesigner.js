@@ -1,7 +1,7 @@
 /**
  * Created by huling on 11/23/2016.
  */
-import {candy as logo} from './logoImg.js';
+import {hpe as logo} from './logoImg.js';
 
 const MODE = {
   CODE: 'Code',
