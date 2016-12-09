@@ -205,7 +205,7 @@ export default class SAMContainer extends Component {
         </Box>
         {
           product &&
-          <Box flex={true} className='autoScroll' style={{height: '100%'}}>
+          <Box flex={true} pad={{horizontal: "small"}} className='autoScroll' style={{height: '100%'}}>
             <Card {...product}/>
             {
               license &&
