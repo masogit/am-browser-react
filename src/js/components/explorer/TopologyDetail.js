@@ -8,7 +8,6 @@ import {Topology, Box}from 'grommet';
 const Part = Topology.Part;
 const Label = Topology.Label;
 import More from 'grommet/components/icons/base/More';
-import LinkPrevious  from 'grommet/components/icons/base/LinkPrevious';
 import Spinning from 'grommet/components/icons/Spinning';
 import getIcon from './iconPicker';
 
@@ -76,33 +75,6 @@ export default class TopologyDetail extends Component {
       ],
       links: []
     };
-
-    let index = 0;
-    this.state.body.fields.map(field => {
-      if (field.sqlname.indexOf('Parent') > -1 && record[field.sqlname]) {
-        const id = 'item-0-' + index++;
-        data.categories[0].items.push({
-          id: id,
-          label: record[field.sqlname],
-          noLeadingStatus: true,
-          iconB: <LinkPrevious />,
-          onClick: () => {
-            const body = Object.assign({}, this.state.body);
-            body.filter = `TcpIpHostName='${record['Portfolio.Parent.Computer.Name']}'`;
-            ExplorerActions.loadRecordsByBody(body).then((data) => {
-              usedIds = {'item-1-0': true};
-              record = data.entities[0];
-              this.setState({
-                record,
-                data: this.getData(record)
-              }, () => this.getLinks(2, 0, this.state.data, this.state.body.links, record));
-            });
-          }
-        });
-
-        data.links.push({parentId: id, childId: 'item-1-0'});
-      }
-    });
 
     return data;
   }
@@ -234,7 +206,7 @@ export default class TopologyDetail extends Component {
           //item.noTailStatus = !idMap[item.id];
           return (
             <Part justify='start' demarcate={false} key={index}>
-              <Part demarcate={false} align='start' direction='column' key={index}>
+              <Part demarcate={false} align='start' direction='column'>
                 <IconPart {...item}/>
               </Part>
               {idMap[item.id] && this.getItems(idMap[item.id].map(id => categoryMap[id]), idMap, categoryMap, item.id + index)}
