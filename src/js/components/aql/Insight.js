@@ -7,8 +7,8 @@ import history from '../../RouteHistory';
 import RecordListLayer from '../explorer/RecordListLayer';
 import { AlertForm, ComponentBase, AMSideBar, Graph, ActionTab } from '../commons';
 import { Anchor, Box, Button, CheckBox, Header, Title, Menu, Table, TableRow, Layer,
-         Carousel, RadioButton, Tabs, Icons, Label } from 'grommet';
-const { Add, Close, Attachment, Checkmark, Shift, More, Group, Expand } = Icons.Base;
+         Carousel, Tabs, Icons, Label } from 'grommet';
+const { Add, Close, Attachment, Checkmark, Shift, More, Group, Expand, Checkbox, CheckboxSelected  } = Icons.Base;
 import AQL from './AQL';
 import _ from 'lodash';
 
@@ -428,6 +428,7 @@ export default class Insight extends ComponentBase {
   }
 
   _renderSingleAQL(graph) {
+    const id = this.props.params.id;
     const {aql, data} = graph;
     const header = data.header.map((col) => <th key={col.Index}>{col.Name}</th>);
     const rows = data.rows.map((row, index) => (
@@ -439,7 +440,17 @@ export default class Insight extends ComponentBase {
     ));
     return (
       <Box pad="large" flex={false}>
-        <Header><Title>{aql.name}</Title></Header>
+        <Header justify="between" pad="large">
+          <Title>{aql.name}</Title>
+          {
+            id && this.showBack() &&
+            <Anchor icon={<Close />} label="Close" onClick={() => {
+              history.push('/insight');
+              this._loadAQLs();
+              this._loadWall();
+            }}/>
+          }
+        </Header>
         {aql[aql.type] instanceof Object &&
           <Box key={aql._id} pad="large" align={(aql.type=='meter')?'center':null}>
             <Graph type={aql.type} data={data} config={aql[aql.type]}
@@ -566,6 +577,35 @@ export default class Insight extends ComponentBase {
     this.setState(this.state);
   }
 
+  renderHeader() {
+    const { carousel, edit } = this.state;
+    let { showPublic } = this.state;
+    let editAnchor = edit && !showPublic;
+    return (
+        <Header justify="between" pad={{'horizontal': 'medium'}}>
+          <Menu align="center" responsive={true}>
+            <CheckBox label={showPublic ? `Self(${this.state.tabs.length})` : `Public(${this.state.publicTabs.length})`}
+                      toggle={true} checked={showPublic} disabled={edit}
+                      onChange={this._toggleShowPublic.bind(this)}/>
+          </Menu>
+          <Menu inline={false} responsive={true} closeOnClick={false} dropAlign={{top: 'top', right: 'right'}}>
+            <Anchor label="Carousel" icon={carousel ? <CheckboxSelected /> : <Checkbox />}
+                    disabled={edit} onClick={() => !edit && this._toggleCarousel()}/>
+            <Anchor label="Edit" icon={edit ? <CheckboxSelected /> : <Checkbox />}
+                    disabled={showPublic} onClick={this._toggleEdit.bind(this)} />
+            { editAnchor && <Anchor icon={<Checkmark />} onClick={() => !showPublic && this._onSave()} label="Save"/> }
+            { editAnchor && <Anchor icon={<Add />} onClick={this._addTab.bind(this)} label="Add Tab"/> }
+            { editAnchor && <Anchor icon={<Close />} onClick={() => this.state.tabs.length > 1 && this._onRemove(this.state.focusTab)} label="Delete Tab" disabled={this.state.tabs.length <= 1}/> }
+            {
+              this.checkAdmin() && editAnchor &&
+              <Anchor label="Public" icon={<Group />} primary={this.state.tabs[this.state.focusIndex].public}
+                      onClick={this._onPublicTab.bind(this, this.state.tabs[this.state.focusIndex])}/>
+            }
+          </Menu>
+        </Header>
+    );
+  }
+
   render() {
     const {tabs, data, carousel, edit, layer, alert} = this.state;
     let showedTabs = this.state.showPublic ? this.state.publicTabs : tabs;
@@ -589,49 +629,7 @@ export default class Insight extends ComponentBase {
 
     return (
       <Box full="horizontal">
-        <Header justify="between" pad={{'horizontal': 'medium'}}>
-          <Title>Insight</Title>
-          {
-            !id &&
-            <Menu direction="row" align="center" responsive={true}>
-              {
-                !edit &&
-                <Menu direction="row" inline={true}>
-                  <RadioButton id="carousel" name="choice" label="Carousel" onChange={this._toggleCarousel.bind(this)}
-                            checked={carousel} disabled={edit}/>
-                  <RadioButton id="dashboard" name="choice" label="Deck" onChange={this._toggleCarousel.bind(this)}
-                              checked={!carousel || edit}/>
-                  <CheckBox label={`Public Tabs(${this.state.publicTabs.length})`} toggle={true} checked={this.state.showPublic}
-                            onChange={this._toggleShowPublic.bind(this)}/>
-                </Menu>
-              }
-              {
-                edit &&
-                <Menu direction="row" inline={true}>
-                  <Anchor icon={<Checkmark />} onClick={this._onSave.bind(this)} label="Save"/>
-                  <Anchor icon={<Add />} onClick={this._addTab.bind(this)} label="Add Tab"/>
-                  <Anchor icon={<Close />} onClick={() => this.state.tabs.length > 1 && this._onRemove(this.state.focusTab)} label="Delete Tab" disabled={this.state.tabs.length <= 1}/>
-                  {
-                    this.checkAdmin() &&
-                    <Anchor label="Public" icon={<Group />} primary={this.state.tabs[this.state.focusIndex].public}
-                            onClick={this._onPublicTab.bind(this, this.state.tabs[this.state.focusIndex])}/>
-                  }
-                </Menu>
-              }
-              {
-                !this.state.showPublic &&
-                <CheckBox id="edit" label="Edit" checked={edit} onChange={this._toggleEdit.bind(this)} toggle={true}/>
-              }
-            </Menu>
-          }
-          {
-            id && this.showBack() && <Anchor icon={<Close />} label="Close" onClick={() => {
-              history.push('/insight');
-              this._loadAQLs();
-              this._loadWall();
-            }}/>
-          }
-        </Header>
+        { !id && this.renderHeader(edit) }
         <Box className={carousel ? '' : 'autoScroll'} style={{marginTop: -60}}>
           {content}
           {layer && this[`_get${layer.name}Layer`](...layer.args)}
