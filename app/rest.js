@@ -28,90 +28,96 @@ function AMREST() {
     };
 
     client.post(url, args, (signData, response) => {
-      req.session.jwt = {
-        secret: signData.toString(),
-        expires: new Date(Date.now() + am.jwt_max_age * 60 * 1000)
-      };
+      // for LB and rest server is down
+      if (response.statusCode != 200) {
+        logger.error(`[user] [${req.sessionID || '-'}]`, "Service Unavailable! Please check Rest server if it is down! ");
+        res.status(503).send('Service Unavailable!');
+      } else {
+        req.session.jwt = {
+          secret: signData.toString(),
+          expires: new Date(Date.now() + am.jwt_max_age * 60 * 1000)
+        };
 
-      var am_rights = ['@anyone'];
+        var am_rights = ['@anyone'];
 
-      args = {
-        path: {
-          server: am.server,
-          context: am.context,
-          "ref-link": `/db/amEmplDept`
-        },
-        parameters: {
-          fields: `bAdminRight, lEmplDeptId, EMail`,
-          filter: `lEmplDeptId=CurrentUser.lEmplDeptId`
-        },
-        headers: {
-          "Content-Type": "application/json",
-          "X-Authorization": req.session.jwt.secret
-        }
-      };
-
-      client.get(url, args, (data, response) => {
-        var user_rights = Object.assign({}, rights.guest);
-        if (!data.entities || !data.entities[0]) {
-          var message = response.statusMessage;
-          logger.warn(`[user] [${req.sessionID || '-'}]`, message, username);
-          res.status(response.statusCode).send(message);
-        } else {
-          var email = data.entities[0].EMail;
-          var isAdmin = !!data.entities[0].bAdminRight[1];
-          var empId = data.entities[0].lEmplDeptId;
-          if (isAdmin) {
-            am_rights.push('@admin');
-            user_rights.ucmdbAdapter = true;
+        args = {
+          path: {
+            server: am.server,
+            context: am.context,
+            "ref-link": `/db/amEmplDept`
+          },
+          parameters: {
+            fields: `bAdminRight, lEmplDeptId, EMail`,
+            filter: `lEmplDeptId=CurrentUser.lEmplDeptId`
+          },
+          headers: {
+            "Content-Type": "application/json",
+            "X-Authorization": req.session.jwt.secret
           }
+        };
 
-          if (config.rights_power.indexOf('@anyone') > -1 || isAdmin && config.rights_power.indexOf('@admin') > -1) {
-            loginSuccess(req, res, username, password, email, Object.assign(user_rights, rights.admin), am);
-            res.end();
+        client.get(url, args, (data, response) => {
+          var user_rights = Object.assign({}, rights.guest);
+          if (!data.entities || !data.entities[0]) {
+            var message = response.statusMessage;
+            logger.warn(`[user] [${req.sessionID || '-'}]`, message, username);
+            res.status(response.statusCode).send(message);
           } else {
-            // get detail rights
-            var aqlUrl = "http://${server}${context}/query?aql=SELECT ${fields} FROM ${tables} WHERE ${clause}";
-            args = {
-              path: {
-                server: am.server,
-                context: config.rest_conn.context ,
-                tables: "amMasterProfile MP,amRelEmplMProf REM",
-                fields: "MP.SQLName",
-                clause: `MP.lMProfileId=REM.lMProfileId AND REM.lEmplDeptId=${empId}`
-              },
-              headers: {
-                Accept: "application/json",
-                "X-Authorization": req.session.jwt.secret
-              }
-            };
+            var email = data.entities[0].EMail;
+            var isAdmin = !!data.entities[0].bAdminRight[1];
+            var empId = data.entities[0].lEmplDeptId;
+            if (isAdmin) {
+              am_rights.push('@admin');
+              user_rights.ucmdbAdapter = true;
+            }
 
-            client.get(aqlUrl, args, (data, response) => {
-              // get user right defined in AM
-              if (data.entities && data.entities.length > 0) {
-                data.entities.forEach((row) => {
-                  am_rights.push(row.SQLName);
-                });
-              }
-
-              // match am_rights and amb rights
-
-              for (var i = 0; i < am_rights.length; i++) {
-                if (config.rights_admin.indexOf(am_rights[i]) > -1) {
-                  Object.assign(user_rights, rights.admin);
-                  break;
-                } else if (config.rights_power.indexOf(am_rights[i]) > -1) {
-                  Object.assign(user_rights, rights.power);
-                }
-              }
-
-              loginSuccess(req, res, username, password, email, user_rights, am);
-
+            if (config.rights_power.indexOf('@anyone') > -1 || isAdmin && config.rights_power.indexOf('@admin') > -1) {
+              loginSuccess(req, res, username, password, email, Object.assign(user_rights, rights.admin), am);
               res.end();
-            });
+            } else {
+              // get detail rights
+              var aqlUrl = "http://${server}${context}/query?aql=SELECT ${fields} FROM ${tables} WHERE ${clause}";
+              args = {
+                path: {
+                  server: am.server,
+                  context: config.rest_conn.context ,
+                  tables: "amMasterProfile MP,amRelEmplMProf REM",
+                  fields: "MP.SQLName",
+                  clause: `MP.lMProfileId=REM.lMProfileId AND REM.lEmplDeptId=${empId}`
+                },
+                headers: {
+                  Accept: "application/json",
+                  "X-Authorization": req.session.jwt.secret
+                }
+              };
+
+              client.get(aqlUrl, args, (data, response) => {
+                // get user right defined in AM
+                if (data.entities && data.entities.length > 0) {
+                  data.entities.forEach((row) => {
+                    am_rights.push(row.SQLName);
+                  });
+                }
+
+                // match am_rights and amb rights
+
+                for (var i = 0; i < am_rights.length; i++) {
+                  if (config.rights_admin.indexOf(am_rights[i]) > -1) {
+                    Object.assign(user_rights, rights.admin);
+                    break;
+                  } else if (config.rights_power.indexOf(am_rights[i]) > -1) {
+                    Object.assign(user_rights, rights.power);
+                  }
+                }
+
+                loginSuccess(req, res, username, password, email, user_rights, am);
+
+                res.end();
+              });
+            }
           }
-        }
-      });
+        });
+      }
     }).on('error', function (err) {
       logger.error(`[user] [${req.sessionID || '-'}]`, "login failed with error: " + err.toString());
       res.status(500).send(err.toString());
@@ -141,65 +147,71 @@ function AMREST() {
     };
 
     client.get(url, args, (data, response) => {
-      var user_rights = Object.assign({}, rights.guest);
-      if (!data.entities || !data.entities[0]) {
-        var message = response.statusMessage;
-        logger.warn(`[user] [${req.sessionID || '-'}]`, message, username);
-        res.status(response.statusCode).send(message);
+      // for LB and rest server is down
+      if (response.statusCode != 200) {
+        logger.error(`[user] [${req.sessionID || '-'}]`, "Service Unavailable! Please check Rest server if it is down! ");
+        res.status(503).send('Service Unavailable!');
       } else {
-        var email = data.entities[0].EMail;
-        var username = data.entities[0].UserLogin;
-        var isAdmin = !!data.entities[0].bAdminRight[1];
-        var empId = data.entities[0].lEmplDeptId;
-        if (isAdmin) {
-          am_rights.push('@admin');
-          user_rights.ucmdbAdapter = true;
-        }
-
-        if (config.rights_power.indexOf('@anyone') > -1 || isAdmin && config.rights_power.indexOf('@admin') > -1) {
-          loginSuccess(req, res, username, '', email, Object.assign(user_rights, rights.admin), am);
-          res.end();
+        var user_rights = Object.assign({}, rights.guest);
+        if (!data.entities || !data.entities[0]) {
+          var message = response.statusMessage;
+          logger.warn(`[user] [${req.sessionID || '-'}]`, message, username);
+          res.status(response.statusCode).send(message);
         } else {
-          // get detail rights
-          var aqlUrl = "http://${server}${context}/query?aql=SELECT ${fields} FROM ${tables} WHERE ${clause}";
-          args = {
-            path: {
-              server: am.server,
-              context: config.rest_conn.context,
-              tables: "amMasterProfile MP,amRelEmplMProf REM",
-              fields: "MP.SQLName",
-              clause: `MP.lMProfileId=REM.lMProfileId AND REM.lEmplDeptId=${empId}`
-            },
-            headers: {
-              Accept: "application/json",
-              Cookie: cookiesUtil.getCookies(req)
-            }
-          };
+          var email = data.entities[0].EMail;
+          var username = data.entities[0].UserLogin;
+          var isAdmin = !!data.entities[0].bAdminRight[1];
+          var empId = data.entities[0].lEmplDeptId;
+          if (isAdmin) {
+            am_rights.push('@admin');
+            user_rights.ucmdbAdapter = true;
+          }
 
-          client.get(aqlUrl, args, (data, response) => {
-            // get user right defined in AM
-            // get user right defined in AM
-            if (data.entities && data.entities.length > 0) {
-              data.entities.forEach((row) => {
-                am_rights.push(row.SQLName);
-              });
-            }
-
-            // match am_rights and amb rights
-
-            for (var i = 0; i < am_rights.length; i++) {
-              if (config.rights_admin.indexOf(am_rights[i]) > -1) {
-                Object.assign(user_rights, rights.admin);
-                break;
-              } else if (config.rights_power.indexOf(am_rights[i]) > -1) {
-                Object.assign(user_rights, rights.power);
-              }
-            }
-
-            loginSuccess(req, res, username, '', email, user_rights, am);
-
+          if (config.rights_power.indexOf('@anyone') > -1 || isAdmin && config.rights_power.indexOf('@admin') > -1) {
+            loginSuccess(req, res, username, '', email, Object.assign(user_rights, rights.admin), am);
             res.end();
-          });
+          } else {
+            // get detail rights
+            var aqlUrl = "http://${server}${context}/query?aql=SELECT ${fields} FROM ${tables} WHERE ${clause}";
+            args = {
+              path: {
+                server: am.server,
+                context: config.rest_conn.context,
+                tables: "amMasterProfile MP,amRelEmplMProf REM",
+                fields: "MP.SQLName",
+                clause: `MP.lMProfileId=REM.lMProfileId AND REM.lEmplDeptId=${empId}`
+              },
+              headers: {
+                Accept: "application/json",
+                Cookie: cookiesUtil.getCookies(req)
+              }
+            };
+
+            client.get(aqlUrl, args, (data, response) => {
+              // get user right defined in AM
+              // get user right defined in AM
+              if (data.entities && data.entities.length > 0) {
+                data.entities.forEach((row) => {
+                  am_rights.push(row.SQLName);
+                });
+              }
+
+              // match am_rights and amb rights
+
+              for (var i = 0; i < am_rights.length; i++) {
+                if (config.rights_admin.indexOf(am_rights[i]) > -1) {
+                  Object.assign(user_rights, rights.admin);
+                  break;
+                } else if (config.rights_power.indexOf(am_rights[i]) > -1) {
+                  Object.assign(user_rights, rights.power);
+                }
+              }
+
+              loginSuccess(req, res, username, '', email, user_rights, am);
+
+              res.end();
+            });
+          }
         }
       }
     }).on('error', function (err) {
@@ -339,6 +351,8 @@ function getHeadNav(rights) {
     search: rights.index < 2,
     'search/:keyword': rights.index < 2,
     insight: rights.index < 2,
+    sam: rights.index < 2,
+    'sam/:id': rights.index < 2,
     'insight/:id': rights.index < 3,
     explorer: rights.index < 2,
     'explorer/:id': rights.index < 3,
@@ -379,3 +393,4 @@ function live_net_work(req, res) {
     res.end(errMsg);
   });
 }
+

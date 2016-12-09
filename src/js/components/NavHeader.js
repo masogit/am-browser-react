@@ -38,6 +38,7 @@ export default class NavHeader extends Component {
   render() {
     const defaultLinks = [
       {to: '/insight', text: 'Insight'},
+      {to: '/sam', text: 'SAM'},
       {to: '/explorer', text: 'Viewer'},
       {to: '/ucmdbAdapter', text: 'Adapter'}
     ];
