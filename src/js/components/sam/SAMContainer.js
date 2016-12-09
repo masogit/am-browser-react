@@ -4,7 +4,6 @@ import {Box} from 'grommet';
 import RecordListLayer from '../explorer/RecordListLayer';
 import Card from '../commons/Card';
 import RecordList from '../explorer/RecordList';
-import history from '../../RouteHistory';
 
 export default class SAMContainer extends Component {
   constructor() {
@@ -52,7 +51,6 @@ export default class SAMContainer extends Component {
         license: null,
         software: null
       }, () => {
-        history.push(`/sam/${name}`);
         this.setState({
           product: {
             title: 'Product',
