@@ -39,34 +39,14 @@ input {
 }
 
 .grommetux-form-field__contents>.grommetux-number-input.number-input-label {
+  transform: scale(0.5);
   position: absolute;
-  right: 18px;
-  top: 5px;
-  width: 100px;
+  right: -50px;
+  top: 0;
+  width: 170px;
 
   input {
-    padding-right: 0;
-    margin-top: 2px;
     font-weight: 600;
-    @extend .grommetux-form-field__help;
-
-    &:focus {
-      padding-right: 0;
-    }
-  }
-
-
-  .grommetux-button__icon {
-    padding: 2px;
-  }
-
-  button {
-    height: 12px;
-    margin-top: 5px;
-  }
-
-  svg {
-    width: 13px;
-    height: 13px;
+    font-size: 1.5em;
   }
 }

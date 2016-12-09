@@ -28,16 +28,16 @@ const NumberInputField = ({state, label, name, updateValue, min, max, step = 1, 
 
 class MarginDesigner extends Component {
   componentWillMount() {
-    this.updateValue = this.updateValue.bind(this);
+    this._updateValue = this._updateValue.bind(this);
   }
 
-  updateValue(event) {
+  _updateValue(event) {
     const value = [parseInt(this.left.value), parseInt(this.top.value), parseInt(this.right.value), parseInt(this.bottom.value)];
     this.props.updateValue(event, value, 'margin', 'text');
   }
 
   renderInput(refName, value) {
-    return (<input type='number' ref={node=> this[refName] = node} min={0} max={64} value={value} onChange={this.updateValue}/>);
+    return (<input type='number' ref={node=> this[refName] = node} min={0} max={64} value={value} onChange={this._updateValue}/>);
   }
 
   render() {
@@ -86,7 +86,7 @@ class StyleDesigner extends Component {
     this.state = {
       styles: styleArray
     };
-    this.updateValue = this.updateValue.bind(this);
+    this._updateValue = this._updateValue.bind(this);
     this.initStyle = this.initStyle.bind(this);
     this.initStyle();
     this.styles = _.cloneDeep(styleArray);
@@ -107,26 +107,13 @@ class StyleDesigner extends Component {
     this.setState({styleObj: Object.assign({}, init_style)});
   }
 
-  updateValue(event, val = event.target.value, name = event.target.name, type = event.target.type) {
-    if (type == 'range' || type == 'number') {
-      val = parseInt(val);
-    } else if (type == 'checkbox') {
-      val = event.target.checked;
-    }
-
-    if (name.indexOf('.') > -1) {
-      const nameParts = name.split('.');
-      nameParts.reduce((state, key, index) => {
-        if (index == nameParts.length - 1) {
-          state[key] = val;
-        }
-        return state[key];
-      }, this.state.styleObj);
-    } else {
-      this.state.styleObj[name] = val;
-    }
-
-    this.setState(this.state);
+  _updateValue(event, val) {
+    const styleObj = this.state.styleObj;
+    updateValue(event, {
+      val: val,
+      state: styleObj,
+      callback: () => this.setState({styleObj: styleObj})
+    });
   }
 
   renderSidebar(styles = this.state.styles) {
@@ -203,7 +190,7 @@ class StyleDesigner extends Component {
   }
 
   renderNumberInput(props) {
-    return <NumberInputField state={this.state.styleObj} {...props} updateValue={this.updateValue}/>;
+    return <NumberInputField state={this.state.styleObj} {...props} updateValue={this._updateValue}/>;
   }
 
   renderAlert() {
@@ -230,21 +217,21 @@ class StyleDesigner extends Component {
           <Box>
             <Form className='no-border strong-label style-designer'>
               <FormField>
-                <MarginDesigner styleObj={styleObj} updateValue={this.updateValue}/>
+                <MarginDesigner styleObj={styleObj} updateValue={this._updateValue}/>
               </FormField>
               <FormField>
                 <Box direction='row' align='center' justify='between' pad='medium'>
                   <Box direction='row'><Label margin='none' style={{color: '#ff0000', fontWeight: '400'}}>Name:</Label>
-                    <input className='input-field' name='name' type="text" value={styleObj.name} onChange={this.updateValue}
+                    <input className='input-field' name='name' type="text" value={styleObj.name} onChange={this._updateValue}
                            autoFocus={true} maxLength='20'/>
                   </Box>
-                  <label><Label>Color:</Label><input type='color' name='color' value={styleObj.color} onChange={this.updateValue}/></label>
+                  <label><Label>Color:</Label><input type='color' name='color' value={styleObj.color} onChange={this._updateValue}/></label>
                   <CheckBox checked={styleObj.bold} name='bold' toggle={true}
                             value={styleObj.bold} label={<Label>Bold</Label>}
-                            onChange={this.updateValue}/>
+                            onChange={this._updateValue}/>
                   <CheckBox checked={styleObj.italics} name='italics' toggle={true}
                             value={styleObj.italics} label={<Label>Italics</Label>}
-                            onChange={this.updateValue}/>
+                            onChange={this._updateValue}/>
                 </Box>
               </FormField>
               {this.renderNumberInput({label: 'Font Size', name: 'fontSize', min: 10, max: 64})}
