@@ -194,27 +194,28 @@ export default class SAMContainer extends Component {
   }
 
   render() {
+    const {product, software, vendor, license} = this.state;
     return (
-      <Box flex={true} direction="row" align={!this.state.product ? 'center' : 'start'} justify={!this.state.product ? 'center' : 'start'}>
-        <Box flex={!this.state.product} style={this.state.product && {'width': '260px'}} pad={{horizontal: "small"}}>
+      <Box flex={true} direction="row" align={!product ? 'center' : 'start'} justify={!product ? 'center' : 'start'}>
+        <Box flex={!this.state.product} style={product && {'width': '260px', height: '100%'}} pad={{horizontal: "small"}} className='autoScroll'>
           {
-            this.state.vendor &&
-            <Card {...this.state.vendor}/>
+            vendor &&
+            <Card {...vendor}/>
           }
         </Box>
         {
-          this.state.product &&
-          <Box flex={true}>
-            <Card {...this.state.product}/>
+          product &&
+          <Box flex={true} className='autoScroll' style={{height: '100%'}}>
+            <Card {...product}/>
             {
-              this.state.license &&
-              <RecordList body={this.state.license} title="Version" allFields={true} onClick={(record) => this.renderSoftware(record)} root={true}/>
+              license &&
+              <RecordList body={license} title="Version" allFields={true} onClick={(record) => this.renderSoftware(record)} root={true}/>
             }
           </Box>
         }
         {
-          this.state.software &&
-          <RecordListLayer body={this.state.software} title="Computer" onClose={this._onClose.bind(this)} allFields={true}/>
+          software &&
+          <RecordListLayer body={software} title="Computer" onClose={this._onClose.bind(this)} allFields={true}/>
         }
       </Box>
     );

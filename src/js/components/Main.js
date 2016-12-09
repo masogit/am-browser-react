@@ -56,9 +56,12 @@ class Indexer extends Component {
     }
     return (
       <App centered={false}>
-        <Box full='vertical' >
-          {header}{alert}
-          {this.props.children}
+        <Box full='vertical'>
+          {header}
+          {alert}
+          <Box className='content-height autoScroll'>
+            {this.props.children}
+          </Box>
         </Box>
       </App>
     );

@@ -624,7 +624,7 @@ export default class Insight extends ComponentBase {
             }}/>
           }
         </Header>
-        <Box className={edit || carousel ? '' : 'autoScroll'} flex={true}>
+        <Box className={carousel ? '' : 'autoScroll'} style={{marginTop: -60}}>
           {content}
           {layer && this[`_get${layer.name}Layer`](...layer.args)}
           {alert}

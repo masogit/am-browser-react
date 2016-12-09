@@ -22,14 +22,6 @@
 }
 
 /** Grommet: */
-.grommetux-tabs__content {
-  flex-grow: 1;
-}
-
-/** Firefox: for the minimum sizing behavior*/
-.main-container > .grommetux-box {
-  min-height: 0;
-}
 
 /** Firefox: for the minimum sizing behavior*/
 .fixMinSizing {
@@ -210,4 +202,8 @@ div .grommetux-menu__drop .grommetux-anchor {
   & .grommetux-tab {
     padding: 0 3px;
   }
+}
+
+.content-height {
+  height: calc(100vh - 51px);
 }

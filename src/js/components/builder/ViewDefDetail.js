@@ -473,35 +473,35 @@ export default class ViewDefDetail extends ComponentBase {
       <Box flex={true}>
         {this.getLayer(layer)}
         {this.renderHeader(selectedView, table)}
-        <Box pad={{horizontal: 'medium'}} direction="row">
-            <Box flex={true}>
-              {
-                selectedView.body.sqlname &&
-                <Map vertical={true} className='grid' data={bodyToMapData(selectedView.body)}/>
-              }
-              <Box className="autoScroll">{table}</Box>
+        <Box pad={{horizontal: 'medium'}} direction="row" className='autoScroll'>
+          <Box flex={true}>
+            {
+              selectedView.body.sqlname &&
+              <Map vertical={true} className='grid' data={bodyToMapData(selectedView.body)}/>
+            }
+            <Box>{table}</Box>
+          </Box>
+          <Box pad={{horizontal: 'small', vertical: 'none'}}>
+            <Form onSubmit={onSubmit} compact={true}>
+              <FormField label="Name">
+                <input id="v.name" name="v.name" type="text" onChange={this._onChange}
+                       value={selectedView.name}/>
+              </FormField>
+              <FormField label="Description">
+                  <textarea value={selectedView.desc} onClick={() => this.setState({layer: 'description'})}
+                            onChange={() => this.setState({layer: 'description'})}/>
+              </FormField>
+              <FormField label="Category">
+                <SearchInput id="v.category" name="v.category" value={selectedView.category}
+                             suggestions={categories} onDOMChange={this._onChange}
+                             onSelect={this._setCategory}/>
+              </FormField>
+            </Form>
+            <Box pad="small" style={{width: '235px'}}>
+              <p>All views under <strong>My Assets</strong> Category will replace Out-Of-Box My Assets module</p>
             </Box>
-            <Box pad={{horizontal: 'small', vertical: 'none'}}>
-              <Form onSubmit={onSubmit} compact={true}>
-                <FormField label="Name">
-                  <input id="v.name" name="v.name" type="text" onChange={this._onChange}
-                         value={selectedView.name}/>
-                </FormField>
-                <FormField label="Description">
-                    <textarea value={selectedView.desc} onClick={() => this.setState({layer: 'description'})}
-                              onChange={() => this.setState({layer: 'description'})}/>
-                </FormField>
-                <FormField label="Category">
-                  <SearchInput id="v.category" name="v.category" value={selectedView.category}
-                               suggestions={categories} onDOMChange={this._onChange}
-                               onSelect={this._setCategory}/>
-                </FormField>
-              </Form>
-              <Box pad="small" style={{width: '235px'}}>
-                <p>All views under <strong>My Assets</strong> Category will replace Out-Of-Box My Assets module</p>
-              </Box>
-            </Box>
-            {selectedView && selectedView.name && this.getAlertLayer(alertForm, selectedView.name)}
+          </Box>
+          {selectedView && selectedView.name && this.getAlertLayer(alertForm, selectedView.name)}
         </Box>
       </Box>
     );

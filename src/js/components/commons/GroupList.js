@@ -113,7 +113,7 @@ export default class GroupList extends Component {
             </FormField>
           </Box>
         }
-        <Box className='autoScroll' margin={{vertical: 'small'}}>
+        <Box className='autoScroll fixIEScrollBar' margin={{vertical: 'small'}}>
         {this.props.loading ? <ListItem separator="none"><Spinning /></ListItem>
           :
           Object.keys(grouped).sort().map((key, i) => {

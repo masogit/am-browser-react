@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react';
 import RecordDetail from './RecordDetail';
 import RecordTopology from './RecordTopology';
-import {Table, TableRow, Box, Anchor, Header, Menu, Icons, Layer} from 'grommet';
+import {Table, TableRow, Box, Anchor, Header, Menu, Icons, Layer, Title} from 'grommet';
 const { Close, Ascend, Descend, Checkbox, Filter, BarChart, LineChart, Aggregate,
    CheckboxSelected, Cluster, Menu: MenuIcon, DocumentPdf: Pdf, DocumentCsv: Csv}= Icons.Base;
 import Status from 'grommet/components/icons/Status';
@@ -431,7 +431,7 @@ export default class RecordList extends ComponentBase {
 
     return (
       <Header justify="between" pad='none'>
-        {title && <Box margin={{right: 'small'}}>{title}</Box>}
+        {title && <Title margin={{right: 'small'}}>{title}</Title>}
         <SearchInputWithTags searchFields={searchFields} reusedFilters={reusedFilters}
           onSearch={(this._filterAdd.bind(this))} locked={locked} onChange={this._filterAdd.bind(this)} />
         <Menu direction="column" margin={{left: 'small'}}>
@@ -545,7 +545,7 @@ export default class RecordList extends ComponentBase {
 
       return (
         <Box colorIndex='light-1' pad='small' flex={true}>
-          <Table selectable={true} className={`autoScroll ${this.props.root?'':'fixIEScrollBar'}`}
+          <Table selectable={true} className='autoScroll fixIEScrollBar'
                  onMore={this.state.onMoreLock || this.state.filtered ? null : this._getMoreRecords.bind(this)}>
             <thead>
             <tr>
