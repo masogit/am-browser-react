@@ -6,7 +6,7 @@ import { Box, Header, Heading, Menu, Search, Anchor, Icons } from 'grommet';
 
 
 import SessionMenu from './SessionMenu/MenuContainer';
-import {dropCurrentPop_stopMonitor} from '../actions/system';
+import {dropCurrentPop_stopMonitor, toggleSidebar} from '../actions/system';
 import history from '../RouteHistory';
 
 export default class NavHeader extends Component {
@@ -88,6 +88,7 @@ export default class NavHeader extends Component {
                     className={this.getActive(link.to)}
                     onClick={e => {
                       e.preventDefault();
+                      toggleSidebar(true);
                       const goLink = defaultLinks.filter(linkObj => linkObj.to == link.to)[0];
                       dropCurrentPop_stopMonitor(`Go to ${goLink.text}`, () => history.push(link.to));
                     }}>{link.text}</Link>))
@@ -101,6 +102,7 @@ export default class NavHeader extends Component {
                     <Anchor key={index} to={link.to} label={link.text} icon={<Icon />}
                             onClick={e => {
                               e.preventDefault();
+                              toggleSidebar(true);
                               const goLink = builderLinks.filter(linkObj => linkObj.to == link.to)[0];
                               dropCurrentPop_stopMonitor(`Go to ${goLink.text}`, () => history.push(link.to));
                             }}/>
