@@ -54,12 +54,14 @@ class Indexer extends Component {
         timeout = setTimeout(this._newMsgRead, msgRemainTime);
       }
     }
+
+    const className = path.indexOf('login') > -1 ? '' : 'content-height autoScroll';
     return (
       <App centered={false}>
         <Box full='vertical'>
           {header}
           {alert}
-          <Box className='content-height autoScroll'>
+          <Box className={className}>
             {this.props.children}
           </Box>
         </Box>
