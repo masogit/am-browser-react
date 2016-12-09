@@ -1,17 +1,14 @@
 import React from 'react';
 import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
-import {showWarning, monitorEdit} from '../../actions/system';
+import { showWarning, monitorEdit } from '../../actions/system';
 import * as Format from '../../util/RecordFormat';
 import history from '../../RouteHistory';
 import RecordListLayer from '../explorer/RecordListLayer';
-import AlertForm from '../commons/AlertForm';
-import Graph from '../commons/Graph';
-import ComponentBase  from '../commons/ComponentBase';
-import ActionTab from '../commons/ActionTab';
-import {Anchor, Box, Button, CheckBox, Header, Title, Menu, Table, TableRow, Layer, Carousel, RadioButton, Tabs, Icons, Label} from 'grommet';
+import { AlertForm, ComponentBase, AMSideBar, Graph, ActionTab } from '../commons';
+import { Anchor, Box, Button, CheckBox, Header, Title, Menu, Table, TableRow, Layer,
+         Carousel, RadioButton, Tabs, Icons, Label } from 'grommet';
 const { Add, Close, Attachment, Checkmark, Shift, More, Group, Expand } = Icons.Base;
-import AMSideBar from '../commons/AMSideBar';
 import AQL from './AQL';
 import _ from 'lodash';
 
