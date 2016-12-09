@@ -28,7 +28,7 @@ const setOnClick = (obj, value, onClick, row, header, keyIndex, valueIndex) => {
     if (onClick) {
       obj.onClick = () => {
         onClick({
-          key: Number.isFinite(keyIndex) ? header[keyIndex].Name: keyIndex,
+          key: !isNaN(Number.parseInt(keyIndex)) ? header[keyIndex].Name: keyIndex,
           value: row[valueIndex]
         }, filter);
       };
