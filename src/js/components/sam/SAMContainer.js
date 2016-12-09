@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import * as SAMActions from '../../actions/sam';
-import {Box} from 'grommet';
+import { Box, Icons } from 'grommet';
 import RecordListLayer from '../explorer/RecordListLayer';
 import Card from '../commons/Card';
 import RecordList from '../explorer/RecordList';
@@ -193,12 +193,12 @@ export default class SAMContainer extends Component {
 
   render() {
     const {product, software, vendor, license} = this.state;
+    const Spinning = Icons.Spinning;
     return (
       <Box flex={true} direction="row" align={!product ? 'center' : 'start'} justify={!product ? 'center' : 'start'}>
         <Box flex={!this.state.product} style={product && {'width': '260px', height: '100%'}} pad={{horizontal: "small"}} className='autoScroll'>
           {
-            vendor &&
-            <Card {...vendor}/>
+            vendor ? <Card {...vendor}/> : <Box flex={true} align="center" justify="center"><Spinning /></Box>
           }
         </Box>
         {
