@@ -189,10 +189,6 @@ class StyleDesigner extends Component {
     }
   }
 
-  renderNumberInput(props) {
-    return <NumberInputField state={this.state.styleObj} {...props} updateValue={this._updateValue}/>;
-  }
-
   renderAlert() {
     if (this.state.alert == 'CAN_NOT_DELETE') {
       const onClose = () => this.setState({alert: ''});
@@ -234,7 +230,9 @@ class StyleDesigner extends Component {
                             onChange={this._updateValue}/>
                 </Box>
               </FormField>
-              {this.renderNumberInput({label: 'Font Size', name: 'fontSize', min: 10, max: 64})}
+              <FormField>
+                <NumberInputField state={styleObj} label='Font Size' name='fontSize' min={10} max={64} updateValue={this._updateValue}/>;
+              </FormField>
             </Form>
 
             <Footer justify='between' pad='medium' flex={false}>

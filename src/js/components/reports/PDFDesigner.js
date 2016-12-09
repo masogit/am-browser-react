@@ -1,13 +1,13 @@
 import React, {Component, PropTypes} from 'react';
 import {Box, Header, Icons, Anchor, Menu, FormField, Form,
-  RadioButton, Layer} from 'grommet';
+  RadioButton, Layer, NumberInput} from 'grommet';
 const {Download, Close, Play: Preview, Code, Checkmark, Duplicate} = Icons.Base;
 import {loadRecordsByBody} from '../../actions/explorer';
 import { cloneDeep } from 'lodash';
 import { preview,
   getPreviewStyle, updateValue, translateText, download } from '../../util/pdfDesigner';
 import {MODE, init_style, table_style, GLOBAL_VARIABLES} from '../../constants/PDFDesigner';
-import {Brush, StyleDesigner, ExportLayer, NumberInputField, ExportLayerForDetail} from './../commons/PDFWidgets';
+import {Brush, StyleDesigner, ExportLayer, ExportLayerForDetail} from './../commons/PDFWidgets';
 import AlertForm from '../commons/AlertForm';
 import {UploadWidget} from '../commons/Widgets';
 
@@ -139,17 +139,21 @@ export default class PDFDesigner extends Component {
     const styleName = noInput ? name : name + '.style';
     const styleValue = noInput ? value : value.style;
 
+    const fieldLabel = (
+      <Box justify='between' direction='row'>
+        <span>{label}</span>
+        <Menu size='small' label={<span style={getPreviewStyle(styles[styleValue])}>{styleValue}</span>}>
+          {data.map((s, index) => <Anchor key={index} onClick={(event) => this.updatePDFSettings(event, s, styleName)}>
+            <span style={getPreviewStyle(styles[s])}>{s}</span>
+          </Anchor>)}
+        </Menu>
+      </Box>
+    );
+
     return (
-      <FormField className={noInput ? '' : 'input-field'} label={
-          <Box justify='between' direction='row'>
-            <span>{label}</span>
-            <Menu size='small' label={<span style={getPreviewStyle(styles[styleValue])}>{styleValue}</span>} dropAlign={{top: 'top', right: 'right'}}>
-             {data.map((s, index) => <Anchor key={index} onClick={(event) => this.updatePDFSettings(event, s, styleName)}>
-              <span style={getPreviewStyle(styles[s])}>{s}</span>
-              </Anchor>)}
-            </Menu>
-          </Box>}>
-        {!noInput && <input name={name + '.text'} type="text" onChange={this.updatePDFSettings} placeholder={placeHolder}
+      <FormField className={noInput ? '' : 'input-field'} label={fieldLabel} ref={node => node && (node._onClick = () => {})}>
+        {!noInput &&
+        <input name={name + '.text'} type="text" onChange={this.updatePDFSettings} placeholder={placeHolder}
                value={value.text} style={getPreviewStyle(styles[value.style], true)}/>}
       </FormField>
     );
@@ -157,7 +161,7 @@ export default class PDFDesigner extends Component {
 
   returnTableStyleField({layout, style, header, text}) {
     return (
-      <FormField label='Table'>
+      <FormField label='Table' ref={node => node && (node._onClick = () => {})}>
         <Box pad={{horizontal: 'small'}}>
           {this.returnStyleField({
             label: 'Title',
@@ -196,9 +200,10 @@ export default class PDFDesigner extends Component {
               value: fieldBlock.fieldTitle,
               placeHolder: '@linkTitle'
             })}
-            <NumberInputField state={fieldBlock} label='Columns' name='column'
-                              updateValue={(event) => this._updateValue(event, {state: fieldBlock, callback: this.autoPreview})}
-                              min={1} max={3} compact={true}/>
+            <FormField label='Columns'>
+              <NumberInput name='column' type="range" min={1} max={3} value={fieldBlock.column}
+                           onChange={(event) => this._updateValue(event, {state: fieldBlock, callback: this.autoPreview})}/>
+            </FormField>
           </Box>
           <Box direction='row'>
             {this.returnStyleField({label: 'Label:', name: 'fieldBlock.label', value: fieldBlock.label, noInput: true})}
