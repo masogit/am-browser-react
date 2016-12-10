@@ -605,18 +605,7 @@ export default class Insight extends ComponentBase {
           { !edit &&
           <CheckBox label="Carousel" toggle={true} checked={carousel} onChange={this._toggleCarousel.bind(this)}/> }
           {
-            editAnchor &&
-            <Menu inline={false} disabled={showPublic} closeOnClick={false}>
-              <Anchor icon={<Checkmark />} onClick={() => !showPublic && this._onSave()} label="Save"/>
-              <Anchor icon={<Add />} onClick={this._addTab.bind(this)} label="Add Tab"/>
-              <Anchor icon={<Close />} onClick={() => tabs.length > 1 && this._onRemove(focusTab)} label="Delete Tab"
-                      disabled={tabs.length <= 1}/>
-              {
-                this.checkAdmin() &&
-                <Anchor label="Public" icon={<Group />} primary={tabs[focusIndex].public}
-                        onClick={this._onPublicTab.bind(this, tabs[focusIndex])}/>
-              }
-            </Menu>
+            editAnchor && <Box justify='center'><Anchor icon={<Checkmark />} onClick={() => !showPublic && this._onSave()} label="Save"/></Box>
           }
         </Menu>
       </Header>
@@ -624,24 +613,27 @@ export default class Insight extends ComponentBase {
   }
 
   render() {
-    const {tabs, data, carousel, edit, layer, alert, showPublic, publicTabs} = this.state;
+    const {tabs, data, carousel, edit, layer, alert, showPublic, publicTabs, focusIndex, focusTab} = this.state;
     let showedTabs = showPublic ? publicTabs : tabs;
     const id = this.props.params.id;
     let content;
     if (id) {
       content = data && data[id] && this._renderSingleAQL(data[id]);
     } else {
+      const displayTabs = showedTabs.map((tab, index) => (
+        <ActionTab ref={tab.name} title={tab.name} key={index} className={tab.public ? 'public-tab' : ''}
+                   onClick={this._setFocusTab.bind(this, tab, index)}
+                   leftIcon={edit && this.checkAdmin() ? <Group onClick={this._onPublicTab.bind(this, tab)}/> : null}
+                   rightIcon={edit ? <Close onClick={() => tabs.length > 1 && this._onRemove(focusTab)}/> : null}
+                   onEdit={edit} onDoubleClick={edit ? this._onUpdateTitle.bind(this, tab) : null}>
+          {carousel && !edit ? this._buildCarousel(tab) : this._buildBox(tab.box, tab.box, tab.name)}
+        </ActionTab>
+      ));
+      if (edit) {
+        displayTabs.push(<ActionTab onClick={this._addTab.bind(this)} title='New' leftIcon={<Add/>} key='new'></ActionTab>);
+      }
       content = (
-        <Tabs justify='center' className='flex' activeIndex={this.state.focusIndex}>{
-          showedTabs.map((tab, index) => (
-            <ActionTab ref={tab.name} title={tab.name} key={tab.name} className={tab.public ? 'public-tab' : ''}
-                       onClick={this._setFocusTab.bind(this, tab, index)}
-                       onEdit={edit} onDoubleClick={edit ? this._onUpdateTitle.bind(this, tab) : null}>
-              {carousel && !edit ? this._buildCarousel(tab) : this._buildBox(tab.box, tab.box, tab.name)}
-            </ActionTab>
-          ))
-        }
-        </Tabs>
+        <Tabs justify='center' className='flex' activeIndex={focusIndex}>{displayTabs}</Tabs>
       );
     }
 

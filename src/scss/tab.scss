@@ -7,4 +7,22 @@
     border-color: $brand-color;
     color: $brand-color;
   }
+
+  & > svg:first-child {
+    stroke: $brand-color;
+  }
+
+
+}
+
+.action-tab {
+  display: flex;
+
+  & button.grommetux-button {
+    padding: 0 4px;
+  }
+
+  svg {
+    transform: scale(0.75);
+  }
 }
