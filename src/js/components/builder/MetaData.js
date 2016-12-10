@@ -1,6 +1,6 @@
 import React from 'react';
 import ComponentBase from '../commons/ComponentBase';
-import { Anchor, Box, Tabs, Tab, ListItem, Form, FormField } from 'grommet';
+import { Box, Tabs, Tab, ListItem, Form, FormField } from 'grommet';
 import SearchInput from '../commons/SearchInput';
 import Notes from 'grommet/components/icons/base/Notes';
 import LinkNext from 'grommet/components/icons/base/LinkNext';

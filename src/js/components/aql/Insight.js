@@ -590,7 +590,7 @@ export default class Insight extends ComponentBase {
   }
 
   renderHeader() {
-    const { carousel, edit, showPublic, tabs, focusTab, focusIndex, publicTabs } = this.state;
+    const { carousel, edit, showPublic, tabs, publicTabs } = this.state;
     let editAnchor = edit && !showPublic;
     return (
       <Header justify="between" pad={{'horizontal': 'medium'}}>
@@ -604,8 +604,8 @@ export default class Insight extends ComponentBase {
           <CheckBox label="Edit" toggle={true} checked={edit} onChange={this._toggleEdit.bind(this)}/> }
           { !edit &&
           <CheckBox label="Carousel" toggle={true} checked={carousel} onChange={this._toggleCarousel.bind(this)}/> }
-          {
-            editAnchor && <Box justify='center'><Anchor icon={<Checkmark />} onClick={() => !showPublic && this._onSave()} label="Save"/></Box>
+          { editAnchor &&
+          <Box justify='center'><Anchor icon={<Checkmark />} onClick={() => !showPublic && this._onSave()} label="Save"/></Box>
           }
         </Menu>
       </Header>
@@ -630,7 +630,7 @@ export default class Insight extends ComponentBase {
         </ActionTab>
       ));
       if (edit) {
-        displayTabs.push(<ActionTab onClick={this._addTab.bind(this)} title='New' leftIcon={<Add/>} key='new'></ActionTab>);
+        displayTabs.push(<ActionTab onClick={this._addTab.bind(this)} title='New' leftIcon={<Add/>} key='new'/>);
       }
       content = (
         <Tabs justify='center' className='flex' activeIndex={focusIndex}>{displayTabs}</Tabs>
