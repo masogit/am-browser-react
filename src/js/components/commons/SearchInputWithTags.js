@@ -82,27 +82,27 @@ export default class SearchInputWithTags extends Component {
   renderTagButtons(tags) {
     const {aqlInput} = this.state;
 
-    return (tags && tags.map(tag => {
-      return <Button label={tag.label} onClick={() => (!aqlInput && this._resetSearchTags(tag))} primary={!tag.disabled && !aqlInput} key={`tb-tag-${tag.label}`}/>;
+    return (tags && tags.map((tag, index) => {
+      return <Button label={tag.label} onClick={() => (!aqlInput && this._resetSearchTags(tag))} primary={!tag.disabled && !aqlInput} key={index}/>;
     }));
   }
 
   render() {
-    const {searchFields, searchTags} = this.state;
+    const {searchFields, searchTags, aqlInput, locked} = this.state;
     const onSearch = this.props.onSearch;
     const aqlWhere = "press / input AQL where statement";
     const quickSearch = searchFields ? `press Enter to quick search in ${searchFields}; ${aqlWhere}` : aqlWhere;
-    const placeholder = this.state.aqlInput ? "input AQL where statement…" : quickSearch;
+    const placeholder = aqlInput ? "input AQL where statement…" : quickSearch;
 
     return (
       <Box className="set-position" flex={true}>
-        <input type="text" className={this.state.aqlInput ? 'aql flex shadow' : 'flex shadow'} ref="search"
-               placeholder={placeholder} disabled={this.state.locked}
-               onKeyDown={(event) => (onSearch(event, this.state.searchFields, this.state.aqlInput, this.refs.search.value.trim()))}
+        <input type="text" className={aqlInput ? 'aql flex shadow' : 'flex shadow'} ref="search"
+               placeholder={placeholder} disabled={locked}
+               onKeyDown={(event) => (onSearch(event, searchFields, aqlInput, this.refs.search.value.trim()))}
                onChange={this.onChange.bind(this)}/>
              <Box justify="center" direction="row" flex={true} className="input-with-tag-buttons">
-               {(searchTags.length > 0) && this.renderTagButtons(searchTags)}
-               <Button icon={<Code />} primary={!this.state.aqlInput} onClick={this._toggleAQLInput.bind(this)}/>
+               {searchTags.length > 0 && !aqlInput && this.renderTagButtons(searchTags)}
+               <Button icon={<Code />} primary={!aqlInput} onClick={this._toggleAQLInput.bind(this)}/>
         </Box>
       </Box>
     );
