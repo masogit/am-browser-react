@@ -61,7 +61,7 @@ export default class ActionTab extends Component {
 
     return (
       <li className={`grommetux-tab action-tab ${active ? 'grommetux-tab--active' : ''} ${className}`}>
-        {leftIcon}
+        { active && leftIcon }
         <Button role='tab' onClick={this._onClickTab} plain
                 onDoubleClick={onEdit ? this._toggleEdit.bind(this) : null}>
           <label className='grommetux-tab__label'>
@@ -72,7 +72,7 @@ export default class ActionTab extends Component {
               : title}
           </label>
         </Button>
-        {rightIcon}
+        { active && rightIcon }
       </li>
     );
   }

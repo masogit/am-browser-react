@@ -8,7 +8,7 @@ import RecordListLayer from '../explorer/RecordListLayer';
 import { AlertForm, ComponentBase, AMSideBar, Graph, ActionTab } from '../commons';
 import { Anchor, Box, Button, CheckBox, Header, Title, Menu, Table, TableRow, Layer,
          Carousel, Tabs, Icons, Label } from 'grommet';
-const { Add, Close, Attachment, Checkmark, Shift, More, Group, Expand } = Icons.Base;
+const { Add, Close, Attachment, Checkmark, Shift, More, Group, Expand, Edit } = Icons.Base;
 import AQL from './AQL';
 import _ from 'lodash';
 
@@ -600,12 +600,15 @@ export default class Insight extends ComponentBase {
                     onChange={this._toggleShowPublic.bind(this)}/>
         </Menu>
         <Menu direction="row">
-          { !showPublic &&
-          <CheckBox label="Edit" toggle={true} checked={edit} onChange={this._toggleEdit.bind(this)}/> }
           { !edit &&
           <CheckBox label="Carousel" toggle={true} checked={carousel} onChange={this._toggleCarousel.bind(this)}/> }
+          { !showPublic && !edit &&
+          <Box justify='center'><Anchor icon={<Edit />} onClick={() => this._toggleEdit()} label="Edit"/></Box> }
           { editAnchor &&
           <Box justify='center'><Anchor icon={<Checkmark />} onClick={() => !showPublic && this._onSave()} label="Save"/></Box>
+          }
+          { editAnchor &&
+          <Box justify='center'><Anchor icon={<Close />} onClick={() => !showPublic && this._toggleEdit()} label="Cancel"/></Box>
           }
         </Menu>
       </Header>
