@@ -1,13 +1,14 @@
 import _ from 'lodash';
 const storageName = 'AMB_Storage';
 
+const getRandomId = () => (Math.random() + 1).toString(36).substring(7);
 export function bodyToMapData(body) {
   let link = Object.assign({}, body);
   let categories = [];
   let links = [];
   let index = 0;
   // add root
-  let id = (Math.random() + 1).toString(36).substring(7);
+  const id = getRandomId();
   categories.push({ id: index.toString(), items: [{id, node: link.label}] });
   // add sub link
   if (link.links && link.links.length > 0)
@@ -16,10 +17,15 @@ export function bodyToMapData(body) {
 }
 
 function addCategory(categories, links, bodyLinks, parentId, index) {
-  let category = categories[index] || { id: index.toString(), items: [] };
-  categories.push(category);
+  let category = categories[index];
+
+  if (!category) {
+    category = { id: index.toString(), items: [] };
+    categories.push(category);
+  }
+
   bodyLinks.forEach((link) => {
-    let childId = (Math.random() + 1).toString(36).substring(7);
+    const childId = getRandomId();
     category.items.push({id: childId, node: link.sqlname});
     links.push({parentId, childId});
     // check sub links
