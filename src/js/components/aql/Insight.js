@@ -583,12 +583,12 @@ export default class Insight extends ComponentBase {
     let editAnchor = edit && !showPublic;
     return (
         <Header justify="between" pad={{'horizontal': 'medium'}}>
-          <Menu align="center" responsive={true}>
+          <Menu align="center">
             <CheckBox label={showPublic ? `Self(${this.state.tabs.length})` : `Public(${this.state.publicTabs.length})`}
                       toggle={true} checked={showPublic} disabled={edit}
                       onChange={this._toggleShowPublic.bind(this)}/>
           </Menu>
-          <Menu inline={false} responsive={true} closeOnClick={false} dropAlign={{top: 'top', right: 'right'}}>
+          <Menu inline={false} closeOnClick={false} dropAlign={{top: 'top', right: 'right'}}>
             <Anchor label="Carousel" icon={carousel ? <CheckboxSelected /> : <Checkbox />}
                     disabled={edit} onClick={() => !edit && this._toggleCarousel()}/>
             <Anchor label="Edit" icon={edit ? <CheckboxSelected /> : <Checkbox />}

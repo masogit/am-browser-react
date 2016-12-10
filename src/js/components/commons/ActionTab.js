@@ -72,7 +72,9 @@ export default class ActionTab extends Tab {
         </Box>
       );
     } else {
-      return super.render();
+      const props = Object.assign({}, this.props);
+      delete props.onEdit;
+      return <Tab {...props}/>;
     }
   }
 }

@@ -222,7 +222,7 @@ export default class RecordSearch extends ComponentBase {
               </thead>
               <tbody>{
                 messages.map((msg) => (
-                  <TableRow key={msg._id} justify="between">
+                  <TableRow key={msg._id}>
                     <td>{msg.view.name}</td>
                     <td>
                       <Box align="end">
