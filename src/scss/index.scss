@@ -12,6 +12,7 @@
 @import './topology';
 @import './pdf_style';
 @import './menu';
+@import './tab';
 
 $hpe-fonts-path: './fonts';
 
@@ -92,12 +93,12 @@ $hpe-fonts-path: './fonts';
 }
 
 .active {
-  border-bottom: 3px solid #01A982;
+  border-bottom: 3px solid $brand-color;
 }
 
 @include keyframes(slide-sidebar) {
   0% {
-    width: 0px;
+    width: 0;
   }
 
   100% {

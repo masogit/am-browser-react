@@ -28,7 +28,7 @@
     margin-left: 3px;
     border-width: 1px;
     &:hover {
-      box-shadow: 0 0 0 1px #01a982;
+      box-shadow: 0 0 0 1px $brand-color;
     }
   }
 
@@ -36,7 +36,7 @@
     padding: 0;
   }
   .grommetux-button--plain {
-    border: 1px solid #01a982;
+    border: 1px solid $brand-color;
   }
 
 }

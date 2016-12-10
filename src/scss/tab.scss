@@ -1,0 +1,10 @@
+.public-tab {
+  & *, &.grommetux-tab--active * {
+    color: rgba($brand-color, .8 )
+  }
+
+  &.grommetux-tab--active * {
+    border-color: $brand-color;
+    color: $brand-color;
+  }
+}

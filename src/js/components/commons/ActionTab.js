@@ -1,32 +1,17 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
-import React, {PropTypes} from 'react';
-import {Box, Tab} from 'grommet';
+import React, {PropTypes, Component} from 'react';
+import {Button} from 'grommet';
 
-export default class ActionTab extends Tab {
+export default class ActionTab extends Component {
   componentWillMount() {
     this.state = {
       editing: false,
       title: this.props.title
     };
+    this._onClickTab = this._onClickTab.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.disabled) {
-      //TODO: set disabled style
-      this._onClickTab = () => {
-      };
-    } else {
-      let clickHandler = this.props.onClick;
-      if (typeof clickHandler === 'function') {
-        let originalClick = Tab.prototype._onClickTab.bind(this);
-        if (originalClick) {
-          this._onClickTab = (event) => {
-            originalClick(event);
-            clickHandler();
-          };
-        }
-      }
-    }
     if (nextProps.title && nextProps.title != this.state.title) {
       this.setState({
         title: nextProps.title
@@ -34,18 +19,29 @@ export default class ActionTab extends Tab {
     }
   }
 
+  _onClickTab(event) {
+    if (!this.props.disabled) {
+      if (event) {
+        event.preventDefault();
+      }
+      this.props.onRequestForActive();
+      this.props.onClick();
+    }
+  }
+
   _toggleEdit() {
+    const {editing, title} = this.state;
+    const {title: propTitle, onDoubleClick} = this.props;
     let canUpdate = true;
-    if (this.state.editing && this.state.title != this.props.title) {
-      if (this.props.onDoubleClick)
-        canUpdate = this.props.onDoubleClick(this.state.title);
+    if (editing && title != propTitle && onDoubleClick) {
+      canUpdate = onDoubleClick(title);
     }
 
     this.setState({
-      editing: !this.state.editing,
-      title: canUpdate ? this.state.title : (this.lastTitle || this.props.title)
+      editing: !editing,
+      title: canUpdate ? title : (this.lastTitle || propTitle)
     }, () => {
-      this.lastTitle = this.state.title;
+      this.lastTitle = title;
     });
   }
 
@@ -60,27 +56,31 @@ export default class ActionTab extends Tab {
   }
 
   render() {
-    if (this.props.onEdit) {
-      return (
-        <Box className={this.props.active ? 'grommetux-tab--active' : ''} pad={{horizontal: 'small'}}>
-          <Box direction='row' className='grommetux-tab__label' style={{display: 'flex'}}>
-            {this.state.editing ?
-              <input autoFocus={true} ref='input' value={this.state.title} onBlur={this._toggleEdit.bind(this)}
-                     onChange={this._onChange.bind(this)} onKeyDown={this._onChange.bind(this)}/> :
-              <label onClick={this._onClickTab} onDoubleClick={this._toggleEdit.bind(this)}>{this.state.title}</label>}
-          </Box>
-        </Box>
-      );
-    } else {
-      const props = Object.assign({}, this.props);
-      delete props.onEdit;
-      return <Tab {...props}/>;
-    }
+    const { title, editing } = this.state;
+    const {onEdit, active, className} = this.props;
+
+    return (
+      <li className={`grommetux-tab ${active ? 'grommetux-tab--active' : ''} ${className}`}>
+        <Button role='tab' onClick={this._onClickTab} plain
+                onDoubleClick={onEdit ? this._toggleEdit.bind(this) : null}>
+          <label className='grommetux-tab__label'>
+            {editing
+              ? <input autoFocus={true} ref='input' value={title} onBlur={this._toggleEdit.bind(this)}
+                       style={{padding: 0}}
+                       onChange={this._onChange.bind(this)} onKeyDown={this._onChange.bind(this)}/>
+              : title}
+          </label>
+        </Button>
+      </li>
+    );
   }
 }
 
 ActionTab.propTypes = {
   onClick: PropTypes.func,
+  onDoubleClick: PropTypes.func,
   onEdit: PropTypes.bool,
-  disabled: PropTypes.bool
+  disabled: PropTypes.bool,
+  icon: PropTypes.element,
+  className: PropTypes.string
 };

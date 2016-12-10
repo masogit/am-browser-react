@@ -578,29 +578,28 @@ export default class Insight extends ComponentBase {
   }
 
   renderHeader() {
-    const { carousel, edit } = this.state;
-    let { showPublic } = this.state;
+    const { carousel, edit, showPublic, tabs, focusTab, focusIndex, publicTabs } = this.state;
     let editAnchor = edit && !showPublic;
     return (
         <Header justify="between" pad={{'horizontal': 'medium'}}>
           <Menu align="center">
-            <CheckBox label={showPublic ? `Self(${this.state.tabs.length})` : `Public(${this.state.publicTabs.length})`}
+            <CheckBox label={showPublic ? `Self(${tabs.length})` : `Public(${publicTabs.length})`}
                       toggle={true} checked={showPublic} disabled={edit}
                       onChange={this._toggleShowPublic.bind(this)}/>
           </Menu>
           <Menu direction="row">
-            { !edit && <CheckBox label="Carousel" toggle={true} checked={carousel} onChange={this._toggleCarousel.bind(this)}/> }
             { !showPublic && <CheckBox label="Edit" toggle={true} checked={edit} onChange={this._toggleEdit.bind(this)}/> }
+            { !edit && <CheckBox label="Carousel" toggle={true} checked={carousel} onChange={this._toggleCarousel.bind(this)}/> }
             {
               editAnchor &&
               <Menu inline={false} disabled={showPublic} closeOnClick={false}>
                 <Anchor icon={<Checkmark />} onClick={() => !showPublic && this._onSave()} label="Save"/>
                 <Anchor icon={<Add />} onClick={this._addTab.bind(this)} label="Add Tab"/>
-                <Anchor icon={<Close />} onClick={() => this.state.tabs.length > 1 && this._onRemove(this.state.focusTab)} label="Delete Tab" disabled={this.state.tabs.length <= 1}/>
+                <Anchor icon={<Close />} onClick={() => tabs.length > 1 && this._onRemove(focusTab)} label="Delete Tab" disabled={tabs.length <= 1}/>
                 {
                   this.checkAdmin() &&
-                  <Anchor label="Public" icon={<Group />} primary={this.state.tabs[this.state.focusIndex].public}
-                          onClick={this._onPublicTab.bind(this, this.state.tabs[this.state.focusIndex])}/>
+                  <Anchor label="Public" icon={<Group />} primary={tabs[focusIndex].public}
+                          onClick={this._onPublicTab.bind(this, tabs[focusIndex])}/>
                 }
               </Menu>
             }
@@ -610,8 +609,8 @@ export default class Insight extends ComponentBase {
   }
 
   render() {
-    const {tabs, data, carousel, edit, layer, alert} = this.state;
-    let showedTabs = this.state.showPublic ? this.state.publicTabs : tabs;
+    const {tabs, data, carousel, edit, layer, alert, showPublic, publicTabs} = this.state;
+    let showedTabs = showPublic ? publicTabs : tabs;
     const id = this.props.params.id;
     let content;
     if (id) {
@@ -619,12 +618,16 @@ export default class Insight extends ComponentBase {
     } else {
       content = (
         <Tabs justify='center' className='flex' activeIndex={this.state.focusIndex}>{
-          showedTabs.map((tab, index) => (
-            <ActionTab ref={tab.name} title={tab.name} key={tab.name} onClick={this._setFocusTab.bind(this, tab, index)}
-                       onEdit={edit} onDoubleClick={this.state.edit ? this._onUpdateTitle.bind(this, tab) : null}>
-              {carousel && !edit ? this._buildCarousel(tab) : this._buildBox(tab.box, tab.box, tab.name)}
-            </ActionTab>
-          ))
+          showedTabs.map((tab, index) => {
+            const isPublic = publicTabs.indexOf(tab) > -1;
+            return (
+              <ActionTab ref={tab.name} title={tab.name} key={tab.name} className={isPublic ? 'public-tab' : ''}
+                         onClick={this._setFocusTab.bind(this, tab, index)}
+                         onEdit={edit} onDoubleClick={edit ? this._onUpdateTitle.bind(this, tab) : null}>
+                {carousel && !edit ? this._buildCarousel(tab) : this._buildBox(tab.box, tab.box, tab.name)}
+              </ActionTab>
+            );
+          })
         }
         </Tabs>
       );
