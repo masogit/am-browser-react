@@ -1,8 +1,9 @@
 import React, {Component, PropTypes} from 'react';
-import {Box, Header, Icons, Anchor, Menu, FormField, Form,
+import {Box, Header, Icons, Anchor, Menu, FormField, Form, Label,
   RadioButton, Layer, NumberInput} from 'grommet';
 const {Download, Close, Play: Preview, Code, Checkmark, Duplicate} = Icons.Base;
 import {loadRecordsByBody} from '../../actions/explorer';
+import {showError} from '../../actions/system';
 import { cloneDeep } from 'lodash';
 import { preview,
   getPreviewStyle, updateValue, translateText, download } from '../../util/pdfDesigner';
@@ -281,10 +282,20 @@ export default class PDFDesigner extends Component {
   }
 
   uploadLogo(src) {
-    this.state.report.settings.images = {};
-    this.state.report.settings.images[GLOBAL_VARIABLES.LOGO] = src;
-    this.setState({report: this.state.report}, this.autoPreview);
-    this.updatePic(src);
+    let data, match;
+    if (match = /^data:.+;base64,(.*)$/.exec(src)) {
+      data = new Buffer(match[1], 'base64');
+    }
+    if ((data[0] === 0xff && data[1] === 0xd8) // jpg
+      || (data[0] === 0x89 && data.toString('ascii', 1, 4) === 'PNG')) { // png
+
+      this.state.report.settings.images = {};
+      this.state.report.settings.images[GLOBAL_VARIABLES.LOGO] = src;
+      this.setState({report: this.state.report}, this.autoPreview);
+      this.updatePic(src);
+    } else {
+      showError('Only png and jpg image are supported');
+    }
   }
 
   render() {
@@ -299,7 +310,7 @@ export default class PDFDesigner extends Component {
       <Box pad={{horizontal: 'small'}} flex={true}>
         <Header justify='between' size='small'>
           <Box direction='row' align='center' className='no-border'>
-            <Box style={{color: '#ff0000'}}>Name:</Box>
+            <Label style={{color: '#ff0000'}}>Name:</Label>
             <FormField>
               <input className='input-field' name='report.name' type="text" value={name} onChange={this._updateValue}
                    maxLength='20'/>
