@@ -202,6 +202,10 @@ div .grommetux-menu__drop .grommetux-anchor {
   & .grommetux-tab {
     padding: 0 3px;
   }
+
+  & + div[role=tabpanel] > div {
+    flex: 1;
+  }
 }
 
 .content-height {

@@ -64,11 +64,7 @@ export function loadRecordsByBody(body) {
 }
 
 export function getQueryByBody(body) {
-
-  var fields = [];
-  body.fields.forEach(function (field) {
-    fields.push(field.sqlname);
-  });
+  let fields =body.fields.map(field => field.is_calc ? undefined:  field.sqlname);
 
   // add src_fields before query
   if (body.links && body.links.length > 0) {

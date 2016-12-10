@@ -13,7 +13,7 @@ import {connect} from 'react-redux';
 import ReactList from 'react-list';
 
 const createReverse = (reverse) => {
-  var obj = {
+  return {
     sqlname: reverse.sqlname,
     label: reverse.label,
     src_field: reverse.src_field,
@@ -25,7 +25,6 @@ const createReverse = (reverse) => {
       links: []
     }
   };
-  return obj;
 };
 
 const generateFieldsLinks = (body, elements, row) => {
@@ -269,6 +268,15 @@ class MetaData extends ComponentBase {
     this.props.dispatch(loadMetadataDetailSuccess({}, []));
   }
 
+  renderListItem({key, onClick, label, icon, style}) {
+    return (
+      <ListItem separator="none" key={key} pad="none" onClick={onClick}>
+        {icon}
+        <Box margin={{left: 'small'}} style={style}>{label}</Box>
+      </ListItem>
+    );
+  }
+
   render() {
     let {filterEntities, elements, rows, schemaToLoad} = this.props;
 
@@ -302,14 +310,14 @@ class MetaData extends ComponentBase {
     let fields = rowsState.fields ? rowsState.fields : [];
 
     entities = entities.sort(sortSqlName);
-    let renderEntityItem = (index, key) => {
+    const renderEntityItem = (index, key) => {
       let row = entities[index];
-      return (
-        <ListItem separator="none" key={key} pad="none" flex={false}>
-          <Anchor icon={<LinkNext/>} label={row.sqlname}
-                  onClick={this._onClick.bind(this, {label: row.label, sqlname: row.sqlname, url: row["ref-link"]})}/>
-        </ListItem>
-      );
+      return this.renderListItem({
+        label: row.sqlname,
+        onClick: this._onClick.bind(this, {label: row.label, sqlname: row.sqlname, url: row["ref-link"]}),
+        icon: <LinkNext/>,
+        key
+      });
     };
 
     let one2onelinks = links.filter((obj) => obj.card11 == true).sort(sortSqlName);
@@ -326,32 +334,30 @@ class MetaData extends ComponentBase {
         src_field: row.src_field,
         dest_field: row.dest_field
       };
-      return (
-        <ListItem separator="none" key={key} pad="none">
-          <Anchor icon={<LinkNext/>} onClick={this._onClick.bind(this, newRow)} label={row.sqlname}/>
-        </ListItem>
-      );
+      return this.renderListItem({
+        label: row.sqlname,
+        onClick: this._onClick.bind(this, newRow),
+        icon: <LinkNext/>,
+        key
+      });
     };
     //let fieldsComponents = fields.sort().map((row, index) => {
     //  return <TableRow key={index}><td><CheckBox key={index} id={`checkbox_${row.sqlname}`} checked={row.checked} onChange={this._onChange.bind(this, row)}/><Notes/>{row.sqlname}</td></TableRow>;
     //});
     fields = fields.sort(sortSqlName);
-    let renderFieldItem = (index, key) => {
-      let row = fields[index];
-      if (!row.sqlname.startsWith('cf_')) {
-        return (
-          <ListItem separator="none" key={key} pad="none">
-            <Anchor icon={<Notes />} onClick={this._onChange.bind(this, row)} label={row.sqlname}/>
-          </ListItem>
-        );
-      } else {
-        return (
-          <ListItem separator="none" key={key} pad="none">
-            <Notes />
-            <Box margin={{left: 'small'}} style={{textDecoration: 'line-through'}}>{row.sqlname}</Box>
-          </ListItem>
-        );
+    const renderFieldItem = (index, key) => {
+      let row = fields[index], onClick = this._onChange.bind(this, row), style = {};
+      if (row.is_calc) {
+        style.textDecoration = 'line-through';
+        onClick = null;
       }
+      return this.renderListItem({
+        label: row.sqlname,
+        onClick: onClick,
+        icon: <Notes/>,
+        style,
+        key
+      });
     };
 
     return (
@@ -374,29 +380,29 @@ class MetaData extends ComponentBase {
           {entities.length == 0 && !rows.entities &&
             // ref='tabs' activeIndex={this.refs.tabs && this.refs.tabs.state.activeInde
             // this can be deleted, if we use grommet build which later then 8.18/2016
-          <Tabs justify="start" ref='tabs' activeIndex={this.refs.tabs && this.refs.tabs.state.activeIndex} className="amb-schema">
-            <Tab title={`1-M Links (${m2mLinks.length})`}>
-              <ReactList itemRenderer={(index, key) => renderLinks(index, key, m2mLinks)}
-                         length={m2mLinks.length}
-                         pageSize={10}
-                         type='simple'
-                />
-            </Tab>
-            <Tab title={`1-1 Links (${one2onelinks.length})`}>
-              <ReactList itemRenderer={(index, key) => renderLinks(index, key, one2onelinks)}
-                         length={one2onelinks.length}
-                         pageSize={10}
-                         type='simple'
-                />
-            </Tab>
-            <Tab title={`Fields (${fields.length})`}>
-              <ReactList itemRenderer={renderFieldItem}
-                         length={fields.length}
-                         pageSize={10}
-                         type='simple'
-                />
-            </Tab>
-          </Tabs>
+            <Tabs justify="start" ref='tabs' activeIndex={this.refs.tabs && this.refs.tabs.state.activeIndex} className="amb-schema">
+              <Tab title={`1-M Links (${m2mLinks.length})`}>
+                <ReactList itemRenderer={(index, key) => renderLinks(index, key, m2mLinks)}
+                           length={m2mLinks.length}
+                           pageSize={10}
+                           type='simple'
+                  />
+              </Tab>
+              <Tab title={`1-1 Links (${one2onelinks.length})`}>
+                <ReactList itemRenderer={(index, key) => renderLinks(index, key, one2onelinks)}
+                           length={one2onelinks.length}
+                           pageSize={10}
+                           type='simple'
+                  />
+              </Tab>
+              <Tab title={`Fields (${fields.length})`}>
+                <ReactList itemRenderer={renderFieldItem}
+                           length={fields.length}
+                           pageSize={10}
+                           type='simple'
+                  />
+              </Tab>
+            </Tabs>
           }
         </Box>
       </Box>
