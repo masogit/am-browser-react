@@ -73,7 +73,7 @@ export default class Insight extends ComponentBase {
     if (box.child && box.child._id) {
       this.addPromise(AQLActions.loadAQL(box.child._id).then((aql)=> {
         if (!this.state.data[aql._id]) {
-          if(!aql[aql.type]) {
+          if (!aql[aql.type]) {
             aql[aql.type] = aql.form; //handle old data
           }
           this._queryData(aql);
@@ -165,9 +165,9 @@ export default class Insight extends ComponentBase {
             monitorEdit(this.wall, this.state.wall);
           });
         } else {
-          const wall =  { tabs: this.state.tabs };
+          const wall = {tabs: this.state.tabs};
           this.wall = _.cloneDeep(wall);
-          this.setState({ wall }, () => {
+          this.setState({wall}, () => {
             monitorEdit(this.wall, this.state.wall);
           });
         }
@@ -282,7 +282,9 @@ export default class Insight extends ComponentBase {
     return (
       <Box {...boxProps} className='box-graph' colorIndex="light-1">
         <Box justify="between" direction="row">
-          <Box pad={{horizontal: 'medium'}} className='left-border' justify="center"><Label margin='none'>{dataMap.aql.name}</Label></Box>
+          <Box pad={{horizontal: 'medium'}} className='left-border' justify="center">
+            <Label margin='none'>{dataMap.aql.name}</Label>
+          </Box>
           <Box pad='small' onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}><Expand /></Box>
         </Box>
         <Box {...graphStyle}>
@@ -338,7 +340,11 @@ export default class Insight extends ComponentBase {
         }
 
         tabIdMap[tabName].dataIds.push(box.child._id);
-        child = this.renderGraphBox({boxProps: {flex: true}, graphStyle: {pad: "small", flex:true, justify: "center"}, dataMap});
+        child = this.renderGraphBox({
+          boxProps: {flex: true},
+          graphStyle: {pad: "small", flex: true, justify: "center"},
+          dataMap
+        });
       }
     } else if (this.state.edit) {
       child = (
@@ -383,7 +389,7 @@ export default class Insight extends ComponentBase {
 
   _buildCarousel(tab) {
 
-    if(!tabIdMap[tab.name] || !tabIdMap[tab.name].dataIds) { // prevent console error: cannot get dataIds of undefined.
+    if (!tabIdMap[tab.name] || !tabIdMap[tab.name].dataIds) { // prevent console error: cannot get dataIds of undefined.
       return null;
     }
     const dataIds = tabIdMap[tab.name].dataIds;
@@ -395,10 +401,15 @@ export default class Insight extends ComponentBase {
             const dataMap = this.state.data[key] || false;
             return dataMap && // fix console error: cannot get aql of undefined.
               (
-              <Box pad="medium" key={index}>
-                {this.renderGraphBox({graphStyle: {pad: "large", align:(dataMap.aql.type=='meter')?'center':null}, dataMap})}
-              </Box>
-            );
+                <Box pad="medium" key={index}>
+                  {this.renderGraphBox({
+                    graphStyle: {
+                      pad: "large",
+                      align: (dataMap.aql.type == 'meter') ? 'center' : null
+                    }, dataMap
+                  })}
+                </Box>
+              );
           })
         }
       </Carousel>
@@ -419,7 +430,8 @@ export default class Insight extends ComponentBase {
           layer: {
             name: 'View',
             args: [body, view.name]
-          }});
+          }
+        });
       });
   }
 
@@ -452,10 +464,10 @@ export default class Insight extends ComponentBase {
           }
         </Header>
         {aql[aql.type] instanceof Object &&
-          <Box key={aql._id} pad="large" align={(aql.type=='meter')?'center':null}>
-            <Graph type={aql.type} data={data} config={aql[aql.type]}
-                  onClick={(filter) => this._showViewRecords(filter, aql.view)}/>
-          </Box>
+        <Box key={aql._id} pad="large" align={(aql.type=='meter')?'center':null}>
+          <Graph type={aql.type} data={data} config={aql[aql.type]}
+                 onClick={(filter) => this._showViewRecords(filter, aql.view)}/>
+        </Box>
         }
         <Table>
           <thead>
@@ -567,7 +579,7 @@ export default class Insight extends ComponentBase {
     let focusTab = tabs[focusIndex];
     this.state.tabs = leftTabs;
     this.state.wall.tabs = leftTabs;
-    this.state.focusIndex = focusIndex > 0 ? focusIndex -1 : focusIndex;
+    this.state.focusIndex = focusIndex > 0 ? focusIndex - 1 : focusIndex;
     this.state.focusTab = focusTab;
     this.setState(this.state);
   }
@@ -581,30 +593,33 @@ export default class Insight extends ComponentBase {
     const { carousel, edit, showPublic, tabs, focusTab, focusIndex, publicTabs } = this.state;
     let editAnchor = edit && !showPublic;
     return (
-        <Header justify="between" pad={{'horizontal': 'medium'}}>
-          <Menu align="center">
-            <CheckBox label={showPublic ? `Self(${tabs.length})` : `Public(${publicTabs.length})`}
-                      toggle={true} checked={showPublic} disabled={edit}
-                      onChange={this._toggleShowPublic.bind(this)}/>
-          </Menu>
-          <Menu direction="row">
-            { !showPublic && <CheckBox label="Edit" toggle={true} checked={edit} onChange={this._toggleEdit.bind(this)}/> }
-            { !edit && <CheckBox label="Carousel" toggle={true} checked={carousel} onChange={this._toggleCarousel.bind(this)}/> }
-            {
-              editAnchor &&
-              <Menu inline={false} disabled={showPublic} closeOnClick={false}>
-                <Anchor icon={<Checkmark />} onClick={() => !showPublic && this._onSave()} label="Save"/>
-                <Anchor icon={<Add />} onClick={this._addTab.bind(this)} label="Add Tab"/>
-                <Anchor icon={<Close />} onClick={() => tabs.length > 1 && this._onRemove(focusTab)} label="Delete Tab" disabled={tabs.length <= 1}/>
-                {
-                  this.checkAdmin() &&
-                  <Anchor label="Public" icon={<Group />} primary={tabs[focusIndex].public}
-                          onClick={this._onPublicTab.bind(this, tabs[focusIndex])}/>
-                }
-              </Menu>
-            }
-          </Menu>
-        </Header>
+      <Header justify="between" pad={{'horizontal': 'medium'}}>
+        <Menu align="center">
+          <CheckBox label={showPublic ? `Self(${tabs.length})` : `Public(${publicTabs.length})`}
+                    toggle={true} checked={showPublic} disabled={edit}
+                    onChange={this._toggleShowPublic.bind(this)}/>
+        </Menu>
+        <Menu direction="row">
+          { !showPublic &&
+          <CheckBox label="Edit" toggle={true} checked={edit} onChange={this._toggleEdit.bind(this)}/> }
+          { !edit &&
+          <CheckBox label="Carousel" toggle={true} checked={carousel} onChange={this._toggleCarousel.bind(this)}/> }
+          {
+            editAnchor &&
+            <Menu inline={false} disabled={showPublic} closeOnClick={false}>
+              <Anchor icon={<Checkmark />} onClick={() => !showPublic && this._onSave()} label="Save"/>
+              <Anchor icon={<Add />} onClick={this._addTab.bind(this)} label="Add Tab"/>
+              <Anchor icon={<Close />} onClick={() => tabs.length > 1 && this._onRemove(focusTab)} label="Delete Tab"
+                      disabled={tabs.length <= 1}/>
+              {
+                this.checkAdmin() &&
+                <Anchor label="Public" icon={<Group />} primary={tabs[focusIndex].public}
+                        onClick={this._onPublicTab.bind(this, tabs[focusIndex])}/>
+              }
+            </Menu>
+          }
+        </Menu>
+      </Header>
     );
   }
 
@@ -618,16 +633,13 @@ export default class Insight extends ComponentBase {
     } else {
       content = (
         <Tabs justify='center' className='flex' activeIndex={this.state.focusIndex}>{
-          showedTabs.map((tab, index) => {
-            const isPublic = publicTabs.indexOf(tab) > -1;
-            return (
-              <ActionTab ref={tab.name} title={tab.name} key={tab.name} className={isPublic ? 'public-tab' : ''}
-                         onClick={this._setFocusTab.bind(this, tab, index)}
-                         onEdit={edit} onDoubleClick={edit ? this._onUpdateTitle.bind(this, tab) : null}>
-                {carousel && !edit ? this._buildCarousel(tab) : this._buildBox(tab.box, tab.box, tab.name)}
-              </ActionTab>
-            );
-          })
+          showedTabs.map((tab, index) => (
+            <ActionTab ref={tab.name} title={tab.name} key={tab.name} className={tab.public ? 'public-tab' : ''}
+                       onClick={this._setFocusTab.bind(this, tab, index)}
+                       onEdit={edit} onDoubleClick={edit ? this._onUpdateTitle.bind(this, tab) : null}>
+              {carousel && !edit ? this._buildCarousel(tab) : this._buildBox(tab.box, tab.box, tab.name)}
+            </ActionTab>
+          ))
         }
         </Tabs>
       );
