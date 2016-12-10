@@ -8,7 +8,7 @@ import RecordListLayer from '../explorer/RecordListLayer';
 import { AlertForm, ComponentBase, AMSideBar, Graph, ActionTab } from '../commons';
 import { Anchor, Box, Button, CheckBox, Header, Title, Menu, Table, TableRow, Layer,
          Carousel, Tabs, Icons, Label } from 'grommet';
-const { Add, Close, Attachment, Checkmark, Shift, More, Group, Expand, Checkbox, CheckboxSelected  } = Icons.Base;
+const { Add, Close, Attachment, Checkmark, Shift, More, Group, Expand } = Icons.Base;
 import AQL from './AQL';
 import _ from 'lodash';
 
@@ -588,18 +588,21 @@ export default class Insight extends ComponentBase {
                       toggle={true} checked={showPublic} disabled={edit}
                       onChange={this._toggleShowPublic.bind(this)}/>
           </Menu>
-          <Menu inline={false} responsive={true} closeOnClick={false} dropAlign={{top: 'top', right: 'right'}}>
-            <Anchor label="Carousel" icon={carousel ? <CheckboxSelected /> : <Checkbox />}
-                    disabled={edit} onClick={() => !edit && this._toggleCarousel()}/>
-            <Anchor label="Edit" icon={edit ? <CheckboxSelected /> : <Checkbox />}
-                    disabled={showPublic} onClick={this._toggleEdit.bind(this)} />
-            { editAnchor && <Anchor icon={<Checkmark />} onClick={() => !showPublic && this._onSave()} label="Save"/> }
-            { editAnchor && <Anchor icon={<Add />} onClick={this._addTab.bind(this)} label="Add Tab"/> }
-            { editAnchor && <Anchor icon={<Close />} onClick={() => this.state.tabs.length > 1 && this._onRemove(this.state.focusTab)} label="Delete Tab" disabled={this.state.tabs.length <= 1}/> }
+          <Menu direction="row" responsive={true}>
+            { !edit && <CheckBox label="Carousel" toggle={true} checked={carousel} onChange={this._toggleCarousel.bind(this)}/> }
+            { !showPublic && <CheckBox label="Edit" toggle={true} checked={edit} onChange={this._toggleEdit.bind(this)}/> }
             {
-              this.checkAdmin() && editAnchor &&
-              <Anchor label="Public" icon={<Group />} primary={this.state.tabs[this.state.focusIndex].public}
-                      onClick={this._onPublicTab.bind(this, this.state.tabs[this.state.focusIndex])}/>
+              editAnchor &&
+              <Menu inline={false} disabled={showPublic} closeOnClick={false}>
+                <Anchor icon={<Checkmark />} onClick={() => !showPublic && this._onSave()} label="Save"/>
+                <Anchor icon={<Add />} onClick={this._addTab.bind(this)} label="Add Tab"/>
+                <Anchor icon={<Close />} onClick={() => this.state.tabs.length > 1 && this._onRemove(this.state.focusTab)} label="Delete Tab" disabled={this.state.tabs.length <= 1}/>
+                {
+                  this.checkAdmin() &&
+                  <Anchor label="Public" icon={<Group />} primary={this.state.tabs[this.state.focusIndex].public}
+                          onClick={this._onPublicTab.bind(this, this.state.tabs[this.state.focusIndex])}/>
+                }
+              </Menu>
             }
           </Menu>
         </Header>
