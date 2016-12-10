@@ -71,14 +71,14 @@ export default class NavHeader extends Component {
     return (
       <Header fixed={true} ref='header' size="small" direction="row" justify="between" responsive={false}
               className='shadow'>
-        <Box direction="row">
+        <Box direction="row" flex>
           <Box margin={{horizontal: 'large'}} size="small" responsive={false} className="app-name">
             <Heading tag="h2" strong={true}>AM Browser</Heading>
           </Box>
           {
             links.length > 0 &&
-            <Search placeHolder="Type to search" inline={true} iconAlign="start" maxLength={20}
-                  onKeyDown={this.onSearch.bind(this)}/>
+            <Search placeHolder="Type to search" inline={true} iconAlign="start" maxLength={20} fill
+                  onKeyDown={this.onSearch.bind(this)} />
           }
         </Box>
         <Menu direction="row" align="center">
