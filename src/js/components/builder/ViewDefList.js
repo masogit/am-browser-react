@@ -50,7 +50,11 @@ export default class ViewsDefList extends Component {
   }
 
   dropCurrentPop(title, onConfirm) {
-    const { selectedView, originView } = this.props;
+    const { selectedView, originView: originFromProps, views } = this.props;
+    let originView = originFromProps;
+    if(!originView) {
+      originView = views.filter(view => view._id == selectedView._id)[0];
+    }
 
     dropCurrentPop(originView, selectedView, emptyViewDef, title, onConfirm);
   }
