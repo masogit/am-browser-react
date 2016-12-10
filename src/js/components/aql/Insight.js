@@ -624,7 +624,7 @@ export default class Insight extends ComponentBase {
       content = data && data[id] && this._renderSingleAQL(data[id]);
     } else {
       const displayTabs = showedTabs.map((tab, index) => (
-        <ActionTab ref={tab.name} title={tab.name} key={index} className={tab.public ? 'public-tab' : ''}
+        <ActionTab ref={tab.name} title={tab.name} key={index} className={(tab.public && !showPublic) ? 'public-tab' : ''}
                    onClick={this._setFocusTab.bind(this, tab, index)}
                    leftIcon={edit && this.checkAdmin() ? <Group onClick={this._onPublicTab.bind(this, tab)}/> : null}
                    rightIcon={edit ? <Close onClick={() => tabs.length > 1 && this._onRemove(focusTab)}/> : null}
