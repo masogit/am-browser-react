@@ -92,6 +92,7 @@
   "scripts": {
     "build": "gulp dist",
     "start": "gulp amdev",
+    "dev": "gulp dev",
     "test": "node_modules/.bin/mocha -R spec --compilers js:babel-register --recursive --require ./test/setup.js",
     "coverage": "node_modules/.bin/istanbul cover -v --report lcovonly --dir ./coverage --hook-run-in-context node_modules/mocha/bin/_mocha -- -R spec --compilers js:babel-register --recursive --require ./test/setup.js",
     "test:watch": "npm test -- --watch"
