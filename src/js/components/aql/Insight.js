@@ -635,7 +635,7 @@ export default class Insight extends ComponentBase {
         </ActionTab>
       ));
       if (edit) {
-        displayTabs.push(<ActionTab onClick={this._addTab.bind(this)} title={<b>&#43;</b>} key='new'/>);
+        displayTabs.push(<ActionTab onClick={this._addTab.bind(this)} title={<b>+</b>} key='new'/>);
       }
       content = (
         <Tabs justify='center' className='flex' activeIndex={focusIndex}>{displayTabs}</Tabs>
