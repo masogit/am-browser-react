@@ -594,10 +594,12 @@ export default class Insight extends ComponentBase {
     let editAnchor = edit && !showPublic;
     return (
       <Header justify="between" pad={{'horizontal': 'medium'}}>
-        <Menu align="center">
-          <CheckBox label={showPublic ? `Self(${tabs.length})` : `Public(${publicTabs.length})`}
-                    toggle={true} checked={showPublic} disabled={edit}
-                    onChange={this._toggleShowPublic.bind(this)}/>
+        <Menu align="center" inline={true} direction="row">
+          { !edit && <Button label={`Public(${publicTabs.length})`} primary={showPublic}
+                  plain={true} onClick={this._toggleShowPublic.bind(this)}/> }
+          { !edit && <Button label={`Self(${tabs.length})`} primary={!showPublic}
+                  plain={true} onClick={this._toggleShowPublic.bind(this)}/> }
+          { edit && <Button label="Editing mode" plain={true}/> }
         </Menu>
         <Menu direction="row">
           { !edit &&
