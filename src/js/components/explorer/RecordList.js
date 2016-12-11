@@ -395,16 +395,13 @@ export default class RecordList extends ComponentBase {
     let menus = this.props.body.fields.map((field, index) => {
       let selected = (field.sqlname == this.state.param.groupby);
       let label = Format.getDisplayLabel(field);
-      if (field.searchable)
-        label = label + ' [Quick search]';
-      let isPrimary = field.searchable;
       return (
         <Box direction="row" align="center" key={`icon_${index}`}>
           <Box direction="row" className='orderbyIcon-margin-left' >
             {!_.isEmpty(this.props.body.orderby) && this._showOrderByIcon(field.sqlname, this.props.body.orderby)}
           </Box>
           <Anchor key={`a_groupby_${index}`} icon={selected?<CheckboxSelected />:<Checkbox />}
-                  label={label} primary={isPrimary} disabled={this.state.locked}
+                  label={label} disabled={this.state.locked}
                   onClick={() => {
                     if (!this.state.locked) {
                       if (selected) {
