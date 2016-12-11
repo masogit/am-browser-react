@@ -496,8 +496,10 @@ export default class Insight extends ComponentBase {
     wall.tabs = this.state.tabs;
     wall.user = cookies.get('user');
     AQLActions.saveWall(wall).then(data => {
-      if (data)
+      if (data) {
+        this._toggleEdit();
         this._loadWall();
+      }
     });
   }
 
