@@ -8,7 +8,7 @@ import RecordListLayer from '../explorer/RecordListLayer';
 import { AlertForm, ComponentBase, AMSideBar, Graph, ActionTab } from '../commons';
 import { Anchor, Box, Button, CheckBox, Header, Title, Menu, Table, TableRow, Layer,
          Carousel, Tabs, Icons, Label } from 'grommet';
-const { Add, Close, Attachment, Checkmark, Shift, More, Group, Expand, Edit } = Icons.Base;
+const { Close, Attachment, Checkmark, Shift, More, Group, Expand, Edit } = Icons.Base;
 import AQL from './AQL';
 import _ from 'lodash';
 
@@ -633,7 +633,7 @@ export default class Insight extends ComponentBase {
         </ActionTab>
       ));
       if (edit) {
-        displayTabs.push(<ActionTab onClick={this._addTab.bind(this)} title='New' leftIcon={<Add/>} key='new'/>);
+        displayTabs.push(<ActionTab onClick={this._addTab.bind(this)} title={<b>&#43;</b>} key='new'/>);
       }
       content = (
         <Tabs justify='center' className='flex' activeIndex={focusIndex}>{displayTabs}</Tabs>
