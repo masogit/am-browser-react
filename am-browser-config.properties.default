@@ -10,9 +10,9 @@ base = /
 session_max_age = 30
 is_debug = false
 session_secret = keyboard cat
-enable_csrf = true
+enable_csrf = false
 # LWSSO enabled
-enable_lwsso = true
+enable_lwsso = false
 
 [rest]
 protocol = http
@@ -31,6 +31,7 @@ browser_server = ucmdbhost
 browser_port = 8080
 browser_param = /ucmdb-browser/ucmdb_widget.jsp?server=Default%20Client&locale=en#widget=properties;refocus-selection=
 
+# db type: file, mongo
 [db]
 type = file
 folder = ./db
