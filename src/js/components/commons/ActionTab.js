@@ -25,7 +25,9 @@ export default class ActionTab extends Component {
         event.preventDefault();
       }
       this.props.onRequestForActive();
-      this.props.onClick();
+      if (typeof this.props.onClick === 'function') {
+        this.props.onClick();
+      }
     }
   }
 
@@ -60,7 +62,7 @@ export default class ActionTab extends Component {
     const {onEdit, active, className, leftIcon, rightIcon} = this.props;
 
     return (
-      <li className={`grommetux-tab action-tab ${active ? 'grommetux-tab--active' : ''} ${className}`}>
+      <li className={`grommetux-tab action-tab ${active ? 'grommetux-tab--active' : ''} ${className ||''}`}>
         { active && leftIcon }
         <Button role='tab' onClick={this._onClickTab} plain
                 onDoubleClick={onEdit ? this._toggleEdit.bind(this) : null}>
