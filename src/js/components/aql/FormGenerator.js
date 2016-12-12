@@ -142,9 +142,6 @@ export default class GraphForm extends Component {
     } else {
       this._init();
       this.props.setInitSetting(this.state[type]);
-
-      this.state.showBasic = this.state.showBasic == undefined ? true : this.state.showBasic;
-      this.state.showAdvance = this.state.showAdvance == undefined ? false : this.state.showAdvance;
     }
   }
 
@@ -156,9 +153,6 @@ export default class GraphForm extends Component {
     } else {
       this.state[type] = nextProps[type];
     }
-
-    this.state.showBasic = this.state.showBasic == undefined ? true : this.state.showBasic;
-    this.state.showAdvance = this.state.showAdvance == undefined ? false : this.state.showAdvance;
   }
 
   _setFormValues(event) {
@@ -184,11 +178,7 @@ export default class GraphForm extends Component {
   }
 
   render(basicOptions, advanceOptions, selections) {
-    const {showBasic, showAdvance, type} = this.state;
-
-    if (!showBasic && !showAdvance) {
-      return null;
-    }
+    const {showAdvance, type} = this.state;
 
     const advance = genOptions(advanceOptions, this, type, selections);
     const basic = genOptions(basicOptions, this, type, selections);
@@ -202,10 +192,10 @@ export default class GraphForm extends Component {
     const legend = genOptions(legendOptions, this, type, legendSelections);
 
     const settings = [];
-    if (showBasic) {
-      settings.push([basic[0]]);
-      settings.push(basic.slice(1));
-    }
+
+    settings.push([basic[0]]);
+    settings.push(basic.slice(1));
+
     if (showAdvance) {
       settings.push(advance);
       settings.push(legend);
@@ -214,9 +204,8 @@ export default class GraphForm extends Component {
       <Box separator='bottom' flex={true}>
         {settings.map((setting, index) => <Form className='vertical-form' key={index}>{setting}</Form>)}
         <Box className='toggle' direction='row'>
-          <CheckBox label='Basic' checked={this.state.showBasic} value={this.state.showBasic}
-                    onChange={() => this.setState({showBasic: !showBasic})}/>
-          <CheckBox label='Advance' checked={this.state.showAdvance} value={this.state.showAdvance}
+          <CheckBox label='Basic' checked disabled/>
+          <CheckBox label='Advance' checked={showAdvance} value={showAdvance}
                     onChange={() => this.setState({showAdvance: !showAdvance})}/>
         </Box>
       </Box>
