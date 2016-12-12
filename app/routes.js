@@ -156,33 +156,53 @@ module.exports = function (app) {
   });
 
   //check AQL syntax
-  app.use('/am/checkAqlSyntax', function(req, res) {
-    rest.checkAqlSyntax(req.session, req.query.str).then((data) => {
-      res.send(true);
-    }).catch((err) => {
-      res.send(err.message);
-    });
+  app.use('/am/checkAqlSyntax', function(req, res, next) {
+    if (req.headers['x-api-version']) {
+        rest.checkAqlSyntax(req.session, req.query.str).then((data) => {
+        res.send(true);
+      }).catch((err) => {
+        res.send(err.message);
+      });
+    } else {
+      next();
+    }
   });
 
   // Proxy the backend rest service /rs/db -> /am/db
-  app.use('/am/db', function (req, res) {
+  app.use('/am/db', function (req, res, next) {
     // TODO: need to take care of https
-    apiProxy.web(req, res, { target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}${config.version}/db` });
+    if (req.headers['x-api-version']) {
+      apiProxy.web(req, res, { target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}${config.version}/db` });
+    } else {
+      next();
+    }
   });
 
-  app.use('/am/query', function (req, res) {
+  app.use('/am/query', function (req, res, next) {
     // TODO: need to take care of https
-    apiProxy.web(req, res, { target: `${rest_protocol}://${rest_server}:${rest_port}${config.rest_conn.context}/query` });
+    if (req.headers['x-api-version']) {
+      apiProxy.web(req, res, { target: `${rest_protocol}://${rest_server}:${rest_port}${config.rest_conn.context}/query` });
+    } else {
+      next();
+    }
   });
 
-  app.use('/am/schema', function (req, res) {
+  app.use('/am/schema', function (req, res, next) {
     // TODO: need to take care of https
-    apiProxy.web(req, res, { target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}${config.version}/schema` });
+    if (req.headers['x-api-version']) {
+      apiProxy.web(req, res, { target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}${config.version}/schema` });
+    } else {
+      next();
+    }
   });
 
   // get ucmdb point data
-  app.use('/am/ucmdbPoint/', isAuthenticated, function (req, res) {
-    apiProxy.web(req, res, { target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}/integration/ucmdbAdapter/points` });
+  app.use('/am/ucmdbPoint/', isAuthenticated, function (req, res, next) {
+    if (req.headers['x-api-version']) {
+      apiProxy.web(req, res, { target: `${rest_protocol}://${rest_server}:${rest_port}${config.base}/integration/ucmdbAdapter/points` });
+    } else {
+      next();
+    }
   });
 
   /**

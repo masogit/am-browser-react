@@ -58,8 +58,8 @@ require('./routes.js')(AMBRouter);
 
 // error handle
 app.use(function (err, req, res, next) {
-  logger.error(`[csrf] [${req.sessionID}] [${req.session && req.session.csrfSecret}] [${err.name}: ${err.message}] ${req.method} ${req.url}`);
   if (enable_csrf && (err.code === 'EBADCSRFTOKEN') ) {
+    logger.error(`[csrf] [${req.sessionID}] [${req.session && req.session.csrfSecret}] [${err.name}: ${err.message}] ${req.method} ${req.url}`);
     res.cookie('csrf-token', req.csrfToken());
   }
   next(err);
