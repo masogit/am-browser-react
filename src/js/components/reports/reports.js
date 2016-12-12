@@ -155,7 +155,7 @@ export default class Reports extends ComponentBase {
     const focus = report && {expand: report.category, selected: report._id};
 
     return (
-      <Box direction="row" flex={true} pad={fromView ? 'small' : 'none'} style={{minWidth: '90vw', minHeight: '90%'}}>
+      <Box direction="row" flex={true} pad={fromView ? 'small' : 'none'} style={{minWidth: '90vw', minHeight: fromView ? '90vh' : '90%'}}>
         <AMSideBar title='Templates' toolbar={toolbar} contents={contents} focus={focus}/>
         {!_.isEmpty(report) ?
           <PDFDesigner body={body} records={records} onSaveReport={this._onSaveReport} links={links} record={record}
