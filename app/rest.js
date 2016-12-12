@@ -29,7 +29,7 @@ function AMREST() {
 
     client.post(url, args, (signData, response) => {
       // for LB and rest server is down
-      if (response.statusCode != 200) {
+      if (response.statusCode == 502) {
         logger.error(`[user] [${req.sessionID || '-'}]`, "Service Unavailable! Please check Rest server if it is down! ");
         res.status(503).send('Service Unavailable!');
       } else {
@@ -148,7 +148,7 @@ function AMREST() {
 
     client.get(url, args, (data, response) => {
       // for LB and rest server is down
-      if (response.statusCode != 200) {
+      if (response.statusCode == 502) {
         logger.error(`[user] [${req.sessionID || '-'}]`, "Service Unavailable! Please check Rest server if it is down! ");
         res.status(503).send('Service Unavailable!');
       } else {
