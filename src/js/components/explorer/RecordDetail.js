@@ -65,7 +65,7 @@ export default class RecordDetail extends Component {
 
   _getUCMDBURL(fields) {
     var globalIds = fields.filter((field) => {
-      return field.sqlname.indexOf('GlobalId') > -1;
+      return field.sqlname.indexOf('GlobalId') > -1 && this.props.record[field.sqlname];
     });
 
     if (globalIds.length > 0)
@@ -120,7 +120,7 @@ export default class RecordDetail extends Component {
                         <td>
                           {Format.getFieldStrVal(this.props.record, field)}
                           {
-                            field.sqlname.indexOf('GlobalId') > -1 && this.props.record[field.sqlname] &&
+                            field.sqlname.indexOf('GlobalId') > -1 && this.props.record[field.sqlname] && this.state.ucmdb &&
                             <Anchor href={`${this.state.ucmdb}${this.props.record[field.sqlname]}`}
                                     target="_blank"
                                     label={`Open UCMDB Browser`} primary={true}/>

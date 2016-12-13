@@ -212,6 +212,8 @@ module.exports = function (app) {
   app.get('/ucmdb-browser/', function (req, res) {
     if (config.ucmdb_adapter_enabled) {
       res.send(`http://${ucmdb_browser_server}:${ucmdb_browser_port}${config.ucmdb_browser_param}`);
+    } else {
+      res.send('');
     }
   });
 
