@@ -3,7 +3,7 @@
  */
 
 import React, {Component} from 'react';
-import { Header, Sidebar, Menu, Box, Footer, Anchor} from 'grommet';
+import { Header, Sidebar, Menu, Box, Anchor} from 'grommet';
 import GroupList from './GroupList';
 import GroupListItem from './GroupListItem';
 import EmptyIcon from './EmptyIcon';
