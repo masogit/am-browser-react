@@ -14,7 +14,10 @@ export function getFieldStrVal(record, field) {
 }
 
 export function getDisplayLabel(field) {
-  return field.alias ? field.alias : (field.label ? field.label : field.sqlname);
+  if (field)
+    return field.alias ? field.alias : (field.label ? field.label : field.sqlname);
+  else
+    return '';
 }
 
 export function getFilterFromField(fields, filter) {
