@@ -28,6 +28,7 @@
     "object-path": "^0.9.2",
     "pdfmake": "^0.1.18",
     "properties-reader": "0.0.15",
+    "pug": "^2.0.0-beta6",
     "react-intl": "^2.0.0-rc-1",
     "react-list": "^0.7.20",
     "react-redux": "^3.1.0",
