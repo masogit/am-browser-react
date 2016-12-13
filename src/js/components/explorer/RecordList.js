@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react';
 import RecordDetail from './RecordDetail';
 import RecordTopology from './RecordTopology';
 import {Table, TableRow, Box, Anchor, Header, Menu, Icons, Layer, Title} from 'grommet';
-const { Close, Ascend, Descend, Checkbox, Filter, BarChart, LineChart, Aggregate,
+const { Close, Ascend, Descend, Checkbox, Filter, BarChart, LineChart, Aggregate, RadialSelected, Radial,
    CheckboxSelected, Cluster, Menu: MenuIcon, DocumentPdf: Pdf, DocumentCsv: Csv}= Icons.Base;
 import Status from 'grommet/components/icons/Status';
 import SearchInputWithTags from '../commons/SearchInputWithTags';
@@ -400,7 +400,7 @@ export default class RecordList extends ComponentBase {
           <Box direction="row" className='orderbyIcon-margin-left' >
             {!_.isEmpty(this.props.body.orderby) && this._showOrderByIcon(field.sqlname, this.props.body.orderby)}
           </Box>
-          <Anchor key={`a_groupby_${index}`} icon={selected?<CheckboxSelected />:<Checkbox />}
+          <Anchor key={`a_groupby_${index}`} icon={selected?<RadialSelected />:<Radial />}
                   label={label} disabled={this.state.locked}
                   onClick={() => {
                     if (!this.state.locked) {
