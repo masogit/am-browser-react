@@ -135,7 +135,7 @@ export default class AQL extends ComponentBase {
         queryFunc = AQLActions.queryAQLWithCheck;
       }
 
-      this.addPromise(queryFunc(str).then((data) => {
+      this.addPromise(queryFunc(encodeURI(str)).then((data) => {
         if (data) {
           if (data.rows.length == 0) {
             showInfo('No records found for this AQL');
