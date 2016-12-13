@@ -100,14 +100,15 @@ module.exports = function (app) {
   app.post('/am/login', rest.login);
   app.get('/am/logout', rest.logout);
   // AM LWSSO Login
-  if (enable_lwsso) {
-    app.post('/am/lwssoLogin', function (req, res) {
-      if (req.cookies && req.cookies.LWSSO_COOKIE_KEY) {
-        rest.lwssoLogin(req, res);
-      }
-    });
+  app.post('/am/lwssoLogin', function (req, res) {
+    if (enable_lwsso && req.cookies && req.cookies.LWSSO_COOKIE_KEY) {
+      rest.lwssoLogin(req, res);
+    } else {
+      //logger.warn(`[lwssoLogin] [${req.sessionID || '-'}]`, "LWSSO disabled or no LWSSO_COOKIE_KEY found in cookies!");
+      res.status(200).end();
+    }
+  });
 
-  }
   app.all("/*", function (req, res, next) {
     var session = req.session;
 
