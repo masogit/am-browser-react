@@ -385,7 +385,7 @@ export default class AQL extends ComponentBase {
       onChange: this.uploadJson
     };
 
-    return (<AMHeader title='AQL and Graph' buttons={buttons} subMenuButtons={subMenuButtons}
+    return (<AMHeader title='Graph Builder' buttons={buttons} subMenuButtons={subMenuButtons}
                      uploadProps={uploadProps}/>);
   }
 
