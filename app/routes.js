@@ -12,6 +12,7 @@ var upload = multer({storage: storage});
 var isAuthenticated = require('./authentication').isAuthenticated;
 var path = require('path');
 var cookiesUtil = require('./cookiesUtil');
+var pug = require('pug');
 
 module.exports = function (app) {
   var rest_protocol = config.rest_protocol;
@@ -23,6 +24,10 @@ module.exports = function (app) {
   var enable_csrf = config.enable_csrf;
   var jwt_max_age = config.jwt_max_age;
   var enable_lwsso = config.enable_lwsso;
+
+  var html = pug.renderFile(path.resolve(path.join(__dirname, '/../dist/index.pug')), {
+    baseName: config.node_base == '/' ? '' : config.node_base
+  });
 
   switch (config.db_type) {
     case 'file':
@@ -105,6 +110,7 @@ module.exports = function (app) {
   }
   app.all("/*", function (req, res, next) {
     var session = req.session;
+
     if (!session || !session.user) {
       if (enable_csrf) {
         res.cookie('csrf-token', req.csrfToken());
@@ -113,8 +119,9 @@ module.exports = function (app) {
       if (req.headers['x-api-version']) {
         res.sendStatus(401); // if the request is from rest, won't send file
       } else {
-        res.sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));
+        res.send(html);
       }
+
     } else {
       req.session.expires = new Date(Date.now() + session_max_age * 60 * 1000);
       sessionUtil.touch(req.session, session_max_age);
@@ -238,6 +245,6 @@ module.exports = function (app) {
     if (enable_csrf) {
       res.cookie('csrf-token', req.csrfToken());
     }
-    res.sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));
+    res.send(html);
   });
 };

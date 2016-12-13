@@ -37,7 +37,16 @@
 table {
   margin-bottom: 0;
 
+  td, th {
+    vertical-align: middle;
+  }
+
+  input[type=text]:focus, input.header-form-field:focus, select.header-form-field:focus {
+    border: 1px solid rgba(40, 202, 193, 0.815686) !important;
+  }
+
   .textarea {
+    padding: 0 !important;
     width: 100%;
     margin: 0;
     outline: 0;

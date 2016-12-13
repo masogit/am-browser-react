@@ -30,7 +30,8 @@ const opts = {
   base: '.',
   dist: path.resolve(__dirname, 'dist/'),
   copyAssets: [
-    'src/index.html',
+    'src/index.pug',
+    'src/loading.css',
     {
       asset: 'src/img/**',
       dist: 'dist/img/'
