@@ -13,6 +13,16 @@ var isAuthenticated = require('./authentication').isAuthenticated;
 var path = require('path');
 var cookiesUtil = require('./cookiesUtil');
 var pug = require('pug');
+var html;
+var getHtml = function() {
+  if (!html) {
+    html = pug.renderFile(path.resolve(path.join(__dirname, '/../dist/index.pug')), {
+      baseName: config.node_base == '/' ? '' : config.node_base
+    });
+  }
+
+  return html;
+};
 
 module.exports = function (app) {
   var rest_protocol = config.rest_protocol;
@@ -24,10 +34,6 @@ module.exports = function (app) {
   var enable_csrf = config.enable_csrf;
   var jwt_max_age = config.jwt_max_age;
   var enable_lwsso = config.enable_lwsso;
-
-  var html = pug.renderFile(path.resolve(path.join(__dirname, '/../dist/index.pug')), {
-    baseName: config.node_base == '/' ? '' : config.node_base
-  });
 
   switch (config.db_type) {
     case 'file':
@@ -120,7 +126,7 @@ module.exports = function (app) {
       if (req.headers['x-api-version']) {
         res.sendStatus(401); // if the request is from rest, won't send file
       } else {
-        res.send(html);
+        res.send(getHtml());
       }
 
     } else {
@@ -246,6 +252,6 @@ module.exports = function (app) {
     if (enable_csrf) {
       res.cookie('csrf-token', req.csrfToken());
     }
-    res.send(html);
+    res.send(getHtml());
   });
 };
