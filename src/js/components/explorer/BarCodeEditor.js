@@ -221,7 +221,7 @@ export default class RecordList extends Component {
     }
   }
 
-  _updateValue(event, val = event.target.value) {
+  _updateValue(event, val) {
     updateValue(event, {val,
       name: event.target.name,
       state: this.state,
