@@ -119,8 +119,8 @@ export default class MyAsset extends ComponentBase {
 
     return (
       <Box flex={true} direction='row'>
-        <Box align="center" flex={false} colorIndex='light-2' style={{width: '125px'}}>
-          <Header pad={{"horizontal": "small"}}>
+        <Box align="center" flex={false} colorIndex='light-1' className="grommetux-sidebar">
+          <Header pad={{"horizontal": "small"}} justify="center">
             <Title>My Assets</Title>
           </Header>
           <Box tag='h3' onClick={this.setType.bind(this, 'Summary')} className={this.state.type == 'Summary' ? 'active' : ''}>Summary</Box>
@@ -133,7 +133,7 @@ export default class MyAsset extends ComponentBase {
         <Box full='horizontal' pad={{horizontal: 'small'}} justify='center'>
           {
             recordBody ? <RecordList body={recordBody} showTopology={true}/>
-              : <Tiles flush={false} className='justify-around' colorIndex='light-1'>{summary}</Tiles>
+              : <Tiles flush={false} className='justify-around'>{summary}</Tiles>
           }
         </Box>
       </Box>
