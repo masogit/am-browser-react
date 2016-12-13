@@ -176,8 +176,8 @@ const genSummary = (record, fields, style = {column: 2, label: 'fieldLabel', val
       });
 
     column.table.body.push([
-      {text: getDisplayLabel(field), style: style.label},
-      {text: getFieldStrVal(record, field, true), style: style.value}
+      {text: getDisplayLabel(field).toString(), style: style.label},
+      {text: getFieldStrVal(record, field).toString(), style: style.value}
     ]);
   });
 
