@@ -11,7 +11,6 @@ import example_body from './body_template.json';
 import example_records from './records_template.json';
 import PDFDesigner from './PDFDesigner.js';
 import {defaultSettings, defaultPDFDefinition} from '../../constants/PDFDesigner';
-import * as ExplorerActions from '../../actions/explorer';
 
 const category_PUBLIC = 'Public';
 const category_PERSONAL = 'Personal';
@@ -41,6 +40,9 @@ export default class Reports extends ComponentBase {
 
   componentDidMount() {
     this._loadReports();
+    if (typeof this.props.setOnDrop == 'function') {
+      this.props.setOnDrop(this._dropCurrentPop);
+    }
   }
 
   _initReport(callback) {

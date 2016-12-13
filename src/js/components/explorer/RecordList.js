@@ -480,9 +480,13 @@ export default class RecordList extends ComponentBase {
         </Layer>
       );
     } else {
+      const onClose = () => {
+        this.onDrop('Drop templates settings', ()=>this.setState({pdfSettings: null}));
+      };
+
       return (
-        <Layer closer={true} onClose={() => this.setState({pdfSettings: null})}>
-          <Reports {...pdfSettings} fromView={true} />
+        <Layer closer={true} onClose={onClose}>
+          <Reports {...pdfSettings} fromView={true} setOnDrop={func => this.onDrop = func}/>
         </Layer>
       );
     }

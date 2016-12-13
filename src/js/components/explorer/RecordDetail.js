@@ -88,9 +88,14 @@ export default class RecordDetail extends Component {
       return;
     }
 
+    const onClose = () => {
+      this.onDrop('Drop templates settings', ()=>this.setState({pdfSettings: null}));
+    };
+
     return (
-      <Layer closer={true} onClose={() => this.setState({pdfSettings: null})}>
-        <PDFTemplate {...pdfSettings} fromView={true} links={this.state.links} record={this.props.record}/>
+      <Layer closer={true} onClose={onClose}>
+        <PDFTemplate {...pdfSettings} fromView={true} links={this.state.links}
+                     setOnDrop={func => this.onDrop = func} record={this.props.record}/>
       </Layer>
     );
   }

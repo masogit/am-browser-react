@@ -209,8 +209,8 @@ export function stopMonitorEdit() {
   store.dispatch({type: Types.STOP_MONITOR_EDIT});
 }
 
-export function alert(alertInfo) {
-  store.dispatch({type: Types.ALERT, msg: alertInfo.msg, onConfirm: alertInfo.onConfirm, title: alertInfo.title});
+export function alert({msg, onConfirm, title}) {
+  store.dispatch({type: Types.ALERT, msg, onConfirm, title});
 }
 
 export function dropCurrentPop(origin, current, initState, title, onConfirm) {
