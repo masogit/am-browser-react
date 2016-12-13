@@ -320,14 +320,9 @@ export default class RecordList extends ComponentBase {
     let param = this.state.param;
     param.aqlInput = true;
 
-    let reusedFilters = this.state.reusedFilters || filter;
-    if(reusedFilters !== filter)
-      reusedFilters += 'AND ' + filter;
-    else
-      reusedFilters = filter;
     this.setState({
       param: param,
-      reusedFilters: reusedFilters
+      reusedFilters: filter
     });
   }
 
@@ -653,7 +648,7 @@ export default class RecordList extends ComponentBase {
     } else {
       return (
         <Box flex={true}>
-          {this.renderToolBox()}
+          {!(showTopology && record) && this.renderToolBox()}
           {filters.length > 0 &&
           <Box direction='row' className='topology-background-color' pad='small' flex={false} margin={{bottom: 'small'}}>
             {filters.map((filter, index) => (
