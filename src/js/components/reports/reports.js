@@ -37,7 +37,6 @@ export default class Reports extends ComponentBase {
     this._initReport = this._initReport.bind(this);
     this.isChanged = this.isChanged.bind(this);
     this.resetOrigin = this.resetOrigin.bind(this);
-    this.getLinkRecords = this.getLinkRecords.bind(this);
   }
 
   componentDidMount() {
@@ -123,17 +122,6 @@ export default class Reports extends ComponentBase {
     const currentReport = _.cloneDeep(this.state.report);
 
     dropCurrentPop(originReport, currentReport, this.initReport, title, onConfirm);
-  }
-
-  getLinkRecords() {
-    const links = this.props.links;
-    links.map(link => {
-      this.addPromise(ExplorerActions.loadRecordsByBody(link.body));
-    });
-
-    Promise.all(this.promiseList).then(result => {
-      console.log(result);
-    });
   }
 
   render() {
