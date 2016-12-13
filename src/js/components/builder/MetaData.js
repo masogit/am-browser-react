@@ -362,7 +362,7 @@ class MetaData extends ComponentBase {
 
     return (
       <Box flex={true} className='fixMinSizing fixIEScrollBar'>
-        <Form compact={true}>
+        <Form>
           <FormField>
             <SearchInput value={this.state.searchText} placeHolder="Search fields and links..."
                       onDOMChange={this._onSearch}/>
