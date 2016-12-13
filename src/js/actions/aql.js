@@ -86,7 +86,7 @@ export function loadReports() {
 }
 
 function checkAqlSyntax(str) {
-  return Rest.get(AM_AQL_VALIDATION_URL, {str: encodeURI(str)}).then(res => {
+  return Rest.get(AM_AQL_VALIDATION_URL, {str: str}).then(res => {
     if (!res.body) {
       store.dispatch({type: Types.RECEIVE_ERROR, msg: res.text});
     } else {

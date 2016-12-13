@@ -50,7 +50,6 @@ export default class RecordSearch extends ComponentBase {
 
     //  Escaped for SQL. e.g. org.apache.commons.lang.StringEscapeUtils.escapeSql(String str).
     let keyword = input.replace(/[']/g, '\'\'');
-    keyword = encodeURI(keyword);
     this.setState({
       messages: {},
       results: [],
