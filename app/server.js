@@ -20,6 +20,7 @@ var https_port = config.node_https_port;     // set the https port
 
 var isDebug = config.isDebug;
 var enable_csrf = config.enable_csrf;
+var enable_lwsso = config.enable_lwsso;
 
 app.use(cookieParser());
 app.use(compression());
@@ -56,6 +57,9 @@ if (config.node_base == '/') {
 
 require('./routes.js')(AMBRouter);
 
+logger.info('[server]', 'App CSRF ' + (enable_csrf ? 'enabled' : 'disabled') + '.');
+logger.info('[server]', 'App LWSSO ' + (enable_lwsso ? 'enabled' : 'disabled') + '.');
+
 // error handle
 app.use(function (err, req, res, next) {
   if (enable_csrf && (err.code === 'EBADCSRFTOKEN') ) {
@@ -68,7 +72,7 @@ app.use(function (err, req, res, next) {
 // listen (start app with node server.js) ======================================
 var http_server = http.createServer(app);
 http_server.listen(port, server, () => {
-  logger.info("[server]", "App listening HTTP on port " + port);
+  logger.info('[server]', 'App listening HTTP on port ' + port);
 });
 http_server.on('error', (e) => {
   if (e.code == 'EADDRINUSE') {
@@ -89,7 +93,7 @@ try {
   };
   var https_server = https.createServer(server_options, app);
   https_server.listen(https_port, () => {
-    logger.info("[server]", "App listening HTTPS on port " + https_port);
+    logger.info('[server]', 'App listening HTTPS on port ' + https_port);
   });
   https_server.on('error', (e) => {
     if (e.code == 'EADDRINUSE') {
@@ -97,11 +101,11 @@ try {
     }
   });
 } catch (e) {
-  logger.warn("[server]", "HTTPS is not set correctly");
+  logger.warn('[server]', 'HTTPS is not set correctly');
 }
 
 var shutdown = function () {
-  logger.info("[server]", "Received kill signal, shut down server.");
+  logger.info('[server]', 'Received kill signal, shut down server.');
   process.exit();
 };
 

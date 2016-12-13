@@ -1,0 +1,43 @@
+body.loading {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(circle at 50% 15%, #fff, #fff 30%, #ccc);
+    -webkit-animation: draw 3s infinite linear alternate;
+    -moz-animation: draw 3s infinite linear alternate;
+    animation: draw 3s infinite linear alternate;
+}
+
+body.loading #content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    font-size: 0;
+}
+
+body.loading #logo {
+    position: absolute;
+    display: block;
+    width: 140px;
+    height: 140px;
+    top: calc(50vh - 70px);
+    left: calc(50vw - 70px);
+}
+
+body.loading #logo path,
+body.loading #logo rect {
+    stroke-dasharray: 300px 600px;
+    stroke-dashoffset: 0;
+    -webkit-animation: draw 3s infinite linear alternate;
+    -moz-animation: draw 3s infinite linear alternate;
+    animation: draw 3s infinite linear alternate;
+}
+
+@keyframes draw {
+    0%, 5% {
+        stroke-dashoffset: 300px;
+    }
+    90%, 100% {
+        stroke-dashoffset: 0;
+    }
+}

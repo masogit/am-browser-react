@@ -19,7 +19,7 @@ echo.
 goto end
 :main
 if not exist "%SCRIPTPATH%\am-browser-config.properties" goto customInfo
-call "%SCRIPTPATH%\set_basename.bat"
+
 cd /d %SCRIPTPATH%
 "%SCRIPTPATH%\node\nodejs\node.exe" "%SCRIPTPATH%\app\server.js"
 goto end
