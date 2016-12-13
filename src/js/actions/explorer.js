@@ -120,7 +120,7 @@ export function getGroupByAql(body) {
   let aql = `select ${body.groupby}, ${aggregate} from ${body.sqlname}`;
   // let fieldsWhere = getWhereFromFields(body.fields);
   if (body.filter)
-    aql += ` where (${encodeURI(body.filter)}) AND (PK <> 0)`; // PK <> 0 to avoid the invalid empty record
+    aql += ` where (${encodeURIComponent(body.filter)}) AND (PK <> 0)`; // PK <> 0 to avoid the invalid empty record
   else
     aql += ` where PK <> 0`; // PK <> 0 to avoid the invalid empty record
   // if (fieldsWhere)
