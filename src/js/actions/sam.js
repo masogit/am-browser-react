@@ -58,12 +58,15 @@ export function productInVendor(vendorName) {
   return aql.queryAQL(aqlStr).then((aqlData) => {
     if (aqlData.rows) {
       let products = aqlData.rows.map((product) => {
-        return {
-          name: product[0],
-          unused: Number(product[1]),
-          entitled: Number(product[2]),
-          versions: Number(product[3])
-        };
+        let p = { name: product[0] };
+        if (product[1])
+          p.unused = Number(product[1]);
+        if (product[2])
+          p.entitled = Number(product[2]);
+        if (product[3])
+          p.versions = Number(product[3]);
+
+        return p;
       });
 
       return products;

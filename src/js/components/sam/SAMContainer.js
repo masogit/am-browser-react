@@ -117,7 +117,6 @@ export default class SAMContainer extends Component {
   }
 
   renderSoftware(record) {
-    console.log(record);
     let filter = record['SoftInstQuery.memQueryText'];
     let table = record['SoftInstQuery.TableName'];
     let parent = '';
@@ -139,7 +138,8 @@ export default class SAMContainer extends Component {
         parent = 'SoftInstall.ParentPortfolio.Computer';
         break;
       default:
-        filter = `seType=0 AND bMissing=0 AND seType=0 AND Model.Name='${record.Name}'`;
+        return true;  // Ignore query computers for other tables, for example: amEmplDept, amSoftLicCounter etc
+        // filter = `seType=0 AND bMissing=0 AND seType=0 AND Model.Name='${record.Name}'`;
     }
 
     let body_software = {
@@ -177,11 +177,7 @@ export default class SAMContainer extends Component {
     };
 
     this.setState({
-      software: null
-    }, () => {
-      this.setState({
-        software: body_software
-      });
+      software: body_software
     });
   }
 
