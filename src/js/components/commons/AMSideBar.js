@@ -100,11 +100,7 @@ class AMSideBar extends Component {
             }
           </Header>
           {sidebarContent}
-          {footer ? footer :
-            <Footer justify="center">
-               {(new Date()).toLocaleString()}
-            </Footer>
-          }
+          {footer}
         </Box>
       </Sidebar>
     );
