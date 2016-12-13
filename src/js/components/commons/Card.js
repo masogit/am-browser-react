@@ -37,8 +37,7 @@ export default class Card extends Component {
           <Header>{record[this.props.conf.header]}</Header>
           {
             this.props.conf.body.map((row, index) => {
-              return record[row.value] &&
-                <Box key={index} flex={true} style={this.renderSortStyle(row.value)}>{`${record[row.value]} ${row.label}`}</Box>;
+              return <Box key={index} flex={true} style={this.renderSortStyle(row.value)}>{`${record[row.value]} ${row.label}`}</Box>;
             })
           }
           <Footer justify="between">
