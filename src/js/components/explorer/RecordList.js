@@ -222,7 +222,7 @@ export default class RecordList extends ComponentBase {
         var param = this.state.param;
         if (param.filters.indexOf(event.target.value) == -1) {
           var aql = this.props.body.fields.filter((field) => {
-            return field.searchable && searches.indexOf(field.label) > -1;
+            return field.searchable && (searches.indexOf(field.label) > -1 || searches.indexOf(field.alias) > -1);
           }).map((field) => {
             return field.sqlname + " like '%" + event.target.value.trim() + "%'";
           }).join(' OR ');
