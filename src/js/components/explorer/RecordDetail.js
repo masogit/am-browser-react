@@ -154,7 +154,7 @@ export default class RecordDetail extends Component {
       <Box className='topology-background-color autoScroll' flex={false}>
         <Header justify='between'>
             {body.label}
-            <Anchor icon={<Close />} onClick={this.props.onClose} justify='end'/>
+            <Anchor icon={<Close />} onClick={this.props.onClose}/>
         </Header>
         <Box justify='center' pad={{horizontal: 'small'}} flex={false}>
           <List>
