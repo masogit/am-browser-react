@@ -17,7 +17,7 @@ const getLinkBody = (link, record) => {
   if (link.src_field) {
     var relative_path = link.src_field.relative_path;
     var src_field = relative_path ? relative_path + '.' + link.src_field.sqlname : link.src_field.sqlname;
-    if (record[src_field]) {
+    if (typeof record[src_field] !== 'undefined') {
       AQL = `${link.dest_field.sqlname}=${record[src_field]}`;
     }
   }
