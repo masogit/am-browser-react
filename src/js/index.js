@@ -17,6 +17,7 @@ import store from './store';
 import history from './RouteHistory';
 import {init, initToken, lwssoPreAuthenticate, routeChanged} from './actions/system';
 import {ReduxRouter} from 'redux-router';
+import {saveSetting} from './util/util';
 
 if (process.env.NODE_ENV !== 'production') {
   require('index.scss');
@@ -81,6 +82,17 @@ if (process.env.NODE_ENV === 'production') {
   initToken().then(renderPage);
 }
 
+const getIconMap = () => {
+  Rest.get('/icon-map').then((res) => {
+    if (res.text) {
+      const iconMap = JSON.parse(res.text);
+      saveSetting('iconMap', iconMap);
+    }
+  }, (err) => {
+    console.log(err.response ? err.response.text : err);
+  });
+};
+
 // check for session
 const sessionWatcher = () => {
   const {route, session} = store.getState();
@@ -92,8 +104,11 @@ const sessionWatcher = () => {
     Routes.routes[0].childRoutes = getRoutes(session.headerNavs);
     const isAuthorized = !!session.headerNavs;
     const isLoginUrl = route.pathname === Routes.path('/login');
-    if (isAuthorized && isLoginUrl) {
-      history.pushState(null, Routes.path(getPostLoginPath()));
+    if (isAuthorized) {
+      getIconMap();
+      if (isLoginUrl) {
+        history.pushState(null, Routes.path(getPostLoginPath()));
+      }
     } else if (!isAuthorized && !isLoginUrl) {
       setPostLoginPath(route.pathname);
       history.pushState(null, Routes.path('/login'));

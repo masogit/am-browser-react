@@ -13,6 +13,7 @@ var isAuthenticated = require('./authentication').isAuthenticated;
 var path = require('path');
 var cookiesUtil = require('./cookiesUtil');
 var pug = require('pug');
+var fs = require('fs');
 var html;
 var getHtml = function() {
   if (!html) {
@@ -246,6 +247,12 @@ module.exports = function (app) {
 
   app.get('/live-network', function (req, res) {
     rest.live_net_work(req, res);
+  });
+
+  app.get('/icon-map', function (req, res) {
+    fs.readFile('./app/iconMap.json', 'utf-8', (err, data) => {
+      res.send(data);
+    });
   });
 
   app.get('/*', function (req, res) {
