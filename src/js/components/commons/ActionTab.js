@@ -20,7 +20,7 @@ export default class ActionTab extends Component {
   }
 
   _onClickTab(event) {
-    if (!this.props.disabled) {
+    if (!this.props.disabled && !this.state.editing) {
       if (event) {
         event.preventDefault();
       }

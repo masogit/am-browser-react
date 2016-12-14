@@ -17,7 +17,7 @@ import Legend from './Legend';
 import Legend_Chart from './Legend_Chart';
 import Legend_Distribution from './Legend_Distribution';
 import Legend_Meter from './Legend_Meter';
-import PDFWidgets from './PDFWidgets';
+import {Brush, MarginDesigner, StyleDesigner, NumberInputField, ExportLayer, ExportLayerForDetail} from './PDFWidgets';
 import SearchInput from './SearchInput';
 import Textarea from './Textarea';
 import {UploadWidget} from './Widgets';
@@ -40,9 +40,9 @@ export {
   Legend_Chart,
   Legend_Distribution,
   Legend_Meter,
-  PDFWidgets,
   SearchInput,
   Textarea,
   UploadWidget,
-  AMHeader
+  AMHeader,
+  Brush, MarginDesigner, StyleDesigner, NumberInputField, ExportLayer, ExportLayerForDetail
 };

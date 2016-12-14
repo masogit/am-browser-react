@@ -57,7 +57,7 @@ Request.prototype.promise = function () {
             if (err.status == 400 || (typeof err.status == 'undefined' && msg.indexOf('network is offline') > -1)) {
               store.default.dispatch({type: Types.RECEIVE_ERROR, msg: msg});
             } else if (err.status == 500) {
-              store.default.dispatch({type: Types.RECEIVE_ERROR, msg: "Server error."});
+              store.default.dispatch({type: Types.RECEIVE_ERROR, msg: msg});
             } else if (err.status == 502) {
               store.default.dispatch({type: Types.FORCE_LOGOUT, error: CANNOT_CONNECT_NODE});
             }

@@ -3,11 +3,6 @@
  */
 import {hpe as logo} from './logoImg.js';
 
-const MODE = {
-  CODE: 'Code',
-  DESIGN: 'Design'
-};
-
 const init_style = {
   name: '',
   fontSize: 13,
@@ -188,7 +183,6 @@ const GLOBAL_VARIABLES = {
 };
 
 export {
-  MODE,
   init_style,
   table_style,
   defaultPDFDefinition,
