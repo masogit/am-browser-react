@@ -4,13 +4,11 @@ import {Box, Form, FormField, CheckBox, Table, Anchor, Map, Icons} from 'grommet
 const {Close, LinkUp: Up, LinkDown: Down, Ascend, Descend, CaretPrevious} = Icons.Base;
 import {isEmpty, isEqual} from 'lodash';
 import {AlertForm, EditLayer, ContentPlaceHolder, SearchInput, ComponentBase, AMHeader } from '../commons';
-import FieldTypes from '../../constants/FieldTypes';
+import { forSum } from '../../constants/FieldTypes';
 import {bodyToMapData} from '../../util/util';
 import PDFDesigner from './../reports/PDFDesigner';
 import {toggleSidebar, onMail, onDownload} from '../../actions/system';
 import {posOrderby} from '../../actions/explorer';
-
-const isNumber = field => FieldTypes.number.indexOf(field.type) > -1 && !field.user_type;
 
 const updateTableSize = () => {
   const elements = document.getElementsByClassName('grommetux-table');
@@ -235,7 +233,7 @@ export default class ViewDefDetail extends ComponentBase {
           <td>
             <CheckBox id={`v.${currentPath}body.sum`} name={`v.${currentPath}body.sum`}
                       value={field.sqlname} checked={selfView.body.sum==field.sqlname}
-                      disabled={(!!selfView.body.sum&&selfView.body.sum!=field.sqlname) || !isNumber(field) || !selfView.body.groupby}
+                      disabled={(!!selfView.body.sum&&selfView.body.sum!=field.sqlname) || !forSum(field) || !selfView.body.groupby}
                       onChange={
                         (event) => {
                           this._onChange(event, field.sqlname);
