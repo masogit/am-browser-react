@@ -80,7 +80,7 @@ export default class ViewDefDetail extends ComponentBase {
     this.props.onValueChange(event.target.name.substring(2), event.suggestion);
   }
 
-  _onTripleStateChange(event, value, orderby) {
+  _onTripleStateChange(event, value, orderby='') {
     let path = event.currentTarget.name;
     let fields = orderby.split(',');
     let pos = (fields.indexOf(value + ' desc') > -1) ? fields.indexOf(value + ' desc') : fields.indexOf(value);
