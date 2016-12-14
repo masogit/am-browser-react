@@ -103,7 +103,7 @@ exports.init = function (dbFolder) {
   });
 };
 
-exports.mongo = function (mongo) {
+  exports.mongo = function (mongo) {
   logger.info("[server]", `Connecting mongodb`);
 
   var MongoClient = require('mongodb').MongoClient;
@@ -114,7 +114,7 @@ exports.mongo = function (mongo) {
       db = ambdb;
       logger.info("[server]", `Mongodb ${mongo.server} connected`);
     } else {
-      logger.error("[mongodb]", err);
+     logger.error("[mongodb]", err.message);
     }
   });
 };
