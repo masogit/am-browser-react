@@ -22,7 +22,6 @@ export function loadView(id) {
 }
 
 export function getCount(body) {
-  body.orderby = '';
   body.param = {
     limit: 1,
     offset: 0
