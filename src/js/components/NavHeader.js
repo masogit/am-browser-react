@@ -111,7 +111,7 @@ export default class NavHeader extends Component {
               }
             </Menu>
           }
-          <SessionMenu />
+          <SessionMenu disabledItems={this.props.headerNavs} />
         </Menu>
       </Header>
     );

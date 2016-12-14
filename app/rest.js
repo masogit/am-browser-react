@@ -364,7 +364,9 @@ function getHeadNav(rights) {
     views: rights.index < 1,
     'views/:id': rights.index < 1,
     my: rights.index < 3,
-    'my/:name': rights.index < 3
+    'my/:name': rights.index < 3,
+    about: rights.index < 1,
+    slack: rights.index < 2
   };
 }
 
@@ -393,4 +395,3 @@ function live_net_work(req, res) {
     res.end(errMsg);
   });
 }
-

@@ -66,9 +66,9 @@ class SessionMenu extends Component {
            <Anchor href="#">Help</Anchor>
            */}
           <Anchor icon={<Help />} href="http://ambrowser.readthedocs.io" target="about:blank" label="Help"/>
-          <Anchor icon={<About />} onClick={() => this.showDialog("about")} label="About"/>
+          {this.props.disabledItems.about && <Anchor icon={<About />} onClick={() => this.showDialog("about")} label="About"/> }
           <Anchor icon={<History />} onClick={() => this.showDialog("history")} label="Message History"/>
-          <Anchor icon={<Slack />} onClick={() => this.showDialog("slack")} label="Slack"/>
+          {this.props.disabledItems.slack && <Anchor icon={<Slack />} onClick={() => this.showDialog("slack")} label="Slack"/> }
           <Anchor icon={<Archive />} onClick={() =>  history.push('/my')} label="My Assets"/>
           <Anchor icon={<Logout />} onClick={this._onLogout.bind(this)} label="Logout"/>
         </Menu>
