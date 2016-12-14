@@ -1,16 +1,13 @@
 import React, {Component, PropTypes} from 'react';
 import {Box, Header, Icons, Anchor, Menu, FormField, Form, Label,
   RadioButton, Layer, NumberInput} from 'grommet';
-const {Download, Close, Play: Preview, Code, Checkmark, Duplicate} = Icons.Base;
+const {Download, Play: Preview} = Icons.Base;
 import {loadRecordsByBody} from '../../actions/explorer';
 import {showError} from '../../actions/system';
 import { cloneDeep } from 'lodash';
-import { preview,
-  getPreviewStyle, updateValue, translateText, download } from '../../util/pdfDesigner';
-import {MODE, init_style, table_style, GLOBAL_VARIABLES} from '../../constants/PDFDesigner';
-import {Brush, StyleDesigner, ExportLayer, ExportLayerForDetail} from './../commons/PDFWidgets';
-import AlertForm from '../commons/AlertForm';
-import {UploadWidget} from '../commons/Widgets';
+import { preview, getPreviewStyle, updateValue, translateText, download } from '../../util/pdfDesigner';
+import { init_style, table_style, GLOBAL_VARIABLES} from '../../constants/PDFDesigner';
+import {AlertForm, UploadWidget, AMHeader, Brush, StyleDesigner, ExportLayer, ExportLayerForDetail} from '../commons';
 
 Menu.propTypes.label = PropTypes.oneOfType([PropTypes.object, PropTypes.string]);
 
@@ -19,7 +16,7 @@ export default class PDFDesigner extends Component {
     const {body: {fields}, records, report, definition} = this.props;
     this.state = {
       pdfDefinition: definition,
-      mode: MODE.DESIGN,
+      code: '',
       fields: fields,
       records: records || [],
       report: report,
@@ -77,20 +74,14 @@ export default class PDFDesigner extends Component {
     }
   }
 
-  updateCode(event, val = event.target.value) {
-    const name = event.target.name;
-
-    let error = '', obj;
+  updateCode(event, code = event.target.value) {
+    let error = '';
     try {
-      obj = JSON.parse(val);
+      JSON.parse(code);
     } catch (e) {
       error = e.message;
-      obj = val;
     }
-
-    this.state.error = error;
-    this.state[name] = obj;
-    this.setState(this.state, this.autoPreview);
+    this.setState({code, error});
   }
 
   _updateValue(event, props = {}) {
@@ -118,7 +109,7 @@ export default class PDFDesigner extends Component {
   _preview() {
     let pdfDefinition = this.state.pdfDefinition;
     this.setState({loading: true});
-    if (this.state.mode != MODE.CODE) {
+    if (!this.state.code) {
       this._translateText(pdfDefinition).then(data => {
         preview(cloneDeep(data), () => this.setState({loading: false}));
       });
@@ -298,106 +289,177 @@ export default class PDFDesigner extends Component {
     }
   }
 
-  render() {
-    const {mode, pdfDefinition, error, report, loading} = this.state;
-    const {settings, name, _id} = report;
+  renderCode() {
+    const {error, code} = this.state;
+    return (
+      <Box flex>
+        <FormField error={error} className='code-panel'>
+          <textarea value={code} onChange={this.updateCode}
+                    onBlur={event => this._updateValue(event, {val: JSON.parse(code), name: 'pdfDefinition', callback: ()=> this.setState(this.state, this._preview)})} />
+        </FormField>
+      </Box>
+    );
+  }
+
+  renderSettingsForm() {
+    const settings = this.state.report.settings;
+    let formClasses = 'strong-label flex no-border background-';
+    formClasses += this.state.root ? 'white' : 'grey';
+    return (
+      <Box direction='row' flex={true}>
+        <Form className={formClasses}>
+          <FormField label='Page Header'>
+            <Box direction='row' pad={{horizontal:'small'}}>
+              {this.returnStyleField({
+                label: 'Left',
+                name: "pageHeader.left",
+                value: settings.pageHeader.left,
+                placeHolder: '@date or @logo'
+              })}
+              {this.returnStyleField({
+                label: 'Center',
+                name: "pageHeader.center",
+                value: settings.pageHeader.center,
+                placeHolder: '@date or @logo'
+              })}
+              {this.returnStyleField({
+                label: 'Right',
+                name: "pageHeader.right",
+                value: settings.pageHeader.right,
+                placeHolder: '@date or @logo'
+              })}
+            </Box>
+          </FormField>
+          <FormField label='Report Body'>
+            <Box pad={{horizontal:'small'}}>
+              <Box direction='row'>
+                {this.returnStyleField({
+                  label: 'Header',
+                  name: "reportHead",
+                  value: settings.reportHead,
+                  placeHolder: '@date or @logo or @title'
+                })}
+                {this.returnStyleField({
+                  label: 'Descriptions',
+                  name: "reportDesc",
+                  value: settings.reportDesc,
+                  placeHolder: '@date or @logo or @title'
+                })}
+              </Box>
+              {this.returnTableStyleField(settings.contents)}
+              {this.returnFieldBlockStyleField(settings.fieldBlock)}
+            </Box>
+          </FormField>
+          <FormField label='Page Footer'>
+            <Box direction='row' pad={{horizontal:'small'}}>
+              {this.returnStyleField({
+                label: 'Left',
+                name: "pageFooter.left",
+                value: settings.pageFooter.left,
+                placeHolder: '@date or @logo'
+              })}
+              {this.returnStyleField({
+                label: 'Center',
+                name: "pageFooter.center",
+                value: settings.pageFooter.center,
+                placeHolder: '@date or @logo'
+              })}
+              {this.returnStyleField({
+                label: 'Right',
+                name: "pageFooter.right",
+                value: settings.pageFooter.right,
+                placeHolder: '@date or @logo'
+              })}
+            </Box>
+          </FormField>
+
+          <FormField label="Page Orientation">
+            <Box pad={{vertical: 'small',horizontal: 'large'}} direction='row'>
+              <RadioButton id='pageOrientation' name='pageOrientation' label='portrait'
+                           checked={settings.pageOrientation == 'portrait'}
+                           onChange={(event) => this.updatePDFSettings(event, 'portrait')}/>
+              <RadioButton id='pageOrientation' name='pageOrientation' label='landscape'
+                           checked={settings.pageOrientation == 'landscape'}
+                           onChange={(event) => this.updatePDFSettings(event, 'landscape')}/>
+            </Box>
+          </FormField>
+        </Form>
+      </Box>
+    );
+  }
+
+  renderHeader() {
+    const {report, loading, code, pdfDefinition} = this.state;
+    const {name, _id} = report;
     const root = this.props.root;
     const canEdit = root || !report.public;
-    let formClasses = 'strong-label flex no-border background-';
-    formClasses += root ? 'white' : 'grey';
+
+    const buttons = [{
+      icon: <Download />,
+      onClick: () => this.setState({showExportLayer: true}),
+      enable: !loading,
+      label: 'Export'
+    }];
+    if (canEdit) {
+      buttons.push({
+        id: 'Save',
+        onClick: () => this.props.onSaveReport(report),
+        enable: name && this.isChanged()
+      });
+      buttons.push({id: 'Delete', onClick: this.props.onRemoveReport, enable: _id});
+    }
+
+    const subMenuButtons = [{
+      icon: <Preview />,
+      onClick: this._preview,
+      enable: !loading,
+      label: 'Preview'
+    }, {
+      id: 'Duplicate',
+      onClick: this.onDuplicate,
+      enable: _id
+    }
+    ];
+
+    const toggleCodeMode = () => {
+      if (code) {
+        this.setState({code: ''});
+      } else {
+        this.setState({code: JSON.stringify(pdfDefinition, null, ' ')});
+      }
+    };
+
+    return (<AMHeader title={<Box onDoubleClick={toggleCodeMode}>Template Builder</Box>}
+                     buttons={buttons} subMenuButtons={subMenuButtons}/>);
+  }
+
+  render() {
+    const {code, report: {name}} = this.state;
 
     return (
-      <Box pad={{horizontal: 'small'}} flex={true}>
-        <Header justify='between' size='small'>
-          <Box direction='row' align='center' className='no-border'>
-            <Label style={{color: '#ff0000'}}>Name:</Label>
-            <FormField>
-              <input className='input-field' name='report.name' type="text" value={name} onChange={this._updateValue}
-                   maxLength='20'/>
-            </FormField>
+      <Box flex={true}>
+        {this.renderHeader()}
+        <Box flex={true} direction='row' margin={{bottom: 'small'}} pad={{'horizontal': 'medium'}}>
+          <Box flex={true} style={{maxWidth: '50vw'}} className='autoScroll'>
+            <Header justify='between' size='small' direction='row'>
+              <Box direction='row' align='center' className='no-border'>
+                <Label style={{color: '#ff0000'}}>Name:</Label>
+                <FormField>
+                  <input className='input-field' name='report.name' type="text" value={name}
+                         onChange={this._updateValue} maxLength='20'/>
+                </FormField>
+              </Box>
+              <Box direction='row' align='center'>
+                <UploadWidget accept=".jpg,.png" label='Logo' onChange={this.uploadLogo.bind(this)}/>
+                <Box pad={{horizontal: 'small'}}/>
+                <img id='logo' height='24px'/>
+              </Box>
+              <Box pad={{horizontal: 'small'}}>
+                <Anchor icon={<Brush />} onClick={() => this.setState({showLayer: 'new_style'})} label="Style Designer"/>
+              </Box>
+            </Header>
+            {code ? this.renderCode() : this.renderSettingsForm() }
           </Box>
-          <Menu direction="row" align="center" responsive={true}>
-            <UploadWidget accept=".jpg,.png" label='Logo' onChange={this.uploadLogo.bind(this)}/>
-            <img id='logo' height='24px'/>
-            <Anchor icon={<Code />} onClick={() => this.setState({ mode: mode == MODE.CODE ? MODE.DESIGN : MODE.CODE })}
-                    label={mode}/>
-            <Anchor icon={<Brush />} onClick={() => this.setState({showLayer: 'new_style'})} label="Style Designer"/>
-            <Anchor icon={<Preview/>} disabled={loading} onClick={loading ? null : this._preview} label='Preview'/>
-            <Anchor icon={<Download />} disabled={loading}
-                    onClick={() => !loading && this.setState({showExportLayer: true})} label='Export'/>
-            <Anchor icon={<Duplicate />} onClick={_id ? this.onDuplicate : null} label="Duplicate" disabled={!_id}/>
-            {canEdit &&
-            <Anchor icon={<Checkmark />} onClick={() => name && this.isChanged() && this.props.onSaveReport(report)}
-                    label="Save" disabled={!name || !this.isChanged()}/>}
-            {canEdit && <Anchor icon={<Close />} onClick={_id ? this.props.onRemoveReport : null}
-                                label="Delete" disabled={!_id}/>}
-          </Menu>
-        </Header>
-        <Box flex={true} direction='row' margin={{bottom: 'small'}}>
-          {mode == MODE.CODE ? <FormField error={error} className='code-panel'>
-            <textarea name='pdfDefinition' value={JSON.stringify(pdfDefinition, null, ' ')} onChange={this.updateCode}/>
-          </FormField> :
-            <Box flex={true} style={{maxWidth: '50vw'}} direction='row' className='autoScroll'>
-              <Form className={formClasses}>
-                <FormField label='Page Header'>
-                  <Box direction='row' pad={{horizontal:'small'}}>
-                    {this.returnStyleField({label: 'Left', name: "pageHeader.left", value: settings.pageHeader.left, placeHolder: '@date or @logo'})}
-                    {this.returnStyleField({
-                      label: 'Center',
-                      name: "pageHeader.center",
-                      value: settings.pageHeader.center,
-                      placeHolder: '@date or @logo'
-                    })}
-                    {this.returnStyleField({
-                      label: 'Right',
-                      name: "pageHeader.right",
-                      value: settings.pageHeader.right,
-                      placeHolder: '@date or @logo'
-                    })}
-                  </Box>
-                </FormField>
-                <FormField label='Report Body'>
-                  <Box pad={{horizontal:'small'}}>
-                    <Box direction='row'>
-                      {this.returnStyleField({label: 'Header', name: "reportHead", value: settings.reportHead, placeHolder: '@date or @logo or @title'})}
-                      {this.returnStyleField({label: 'Descriptions', name: "reportDesc", value: settings.reportDesc, placeHolder: '@date or @logo or @title'})}
-                    </Box>
-                    {this.returnTableStyleField(settings.contents)}
-                    {this.returnFieldBlockStyleField(settings.fieldBlock)}
-                  </Box>
-                </FormField>
-                <FormField label='Page Footer'>
-                  <Box direction='row' pad={{horizontal:'small'}}>
-                    {this.returnStyleField({label: 'Left', name: "pageFooter.left", value: settings.pageFooter.left, placeHolder: '@date or @logo'})}
-                    {this.returnStyleField({
-                      label: 'Center',
-                      name: "pageFooter.center",
-                      value: settings.pageFooter.center,
-                      placeHolder: '@date or @logo'
-                    })}
-                    {this.returnStyleField({
-                      label: 'Right',
-                      name: "pageFooter.right",
-                      value: settings.pageFooter.right,
-                      placeHolder: '@date or @logo'
-                    })}
-                  </Box>
-                </FormField>
-
-                <FormField label="Page Orientation">
-                  <Box pad={{vertical: 'small',horizontal: 'large'}} direction='row'>
-                    <RadioButton id='pageOrientation' name='pageOrientation' label='portrait'
-                                 checked={settings.pageOrientation == 'portrait'}
-                                 onChange={(event) => this.updatePDFSettings(event, 'portrait')}/>
-                    <RadioButton id='pageOrientation' name='pageOrientation' label='landscape'
-                                 checked={settings.pageOrientation == 'landscape'}
-                                 onChange={(event) => this.updatePDFSettings(event, 'landscape')}/>
-
-                  </Box>
-                </FormField>
-              </Form>
-            </Box>
-          }
           <div id='pdfContainer'/>
         </Box>
         {this.renderStyleLayer()}
