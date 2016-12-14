@@ -58,7 +58,7 @@ class Indexer extends Component {
     const className = path.indexOf('login') > -1 ? '' : 'content-height autoScroll';
     return (
       <App centered={false}>
-        <Box full='vertical'>
+        <Box full>
           {header}
           {alert}
           <Box className={className}>
