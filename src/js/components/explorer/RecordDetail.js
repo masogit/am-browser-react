@@ -78,8 +78,8 @@ export default class RecordDetail extends Component {
       });
   }
 
-  showPDFDesigner() {
-    this.setState({pdfSettings: {body: this.props.body}});
+  showPDFDesigner(body) {
+    this.setState({pdfSettings: {body: body}});
   }
 
   renderPDFPreview() {
@@ -107,7 +107,7 @@ export default class RecordDetail extends Component {
           <ActionTab title={this.props.body.label}>
             <Box flex={true}>
               <Header justify="end">
-                <Anchor icon={<Pdf />} label="Download PDF" onClick={this.showPDFDesigner}/>
+                <Anchor icon={<Pdf />} label="Download PDF" onClick={this.showPDFDesigner.bind(this, this.props.body)}/>
               </Header>
               <Table>
                 <thead>
@@ -165,7 +165,7 @@ export default class RecordDetail extends Component {
           <List>
             <ListItem>
               <Header justify='end' size='small'>
-                <Anchor icon={<Pdf />} label="Download PDF" onClick={this.showPDFDesigner}/>
+                <Anchor icon={<Pdf />} label="Download PDF" onClick={this.showPDFDesigner.bind(this, this.props.choosenRecord)}/>
               </Header>
             </ListItem>
             {
