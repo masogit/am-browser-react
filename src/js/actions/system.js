@@ -268,6 +268,13 @@ export function getOnlineUser() {
     });
 }
 
+export function isAqlInputAllowed() {
+  const state = store.getState();
+  if (state.session.headerNavs)
+    return state.session.headerNavs.aqlInput;
+  return false;
+}
+
 export function onMail(obj, subject, urlLocation, secondLine) {
   if (obj._id) {
     const fullSubject = `AM Browser ${subject}: ${obj.name}`;

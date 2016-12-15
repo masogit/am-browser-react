@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {Box, Button, Icons} from 'grommet';
+import {isAqlInputAllowed} from '../../actions/system';
 import _ from 'lodash';
 const {Code} = Icons.Base;
 
@@ -14,7 +15,8 @@ export default class SearchInputWithTags extends Component {
       searchFields: this.props.searchFields,
       searchTags: searchTags,
       locked: this.props.locked || false,
-      aqlInput: false
+      aqlInput: false,
+      isAqlInputAllowed: isAqlInputAllowed()
     };
   }
 
@@ -66,9 +68,9 @@ export default class SearchInputWithTags extends Component {
   }
 
   onChange(event) {
-    let aqlInput = this.state.aqlInput;
+    const {aqlInput, isAqlInputAllowed} = this.state;
 
-    if (event.target.value.trim()== '/') {
+    if (event.target.value.trim()== '/' && isAqlInputAllowed) {
       this._toggleAQLInput();
       event.target.value="";
     } else if(!aqlInput) {
@@ -86,9 +88,9 @@ export default class SearchInputWithTags extends Component {
   }
 
   render() {
-    const {searchFields, searchTags, aqlInput, locked} = this.state;
+    const {searchFields, searchTags, aqlInput, locked, isAqlInputAllowed} = this.state;
     const onSearch = this.props.onSearch;
-    const aqlWhere = "press / input AQL where statement";
+    const aqlWhere = isAqlInputAllowed ? "press / input AQL where statement" : "";
     const quickSearch = searchFields ? `press Enter to quick search in ${searchFields}; ${aqlWhere}` : aqlWhere;
     const placeholder = aqlInput ? "input AQL where statement…" : quickSearch;
 
@@ -100,7 +102,7 @@ export default class SearchInputWithTags extends Component {
                onChange={this.onChange.bind(this)}/>
              <Box justify="center" direction="row" flex={true} className="input-with-tag-buttons">
                {searchTags.length > 0 && !aqlInput && this.renderTagButtons(searchTags)}
-               <Button icon={<Code />} primary={aqlInput} onClick={this._toggleAQLInput.bind(this)}/>
+               {isAqlInputAllowed && <Button icon={<Code />} primary={aqlInput} onClick={this._toggleAQLInput.bind(this)}/>}
         </Box>
       </Box>
     );
