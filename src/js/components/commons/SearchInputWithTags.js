@@ -14,7 +14,7 @@ export default class SearchInputWithTags extends Component {
       searchFields: this.props.searchFields,
       searchTags: searchTags,
       locked: this.props.locked || false,
-      aqlInput: (this.props.searchFields == "") || false
+      aqlInput: false
     };
   }
 
@@ -56,8 +56,6 @@ export default class SearchInputWithTags extends Component {
       searchTags: searchTags,
       searchFields: searchFields
     });
-    if (!searchFields)
-      this._toggleAQLInput();
   }
 
   _toggleAQLInput() {
@@ -101,7 +99,7 @@ export default class SearchInputWithTags extends Component {
                onKeyDown={(event) => (onSearch(event, searchFields, aqlInput, this.refs.search.value.trim()))}
                onChange={this.onChange.bind(this)}/>
              <Box justify="center" direction="row" flex={true} className="input-with-tag-buttons">
-               {searchTags.length > 0 && this.renderTagButtons(searchTags)}
+               {searchTags.length > 0 && !aqlInput && this.renderTagButtons(searchTags)}
                <Button icon={<Code />} primary={aqlInput} onClick={this._toggleAQLInput.bind(this)}/>
         </Box>
       </Box>
