@@ -67,7 +67,7 @@ export default class RecordTopology extends Component {
     if (record) {
       return (
         <Box className='autoScroll fixMinSizing' flex={true}>
-          <Box flex={true} align='center' justify='center' className='grid' style={{minWidth: '1000px',width: '100%'}}>
+          <Box flex={true} align='center' justify='center' className='grid'>
             <TopologyDetail record={record} body={body} onClick={this.updateDetail}/>
           </Box>
         </Box>
