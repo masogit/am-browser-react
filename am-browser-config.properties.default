@@ -39,7 +39,7 @@ folder = ./db
 [mongo]
 server = localhost
 port = 27017
-db = test
+db = amb
 username =
 password =
 

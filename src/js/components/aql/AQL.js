@@ -354,30 +354,28 @@ export default class AQL extends ComponentBase {
     const hasCategory = Boolean(currentAql.category);
 
     const buttons = [
-      { id: 'Query', onClick: () => this._onQuery(true), enable: hasStr },
+      {id: 'Query', onClick: () => this._onQuery(true), enable: hasStr},
       {
         id: 'Save',
         onClick: () => this.alert(ALERT_TYPE.SAVE),
         enable: !(!hasStr || !hasName || !hasCategory)
       },
-      { id: 'Delete', onClick: () => this.alert(ALERT_TYPE.DELETE), enable: hasId}
+      {id: 'Delete', onClick: () => this.alert(ALERT_TYPE.DELETE), enable: hasId}
     ];
 
     const subMenuButtons = [{
       id: 'Mail', onClick: () => onMail(currentAql, 'Graph', 'insight'),
       enable: hasId, hide: !hasId
-    },
-      {
-        id: 'Download',
-        onClick: () => onDownload(currentAql, currentAql.name || 'graph'),
-        enable: hasId
-      }, {
-        icon: <Attachment />,
-        onClick: () => this.openLayer(LAYER_TYPE.VIEW),
-        enable: hasStr,
-        label: currentAql.view ? 'Attached view: ' + currentAql.view.name : 'Attach View'
-      }
-    ];
+    }, {
+      id: 'Download',
+      onClick: () => onDownload(currentAql, currentAql.name || 'graph'),
+      enable: hasId
+    }, {
+      icon: <Attachment />,
+      onClick: () => this.openLayer(LAYER_TYPE.VIEW),
+      enable: hasStr,
+      label: currentAql.view ? 'Attached view: ' + currentAql.view.name : 'Attach View'
+    }];
 
     const uploadProps = {
       enable: !hasId,
@@ -386,7 +384,7 @@ export default class AQL extends ComponentBase {
     };
 
     return (<AMHeader title='Graph Builder' buttons={buttons} subMenuButtons={subMenuButtons}
-                     uploadProps={uploadProps}/>);
+                      uploadProps={uploadProps}/>);
   }
 
   _updateValue(event, val, state = this.state.aql) {
