@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import RecordList from './RecordList';
 import ActionTab from '../commons/ActionTab';
 import * as ExplorerActions from '../../actions/explorer';
-import { Anchor, Layer, Tabs, Table, TableRow, Header, Box, List, ListItem } from 'grommet';
+import { Anchor, Layer, Tabs, Table, TableRow, Header, Box, List, ListItem, Title } from 'grommet';
 import Close from 'grommet/components/icons/base/Close';
 import Pdf from 'grommet/components/icons/base/DocumentPdf';
 import * as Format from '../../util/RecordFormat';
@@ -158,8 +158,8 @@ export default class RecordDetail extends Component {
     return (
       <Box className='topology-background-color autoScroll' flex={false}>
         <Header justify='between'>
-            {body.label}
-            <Anchor icon={<Close />} onClick={this.props.onClose}/>
+            <Title>{body.label}</Title>
+            <Anchor icon={<Close />} onClick={this.props.onClose} justify='end'/>
         </Header>
         <Box justify='center' pad={{horizontal: 'small'}} flex={false}>
           <List>
