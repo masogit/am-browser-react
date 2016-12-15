@@ -10,13 +10,6 @@ import PDFDesigner from './../reports/PDFDesigner';
 import {toggleSidebar, onMail, onDownload} from '../../actions/system';
 import {posOrderby} from '../../actions/explorer';
 
-const updateTableSize = () => {
-  const elements = document.getElementsByClassName('grommetux-table');
-  for (let i = 0; i < elements.length; i++) {
-    elements[i].className = elements[i].className.replace('grommetux-table--small', '');
-  }
-};
-
 const isValidateView = json => json.name && json.category && json.body;
 
 export default class ViewDefDetail extends ComponentBase {
@@ -39,10 +32,6 @@ export default class ViewDefDetail extends ComponentBase {
       mainFilter: false,
       alertForm: null
     };
-  }
-
-  componentDidUpdate() {
-    setTimeout(updateTableSize, 200);
   }
 
   _onChange(event, value) {
