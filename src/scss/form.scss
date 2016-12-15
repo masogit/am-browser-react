@@ -112,3 +112,40 @@
     height: 100%
   }
 }
+
+// define amb small table mixin
+@mixin amb-small-table {
+
+  thead {
+    // change from 'none' to 'table-header-group'
+    display: table-header-group;
+  }
+
+  td {
+    // change from 'block' to 'table-cell'
+    display: table-cell;
+
+    &:before {
+      font-weight: $text-font-weight;
+      @include inuit-font-size($control-font-size, $inuit-base-spacing-unit);
+      content: '';
+      display: block;
+
+      padding-right: halve($inuit-base-spacing-unit);
+    }
+  }
+
+  tr {
+    // change from '1px solid $border-color' to '0'
+    border-bottom: 0;
+  }
+
+  td,
+  th {
+    padding-left: $inuit-base-spacing-unit;
+  }
+}
+// hack grommet small table css
+.#{$grommet-namespace}table--small {
+  @include amb-small-table();
+}
