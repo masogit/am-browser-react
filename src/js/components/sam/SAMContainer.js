@@ -192,7 +192,7 @@ export default class SAMContainer extends Component {
     const Spinning = Icons.Spinning;
     return (
       <Box flex={true} direction="row" align={!product ? 'center' : 'start'} justify={!product ? 'center' : 'start'}>
-        <Box flex={!this.state.product} style={product && {'width': '260px', height: '100%'}} pad={{horizontal: "small"}} className='autoScroll'>
+        <Box flex={!this.state.product} style={product && {'width': '280px', height: '100%'}} pad={{horizontal: "small"}} className='autoScroll'>
           {
             vendor ? <Card {...vendor}/> : <Box flex={true} align="center" justify="center"><Spinning /></Box>
           }
@@ -200,7 +200,7 @@ export default class SAMContainer extends Component {
         {
           product &&
           <Box flex={true} pad={{horizontal: "small"}} className='autoScroll' style={{height: '100%'}}>
-            <Card {...product}/>
+            <Card {...product} className={license ? 'single-line' : ''}/>
             {
               license &&
               <RecordList body={license} title="Version" allFields={true} onClick={(record) => this.renderSoftware(record)} root={true}/>

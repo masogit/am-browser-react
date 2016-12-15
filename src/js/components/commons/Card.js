@@ -22,26 +22,28 @@ export default class Card extends Component {
   }
 
   render() {
-    let tiles = this.props.data;
     let sortBy = this.state.sortBy;
-    if (sortBy)
-      tiles.sort((a, b) => {
+    let {data, className, conf: {footer, header, body}, title, onSelect} = this.props;
+
+    if (sortBy) {
+      data.sort((a, b) => {
         let aa = a[sortBy] || 0;
         let bb = b[sortBy] || 0;
         return aa - bb;
       }).reverse();
+    }
 
-    tiles = tiles.map((record, index) => {
+    const tiles = data.map((record, index) => {
       return (
-        <Tile key={`${record[this.props.conf.header]}-${index}`} separator="top" colorIndex="light-1" pad="small" size="small">
-          <Header>{record[this.props.conf.header]}</Header>
+        <Tile key={`${record[header]}-${index}`} separator="top" colorIndex="light-1" pad="small" size="small" flex={false}>
+          <Header>{record[header]}</Header>
           {
-            this.props.conf.body.map((row, index) => {
+            body.map((row, index) => {
               return <Box key={index} flex={true} style={this.renderSortStyle(row.value)}>{`${record[row.value]} ${row.label}`}</Box>;
             })
           }
           <Footer justify="between">
-            <Box>{this.props.conf.footer}: {record[this.props.conf.footer]}</Box>
+            <Box>{footer}: {record[footer]}</Box>
           </Footer>
         </Tile>
       );
@@ -50,10 +52,10 @@ export default class Card extends Component {
     return (
       <Box>
         <Header justify="between">
-          <Title>{this.props.title}</Title>
-          <SortMenu data={this.props.conf.body} onSort={this.sort} />
+          <Title>{title}</Title>
+          <SortMenu data={body} onSort={this.sort} />
         </Header>
-        <Tiles flush={false} colorIndex="light-2" selectable={true} onSelect={this.props.onSelect}>
+        <Tiles flush={false} colorIndex="light-2" selectable={true} onSelect={onSelect} className={className}>
           {tiles}
         </Tiles>
       </Box>
