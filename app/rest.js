@@ -366,7 +366,8 @@ function getHeadNav(rights) {
     my: rights.index < 3,
     'my/:name': rights.index < 3,
     about: rights.index < 1,
-    slack: rights.index < 2
+    slack: rights.index < 2,
+    aqlInput: rights.index < 2
   };
 }
 
