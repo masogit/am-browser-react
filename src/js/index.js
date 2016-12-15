@@ -82,15 +82,20 @@ if (process.env.NODE_ENV === 'production') {
   initToken().then(renderPage);
 }
 
+let loadingIconMap = false;
 const getIconMap = () => {
-  Rest.get('/icon-map').then((res) => {
-    if (res.text) {
-      const iconMap = JSON.parse(res.text);
-      saveSetting('iconMap', iconMap);
-    }
-  }, (err) => {
-    console.log(err.response ? err.response.text : err);
-  });
+  if (!loadingIconMap) {
+    loadingIconMap = true;
+    Rest.get('/icon-map').then((res) => {
+      if (res.text) {
+        const iconMap = JSON.parse(res.text);
+        saveSetting('iconMap', iconMap);
+      }
+    }, (err) => {
+      console.log(err.response ? err.response.text : err);
+      loadingIconMap = false;
+    });
+  }
 };
 
 // check for session
