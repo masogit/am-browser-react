@@ -258,7 +258,7 @@ export default class AQL extends ComponentBase {
 
       return (
         <Layer onClose={this.closeLayer} closer={true} align="left" flush={true}>
-          <AMSideBar title='AQL Selector' contents={contents} colorIndex="transparent" toggle={false}
+          <AMSideBar title='AQL Selector' contents={contents} colorIndex="transparent" toggle={false} showInLayer={true}
                      margin={{horizontal: 'medium'}} pad={{vertical: 'small'}}/>
         </Layer>
       );
@@ -284,7 +284,7 @@ export default class AQL extends ComponentBase {
 
       return (
         <Layer onClose={this.closeLayer} closer={true} align="left" flush={true}>
-          <AMSideBar title='Views Selector' contents={contents} colorIndex="transparent" toggle={false}
+          <AMSideBar title='Views Selector' contents={contents} colorIndex="transparent" toggle={false} showInLayer={true}
                      margin={{horizontal: 'medium'}} pad={{vertical: 'small'}}/>
         </Layer>
       );

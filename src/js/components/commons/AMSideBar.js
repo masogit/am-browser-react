@@ -40,8 +40,8 @@ class AMSideBar extends Component {
   }
 
   render() {
-    const {toolbar, contents, focus, footer, loading, colorIndex, showSidebar, toggle, pad, margin} = this.props;
-    if (!showSidebar) {
+    const {toolbar, contents, focus, footer, loading, colorIndex, showSidebar, toggle, pad, margin, showInLayer} = this.props;
+    if (!showSidebar && !showInLayer) {
       return (
         <Sidebar fixed={true} full={false} style={{minHeight: '100%', width: '50px'}}
                  colorIndex={colorIndex || 'light-1'}>
