@@ -288,7 +288,7 @@ export default class Insight extends ComponentBase {
           <Box pad='small' onClick={this._showAQLDetail.bind(this, dataMap.aql._id)}><Expand /></Box>
         </Box>
         <Box {...graphStyle}>
-          <Graph type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql[dataMap.aql.type]}
+          <Graph type={dataMap.aql.type} data={dataMap.data} config={dataMap.aql[dataMap.aql.type]} condition={dataMap.aql.condition}
                  onClick={(filter) => this._showViewRecords(filter, dataMap.aql.view)}/>
         </Box>
       </Box>
@@ -465,7 +465,7 @@ export default class Insight extends ComponentBase {
         </Header>
         {aql[aql.type] instanceof Object &&
         <Box key={aql._id} pad="large" align={(aql.type=='meter')?'center':null}>
-          <Graph type={aql.type} data={data} config={aql[aql.type]}
+          <Graph type={aql.type} data={data} config={aql[aql.type]} condition={aql.condition}
                  onClick={(filter) => this._showViewRecords(filter, aql.view)}/>
         </Box>
         }

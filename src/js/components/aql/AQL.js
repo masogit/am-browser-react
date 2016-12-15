@@ -9,7 +9,7 @@ import RecordListLayer from '../explorer/RecordListLayer';
 import * as Format from '../../util/RecordFormat';
 import {updateValue} from '../../util/util';
 import {monitorEdit, stopMonitorEdit, dropCurrentPop, showInfo, onDownload, onMail} from '../../actions/system';
-import { Anchor, Box, Form, FormField, Layer, Tabs, Table, TableRow, Icons } from 'grommet';
+import { Anchor, Box, Form, FormField, Layer, Tabs, Table, TableRow, Icons, SearchInput as GSearchInput } from 'grommet';
 const { Add, Trash, Attachment } = Icons.Base;
 import {ActionLabel,EditLayer, ContentPlaceHolder, ActionTab, AMSideBar, SearchInput,
   ComponentBase, Graph, AlertForm, AMHeader} from '../commons';
@@ -60,7 +60,8 @@ export default class AQL extends ComponentBase {
       str: '',
       name: '',
       category: '',
-      type: 'chart'
+      type: 'chart',
+      condition: {}
     };
   }
 
@@ -104,12 +105,13 @@ export default class AQL extends ComponentBase {
   }
 
   _loadAQL(aql) {
-    aql.type = aql.type || 'chart';
-    if (!aql[aql.type]) {
-      aql[aql.type] = aql.form; // try to get data from the old form
+    const type = aql.type || 'chart';
+    let graph = aql[type];
+    if (!graph) {
+      graph = aql.form; // try to get data from the old form
     }
-    if (!aql[aql.type].condition) {
-      aql[aql.type].condition = {};
+    if (!aql.condition) {
+      aql.condition = {};
     }
 
     this.setState({
@@ -224,9 +226,14 @@ export default class AQL extends ComponentBase {
   _showViewRecords(filter, viewInAQL) {
     if (viewInAQL && viewInAQL._id)
       ExplorerActions.loadView(viewInAQL._id).then((view) => {
-        var body = view.body;
-        var newFilter = Format.getFilterFromField(view.body.fields, filter);
-        body.filter = (body.filter) ? `(${body.filter} AND ${newFilter})` : newFilter;
+        const body = view.body;
+        const filters = body.filter ? [body.filter] : [];
+        const newFilter = filter.key ? Format.getFilterFromField(view.body.fields, filter) : '';
+        if (newFilter) {
+          filters.push(newFilter);
+        }
+
+        body.filter = filters.map(filter => `(${filter})`).join(" AND ");
 
         this.setState({
           layer: {
@@ -299,15 +306,12 @@ export default class AQL extends ComponentBase {
 
         if (aql.meter) {
           aql.meter.series_col = "";
-          aql.meter.condition = {};
         }
         if (aql.chart) {
           aql.chart.series_col = [];
-          aql.chart.condition = {};
         }
         if (aql.distribution) {
           aql.distribution.series_col = "";
-          aql.distribution.condition = {};
         }
         this.setState({aql: aql, data: data});
       };
@@ -410,9 +414,6 @@ export default class AQL extends ComponentBase {
 
     const updateType = type => {
       const aql = this.state.aql;
-      if (aql[type] && !aql[type].condition) {
-        aql[type].condition = aql[aql.type].condition;
-      }
       aql.type = type;
 
       this.setState({aql: aql});
@@ -445,7 +446,7 @@ export default class AQL extends ComponentBase {
   }
 
   renderBasicForm(currentAql, categories, data) {
-    const {name, str, category, view, type} = currentAql;
+    const {name, str, category, view, type, condition} = currentAql;
     const fields = [{
       label: 'AQL Name',
       content: <input type="text" name="name" value={name} onChange={this._updateValue}/>
@@ -476,39 +477,36 @@ export default class AQL extends ComponentBase {
       });
 
       if (currentAql[type]) {
-        const condition = currentAql[type].condition || {};
-        const index = (() => {
-          if (type == 'chart') return currentAql[type].xAxis_col;
-          if (type == 'meter') return currentAql[type].col_unit;
-          if (type == 'distribution') return currentAql[type].label;
-        })() || 0;
-
-        if (!condition.key) {
-          condition.key = data ? data.header[index].Name : '';
-        }
-        if (!condition.value) {
-          condition.value = data ? data.header[index].Name : '';
-        }
+        const getFields = id => {
+          const currentView = this.state.views.filter(view => view._id == id)[0];
+          if (currentView && currentView.body.fields) {
+            return currentView.body.fields.map((field) => field.sqlname);
+          }
+          return [];
+        };
 
         viewFields.push({
-          label: 'Key',
+          label: 'Field (View)',
           content: (
-            <input type="text" name="condition.key"
-                   value={condition.key}
-                   onChange={this._updateGraphData}/>
+          <GSearchInput type="text" name="condition.key" value={condition.key}
+                       onDOMChange={this._updateValue} suggestions={getFields(view._id)}
+                       onSelect={event => this._updateValue(event, event.suggestion)} />
           )
         });
 
-        viewFields.push(
-          {
-            label: 'Value column',
-            content: (
-              <select name='condition.value' value={condition.value} onChange={this._updateGraphData}>
-                {data && data.header.map((item, index) => <option key={index} value={item.Name}>{item.Name}</option>)}
-              </select>
-            )
-          }
-        );
+        if (condition.key) {
+          viewFields.push(
+            {
+              label: 'Value (Column)',
+              content: (
+                <select name='condition.value' value={condition.value} onChange={this._updateValue}>
+                  <option/>
+                  {data && data.header.map((item, index) => <option key={index} value={item.Name}>{item.Name}</option>)}
+                </select>
+              )
+            }
+          );
+        }
       }
 
       viewComp = (
@@ -559,7 +557,7 @@ export default class AQL extends ComponentBase {
               <Box pad={{vertical: 'small'}}>
                 {validData && data && currentAql.type && currentAql[currentAql.type] &&
                 <Box flex={false} className='grid' margin={{vertical: 'small'}}>
-                  <Graph type={currentAql.type} data={data} config={currentAql[currentAql.type]}
+                  <Graph type={currentAql.type} data={data} config={currentAql[currentAql.type]} condition={currentAql.condition}
                          onClick={(filter) => this._showViewRecords(filter, currentAql.view)}/>
                 </Box>}
                 <Table>

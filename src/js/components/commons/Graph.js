@@ -27,16 +27,17 @@ const setOnClick = (obj, value, onClick, row, header, keyIndex, valueIndex) => {
     const filter = getFullCol(row, header);
     if (onClick) {
       obj.onClick = () => {
-        onClick({
+        const args = keyIndex != null ? {
           key: !isNaN(Number.parseInt(keyIndex)) ? header[keyIndex].Name: keyIndex,
           value: row[valueIndex]
-        }, filter);
+        } : {};
+        onClick(args, filter);
       };
     }
   }
 };
 
-const setSeriesItem = (seriesIndex, onClick, row, header, index, text, condition = {}) => {
+const setSeriesItem = (seriesIndex, onClick, row, header, text, condition = {}) => {
   const value = row[seriesIndex] / 1.0;
 
   const legend = {
@@ -44,8 +45,8 @@ const setSeriesItem = (seriesIndex, onClick, row, header, index, text, condition
     label: '' + text
   };
 
-  const valueIndex = condition.value ? findIndex(header, item => item.Name == condition.value) : index || 0;
-  setOnClick(legend, value, onClick, row, header, condition.key || index || 0, valueIndex);
+  const valueIndex = condition.value ? findIndex(header, item => item.Name == condition.value) : '';
+  setOnClick(legend, value, onClick, row, header, condition.key, valueIndex);
   return legend;
 };
 
@@ -78,8 +79,8 @@ const cloneObj = form => {
 };
 
 export default class Graph extends Component {
-  _gen_chart(form, data, onClick) {
-    const { series_col = [], series, xAxis_col, label, condition} = form;
+  _gen_chart(form, data, onClick, condition) {
+    const { series_col = [], series} = form;
     const chart = cloneObj(form);
 
     if (series_col.length > 0 || (series && series.length > 0)) {
@@ -94,7 +95,7 @@ export default class Graph extends Component {
         const values = [];
         form.series_col.map((seriesIndex, index) => {
           const value = row[seriesIndex] / 1.0;
-          const legend = setSeriesItem(seriesIndex, onClick, row, data.header, label || xAxis_col, xAxisLabel, condition);
+          const legend = setSeriesItem(seriesIndex, onClick, row, data.header, xAxisLabel, condition);
           legendSeries[index].push(legend);
 
           chartsValues[index].push(value);
@@ -115,15 +116,15 @@ export default class Graph extends Component {
     return chart;
   }
 
-  _gen_distribution(form, data, onClick) {
-    const {series_col, important, label, condition} = form;
+  _gen_distribution(form, data, onClick, condition) {
+    const {series_col, important, label} = form;
     const distribution = cloneObj(form);
 
     const series = [];
 
     if (series_col) {
       data.rows.forEach(row  => {
-        const legend = setSeriesItem(series_col, onClick, row, data.header, label, row[label] || '', condition);
+        const legend = setSeriesItem(series_col, onClick, row, data.header, row[label] || '', condition);
         legend.important = series_col == important;
         series.push(legend);
       });
@@ -136,15 +137,15 @@ export default class Graph extends Component {
     return distribution;
   }
 
-  _gen_meter(form, data, onClick) {
-    const { col_unit, series_col, condition} = form;
+  _gen_meter(form, data, onClick, condition) {
+    const { col_unit, series_col} = form;
     const meter = cloneObj(form);
 
     const series = [];
 
     if (series_col) {
       data.rows.forEach(row => {
-        const legend = setSeriesItem(series_col, onClick, row, data.header, col_unit, row[col_unit] || '', condition);
+        const legend = setSeriesItem(series_col, onClick, row, data.header, row[col_unit] || '',condition);
         series.push(legend);
       });
 
@@ -165,7 +166,7 @@ export default class Graph extends Component {
 
     if (series_col) {
       data.rows.forEach(row => {
-        const legend = setSeriesItem(series_col, onClick, row, data.header, label, row[label] || '');
+        const legend = setSeriesItem(series_col, onClick, row, data.header, row[label] || '', {key: label, value: data.header[label].Name});
         series.push(legend);
       });
     }
@@ -196,7 +197,7 @@ export default class Graph extends Component {
   }
 
   render() {
-    const {type, config, onClick, data, className} = this.props;
+    const {type, config, onClick, data, className, condition} = this.props;
 
     let classes = ['hiddenScroll'];
     if (className) {
@@ -209,7 +210,7 @@ export default class Graph extends Component {
     }
 
     if (data && data.rows.length > 0) {
-      const graph = this['_gen_' + type](config, data, onClick);
+      const graph = this['_gen_' + type](config, data, onClick, condition);
       let Chart;
       switch (type) {
         case 'chart':
