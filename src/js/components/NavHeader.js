@@ -77,8 +77,7 @@ export default class NavHeader extends Component {
           </Box>
           {
             links.length > 0 &&
-            <Search placeHolder="Type to search" inline={true} iconAlign="start" maxLength={20} fill
-                  onKeyDown={this.onSearch.bind(this)} />
+            <Search placeHolder="Type to search" inline={true} iconAlign="start" maxLength={100} fill onKeyDown={this.onSearch.bind(this)} />
           }
         </Box>
         <Menu direction="row" align="center">
