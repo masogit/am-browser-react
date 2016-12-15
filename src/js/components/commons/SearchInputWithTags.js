@@ -8,12 +8,11 @@ export default class SearchInputWithTags extends Component {
 
   constructor(props) {
     super(props);
-    let fields = this.props.searchFields ? this.props.searchFields.split(',') : [];
-    let searchTags = fields ? fields.map(field => ({label: field.trim(), disabled: false})) : [];
+    let searchFields = this.props.searchFields;
 
     this.state = {
-      searchFields: this.props.searchFields,
-      searchTags: searchTags,
+      searchFields: searchFields,
+      searchTags: this.convertToSearchTags(searchFields),
       locked: this.props.locked || false,
       aqlInput: false,
       isAqlInputAllowed: isAqlInputAllowed()
@@ -21,12 +20,8 @@ export default class SearchInputWithTags extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps) {
-      let locked = this.props.locked;
+    if (nextProps !== this.props) {
       let aqlInput = this.state.aqlInput;
-
-      if (nextProps.locked !== this.props.locked)
-        locked = nextProps.locked;
 
       if (nextProps.reusedFilters !== this.props.reusedFilters) {
         this.refs.search.value=nextProps.reusedFilters;
@@ -34,10 +29,17 @@ export default class SearchInputWithTags extends Component {
       }
 
       this.setState({
-        locked: locked,
-        aqlInput: aqlInput
+        locked: nextProps.locked,
+        aqlInput: aqlInput,
+        searchFields: nextProps.searchFields,
+        searchTags: this.convertToSearchTags(nextProps.searchFields)
       });
     }
+  }
+
+  convertToSearchTags(searchFieldString) {
+    let fields = searchFieldString ? searchFieldString.split(',') : [];
+    return fields ? fields.map(field => ({label: field.trim(), disabled: false})) : [];
   }
 
   _resetSearchTags(field) {
