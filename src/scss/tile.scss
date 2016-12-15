@@ -1,0 +1,10 @@
+.grommetux-tiles {
+  &:focus {
+    outline: none;
+  }
+
+  &.single-line {
+    overflow: auto;
+    flex-wrap: nowrap;
+  }
+}
