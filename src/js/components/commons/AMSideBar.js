@@ -89,7 +89,7 @@ class AMSideBar extends Component {
       <Sidebar fixed={true} full={false} style={{minHeight: '100%'}} colorIndex={colorIndex || 'light-1'} pad={pad} margin={margin}>
         <Box style={{overflow: 'visible'}} className='fixMinSizing' flex={true}>
           <Header justify="between" pad='small'>
-            {toggle == false ? <Title>{this.state.title}</Title>
+            {(toggle == false || showInLayer) ? <Title>{this.state.title}</Title>
               : (<Anchor icon={<ChapterPrevious/>} onClick={toggleSidebar} label={this.state.title}
                       className='grommetux-title'/>)
             }
