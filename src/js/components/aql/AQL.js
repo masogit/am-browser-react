@@ -463,14 +463,13 @@ export default class AQL extends ComponentBase {
     const viewFields = [];
     viewFields.push({
       label: 'Attached View',
-      enable: view.name || Boolean(str),
       content: (
-        <ActionLabel label={view.name || '<Empty>'} icon={view.name ? <Trash/> : <Attachment />}
-                     onClick={() => view.name ? this.alert(ALERT_TYPE.REMOVE) : this.openLayer(LAYER_TYPE.VIEW)}/>
+        <ActionLabel label={view && view.name || '<Empty>'} icon={view && view.name ? <Trash/> : <Attachment />}
+                     onClick={() => view && view.name ? this.alert(ALERT_TYPE.REMOVE) : this.openLayer(LAYER_TYPE.VIEW)}/>
       )
     });
 
-    if (view.name) {
+    if (view && view.name) {
       if (currentAql[type]) {
         const getFields = id => {
           const currentView = this.state.views.filter(view => view._id == id)[0];
@@ -490,12 +489,15 @@ export default class AQL extends ComponentBase {
         });
 
         if (condition.key) {
+          if (data && data.header[0] && !condition.value) {
+            condition.value = data.header[0].Name;
+          }
+
           viewFields.push(
             {
               label: 'Value (Column)',
               content: (
                 <select name='condition.value' value={condition.value} onChange={this._updateValue}>
-                  <option/>
                   {data && data.header.map((item, index) => <option key={index} value={item.Name}>{item.Name}</option>)}
                 </select>
               )
