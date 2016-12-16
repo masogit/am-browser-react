@@ -205,7 +205,7 @@ export default class GraphForm extends Component {
         {settings.map((setting, index) => <Form className='vertical-form' key={index}>{setting}</Form>)}
         <Box className='toggle' direction='row'>
           <CheckBox label='Basic' checked disabled/>
-          <CheckBox label='Advance' checked={showAdvance} value={showAdvance}
+          <CheckBox label='Advance' checked={!!showAdvance} value={showAdvance}
                     onChange={() => this.setState({showAdvance: !showAdvance})}/>
         </Box>
       </Box>
