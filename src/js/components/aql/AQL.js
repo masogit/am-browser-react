@@ -471,7 +471,7 @@ export default class AQL extends ComponentBase {
         viewFields.push({
           label: 'Field (View)',
           content: (
-          <SearchInput type="text" name="condition.key" value={condition.key}
+          <SearchInput type="text" name="condition.key" value={condition.key || ''}
                        onDOMChange={this._updateValue} suggestions={getFields(view._id)}
                        onSelect={event => this._updateValue(event, event.suggestion)} />
           )
