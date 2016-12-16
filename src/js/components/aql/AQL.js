@@ -9,9 +9,9 @@ import RecordListLayer from '../explorer/RecordListLayer';
 import * as Format from '../../util/RecordFormat';
 import {updateValue} from '../../util/util';
 import {monitorEdit, stopMonitorEdit, dropCurrentPop, showInfo, onDownload, onMail} from '../../actions/system';
-import { Anchor, Box, Form, FormField, Layer, Tabs, Table, TableRow, Icons, SearchInput as GSearchInput } from 'grommet';
+import { Anchor, Box, Form, FormField, Layer, Tabs, Table, TableRow, Icons } from 'grommet';
 const { Add, Trash, Attachment } = Icons.Base;
-import {ActionLabel,EditLayer, ContentPlaceHolder, ActionTab, AMSideBar, SearchInput,
+import {ActionLabel, EditLayer, ContentPlaceHolder, ActionTab, AMSideBar, SearchInput,
   ComponentBase, Graph, AlertForm, AMHeader} from '../commons';
 
 const ALERT_TYPE = {
@@ -483,7 +483,7 @@ export default class AQL extends ComponentBase {
         viewFields.push({
           label: 'Field (View)',
           content: (
-          <GSearchInput type="text" name="condition.key" value={condition.key}
+          <SearchInput type="text" name="condition.key" value={condition.key}
                        onDOMChange={this._updateValue} suggestions={getFields(view._id)}
                        onSelect={event => this._updateValue(event, event.suggestion)} />
           )

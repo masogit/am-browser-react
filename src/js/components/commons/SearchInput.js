@@ -2,22 +2,24 @@
 import React, {Component} from 'react';
 import {SearchInput, Box, Anchor, Header} from 'grommet';
 import Search from 'grommet/components/icons/base/Search';
+import {difference} from 'lodash';
 
+// support filter
 export default class Input extends SearchInput {
+  componentWillMount() {
+    this.state = {
+      suggestions: this.props.suggestions
+    };
+  }
+
   componentDidMount() {
     const _renderDrop = this.search._renderDrop.bind(this.search);
     this.search._renderDrop = () => <div style={{background: '#fff', boxShadow: '0px 0px 4px #eee inset'}}>{_renderDrop()}</div>;
-    this.setSuggestions();
   }
 
-  componentDidUpdate() {
-    this.setSuggestions();
-  }
-
-  setSuggestions() {
-    const suggestions = this.props.suggestions;
-    if (!this.state.suggestions && suggestions && suggestions.length > 0) {
-      this.setState({ suggestions });
+  componentWillReceiveProps(nextProps) {
+    if (difference(nextProps.suggestions, this.state.suggestions).length != 0) {
+      this.setState({suggestions: nextProps.suggestions});
     }
   }
 
