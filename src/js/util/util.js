@@ -88,7 +88,7 @@ export function updateValue(event, props) {
       if (index == nameParts.length - 1) {
         state[key] = val;
       }
-      if (!state[key]) {
+      if (!state.hasOwnProperty(key)) {
         console.log(`[update value] Can not find ${key} in state!`);
         return {};
       } else {
