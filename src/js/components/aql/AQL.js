@@ -6,7 +6,6 @@ import DistributionForm from './DistributionForm';
 import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
 import RecordListLayer from '../explorer/RecordListLayer';
-import * as Format from '../../util/RecordFormat';
 import {updateValue} from '../../util/util';
 import {monitorEdit, stopMonitorEdit, dropCurrentPop, showInfo, onDownload, onMail} from '../../actions/system';
 import { Anchor, Box, Form, FormField, Layer, Tabs, Table, TableRow, Icons } from 'grommet';
@@ -224,24 +223,14 @@ export default class AQL extends ComponentBase {
   }
 
   _showViewRecords(filter, viewInAQL) {
-    if (viewInAQL && viewInAQL._id)
-      ExplorerActions.loadView(viewInAQL._id).then((view) => {
-        const body = view.body;
-        const filters = body.filter ? [body.filter] : [];
-        const newFilter = filter.key ? Format.getFilterFromField(view.body.fields, filter) : '';
-        if (newFilter) {
-          filters.push(newFilter);
+    ExplorerActions.showViewRecords(filter, viewInAQL, (body, name) => {
+      this.setState({
+        layer: {
+          type: LAYER_TYPE.RECORDS,
+          args: {body, name: name}
         }
-
-        body.filter = filters.map(filter => `(${filter})`).join(" AND ");
-
-        this.setState({
-          layer: {
-            type: LAYER_TYPE.RECORDS,
-            args: {body, name: view.name}
-          }
-        });
       });
+    });
   }
 
   closeLayer() {

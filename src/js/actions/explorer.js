@@ -1,5 +1,24 @@
 import {AM_DB_DEF_URL, VIEW_DEF_URL, DOWNLOAD_DEF_URL, UCMDB_DEF_URL} from '../constants/ServiceConfig';
 import Rest from '../util/grommet-rest-promise';
+import * as Format from '../util/RecordFormat';
+
+export function showViewRecords (filter, viewInAQL, callback) {
+  if (viewInAQL && viewInAQL._id) {
+    loadView(viewInAQL._id).then((view) => {
+      var body = view.body;
+      const filters = body.filter ? [body.filter] : [];
+      const newFilter = filter.key ? Format.getFilterFromField(view.body.fields, filter) : '';
+      if (newFilter) {
+        filters.push(newFilter);
+      }
+
+      body.filter = filters.map(filter => `(${filter})`).join(" AND ");
+      if (typeof callback === 'function') {
+        callback(body, view.name);
+      }
+    });
+  }
+}
 
 export function loadViews(filter) {
   return Rest.get(VIEW_DEF_URL, filter).then((res) => {

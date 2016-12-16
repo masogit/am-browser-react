@@ -2,7 +2,7 @@ import React from 'react';
 import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
 import { showWarning, monitorEdit } from '../../actions/system';
-import * as Format from '../../util/RecordFormat';
+
 import history from '../../RouteHistory';
 import RecordListLayer from '../explorer/RecordListLayer';
 import { AlertForm, ComponentBase, AMSideBar, Graph, ActionTab } from '../commons';
@@ -421,18 +421,14 @@ export default class Insight extends ComponentBase {
   }
 
   _showViewRecords(filter, viewInAQL) {
-    if (viewInAQL && viewInAQL._id)
-      ExplorerActions.loadView(viewInAQL._id).then((view) => {
-        var body = view.body;
-        var newFitler = Format.getFilterFromField(view.body.fields, filter);
-        body.filter = (body.filter) ? `(${body.filter} AND ${newFitler})` : newFitler;
-        this.setState({
-          layer: {
-            name: 'View',
-            args: [body, view.name]
-          }
-        });
+    ExplorerActions.showViewRecords(filter, viewInAQL, (body, name) => {
+      this.setState({
+        layer: {
+          name: 'View',
+          args: [body, name]
+        }
       });
+    });
   }
 
   _showAQLDetail(id) {

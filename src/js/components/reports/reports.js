@@ -146,7 +146,7 @@ export default class Reports extends ComponentBase {
 
     return (
       <Box direction="row" flex={true} pad={fromView ? 'small' : 'none'} style={{minWidth: '90vw', minHeight: fromView ? '90vh' : '90%'}}>
-        <AMSideBar title='Templates' toolbar={toolbar} contents={contents} focus={focus}/>
+        <AMSideBar title='Templates' toolbar={toolbar} contents={contents} focus={focus} showInLayer={true}/>
         {!_.isEmpty(report) ?
           <PDFDesigner body={body} records={records} onSaveReport={this._onSaveReport} links={links} record={record}
                         definition={defaultPDFDefinition} onDupReport={this._onDupReport} root={!fromView} isChanged={this.isChanged()}
