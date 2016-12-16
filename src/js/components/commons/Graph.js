@@ -28,7 +28,7 @@ const setOnClick = (obj, value, onClick, row, header, keyIndex, valueIndex) => {
     if (onClick) {
       obj.onClick = () => {
         const args = keyIndex != null ? {
-          key: !isNaN(Number.parseInt(keyIndex)) ? header[keyIndex].Name: keyIndex,
+          key: !isNaN(keyIndex / 1.0) ? header[keyIndex].Name: keyIndex,
           value: row[valueIndex]
         } : {};
         onClick(args, filter);
@@ -45,8 +45,20 @@ const setSeriesItem = (seriesIndex, onClick, row, header, text, condition = {}) 
     label: '' + text
   };
 
-  const valueIndex = condition.value ? findIndex(header, item => item.Name == condition.value) : '';
-  setOnClick(legend, value, onClick, row, header, condition.key, valueIndex);
+  let keyIndex, valueIndex;
+  if (condition.key == undefined) {
+    let index = findIndex(row, item => item == text);
+    if (index > -1) {
+      keyIndex = header[index].Name;
+      valueIndex = index;
+    }
+
+  } else {
+    keyIndex = condition.key;
+    valueIndex = condition.value ? findIndex(header, item => item.Name == condition.value) : '';
+  }
+
+  setOnClick(legend, value, onClick, row, header, keyIndex, valueIndex);
   return legend;
 };
 
