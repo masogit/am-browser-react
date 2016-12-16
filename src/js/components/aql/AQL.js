@@ -193,7 +193,7 @@ export default class AQL extends ComponentBase {
       case ALERT_TYPE.REMOVE : {
         title = 'Remove attached view?';
         desc = 'View name: ' + view.name;
-        onConfirm = () => this.state.aql.view = null;
+        onConfirm = () => this.state.aql.view = {};
         break;
       }
       case ALERT_TYPE.DELETE: {
@@ -374,11 +374,6 @@ export default class AQL extends ComponentBase {
       id: 'Download',
       onClick: () => onDownload(currentAql, currentAql.name || 'graph'),
       enable: hasId
-    }, {
-      icon: <Attachment />,
-      onClick: () => this.openLayer(LAYER_TYPE.VIEW),
-      enable: hasStr,
-      label: currentAql.view ? 'Attached view: ' + currentAql.view.name : 'Attach View'
     }];
 
     const uploadProps = {
@@ -465,17 +460,17 @@ export default class AQL extends ComponentBase {
       )
     }];
 
-    let viewComp;
-    if (view) {
-      const viewFields = [];
-      viewFields.push({
-        label: 'View',
-        content: (
-          <ActionLabel label={currentAql.view.name} icon={<Trash/>}
-                       onClick={() => this.alert(ALERT_TYPE.REMOVE)}/>
-        )
-      });
+    const viewFields = [];
+    viewFields.push({
+      label: 'Attached View',
+      enable: view.name || Boolean(str),
+      content: (
+        <ActionLabel label={view.name || '<Empty>'} icon={view.name ? <Trash/> : <Attachment />}
+                     onClick={() => view.name ? this.alert(ALERT_TYPE.REMOVE) : this.openLayer(LAYER_TYPE.VIEW)}/>
+      )
+    });
 
+    if (view.name) {
       if (currentAql[type]) {
         const getFields = id => {
           const currentView = this.state.views.filter(view => view._id == id)[0];
@@ -508,15 +503,15 @@ export default class AQL extends ComponentBase {
           );
         }
       }
-
-      viewComp = (
-        <Box separator='all'>
-          <Form className='no-border'>
-            {viewFields.map(({label, content}, index) => <FormField label={label} key={index}>{content}</FormField>)}
-          </Form>
-        </Box>
-      );
     }
+
+    const viewComp = (
+      <Box separator='all'>
+        <div className='grommetux-form no-border'>
+          {viewFields.map(({label, content}, index) => <FormField label={label} key={index}>{content}</FormField>)}
+        </div>
+      </Box>
+    );
 
     return (
       <Form compact={true}>
