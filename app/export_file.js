@@ -5,12 +5,12 @@ var logger = require('./logger');
 var PdfPrinter = require('pdfmake/src/printer');
 var cookiesUtil = require('./cookiesUtil');
 var fonts = {
-  Roboto: {
-    normal: './app/fonts/Roboto-Regular.ttf',
-    bold: './app/fonts/Roboto-Bold.ttf',
-    italics: './app/fonts/Roboto-Italic.ttf',
-    bolditalics: './app/fonts/Roboto-Italic.ttf'
-  }
+  // Roboto: {
+  //   normal: './app/fonts/Roboto-Regular.ttf',
+  //   bold: './app/fonts/Roboto-Bold.ttf',
+  //   italics: './app/fonts/Roboto-Italic.ttf',
+  //   bolditalics: './app/fonts/Roboto-Italic.ttf'
+  // }
 };
 var printer = new PdfPrinter(fonts);
 var pdf_styles = {
