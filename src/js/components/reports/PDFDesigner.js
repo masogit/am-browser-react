@@ -440,7 +440,7 @@ export default class PDFDesigner extends Component {
       <Box flex={true}>
         {this.renderHeader()}
         <Box flex={true} direction='row' margin={{bottom: 'small'}} pad={{'horizontal': 'medium'}}>
-          <Box flex={true} style={{maxWidth: '50vw'}} className='autoScroll'>
+          <Box className='autoScroll'>
             <Header justify='between' size='small' direction='row'>
               <Box direction='row' align='center' className='no-border'>
                 <Label style={{color: '#ff0000'}}>Name:</Label>
@@ -460,7 +460,7 @@ export default class PDFDesigner extends Component {
             </Header>
             {code ? this.renderCode() : this.renderSettingsForm() }
           </Box>
-          <div id='pdfContainer'/>
+          <Box flex={true} id='pdfContainer'/>
         </Box>
         {this.renderStyleLayer()}
         {this.renderExportLayer()}
