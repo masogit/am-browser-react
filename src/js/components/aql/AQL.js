@@ -114,7 +114,7 @@ export default class AQL extends ComponentBase {
     }
 
     this.setState({
-      aql: {...aql},
+      aql: Object.assign({}, aql),
       data: {
         header: [],
         rows: []
