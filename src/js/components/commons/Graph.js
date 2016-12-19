@@ -26,9 +26,10 @@ const setOnClick = (obj, value, onClick, row, header, keyIndex, valueIndex) => {
   if (!isNaN(value)) {
     const filter = getFullCol(row, header);
     if (onClick) {
+      let index = (typeof keyIndex === 'string') ? keyIndex.trim() : keyIndex;
       obj.onClick = () => {
-        const args = keyIndex != null ? {
-          key: !isNaN(keyIndex / 1.0) ? header[keyIndex].Name: keyIndex,
+        const args = (index != null && index != "") ? {
+          key: Number.isInteger(index) ? header[keyIndex].Name: keyIndex,
           value: row[valueIndex]
         } : {};
         onClick(args, filter);
