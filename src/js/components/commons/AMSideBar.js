@@ -15,7 +15,8 @@ import {toggleSidebar} from '../../actions/system';
 class AMSideBar extends Component {
   componentWillMount() {
     this.state = {
-      title: this.props.title
+      title: this.props.title,
+      toggle: true
     };
   }
 
@@ -39,14 +40,22 @@ class AMSideBar extends Component {
     });
   }
 
+  _toggleSidebar() {
+    if (this.props.showInLayer)
+      this.setState({ toggle: !this.state.toggle});
+    else
+      toggleSidebar();
+  }
+
   render() {
     const {toolbar, contents, focus, footer, loading, colorIndex, showSidebar, toggle, pad, margin, showInLayer} = this.props;
-    if (!showSidebar && !showInLayer) {
+    let sidebarToggle = showInLayer ? this.state.toggle : showSidebar;
+    if (!sidebarToggle) {
       return (
         <Sidebar fixed={true} full={false} style={{minHeight: '100%', width: '50px'}}
                  colorIndex={colorIndex || 'light-1'}>
           <Box style={{overflow: 'visible'}} className='fixMinSizing'>
-            <Header justify="between" pad='small' onClick={toggleSidebar}>
+            <Header justify="between" pad='small' onClick={this._toggleSidebar.bind(this)}>
               <ChapterNext />
             </Header>
           </Box>
@@ -89,8 +98,8 @@ class AMSideBar extends Component {
       <Sidebar fixed={true} full={false} style={{minHeight: '100%'}} colorIndex={colorIndex || 'light-1'} pad={pad} margin={margin}>
         <Box style={{overflow: 'visible'}} className='fixMinSizing' flex={true}>
           <Header justify="between" pad='small'>
-            {(toggle == false || showInLayer) ? <Title>{this.state.title}</Title>
-              : (<Anchor icon={<ChapterPrevious/>} onClick={toggleSidebar} label={this.state.title}
+            {(toggle == false) ? <Title>{this.state.title}</Title>
+              : (<Anchor icon={<ChapterPrevious/>} onClick={this._toggleSidebar.bind(this)} label={this.state.title}
                       className='grommetux-title'/>)
             }
             {toolbar &&
