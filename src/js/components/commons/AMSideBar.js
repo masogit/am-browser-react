@@ -53,7 +53,7 @@ class AMSideBar extends Component {
     if (!sidebarToggle) {
       return (
         <Sidebar fixed={true} full={false} style={{minHeight: '100%', width: '50px'}}
-                 colorIndex={colorIndex || 'light-1'}>
+                 colorIndex={colorIndex || 'light-2'}>
           <Box style={{overflow: 'visible'}} className='fixMinSizing'>
             <Header justify="between" pad='small' onClick={this._toggleSidebar.bind(this)}>
               <ChapterNext />
@@ -95,7 +95,7 @@ class AMSideBar extends Component {
     }
 
     return (
-      <Sidebar fixed={true} full={false} style={{minHeight: '100%'}} colorIndex={colorIndex || 'light-1'} pad={pad} margin={margin}>
+      <Sidebar fixed={true} full={false} style={{minHeight: '100%'}} colorIndex={colorIndex || 'light-2'} pad={pad} margin={margin}>
         <Box style={{overflow: 'visible'}} className='fixMinSizing' flex={true}>
           <Header justify="between" pad='small'>
             {(toggle == false) ? <Title>{this.state.title}</Title>

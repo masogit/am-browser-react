@@ -7,7 +7,7 @@ import ContentPlaceHolder from '../commons/ContentPlaceHolder';
 import history from '../../RouteHistory';
 import Spinning from 'grommet/components/icons/Spinning';
 import {
-  Anchor, Box, Header, Footer, Split, Table, TableRow, Tiles, Tile
+  Anchor, Box, Header, Footer, Split, Table, TableRow, Tiles, Tile, Title
 } from 'grommet';
 
 export default class RecordSearch extends ComponentBase {
@@ -107,16 +107,11 @@ export default class RecordSearch extends ComponentBase {
           var pre_str = record[field.sqlname].substr(0, index);
           var key_str = record[field.sqlname].substr(index, length);
           var suf_str = record[field.sqlname].substr(index + length);
-          const title = pre_str + key_str + suf_str;
           return (
             <Box key={field.sqlname + index} direction='row'>
-              <span className='grommetux-text-ellipsis' title={title}>{
-                `${field.sqlname}: ${pre_str}`
-              }<span className='grommetux-background-color-index-brand'>{
-                key_str
-              }</span>{
-                  suf_str
-                }</span>
+              <Box>{`${field.sqlname}: ${pre_str}`}</Box>
+              <Box colorIndex="brand">{ key_str }</Box>
+              <Box>{ suf_str }</Box>
             </Box>
           );
         }
@@ -211,37 +206,40 @@ export default class RecordSearch extends ComponentBase {
         {this.state.warning ? <ContentPlaceHolder content={this.state.warning} />
           :
           <Split flex="right" fixed={false} className='flex'>
-            <Table ref='table'>
-              <thead>
-                <tr>
-                  <th>View</th>
-                  <th><Box align="end">Time</Box></th>
-                  <th><Box align="end">Count</Box></th>
-                </tr>
-              </thead>
-              <tbody>{
-                messages.map((msg) => (
-                  <TableRow key={msg._id}>
-                    <td>{msg.view.name}</td>
-                    <td>
-                      <Box align="end">
-                        {`${msg.timeEnd ? (msg.timeEnd - msg.timeStart) + ' ms' : ''}`}
-                      </Box>
-                    </td>
-                    <td>
-                      <Box align="end">
-                      {msg.num > 0 ?
-                          <Anchor onClick={this._showViewRecords.bind(this, msg.view)} label={msg.num}/> : msg.num
-                      }
-                      </Box>
-                    </td>
-                  </TableRow>))
-              }</tbody>
-            </Table>
+            <Box>
+              <Header><Title>Global Search</Title></Header>
+              <Table ref='table'>
+                <thead>
+                  <tr>
+                    <th>View</th>
+                    <th><Box align="end">Time</Box></th>
+                    <th><Box align="end">Count</Box></th>
+                  </tr>
+                </thead>
+                <tbody>{
+                  messages.map((msg) => (
+                    <TableRow key={msg._id}>
+                      <td>{msg.view.name}</td>
+                      <td>
+                        <Box align="end">
+                          {`${msg.timeEnd ? (msg.timeEnd - msg.timeStart) + ' ms' : ''}`}
+                        </Box>
+                      </td>
+                      <td>
+                        <Box align="end">
+                        {msg.num > 0 ?
+                            <Anchor onClick={this._showViewRecords.bind(this, msg.view)} label={msg.num}/> : msg.num
+                        }
+                        </Box>
+                      </td>
+                    </TableRow>))
+                }</tbody>
+              </Table>
+            </Box>
             <Tiles flush={false} fill={true} className={`autoScroll ${cards.length > 10 ? 'fixIEScrollBar' : ''}`}>
               {
                 this.locked ? <Spinning /> : cards.map((record, index) => (
-                  <Tile key={index} align="start" colorIndex='light-1' pad={{ horizontal: 'small' }}>
+                  <Tile key={index} align="start" colorIndex='light-2' pad={{ horizontal: 'small' }}>
                     <Header size="small">{record.view.name}</Header>
                     <Box flex={true}>
                       <Anchor onClick={this._onClick.bind(this, record.view, record)}
