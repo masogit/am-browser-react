@@ -119,7 +119,7 @@ export default class MyAsset extends ComponentBase {
 
     return (
       <Box flex={true} direction='row'>
-        <Box align="center" flex={false} colorIndex='light-1' className="grommetux-sidebar">
+        <Box align="center" flex={false} colorIndex='light-2' className="grommetux-sidebar">
           <Header pad={{"horizontal": "small"}} justify="center">
             <Title>My Assets</Title>
           </Header>
