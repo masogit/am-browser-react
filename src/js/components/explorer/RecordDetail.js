@@ -103,7 +103,7 @@ export default class RecordDetail extends Component {
   _renderDetailInList() {
     return (
       <Layer closer={true} align="right" onClose={this.props.onClose}>
-        <Tabs justify="start" activeIndex={0}>
+        <Tabs justify="start">
           <ActionTab title={this.props.body.label}>
             <Box flex={true}>
               <Header justify="end">

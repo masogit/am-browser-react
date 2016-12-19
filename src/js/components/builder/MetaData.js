@@ -378,9 +378,7 @@ class MetaData extends ComponentBase {
             />
           }
           {entities.length == 0 && !rows.entities &&
-            // ref='tabs' activeIndex={this.refs.tabs && this.refs.tabs.state.activeInde
-            // this can be deleted, if we use grommet build which later then 8.18/2016
-            <Tabs justify="start" ref='tabs' activeIndex={this.refs.tabs && this.refs.tabs.state.activeIndex} className="amb-schema">
+            <Tabs justify="start" ref='tabs' className="amb-schema">
               <Tab title={`1-M Links (${m2mLinks.length})`}>
                 <ReactList itemRenderer={(index, key) => renderLinks(index, key, m2mLinks)}
                            length={m2mLinks.length}
