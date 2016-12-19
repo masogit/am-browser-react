@@ -19,7 +19,7 @@ export default class SAMContainer extends Component {
     SAMActions.vendorWithBrand().then((vendors) => {
       this.setState({
         vendor: {
-          title: 'Vendor',
+          title: 'Effective License Positioning',
           data: vendors,
           onSelect: this.renderProduct,
           conf: {
