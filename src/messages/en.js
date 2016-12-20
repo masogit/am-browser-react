@@ -32,5 +32,7 @@ module.exports = {
   duplicate: 'duplicate',
   'document-csv': 'document-csv',
   Spiral: 'Spiral',
-  next: 'next'
+  next: 'next',
+  icon: 'icon',
+  control: 'control'
 };
