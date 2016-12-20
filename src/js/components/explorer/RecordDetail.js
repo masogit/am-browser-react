@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import RecordList from './RecordList';
 import ActionTab from '../commons/ActionTab';
 import * as ExplorerActions from '../../actions/explorer';
-import { Anchor, Layer, Tabs, Table, TableRow, Header, Box, List, ListItem, Title } from 'grommet';
+import { Anchor, Layer, Tabs, Header, Box, List, ListItem, Title } from 'grommet';
 import Close from 'grommet/components/icons/base/Close';
 import Pdf from 'grommet/components/icons/base/DocumentPdf';
 import * as Format from '../../util/RecordFormat';
