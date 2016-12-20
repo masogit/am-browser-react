@@ -106,37 +106,7 @@ export default class RecordDetail extends Component {
         <Tabs justify="start">
           <ActionTab title={this.props.body.label}>
             <Box flex={true}>
-              <Header justify="end">
-                <Anchor icon={<Pdf />} label="Download PDF" onClick={this.showPDFDesigner.bind(this, this.props.body)}/>
-              </Header>
-              <Table>
-                <thead>
-                <tr>
-                  <th>Field</th>
-                  <th>Value</th>
-                </tr>
-                </thead>
-                <tbody>
-                {
-                  this.props.body.fields.map((field, index) => {
-                    return (
-                      <TableRow key={index}>
-                        <td>{Format.getDisplayLabel(field)}</td>
-                        <td>
-                          {Format.getFieldStrVal(this.props.record, field)}
-                          {
-                            field.sqlname.indexOf('GlobalId') > -1 && this.props.record[field.sqlname] && this.state.ucmdb &&
-                            <Anchor href={`${this.state.ucmdb}${this.props.record[field.sqlname]}`}
-                                    target="_blank"
-                                    label={`Open UCMDB Browser`} primary={true}/>
-                          }
-                        </td>
-                      </TableRow>
-                    );
-                  })
-                }
-                </tbody>
-              </Table>
+              { this._renderRecord(this.props.body.fields) }
             </Box>
           </ActionTab>
           {
@@ -162,32 +132,45 @@ export default class RecordDetail extends Component {
             <Anchor icon={<Close />} onClick={this.props.onClose}/>
         </Header>
         <Box justify='center' pad={{horizontal: 'small'}} flex={false}>
-          <List>
-            <ListItem>
-              <Header justify='end' size='small'>
-                <Anchor icon={<Pdf />} label="Download PDF" onClick={this.showPDFDesigner.bind(this, this.props.choosenRecord)}/>
-              </Header>
-            </ListItem>
-            {
-              body.fields.map((field, index) => {
-                return (
-                  <ListItem key={index} justify="between">
-                    <span>
-                      {Format.getDisplayLabel(field)}
-                    </span>
-                    <Box pad={{horizontal: 'medium'}} />
-                    <span className="secondary">
-                      {Format.getFieldStrVal(this.props.record, field)}
-                    </span>
-                  </ListItem>
-                );
-              })
-            }
-          </List>
+          { this._renderRecord(body.fields) }
         </Box>
         {this.renderPDFPreview()}
       </Box>
     );
+  }
+
+  _renderRecord(fields) {
+    return (
+      <List>
+        <ListItem>
+          <Header justify='end' size='small'>
+            <Anchor icon={<Pdf />} label="Download PDF" onClick={this.showPDFDesigner.bind(this, this.props.choosenRecord)}/>
+          </Header>
+        </ListItem>
+        {
+          fields.map((field, index) => {
+            return (
+              <ListItem key={index} justify="between">
+                <span>
+                  {Format.getDisplayLabel(field)}
+                </span>
+                <Box pad={{horizontal: 'medium'}} />
+                <span className="secondary">
+                  {Format.getFieldStrVal(this.props.record, field)}
+                  {
+                    field.sqlname.indexOf('GlobalId') > -1 && this.props.record[field.sqlname] && this.state.ucmdb &&
+                    <Anchor href={`${this.state.ucmdb}${this.props.record[field.sqlname]}`}
+                            target="_blank"
+                            label={`Open UCMDB Browser`} primary={true}/>
+                  }
+                </span>
+              </ListItem>
+            );
+          })
+        }
+      </List>
+    );
+
   }
 
   render() {
