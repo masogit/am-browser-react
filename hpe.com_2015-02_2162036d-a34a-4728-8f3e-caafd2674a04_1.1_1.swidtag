@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?><ns2:SoftwareIdentity xmlns:ns2="http://www.w3.org/2000/09/xmldsig#" xmlns="http://standards.iso.org/iso/19770/-2/2015/schema.xsd" xmlns:hpeswidns="http://autopass.hpeswlab.net/apsc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Asset Manager Browser" tagId="iso_sid_app_hpe.com_2162036d-a34a-4728-8f3e-caafd2674a04_1.1_1" version="1.1" xsi:schemaLocation="http://standards.iso.org/iso/19770/-2/2015/schema.xsd">
+    <Entity name="Hewlett Packard Enterprise" regid="hpe.com" role="tagCreator"/>
+    <Entity name="Hewlett Packard Enterprise" regid="hpe.com" role="softwareCreator"/>
+    <Entity name="Hewlett Packard Enterprise" regid="hpe.com" role="licensor"/>
+    <Meta description="Asset Manager Browser" edition="Standard Edition" hpeswidns:centerCode="AMC" hpeswidns:editionCode="SE" product="HPAM-BROWSER" productFamily="Asset Management Center" revision="1" xsi:type="SoftwareMeta"/>
+<Signature xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/></Transforms><DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><DigestValue>nMQl2C3WtL8Ovb2Hl3WJtzWaOQFqXriz2XrNzvyAgeQ=</DigestValue></Reference></SignedInfo><SignatureValue>Rce4m6aq9Q4H0Lxqs7N4KQ0gLndgj2w317YMaeGrJi6sRc835bj0Lu9Usc4Hi6UGP6WYl+Motf0H
++TlOdQk8r2Ml0UuB5Tyxt9jDHYm2hT42eAzbpa1h00neqMU+uxRmFZEWmdBi57TL/rciQlNj7/ml
+BYNpvCCmUdaNEfKmeWRHw3jNvBQk5oiZihAV0ADM1ShgFhaEWiQhtbP0QGCP2FWPjjQq65GttRFJ
+L7Z/5SR2cHBbcd94jlvx1135nbDCaOYhSiDLm5f/6V8fVgRNFytroeYZpmELdVVvNvBHZ3nITKd0
+xqsSkhQwxHyuJp7RoszjOFk9zmRFVRewaV1N5Q==</SignatureValue><KeyInfo><KeyValue><RSAKeyValue><Modulus>kMh27dI3fQg8nQn1J1Lp4u3yBQXx0nH12qoVoMYZ/54r1ZCgejhejcPfdgbeSXMPWBUVrjf7THhP
+90UN39IAru04N6hxnCogvHj1pH+UNbyT3kO2WeMYnbD376c3DYyNKzNqy3ZKDcYKjOaXrpcBokw4
+y5IlEP9MH/QPccpkTTGF6vUvS5JSFpw3POWXytcHjQoE96uDh1hl/sLvQLXfcXdoHHRY83jM8U4Z
+riSpApNa0XJGfV65i7Mfkchkpc68S29kTo3Ytu7KAXPotd2TFwGTQ/+rQxXkGTUGtUK1lMJut5Pe
+pSyQwu6cvObYvGav3h5+3fkmY0H8v2pdhvWQSQ==</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue></KeyInfo></Signature></ns2:SoftwareIdentity>
