@@ -25,6 +25,7 @@ function vendorWithNonCompliance(vendors) {
     if (aqlData.rows) {
       aqlData.rows.forEach((vendor) => {
         vendors.forEach((v) => {
+          v.nonCompliance = v.nonCompliance || 0;
           if (v.name == vendor[0])
             v.nonCompliance = Number(vendor[1]);
         });
@@ -42,6 +43,7 @@ function vendorWithOverCompliance(vendors) {
     if (aqlData.rows) {
       aqlData.rows.forEach((vendor) => {
         vendors.forEach((v) => {
+          v.overCompliance = v.overCompliance || 0;
           if (v.name == vendor[0])
             v.overCompliance = Number(vendor[1]);
         });
