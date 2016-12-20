@@ -306,7 +306,7 @@ gulp.task('gen-ws-base', ['clean-gen-ws', 'download-ws'], function () {
     .pipe(gulp.dest('./rest/gen/temp/'));
   var copy_version = gulp.src('./version.json', {base : '.'})
     .pipe(jeditor({'id': currentId}))
-    .pipe(gulp.dest('./rest/gen/temp/version.json'));
+    .pipe(gulp.dest('./rest/gen/temp'));
   var copy_bat = gulp.src('./rest/bin/*.bat')
     .pipe(gulp.dest('./rest/gen/temp/bin'));
   // copy x64 folder
@@ -580,7 +580,7 @@ gulp.task('gen-ws-base-linux', ['clean-gen-ws-linux', 'download-ws-linux'], func
     .pipe(gulp.dest('./rest/gen/temp/websvc'));
   var copy_version = gulp.src('./version.json', {base : '.'})
     .pipe(jeditor({'id': currentId}))
-    .pipe(gulp.dest('./rest/gen/temp/'));
+    .pipe(gulp.dest('./rest/gen/temp'));
   var copy_swidtag= gulp.src('./*.swidtag')
     .pipe(gulp.dest('./rest/gen/temp/'));
   var copy_sh = gulp.src('./rest/bin/*.sh')
