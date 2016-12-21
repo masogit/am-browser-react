@@ -29,7 +29,7 @@ const setOnClick = (obj, value, onClick, row, header, keyIndex, valueIndex) => {
       let index = (typeof keyIndex === 'string') ? keyIndex.trim() : keyIndex;
       obj.onClick = () => {
         const args = (index != null && index != "") ? {
-          key: Number.isInteger(index) ? header[keyIndex].Name: keyIndex,
+          key: !isNaN(index) ? header[keyIndex].Name: keyIndex,
           value: row[valueIndex]
         } : {};
         onClick(args, filter);
