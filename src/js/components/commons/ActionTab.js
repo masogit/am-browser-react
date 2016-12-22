@@ -59,10 +59,10 @@ export default class ActionTab extends Component {
 
   render() {
     const { title, editing } = this.state;
-    const {onEdit, active, className, leftIcon, rightIcon} = this.props;
+    const {onEdit, active, className, leftIcon, rightIcon, disabled} = this.props;
 
     return (
-      <li className={`grommetux-tab action-tab ${active ? 'grommetux-tab--active' : ''} ${className ||''}`}>
+      <li className={`${disabled ? 'grommetux-label' : 'grommetux-tab'} action-tab ${active ? 'grommetux-tab--active' : ''} ${className ||''}`}>
         { active && leftIcon }
         <Button role='tab' onClick={this._onClickTab} plain
                 onDoubleClick={onEdit ? this._toggleEdit.bind(this) : null}>
