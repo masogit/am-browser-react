@@ -222,7 +222,7 @@ export default class RecordSearch extends ComponentBase {
                       <td>{msg.view.name}</td>
                       <td>
                         <Box align="end">
-                          {`${msg.timeEnd ? (msg.timeEnd - msg.timeStart) + ' ms' : ''}`}
+                          {`${msg.timeEnd ? (msg.timeEnd - msg.timeStart) + 'ms' : ''}`}
                         </Box>
                       </td>
                       <td>
