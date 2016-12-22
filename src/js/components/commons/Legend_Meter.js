@@ -20,7 +20,7 @@ class LegendMeter extends Component {
 
   renderLegend (props) {
     return (
-      <Legend justify='start' pad='medium' flex={false} {...props} onActive={this.handleActive}/>
+      <Legend justify='start' pad='medium' flex={true} {...props} onActive={this.handleActive}/>
     );
   };
 
