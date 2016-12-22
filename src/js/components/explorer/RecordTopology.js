@@ -1,9 +1,10 @@
 import React, {Component, PropTypes} from 'react';
 import TopologyDetail from './TopologyDetail';
-import {Box, Anchor, Topology, Map, Tiles, Tile}from 'grommet';
+import { Box, Anchor, Topology, Map, Tiles, Tile, Icons }from 'grommet';
 const Part = Topology.Part;
 const Label = Topology.Label;
-import More from 'grommet/components/icons/base/More';
+const { More } = Icons.Base;
+const Spinning = Icons.Spinning;
 import {bodyToMapData} from '../../util/util';
 import getIcon from './iconPicker';
 
@@ -54,7 +55,7 @@ export default class RecordTopology extends Component {
         {splitLine(parts, 3)}
         {this.props.numTotal > records.length &&
           <Box align='end'>
-            <Anchor icon={<More/>} onClick={this.props.getMoreRecords} />
+            <Anchor icon={this.props.locker ? <Spinning /> : <More/>} onClick={this.props.getMoreRecords} />
           </Box>
         }
       </Topology>

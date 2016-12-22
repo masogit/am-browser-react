@@ -498,6 +498,7 @@ export default class RecordList extends ComponentBase {
         <RecordTopology {...this.state}
           body={this.state.body}
           recordBody={this.props.body}
+          locker={this.state.onMoreLock}
           getMoreRecords={this._getMoreRecords.bind(this)}
           updateDetail={(body, record, callback) => {
             this.setState({
