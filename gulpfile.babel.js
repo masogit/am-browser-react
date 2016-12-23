@@ -152,10 +152,12 @@ gulp.task('copy-temp', ['dist', 'clean-gen'], function () {
   var gen_version = gulp.src('./version.json', {base : '.'})
     .pipe(jeditor({'id': currentId}))
     .pipe(gulp.dest('./gen/temp'));
-  var copy_file = gulp.src(['./*.swidtag', './app/**', './demo/**', './dist/**', './build/node_modules/**', './am-browser-config.properties.default'], {base : '.'})
+  var copy_file = gulp.src(['./*.swidtag', './app/**', './demo/**', './dist/**', './am-browser-config.properties.default'], {base : '.'})
+    .pipe(gulp.dest('./gen/temp'));
+  var copy_modules = gulp.src('./build/node_modules/**', {base : 'build'})
     .pipe(gulp.dest('./gen/temp'));
 
-  return merge(unzip_node, copy_bat, gen_version, copy_file);
+  return merge(unzip_node, copy_bat, gen_version, copy_file, copy_modules);
 });
 
 gulp.task('gen', ['copy-temp'], function () {
@@ -409,9 +411,11 @@ gulp.task('copy-temp-linux', ['unzip-node-linux'], function () {
   var gen_version = gulp.src('./version.json', {base : '.'})
     .pipe(jeditor({'id': currentId}))
     .pipe(gulp.dest('./gen/temp'));
-  var copy_file = gulp.src(['./*.swidtag', './app/**', './demo/**', './dist/**', './build/node_modules/**', './am-browser-config.properties.default'], {base : '.'})
+  var copy_file = gulp.src(['./*.swidtag', './app/**', './demo/**', './dist/**', './am-browser-config.properties.default'], {base : '.'})
     .pipe(gulp.dest('./gen/temp'));
-  return merge(copy_node, copy_sh, gen_version, copy_file);
+  var copy_modules = gulp.src('./build/node_modules/**', {base : 'build'})
+    .pipe(gulp.dest('./gen/temp'));
+  return merge(copy_node, copy_sh, gen_version, copy_file, copy_modules);
 });
 
 gulp.task('chmod-linux', ['copy-temp-linux'], function () {
