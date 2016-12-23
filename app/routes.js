@@ -162,18 +162,12 @@ module.exports = function (app) {
   app.delete('/coll/:collection/:id', isAuthenticated, db.delete);
 
   // Download CSV in server side
-  app.use('/am/download/:tableName', function (req, res) {
-    // type: 'csv' or 'pdf' or '1vM'
-    if (req.query.type == '1vM')
-      export_file.report(req, res);
-    else
-      export_file.list(req, res);
-  });
+  app.use('/am/download/:tableName', export_file.list);
 
   //check AQL syntax
   app.use('/am/checkAqlSyntax', function(req, res, next) {
     if (req.headers['x-api-version']) {
-        rest.checkAqlSyntax(req.session, req.query.str).then((data) => {
+      rest.checkAqlSyntax(req.session, req.query.str).then((data) => {
         res.send(true);
       }).catch((err) => {
         res.send(err.message);
