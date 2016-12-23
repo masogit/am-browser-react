@@ -152,7 +152,7 @@ gulp.task('copy-temp', ['dist', 'clean-gen'], function () {
   var gen_version = gulp.src('./version.json', {base : '.'})
     .pipe(jeditor({'id': currentId}))
     .pipe(gulp.dest('./gen/temp'));
-  var copy_file = gulp.src(['./*.swidtag', './app/**', './demo/**', './dist/**', './node_modules/**', './am-browser-config.properties.default'], {base : '.'})
+  var copy_file = gulp.src(['./*.swidtag', './app/**', './demo/**', './dist/**', './build/node_modules/**', './am-browser-config.properties.default'], {base : '.'})
     .pipe(gulp.dest('./gen/temp'));
 
   return merge(unzip_node, copy_bat, gen_version, copy_file);
@@ -409,7 +409,7 @@ gulp.task('copy-temp-linux', ['unzip-node-linux'], function () {
   var gen_version = gulp.src('./version.json', {base : '.'})
     .pipe(jeditor({'id': currentId}))
     .pipe(gulp.dest('./gen/temp'));
-  var copy_file = gulp.src(['./*.swidtag', './app/**', './demo/**', './dist/**', './node_modules/**', './am-browser-config.properties.default'], {base : '.'})
+  var copy_file = gulp.src(['./*.swidtag', './app/**', './demo/**', './dist/**', './build/node_modules/**', './am-browser-config.properties.default'], {base : '.'})
     .pipe(gulp.dest('./gen/temp'));
   return merge(copy_node, copy_sh, gen_version, copy_file);
 });
