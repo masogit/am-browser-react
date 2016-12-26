@@ -95,13 +95,18 @@ table {
   }
 
   & div[role=tabpanel] {
-    display: flex;
     overflow-y: auto;
     flex: 1;
 
     & li {
       flex-shrink: 0;
     }
+  }
+}
+
+.grommetux-layer {
+  & div[role=tabpanel] {
+    display: flex;
   }
 }
 

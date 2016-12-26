@@ -2,7 +2,7 @@ import React from 'react';
 import * as AQLActions from '../../actions/aql';
 import * as ExplorerActions from '../../actions/explorer';
 import { showWarning, monitorEdit } from '../../actions/system';
-
+import Spinning from 'grommet/components/icons/Spinning';
 import history from '../../RouteHistory';
 import RecordListLayer from '../explorer/RecordListLayer';
 import { AlertForm, ComponentBase, AMSideBar, Graph, ActionTab } from '../commons';
@@ -51,10 +51,15 @@ export default class Insight extends ComponentBase {
     this._toggleShowPublic.bind(this);
   }
 
+  componentWillMount() {
+    this.acquireLock();
+  }
+
   componentDidMount() {
     if (this.props.params.id) {
       this.addPromise(AQLActions.loadAQL(this.props.params.id).then((aql)=> {
         this._queryData(aql);
+        this.releaseLock();
       }));
     } else {
       this._loadAQLs();
@@ -280,7 +285,7 @@ export default class Insight extends ComponentBase {
 
   renderGraphBox({boxProps, graphStyle, dataMap}) {
     return (
-      <Box {...boxProps} className='box-graph' colorIndex="light-1">
+      <Box {...boxProps} className='box-graph' colorIndex="light-1" flex={true}>
         <Box justify="between" direction="row">
           <Box pad={{horizontal: 'medium'}} className='left-border' justify="center">
             <Label margin='none'>{dataMap.aql.name}</Label>
@@ -330,7 +335,7 @@ export default class Insight extends ComponentBase {
     if (box.child) {
       if (box.child instanceof Array) {
         child = (
-          <Box justify="center" direction={box.direction} flex={false}>{
+          <Box justify="center" direction={box.direction} flex={true}>{
             box.child.map((child) => this._buildBox(child, parent, tabName, mapOfTabId))
           }</Box>
         );
@@ -403,9 +408,10 @@ export default class Insight extends ComponentBase {
             const dataMap = this.state.data[key] || false;
             return dataMap && // fix console error: cannot get aql of undefined.
               (
-                <Box pad="medium" key={index}>
+                <Box pad="medium" key={index} flex={true}>
                   {this.renderGraphBox({
                     graphStyle: {
+                      flex: true,
                       pad: "large",
                       align: (dataMap.aql.type == 'meter') ? 'center' : null
                     }, dataMap
@@ -622,6 +628,10 @@ export default class Insight extends ComponentBase {
     let showedTabs = showPublic ? publicTabs : tabs;
     const id = this.props.params.id;
     let content;
+
+    if (this.locked)
+      return <Box flex={true} align="center" justify="center"><Spinning /></Box>;
+
     if (id) {
       content = data && data[id] && this._renderSingleAQL(data[id]);
     } else {

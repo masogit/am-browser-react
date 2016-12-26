@@ -530,6 +530,7 @@ export default class AQL extends ComponentBase {
 
     const focus = currentAql && {expand: currentAql.category, selected: currentAql._id};
     const validData = data.rows.length > 0 && data.header.length === data.rows[0].length;
+    const NODATA = '<No Data>';
 
     return (
       <Box direction="row" flex={true}>
@@ -541,11 +542,13 @@ export default class AQL extends ComponentBase {
             <Box className='fixMinSizing' flex={true} pad={{horizontal: 'small'}}>
               {this.renderGraphForm(currentAql, data)}
               <Box pad={{vertical: 'small'}}>
-                {validData && data && currentAql.type && currentAql[currentAql.type] &&
                 <Box flex={false} className='grid' margin={{vertical: 'small'}}>
+                {validData && data && currentAql.type && currentAql[currentAql.type] ?
                   <Graph type={currentAql.type} data={data} config={currentAql[currentAql.type]} condition={currentAql.condition}
-                         onClick={(filter) => this._showViewRecords(filter, currentAql.view)}/>
-                </Box>}
+                           onClick={(filter) => this._showViewRecords(filter, currentAql.view)}/>
+                :
+                  <Box direction='row' flex={true} justify='center' align='center'>{NODATA}</Box>}
+                </Box>
                 <Table>
                   <thead><tr>
                     {data.header.map((col, index) => <th key={index}>{col.Name}</th>)}

@@ -2,7 +2,7 @@
  * Created by huling on 5/22/2016.
  */
 import React, {Component, PropTypes} from 'react';
-import { Table, TableRow} from 'grommet';
+import {Box, Table, TableRow} from 'grommet';
 import LegendMeter from './Legend_Meter';
 import LegendChart from './Legend_Chart';
 import Legend from './Legend';
@@ -92,6 +92,7 @@ const cloneObj = form => {
 };
 
 export default class Graph extends Component {
+
   _gen_chart(form, data, onClick, condition) {
     const { series_col = [], series} = form;
     const chart = cloneObj(form);
@@ -228,6 +229,7 @@ export default class Graph extends Component {
 
   render() {
     const {type, config, onClick, data, className, condition} = this.props;
+    const NODATA = '<No Data>';
 
     let classes = ['hiddenScroll'];
     if (className) {
@@ -256,7 +258,7 @@ export default class Graph extends Component {
       return <Chart {...graph} className={classes}/>;
     }
 
-    return null;
+    return <Box direction='row' flex={true} justify='center' align='center'>{NODATA}</Box>;
   }
 }
 
