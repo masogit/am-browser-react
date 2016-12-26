@@ -1,6 +1,6 @@
-exports.getCookies = function(req) {
-  var cookies = req.cookies.map((val, key) => {
-    return key + "=" + encodeURIComponent(val);
+exports.getCookies = function (req) {
+  var cookies = Object.keys(req.cookies).map((key) => {
+    return key + "=" + encodeURIComponent(req.cookies[key]);
   }).join("; ");
   return cookies;
 };
