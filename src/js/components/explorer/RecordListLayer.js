@@ -7,7 +7,7 @@ export default class RecordListLayer extends Component {
     const {onClose, body, title, editMode} = this.props;
     return (
       <Layer onClose={onClose} closer={!!onClose} flush={true} align="center">
-        <Box full={true} pad="large" style={{minHeight: '90vh'}}>
+        <Box full={true} pad="large">
           <RecordList body={body} title={title} editMode={editMode}/>
         </Box>
       </Layer>
