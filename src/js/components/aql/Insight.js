@@ -319,8 +319,9 @@ export default class Insight extends ComponentBase {
     }, this._onClose(this));
   }
 
-  _buildBox(box, parent, tabName) {
+  _buildBox(box, parent, tabName, idMap) {
     let child;
+    let mapOfTabId = idMap || [];
 
     // Handle old box no key or number key
     if (!box.key || !isNaN(box.key))
@@ -330,22 +331,23 @@ export default class Insight extends ComponentBase {
       if (box.child instanceof Array) {
         child = (
           <Box justify="center" direction={box.direction} flex={false}>{
-            box.child.map((child) => this._buildBox(child, parent, tabName))
+            box.child.map((child) => this._buildBox(child, parent, tabName, mapOfTabId))
           }</Box>
         );
       } else if (box.child._id && this.state.data[box.child._id]) {
         const dataMap = this.state.data[box.child._id];
-        if (!tabIdMap[tabName]) {
-          tabIdMap[tabName] = {dataIds: []};
+        if (!mapOfTabId[tabName]) {
+          mapOfTabId[tabName] = {dataIds: []};
         }
+        mapOfTabId[tabName].dataIds.push(box.child._id);
 
-        tabIdMap[tabName].dataIds.push(box.child._id);
         child = this.renderGraphBox({
           boxProps: {flex: true},
           graphStyle: {pad: "small", flex: true, justify: "center"},
           dataMap
         });
       }
+      tabIdMap = mapOfTabId;
     } else if (this.state.edit) {
       child = (
         <Box direction="row" justify="center" pad="large">
@@ -396,8 +398,8 @@ export default class Insight extends ComponentBase {
     return (
       <Carousel ref='carousel' className='flex'>
         {
-          // dataIds contains a lot duplicated ids, and the last unique ids is the right order
-          dataIds.slice(-_.uniq(dataIds).length).map((key, index)=> {
+
+          dataIds.map((key, index)=> {
             const dataMap = this.state.data[key] || false;
             return dataMap && // fix console error: cannot get aql of undefined.
               (
