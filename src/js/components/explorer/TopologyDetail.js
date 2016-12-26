@@ -42,7 +42,8 @@ export default class TopologyDetail extends Component {
   }
 
   componentDidMount() {
-    this.getLinks(2, 0, this.state.data, this.state.body.links, this.state.record);
+    if (this.state.body.links)
+      this.getLinks(2, 0, this.state.data, this.state.body.links, this.state.record);
   }
 
   componentWillUnmount() {
