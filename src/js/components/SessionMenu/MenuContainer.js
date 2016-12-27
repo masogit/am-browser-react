@@ -28,6 +28,7 @@ class SessionMenu extends Component {
   }
 
   _onLogout(event) {
+    event.preventDefault();
     alert({
       msg:'Are you sure you want to logout?',
       onConfirm:()=>this.props.dispatch(logout()),
