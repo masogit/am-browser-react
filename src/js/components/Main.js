@@ -61,7 +61,7 @@ class Indexer extends Component {
         <Box full>
           {header}
           {alert}
-          <Box className={className}>
+          <Box className={className} colorIndex="light-2">
             {this.props.children}
           </Box>
         </Box>
