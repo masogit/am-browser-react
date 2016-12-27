@@ -8,6 +8,7 @@ import LegendChart from './Legend_Chart';
 import Legend from './Legend';
 import LegendDistribution from './Legend_Distribution';
 import {findIndex} from 'lodash';
+import {FormattedMessage} from 'react-intl';
 
 const assignObjectProp = (from, to, propName) => {
   if (from[propName]) {
@@ -106,6 +107,7 @@ export default class Graph extends Component {
 
       let expandedRows = [...data.rows];
       if(expandedRows.length == 1 && (form.type == 'area' || form.type == 'line' )) {
+        chart.warningMessageId = 'cannotRenderOneRecordChart';
         return chart;
       }
       if(expandedRows.length == 1 && form.type == 'bar') {
@@ -255,7 +257,13 @@ export default class Graph extends Component {
           Chart = Legend; break;
       }
 
-      return <Chart {...graph} className={classes}/>;
+      return !graph.warningMessageId ?
+        <Chart {...graph} className={classes}/>
+        :
+        <Box flex={true} justify="center" align="center">
+          <FormattedMessage id={graph.warningMessageId}
+                            defaultMessage={"Can't render this chart with only one record."}/>
+        </Box>;
     }
 
     return <Box direction='row' flex={true} justify='center' align='center'>{NODATA}</Box>;

@@ -35,5 +35,5 @@ module.exports = {
   next: 'next',
   icon: 'icon',
   control: 'control',
-  noDataToRenderChart: 'No enough data to render this chart.'
+  cannotRenderOneRecordChart: "Can't render this chart with only one record."
 };

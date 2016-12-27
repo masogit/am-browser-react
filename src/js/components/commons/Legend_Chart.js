@@ -17,7 +17,6 @@ const {
   } = chart;
 
 import {setColorIndex, getColorIndex, resizeBar} from '../../util/charts';
-import {FormattedMessage} from 'react-intl';
 
 class LegendChart extends Component {
   constructor(props) {
@@ -212,47 +211,43 @@ class LegendChart extends Component {
     }
 
     return (
-      chartsValues.length > 0 ?
-        <Box direction={direction} className={className + (type == 'bar' ? ' hide-HotSpots' : '')}>
-          {top_left_Legend}
-          <Chart ref='chart' full>
-            <Axis count={5} vertical={true}
-                  labels={[{"index": 0, "label": min}, {"index": 2, "label": Math.floor(max/2)}, {"index": 4, "label": max}]}/>
-            <Chart vertical full ref='chart2'>
-              <Base height={size} width="full"/>
-              {topAxis}
-              <Layers>
-                <Marker colorIndex='graph-2' vertical value={0}/>
-                {this.renderMetaGraphs(chartsValues, type, activeIndex, max, min, points, smooth)}
-                {threshold && <Marker colorIndex='critical' value={threshold}/>}
-                {xAxisPlacement && <Marker colorIndex='graph-2' value={0}/>}
-                <Marker
-                  count={count}
-                  index={activeIndex}
-                  value={activeIndex}
-                  vertical
-                  colorIndex={markerColorIndex || getColorIndex(1)}/>
-                {this.renderMarkLabel(count, valueExpanded == true ? 1 : activeIndex, xAxisLabels, units, legendTitles)}
-                <HotSpots
-                  count={count}
-                  activeIndex={activeIndex}
-                  onActive={this.handleActive}
-                  onClick={() => {
-                    if(Number.isInteger(activeIndex) && legendSeries.length > 0) {
-                      legendSeries[0][activeIndex].onClick();
-                    }
-                  }}
-                  />
-              </Layers>
-              {bottomAxis}
-            </Chart>
+      chartsValues.length > 0 &&
+      <Box direction={direction} className={className + (type == 'bar' ? ' hide-HotSpots' : '')}>
+        {top_left_Legend}
+        <Chart ref='chart' full>
+          <Axis count={5} vertical={true}
+                labels={[{"index": 0, "label": min}, {"index": 2, "label": Math.floor(max/2)}, {"index": 4, "label": max}]}/>
+          <Chart vertical full ref='chart2'>
+            <Base height={size} width="full"/>
+            {topAxis}
+            <Layers>
+              <Marker colorIndex='graph-2' vertical value={0}/>
+              {this.renderMetaGraphs(chartsValues, type, activeIndex, max, min, points, smooth)}
+              {threshold && <Marker colorIndex='critical' value={threshold}/>}
+              {xAxisPlacement && <Marker colorIndex='graph-2' value={0}/>}
+              <Marker
+                count={count}
+                index={activeIndex}
+                value={activeIndex}
+                vertical
+                colorIndex={markerColorIndex || getColorIndex(1)}/>
+              {this.renderMarkLabel(count, valueExpanded == true ? 1 : activeIndex, xAxisLabels, units, legendTitles)}
+              <HotSpots
+                count={count}
+                activeIndex={activeIndex}
+                onActive={this.handleActive}
+                onClick={() => {
+                  if(Number.isInteger(activeIndex) && legendSeries.length > 0) {
+                    legendSeries[0][activeIndex].onClick();
+                  }
+                }}
+                />
+            </Layers>
+            {bottomAxis}
           </Chart>
-          {bottom_right_Legend}
-        </Box> :
-        <Box>
-          <FormattedMessage id='noDataToRenderChart'
-                            defaultMessage={'No enough data to render this chart.'}/>
-        </Box>
+        </Chart>
+        {bottom_right_Legend}
+      </Box>
     );
   }
 
