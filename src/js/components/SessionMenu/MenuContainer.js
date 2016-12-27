@@ -28,14 +28,11 @@ class SessionMenu extends Component {
   }
 
   _onLogout(event) {
-    alert(
-      {
-        msg:'Are you sure you want to logout?',
-        onConfirm:()=>this.props.dispatch(logout()),
-        title:'Log out'
-      }
-
-    );
+    alert({
+      msg:'Are you sure you want to logout?',
+      onConfirm:()=>this.props.dispatch(logout()),
+      title:'Log out'
+    });
   }
 
   closeDialog() {
