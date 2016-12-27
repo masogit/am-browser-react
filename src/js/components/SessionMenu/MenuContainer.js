@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {logout, dropCurrentPop_stopMonitor } from '../../actions/system';
+import {alert, logout } from '../../actions/system';
 import {sendMessageToSlack} from '../../actions/sessionMenu';
 import { Menu, Anchor, Layer, Box, Icons } from 'grommet';
 import MessageHistory from './MessageHistory';
@@ -29,7 +29,11 @@ class SessionMenu extends Component {
 
   _onLogout(event) {
     event.preventDefault();
-    dropCurrentPop_stopMonitor('Log out', () => this.props.dispatch(logout()));
+    alert({
+      msg:'Are you sure you want to logout?',
+      onConfirm:()=>this.props.dispatch(logout()),
+      title:'Log out'
+    });
   }
 
   closeDialog() {
