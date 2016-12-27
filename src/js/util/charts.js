@@ -21,6 +21,10 @@ const setColorIndex = (series, colorIndex) => series.map((item, index) => {
 });
 
 const resizeBar = (node, count) => {
+  // check if node is mounted
+  if (!node || !node._reactInternalInstance) {
+    return;
+  }
   const domNode = ReactDOM.findDOMNode(node);
   const rect = domNode.getBoundingClientRect();
   let strokeWidth = Math.floor(rect.width/count);

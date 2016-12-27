@@ -103,13 +103,20 @@ export default class Graph extends Component {
       const legendSeries = _.times(form.series_col.length, () => []);
       const chartsValues = _.times(form.series_col.length, () => []);
 
-      data.rows.map((row, i) => {
+      let expandedRows = [...data.rows];
+      if(expandedRows.length == 1 && (form.type == 'area' || form.type == 'line' )) {
+        return chart;
+      }
+      if(expandedRows.length == 1 && form.type == 'bar') {
+        expandedRows.splice(1, 0, ["", 0]);
+        expandedRows.splice(0, 0, ["", 0]);
+        chart.valueExpanded = true;
+      }
+      expandedRows.map((row, i) => {
         const xAxisLabel = form.xAxis_col ? row[form.xAxis_col] : i;
         const values = [];
         form.series_col.map((seriesIndex, index) => {
           const value = row[seriesIndex] / 1.0;
-          const legend = setSeriesItem(seriesIndex, onClick, row, data.header, xAxisLabel, condition);
-          legendSeries[index].push(legend);
 
           chartsValues[index].push(value);
           values.push(value);
@@ -117,6 +124,16 @@ export default class Graph extends Component {
 
         // gen xAxis
         xAxisLabels.push({label: xAxisLabel, displayValue: values, index: i});
+      });
+      data.rows.map((row, i) => {
+        const xAxisLabel = form.xAxis_col ? row[form.xAxis_col] : i;
+        //const values = [];
+        form.series_col.map((seriesIndex, index) => {
+          //const value = row[seriesIndex] / 1.0;
+          const legend = setSeriesItem(seriesIndex, onClick, row, data.header, xAxisLabel, condition);
+          legendSeries[index].push(legend);
+        });
+
       });
 
       series_col.map(col => titles.push(data.header[col] ? data.header[col].Name : ''));

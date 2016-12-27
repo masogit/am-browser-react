@@ -34,5 +34,6 @@ module.exports = {
   Spiral: 'Spiral',
   next: 'next',
   icon: 'icon',
-  control: 'control'
+  control: 'control',
+  noDataToRenderChart: 'No enough data to render this chart.'
 };
