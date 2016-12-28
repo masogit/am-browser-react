@@ -403,7 +403,7 @@ gulp.task('unzip-node-linux', ['dist', 'clean-gen-linux'], function () {
 gulp.task('copy-temp-linux', ['unzip-node-linux'], function () {
   console.log('Copy all neccessary files into the gen temp folder');
   // copy node installation folder and shell to gen temp
-  var copy_node = gulp.src('./build/node/node-v6.7.0-linux-x64/**')
+  var copy_node = gulp.src('./build/node/node-v6.7.0/**')
     .pipe(gulp.dest('./gen/temp/node'));
   var copy_sh = gulp.src('./build/*.sh')
     .pipe(gulp.dest('./gen/temp'));
