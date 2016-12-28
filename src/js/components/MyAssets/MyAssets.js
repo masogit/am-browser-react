@@ -109,8 +109,8 @@ export default class MyAsset extends ComponentBase {
       const data = this.state[dataName];
 
       return (
-        <Tile colorIndex='light-2' key={index} pad="large">
-          <Header size='small' justify='center'>{obj.key}</Header>
+        <Tile colorIndex='light-2' key={index} pad={{vertical: 'small', horizontal: 'medium'}}>
+          <Header size='small' justify='center'><Title>{obj.key}</Title></Header>
           {(data && typeof data == 'string') ? data :
           <Graph type='legend' data={this.state[dataName]} config={config} onClick={() => this.setState({type: obj.key})}/>}
         </Tile>

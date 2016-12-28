@@ -355,7 +355,7 @@ export default class Insight extends ComponentBase {
       tabIdMap = mapOfTabId;
     } else if (this.state.edit) {
       child = (
-        <Box direction="row" justify="center" pad="large">
+        <Box direction="row" justify="center" align="center" flex={true} pad="large">
           <Anchor href="#" icon={<Attachment />} label="Attach a Graph"
                   onClick={() => this.setState({
                     layer: {
@@ -379,7 +379,7 @@ export default class Insight extends ComponentBase {
   _buildActions(box, parent) {
     if (this.state.edit)
       return (
-        <Header justify="center">
+        <Box justify="center" align="center">
           <Menu icon={<More />} closeOnClick={false} inline={true} direction="row">
             <CheckBox id={box.key} label={box.direction==='row'?'Column':'Row'} checked={box.direction!=='column'}
                       onChange={this._toggleDirection.bind(this, box, parent)} toggle={true}/>
@@ -390,7 +390,7 @@ export default class Insight extends ComponentBase {
               <Button icon={<Close />} onClick={this._deleteBox.bind(this, box, parent)}/>
             }
           </Menu>
-        </Header>
+        </Box>
       );
   }
 
@@ -455,7 +455,7 @@ export default class Insight extends ComponentBase {
       }</TableRow>
     ));
     return (
-      <Box pad="large" flex={false}>
+      <Box pad="large">
         <Header justify="between" pad="large">
           <Title>{aql.name}</Title>
           {
@@ -468,7 +468,7 @@ export default class Insight extends ComponentBase {
           }
         </Header>
         {aql[aql.type] instanceof Object &&
-        <Box key={aql._id} pad="large" align={(aql.type=='meter')?'center':null}>
+        <Box key={aql._id} pad="large" align={(aql.type=='meter')?'center':null} flex={false}>
           <Graph type={aql.type} data={data} config={aql[aql.type]} condition={aql.condition}
                  onClick={(filter) => this._showViewRecords(filter, aql.view)}/>
         </Box>
@@ -655,7 +655,7 @@ export default class Insight extends ComponentBase {
     return (
       <Box full="horizontal">
         { !id && this.renderHeader(edit) }
-        <Box className={carousel ? '' : 'autoScroll'} style={{marginTop: -60}}>
+        <Box className={carousel ? '' : 'autoScroll'} style={{marginTop: -60}} flex={true}>
           {content}
           {layer && this[`_get${layer.name}Layer`](...layer.args)}
           {alert}

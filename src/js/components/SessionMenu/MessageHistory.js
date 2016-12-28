@@ -1,11 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {
-  Box,
-  Header,
-  Table,
-  TableRow
-} from 'grommet';
+import { Box, Header, Table, TableRow, Title } from 'grommet';
 import Status from 'grommet/components/icons/Status';
 
 class MessageHistory extends Component {
@@ -14,7 +9,7 @@ class MessageHistory extends Component {
     const sortedMsgs = this.props.msgs.sort((msg_last, msg_latest) => (msg_latest.id > msg_last.id));
     return (
       <Box pad="medium" size='large'>
-        <Header>Message history</Header>
+        <Header><Title>Message history</Title></Header>
         <Table>
           <thead>
           <tr>

@@ -280,7 +280,7 @@ export default class AQL extends ComponentBase {
 
       return (
         <Layer onClose={this.closeLayer} closer={true} align="left" flush={true}>
-          <AMSideBar title='Views Selector' contents={contents} colorIndex="light-1-a" toggle={false} showInLayer={true}
+          <AMSideBar title='Views Selector' contents={contents} colorIndex="light-1" toggle={false} showInLayer={true}
                      margin={{horizontal: 'medium'}} pad={{vertical: 'small'}}/>
         </Layer>
       );
@@ -497,7 +497,7 @@ export default class AQL extends ComponentBase {
     }
 
     const viewComp = (
-      <Box separator='all'>
+      <Box separator='all' colorIndex="light-1">
         <div className='grommetux-form no-border'>
           {viewFields.map(({label, content}, index) => <FormField label={label} key={index}>{content}</FormField>)}
         </div>

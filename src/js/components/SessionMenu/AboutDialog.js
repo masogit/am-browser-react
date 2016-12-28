@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { initAbout, getOnlineUser } from '../../actions/system';
 import { getVersionFromLiveNetWork } from '../../actions/sessionMenu';
 import {
-  Box, Header, Table, TableRow, Label, Tabs, Tiles, Tile, Anchor, List, ListItem, Button
+  Box, Header, Table, TableRow, Label, Tabs, Tiles, Tile, Anchor, List, ListItem, Button, Title
 } from 'grommet';
 import Star from 'grommet/components/icons/base/Star';
 import Down from 'grommet/components/icons/base/Down';
@@ -204,7 +204,7 @@ export default class About extends Component {
 
     return (
       <Box pad='medium' className='autoScroll'>
-        <Header pad='none'><img src="../../img/favicon.png" /><Box margin={{ left: 'small' }}>Asset Manager Browser</Box></Header>
+        <Header pad='none'><Title><img src="../../img/favicon.png" /><Box margin={{ left: 'small' }}>Asset Manager Browser</Box></Title></Header>
         <Tabs justify='start' activeIndex={activeIndex}>
           <ActionTab title="General" onClick={() => this.setState({ activeIndex: 0 })}>
             {this.renderGeneral()}

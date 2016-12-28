@@ -466,7 +466,7 @@ export default class ViewDefDetail extends ComponentBase {
               selectedView.body.sqlname &&
               <Map vertical={true} className='grid' data={bodyToMapData(selectedView.body)}/>
             }
-            <Box>{table}</Box>
+            <Box pad={{vertical: 'small'}}>{table}</Box>
           </Box>
           <Box pad={{horizontal: 'small', vertical: 'none'}}>
             <Form onSubmit={onSubmit} compact={true}>
