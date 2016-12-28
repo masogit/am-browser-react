@@ -352,7 +352,7 @@ export default class Insight extends ComponentBase {
           dataMap
         });
       }
-      tabIdMap = mapOfTabId;
+      tabIdMap[tabName] = mapOfTabId[tabName];
     } else if (this.state.edit) {
       child = (
         <Box direction="row" justify="center" align="center" flex={true} pad="large">
