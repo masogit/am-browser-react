@@ -110,9 +110,10 @@ export default class Graph extends Component {
         chart.warningMessageId = 'cannotRenderOneRecordChart';
         return chart;
       }
+      const sideHidden = (Math.random() + 1).toString(36).substring(7);
       if(expandedRows.length == 1 && form.type == 'bar') {
-        expandedRows.splice(1, 0, ["", 0]);
-        expandedRows.splice(0, 0, ["", 0]);
+        expandedRows.splice(1, 0, [sideHidden, chart.min || 0]);
+        expandedRows.splice(0, 0, [sideHidden, chart.min || 0]);
         chart.valueExpanded = true;
       }
       expandedRows.map((row, i) => {
@@ -120,23 +121,16 @@ export default class Graph extends Component {
         const values = [];
         form.series_col.map((seriesIndex, index) => {
           const value = row[seriesIndex] / 1.0;
-
+          const legend = setSeriesItem(seriesIndex, onClick, row, data.header, xAxisLabel, condition);
+          if (legend.label !== sideHidden) {
+            legendSeries[index].push(legend);
+          }
           chartsValues[index].push(value);
           values.push(value);
         });
 
         // gen xAxis
         xAxisLabels.push({label: xAxisLabel, displayValue: values, index: i});
-      });
-      data.rows.map((row, i) => {
-        const xAxisLabel = form.xAxis_col ? row[form.xAxis_col] : i;
-        //const values = [];
-        form.series_col.map((seriesIndex, index) => {
-          //const value = row[seriesIndex] / 1.0;
-          const legend = setSeriesItem(seriesIndex, onClick, row, data.header, xAxisLabel, condition);
-          legendSeries[index].push(legend);
-        });
-
       });
 
       series_col.map(col => titles.push(data.header[col] ? data.header[col].Name : ''));

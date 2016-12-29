@@ -197,7 +197,7 @@ class LegendChart extends Component {
     }
 
     const count = this.getCountNum(chartsValues);
-    const activeIndex = this.state.activeIndex != undefined ? this.state.activeIndex : important;
+    let activeIndex = this.state.activeIndex != undefined ? this.state.activeIndex : important;
     const legend = legendSeries.length > 0 && legendSeries.map((series, index) => this.renderLegend(series, units, activeIndex, legendTitles, index, legendTotal));
     let [direction, legendDir] = ['row', 'column'];
     if (legendPosition == 'top' || legendPosition == 'bottom') {
@@ -238,6 +238,7 @@ class LegendChart extends Component {
                 onActive={this.handleActive}
                 onClick={() => {
                   if(Number.isInteger(activeIndex) && legendSeries.length > 0) {
+                    activeIndex = valueExpanded ? activeIndex - 1 : activeIndex;
                     legendSeries[0][activeIndex].onClick();
                   }
                 }}
