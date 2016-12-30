@@ -13,7 +13,7 @@ var isAuthenticated = require('./authentication').isAuthenticated;
 var path = require('path');
 var cookiesUtil = require('./cookiesUtil');
 var pug = require('pug');
-var fs = require('fs');
+var iconMap = require('./iconMap');
 var html;
 var getHtml = function() {
   if (!html) {
@@ -33,7 +33,7 @@ module.exports = function (app) {
   var ucmdb_browser_port = config.ucmdb_browser_port;
   var session_max_age = config.session_max_age;
   var enable_csrf = config.enable_csrf;
-  var jwt_max_age = config.jwt_max_age;
+  // var jwt_max_age = config.jwt_max_age;
   var enable_lwsso = config.enable_lwsso;
 
   switch (config.db_type) {
@@ -244,9 +244,7 @@ module.exports = function (app) {
   });
 
   app.get('/icon-map', function (req, res) {
-    fs.readFile('./app/iconMap.json', 'utf-8', (err, data) => {
-      res.send(data);
-    });
+    res.send(iconMap);
   });
 
   app.get('/*', function (req, res) {
