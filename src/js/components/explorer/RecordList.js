@@ -439,8 +439,7 @@ export default class RecordList extends ComponentBase {
         <Menu icon={<Filter />}>
           {this.renderGroupBy()}
         </Menu>
-        <Anchor icon={<Cluster colorIndex={showTopology?'brand': ''}/>}
-                onClick={this._toggleShowTopology.bind(this)}/>
+        <Anchor icon={<Cluster />} primary={showTopology} onClick={this._toggleShowTopology.bind(this)}/>
         <Menu icon={<MenuIcon />} dropAlign={{ right: 'right', top: 'top' }}>
           {!showTopology && <Anchor icon={allFields?<CheckboxSelected />:<Checkbox />} label="Full columns"
                   onClick={() => (body.fields.length > numColumn) && this._toggleAllFields()}
