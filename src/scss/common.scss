@@ -21,6 +21,10 @@
   overflow: auto;
 }
 
+.autoScroll-Y {
+  overflow-x: hidden;
+}
+
 /** Grommet: */
 
 /** Firefox: for the minimum sizing behavior*/

@@ -51,7 +51,7 @@ export default class RecordTopology extends Component {
 
 
     return (
-      <Topology className='autoScroll'>
+      <Topology className='autoScroll-Y'>
         {splitLine(parts, 3)}
         {this.props.numTotal > records.length &&
           <Box align='end'>

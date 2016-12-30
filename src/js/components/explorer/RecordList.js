@@ -391,21 +391,23 @@ export default class RecordList extends ComponentBase {
       let selected = (field.sqlname == this.state.param.groupby);
       let label = Format.getDisplayLabel(field);
       return (
-        <Box direction="row" align="center" key={`icon_${index}`}>
+        <Box direction="row" key={`icon_${index}`}>
           <Box direction="row" className='orderbyIcon-margin-left' >
             {!_.isEmpty(this.props.body.orderby) && this._showOrderByIcon(field.sqlname, this.props.body.orderby)}
           </Box>
-          <Anchor key={`a_groupby_${index}`} icon={selected?<RadialSelected />:<Radial />}
-                  label={label} disabled={this.state.locked}
-                  onClick={() => {
-                    if (!this.state.locked) {
-                      if (selected) {
-                        clearGroupBy(field.sqlname);
-                      } else {
-                        this._getGroupByData(field.sqlname);
+          <Box direction="row" flex={true}>
+            <Anchor key={`a_groupby_${index}`} icon={selected?<RadialSelected />:<Radial />}
+                    label={label} disabled={this.state.locked}
+                    onClick={() => {
+                      if (!this.state.locked) {
+                        if (selected) {
+                          clearGroupBy(field.sqlname);
+                        } else {
+                          this._getGroupByData(field.sqlname);
+                        }
                       }
-                    }
-                  }}/>
+                    }}/>
+            </Box>
         </Box>
       );
     });
