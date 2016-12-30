@@ -53,6 +53,7 @@ export default class AQL extends ComponentBase {
     this.closeLayer = this.closeLayer.bind(this);
     this.alert = this.alert.bind(this);
     this.openLayer = this.openLayer.bind(this);
+    this.uploadJson = this.uploadJson.bind(this);
     this._updateValue = this._updateValue.bind(this);
     this._updateGraphData = this._updateGraphData.bind(this);
     this.initAQL = {
