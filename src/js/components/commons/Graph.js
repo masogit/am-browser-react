@@ -110,10 +110,10 @@ export default class Graph extends Component {
         chart.warningMessageId = 'cannotRenderOneRecordChart';
         return chart;
       }
-      const sideHidden = (Math.random() + 1).toString(36).substring(7);
+      const escaped = "";
       if(expandedRows.length == 1 && form.type == 'bar') {
-        expandedRows.splice(1, 0, [sideHidden, chart.min || 0]);
-        expandedRows.splice(0, 0, [sideHidden, chart.min || 0]);
+        expandedRows.splice(1, 0, [escaped, chart.min || 0]);
+        expandedRows.splice(0, 0, [escaped, chart.min || 0]);
         chart.valueExpanded = true;
       }
       expandedRows.map((row, i) => {
@@ -122,7 +122,7 @@ export default class Graph extends Component {
         form.series_col.map((seriesIndex, index) => {
           const value = row[seriesIndex] / 1.0;
           const legend = setSeriesItem(seriesIndex, onClick, row, data.header, xAxisLabel, condition);
-          if (legend.label !== sideHidden) {
+          if (legend.label !== escaped) {
             legendSeries[index].push(legend);
           }
           chartsValues[index].push(value);
