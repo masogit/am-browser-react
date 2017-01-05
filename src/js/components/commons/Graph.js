@@ -111,9 +111,16 @@ export default class Graph extends Component {
         return chart;
       }
       const escaped = "";
-      if(expandedRows.length == 1 && form.type == 'bar') {
-        expandedRows.splice(1, 0, [escaped, chart.min || 0]);
-        expandedRows.splice(0, 0, [escaped, chart.min || 0]);
+      if (expandedRows.length == 1 && form.type == 'bar') {
+        let fakeRow = [...expandedRows[0]].map(row => {
+          if (typeof row === 'string') {
+            return escaped;
+          } else if (typeof row === 'number') {
+            return chart.min || 0;
+          }
+        });
+        expandedRows.splice(1, 0, fakeRow);
+        expandedRows.splice(0, 0, fakeRow);
         chart.valueExpanded = true;
       }
       expandedRows.map((row, i) => {
