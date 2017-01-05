@@ -17,7 +17,7 @@ export function sendMessageToSlack(messages) {
     }
   }, err => {
     if (err && err.status == 500) {
-      showWarning('Can not initialize rest client, please check your proxy setting.');
+      showWarning('Cannot initialize rest client, please check your proxy setting.');
     }
   });
 }
@@ -27,7 +27,13 @@ export function getVersionFromLiveNetWork() {
     .then(res => ({
       list: res.body || [],
       err: !res.body && res.text
-    }));
+    }), err => {
+      showWarning('Cannot get version information from live network.');
+      return {
+        list: [],
+        err: 'Cannot get version information from live network.'
+      };
+    });
 }
 
 

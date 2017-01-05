@@ -5,7 +5,7 @@ var config = require('./config');
 var rights = require('./constants').rights;
 var logger = require('./logger');
 var cookiesUtil = require('./cookiesUtil');
-
+var domain = require('domain');
 
 function AMREST() {
   var am = config.rest_conn;
@@ -385,14 +385,22 @@ function live_net_work(req, res) {
     proxyClient = new Client(options_proxy);
   }
 
-  proxyClient.get(url, (data) => {
-    res.json(data).end();
-  }).on('error', function (err) {
-    var errMsg = err.message;
-    if (err.code == 'ECONNRESET') {
-      errMsg = 'Can not connect to live net work(https://hpln.hpe.com)';
-    }
-    logger.error(`[live net work] [${req.sessionID || '-'}]`, errMsg);
-    res.end(errMsg);
+  var d = domain.create();
+  d.on('error', function (err) {
+    logger.error(`[live net work] [${req.sessionID || '-'}]`, err);
+    res.status(500).send(err.toString());
+  });
+
+  d.run(() => {
+    proxyClient.get(url, (data) => {
+      res.json(data).end();
+    }).on('error', function (err) {
+      var errMsg = err.message;
+      if (err.code == 'ECONNRESET') {
+        errMsg = 'Can not connect to live net work(https://hpln.hpe.com)';
+      }
+      logger.error(`[live net work] [${req.sessionID || '-'}]`, errMsg);
+      res.status(500).send(errMsg.toString());
+    });
   });
 }

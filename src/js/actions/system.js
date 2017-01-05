@@ -265,6 +265,9 @@ export function getOnlineUser() {
   return Rest.get(ONLINE_USER_DEF_URL)
     .then(res => {
       return res.body || [];
+    }, err => {
+      showWarning('Cannot get online user information.');
+      return [];
     });
 }
 
