@@ -5,7 +5,7 @@ import subprocess
 
 
 versionConfig = './version.json'
-gitBranch = 'master'
+gitBranch = 'release'
 
 print "--------------read version config file--------------"
 with open(versionConfig, 'r') as f1:
