@@ -95,9 +95,9 @@ if (argv._[0] == 'dev') {
 }
 
 var express;
-//var timestamp = dateformat(new Date(), 'yyyymmddHHMM');
+var timestamp = dateformat(new Date(), 'yyyymmddHHMM');
 //var timestamp = Math.floor(new Date().getTime()/1000);
-var timestamp = new Date().toISOString().substring(0, 10);
+//var timestamp = new Date().toISOString().substring(0, 13);
 //var currentId = (parseInt(version.id)+1).toString();
 var currentId = version.id;
 console.log("currentId is " + currentId);
