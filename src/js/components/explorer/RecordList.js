@@ -16,6 +16,7 @@ import {hash, loadSetting, saveSetting} from '../../util/util';
 import cookies from 'js-cookie';
 import BarCodeEditor from './BarCodeEditor';
 import Reports from '../reports/reports';
+import { isEmpty } from 'lodash';
 
 const getFirstGroupby = (groupby) => {
   if (groupby && groupby.split('|').length > 0)
@@ -393,7 +394,7 @@ export default class RecordList extends ComponentBase {
       return (
         <Box direction="row" key={`icon_${index}`}>
           <Box direction="row" className='orderbyIcon-margin-left' >
-            {!_.isEmpty(this.props.body.orderby) && this._showOrderByIcon(field.sqlname, this.props.body.orderby)}
+            {!isEmpty(this.props.body.orderby) && this._showOrderByIcon(field.sqlname, this.props.body.orderby)}
           </Box>
           <Box direction="row" flex={true}>
             <Anchor key={`a_groupby_${index}`} icon={selected?<RadialSelected />:<Radial />}
@@ -659,7 +660,7 @@ export default class RecordList extends ComponentBase {
           <Box direction='row' className='topology-background-color' pad='small' flex={false} margin={{bottom: 'small'}}>
             {filters.map((filter, index) => (
                 <Box direction='row' key={index}>
-                  {(this.state.param.showTopology && !_.isEmpty(this.state.record)) ?
+                  {(this.state.param.showTopology && !isEmpty(this.state.record)) ?
                       <Box pad={{horizontal: 'small'}}>{filter}
                     </Box>
                   : <Box direction='row'>
