@@ -55,17 +55,24 @@ function vendorWithOverCompliance(vendors) {
 }
 
 export function productInVendor(vendorName) {
-  let aqlStr = `SELECT Brand.Name, sum(dUnusedInstall), sum(dEntitled), count(*) FROM amSoftLicCounter WHERE (bType = 0) AND (bLicUpgrade = 0) AND (dSoftInstallCount> 0)  AND Brand.PK<>0 AND Brand.Company.Name = '${vendorName}' GROUP BY Brand.Name`;
+  let aqlStr = `SELECT Brand.Name, sum(dSoftInstallCount), sum(dLicUseRights), count(*) FROM amSoftLicCounter WHERE (bType = 0) AND (bLicUpgrade = 0) AND (dSoftInstallCount> 0)  AND Brand.PK<>0 AND Brand.Company.Name = '${vendorName}' GROUP BY Brand.Name`;
 
   return aql.queryAQL(aqlStr).then((aqlData) => {
     if (aqlData.rows) {
       let products = aqlData.rows.map((product) => {
-        return {
+        let summary = {
           name: product[0],
-          unused: Number(product[1]),
-          entitled: Number(product[2]),
+          license: Number(product[2]),
+          consumption: Number(product[1]),
           versions: Number(product[3])
         };
+        const balance = Number(product[2]) - Number(product[1]);
+        if (balance >= 0)
+          summary.surplus = balance;
+        else
+          summary.gap = Math.abs(balance);
+
+        return summary;
       });
 
       return products;

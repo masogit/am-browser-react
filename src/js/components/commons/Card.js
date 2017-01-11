@@ -34,12 +34,22 @@ export default class Card extends Component {
     }
 
     const tiles = data.map((record, index) => {
+      let summary = [];
+      body.forEach((row, index) => {
+        if (record[row.value] !== undefined)
+          summary.push(row);
+      });
+
       return (
         <Tile key={`${record[header]}-${index}`} separator="top" colorIndex="light-1" pad="small" size="small" flex={false}>
           <Header>{record[header]}</Header>
           {
-            body.map((row, index) => {
-              return <Box key={index} flex={true} style={this.renderSortStyle(row.value)}>{`${record[row.value]} ${row.label}`}</Box>;
+            summary.map((row, index) => {
+              return (
+                <Box key={index} flex={true} style={this.renderSortStyle(row.value)}>
+                  {record[row.value] !== undefined  ? `${record[row.value]} ${row.label}` : ''}
+                </Box>
+              );
             })
           }
           <Footer justify="between">

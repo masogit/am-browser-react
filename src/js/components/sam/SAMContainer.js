@@ -59,8 +59,10 @@ export default class SAMContainer extends Component {
             conf: {
               header: 'name',
               body: [
-                {label: 'Unused', value: 'unused'},
-                {label: 'Entitled', value: 'entitled'}
+                {label: 'License', value: 'license'},
+                {label: 'Consumption', value: 'consumption'},
+                {label: 'Surplus', value: 'surplus'},
+                {label: 'Gap', value: 'gap'}
               ],
               footer: 'versions'
             },
