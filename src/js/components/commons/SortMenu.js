@@ -11,7 +11,12 @@ export default class SortMenu extends Component {
     };
   }
 
-  componentDidMount() {
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.data.indexOf(this.state.selectedLabel) && nextProps.data != this.props.data) {
+      this.setState({
+        selectedLabel: ''
+      });
+    }
   }
 
   render() {

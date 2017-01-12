@@ -4,6 +4,7 @@ import { Box, Icons } from 'grommet';
 import RecordListLayer from '../explorer/RecordListLayer';
 import Card from '../commons/Card';
 import RecordList from '../explorer/RecordList';
+import SAMBreadCrumb from '../commons/SAMBreadCrumb';
 
 export default class SAMContainer extends Component {
   constructor() {
@@ -13,6 +14,7 @@ export default class SAMContainer extends Component {
     };
     this.renderProduct = this.renderProduct.bind(this);
     this.renderVersion = this.renderVersion.bind(this);
+    this._toOverview = this._toOverview.bind(this);
   }
 
   componentWillMount() {
@@ -49,7 +51,8 @@ export default class SAMContainer extends Component {
         product: null,
         version: null,
         license: null,
-        software: null
+        software: null,
+        itemSelected: []
       }, () => {
         this.setState({
           product: {
@@ -71,13 +74,16 @@ export default class SAMContainer extends Component {
               fontWeight: 'bold',
               fontSize: '120%'
             }
-          }
+          },
+          itemSelected: this._setItemsSelected(name)
         });
       });
     });
   }
 
   renderVersion(selected) {
+    let name = this.state.product.data[selected].name;
+
     let body_license = {
       label: 'Software Counters',
       sqlname: 'amSoftLicCounter',
@@ -112,7 +118,8 @@ export default class SAMContainer extends Component {
       software: null
     }, () => {
       this.setState({
-        license: body_license
+        license: body_license,
+        itemSelected: this._setItemsSelected(name)
       });
     });
 
@@ -183,36 +190,67 @@ export default class SAMContainer extends Component {
     });
   }
 
+  _setItemsSelected(name) {
+    let itemSelected = this.state.itemSelected || [];
+    itemSelected.push(name);
+    return itemSelected;
+  }
+
   _onClose() {
     this.setState({
       software: null
     });
   }
 
-  render() {
+  _toOverview() {
+    this.setState({
+      product: null,
+      software: null,
+      license: null,
+      itemSelected: null
+    });
+  }
+
+  renderContent() {
     const {product, software, vendor, license} = this.state;
     const Spinning = Icons.Spinning;
+
+    let content, level;
+    if(vendor) {
+      level = 0;
+      if(product) {
+        level = 1;
+        if(license) {
+          level = 2;
+          if(software)
+            level = 3;
+        }
+      }
+    }
+
+    switch(level) {
+      case 0: content = <Card {...vendor}/>; break;
+      case 1: content = <Card {...product} className={license ? 'single-line' : ''}/>; break;
+      case 2: content = <RecordList body={license} title="Version" allFields={true} onClick={(record) => this.renderSoftware(record)} root={true}/>; break;
+      case 3: content = (<Box>
+                            <RecordList body={license} title="Version" allFields={true} onClick={(record) => this.renderSoftware(record)} root={true}/>
+                            <RecordListLayer body={software} title="Computer" onClose={this._onClose.bind(this)} allFields={true}/>
+                          </Box>); break;
+      default: content = <Box flex={true} align="center" justify="center"><Spinning /></Box>; break;
+    }
+    return content;
+  }
+
+  render() {
+    const {product, software, vendor, license, itemSelected} = this.state;
+    const data = [].concat(vendor, product, license, software);
+
     return (
-      <Box flex={true} direction="row" align={!product ? 'center' : 'start'} justify={!product ? 'center' : 'start'}>
-        <Box flex={!this.state.product} style={product && {'width': '280px', height: '100%'}} pad={{horizontal: "small"}} className='autoScroll'>
-          {
-            vendor ? <Card {...vendor}/> : <Box flex={true} align="center" justify="center"><Spinning /></Box>
-          }
+      <Box flex={true}>
+        <SAMBreadCrumb hierarchyData = {data} itemSelected={itemSelected} toOverview={() => this._toOverview()}/>
+        <Box flex={true} margin={{horizontal: "medium"}} className='autoScroll' colorIndex='light-2' pad={{horizontal:"small"}}>
+          {this.renderContent()}
         </Box>
-        {
-          product &&
-          <Box flex={true} pad={{horizontal: "small"}} className='autoScroll' style={{height: '100%'}}>
-            <Card {...product} className={license ? 'single-line' : ''}/>
-            {
-              license &&
-              <RecordList body={license} title="Version" allFields={true} onClick={(record) => this.renderSoftware(record)} root={true}/>
-            }
-          </Box>
-        }
-        {
-          software &&
-          <RecordListLayer body={software} title="Computer" onClose={this._onClose.bind(this)} allFields={true}/>
-        }
       </Box>
     );
   }

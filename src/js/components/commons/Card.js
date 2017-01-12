@@ -41,31 +41,37 @@ export default class Card extends Component {
       });
 
       return (
-        <Tile key={`${record[header]}-${index}`} separator="top" colorIndex="light-1" pad="small" size="small" flex={false}>
-          <Header>{record[header]}</Header>
+        <Box key={`tile-${index}`} colorIndex="light-2" margin="small" pad="small">
+        <Tile key={`${record[header]}-${index}`} separator="top" align="stretch" justify="between" colorIndex="light-1" flex={true} pad="small" size="small" onClick={onSelect.bind(this, index)}>
+          <Header size="small" justify="center"><b>{record[header]}</b></Header>
+          <Box pad={{vertical: "small"}}>
           {
             summary.map((row, index) => {
               return (
-                <Box key={index} flex={true} style={this.renderSortStyle(row.value)}>
-                  {record[row.value] !== undefined  ? `${record[row.value]} ${row.label}` : ''}
-                </Box>
+                record[row.value] !== undefined  &&
+                  <Box key={index} style={this.renderSortStyle(row.value)} justify="between" direction="row" >
+                    <Box>{row.label}</Box>
+                    <Box>{record[row.value]}</Box>
+                  </Box>
               );
             })
           }
+          </Box>
           <Footer justify="between">
             <Box>{footer}: {record[footer]}</Box>
           </Footer>
         </Tile>
+        </Box>
       );
     });
 
     return (
       <Box>
-        <Header justify="between">
+        <Header justify="between" margin={{vertical: "small"}} pad={{horizontal: "small"}}>
           <Title>{title}</Title>
           <SortMenu data={body} onSort={this.sort} />
         </Header>
-        <Tiles flush={false} colorIndex="light-2" selectable={true} onSelect={onSelect} className={className}>
+        <Tiles flush={false}  className={className}>
           {tiles}
         </Tiles>
       </Box>
