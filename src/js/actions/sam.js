@@ -2,7 +2,7 @@ import * as aql from './aql';
 // import db from './explorer';
 
 export function vendorWithBrand() {
-  let aqlStr = "SELECT Brand.Company, COUNTDISTINCT(Brand.Name) FROM amSoftLicCounter WHERE (bType = 0) AND (bLicUpgrade = 0) AND (dSoftInstallCount > 0) AND Brand.PK<>0 GROUP BY Brand.Company";
+  let aqlStr = "SELECT Brand.Company, COUNTDISTINCT(Brand.Name) FROM amSoftLicCounter WHERE (bType = 0) AND (bLicUpgrade = 0) AND (dSoftInstallCount > 0 OR dLicUseRights > 0 OR dLicUseRightsUpg > 0) AND Brand.PK<>0 GROUP BY Brand.Company";
 
   return aql.queryAQL(aqlStr).then((aqlData) => {
     if (aqlData.rows) {
@@ -55,7 +55,7 @@ function vendorWithOverCompliance(vendors) {
 }
 
 export function productInVendor(vendorName) {
-  let aqlStr = `SELECT Brand.Name, sum(dSoftInstallCount), sum(dLicUseRights), count(*) FROM amSoftLicCounter WHERE (bType = 0) AND (bLicUpgrade = 0) AND (dSoftInstallCount> 0)  AND Brand.PK<>0 AND Brand.Company.Name = '${vendorName}' GROUP BY Brand.Name`;
+  let aqlStr = `SELECT Brand.Name, sum(dSoftInstallCount), sum(dLicUseRights), count(*) FROM amSoftLicCounter WHERE (bType = 0) AND (bLicUpgrade = 0) AND (dSoftInstallCount> 0 OR dLicUseRights > 0 OR dLicUseRightsUpg > 0)  AND Brand.PK<>0 AND Brand.Company.Name = '${vendorName}' GROUP BY Brand.Name`;
 
   return aql.queryAQL(aqlStr).then((aqlData) => {
     if (aqlData.rows) {
