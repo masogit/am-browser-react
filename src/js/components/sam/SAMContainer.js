@@ -110,7 +110,7 @@ export default class SAMContainer extends Component {
         sqlname: 'SoftInstQuery.memQueryText',
         alias: 'Query'
       }],
-      filter: `dSoftInstallCount> 0 AND Brand.Name='${this.state.product.data[selected].name}'`
+      filter: `(dSoftInstallCount> 0 OR dLicUseRights > 0 OR dLicUseRightsUpg > 0) AND Brand.Name='${this.state.product.data[selected].name}'`
     };
 
     this.setState({
