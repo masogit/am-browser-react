@@ -12,6 +12,7 @@ var csrf = require('csurf');
 var fs = require('fs'), https = require('https'), http = require('http');
 var cors = require('cors');
 var config = require('./config.js');
+var sessionUtil = require('./sessionUtil.js');
 
 // initial AM node server
 var server = config.node_server;
@@ -104,8 +105,13 @@ try {
   logger.warn('[server]', 'HTTPS is not set correctly');
 }
 
+var sessionClearer = setTimeout(function () {
+  sessionUtil.userTracking.get();
+}, config.session_max_age * 2 * 60 * 1000);
+
 var shutdown = function () {
   logger.info('[server]', 'Received kill signal, shut down server.');
+  clearTimeout(sessionClearer);
   process.exit();
 };
 
