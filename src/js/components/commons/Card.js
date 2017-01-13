@@ -19,10 +19,11 @@ export default class Card extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps != this.props) {
+    if (nextProps != this.props && nextProps.title != this.props.title) {
       this.refs.searchInput._inputRef.value = '';
       this.setState({
-        filter: ''
+        filter: '',
+        sortBy: nextProps.sortDefault
       });
     }
   }

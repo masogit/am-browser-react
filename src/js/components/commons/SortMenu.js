@@ -4,19 +4,32 @@ import Sort from 'grommet/components/icons/base/Sort';
 
 export default class SortMenu extends Component {
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+    const {sortDefault, data} = this.props;
     this.state = {
-      selectedLabel: ''
+      selectedLabel: sortDefault ? this.getLabel(data, sortDefault) : ''
     };
   }
 
   componentWillReceiveProps(nextProps) {
-    if(nextProps.data.indexOf(this.state.selectedLabel) && nextProps.data != this.props.data) {
+    if(nextProps.data != this.props.data) {
+      const {sortDefault, data} = nextProps;
+
       this.setState({
-        selectedLabel: ''
+        selectedLabel: sortDefault ? this.getLabel(data, sortDefault) : ''
       });
     }
+  }
+
+  getLabel(propsData, sortDefault) {
+    let label = '';
+    propsData.forEach(data => {
+      if (data.value == sortDefault)
+        label = data.label;
+    });
+
+    return label;
   }
 
   render() {
