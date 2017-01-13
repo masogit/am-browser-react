@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { initAbout, getOnlineUser } from '../../actions/system';
 import { getVersionFromLiveNetWork } from '../../actions/sessionMenu';
+import { HPELN_DOWNLOAD } from '../../constants/ServiceConfig';
 import {
   Box, Header, Table, TableRow, Label, Tabs, Tiles, Tile, Anchor, List, ListItem, Button, Title
 } from 'grommet';
@@ -45,7 +46,7 @@ export default class About extends Component {
   }
 
   _download() {
-    window.open('https://hpln.hpe.com/contentoffering/am-browser', '_blank');
+    window.open(HPELN_DOWNLOAD, '_blank');
   }
 
   getVersions() {

@@ -10,6 +10,7 @@ import SlackDialog from './SlackDialog';
 import AboutDialog from './AboutDialog';
 const {Close, SocialSlack: Slack, Logout, History, CircleInformation: About, Help, User, Archive} = Icons.Base;
 import history from '../../RouteHistory';
+import { AMB_DOCS } from '../../constants/ServiceConfig';
 
 import cookies from 'js-cookie';
 
@@ -69,7 +70,7 @@ class SessionMenu extends Component {
            <Anchor href="#" className="active">Settings</Anchor>
            <Anchor href="#">Help</Anchor>
            */}
-          <Anchor icon={<Help />} href="http://ambrowser.readthedocs.io" target="about:blank" label="Help"/>
+          <Anchor icon={<Help />} href={AMB_DOCS} target="about:blank" label="Help"/>
           {this.props.disabledItems.about && <Anchor icon={<About />} onClick={() => this.showDialog("about")} label="About"/> }
           <Anchor icon={<History />} onClick={() => this.showDialog("history")} label="Message History"/>
           {this.props.disabledItems.slack && <Anchor icon={<Slack />} onClick={() => this.showDialog("slack")} label="Slack"/> }

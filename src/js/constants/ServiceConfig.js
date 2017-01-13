@@ -38,3 +38,9 @@ export const LNW_DEF_URL = "/live-network";
 
 // My Assets
 export const CATEGORY_MY_ASSETS = 'My Assets';
+
+// Document address
+export const AMB_DOCS = "http://docs.software.hpe.com/AMB/1.10/Content/Home.htm"; // 1.0: http://ambrowser.readthedocs.io
+
+// HPELN download
+export const HPELN_DOWNLOAD = "https://hpln.hpe.com/contentoffering/am-browser";
