@@ -43,8 +43,8 @@ export default class SAMContainer extends Component {
     });
   }
 
-  renderProduct(selected) {
-    let name = this.state.vendor.data[selected].name;
+  renderProduct(selectedName) {
+    let name = selectedName;
 
     SAMActions.productInVendor(name).then((products) => {
       this.setState({
@@ -81,8 +81,8 @@ export default class SAMContainer extends Component {
     });
   }
 
-  renderVersion(selected) {
-    let name = this.state.product.data[selected].name;
+  renderVersion(selectedName) {
+    let name = selectedName;
 
     let body_license = {
       label: 'Software Counters',
@@ -110,7 +110,7 @@ export default class SAMContainer extends Component {
         sqlname: 'SoftInstQuery.memQueryText',
         alias: 'Query'
       }],
-      filter: `(dSoftInstallCount> 0 OR dLicUseRights > 0 OR dLicUseRightsUpg > 0) AND Brand.Name='${this.state.product.data[selected].name}'`
+      filter: `(dSoftInstallCount> 0 OR dLicUseRights > 0 OR dLicUseRightsUpg > 0) AND Brand.Name='${name}'`
     };
 
     this.setState({

@@ -45,11 +45,11 @@ export default class SAMBreadCrumb extends Component {
 
     let breadCrumbsContent = breadCrumbs.map((bcrumb, index) => (
         <Box direction="row" key={`bcrumb-${index}`}>
-          <Button label="|" plain={true} />
+          <Button label="/" plain={true} />
           <Menu label={itemSelected[index]}>
             {bcrumb.items.map((item, index) => {
               return (<Anchor key={index} label={item.label} onClick={() => {
-                bcrumb.onSelect(index);
+                bcrumb.onSelect(item.label);
               }} />);
             })}
           </Menu>
@@ -62,7 +62,7 @@ export default class SAMBreadCrumb extends Component {
   render() {
     const {product} = this.state;
     return(
-      <Box direction="row"  pad={{vertical: product ? 'small': "medium"}} justify="start" alignContent="start">
+      <Box direction="row"  pad={{vertical: product ? 'small': "medium"}} justify="start" alignContent="start" margin={{horizontal: "small"}}>
         <Button label="Home" onClick={() => (this.props.toOverview())}
           plain={true}/>
         {this.renderBreadCrumbs()}

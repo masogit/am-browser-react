@@ -1,14 +1,25 @@
 import React, {Component} from 'react';
-import {Box, Header, Title, Footer, Tiles, Tile} from 'grommet';
+import {Box, Header, Title, Footer, Tiles, Tile, Search} from 'grommet';
 import SortMenu from './SortMenu';
 
 export default class Card extends Component {
   constructor() {
     super();
     this.state = {
-      sortBy: ''
+      sortBy: '',
+      filter: ''
     };
     this.sort = this.sort.bind(this);
+    this._onSearch = this._onSearch.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps != this.props) {
+      this.refs.searchInput._inputRef.value = '';
+      this.setState({
+        filter: ''
+      });
+    }
   }
 
   renderSortStyle(sortBy) {
@@ -21,8 +32,15 @@ export default class Card extends Component {
     });
   }
 
+  _onSearch(event) {
+    const value = event.target.value.trim().toLowerCase();
+    this.setState({
+      filter: value
+    });
+  }
+
   render() {
-    let sortBy = this.state.sortBy;
+    let {sortBy, filter} = this.state;
     let {data, className, conf: {footer, header, body}, title, onSelect} = this.props;
 
     if (sortBy) {
@@ -33,7 +51,9 @@ export default class Card extends Component {
       }).reverse();
     }
 
-    const tiles = data.map((record, index) => {
+    const cards = !filter ? data : data.filter((record) => (record[header].toLowerCase().indexOf(filter) > -1));
+
+    const tiles = cards.map((record, index) => {
       let summary = [];
       body.forEach((row, index) => {
         if (record[row.value] !== undefined)
@@ -42,7 +62,7 @@ export default class Card extends Component {
 
       return (
         <Box key={`tile-${index}`} colorIndex="light-2" margin="small" pad="small">
-        <Tile key={`${record[header]}-${index}`} separator="top" align="stretch" justify="between" colorIndex="light-1" flex={true} pad="small" size="small" onClick={onSelect.bind(this, index)}>
+        <Tile key={`${record[header]}-${index}`} separator="top" align="stretch" justify="between" colorIndex="light-1" flex={true} pad="small" size="small" onClick={onSelect.bind(this, record.name)}>
           <Header size="small" justify="center"><b>{record[header]}</b></Header>
           <Box pad={{vertical: "small"}}>
           {
@@ -69,7 +89,10 @@ export default class Card extends Component {
       <Box>
         <Header justify="between" margin={{vertical: "small"}} pad={{horizontal: "small"}}>
           <Title>{title}</Title>
-          <SortMenu data={body} onSort={this.sort} />
+          <Box direction="row">
+            <Search ref="searchInput" inline={true} placeHolder="Type to search" onDOMChange={this._onSearch}/>
+            <SortMenu data={body} onSort={this.sort} />
+          </Box>
         </Header>
         <Tiles flush={false}  className={className}>
           {tiles}
