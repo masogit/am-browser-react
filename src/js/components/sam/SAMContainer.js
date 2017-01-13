@@ -32,6 +32,7 @@ export default class SAMContainer extends Component {
             ],
             footer: 'products'
           },
+          sortDefault: 'nonCompliance',
           sortStyle: {
             color: '#DC2878',
             fontWeight: 'bold',
@@ -69,8 +70,9 @@ export default class SAMContainer extends Component {
               ],
               footer: 'versions'
             },
+            sortDefault: 'gap',
             sortStyle: {
-              color: '#0A64A0',
+              color: '#DC2878',
               fontWeight: 'bold',
               fontSize: '120%'
             }

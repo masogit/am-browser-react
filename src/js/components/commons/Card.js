@@ -13,6 +13,11 @@ export default class Card extends Component {
     this._onSearch = this._onSearch.bind(this);
   }
 
+  componentWillMount() {
+    if (this.props.sortDefault)
+      this.sort(this.props.sortDefault);
+  }
+
   componentWillReceiveProps(nextProps) {
     if (nextProps != this.props) {
       this.refs.searchInput._inputRef.value = '';
@@ -22,8 +27,9 @@ export default class Card extends Component {
     }
   }
 
-  renderSortStyle(sortBy) {
-    return this.state.sortBy == sortBy && this.props.sortStyle;
+
+  renderSortStyle(sortBy, value) {
+    return (this.state.sortBy == sortBy && value > 0) && this.props.sortStyle;
   }
 
   sort(value) {
@@ -69,7 +75,7 @@ export default class Card extends Component {
             summary.map((row, index) => {
               return (
                 record[row.value] !== undefined  &&
-                  <Box key={index} style={this.renderSortStyle(row.value)} justify="between" direction="row" >
+                  <Box key={index} style={this.renderSortStyle(row.value, record[row.value])} justify="between" direction="row" >
                     <Box>{row.label}</Box>
                     <Box>{record[row.value]}</Box>
                   </Box>
@@ -91,7 +97,7 @@ export default class Card extends Component {
           <Title>{title}</Title>
           <Box direction="row">
             <Search ref="searchInput" inline={true} placeHolder="Type to search" onDOMChange={this._onSearch}/>
-            <SortMenu data={body} onSort={this.sort} />
+            <SortMenu data={body} onSort={this.sort} sortDefault={this.state.sortBy}/>
           </Box>
         </Header>
         <Tiles flush={false}  className={className}>
