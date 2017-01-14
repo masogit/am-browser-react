@@ -77,7 +77,7 @@ export default class SAMContainer extends Component {
               fontSize: '120%'
             }
           },
-          itemSelected: this._setItemsSelected(name)
+          itemSelected: this._setItemsSelected(name, 0)
         });
       });
     });
@@ -121,7 +121,7 @@ export default class SAMContainer extends Component {
     }, () => {
       this.setState({
         license: body_license,
-        itemSelected: this._setItemsSelected(name)
+        itemSelected: this._setItemsSelected(name, 1)
       });
     });
 
@@ -192,9 +192,9 @@ export default class SAMContainer extends Component {
     });
   }
 
-  _setItemsSelected(name) {
+  _setItemsSelected(name, index) {
     let itemSelected = this.state.itemSelected || [];
-    itemSelected.push(name);
+    itemSelected[index] = name;
     return itemSelected;
   }
 
