@@ -63,14 +63,12 @@ export default class SAMContainer extends Component {
             conf: {
               header: 'name',
               body: [
-                {label: 'License', value: 'license'},
-                {label: 'Consumption', value: 'consumption'},
-                {label: 'Surplus', value: 'surplus'},
-                {label: 'Gap', value: 'gap'}
+                {label: 'Non-Compliance', value: 'nonCompliance'},
+                {label: 'Over-Compliance', value: 'overCompliance'}
               ],
               footer: 'versions'
             },
-            sortDefault: 'gap',
+            sortDefault: 'nonCompliance',
             sortStyle: {
               color: '#DC2878',
               fontWeight: 'bold',
@@ -87,9 +85,9 @@ export default class SAMContainer extends Component {
     let name = selectedName;
 
     let body_license = {
+      orderby: 'dCompliancyUpg',
       label: 'Software Counters',
       sqlname: 'amSoftLicCounter',
-      // groupby: 'LicType.Name',
       fields: [{
         sqlname: 'Name',
         alias: 'Version'
@@ -100,11 +98,11 @@ export default class SAMContainer extends Component {
         sqlname: 'dSoftInstallCount',
         alias: 'Consumption'
       }, {
-        sqlname: 'dCompliancy',
-        alias: 'Compliancy'
+        sqlname: 'dCompliancyUpg',
+        alias: 'Balance'
       }, {
         sqlname: 'dUnusedInstall',
-        alias: 'Unused'
+        alias: 'Unused Installation'
       }, {
         sqlname: 'SoftInstQuery.TableName',
         alias: 'Table'
