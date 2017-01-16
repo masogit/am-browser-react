@@ -223,6 +223,7 @@ function AMREST() {
   this.logout = function(req, res) {
     logger.info(`[user] [${req.sessionID || '-'}]`, (req.session && req.session.user ? req.session.user : "user") + " logout.");
     const username = req.session.user;
+    sessionUtil.clear(req.session);
     sessionUtil.userTracking.remove(req.session.id);
     req.session.destroy(err => {});
     res.clearCookie('headerNavs');

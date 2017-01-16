@@ -5,10 +5,18 @@ var onlineUsers = {};
 exports.touch = function (session, maxAge) {
   clearTimeout(map[session.id]);
   map[session.id] = setTimeout(function () {
-    delete map[session.id];
+    var id = session.id;
+    delete map[id];
+    delete onlineUsers[id];
     session.destroy();
-    logger.debug(`[user] [${session.id}] session destroyed.`);
+    logger.debug(`[user] [${id}] session destroyed.`);
   }, maxAge * 60 * 1000);
+};
+
+exports.clear = function (session) {
+  var id = session.id;
+  clearTimeout(map[id]);
+  delete map[id];
 };
 
 exports.userTracking = {
@@ -19,7 +27,7 @@ exports.userTracking = {
   },
   remove: function (ipAddress) {
     if (onlineUsers[ipAddress]) {
-      onlineUsers[ipAddress].online = false;
+      delete onlineUsers[ipAddress];
     }
   },
   get: function () {

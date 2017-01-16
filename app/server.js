@@ -31,7 +31,7 @@ app.use(bodyParser.json()); // parse application/json
 app.use(bodyParser.json({type: 'application/vnd.api+json'})); // parse application/vnd.api+json as json
 app.use(methodOverride('X-HTTP-Method-Override')); // override with the X-HTTP-Method-Override header in the request
 app.use(session({
-  resave: true,
+  resave: false,
   saveUninitialized: true,
   secret: config.session_secret
 }));
@@ -105,13 +105,8 @@ try {
   logger.warn('[server]', 'HTTPS is not set correctly');
 }
 
-var sessionClearer = setTimeout(function () {
-  sessionUtil.userTracking.get();
-}, config.session_max_age * 2 * 60 * 1000);
-
 var shutdown = function () {
   logger.info('[server]', 'Received kill signal, shut down server.');
-  clearTimeout(sessionClearer);
   process.exit();
 };
 
