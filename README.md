@@ -1,5 +1,7 @@
 # To run this application, execute the following commands: 
 
+Here is the internal document server: [AM Browser Online Document](https://pages.github.hpe.com/AssetManager/am-browser-doc/)
+
 ## 1. Install NPM modules
     $ cd am-browser
     $ npm install
